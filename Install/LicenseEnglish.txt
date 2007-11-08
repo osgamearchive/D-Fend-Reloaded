@@ -1,0 +1,9 @@
+1.) This is the first release of D-Fend Reloaded. This means: I do not guarantee that its running correctly. The following things are not jet finished:
+
+- Nicer toolbar icons
+- More language files for D-Fend Reloaded (at the moment: English and German)
+- Testing, much testing...
+
+2.) If you don't know much about D-Fend Reloaded and DOSBox you should use the default values on the next two installer pages.
+
+3.) D-Fend Reloaded is open source but I have no homepage at the moment. 

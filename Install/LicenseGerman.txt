@@ -1,0 +1,9 @@
+1.) Dies ist die erste Version von D-Fend Reloaded. D.h. insbesondere, dass ich keinerlei Garantie für die korrekte Funktionsweise übernehme. Die folgenden Punkte sind noch nicht fertig:
+
+- Schönere Symbolleisten Icons
+- Mehr Sprachdateien für D-Fend Reloaded (momentan gibt es nur deutsch und englisch)
+- Testen, ganz viel Testen...
+
+2.) Wenn Sie sich mit D-Fend Reloaded und DOSBox nicht gut auskennen, sollten Sie die Vorgabewerte auf den nächsten beiden Seiten des Installationsassistenten unverändert übernehmen.
+
+3.) D-Fend Reloaded ist open source, aber momentan habe ich noch keine offizielle Homepage.

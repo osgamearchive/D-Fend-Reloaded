@@ -1,0 +1,11 @@
+Used as part of the D-Fend Reloaded source code:
+
+Portable Network Graphics Delphi
+written by Gustavo Daud
+(http://pngdelphi.sourceforge.net/)
+
+Used as binary program by D-Fend Reloaded:
+
+MTOOLs for Bochs and Win32 and/or DOS
+written by Benjamin David Lunt
+(http://www.frontiernet.net/~fys/mtools.htm)
