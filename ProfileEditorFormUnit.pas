@@ -4,7 +4,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, GameDBUnit, StdCtrls, Buttons, ComCtrls, ExtCtrls, Grids, ValEdit;
+  Dialogs, GameDBUnit, StdCtrls, Buttons, ComCtrls, ExtCtrls, Grids, ValEdit,
+  ImgList;
 
 type
   TProfileEditorForm = class(TForm)
@@ -75,6 +76,11 @@ type
     NotesMemo: TRichEdit;
     AutoexecMemo: TRichEdit;
     CustomSetsMemo: TRichEdit;
+    GenerateGameDataFolderNameButton: TBitBtn;
+    ImageList: TImageList;
+    MountingAutoCreateButton: TBitBtn;
+    PreviousButton: TBitBtn;
+    NextButton: TBitBtn;
     procedure OKButtonClick(Sender: TObject);
     procedure ButtonWork(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -103,14 +109,16 @@ type
     Function NextFreeDriveLetter : Char;
   public
     { Public-Deklarationen }
+    MoveStatus : Integer;
     LoadTemplate, Game : TGame;
     GameDB : TGameDB;
+    RestoreLastPosition : Boolean;
   end;
 
 var
   ProfileEditorForm: TProfileEditorForm;
 
-Function EditGameProfil(const AOwner : TComponent; const AGameDB : TGameDB; var AGame : TGame; const ADefaultGame : TGame) : Boolean;
+Function EditGameProfil(const AOwner : TComponent; const AGameDB : TGameDB; var AGame : TGame; const ADefaultGame : TGame; const GameList : TList = nil) : Boolean;
 
 implementation
 
@@ -118,6 +126,8 @@ uses Math, LanguageSetupUnit, VistaToolsUnit, CommonTools, PrgConsts,
      PrgSetupUnit, IconManagerFormUnit, ProfileMountEditorFormUnit;
 
 {$R *.dfm}
+
+var LastPage, LastTop, LastLeft : Integer;
 
 procedure TProfileEditorForm.InitGUI;
 Var St : TStringList;
@@ -127,10 +137,13 @@ begin
   DoubleBuffered:=True;
   SetVistaFonts(self);
 
-  Caption:=LanguageSetup.ProfileEditor;
+  MoveStatus:=0;
 
+  Caption:=LanguageSetup.ProfileEditor;
   OKButton.Caption:=LanguageSetup.OK;
   CancelButton.Caption:=LanguageSetup.Cancel;
+  PreviousButton.Caption:=LanguageSetup.Previous;
+  NextButton.Caption:=LanguageSetup.Next;
 
   {Profile Settings Sheet}
 
@@ -199,6 +212,7 @@ begin
     ItemProps[Strings.Count-1].PickList.Add(RemoveUnderline(LanguageSetup.Yes));
     ItemProps[Strings.Count-1].PickList.Add(RemoveUnderline(LanguageSetup.No));
   end;
+  GenerateGameDataFolderNameButton.Caption:=LanguageSetup.ProfileEditorGenerateGameDataFolder;
   NotesLabel.Caption:=LanguageSetup.GameNotes+':';
 
   { General Sheet }
@@ -347,6 +361,8 @@ begin
   MountingEditButton.Caption:=LanguageSetup.ProfileEditorMountingEdit;
   MountingDelButton.Caption:=LanguageSetup.ProfileEditorMountingDel;
   MountingDeleteAllButton.Caption:=LanguageSetup.ProfileEditorMountingDelAll;
+  MountingDeleteAllButton.Caption:=LanguageSetup.ProfileEditorMountingDelAll;
+  MountingAutoCreateButton.Caption:=LanguageSetup.ProfileEditorMountingAutoCreate;
   L:=MountingListView.Columns.Add; L.Width:=-2; L.Caption:=LanguageSetup.ProfileEditorMountingFolderImage;
   L:=MountingListView.Columns.Add; L.Width:=-2; L.Caption:=LanguageSetup.ProfileEditorMountingAs;
   L:=MountingListView.Columns.Add; L.Width:=-2; L.Caption:=LanguageSetup.ProfileEditorMountingLetter;
@@ -614,6 +630,12 @@ begin
   end else begin
     LoadData;
   end;
+
+  If RestoreLastPosition then begin
+    PageControl.ActivePageIndex:=LastPage;
+    Top:=LastTop;
+    Left:=LastLeft;
+  end;
 end;
 
 procedure TProfileEditorForm.FormDestroy(Sender: TObject);
@@ -639,7 +661,9 @@ begin
     IconName:=Game.Icon;
     LoadIcon;
     with ProfileSettingsValueListEditor.Strings do begin
-      If Game.Name<>'' then ValueFromIndex[0]:=Game.Name;
+      If LoadTemplate=nil then begin
+        If Game.Name<>'' then ValueFromIndex[0]:=Game.Name;
+      end;
       If LoadTemplate<>nil then begin
         ValueFromIndex[1]:=LanguageSetup.ProfileEditorNoFilename;
       end else begin
@@ -657,7 +681,7 @@ begin
       If Game.SetupParameters<>'' then ValueFromIndex[5]:=Game.SetupParameters;
       If Game.LoadFix then ValueFromIndex[6]:=RemoveUnderline(LanguageSetup.Yes) else ValueFromIndex[6]:=RemoveUnderline(LanguageSetup.No);
       ValueFromIndex[7]:=IntToStr(Game.LoadFixMemory);
-      If Game.CaptureFolder<>'' then ValueFromIndex[8]:=Game.CaptureFolder;
+      If Game.CaptureFolder<>'' then ValueFromIndex[8]:=Game.CaptureFolder else ValueFromIndex[8]:=MakeRelPath(IncludeTrailingPathDelimiter(PrgDataDir+CaptureSubDir),PrgSetup.BaseDir);
     end;
     St:=ValueToList(Game.ExtraDirs); try ExtraDirsListBox.Items.AddStrings(St); finally St.Free; end;
     If ExtraDirsListBox.Items.Count>0 then ExtraDirsListBox.ItemIndex:=0;
@@ -690,7 +714,7 @@ begin
       ValueFromIndex[0]:=RemoveUnderline(LanguageSetup.Yes);
       ValueFromIndex[1]:=RemoveUnderline(LanguageSetup.Yes);
       ValueFromIndex[2]:=RemoveUnderline(LanguageSetup.No);
-      ValueFromIndex[3]:=RemoveUnderline(LanguageSetup.No);
+      ValueFromIndex[3]:=RemoveUnderline(LanguageSetup.Yes);
       ValueFromIndex[4]:=RemoveUnderline(LanguageSetup.No);
       ValueFromIndex[5]:=RemoveUnderline(LanguageSetup.Yes);
       ValueFromIndex[6]:='100';
@@ -873,7 +897,7 @@ begin
       If Game.SBMixer then ValueFromIndex[7]:=RemoveUnderline(LanguageSetup.Yes) else ValueFromIndex[7]:=RemoveUnderline(LanguageSetup.No);
     end;
     with SoundGUSValueListEditor.Strings do begin
-      If not Game.GUS then ValueFromIndex[0]:=RemoveUnderline(LanguageSetup.Yes) else ValueFromIndex[0]:=RemoveUnderline(LanguageSetup.No);
+      If Game.GUS then ValueFromIndex[0]:=RemoveUnderline(LanguageSetup.Yes) else ValueFromIndex[0]:=RemoveUnderline(LanguageSetup.No);
       ValueFromIndex[1]:=IntToStr(Game.GUSBase);
       ValueFromIndex[2]:=IntToStr(Game.GUSIRQ1);
       ValueFromIndex[3]:=IntToStr(Game.GUSIRQ2);
@@ -1007,6 +1031,12 @@ Var I : Integer;
     St : TStringList;
     S : String;
 begin
+  Case (Sender as TComponent).Tag of
+    0 : MoveStatus:=0;
+    1 : MoveStatus:=-1;
+    2 : MoveStatus:=1;
+  End;
+
   If Game=nil then begin
     I:=GameDB.Add(ProfileSettingsValueListEditor.Strings.ValueFromIndex[0]);
     Game:=GameDB[I];
@@ -1186,8 +1216,9 @@ begin
 end;
 
 procedure TProfileEditorForm.ButtonWork(Sender: TObject);
-Var S : String;
+Var S,T : String;
     I : Integer;
+    St : TStringList;
 begin
   Case (Sender as TComponent).Tag of
     {Icon}
@@ -1239,6 +1270,21 @@ begin
         end;
     8 : If (Mounting.Count>0) and (Messagedlg(LanguageSetup.ProfileEditorMountingDeleteAllMessage,mtConfirmation,[mbYes,mbNo],0)=mrYes) then begin
           Mounting.Clear;
+          LoadMountingList;
+        end;
+   20 : begin
+          I:=0;
+          while I<Mounting.Count do begin
+            St:=ValueToList(Mounting[I]);
+            try
+              If (St.Count>=3) and (St[2]='C') then begin Mounting.Delete(I); continue; end;
+              inc(I);
+            finally
+              St.Free;
+            end;
+          end;
+          If Mounting.Count<10 then
+            Mounting.Insert(0,MakeRelPath(PrgSetup.GameDir,PrgDataDir)+';Drive;C;false;');
           LoadMountingList;
         end;
     {GenerateScreenshotFolderName}
@@ -1311,7 +1357,17 @@ begin
            end;
          end;
     17 : CustomSetsValueListEditor.Strings.Add('Key=');
-    18 : if (CustomSetsValueListEditor.Row>0) and (CustomSetsValueListEditor.RowCount>2) then CustomSetsValueListEditor.Strings.Delete(CustomSetsValueListEditor.Row-1);         
+    18 : if (CustomSetsValueListEditor.Row>0) and (CustomSetsValueListEditor.RowCount>2) then CustomSetsValueListEditor.Strings.Delete(CustomSetsValueListEditor.Row-1);
+    {GenerateGameDataFolderName}
+    19 : begin
+           If PrgSetup.DataDir='' then S:=PrgSetup.BaseDir else S:=PrgSetup.DataDir;
+           S:=IncludeTrailingPathDelimiter(S)+ProfileSettingsValueListEditor.Strings.ValueFromIndex[0]+'\';
+           T:=MakeRelPath(S,PrgSetup.BaseDir);
+           If T<>'' then GameInfoValueListEditor.Strings.ValueFromIndex[6]:=T;
+           If DirectoryExists(S) then exit;
+           If MessageDlg(Format(LanguageSetup.MessageConfirmationCreateDir,[S]),mtConfirmation,[mbYes,mbNo],0)<>mrYes then exit;
+           ForceDirectories(S);
+         end;
   end;
 end;
 
@@ -1452,18 +1508,58 @@ end;
 
 { global }
 
-Function EditGameProfil(const AOwner : TComponent; const AGameDB : TGameDB; var AGame : TGame; const ADefaultGame : TGame) : Boolean;
+Function EditGameProfilInt(const AOwner : TComponent; const AGameDB : TGameDB; var AGame : TGame; const ADefaultGame : TGame; const PrevButton, NextButton, RestorePos : Boolean) : Integer;
 begin
   ProfileEditorForm:=TProfileEditorForm.Create(AOwner);
+
   try
+    ProfileEditorForm.RestoreLastPosition:=RestorePos;
+    If RestorePos then ProfileEditorForm.Position:=poDesigned;
     ProfileEditorForm.GameDB:=AGameDB;
     ProfileEditorForm.Game:=AGame;
     ProfileEditorForm.LoadTemplate:=ADefaultGame;
-    result:=(ProfileEditorForm.ShowModal=mrOK);
-    if result then AGame:=ProfileEditorForm.Game;
+    ProfileEditorForm.PreviousButton.Visible:=PrevButton;
+    ProfileEditorForm.NextButton.Visible:=NextButton;
+    If ProfileEditorForm.ShowModal=mrOK then begin
+      result:=ProfileEditorForm.MoveStatus;
+      AGame:=ProfileEditorForm.Game;
+      LastPage:=ProfileEditorForm.PageControl.ActivePageIndex;
+      LastTop:=ProfileEditorForm.Top;
+      LastLeft:=ProfileEditorForm.Left;
+    end else begin
+      result:=-2;
+    end;
   finally
     ProfileEditorForm.Free;
   end;
+end;
+
+Function EditGameProfil(const AOwner : TComponent; const AGameDB : TGameDB; var AGame : TGame; const ADefaultGame : TGame; const GameList : TList = nil) : Boolean;
+Var I,J : Integer;
+    PrevButton,NextButton,RestorePos : Boolean;
+begin
+  I:=0; RestorePos:=False;
+  repeat
+    If GameList=nil then begin
+      NextButton:=False;
+      PrevButton:=False;
+    end else begin
+      If I=1 then begin
+        J:=GameList.IndexOf(AGame);
+        If (J>=0) and (J<GameList.Count-1) then AGame:=TGame(GameList[J+1]);
+      end;
+      If I=-1 then begin
+        J:=GameList.IndexOf(AGame);
+        If J>0 then AGame:=TGame(GameList[J-1]);
+      end;
+      J:=GameList.IndexOf(AGame);
+      NextButton:=(J>=0) and (J<GameList.Count-1);
+      PrevButton:=(J>0);
+    end;
+    I:=EditGameProfilInt(AOwner,AGameDB,AGame,ADefaultGame,PrevButton,NextButton,RestorePos);
+    RestorePos:=True;
+  until (I=0) or (I=-2);
+  result:=(I<>-2);
 end;
 
 end.

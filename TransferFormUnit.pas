@@ -45,7 +45,8 @@ Function TransferGames(const AOwner : TComponent; const AGameDB : TGameDB) : Boo
 
 implementation
 
-uses ShlObj, VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgConsts;
+uses ShlObj, VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgConsts,
+     ProgressFormUnit;
 
 {$R *.dfm}
 
@@ -81,7 +82,7 @@ begin
     St.Free;
   end;
 
-  St:=GameDB.GetGenreList;
+  St:=GameDB.GetGenreList(False);
   try
     For I:=0 to St.Count-1 do begin
       M:=TMenuItem.Create(self);
@@ -262,6 +263,14 @@ begin
     if not CopyFiles(S,PrgDataDir,DestDataDir) then exit;
   end;
 
+  S:=Trim(Game.Icon);
+  If (S<>'') and FileExists(PrgDataDir+IconsSubDir+'\'+S) then begin
+    if not CopyFile(PChar(PrgDataDir+IconsSubDir+'\'+S),PChar(DestDataDir+IconsSubDir+'\'+S),False) then begin
+      MessageDlg(Format(LanguageSetup.MessageCouldNotCopyFile,[PrgDataDir+IconsSubDir+'\'+S,DestDataDir+IconsSubDir+'\'+S]),mtError,[mbOK],0); exit;
+      exit;
+    end;
+  end;
+
   S:=Trim(Game.DataDir);
   If S<>'' then begin
     S:=IncludeTrailingPathDelimiter(S);
@@ -287,13 +296,21 @@ end;
 procedure TTransferForm.OKButtonClick(Sender: TObject);
 Var OpMode : TOperationMode;
     DestPrgDataDir : String;
-    I : Integer;
+    I,J : Integer;
 begin
   If not GetOperationMode(OpMode) then begin ModalResult:=mrNone; exit; end;
   if not GetDestPrgDataDir(OpMode,DestPrgDataDir) then begin ModalResult:=mrNone; exit; end;
 
-  For I:=0 to ListBox.Items.Count-1 do If ListBox.Checked[I] then
-    if not TransferGame(TGame(ListBox.Items.Objects[I]),DestPrgDataDir) then begin ModalResult:=mrNone; exit; end;
+  J:=0; For I:=0 to ListBox.Items.Count-1 do If ListBox.Checked[I] then inc(J);
+  InitProgressWindow(self,J);
+  try
+    For I:=0 to ListBox.Items.Count-1 do If ListBox.Checked[I] then begin
+      StepProgressWindow;
+      if not TransferGame(TGame(ListBox.Items.Objects[I]),DestPrgDataDir) then begin ModalResult:=mrNone; exit; end;
+    end;
+  finally
+    DoneProgressWindow;
+  end;
 end;
 
 { global }

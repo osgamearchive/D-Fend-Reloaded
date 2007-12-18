@@ -82,14 +82,14 @@ object BuildInstallerForm: TBuildInstallerForm
     EditLabel.Width = 112
     EditLabel.Height = 13
     EditLabel.Caption = 'Dateiname des Paketes'
-    TabOrder = 3
+    TabOrder = 4
   end
   object OKButton: TBitBtn
     Left = 8
     Top = 516
     Width = 97
     Height = 25
-    TabOrder = 4
+    TabOrder = 7
     OnClick = OKButtonClick
     Kind = bkOK
   end
@@ -98,7 +98,7 @@ object BuildInstallerForm: TBuildInstallerForm
     Top = 516
     Width = 97
     Height = 25
-    TabOrder = 5
+    TabOrder = 8
     Kind = bkCancel
   end
   object InstTypeRadioGroup: TRadioGroup
@@ -119,7 +119,7 @@ object BuildInstallerForm: TBuildInstallerForm
     Width = 376
     Height = 17
     Caption = 'Spiele im Installer nach Generes gruppieren'
-    TabOrder = 7
+    TabOrder = 5
   end
   object SelectGenreButton: TBitBtn
     Tag = 2
@@ -128,7 +128,7 @@ object BuildInstallerForm: TBuildInstallerForm
     Width = 97
     Height = 25
     Caption = 'By Genre'
-    TabOrder = 8
+    TabOrder = 3
     OnClick = SelectButtonClick
   end
   object SaveDialog: TSaveDialog

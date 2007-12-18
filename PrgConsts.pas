@@ -16,7 +16,6 @@ const DosBoxFileName='DOSBOX.EXE';
       CustomConfigsSubDir='CustomConfigs';
       TemplateSubDir='Templates';
 
-
 var MainSetupFile : String;
     OperationModeConfig : String;
 

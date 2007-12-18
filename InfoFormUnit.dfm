@@ -62,10 +62,10 @@ object InfoForm: TInfoForm
       object HomepageLabel: TLabel
         Left = 16
         Top = 136
-        Width = 185
+        Width = 231
         Height = 13
         Cursor = crHandPoint
-        Caption = 'http://www.SorryNoHomepageJet.org'
+        Caption = 'http://sourceforge.net/projects/dfendreloaded/'
         Color = clBtnFace
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clNavy
@@ -103,6 +103,27 @@ object InfoForm: TInfoForm
         ReadOnly = True
         ScrollBars = ssBoth
         TabOrder = 0
+      end
+    end
+    object ChangeLogTabSheet: TTabSheet
+      Caption = 'ChangeLogTabSheet'
+      ImageIndex = 3
+      object ChangeLogMemo: TRichEdit
+        Left = 0
+        Top = 0
+        Width = 569
+        Height = 181
+        Align = alClient
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -11
+        Font.Name = 'Courier New'
+        Font.Style = []
+        ParentFont = False
+        ReadOnly = True
+        ScrollBars = ssBoth
+        TabOrder = 0
+        WordWrap = False
       end
     end
   end

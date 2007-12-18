@@ -8,8 +8,13 @@ uses
   AppEvnts, GameDBUnit;
 
 {
-- Alternativer Profil-Dialog
-- Hotkeys und "Abbrechen" bei engl. Windows ?
+0.2:
+- Game library for autocreate profiles
+- Alternative profile dialog
+- Dialog for changing multiple profiles at once (genre, year, ...)
+- Start at Windows boot
+- Start minimized
+- More options for serial port
 }
 
 type
@@ -102,7 +107,7 @@ type
     MenuHelpDosBox: TMenuItem;
     MenuHelpDosBoxFAQ: TMenuItem;
     MenuHelpDosBoxHotkeys: TMenuItem;
-    MenuHelpDosBoxCompability: TMenuItem;
+    MenuHelpDosBoxCompatibility: TMenuItem;
     MenuHelpAbandonware: TMenuItem;
     N11: TMenuItem;
     MenuHelpAbout: TMenuItem;
@@ -129,6 +134,8 @@ type
     MenuExtrasTransferProfiles: TMenuItem;
     MenuExtrasBuildInstaller: TMenuItem;
     MenuRunRunDosBoxKeyMapper: TMenuItem;
+    MenuHelpDemoCompatibility: TMenuItem;
+    MenuProfileAddFromTemplate: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure TreeViewChange(Sender: TObject; Node: TTreeNode);
@@ -157,12 +164,16 @@ type
   private
     { Private-Deklarationen }
     hChangeNotification : THandle;
+    Procedure StartCaptureChangeNotify;
+    Procedure StopCaptureChangeNotify;
     Procedure LoadMenuLanguage;
     Procedure InitGUI;
     Procedure SelectGame(const AGame : TGame);
     Procedure LoadHelpLinks;
     Procedure ProcessParams;
     Procedure UpdateScreenshotList;
+    Procedure UpdateAddFromTemplateMenu;
+    Procedure AddFromTemplateClick(Sender: TObject);
   public
     { Public-Deklarationen }
     GameDB : TGameDB;
@@ -186,12 +197,13 @@ uses ShellAPI, ClipBrd, Math, PNGImage, CommonTools, LanguageSetupUnit,
 procedure TDFendReloadedMainForm.FormCreate(Sender: TObject);
 begin
   try ForceDirectories(PrgDataDir+CaptureSubDir); except end;
-  hChangeNotification:=FindFirstChangeNotification(PChar(PrgDataDir+CaptureSubDir),True,FILE_NOTIFY_CHANGE_FILE_NAME or FILE_NOTIFY_CHANGE_DIR_NAME or FILE_NOTIFY_CHANGE_ATTRIBUTES or FILE_NOTIFY_CHANGE_SIZE or FILE_NOTIFY_CHANGE_LAST_WRITE or FILE_NOTIFY_CHANGE_SECURITY);
+  StartCaptureChangeNotify;
 
   GameDB:=TGameDB.Create(PrgDataDir+GameListSubDir);
   
   LoadMenuLanguage;
   InitGUI;
+  UpdateAddFromTemplateMenu;
 end;
 
 procedure TDFendReloadedMainForm.FormShow(Sender: TObject);
@@ -223,7 +235,7 @@ end;
 
 procedure TDFendReloadedMainForm.FormDestroy(Sender: TObject);
 begin
-  If hChangeNotification<>INVALID_HANDLE_VALUE then CloseHandle(hChangeNotification);
+  StopCaptureChangeNotify;
   PrgSetup.MainMaximized:=(WindowState=wsMaximized);
   PrgSetup.MainLeft:=Left;
   PrgSetup.MainTop:=Top;
@@ -260,6 +272,7 @@ begin
   MenuRunOpenDosBoxConfig.Caption:=LanguageSetup.MenuRunOpenDosBoxConfig;
   MenuProfile.Caption:=LanguageSetup.MenuProfile;
   MenuProfileAdd.Caption:=LanguageSetup.MenuProfileAdd;
+  MenuProfileAddFromTemplate.Caption:=LanguageSetup.MenuProfileAddFromTemplate;
   MenuProfileAddWithWizard.Caption:=LanguageSetup.MenuProfileAddWithWizard;
   MenuProfileEdit.Caption:=LanguageSetup.MenuProfileEdit;
   MenuProfileCopy.Caption:=LanguageSetup.MenuProfileCopy;
@@ -285,7 +298,8 @@ begin
   MenuHelpDosBoxFAQ.Caption:=LanguageSetup.MenuHelpDosBoxFAQ;
   MenuHelpDosBoxHotkeys.Caption:=LanguageSetup.MenuHelpDosBoxHotkeys;
   MenuHelpDosBoxHotkeysDosbox.Caption:=LanguageSetup.MenuHelpDosBoxHotkeysDosbox;
-  MenuHelpDosBoxCompability.Caption:=LanguageSetup.MenuHelpDosBoxCompability;
+  MenuHelpDosBoxCompatibility.Caption:=LanguageSetup.MenuHelpDosBoxCompatibility;
+  MenuHelpDemoCompatibility.Caption:=LanguageSetup.MenuHelpDemoCompatibility;
   MenuHelpDosBoxIntro.Caption:=LanguageSetup.MenuHelpDosBoxIntro;
   MenuHelpDosBoxIntroDosBox.Caption:=LanguageSetup.MenuHelpDosBoxIntroDosBox;
   MenuHelpDosBoxReadme.Caption:=LanguageSetup.MenuHelpDosBoxReadme;
@@ -389,6 +403,12 @@ begin
       For I:=0 to St.Count-1 do begin
         S:=Trim(St[I]);
         If S='' then continue;
+        If (S='-') or (S='---') then begin
+          M:=TMenuItem.Create(self);
+          M.Caption:='-';
+          MenuHelpAbandonware.Add(M);
+          continue;
+        end;
         If Pos(';',S)=0 then continue;
         M:=TMenuItem.Create(self);
         M.Caption:=Trim(Copy(S,1,Pos(';',S)-1));
@@ -434,6 +454,17 @@ begin
   end;
 
   MessageDlg(Format(LanguageSetup.MessageCouldNotFindGame,[S]),mtError,[mbOK],0);
+end;
+
+procedure TDFendReloadedMainForm.StartCaptureChangeNotify;
+begin
+  hChangeNotification:=FindFirstChangeNotification(PChar(PrgDataDir+CaptureSubDir),True,FILE_NOTIFY_CHANGE_FILE_NAME or FILE_NOTIFY_CHANGE_DIR_NAME or FILE_NOTIFY_CHANGE_ATTRIBUTES or FILE_NOTIFY_CHANGE_SIZE or FILE_NOTIFY_CHANGE_LAST_WRITE or FILE_NOTIFY_CHANGE_SECURITY);
+end;
+
+procedure TDFendReloadedMainForm.StopCaptureChangeNotify;
+begin
+  If hChangeNotification<>INVALID_HANDLE_VALUE then FindCloseChangeNotification(hChangeNotification);
+  hChangeNotification:=INVALID_HANDLE_VALUE;
 end;
 
 procedure TDFendReloadedMainForm.SearchEditChange(Sender: TObject);
@@ -490,7 +521,7 @@ end;
 
 procedure TDFendReloadedMainForm.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
-  If (Key=VK_F2) and (Shift=[]) then MenuWork(MenuProfileAdd);
+  If (Key=VK_F2) and (Shift=[]) then MenuWork(MenuProfileEdit);
 end;
 
 procedure TDFendReloadedMainForm.ListViewDblClick(Sender: TObject);
@@ -575,9 +606,33 @@ begin
   ScreenshotListViewSelectItem(self,ScreenshotListView.Selected,True);
 end;
 
+Procedure TDFendReloadedMainForm.UpdateAddFromTemplateMenu;
+Var TemplateDB : TGameDB;
+    I : Integer;
+    M : TMenuItem;
+begin
+  while MenuProfileAddFromTemplate.Count>0 do MenuProfileAddFromTemplate.Items[0].Free;
+
+  TemplateDB:=TGameDB.Create(PrgDataDir+TemplateSubDir);
+  try
+    MenuProfileAddFromTemplate.Visible:=(TemplateDB.Count>0);
+    For I:=0 to TemplateDB.Count-1 do begin
+      M:=TMenuItem.Create(MenuProfileAddFromTemplate);
+      M.Caption:=TemplateDB[I].Name;
+      M.Tag:=I;
+      M.OnClick:=AddFromTemplateClick;
+      MenuProfileAddFromTemplate.Add(M);
+    end;
+  finally
+    TemplateDB.Free;
+  end;
+end;
+
 procedure TDFendReloadedMainForm.MenuWork(Sender: TObject);
 Var G,DefaultGame : TGame;
     S : String;
+    L : TList;
+    I : Integer;
 begin
   Case (Sender as TComponent).Tag of
     {File}
@@ -731,11 +786,17 @@ begin
              If (ListView.Selected=nil) or (ListView.Selected.Data=nil) then begin
                MessageDlg(LanguageSetup.MessageNoGameSelected,mtError,[mbOK],0); exit;
              end;
-             G:=TGame(ListView.Selected.Data);
-             if not EditGameProfil(self,GameDB,G,nil) then exit;
-             InitTreeViewForGamesList(TreeView,GameDB);
-             TreeViewChange(Sender,TreeView.Selected);
-             SelectGame(G);
+             L:=TList.Create;
+             try
+               For I:=0 to ListView.Items.Count-1 do L.Add(ListView.Items[I].Data);
+               G:=TGame(ListView.Selected.Data);
+               if not EditGameProfil(self,GameDB,G,nil,L) then exit;
+               InitTreeViewForGamesList(TreeView,GameDB);
+               TreeViewChange(Sender,TreeView.Selected);
+               SelectGame(G);
+             finally
+               L.Free;
+             end;
            end;
     4004 : begin
              If (ListView.Selected=nil) or (ListView.Selected.Data=nil) then begin
@@ -745,6 +806,7 @@ begin
              G:=GameDB[GameDB.Add(S)];
              G.AssignFrom(TGame(ListView.Selected.Data));
              G.Name:=S;
+             G.LoadCache;
              InitTreeViewForGamesList(TreeView,GameDB);
              TreeViewChange(Sender,TreeView.Selected);
              SelectGame(G);
@@ -769,7 +831,8 @@ begin
              G:=TGame(ListView.Selected.Data);
              ListView.Selected:=nil;
              ListView.Items.Clear;
-             UninstallGame(self,GameDB,G);
+             StopCaptureChangeNotify;
+             try UninstallGame(self,GameDB,G); finally StartCaptureChangeNotify; end;
              InitTreeViewForGamesList(TreeView,GameDB);
              TreeViewChange(Sender,TreeView.Selected);
            end;
@@ -807,6 +870,7 @@ begin
     5004 : EditDefaultProfile(self,GameDB);
     5005 : begin
              G:=ShowTemplateDialog(self,GameDB);
+             UpdateAddFromTemplateMenu;
              if G=nil then exit;
              ListView.Items.Clear;
              InitTreeViewForGamesList(TreeView,GameDB);
@@ -816,7 +880,8 @@ begin
     5006 : begin
              ListView.Selected:=nil;
              ListView.Items.Clear;
-             UninstallMultipleGames(self,GameDB);
+             StopCaptureChangeNotify;
+             try UninstallMultipleGames(self,GameDB); finally StartCaptureChangeNotify; end;
              InitTreeViewForGamesList(TreeView,GameDB);
              TreeViewChange(Sender,TreeView.Selected);
            end;
@@ -837,8 +902,9 @@ begin
              MessageDlg(Format(LanguageSetup.MessageCouldNotFindFile,[IncludeTrailingPathDelimiter(PrgSetup.DosBoxDir)+DosBoxFileName]),mtError,[mbOK],0);
            end;
     6004 : ShellExecute(Handle,'open',PChar('http://dosbox.sourceforge.net/comp_list.php?letter=a'),nil,nil,SW_SHOW);
-    6005 : ShellExecute(Handle,'open',PChar('http://dosbox.sourceforge.net/wiki/index.php?page=CommandLine'),nil,nil,SW_SHOW);
-    6006 : If FileExists(IncludeTrailingPathDelimiter(PrgSetup.DosBoxDir)+DosBoxFileName) then begin
+    6005 : ShellExecute(Handle,'open',PChar('http://pain.scene.org/service_dosbox.php'),nil,nil,SW_SHOW);
+    6006 : ShellExecute(Handle,'open',PChar('http://dosbox.sourceforge.net/wiki/index.php?page=CommandLine'),nil,nil,SW_SHOW);
+    6007 : If FileExists(IncludeTrailingPathDelimiter(PrgSetup.DosBoxDir)+DosBoxFileName) then begin
              DefaultGame:=TGame.Create(PrgSetup);
              try
                RunCommand(DefaultGame,'intro',True);
@@ -848,9 +914,25 @@ begin
            end else begin
              MessageDlg(Format(LanguageSetup.MessageCouldNotFindFile,[IncludeTrailingPathDelimiter(PrgSetup.DosBoxDir)+DosBoxFileName]),mtError,[mbOK],0);
            end;
-    6007 : ShowInfoDialog(self);
+    6008 : ShowInfoDialog(self);
     6101 : ShellExecute(Handle,'open',PChar(PrgSetup.DosBoxDir+RemoveUnderline((Sender as TMenuItem).Caption)),nil,nil,SW_SHOW);
     6102 : ShellExecute(Handle,'open',PChar((Sender as TMenuItem).Hint),nil,nil,SW_SHOW);
+  end;
+end;
+
+Procedure TDFendReloadedMainForm.AddFromTemplateClick(Sender: TObject);
+Var TemplateDB : TGameDB;
+    G : TGame;
+begin
+  TemplateDB:=TGameDB.Create(PrgDataDir+TemplateSubDir);
+  try
+    G:=nil;
+    EditGameProfil(self,GameDB,G,TemplateDB[(Sender as TComponent).Tag]);
+    InitTreeViewForGamesList(TreeView,GameDB);
+    TreeViewChange(Sender,TreeView.Selected);
+    SelectGame(G);
+  finally
+    TemplateDB.Free;
   end;
 end;
 

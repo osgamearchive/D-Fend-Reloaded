@@ -130,7 +130,9 @@ begin
   end;
   If UseLoadFix then Prefix:='loadfix -'+IntToStr(LoadFixMemory)+' ' else Prefix:='';
   If (not UseLoadFix) and (Trim(ExtUpperCase(ExtractFileExt(ProgramFile)))='.BAT') then Prefix:='call ';
-  St.Add(Prefix+ExtractFileName(ProgramFile)+ProgramParameters)
+  If Trim(ProgramParameters)<>''
+    then St.Add(Prefix+ExtractFileName(ProgramFile)+' '+ProgramParameters)
+    else St.Add(Prefix+ExtractFileName(ProgramFile));
 end;
 
 Function BuildConfFile(const Game : TGame; const RunSetup : Boolean) : TStringList;
@@ -290,12 +292,70 @@ begin
   try result.AddStrings(St); finally St.Free; end;
 end;
 
+Type TCharArray=Array[0..MaxInt-1] of Char;
+     PCharArray=^TCharArray;
+
 Procedure RunDosBox(const ConfFile : String; const DosBoxCommandLine : String ='');
 Var Add : String;
+    PrgFile, Params, Env : String;
+    StartupInfo : TStartupInfo;
+    ProcessInformation : TProcessInformation;
+    I,Size : Integer;
+    P : PCharArray;
+    Q : Array of Char;
 begin
   if PrgSetup.HideDosBoxConsole then Add:=' -NOCONSOLE';
   If DosBoxCommandLine<>'' then Add:=Add+' '+DosBoxCommandLine;
-  ShellExecute(Application.MainForm.Handle,'open',PChar(IncludeTrailingPathDelimiter(PrgSetup.DosBoxDir)+DosBoxFileName),PChar('-CONF '+ConfFile+Add),PChar(IncludeTrailingPathDelimiter((ExtractFilePath(ConfFile)))),SW_SHOW);
+
+  PrgFile:=IncludeTrailingPathDelimiter(PrgSetup.DosBoxDir)+DosBoxFileName;
+  Params:='-CONF '+ConfFile+Add;
+
+  If Trim(ExtUpperCase(PrgSetup.SDLVideodriver))='WINDIB' then begin
+    Env:='SDL_VIDEODRIVER=windib';
+    P:=PCharArray(GetEnvironmentStrings);
+    try
+      Size:=0;
+      For I:=0 to MaxInt-1 do If (P^[I]=#0) and (P^[I+1]=#0) then begin Size:=I+1; break; end;
+      SetLength(Q,Size+length(Env)+1+1);
+      Move(P^[0],Q[0],Size);
+      Move(Env[1],Q[Size],length(Env));
+      Q[Size+length(Env)]:=#0;
+      Q[Size+length(Env)+1]:=#0;
+    finally
+      FreeEnvironmentStrings(PAnsiChar(P));
+    end;
+    P:=@Q[0];
+  end else begin
+    P:=nil;
+  end;
+
+  with StartupInfo do begin
+    cb:=SizeOf(TStartupInfo);
+    lpReserved:=nil;
+    lpDesktop:=nil;
+    lpTitle:=nil;
+    dwFlags:=0;
+    cbReserved2:=0;
+    lpReserved2:=nil;
+  end;
+
+  CreateProcess(
+    PChar(PrgFile),
+    PChar(PrgFile+' '+Params),
+    nil,
+    nil,
+    False,
+    0,
+    P,
+    PChar(TempDir),
+    StartupInfo,
+    ProcessInformation
+  );
+
+  CloseHandle(ProcessInformation.hProcess);
+  CloseHandle(ProcessInformation.hThread);
+
+  //ShellExecute(Application.MainForm.Handle,'open',PChar(IncludeTrailingPathDelimiter(PrgSetup.DosBoxDir)+DosBoxFileName),PChar('-CONF '+ConfFile+Add),PChar(IncludeTrailingPathDelimiter((ExtractFilePath(ConfFile)))),SW_SHOW);
 end;
 
 Procedure RunGame(const Game : TGame; const RunSetup : Boolean; const DosBoxCommandLine : String);

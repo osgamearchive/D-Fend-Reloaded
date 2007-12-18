@@ -120,22 +120,58 @@ begin
   ImageButton.Hint:=LanguageSetup.ChooseFile;
   ImageCreateButton.Hint:=LanguageSetup.ProfileMountingCreateImage;
 
-  For C:='A' to 'Y' do FolderDriveLetterComboBox.Items.Add(C);
-  FolderDriveLetterComboBox.ItemIndex:=2;
-  For C:='A' to 'Y' do FloppyDriveLetterComboBox.Items.Add(C);
-  FloppyDriveLetterComboBox.ItemIndex:=0;
-  For C:='A' to 'Y' do CDROMDriveLetterComboBox.Items.Add(C);
-  CDROMDriveLetterComboBox.ItemIndex:=3;
-  For C:='A' to 'Y' do FloppyImageDriveLetterComboBox.Items.Add(C);
-  FloppyImageDriveLetterComboBox.Items.Add('0');
-  FloppyImageDriveLetterComboBox.Items.Add('1');
-  FloppyImageDriveLetterComboBox.ItemIndex:=0;
-  For C:='A' to 'Y' do CDROMImageDriveLetterComboBox.Items.Add(C);
-  CDROMImageDriveLetterComboBox.ItemIndex:=3;
-  For C:='A' to 'Y' do ImageDriveLetterComboBox.Items.Add(C);
-  ImageDriveLetterComboBox.Items.Add('2');
-  ImageDriveLetterComboBox.Items.Add('3');
-  ImageDriveLetterComboBox.ItemIndex:=3;
+  FolderDriveLetterComboBox.Items.BeginUpdate;
+  try
+    FolderDriveLetterComboBox.Items.Capacity:=30;
+    For C:='A' to 'Y' do FolderDriveLetterComboBox.Items.Add(C);
+    FolderDriveLetterComboBox.ItemIndex:=2;
+  finally
+    FolderDriveLetterComboBox.Items.EndUpdate;
+  end;
+  FloppyDriveLetterComboBox.Items.BeginUpdate;
+  try
+    FloppyDriveLetterComboBox.Items.Capacity:=30;
+    FloppyDriveLetterComboBox.Items.AddStrings(FolderDriveLetterComboBox.Items);
+    FloppyDriveLetterComboBox.ItemIndex:=0;
+  finally
+    FloppyDriveLetterComboBox.Items.EndUpdate;
+  end;
+  CDROMDriveLetterComboBox.Items.BeginUpdate;
+  try
+    CDROMDriveLetterComboBox.Items.Capacity:=30;
+    CDROMDriveLetterComboBox.Items.AddStrings(FolderDriveLetterComboBox.Items);
+    CDROMDriveLetterComboBox.ItemIndex:=3;
+  finally
+    CDROMDriveLetterComboBox.Items.EndUpdate;
+  end;
+  FloppyImageDriveLetterComboBox.Items.BeginUpdate;
+  try
+    FloppyImageDriveLetterComboBox.Items.Capacity:=30;
+    FloppyImageDriveLetterComboBox.Items.AddStrings(FolderDriveLetterComboBox.Items);
+    FloppyImageDriveLetterComboBox.Items.Add('0');
+    FloppyImageDriveLetterComboBox.Items.Add('1');
+    FloppyImageDriveLetterComboBox.ItemIndex:=0;
+  finally
+    FloppyImageDriveLetterComboBox.Items.EndUpdate;
+  end;
+  CDROMImageDriveLetterComboBox.Items.BeginUpdate;
+  try
+    CDROMImageDriveLetterComboBox.Items.Capacity:=30;
+    CDROMImageDriveLetterComboBox.Items.AddStrings(FolderDriveLetterComboBox.Items);
+    CDROMImageDriveLetterComboBox.ItemIndex:=3;
+  finally
+    CDROMImageDriveLetterComboBox.Items.EndUpdate;
+  end;
+  ImageDriveLetterComboBox.Items.BeginUpdate;
+  try
+    ImageDriveLetterComboBox.Items.Capacity:=30;
+    ImageDriveLetterComboBox.Items.AddStrings(FolderDriveLetterComboBox.Items);
+    ImageDriveLetterComboBox.Items.Add('2');
+    ImageDriveLetterComboBox.Items.Add('3');
+    ImageDriveLetterComboBox.ItemIndex:=3;
+  finally
+    ImageDriveLetterComboBox.Items.EndUpdate;
+  end;
 
   ImageGeometryEdit.Text:='512,63,16,142';
 end;

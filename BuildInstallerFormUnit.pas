@@ -89,7 +89,7 @@ begin
     St.Free;
   end;
 
-  St:=GameDB.GetGenreList;
+  St:=GameDB.GetGenreList(False);
   try
     For I:=0 to St.Count-1 do begin
       M:=TMenuItem.Create(self);
@@ -133,7 +133,7 @@ begin
   If Copy(T,1,2)='.\' then T:=Copy(T,3,MaxInt);
   If Copy(T,1,1)='\' then T:=Copy(T,2,MaxInt);
   NSI.Add('  SetOutPath "$DataInstDir\'+T+'"');
-  NSI.Add('  File /nonfatal  /r "'+IncludeTrailingPathDelimiter(S)+'*.*"');
+  NSI.Add('  File /nonfatal /r "'+IncludeTrailingPathDelimiter(S)+'*.*"');
 end;
 Var S : String;
     I : Integer;
@@ -145,7 +145,6 @@ begin
   NSI.Add('Section "'+Game.Name+'"');
   NSI.Add('  SetOutPath "$DataInstDir\Confs"');
   NSI.Add('  File ".\Confs\'+ExtractFileName(Game.SetupFile)+'"');
-  NSI.Add('');
 
 
   S:=Trim(Game.GameExe);
@@ -154,6 +153,12 @@ begin
 
   S:=Trim(Game.CaptureFolder);
   If S<>'' then AddFiles(S);
+
+  S:=Trim(Game.Icon);
+  If (S<>'') and FileExists(PrgDataDir+IconsSubDir+'\'+S) then begin
+    NSI.Add('  SetOutPath "$DataInstDir\'+IconsSubDir+'"');
+    NSI.Add('  File /nonfatal "'+PrgDataDir+IconsSubDir+'\'+S+'"');
+  end;
 
   S:=Trim(Game.DataDir);
   If S<>'' then AddFiles(S);

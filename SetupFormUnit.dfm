@@ -23,7 +23,7 @@ object SetupForm: TSetupForm
     Top = 311
     Width = 97
     Height = 25
-    TabOrder = 0
+    TabOrder = 1
     OnClick = OKButtonClick
     Kind = bkOK
   end
@@ -32,7 +32,7 @@ object SetupForm: TSetupForm
     Top = 311
     Width = 97
     Height = 25
-    TabOrder = 1
+    TabOrder = 2
     Kind = bkCancel
   end
   object PageControl: TPageControl
@@ -41,13 +41,9 @@ object SetupForm: TSetupForm
     Width = 459
     Height = 305
     ActivePage = GeneralSheet
-    TabOrder = 2
+    TabOrder = 0
     object GeneralSheet: TTabSheet
       Caption = 'Allgemein'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object BaseDirButton: TSpeedButton
         Left = 415
         Top = 24
@@ -177,10 +173,6 @@ object SetupForm: TSetupForm
     object LanguageSheet: TTabSheet
       Caption = 'Sprache'
       ImageIndex = 4
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object LanguageLabel: TLabel
         Left = 16
         Top = 16
@@ -201,8 +193,9 @@ object SetupForm: TSetupForm
         Width = 417
         Height = 21
         Style = csDropDownList
-        ItemHeight = 0
+        ItemHeight = 13
         TabOrder = 0
+        OnChange = LanguageComboBoxChange
       end
       object DosBoxLangEditComboBox: TComboBox
         Left = 16
@@ -210,17 +203,13 @@ object SetupForm: TSetupForm
         Width = 417
         Height = 21
         Style = csDropDownList
-        ItemHeight = 0
+        ItemHeight = 13
         TabOrder = 1
       end
     end
     object ListViewSheet: TTabSheet
       Caption = 'Spieleliste'
       ImageIndex = 6
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object ListViewLabel: TLabel
         Left = 14
         Top = 16
@@ -324,10 +313,6 @@ object SetupForm: TSetupForm
     object DosBoxSheet: TTabSheet
       Caption = 'DosBox'
       ImageIndex = 3
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object DosBoxButton: TSpeedButton
         Tag = 3
         Left = 394
@@ -400,6 +385,25 @@ object SetupForm: TSetupForm
         ShowHint = True
         OnClick = ButtonWork
       end
+      object SDLVideodriverLabel: TLabel
+        Left = 16
+        Top = 192
+        Width = 113
+        Height = 18
+        AutoSize = False
+        Caption = 'SDL Videotreiber:'
+      end
+      object SDLVideodriverInfoLabel: TLabel
+        Left = 16
+        Top = 216
+        Width = 417
+        Height = 58
+        AutoSize = False
+        Caption = 
+          'Falls es nicht per Keymapper behebbare Probleme mit der Tastatur' +
+          'belegung gibt, so kann das Umschalten auf "Win DIB" helfen.'
+        WordWrap = True
+      end
       object DosBoxDirEdit: TLabeledEdit
         Left = 16
         Top = 24
@@ -438,14 +442,24 @@ object SetupForm: TSetupForm
         TabOrder = 1
         OnChange = DosBoxDirEditChange
       end
+      object SDLVideoDriverComboBox: TComboBox
+        Left = 117
+        Top = 189
+        Width = 145
+        Height = 21
+        Style = csDropDownList
+        ItemHeight = 13
+        ItemIndex = 0
+        TabOrder = 4
+        Text = 'Direct X (default)'
+        Items.Strings = (
+          'Direct X (default)'
+          'Win DIB')
+      end
     end
     object SecuritySheet: TTabSheet
       Caption = 'Sicherheit'
       ImageIndex = 5
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object DeleteProectionLabel: TLabel
         Left = 40
         Top = 88
@@ -478,10 +492,6 @@ object SetupForm: TSetupForm
     object DefaultValueSheet: TTabSheet
       Caption = 'Vorgabewerte'
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object DefaultValueLabel: TLabel
         Left = 11
         Top = 19
@@ -518,7 +528,7 @@ object SetupForm: TSetupForm
         Width = 145
         Height = 21
         Style = csDropDownList
-        ItemHeight = 0
+        ItemHeight = 13
         TabOrder = 0
         OnChange = DefaultValueComboBoxChange
       end
@@ -535,10 +545,6 @@ object SetupForm: TSetupForm
     object ServiceSheet: TTabSheet
       Caption = 'Upgrade'
       ImageIndex = 2
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object Service1Button: TBitBtn
         Left = 16
         Top = 24

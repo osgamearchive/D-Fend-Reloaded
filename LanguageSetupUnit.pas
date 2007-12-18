@@ -27,7 +27,8 @@ const NR_GlobalOK=10001;
       NR_GlobalSearch=10022;
       NR_GlobalSelect=10023;
       NR_GlobalUnselect=10024;
-
+      NR_GlobalPrevious=10025;
+      NR_GlobalNext=10026;
 
       NR_MessageCouldNotDeleteFile=20001;
       NR_MessageCouldNotDeleteDir=20002;
@@ -36,19 +37,20 @@ const NR_GlobalOK=10001;
       NR_MessageConfirmationDeleteRecord=20005;
       NR_MessageConfirmationDeleteRecordOnly=20006;
       NR_MessageConfirmationDeleteGame=20007;
-      NR_MessageCouldNotSaveFile=20008;
-      NR_MessageCouldNotCopyFile=20009;
-      NR_MessageCouldNotFindDosBox=20010;
-      NR_MessageCouldNotOpenFile=20011;
-      NR_MessageDeleteErrorProtection=20012;
-      NR_MessageDeleteErrorDotDotInPath=20013;
-      NR_MessageCouldNotCreateDir=20014;
-      NR_MessageCouldNotFindGame=20015;
-      NR_MessageConfirmationOverwriteFile=20016;
-      NR_MessageWrongDiskSize=20017;
-      NR_MessageNoFileName=20018;
-      NR_MessageNoInstallationSelected=20019;
-      NR_MessageNoSetupFileFound=20020;
+      NR_MessageConfirmationCreateDir=20008;
+      NR_MessageCouldNotSaveFile=20009;
+      NR_MessageCouldNotCopyFile=20010;
+      NR_MessageCouldNotFindDosBox=20011;
+      NR_MessageCouldNotOpenFile=20012;
+      NR_MessageDeleteErrorProtection=20013;
+      NR_MessageDeleteErrorDotDotInPath=20014;
+      NR_MessageCouldNotCreateDir=20015;
+      NR_MessageCouldNotFindGame=20016;
+      NR_MessageConfirmationOverwriteFile=20017;
+      NR_MessageWrongDiskSize=20018;
+      NR_MessageNoFileName=20019;
+      NR_MessageNoInstallationSelected=20020;
+      NR_MessageNoSetupFileFound=20021;
 
       NR_MenuFile=30001;
       NR_MenuFileImport=30002;
@@ -77,17 +79,18 @@ const NR_GlobalOK=10001;
       NR_MenuRunOpenDosBoxConfig=32006;
       NR_MenuProfile=33001;
       NR_MenuProfileAdd=33002;
-      NR_MenuProfileAddWithWizard=33003;
-      NR_MenuProfileEdit=33004;
-      NR_MenuProfileCopy=33005;
-      NR_MenuProfileCopyTitle=33006;
-      NR_MenuProfileCopyPrompt=33007;
-      NR_MenuProfileDelete=33008;
-      NR_MenuProfileOpenFolder=33009;
-      NR_MenuProfileOpenDataFolder=33010;
-      NR_MenuProfileMarkAsFavorite=33011;
-      NR_MenuProfileCreateShortcut=33012;
-      NR_MenuProfileDeinstall=33013;
+      NR_MenuProfileAddFromTemplate=33003;
+      NR_MenuProfileAddWithWizard=33004;
+      NR_MenuProfileEdit=33005;
+      NR_MenuProfileCopy=33006;
+      NR_MenuProfileCopyTitle=33007;
+      NR_MenuProfileCopyPrompt=33008;
+      NR_MenuProfileDelete=33009;
+      NR_MenuProfileOpenFolder=33010;
+      NR_MenuProfileOpenDataFolder=33011;
+      NR_MenuProfileMarkAsFavorite=33012;
+      NR_MenuProfileCreateShortcut=33013;
+      NR_MenuProfileDeinstall=33014;
       NR_MenuExtras=34001;
       NR_MenuExtrasIconManager=34002;
       NR_MenuExtrasViewLogs=34003;
@@ -105,12 +108,13 @@ const NR_GlobalOK=10001;
       NR_MenuHelpDosBoxFAQ=35003;
       NR_MenuHelpDosBoxHotkeys=35004;
       NR_MenuHelpDosBoxHotkeysDosBox=35005;
-      NR_MenuHelpDosBoxCompability=35006;
-      NR_MenuHelpDosBoxIntro=35007;
-      NR_MenuHelpDosBoxIntroDosBox=35008;
-      NR_MenuHelpDosBoxReadme=35009;
-      NR_MenuHelpAbandonware=35010;
-      NR_MenuHelpAbout=35011;
+      NR_MenuHelpDosBoxCompatibility=35006;
+      NR_MenuHelpDemoCompatibility=35007;
+      NR_MenuHelpDosBoxIntro=35008;
+      NR_MenuHelpDosBoxIntroDosBox=35009;
+      NR_MenuHelpDosBoxReadme=35010;
+      NR_MenuHelpAbandonware=35011;
+      NR_MenuHelpAbout=35012;
       NR_ButtonRun=38001;
       NR_ButtonAdd=38002;
       NR_ButtonEdit=38003;
@@ -151,6 +155,7 @@ const NR_GlobalOK=10001;
       NR_ProfileEditorExtraDirs=41116;
       NR_ProfileEditorGenerateScreenshotFolderName=41117;
       NR_ProfileEditorGameInfoSheet=41201;
+      NR_ProfileEditorGenerateGameDataFolder=41202;
       NR_ProfileEditorGeneralSheet=41301;
       NR_ProfileEditorEnvironmentSheet=41401;
       NR_ProfileEditorMountingSheet=41501;
@@ -158,13 +163,14 @@ const NR_GlobalOK=10001;
       NR_ProfileEditorMountingEdit=41503;
       NR_ProfileEditorMountingDel=41504;
       NR_ProfileEditorMountingDelAll=41505;
-      NR_ProfileEditorMountingFolderImage=41506;
-      NR_ProfileEditorMountingAs=41507;
-      NR_ProfileEditorMountingLetter=41508;
-      NR_ProfileEditorMountingLabel=41509;
-      NR_ProfileEditorMountingIOControl=41510;
-      NR_ProfileEditorMountingDeleteAllMessage=41511;
-      NR_ProfileEditorSoundSheet=41512;
+      NR_ProfileEditorMountingAutoCreate=41506;
+      NR_ProfileEditorMountingFolderImage=41507;
+      NR_ProfileEditorMountingAs=41508;
+      NR_ProfileEditorMountingLetter=41509;
+      NR_ProfileEditorMountingLabel=41510;
+      NR_ProfileEditorMountingIOControl=41511;
+      NR_ProfileEditorMountingDeleteAllMessage=41512;
+      NR_ProfileEditorSoundSheet=41513;
       NR_ProfileEditorSoundEnableSound=41601;
       NR_ProfileEditorSoundSampleRate=41602;
       NR_ProfileEditorSoundBlockSize=41603;
@@ -253,6 +259,8 @@ const NR_GlobalOK=10001;
       NR_SetupFormMinimizeToTray=43106;
       NR_SetupFormLanguage=43201;
       NR_SetupFormDosBoxLang=43202;
+      NR_SetupFormDosBoxSDLVideodriver=43203;
+      NR_SetupFormDosBoxSDLVideodriverInfo=43204;
       NR_SetupFormListViewInfo=43301;
       NR_SetupFormScreenshotPreviewSize=43302;
       NR_SetupFormDosBoxDir=43401;
@@ -297,6 +305,7 @@ const NR_GlobalOK=10001;
       NR_UninstallFormCaptureFolder=46005;
       NR_UninstallFormDataDir=46006;
       NR_UninstallFormExtraDir=46007;
+      NR_UninstallFormIcon=46008;
 
       NR_UninstallSelectForm=47001;
       NR_UninstallSelectFormInfo=47002;
@@ -355,7 +364,8 @@ const NR_GlobalOK=10001;
       NR_InfoFormMain=53002;
       NR_InfoFormLicense=53003;
       NR_InfoFormCompLicense=53004;
-      NR_InfoFormWrittenBy=53005;
+      NR_InfoFormChangeLog=53005;
+      NR_InfoFormWrittenBy=53006;
 
       NR_TransferForm=54001;
       NR_TransferFormInfo=54002;
@@ -372,6 +382,8 @@ const NR_GlobalOK=10001;
       NR_BuildInstallerDestFileFilter=55009;
       NR_BuildInstallerNeedNSIS=55010;
       NR_BuildInstallerPathWarning=55011;
+
+      NR_ProgressFormCaption=56001;
 
       NR_GameName=60001;
       NR_GameSetup=60002;
@@ -453,6 +465,8 @@ Type TLanguageSetup=class(TBasePrgSetup)
     property Search : String index NR_GlobalSearch read GetString write SetString;
     property Select : String index NR_GlobalSelect read GetString write SetString;
     property Unselect : String index NR_GlobalUnselect read GetString write SetString;
+    property Previous : String index NR_GlobalPrevious read GetString write SetString;
+    property Next : String index NR_GlobalNext read GetString write SetString;
 
     property Key : String index NR_GlobalKey read GetString write SetString;
     property Value : String index NR_GlobalValue read GetString write SetString;
@@ -464,6 +478,7 @@ Type TLanguageSetup=class(TBasePrgSetup)
     property MessageConfirmationDeleteRecord : String index NR_MessageConfirmationDeleteRecord read GetString write SetString;
     property MessageConfirmationDeleteRecordOnly : String index NR_MessageConfirmationDeleteRecordOnly read GetString write SetString;
     property MessageConfirmationDeleteGame : String index NR_MessageConfirmationDeleteGame read GetString write SetString;
+    property MessageConfirmationCreateDir : String index NR_MessageConfirmationCreateDir read GetString write SetString;
     property MessageCouldNotSaveFile : String index NR_MessageCouldNotSaveFile read GetString write SetString;
     property MessageCouldNotCopyFile : String index NR_MessageCouldNotCopyFile read GetString write SetString;
     property MessageCouldNotFindDosBox : String index NR_MessageCouldNotFindDosBox read GetString write SetString;
@@ -505,6 +520,7 @@ Type TLanguageSetup=class(TBasePrgSetup)
     property MenuRunOpenDosBoxConfig : String index NR_MenuRunOpenDosBoxConfig read GetString write SetString;
     property MenuProfile : String index NR_MenuProfile read GetString write SetString;
     property MenuProfileAdd : String index NR_MenuProfileAdd read GetString write SetString;
+    property MenuProfileAddFromTemplate : String index NR_MenuProfileAddFromTemplate read GetString write SetString;
     property MenuProfileAddWithWizard : String index NR_MenuProfileAddWithWizard read GetString write SetString;
     property MenuProfileEdit : String index NR_MenuProfileEdit read GetString write SetString;
     property MenuProfileCopy : String index NR_MenuProfileCopy read GetString write SetString;
@@ -533,7 +549,8 @@ Type TLanguageSetup=class(TBasePrgSetup)
     property MenuHelpDosBoxFAQ : String index NR_MenuHelpDosBoxFAQ read GetString write SetString;
     property MenuHelpDosBoxHotkeys : String index NR_MenuHelpDosBoxHotkeys read GetString write SetString;
     property MenuHelpDosBoxHotkeysDosBox : String index NR_MenuHelpDosBoxHotkeysDosBox read GetString write SetString;
-    property MenuHelpDosBoxCompability : String index NR_MenuHelpDosBoxCompability read GetString write SetString;
+    property MenuHelpDosBoxCompatibility : String index NR_MenuHelpDosBoxCompatibility read GetString write SetString;
+    property MenuHelpDemoCompatibility : String index NR_MenuHelpDemoCompatibility read GetString write SetString;
     property MenuHelpDosBoxIntro : String index NR_MenuHelpDosBoxIntro read GetString write SetString;
     property MenuHelpDosBoxIntroDosBox : String index NR_MenuHelpDosBoxIntroDosBox read GetString write SetString;
     property MenuHelpDosBoxReadme : String index NR_MenuHelpDosBoxReadme read GetString write SetString;
@@ -579,6 +596,7 @@ Type TLanguageSetup=class(TBasePrgSetup)
     property ProfileEditorExtraDirs : String index NR_ProfileEditorExtraDirs read GetString write SetString;
     property ProfileEditorGenerateScreenshotFolderName : String index NR_ProfileEditorGenerateScreenshotFolderName read GetString write SetString;
     property ProfileEditorGameInfoSheet : String index NR_ProfileEditorGameInfoSheet read GetString write SetString;
+    property ProfileEditorGenerateGameDataFolder : String index NR_ProfileEditorGenerateGameDataFolder read GetString write SetString;
     property ProfileEditorGeneralSheet : String index NR_ProfileEditorGeneralSheet read GetString write SetString;
     property ProfileEditorEnvironmentSheet : String index NR_ProfileEditorEnvironmentSheet read GetString write SetString;
     property ProfileEditorMountingSheet : String index NR_ProfileEditorMountingSheet read GetString write SetString;
@@ -586,6 +604,7 @@ Type TLanguageSetup=class(TBasePrgSetup)
     property ProfileEditorMountingEdit : String index NR_ProfileEditorMountingEdit read GetString write SetString;
     property ProfileEditorMountingDel : String index NR_ProfileEditorMountingDel read GetString write SetString;
     property ProfileEditorMountingDelAll : String index NR_ProfileEditorMountingDelAll read GetString write SetString;
+    property ProfileEditorMountingAutoCreate : String index NR_ProfileEditorMountingAutoCreate read GetString write SetString;
     property ProfileEditorMountingFolderImage : String index NR_ProfileEditorMountingFolderImage read GetString write SetString;
     property ProfileEditorMountingAs : String index NR_ProfileEditorMountingAs read GetString write SetString;
     property ProfileEditorMountingLetter : String index NR_ProfileEditorMountingLetter read GetString write SetString;
@@ -686,6 +705,9 @@ Type TLanguageSetup=class(TBasePrgSetup)
     property SetupFormDosBoxMapperFileTitle : String index NR_SetupFormDosBoxMapperFileTitle read GetString write SetString;
     property SetupFormDosBoxMapperFileFilter : String index NR_SetupFormDosBoxMapperFileFilter read GetString write SetString;
     property SetupFormDosBoxLang : String index NR_SetupFormDosBoxLang read GetString write SetString;
+    property SetupFormDosBoxSDLVideodriver : String index NR_SetupFormDosBoxSDLVideodriver read GetString write SetString;
+    property SetupFormDosBoxSDLVideodriverInfo : String index NR_SetupFormDosBoxSDLVideodriverInfo read GetString write SetString;
+
     property SetupFormListViewInfo : String index NR_SetupFormListViewInfo read GetString write SetString;
     property SetupFormScreenshotPreviewSize : String index NR_SetupFormScreenshotPreviewSize read GetString write SetString;
     property SetupFormHideDosBoxConsole : String index NR_SetupFormHideDosBoxConsole read GetString write SetString;
@@ -725,6 +747,7 @@ Type TLanguageSetup=class(TBasePrgSetup)
     property UninstallFormCaptureFolder : String index NR_UninstallFormCaptureFolder read GetString write SetString;
     property UninstallFormDataDir : String index NR_UninstallFormDataDir read GetString write SetString;
     property UninstallFormExtraDir : String index NR_UninstallFormExtraDir read GetString write SetString;
+    property UninstallFormIcon : String index NR_UninstallFormIcon read GetString write SetString;
 
     property UninstallSelectForm : String index NR_UninstallSelectForm read GetString write SetString;
     property UninstallSelectFormInfo : String index NR_UninstallSelectFormInfo read GetString write SetString;
@@ -783,6 +806,7 @@ Type TLanguageSetup=class(TBasePrgSetup)
     property InfoFormMain : String index NR_InfoFormMain read GetString write SetString;
     property InfoFormLicense : String index NR_InfoFormLicense read GetString write SetString;
     property InfoFormCompLicense : String index NR_InfoFormCompLicense read GetString write SetString;
+    property InfoFormChangeLog : String index NR_InfoFormChangeLog read GetString write SetString;
     property InfoFormWrittenBy : String index NR_InfoFormWrittenBy read GetString write SetString;
 
     property TransferForm : String index NR_TransferForm read GetString write SetString;
@@ -800,6 +824,8 @@ Type TLanguageSetup=class(TBasePrgSetup)
     property BuildInstallerDestFileFilter : String index NR_BuildInstallerDestFileFilter read GetString write SetString;
     property BuildInstallerNeedNSIS : String index NR_BuildInstallerNeedNSIS read GetString write SetString;
     property BuildInstallerPathWarning : String index NR_BuildInstallerPathWarning read GetString write SetString;
+    
+    property ProgressFormCaption : String index NR_ProgressFormCaption read GetString write SetString;
 
     property GameName : String index NR_GameName read GetString write SetString;
     property GameSetup : String index NR_GameSetup read GetString write SetString;
@@ -899,6 +925,8 @@ begin
   AddStringRec(NR_GlobalSearch,'Global','Search','Search');
   AddStringRec(NR_GlobalSelect,'Global','Select','Select');
   AddStringRec(NR_GlobalUnselect,'Global','Unselect','Unselect');
+  AddStringRec(NR_GlobalPrevious,'Global','Previous','Previous');
+  AddStringRec(NR_GlobalNext,'Global','Next','Next');
 
   AddStringRec(NR_MessageCouldNotDeleteFile,'Messages','CouldNotDeleteFile','Could not delete file %s.');
   AddStringRec(NR_MessageCouldNotDeleteDir,'Messages','CouldNotDeleteFile','Could not delete folder %s.');
@@ -907,6 +935,7 @@ begin
   AddStringRec(NR_MessageConfirmationDeleteRecord,'Messages','ConfirmationDeleteRecord','Do you really want to delete %s ?');
   AddStringRec(NR_MessageConfirmationDeleteRecordOnly,'Messages','ConfirmationDeleteRecordOnly','Do you really want to delete %s ? (Only the list-record will be deleted. No game-files on hard disk will be deleted.)');
   AddStringRec(NR_MessageConfirmationDeleteGame,'Messages','ConfirmationDeleteGame','Do you really want to delete %s including all game-files on hard disk ?');
+  AddStringRec(NR_MessageConfirmationCreateDir,'Messages','ConfirmationCreateDir','Directory %s does not exists. Do you want to create this directory now ?');
   AddStringRec(NR_MessageCouldNotSaveFile,'Messages','CouldNotSaveFile','Could not write to file %s.');
   AddStringRec(NR_MessageCouldNotCopyFile,'Messages','CouldNotCopyFile','Could not copy %s to %s.');
   AddStringRec(NR_MessageCouldNotFindDosBox,'Messages','CouldNotFindDosBox','DosBox does not exists at: %s');
@@ -948,6 +977,7 @@ begin
   AddStringRec(NR_MenuRunOpenDosBoxConfig,'Menu','Run.OpenDosBoxConfig','Open DosBox-&Config');
   AddStringRec(NR_MenuProfile,'Menu','Profile','&Profile');
   AddStringRec(NR_MenuProfileAdd,'Menu','Profile.Add','&Add...');
+  AddStringRec(NR_MenuProfileAddFromTemplate,'Menu','Profile.AddFromTemplate','Add from &template');
   AddStringRec(NR_MenuProfileAddWithWizard,'Menu','Profile.AddWithWizard','&Add with wizard...');
   AddStringRec(NR_MenuProfileEdit,'Menu','Profile.Edit','&Edit...');
   AddStringRec(NR_MenuProfileCopy,'Menu','Profile.Copy','&Copy...');
@@ -976,7 +1006,8 @@ begin
   AddStringRec(NR_MenuHelpDosBoxFAQ,'Menu','Help.DosBox.FAQ','&FAQ (Webpage)');
   AddStringRec(NR_MenuHelpDosBoxHotkeys,'Menu','Help.DosBox.Hotkeys','&Hotkeys (Webpage)');
   AddStringRec(NR_MenuHelpDosBoxHotkeysDosbox,'Menu','Help.DosBox.Hotkeys.DosBox','&Hotkeys (DosBox)');
-  AddStringRec(NR_MenuHelpDosBoxCompability,'Menu','Help.DosBox.Compability','Compability list (Webpage)');
+  AddStringRec(NR_MenuHelpDosBoxCompatibility,'Menu','Help.DosBox.Compatibility','Compatibility list (Webpage)');
+  AddStringRec(NR_MenuHelpDemoCompatibility,'Menu','Help.DosBox.DemoCompatibility','Demo compatibility list (Webpage)');
   AddStringRec(NR_MenuHelpDosBoxIntro,'Menu','Help.DosBox.Intro','Introduction (Webpage)');
   AddStringRec(NR_MenuHelpDosBoxIntroDosBox,'Menu','Help.DosBox.Intro.DosBox','Introduction (DosBox)');
   AddStringRec(NR_MenuHelpDosBoxReadme,'Menu','Help.DosBox.Readme','Manual');
@@ -1023,6 +1054,7 @@ begin
   AddStringRec(NR_ProfileEditorExtraDirs,'ProfileEditorForm','ExtraDirs','Additional program folders (will be deleted when game is deinstalled):');
   AddStringRec(NR_ProfileEditorGenerateScreenshotFolderName,'ProfileEditorForm','GenerateScreenshotFolderName','Set default screenshot folder');
   AddStringRec(NR_ProfileEditorGameInfoSheet,'ProfileEditorForm','GameInfoSheet','Program information');
+  AddStringRec(NR_ProfileEditorGenerateGameDataFolder,'ProfileEditorForm','GenerateGameDataFolder','Create default game data folder');
   AddStringRec(NR_ProfileEditorGeneralSheet,'ProfileEditorForm','GeneralSheet','DosBox settings');
   AddStringRec(NR_ProfileEditorEnvironmentSheet,'ProfileEditorForm','EnvironmentSheet','Environment');
   AddStringRec(NR_ProfileEditorMountingSheet,'ProfileEditorForm','MountingSheet','Drives');
@@ -1030,6 +1062,7 @@ begin
   AddStringRec(NR_ProfileEditorMountingEdit,'ProfileEditorForm','Mounting.Edit','&Edit...');
   AddStringRec(NR_ProfileEditorMountingDel,'ProfileEditorForm','Mounting.Del','&Delete');
   AddStringRec(NR_ProfileEditorMountingDelAll,'ProfileEditorForm','Mounting.DelAll','Delete &all');
+  AddStringRec(NR_ProfileEditorMountingAutoCreate,'ProfileEditorForm','Mounting.AutoCreate','Auto &create');
   AddStringRec(NR_ProfileEditorMountingFolderImage,'ProfileEditorForm','Mounting.FolderImage','Folder / Image');
   AddStringRec(NR_ProfileEditorMountingAs,'ProfileEditorForm','Mounting.As','as');
   AddStringRec(NR_ProfileEditorMountingLetter,'ProfileEditorForm','Mounting.Letter','Letter');
@@ -1125,6 +1158,8 @@ begin
   AddStringRec(NR_SetupFormMinimizeToTray,'SetupForm','MinimizeToTray','Minimize to tray area');
   AddStringRec(NR_SetupFormLanguage,'SetupForm','ProgramLanguage','Program language');
   AddStringRec(NR_SetupFormDosBoxLang,'SetupForm','DosBoxLanguage','DosBox language file');
+  AddStringRec(NR_SetupFormDosBoxSDLVideodriver,'SetupForm','DosBoxVideoDriver','SDL Videodriver:');
+  AddStringRec(NR_SetupFormDosBoxSDLVideodriverInfo,'SetupForm','DosBoxVideoDriverInfo','Setting the SDL videodriver to "Win DIB" may solve keyboard problems.');
   AddStringRec(NR_SetupFormListViewInfo,'SetupForm','ListViewInfo','Visible colums and order:');
   AddStringRec(NR_SetupFormScreenshotPreviewSize,'SetupForm','ScreenshotPreviewSize','Screenshot preview size:');
   AddStringRec(NR_SetupFormDosBoxDir,'SetupForm','DosBoxDir','DosBox folder');
@@ -1169,6 +1204,7 @@ begin
   AddStringRec(NR_UninstallFormCaptureFolder,'DeinstallGame','CaptureFolder','Screenshot folder');
   AddStringRec(NR_UninstallFormDataDir,'DeinstallGame','DataDir','Data folder');
   AddStringRec(NR_UninstallFormExtraDir,'DeinstallGame','ExtraDir','Additional folder');
+  AddStringRec(NR_UninstallFormIcon,'DeinstallGame','Icon','Icon file');
 
   AddStringRec(NR_UninstallSelectForm,'DeinstallSelectGame','Caption','Deinstall programs');
   AddStringRec(NR_UninstallSelectFormInfo,'DeinstallSelectGame','Info','Please select the programs to deinstall:');
@@ -1227,6 +1263,7 @@ begin
   AddStringRec(NR_InfoFormMain,'InfoForm','MainSheet','Info');
   AddStringRec(NR_InfoFormLicense,'InfoForm','LicenseSheet','License');
   AddStringRec(NR_InfoFormCompLicense,'InfoForm','CompLicenseSheet','Used components');
+  AddStringRec(NR_InfoFormChangeLog,'InfoForm','ChangeLogSheet','Change log');
   AddStringRec(NR_InfoFormWrittenBy,'InfoForm','WrittenBy','written by');
 
   AddStringRec(NR_TransferForm,'TransferForm','Caption','Transfer programs to another D-Fend Reloaded installation');
@@ -1244,6 +1281,8 @@ begin
   AddStringRec(NR_BuildInstallerDestFileFilter,'BuildInstaller','PackageFileName.Filter','Program files (*.exe)|*.exe|All files (*.*)|*.*');
   AddStringRec(NR_BuildInstallerNeedNSIS,'BuildInstaller','NeedNSIS','NSIS is needed to build EXE-installer packages. NSIS is open source and can be loaded from http://nsis.sourceforge.net.');
   AddStringRec(NR_BuildInstallerPathWarning,'BuildInstaller','PathWarning','The NSI script can only be compiled when its in %s. Do you really want to save the script in %s ?');
+
+  AddStringRec(NR_ProgressFormCaption,'ProgressForm','Caption','Please wait...');
 
   AddStringRec(NR_GameName,'GameSetup','Name','Name');
   AddStringRec(NR_GameSetup,'GameSetup','Setup','Setup');

@@ -122,6 +122,7 @@ begin
     ListView.Items.Clear;
     AddGamesToList(ListView,ListViewImageList,ListViewIconImageList,ImageList,TemplateDB,RemoveUnderline(LanguageSetup.All),'','',True);
     SelectGame(G);
+    If (ListView.Selected=nil) and (ListView.Items.Count>0) then ListView.Selected:=ListView.Items[0]; 
   finally
     ListView.Items.EndUpdate;
   end;
@@ -156,6 +157,8 @@ procedure TTemplateForm.ButtonWork(Sender: TObject);
 Var G, DefaultGame : TGame;
     P : TPoint;
     S : String;
+    L : TList;
+    I : Integer;
 begin
   Case (Sender as TComponent).Tag of
     0 : Close;
@@ -171,10 +174,16 @@ begin
           If (ListView.Selected=nil) or (ListView.Selected.Data=nil) then begin
             MessageDlg(LanguageSetup.MessageNoGameSelected,mtError,[mbOK],0); exit;
           end;
-          G:=TGame(ListView.Selected.Data);
-          if not EditGameProfil(self,TemplateDB,G,nil) then exit;
-          LoadList;
-          SelectGame(G);
+          L:=TList.Create;
+          try
+            For I:=0 to ListView.Items.Count-1 do L.Add(ListView.Items[I].Data);
+            G:=TGame(ListView.Selected.Data);
+            if not EditGameProfil(self,TemplateDB,G,nil,L) then exit;
+            LoadList;
+            SelectGame(G);
+          finally
+            L.Free;
+          end;
         end;
     4 : begin
           If (ListView.Selected=nil) or (ListView.Selected.Data=nil) then begin
@@ -218,6 +227,7 @@ begin
         end;
     8 : begin
           DefaultGame:=SelectProfile(self,GameDB);
+          If DefaultGame=nil then exit;
           G:=nil;
           if not EditGameProfil(self,TemplateDB,G,DefaultGame) then exit;
           LoadList;

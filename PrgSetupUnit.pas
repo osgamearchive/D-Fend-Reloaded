@@ -31,6 +31,7 @@ Type TPrgSetup=class(TBasePrgSetup)
     property ColOrder : String index 7 read GetString write SetString;
     property ColVisible : String index 8 read GetString write SetString;
     property ListViewStyle : String index 9 read GetString write SetString;
+    property SDLVideodriver : String index 10 read GetString write SetString;
 
     property AskBeforeDelete : Boolean index 0 read GetBoolean write SetBoolean;
     property ReopenLastProfileEditorTab : Boolean index 1 read GetBoolean write SetBoolean;
@@ -80,6 +81,7 @@ begin
   AddStringRec(7,'ProgramSets','ColOrder','123456');
   AddStringRec(8,'ProgramSets','ColVisible','111111');
   AddStringRec(9,'ProgramSets','ILVS','List');
+  AddStringRec(10,'ProgramSets','SDLVideodriver','DirectX');
 
   AddBooleanRec(0,'ProgramSets','AskBeforeDelete',True);
   AddBooleanRec(1,'ProgramSets','ShowLastTab',False);

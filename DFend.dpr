@@ -31,7 +31,8 @@ uses
   CreateImageUnit in 'CreateImageUnit.pas' {CreateImageForm},
   InfoFormUnit in 'InfoFormUnit.pas' {InfoForm},
   TransferFormUnit in 'TransferFormUnit.pas' {TransferForm},
-  BuildInstallerFormUnit in 'BuildInstallerFormUnit.pas' {BuildInstallerForm};
+  BuildInstallerFormUnit in 'BuildInstallerFormUnit.pas' {BuildInstallerForm},
+  ProgressFormUnit in 'ProgressFormUnit.pas' {ProgressForm};
 
 {$R *.res}
 

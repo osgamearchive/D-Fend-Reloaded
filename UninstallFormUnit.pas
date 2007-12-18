@@ -35,12 +35,14 @@ var
 
 Function UninstallGame(const AOwner : TComponent; const AGameDB : TGameDB; const AGame : TGame) : Boolean;
 
-Function DeleteDir(const Dir: String) : Boolean;
+Function DeleteSingleFile(const FileName: String; var ContinueNext : Boolean) : Boolean;
+Function DeleteDir(const Dir: String; var ContinueNext : Boolean) : Boolean;
 Function UsedByOtherGame(const GameDB : TGameDB; const Game : TGame; Dir: String): Boolean;
+Function IconUsedByOtherGame(const GameDB : TGameDB; const Game : TGame; Icon: String): Boolean;
 
 implementation
 
-uses VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgSetupUnit;
+uses VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgSetupUnit, PrgConsts;
 
 {$R *.dfm}
 
@@ -62,6 +64,7 @@ procedure TUninstallForm.FormShow(Sender: TObject);
 Var S : String;
     St : TStringList;
     I : Integer;
+    B : Boolean;
 begin
   DirList:=TStringList.Create;
 
@@ -81,6 +84,13 @@ begin
     S:=ExtractFilePath(MakeAbsPath(IncludeTrailingPathDelimiter(S),PrgSetup.BaseDir));
     ListBox.Items.Add(LanguageSetup.UninstallFormCaptureFolder+': '+S);
     DirList.Add(S);
+  end;
+
+  S:=Trim(Game.Icon);
+  If (S<>'') and FileExists(PrgDataDir+IconsSubDir+'\'+S) and (not IconUsedByOtherGame(GameDB,Game,S)) then begin
+    S:=PrgDataDir+IconsSubDir+'\'+S;
+    ListBox.Items.Add(LanguageSetup.UninstallFormIcon+': '+S);
+    DirList.AddObject(S,TObject(1));
   end;
 
   S:=Trim(Game.DataDir);
@@ -109,9 +119,18 @@ end;
 
 procedure TUninstallForm.OKButtonClick(Sender: TObject);
 Var I : Integer;
+    ContinueNext : Boolean;
 begin
-  For I:=1 to ListBox.Count-1 do If ListBox.Checked[I] then
-    If not DeleteDir(DirList[I]) then exit;
+  SetCurrentDir(PrgDataDir);
+
+  For I:=1 to ListBox.Count-1 do If ListBox.Checked[I] then begin
+    If Integer(DirList.Objects[I])<>0 then begin
+      If (not DeleteSingleFile(DirList[I],ContinueNext)) and (not ContinueNext) then exit;
+
+    end else begin
+      If (not DeleteDir(DirList[I],ContinueNext)) and (not ContinueNext) then exit;
+    end;
+  end;
 
   If ListBox.Checked[0] then GameDB.Delete(Game);
 end;
@@ -141,11 +160,30 @@ begin
   end;
 end;
 
-Function DeleteDir(const Dir: String) : Boolean;
+Function DeleteSingleFile(const FileName: String; var ContinueNext : Boolean) : Boolean;
+begin
+  result:=False;
+  repeat
+    if not DeleteFile(FileName) then begin
+      Case MessageDlg(Format(LanguageSetup.MessageCouldNotDeleteFile,[FileName])+#13+#13+SysErrorMessage(GetLastError),mtError,[mbAbort,mbRetry,mbIgnore],0) of
+        mrIgnore : begin ContinueNext:=True; exit; end;
+        mrRetry : ;
+        else exit;
+      End;
+    end else begin
+      break;
+    end;
+  until False;
+  result:=True;
+end;
+
+
+Function DeleteDir(const Dir: String; var ContinueNext : Boolean) : Boolean;
 Var Rec : TSearchRec;
     I : Integer;
 begin
   result:=False;
+  ContinueNext:=False;
 
   If not DirectoryExists(Dir) then begin result:=True; exit; end;
 
@@ -164,13 +202,10 @@ begin
     while I=0 do begin
       if (Rec.Attr and faDirectory)=faDirectory then begin
         If Rec.Name[1]<>'.' then begin
-          if not DeleteDir(Dir+Rec.Name+'\') then exit;
+          if not DeleteDir(Dir+Rec.Name+'\',ContinueNext) then exit;
         end;
       end else begin
-        if not DeleteFile(Dir+Rec.Name) then begin
-          MessageDlg(Format(LanguageSetup.MessageCouldNotDeleteFile,[Dir+Rec.Name]),mtError,[mbOK],0);
-          exit;
-        end;
+        if not DeleteSingleFile(Dir+Rec.Name,ContinueNext) then exit;
       end;
       I:=FindNext(Rec);
     end;
@@ -178,12 +213,20 @@ begin
     FindClose(Rec);
   end;
 
-  if not RemoveDir(Dir) then begin
-    MessageDlg(Format(LanguageSetup.MessageCouldNotDeleteDir,[Dir])+#13+#13+SysErrorMessage(GetLastError),mtError,[mbOK],0);
-    exit;
-  end;
+  repeat
+    if not RemoveDir(Dir) then begin
+      Case MessageDlg(Format(LanguageSetup.MessageCouldNotDeleteDir,[Dir])+#13+#13+SysErrorMessage(GetLastError),mtError,[mbAbort,mbRetry,mbIgnore],0) of
+        mrIgnore : begin ContinueNext:=True; exit; end;
+        mrRetry : ;
+        else exit;
+      End;
+    end else begin
+      break;
+    end;
+  until False;
 
   result:=True;
+  ContinueNext:=True;
 end;
 
 Function UsedByOtherGame(const GameDB : TGameDB; const Game : TGame; Dir: String): Boolean;
@@ -217,6 +260,16 @@ begin
   end;
 
   result:=False;
+end;
+
+Function IconUsedByOtherGame(const GameDB : TGameDB; const Game : TGame; Icon: String): Boolean;
+Var I : Integer;
+    S : String;
+begin
+  result:=False;
+  S:=Trim(ExtUpperCase(Icon));
+  For I:=0 to GameDB.Count-1 do If GameDB[I]<>Game then
+    If Trim(ExtUpperCase(GameDB[I].Icon))=S then begin result:=False; exit; end;
 end;
 
 end.

@@ -27,10 +27,6 @@ object WizardForm: TWizardForm
     OnChange = PageControlChange
     object BaseSheet: TTabSheet
       Caption = 'Basiseinstellungen'
-      ExplicitLeft = 8
-      ExplicitTop = 16
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object GamesFolderButton: TSpeedButton
         Left = 359
         Top = 144
@@ -249,10 +245,6 @@ object WizardForm: TWizardForm
     object InfoSheet: TTabSheet
       Caption = 'Programminformationen'
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 281
-      ExplicitHeight = 165
       object NotesLabel: TLabel
         Left = 12
         Top = 205
@@ -283,10 +275,6 @@ object WizardForm: TWizardForm
     object SystemSheet: TTabSheet
       Caption = 'Systemeinstellungen'
       ImageIndex = 2
-      ExplicitLeft = 0
-      ExplicitTop = 28
-      ExplicitWidth = 281
-      ExplicitHeight = 165
       object CPULabel: TLabel
         Left = 16
         Top = 152

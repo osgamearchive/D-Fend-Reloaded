@@ -38,7 +38,7 @@ Function UninstallMultipleGames(const AOwner : TComponent; const AGameDB : TGame
 implementation
 
 uses VistaToolsUnit, LanguageSetupUnit, UninstallFormUnit, CommonTools,
-     PrgSetupUnit, PrgConsts;
+     PrgSetupUnit, PrgConsts, ProgressFormUnit;
 
 {$R *.dfm}
 
@@ -77,7 +77,7 @@ begin
     St.Free;
   end;
 
-  St:=GameDB.GetGenreList;
+  St:=GameDB.GetGenreList(False);
   try
     For I:=0 to St.Count-1 do begin
       M:=TMenuItem.Create(self);
@@ -118,52 +118,68 @@ Var I,J : Integer;
     S : String;
     G : TGame;
     St : TStringList;
+    ContinueNext : Boolean;
 begin
-  For I:=0 to ListBox.Items.Count-1 do If ListBox.Checked[I] then begin
-    G:=TGame(ListBox.Items.Objects[I]);
+  SetCurrentDir(PrgDataDir);
+  
+  J:=0; For I:=0 to ListBox.Items.Count-1 do If ListBox.Checked[I] then inc(J);
+  InitProgressWindow(self,J);
+  try
+    For I:=0 to ListBox.Items.Count-1 do If ListBox.Checked[I] then begin
+      G:=TGame(ListBox.Items.Objects[I]);
 
-    if ActionsRadioGroup.ItemIndex=3 then begin
-      if not UninstallGame(self,GameDB,G) then exit;
-      continue;
-    end;
+      StepProgressWindow;
 
-    If ActionsRadioGroup.ItemIndex>0 then begin
-      S:=Trim(G.GameExe);
-      If S='' then S:=Trim(G.SetupExe);
-      If (S<>'') and (not UsedByOtherGame(GameDB,G,S)) then begin
-        S:=ExtractFilePath(MakeAbsPath(S,PrgSetup.BaseDir));
-        if not DeleteDir(S) then exit;
-      end;
-    end;
-
-    If ActionsRadioGroup.ItemIndex>1 then begin
-      S:=Trim( G.CaptureFolder);
-      If (S<>'') and (not UsedByOtherGame(GameDB,G,IncludeTrailingPathDelimiter(S))) then begin
-        S:=ExtractFilePath(MakeAbsPath(IncludeTrailingPathDelimiter(S),PrgSetup.BaseDir));
-        if not DeleteDir(S) then exit;
+      if ActionsRadioGroup.ItemIndex=3 then begin
+        if not UninstallGame(self,GameDB,G) then exit;
+        continue;
       end;
 
-      S:=Trim(G.DataDir);
-      If (S<>'') and (not UsedByOtherGame(GameDB,G,IncludeTrailingPathDelimiter(S))) then begin
-        S:=ExtractFilePath(MakeAbsPath(IncludeTrailingPathDelimiter(S),PrgSetup.BaseDir));
-        if not DeleteDir(S) then exit;
-      end;
-
-      S:=Trim(G.ExtraDirs);
-      If S<>'' then begin
-        St:=ValueToList(S);
-        try
-          For J:=0 to St.Count-1 do If (Trim(St[J])<>'') and (not UsedByOtherGame(GameDB,G,IncludeTrailingPathDelimiter(St[J]))) then begin
-            S:=ExtractFilePath(MakeAbsPath(IncludeTrailingPathDelimiter(St[J]),PrgSetup.BaseDir));
-            if not DeleteDir(S) then exit;
-          end;
-        finally
-          St.Free;
+      If ActionsRadioGroup.ItemIndex>0 then begin
+        S:=Trim(G.GameExe);
+        If S='' then S:=Trim(G.SetupExe);
+        If (S<>'') and (not UsedByOtherGame(GameDB,G,S)) then begin
+          S:=ExtractFilePath(MakeAbsPath(S,PrgSetup.BaseDir));
+          if (not DeleteDir(S,ContinueNext)) and (not ContinueNext) then exit;
         end;
       end;
-    end;
 
-    GameDB.Delete(G);
+      If ActionsRadioGroup.ItemIndex>1 then begin
+        S:=Trim(G.CaptureFolder);
+        If (S<>'') and (not UsedByOtherGame(GameDB,G,IncludeTrailingPathDelimiter(S))) then begin
+          S:=ExtractFilePath(MakeAbsPath(IncludeTrailingPathDelimiter(S),PrgSetup.BaseDir));
+          if (not DeleteDir(S,ContinueNext)) and (not ContinueNext) then exit;
+        end;
+
+        S:=Trim(G.Icon);
+        If (S<>'') and FileExists(PrgDataDir+IconsSubDir+'\'+S) and (not IconUsedByOtherGame(GameDB,G,S)) then begin
+          If not DeleteSingleFile(PrgDataDir+IconsSubDir+'\'+S,ContinueNext) then exit;
+        end;
+
+        S:=Trim(G.DataDir);
+        If (S<>'') and (not UsedByOtherGame(GameDB,G,IncludeTrailingPathDelimiter(S))) then begin
+          S:=ExtractFilePath(MakeAbsPath(IncludeTrailingPathDelimiter(S),PrgSetup.BaseDir));
+          if (not DeleteDir(S,ContinueNext)) and (not ContinueNext) then exit;
+        end;
+
+        S:=Trim(G.ExtraDirs);
+        If S<>'' then begin
+          St:=ValueToList(S);
+          try
+            For J:=0 to St.Count-1 do If (Trim(St[J])<>'') and (not UsedByOtherGame(GameDB,G,IncludeTrailingPathDelimiter(St[J]))) then begin
+              S:=ExtractFilePath(MakeAbsPath(IncludeTrailingPathDelimiter(St[J]),PrgSetup.BaseDir));
+              if (not DeleteDir(S,ContinueNext)) and (not ContinueNext) then exit;
+            end;
+          finally
+            St.Free;
+          end;
+        end;
+      end;
+
+      GameDB.Delete(G);
+    end;
+  finally
+    DoneProgressWindow;
   end;
 end;
 

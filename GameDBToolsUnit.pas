@@ -47,14 +47,14 @@ Var N,N2 : TTreeNode;
 begin
   try
     N:=ATreeView.Items.AddChild(nil,Name);
-    N.ImageIndex:=10;
-    N.SelectedIndex:=10;
+    N.ImageIndex:=12;
+    N.SelectedIndex:=12;
     For I:=0 to St.Count-1 do begin
       S:=St[I];
       If S='' then S:=LanguageSetup.NotSet;
       N2:=ATreeView.Items.AddChild(N,S);
-      N2.ImageIndex:=-1;
-      N2.SelectedIndex:=-1;
+      N2.ImageIndex:=10;
+      N2.SelectedIndex:=10;
     end
   finally
     St.Free;

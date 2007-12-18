@@ -22,7 +22,7 @@ object ProfileMountEditorForm: TProfileMountEditorForm
     Top = 271
     Width = 97
     Height = 25
-    TabOrder = 0
+    TabOrder = 1
     OnClick = OKButtonClick
     Kind = bkOK
   end
@@ -31,7 +31,7 @@ object ProfileMountEditorForm: TProfileMountEditorForm
     Top = 271
     Width = 97
     Height = 25
-    TabOrder = 1
+    TabOrder = 2
     Kind = bkCancel
   end
   object PageControl: TPageControl
@@ -41,7 +41,7 @@ object ProfileMountEditorForm: TProfileMountEditorForm
     Height = 255
     ActivePage = FolderSheet
     Images = ImageList
-    TabOrder = 2
+    TabOrder = 0
     object FolderSheet: TTabSheet
       Caption = 'Folder as HD-Drive'
       object FolderButton: TSpeedButton
@@ -169,7 +169,7 @@ object ProfileMountEditorForm: TProfileMountEditorForm
       end
     end
     object CDROMSheet: TTabSheet
-      Caption = 'Real CD-Drive'
+      Caption = 'CD-Drive'
       ImageIndex = 2
       object CDROMButton: TSpeedButton
         Tag = 2

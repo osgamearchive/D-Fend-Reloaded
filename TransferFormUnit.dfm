@@ -76,7 +76,7 @@ object TransferForm: TTransferForm
     Top = 398
     Width = 97
     Height = 25
-    TabOrder = 3
+    TabOrder = 5
     OnClick = OKButtonClick
     Kind = bkOK
   end
@@ -85,7 +85,7 @@ object TransferForm: TTransferForm
     Top = 398
     Width = 97
     Height = 25
-    TabOrder = 4
+    TabOrder = 6
     Kind = bkCancel
   end
   object DestPrgDirEdit: TLabeledEdit
@@ -96,7 +96,7 @@ object TransferForm: TTransferForm
     EditLabel.Width = 190
     EditLabel.Height = 13
     EditLabel.Caption = 'Programmverzeichnis der Zielinstallation'
-    TabOrder = 5
+    TabOrder = 4
   end
   object SelectGenreButton: TBitBtn
     Tag = 2
@@ -105,7 +105,7 @@ object TransferForm: TTransferForm
     Width = 97
     Height = 25
     Caption = 'By Genre'
-    TabOrder = 6
+    TabOrder = 3
     OnClick = SelectButtonClick
   end
   object PopupMenu: TPopupMenu

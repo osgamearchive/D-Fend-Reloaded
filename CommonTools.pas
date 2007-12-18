@@ -137,7 +137,7 @@ end;
 Function TempDir : String;
 begin
   SetLength(result,255);
-  GetTempPath(250,PChaR(result));
+  GetTempPath(250,PChar(result));
   SetLength(result,StrLen(PChar(result)));
   result:=IncludeTrailingPathDelimiter(result);
 end;

@@ -284,7 +284,7 @@ Type TGameDB=class
     Function Delete(const AGame : TGame) : Boolean; overload;
     Function IndexOf(const AGame : TGame) : Integer; overload;
     Function IndexOf(const AGame : String) : Integer; overload;
-    Function GetGenreList : TStringList;
+    Function GetGenreList(WithDefaultProfile : Boolean =True) : TStringList;
     Function GetDeveloperList : TStringList;
     Function GetPublisherList : TStringList;
     Function GetYearList : TStringList;
@@ -379,7 +379,7 @@ begin
   AddStringRec(NR_SetupParameters,'Extra','SetupParameters','');
   AddBooleanRec(NR_LoadFix,'Extra','Loadhigh',False);
   AddIntegerRec(NR_LoadFixMemory,'Extra','LoadFixVal',64);
-  AddStringRec(NR_CaptureFolder,'dosbox','captures','');
+  AddStringRec(NR_CaptureFolder,'dosbox','captures','.\'+CaptureSubDir+'\');
   AddStringRec(NR_ExtraDirs,'Extra','ExtraDirs','');
 
   AddStringRec(NR_Genre,'ExtraInfo','Genre','');
@@ -395,7 +395,7 @@ begin
   AddBooleanRec(NR_CloseDosBoxAfterGameExit,'Extra','CloseOnExit',True);
   AddBooleanRec(NR_StartFullscreen,'sdl','fullscreen',True);
   AddBooleanRec(NR_AutoLockMouse,'sdl','autolock',False);
-  AddBooleanRec(NR_UseDoublebuffering,'sdl','fulldouble',False);
+  AddBooleanRec(NR_UseDoublebuffering,'sdl','fulldouble',True);
   AddBooleanRec(NR_AspectCorrection,'render','aspect',False);
   AddBooleanRec(NR_UseScanCodes,'sdl','usecancodes',True);
   AddIntegerRec(NR_MouseSensitivity,'sdl','sensitivity',100);
@@ -409,7 +409,7 @@ begin
   AddBooleanRec(NR_XMS,'dos','xms',True);
   AddBooleanRec(NR_EMS,'dos','ems',True);
   AddBooleanRec(NR_UMB,'dos','umb',True);
-  AddStringRec(NR_Core,'cpu','core','normal');
+  AddStringRec(NR_Core,'cpu','core','auto');
   AddStringRec(NR_Cycles,'cpu','cycles','3000');
   AddIntegerRec(NR_CyclesUp,'cpu','cyclesup',500);
   AddIntegerRec(NR_CyclesDown,'cpu','cyclesdown',20);
@@ -656,8 +656,7 @@ begin
   end;
 end;
 
-
-function TGameDB.GetGenreList: TStringList;
+function TGameDB.GetGenreList(WithDefaultProfile : Boolean): TStringList;
 Var StUpper : TStringList;
     I : Integer;
     S : String;
@@ -665,7 +664,7 @@ begin
   result:=TStringList.Create;
   StUpper:=TStringList.Create;
   try
-    For I:=0 to FGameList.Count-1 do begin
+    For I:=0 to FGameList.Count-1 do If WithDefaultProfile or (TGame(FGameList[I]).Name<>DosBoxDOSProfile) then begin
       S:=ExtUpperCase(TGame(FGameList[I]).CacheGenre);
       If StUpper.IndexOf(S)<0 then begin
         StUpper.Add(S);

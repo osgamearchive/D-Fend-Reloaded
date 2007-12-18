@@ -63,7 +63,7 @@ object CreateConfForm: TCreateConfForm
     EditLabel.Width = 48
     EditLabel.Height = 13
     EditLabel.Caption = 'FolderEdit'
-    TabOrder = 1
+    TabOrder = 4
   end
   object SelectAllButton: TBitBtn
     Left = 16
@@ -71,7 +71,7 @@ object CreateConfForm: TCreateConfForm
     Width = 97
     Height = 25
     Caption = 'SelectAllButton'
-    TabOrder = 2
+    TabOrder = 1
     OnClick = SelectButtonClick
   end
   object SelectNoneButton: TBitBtn
@@ -81,7 +81,7 @@ object CreateConfForm: TCreateConfForm
     Width = 97
     Height = 25
     Caption = 'SelectNoneButton'
-    TabOrder = 3
+    TabOrder = 2
     OnClick = SelectButtonClick
   end
   object OKButton: TBitBtn
@@ -89,7 +89,7 @@ object CreateConfForm: TCreateConfForm
     Top = 401
     Width = 97
     Height = 25
-    TabOrder = 4
+    TabOrder = 5
     OnClick = OKButtonClick
     Kind = bkOK
   end
@@ -98,7 +98,27 @@ object CreateConfForm: TCreateConfForm
     Top = 401
     Width = 97
     Height = 25
-    TabOrder = 5
+    TabOrder = 6
     Kind = bkCancel
+  end
+  object SelectGenreButton: TBitBtn
+    Tag = 2
+    Left = 222
+    Top = 305
+    Width = 97
+    Height = 25
+    Caption = 'By Genre'
+    TabOrder = 3
+    OnClick = SelectButtonClick
+  end
+  object PopupMenu: TPopupMenu
+    Left = 328
+    Top = 304
+    object MenuSelect: TMenuItem
+      Caption = '&Select'
+    end
+    object MenuUnselect: TMenuItem
+      Caption = '&Unselect'
+    end
   end
 end

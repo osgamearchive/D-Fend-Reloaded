@@ -20,6 +20,8 @@ type
     CompLicenseMemo: TRichEdit;
     LicenseMemo: TRichEdit;
     HomepageLabel: TLabel;
+    ChangeLogTabSheet: TTabSheet;
+    ChangeLogMemo: TRichEdit;
     procedure FormShow(Sender: TObject);
     procedure HomepageLabelClick(Sender: TObject);
   private
@@ -47,12 +49,14 @@ begin
   MainSheet.Caption:=LanguageSetup.InfoFormMain;
   LicenseSheet.Caption:=LanguageSetup.InfoFormLicense;
   CompLicenseSheet.Caption:=LanguageSetup.InfoFormCompLicense;
+  ChangeLogTabSheet.Caption:=LanguageSetup.InfoFormChangeLog;
   VersionLabel.Caption:=GetFileVersionAsString+' ('+GetFileDateAsString+')';
   WrittenByLabel.Caption:=LanguageSetup.InfoFormWrittenBy+' Alexander Herzog';
-  eMailLabel.Caption:='Alexander dot Herzog at gmx dot de';
+  eMailLabel.Caption:='alexanderherzog at users dot sourceforge dot net';
 
   try LicenseMemo.Lines.LoadFromFile(PrgDir+'License.txt'); except end;
   try CompLicenseMemo.Lines.LoadFromFile(PrgDir+'LicenseComponents.txt'); except end;
+  try ChangeLogMemo.Lines.LoadFromFile(PrgDir+'ChangeLog.txt'); except end;
 end;
 
 procedure TInfoForm.HomepageLabelClick(Sender: TObject);

@@ -1,5 +1,3 @@
-;TODO: http://nsis.sourceforge.net/External_License_file
-
 ; NSI SCRIPT FOR D-FEND RELOADED
 ; ============================================================
 
@@ -18,7 +16,7 @@
 
 !define VER_MAYOR 0
 !define VER_MINOR1 1
-!define VER_MINOR2 0
+!define VER_MINOR2 1
 
 !define PrgName "D-Fend Reloaded ${VER_MAYOR}.${VER_MINOR1}.${VER_MINOR2}"
 OutFile "D-Fend-Reloaded-${VER_MAYOR}.${VER_MINOR1}.${VER_MINOR2}-Setup.exe"
@@ -144,6 +142,7 @@ Section "$(LANGNAME_DFendReloaded)" ID_DFend
   File "..\License.txt"
   File "..\LicenseComponents.txt"
   File "..\Links.txt"
+  File "..\ChangeLog.txt"
   File "..\Readme_OperationMode.txt"
   
   SetOutPath "$DataInstDir"
@@ -157,9 +156,11 @@ Section "$(LANGNAME_DFendReloaded)" ID_DFend
   SetOutPath "$INSTDIR\Lang"
   File "..\Lang\*.ini"  
   
+  SetOutPath "$DataInstDir\Templates"
+  File "..\Templates\*.prof"
+  
   CreateDirectory "$DataInstDir\GameData"
-  CreateDirectory "$DataInstDir\IconLibrary"  
-  CreateDirectory "$DataInstDir\Templates"
+  CreateDirectory "$DataInstDir\IconLibrary"
   CreateDirectory "$DataInstDir\VirtualHD"
 
   ClearErrors
@@ -186,6 +187,7 @@ Section "$(LANGNAME_DFendReloaded)" ID_DFend
   CreateShortCut "$SMPROGRAMS\D-Fend Reloaded\$(LANGNAME_DFendReloaded).lnk" "$INSTDIR\DFend.exe"
   CreateShortCut "$SMPROGRAMS\D-Fend Reloaded\$(LANGNAME_Uninstall).lnk" "$INSTDIR\Uninstall.exe"
   CreateShortCut "$SMPROGRAMS\D-Fend Reloaded\$(LANGNAME_GamesFolder).lnk" "$DataInstDir\VirtualHD"
+  CreateShortCut "$SMPROGRAMS\D-Fend Reloaded\$(LANGNAME_GameDataFolder).lnk" "$DataInstDir\GameData"
   
   IntCmp $InstallDataType 2 NoDFendStartMenuLinks
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\D-Fend Reloaded" "DisplayName" "${PrgName} ($(LANGNAME_Deinstall))"

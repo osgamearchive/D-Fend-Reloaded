@@ -62,6 +62,9 @@ type
     DosBoxMapperEdit: TLabeledEdit;
     DosBoxMapperButton: TSpeedButton;
     DosBoxTxtOpenDialog: TOpenDialog;
+    SDLVideodriverLabel: TLabel;
+    SDLVideoDriverComboBox: TComboBox;
+    SDLVideodriverInfoLabel: TLabel;
     procedure OKButtonClick(Sender: TObject);
     procedure ButtonWork(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -73,10 +76,13 @@ type
     procedure DosBoxDirEditChange(Sender: TObject);
     procedure ListViewMoveButtonClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
+    procedure LanguageComboBoxChange(Sender: TObject);
   private
     { Private-Deklarationen }
+    JustLoading : Boolean;
     DosBoxLang : TStringList;
     LastIndex : Integer;
+    Procedure InitGUI;
   public
     { Public-Deklarationen }
     GameDB : TGameDB;
@@ -97,6 +103,7 @@ uses Math, LanguageSetupUnit, PrgSetupUnit, VistaToolsUnit, CommonTools,
 procedure TSetupForm.FormCreate(Sender: TObject);
 begin
   DosBoxLang:=TStringList.Create;
+  JustLoading:=False;
 end;
 
 procedure TSetupForm.FormDestroy(Sender: TObject);
@@ -119,17 +126,8 @@ begin
   PrgSetup.ColOrder:=O;
 end;
 
-procedure TSetupForm.FormShow(Sender: TObject);
-Var S,T : String;
-    I,J,Nr : Integer;
-    Rec : TSearchRec;
-    B : Boolean;
+procedure TSetupForm.InitGUI;
 begin
-  DoubleBuffered:=True;
-  SetVistaFonts(self);
-
-  { Init GUI }
-
   Caption:=LanguageSetup.SetupForm;
   GeneralSheet.Caption:=LanguageSetup.SetupFormGeneralSheet;
   LanguageSheet.Caption:=LanguageSetup.SetupFormLanguageSheet;
@@ -167,6 +165,8 @@ begin
   FindDosBoxButton.Hint:=LanguageSetup.SetupFormSearchDosBox;
   HideDosBoxConsoleCheckBox.Caption:=LanguageSetup.SetupFormHideDosBoxConsole;
   MinimizeDFendCheckBox.Caption:=LanguageSetup.SetupFormMinimizeDFend;
+  SDLVideodriverLabel.Caption:=LanguageSetup.SetupFormDosBoxSDLVideodriver;
+  SDLVideodriverInfoLabel.Caption:=LanguageSetup.SetupFormDosBoxSDLVideodriverInfo;
 
   AskBeforeDeleteCheckBox.Caption:=LanguageSetup.SetupFormAskBeforeDelete;
   DeleteProectionCheckBox.Caption:=LanguageSetup.SetupFormDeleteOnlyInBaseDir;
@@ -193,80 +193,97 @@ begin
   Service2Button.Caption:=LanguageSetup.SetupFormService2;
   Service3Button.Caption:=LanguageSetup.SetupFormService3;
   Service4Button.Caption:=LanguageSetup.SetupFormService4;
+end;
 
-  { Load Data }
 
-  BaseDirEdit.Text:=PrgSetup.BaseDir;
-  GameDirEdit.Text:=PrgSetup.GameDir;
-  DataDirEdit.Text:=PrgSetup.DataDir;
-  ReopenLastActiveProfileSheetCheckBox.Checked:=PrgSetup.ReopenLastProfileEditorTab;
-  RestoreWindowSizeCheckBox.Checked:=PrgSetup.RestoreWindowSize;
-  MinimizeToTrayCheckBox.Checked:=PrgSetup.MinimizeToTray;
+procedure TSetupForm.FormShow(Sender: TObject);
+Var S,T : String;
+    I,J,Nr : Integer;
+    Rec : TSearchRec;
+    B : Boolean;
+begin
+  DoubleBuffered:=True;
+  SetVistaFonts(self);
 
-  GetColOrderAndVisible(S,T);
-  For I:=0 to 5 do begin
-    try Nr:=StrToInt(S[I+1]); except Nr:=-1; end;
-    If (Nr<1) or (Nr>6) then continue;
+  InitGUI;
 
-    Case Nr-1 of
-      0 : ListViewListBox.Items.AddObject(LanguageSetup.GameSetup,Pointer(Nr-1));
-      1 : ListViewListBox.Items.AddObject(LanguageSetup.GameGenre,Pointer(Nr-1));
-      2 : ListViewListBox.Items.AddObject(LanguageSetup.GameDeveloper,Pointer(Nr-1));
-      3 : ListViewListBox.Items.AddObject(LanguageSetup.GamePublisher,Pointer(Nr-1));
-      4 : ListViewListBox.Items.AddObject(LanguageSetup.GameYear,Pointer(Nr-1));
-      5 : ListViewListBox.Items.AddObject(LanguageSetup.GameLanguage,Pointer(Nr-1));
-    end;
-    ListViewListBox.Checked[ListViewListBox.Items.Count-1]:=(T[Nr]<>'0');
-  end;
-  For I:=0 to 5 do begin
-    B:=False;
-    For J:=0 to ListViewListBox.Items.Count-1 do If Integer(ListViewListBox.Items.Objects[J])=I then begin
-      B:=True; break;
-    end;
-    If not B then Case I of
-      0 : ListViewListBox.Items.AddObject(LanguageSetup.GameSetup,Pointer(I));
-      1 : ListViewListBox.Items.AddObject(LanguageSetup.GameGenre,Pointer(I));
-      2 : ListViewListBox.Items.AddObject(LanguageSetup.GameDeveloper,Pointer(I));
-      3 : ListViewListBox.Items.AddObject(LanguageSetup.GamePublisher,Pointer(I));
-      4 : ListViewListBox.Items.AddObject(LanguageSetup.GameYear,Pointer(I));
-      5 : ListViewListBox.Items.AddObject(LanguageSetup.GameLanguage,Pointer(I));
-    end;
-  end;
-  ScreenshotPreviewEdit.Value:=Max(ScreenshotPreviewEdit.MinValue,Min(ScreenshotPreviewEdit.MaxValue,PrgSetup.ScreenshotPreviewSize));
-  
-  DosBoxDirEdit.Text:=PrgSetup.DosBoxDir;
-  DosBoxDirEditChange(Sender);
-  DosBoxMapperEdit.Text:=PrgSetup.DosBoxMapperFile;
-  HideDosBoxConsoleCheckBox.Checked:=PrgSetup.HideDosBoxConsole;
-  MinimizeDFendCheckBox.Checked:=PrgSetup.MinimizeOnDosBoxStart;
-
-  AskBeforeDeleteCheckBox.Checked:=PrgSetup.AskBeforeDelete;
-  DeleteProectionCheckBox.Checked:=PrgSetup.DeleteOnlyInBaseDir;
-
-  DefaultValueComboBox.ItemIndex:=0; LastIndex:=-1;
-  DefaultValueComboBoxChange(Sender);
-
-  I:=FindFirst(PrgDir+LanguageSubDir+'\*.ini',faAnyFile,Rec);
+  JustLoading:=True;
   try
-    while I=0 do begin
-      LanguageComboBox.Items.Add(Copy(Rec.Name,1,length(Rec.Name)-4));
-      I:=FindNext(Rec);
-    end;
-  finally
-    FindClose(Rec);
-  end;
-  S:=Trim(PrgSetup.Language);
-  If (length(S)>4) and (ExtUpperCase(Copy(S,length(S)-3,4))='.INI') then begin
-    S:=Trim(Copy(S,1,length(S)-4));
-    LanguageComboBox.ItemIndex:=-1;
-    For I:=0 to LanguageComboBox.Items.Count-1 do If ExtUpperCase(LanguageComboBox.Items[I])=ExtUpperCase(S) then begin
-      LanguageComboBox.ItemIndex:=I; break;
-    end;
-  end;
-  If (LanguageComboBox.Items.Count>0) and (LanguageComboBox.ItemIndex<0) then LanguageComboBox.ItemIndex:=0;
+    BaseDirEdit.Text:=PrgSetup.BaseDir;
+    GameDirEdit.Text:=PrgSetup.GameDir;
+    DataDirEdit.Text:=PrgSetup.DataDir;
+    ReopenLastActiveProfileSheetCheckBox.Checked:=PrgSetup.ReopenLastProfileEditorTab;
+    RestoreWindowSizeCheckBox.Checked:=PrgSetup.RestoreWindowSize;
+    MinimizeToTrayCheckBox.Checked:=PrgSetup.MinimizeToTray;
 
-  I:=DosBoxLang.IndexOf(PrgSetup.DosBoxLanguage);
-  If I>=0 then DosBoxLangEditComboBox.ItemIndex:=I else DosBoxLangEditComboBox.ItemIndex:=0;
+    GetColOrderAndVisible(S,T);
+    For I:=0 to 5 do begin
+      try Nr:=StrToInt(S[I+1]); except Nr:=-1; end;
+      If (Nr<1) or (Nr>6) then continue;
+
+      Case Nr-1 of
+        0 : ListViewListBox.Items.AddObject(LanguageSetup.GameSetup,Pointer(Nr-1));
+        1 : ListViewListBox.Items.AddObject(LanguageSetup.GameGenre,Pointer(Nr-1));
+        2 : ListViewListBox.Items.AddObject(LanguageSetup.GameDeveloper,Pointer(Nr-1));
+        3 : ListViewListBox.Items.AddObject(LanguageSetup.GamePublisher,Pointer(Nr-1));
+        4 : ListViewListBox.Items.AddObject(LanguageSetup.GameYear,Pointer(Nr-1));
+        5 : ListViewListBox.Items.AddObject(LanguageSetup.GameLanguage,Pointer(Nr-1));
+      end;
+      ListViewListBox.Checked[ListViewListBox.Items.Count-1]:=(T[Nr]<>'0');
+    end;
+    For I:=0 to 5 do begin
+      B:=False;
+      For J:=0 to ListViewListBox.Items.Count-1 do If Integer(ListViewListBox.Items.Objects[J])=I then begin
+        B:=True; break;
+      end;
+      If not B then Case I of
+        0 : ListViewListBox.Items.AddObject(LanguageSetup.GameSetup,Pointer(I));
+        1 : ListViewListBox.Items.AddObject(LanguageSetup.GameGenre,Pointer(I));
+        2 : ListViewListBox.Items.AddObject(LanguageSetup.GameDeveloper,Pointer(I));
+        3 : ListViewListBox.Items.AddObject(LanguageSetup.GamePublisher,Pointer(I));
+        4 : ListViewListBox.Items.AddObject(LanguageSetup.GameYear,Pointer(I));
+        5 : ListViewListBox.Items.AddObject(LanguageSetup.GameLanguage,Pointer(I));
+      end;
+    end;
+    ScreenshotPreviewEdit.Value:=Max(ScreenshotPreviewEdit.MinValue,Min(ScreenshotPreviewEdit.MaxValue,PrgSetup.ScreenshotPreviewSize));
+
+    DosBoxDirEdit.Text:=PrgSetup.DosBoxDir;
+    DosBoxDirEditChange(Sender);
+    DosBoxMapperEdit.Text:=PrgSetup.DosBoxMapperFile;
+    HideDosBoxConsoleCheckBox.Checked:=PrgSetup.HideDosBoxConsole;
+    MinimizeDFendCheckBox.Checked:=PrgSetup.MinimizeOnDosBoxStart;
+    If Trim(ExtUpperCase(PrgSetup.SDLVideodriver))='WINDIB' then SDLVideoDriverComboBox.ItemIndex:=1 else SDLVideoDriverComboBox.ItemIndex:=0;
+
+    AskBeforeDeleteCheckBox.Checked:=PrgSetup.AskBeforeDelete;
+    DeleteProectionCheckBox.Checked:=PrgSetup.DeleteOnlyInBaseDir;
+
+    DefaultValueComboBox.ItemIndex:=0; LastIndex:=-1;
+    DefaultValueComboBoxChange(Sender);
+
+    I:=FindFirst(PrgDir+LanguageSubDir+'\*.ini',faAnyFile,Rec);
+    try
+      while I=0 do begin
+        LanguageComboBox.Items.Add(Copy(Rec.Name,1,length(Rec.Name)-4));
+        I:=FindNext(Rec);
+      end;
+    finally
+      FindClose(Rec);
+    end;
+    S:=Trim(PrgSetup.Language);
+    If (length(S)>4) and (ExtUpperCase(Copy(S,length(S)-3,4))='.INI') then begin
+      S:=Trim(Copy(S,1,length(S)-4));
+      LanguageComboBox.ItemIndex:=-1;
+      For I:=0 to LanguageComboBox.Items.Count-1 do If ExtUpperCase(LanguageComboBox.Items[I])=ExtUpperCase(S) then begin
+        LanguageComboBox.ItemIndex:=I; break;
+      end;
+    end;
+    If (LanguageComboBox.Items.Count>0) and (LanguageComboBox.ItemIndex<0) then LanguageComboBox.ItemIndex:=0;
+
+    I:=DosBoxLang.IndexOf(PrgSetup.DosBoxLanguage);
+    If I>=0 then DosBoxLangEditComboBox.ItemIndex:=I else DosBoxLangEditComboBox.ItemIndex:=0;
+  finally
+    JustLoading:=False;
+  end;
 end;
 
 procedure TSetupForm.OKButtonClick(Sender: TObject);
@@ -299,6 +316,7 @@ begin
   PrgSetup.DosBoxMapperFile:=DosBoxMapperEdit.Text;
   PrgSetup.HideDosBoxConsole:=HideDosBoxConsoleCheckBox.Checked;
   PrgSetup.MinimizeOnDosBoxStart:=MinimizeDFendCheckBox.Checked;
+  If SDLVideoDriverComboBox.ItemIndex=1 then PrgSetup.SDLVideodriver:='WinDIB' else PrgSetup.SDLVideodriver:='DirectX';
 
   PrgSetup.AskBeforeDelete:=AskBeforeDeleteCheckBox.Checked;  
   PrgSetup.DeleteOnlyInBaseDir:=DeleteProectionCheckBox.Checked;
@@ -496,6 +514,13 @@ begin
   FindAndAddLngFiles(PrgDir+LanguageSubDir+'\',DosBoxLangEditComboBox.Items,DosBoxLang);
   I:=DosBoxLangEditComboBox.Items.IndexOf(S);
   If I>=0 then DosBoxLangEditComboBox.ItemIndex:=I else DosBoxLangEditComboBox.ItemIndex:=0;
+end;
+
+procedure TSetupForm.LanguageComboBoxChange(Sender: TObject);
+begin
+  If JustLoading then exit;
+  LoadLanguage(LanguageComboBox.Text+'.ini');
+  InitGUI;
 end;
 
 procedure TSetupForm.ListViewMoveButtonClick(Sender: TObject);

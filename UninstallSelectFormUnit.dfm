@@ -38,7 +38,7 @@ object UninstallSelectForm: TUninstallSelectForm
         'Profil-Listen Eintrag und alle Programmdatenverzeichnisse l'#246'sche' +
         'n'
       'F'#252'r jeden Eintrag einzelen ausw'#228'hlen')
-    TabOrder = 0
+    TabOrder = 4
   end
   object ListBox: TCheckListBox
     Left = 8
@@ -46,14 +46,14 @@ object UninstallSelectForm: TUninstallSelectForm
     Width = 377
     Height = 270
     ItemHeight = 13
-    TabOrder = 1
+    TabOrder = 0
   end
   object OKButton: TBitBtn
     Left = 8
     Top = 470
     Width = 97
     Height = 25
-    TabOrder = 2
+    TabOrder = 5
     OnClick = OKButtonClick
     Kind = bkOK
   end
@@ -62,7 +62,7 @@ object UninstallSelectForm: TUninstallSelectForm
     Top = 470
     Width = 97
     Height = 25
-    TabOrder = 3
+    TabOrder = 6
     Kind = bkCancel
   end
   object SelectAllButton: TBitBtn
@@ -71,7 +71,7 @@ object UninstallSelectForm: TUninstallSelectForm
     Width = 97
     Height = 25
     Caption = 'SelectAllButton'
-    TabOrder = 4
+    TabOrder = 1
     OnClick = SelectButtonClick
   end
   object SelectNoneButton: TBitBtn
@@ -81,7 +81,7 @@ object UninstallSelectForm: TUninstallSelectForm
     Width = 97
     Height = 25
     Caption = 'SelectNoneButton'
-    TabOrder = 5
+    TabOrder = 2
     OnClick = SelectButtonClick
   end
   object SelectGenreButton: TBitBtn
@@ -91,7 +91,7 @@ object UninstallSelectForm: TUninstallSelectForm
     Width = 97
     Height = 25
     Caption = 'By Genre'
-    TabOrder = 6
+    TabOrder = 3
     OnClick = SelectButtonClick
   end
   object PopupMenu: TPopupMenu

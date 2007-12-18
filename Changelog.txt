@@ -1,0 +1,42 @@
+D-Fend Reloaded Changelog
+
+Version 0.1.1 Build 2 (18.12.2007)
+==================================
+- [Fix] Missing space between programfile und parameters when running a game
+- More icons in treeview and in profile editor dialog
+- Changelog viewer in programinfo dialog
+- [Fix] Wrong tab order in some dialogs
+- New "By genre" button in "Export|Create conf" dialog
+- The "Edit drive" dialog now opens faster
+- [Fix] The alternative profile edit hotkey F2 was linked to profile add
+  instead of profile edit
+- In the transfer dialog, the uninstall dialog and the build installer dialog
+  the "DosBox DOS" default entry is not shown but the genre of this
+  profile has been used when building the "by genre" menu.
+- Additional start menu Link "Manuals folder" to access the manual and
+  game data folder.
+- [Fix] When copying a profile "not set" was shown in the info columns
+  (genre, ...) of the new profile.
+- More abandonded games links in the help menu.
+- Progress dialog when deinstalling or transfering games.
+- "Auto create" button in mounting section of profile editor to create default
+  drive c: with one click.
+- New options "retry" and "ignore" when files are protected when deinstalling
+  games.
+- New buttons "Previous" and "Next" in profile editor to switch between games.
+- Now you can choose between "DirectX" and "WinDIB" als SDL videodrivers.
+  ("WinDIB" is slower than the default "DirectX" but may solve some keyboard
+  problems.)
+- New profile menu option "Add from template" allows to create new profiles
+  from templates without opening the template dialog.
+- Setup dialog language will change immediately when another language is
+  selected in the dialog.
+- [Fix] Icon files were ignored when copying and uninstalling game and when
+  building installers.
+- [Fix] The GUS enabled/disabled setting was not correctly shown in the
+  profile editor.
+
+
+Version 0.1.0 Build 1 (08.11.2007)
+==================================
+- First Version at all, everything is new.
