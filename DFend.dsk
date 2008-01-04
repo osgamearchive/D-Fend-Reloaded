@@ -1,14 +1,14 @@
 [Closed Files]
-File_0=TSourceModule,'C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\InfoFormUnit.pas',0,1,23,70,39,0,0,,
-File_1=TSourceModule,'C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\ProfileEditorFormUnit.pas',0,1,1489,42,1515,0,0,,{0
-File_2=TSourceModule,'C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\LanguageSetupUnit.pas',0,1,738,46,752,0,0,,
-File_3=TSourceModule,'C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\UninstallFormUnit.pas',0,1,131,1,151,0,0,,
-File_4=TSourceModule,'C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\UninstallSelectFormUnit.pas',0,1,140,1,166,0,0,,
-File_5=TSourceModule,'C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\GameDBToolsUnit.pas',0,1,168,2,206,0,0,,
-File_6=TSourceModule,'C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\GameDBUnit.pas',0,1,151,24,151,0,0,,
-File_7=TSourceModule,'c:\program files\codegear\rad studio\5.0\SOURCE\WIN32\RTL\SYS\system.pas',0,1,9256,1,9276,0,0,,
-File_8=TSourceModule,'C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\PrgConsts.pas',0,1,1,20,14,0,0,,
-File_9=TSourceModule,'C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\BuildInstallerFormUnit.pas',0,1,73,32,92,0,0,,
+File_0=TSourceModule,'C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\GameDBToolsUnit.pas',0,1,1,1,19,0,0,,
+File_1=TSourceModule,'C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\TemplateSelectProfileFormUnit.pas',0,1,45,1,70,0,0,,
+File_2=TSourceModule,'C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\TemplateFormUnit.pas',0,1,118,1,136,0,0,,
+File_3=TSourceModule,'C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\SetupFormUnit.pas',0,1,1,7,7,0,0,,
+File_4=TSourceModule,'c:\program files\codegear\rad studio\5.0\SOURCE\WIN32\RTL\SYS\system.pas',0,1,9256,1,9276,0,0,,
+File_5=TSourceModule,'C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\InfoFormUnit.pas',0,1,49,47,61,0,0,,
+File_6=TSourceModule,'C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\LanguageSetupUnit.pas',0,1,1261,89,1291,0,0,,
+File_7=TSourceModule,'C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\PrgConsts.pas',0,1,1,20,14,0,0,,
+File_8=TSourceModule,'C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\ProfileEditorFormUnit.pas',0,1,1489,42,1515,0,0,,{0
+File_9=TSourceModule,'C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\UninstallFormUnit.pas',0,1,131,1,151,0,0,,
 
 [Modules]
 Module0=C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\MainUnit.pas
@@ -57,12 +57,12 @@ BottomMiddelPanelData=0000080001000100000009000000446F636B5369746530301900000000
 [View0]
 CustomEditViewType=TEditView
 Module=C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\MainUnit.pas
-CursorX=7
-CursorY=2
+CursorX=22
+CursorY=19
 TopLine=1
 LeftCol=1
 Elisions=
-Bookmarks={0,779,16}
+Bookmarks={0,772,16}
 EditViewName=C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\MainUnit.pas
 
 [Watches]
@@ -92,7 +92,7 @@ StayOnTop=0
 
 [Breakpoints]
 Count=1
-Breakpoint0='C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\GameDBToolsUnit.pas',664,'',0,1,'',1,0,0,'',1,'','','',0
+Breakpoint0='C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\GameDBToolsUnit.pas',733,'',0,1,'',1,0,0,'',1,'','','',0
 
 [AddressBreakpoints]
 Count=0
@@ -103,8 +103,8 @@ Create=1
 Visible=1
 Docked=0
 State=2
-Left=137
-Top=265
+Left=548
+Top=5412
 Width=8929
 Height=8529
 MaxLeft=-6

@@ -45,6 +45,8 @@ Type TPrgSetup=class(TBasePrgSetup)
     property ShowTree : Boolean index 9 read GetBoolean write SetBoolean;
     property ShowSearchBox : Boolean index 10 read GetBoolean write SetBoolean;
     property ShowExtraInfo : Boolean index 11 read GetBoolean write SetBoolean;
+    property StartWithWindows : Boolean index 12 read GetBoolean write SetBoolean;
+    property StartMinimized : Boolean index 13 read GetBoolean write SetBoolean;
 
     property MainLeft : Integer index 0 read GetInteger write SetInteger;
     property MainTop : Integer index 1 read GetInteger write SetInteger;
@@ -53,6 +55,8 @@ Type TPrgSetup=class(TBasePrgSetup)
     property TreeWidth : Integer index 4 read GetInteger write SetInteger;
     property ScreenshotHeight : Integer index 5 read GetInteger write SetInteger;
     property ScreenshotPreviewSize : Integer index 6 read GetInteger write SetInteger;
+    property AddButtonFunction : Integer index 7 read GetInteger write SetInteger;
+
 end;
 
 var PrgSetup : TPrgSetup;
@@ -95,6 +99,8 @@ begin
   AddBooleanRec(9,'ProgramSets','ShowFilterTree',True);
   AddBooleanRec(10,'ProgramSets','ShowSearchBox',True);
   AddBooleanRec(11,'ProgramSets','ShowExtrainfo',True);
+  AddBooleanRec(12,'ProgramSets','StartWithWindows',False);
+  AddBooleanRec(13,'ProgramSets','StartMinimized',False);
 
   AddIntegerRec(0,'ProgramSets','MainLeft',-1);
   AddIntegerRec(1,'ProgramSets','MainTop',-1);
@@ -103,7 +109,8 @@ begin
   AddIntegerRec(4,'ProgramSets','TreeWidth',-1);
   AddIntegerRec(5,'ProgramSets','ScreenshotHeight',-1);
   AddIntegerRec(6,'ProgramSets','ScreenshotPreviewHeight',100);
-
+  AddIntegerRec(7,'ProgramSets','AddButtonFunction',2);
+  
   InitDirs;
 end;
 

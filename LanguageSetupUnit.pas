@@ -3,7 +3,9 @@ interface
 
 uses CommonComponents;
 
-const NR_GlobalOK=10001;
+const NR_Author=1;
+
+      NR_GlobalOK=10001;
       NR_GlobalCancel=10002;
       NR_GlobalAbort=10003;
       NR_GlobalYes=10004;
@@ -29,6 +31,40 @@ const NR_GlobalOK=10001;
       NR_GlobalUnselect=10024;
       NR_GlobalPrevious=10025;
       NR_GlobalNext=10026;
+
+      NR_KeyBackspace=11001;
+      NR_KeyTab=110012;
+      NR_KeyEscape=110013;
+      NR_KeyEnter=110014;
+      NR_KeySpace=110015;
+      NR_KeyPageUp=110016;
+      NR_KeyPageDown=110017;
+      NR_KeyEnd=110018;
+      NR_KeyHome=110019;
+      NR_KeyLeft=110020;
+      NR_KeyUp=110021;
+      NR_KeyRight=110022;
+      NR_KeyDown=110023;
+      NR_KeyInsert=110024;
+      NR_KeyDelete=110025;
+      NR_KeyShift=110026;
+      NR_KeyCtrl=110027;
+      NR_KeyAlt=110028;
+
+      NR_MsgDlgWarning=120001;
+      NR_MsgDlgError=120002;
+      NR_MsgDlgInformation=120003;
+      NR_MsgDlgConfirm=120004;
+      NR_MsgDlgYes=120005;
+      NR_MsgDlgNo=120006;
+      NR_MsgDlgOK=120007;
+      NR_MsgDlgCancel=120008;
+      NR_MsgDlgAbort=120009;
+      NR_MsgDlgRetry=120010;
+      NR_MsgDlgIgnore=120011;
+      NR_MsgDlgAll=120012;
+      NR_MsgDlgNoToAll=120013;
+      NR_MsgDlgYesToAll=120014;
 
       NR_MessageCouldNotDeleteFile=20001;
       NR_MessageCouldNotDeleteDir=20002;
@@ -131,8 +167,10 @@ const NR_GlobalOK=10001;
       NR_PopupDeinstall=39010;
       NR_ScreenshotPopupOpen=39101;
       NR_ScreenshotPopupRefresh=39102;
-      NR_ScreenshotPopupDelete=39103;
-      NR_ScreenshotPopupDeleteAll=39104;
+      NR_ScreenshotPopupCopy=39103;
+      NR_ScreenshotPopupSave=39104;
+      NR_ScreenshotPopupDelete=39105;
+      NR_ScreenshotPopupDeleteAll=39106;
 
       NR_SetupDosBoxForm=40001;
 
@@ -257,6 +295,13 @@ const NR_GlobalOK=10001;
       NR_SetupFormReopenLastActiveProfileSheet=43104;
       NR_SetupFormRestoreWindowSize=43105;
       NR_SetupFormMinimizeToTray=43106;
+      NR_SetupFormStartWithWindows=43107;
+      NR_SetupFormStartMinimized=43108;
+      NR_SetupFormAddButtonFunctionLabel=43109;
+      NR_SetupFormAddButtonFunctionAdd=43110;
+      NR_SetupFormAddButtonFunctionWizard=43111;
+      NR_SetupFormAddButtonFunctionMenu=43112;
+
       NR_SetupFormLanguage=43201;
       NR_SetupFormDosBoxLang=43202;
       NR_SetupFormDosBoxSDLVideodriver=43203;
@@ -362,10 +407,13 @@ const NR_GlobalOK=10001;
 
       NR_InfoForm=53001;
       NR_InfoFormMain=53002;
-      NR_InfoFormLicense=53003;
-      NR_InfoFormCompLicense=53004;
-      NR_InfoFormChangeLog=53005;
-      NR_InfoFormWrittenBy=53006;
+      NR_InfoFormLanguage=53003;
+      NR_InfoFormLicense=53004;
+      NR_InfoFormCompLicense=53005;
+      NR_InfoFormChangeLog=53006;
+      NR_InfoFormWrittenBy=53007;
+      NR_InfoFormLanguageFile=53008;
+      NR_InfoFormLanguageAuthor=53009;
 
       NR_TransferForm=54001;
       NR_TransferFormInfo=54002;
@@ -443,6 +491,8 @@ Type TLanguageSetup=class(TBasePrgSetup)
   public
     Constructor Create(const FileName : String ='');
     Destructor Destroy; override;
+    property Author : String index NR_Author read GetString write SetString;
+
     property OK : String index NR_GlobalOK read GetString write SetString;
     property Cancel : String index NR_GlobalCancel read GetString write SetString;
     property Abort : String index NR_GlobalAbort read GetString write SetString;
@@ -467,9 +517,42 @@ Type TLanguageSetup=class(TBasePrgSetup)
     property Unselect : String index NR_GlobalUnselect read GetString write SetString;
     property Previous : String index NR_GlobalPrevious read GetString write SetString;
     property Next : String index NR_GlobalNext read GetString write SetString;
-
     property Key : String index NR_GlobalKey read GetString write SetString;
     property Value : String index NR_GlobalValue read GetString write SetString;
+
+    property KeyBackspace : String index NR_KeyBackspace read GetString write SetString;
+    property KeyTab : String index NR_KeyTab read GetString write SetString;
+    property KeyEscape : String index NR_KeyEscape read GetString write SetString;
+    property KeyEnter : String index NR_KeyEnter read GetString write SetString;
+    property KeySpace : String index NR_KeySpace read GetString write SetString;
+    property KeyPageUp : String index NR_KeyPageUp read GetString write SetString;
+    property KeyPageDown : String index NR_KeyPageDown read GetString write SetString;
+    property KeyEnd : String index NR_KeyEnd read GetString write SetString;
+    property KeyHome : String index NR_KeyHome read GetString write SetString;
+    property KeyLeft : String index NR_KeyLeft read GetString write SetString;
+    property KeyUp : String index NR_KeyUp read GetString write SetString;
+    property KeyRight : String index NR_KeyRight read GetString write SetString;
+    property KeyDown : String index NR_KeyDown read GetString write SetString;
+    property KeyInsert : String index NR_KeyInsert read GetString write SetString;
+    property KeyDelete : String index NR_KeyDelete read GetString write SetString;
+    property KeyShift : String index NR_KeyShift read GetString write SetString;
+    property KeyCtrl : String index NR_KeyCtrl read GetString write SetString;
+    property KeyAlt : String index NR_KeyAlt read GetString write SetString;
+
+    property MsgDlgWarning : String index NR_MsgDlgWarning read GetString write SetString;
+    property MsgDlgError : String index NR_MsgDlgError read GetString write SetString;
+    property MsgDlgInformation : String index NR_MsgDlgInformation read GetString write SetString;
+    property MsgDlgConfirm : String index NR_MsgDlgConfirm read GetString write SetString;
+    property MsgDlgYes : String index NR_MsgDlgYes read GetString write SetString;
+    property MsgDlgNo : String index NR_MsgDlgNo read GetString write SetString;
+    property MsgDlgOK : String index NR_MsgDlgOK read GetString write SetString;
+    property MsgDlgCancel : String index NR_MsgDlgCancel read GetString write SetString;
+    property MsgDlgAbort : String index NR_MsgDlgAbort read GetString write SetString;
+    property MsgDlgRetry : String index NR_MsgDlgRetry read GetString write SetString;
+    property MsgDlgIgnore : String index NR_MsgDlgIgnore read GetString write SetString;
+    property MsgDlgAll : String index NR_MsgDlgAll read GetString write SetString;
+    property MsgDlgNoToAll : String index NR_MsgDlgNoToAll read GetString write SetString;
+    property MsgDlgYesToAll : String index NR_MsgDlgYesToAll read GetString write SetString;
 
     property MessageCouldNotDeleteFile : String index NR_MessageCouldNotDeleteFile read GetString write SetString;
     property MessageCouldNotDeleteDir : String index NR_MessageCouldNotDeleteDir read GetString write SetString;
@@ -572,6 +655,8 @@ Type TLanguageSetup=class(TBasePrgSetup)
     property PopupDeinstall : String index NR_PopupDeinstall read GetString write SetString;
     property ScreenshotPopupOpen : String index NR_ScreenshotPopupOpen read GetString write SetString;
     property ScreenshotPopupRefresh : String index NR_ScreenshotPopupRefresh read GetString write SetString;
+    property ScreenshotPopupCopy : String index NR_ScreenshotPopupCopy read GetString write SetString;
+    property ScreenshotPopupSave : String index NR_ScreenshotPopupSave read GetString write SetString;
     property ScreenshotPopupDelete : String index NR_ScreenshotPopupDelete read GetString write SetString;
     property ScreenshotPopupDeleteAll : String index NR_ScreenshotPopupDeleteAll read GetString write SetString;
 
@@ -699,6 +784,12 @@ Type TLanguageSetup=class(TBasePrgSetup)
     property SetupFormReopenLastActiveProfileSheet : String index NR_SetupFormReopenLastActiveProfileSheet read GetString write SetString;
     property SetupFormRestoreWindowSize : String index NR_SetupFormRestoreWindowSize read GetString write SetString;
     property SetupFormMinimizeToTray : String index NR_SetupFormMinimizeToTray read GetString write SetString;
+    property SetupFormStartWithWindows : String index NR_SetupFormStartWithWindows read GetString write SetString;
+    property SetupFormStartMinimized : String index NR_SetupFormStartMinimized read GetString write SetString;
+    property SetupFormAddButtonFunctionLabel : String index NR_SetupFormAddButtonFunctionLabel read GetString write SetString;
+    property SetupFormAddButtonFunctionAdd : String index NR_SetupFormAddButtonFunctionAdd read GetString write SetString;
+    property SetupFormAddButtonFunctionWizard : String index NR_SetupFormAddButtonFunctionWizard read GetString write SetString;
+    property SetupFormAddButtonFunctionMenu : String index NR_SetupFormAddButtonFunctionMenu read GetString write SetString;
     property SetupFormDosBoxDir : String index NR_SetupFormDosBoxDir read GetString write SetString;
     property SetupFormSearchDosBox : String index NR_SetupFormSearchDosBox read GetString write SetString;
     property SetupFormDosBoxMapperFile : String index NR_SetupFormDosBoxMapperFile read GetString write SetString;
@@ -804,10 +895,13 @@ Type TLanguageSetup=class(TBasePrgSetup)
 
     property InfoForm : String index NR_InfoForm read GetString write SetString;
     property InfoFormMain : String index NR_InfoFormMain read GetString write SetString;
+    property InfoFormLanguage : String index NR_InfoFormLanguage read GetString write SetString;
     property InfoFormLicense : String index NR_InfoFormLicense read GetString write SetString;
     property InfoFormCompLicense : String index NR_InfoFormCompLicense read GetString write SetString;
     property InfoFormChangeLog : String index NR_InfoFormChangeLog read GetString write SetString;
     property InfoFormWrittenBy : String index NR_InfoFormWrittenBy read GetString write SetString;
+    property InfoFormLanguageFile : String index NR_InfoFormLanguageFile read GetString write SetString;
+    property InfoFormLanguageAuthor : String index NR_InfoFormLanguageAuthor read GetString write SetString;
 
     property TransferForm : String index NR_TransferForm read GetString write SetString;
     property TransferFormInfo : String index NR_TransferFormInfo read GetString write SetString;
@@ -901,6 +995,8 @@ begin
 
   ForceDirectories(PrgDir+LanguageSubDir);
 
+  AddStringRec(NR_Author,'Author','Name','No Author defined');
+
   AddStringRec(NR_GlobalOK,'Global','OK','&Ok');
   AddStringRec(NR_GlobalCancel,'Global','Cancel','&Cancel');
   AddStringRec(NR_GlobalAbort,'Global','Abort','&Abort');
@@ -916,8 +1012,6 @@ begin
   AddStringRec(NR_GlobalDel,'Global','Del','&Delete');
   AddStringRec(NR_GlobalLoad,'Global','Load','&Load...');
   AddStringRec(NR_GlobalSave,'Global','Save','&Save...');
-  AddStringRec(NR_GlobalKey,'Global','Key','Key');
-  AddStringRec(NR_GlobalValue,'Global','Value','Value');
   AddStringRec(NR_GlobalClose,'Global','Close','&Close');
   AddStringRec(NR_GlobalUse,'Global','Use','Use');
   AddStringRec(NR_GlobalCopy,'Global','Copy','Copy');
@@ -927,6 +1021,42 @@ begin
   AddStringRec(NR_GlobalUnselect,'Global','Unselect','Unselect');
   AddStringRec(NR_GlobalPrevious,'Global','Previous','Previous');
   AddStringRec(NR_GlobalNext,'Global','Next','Next');
+  AddStringRec(NR_GlobalKey,'Global','Key','Key');
+  AddStringRec(NR_GlobalValue,'Global','Value','Value');
+
+  AddStringRec(NR_KeyBackspace,'Keys','Backspace','Back');
+  AddStringRec(NR_KeyTab,'Keys','Tab','Tab');
+  AddStringRec(NR_KeyEscape,'Keys','Escape','Esc');
+  AddStringRec(NR_KeyEnter,'Keys','Enter','Enter');
+  AddStringRec(NR_KeySpace,'Keys','Space','Space');
+  AddStringRec(NR_KeyPageUp,'Keys','PageUp','PageUp');
+  AddStringRec(NR_KeyPageDown,'Keys','PageDown','PageDown');
+  AddStringRec(NR_KeyEnd,'Keys','End','End');
+  AddStringRec(NR_KeyHome,'Keys','Home','Home');
+  AddStringRec(NR_KeyLeft,'Keys','Left','Left');
+  AddStringRec(NR_KeyUp,'Keys','Up','Up');
+  AddStringRec(NR_KeyRight,'Keys','Right','Right');
+  AddStringRec(NR_KeyDown,'Keys','Down','Down');
+  AddStringRec(NR_KeyInsert,'Keys','Insert','Insert');
+  AddStringRec(NR_KeyDelete,'Keys','Delete','Delete');
+  AddStringRec(NR_KeyShift,'Keys','Shift','Shift+');
+  AddStringRec(NR_KeyCtrl,'Keys','Ctrl','Ctrl+');
+  AddStringRec(NR_KeyAlt,'Keys','Alt','Alt+');
+
+  AddStringRec(NR_MsgDlgWarning,'MessageDlg','Type.Warning','Warning');
+  AddStringRec(NR_MsgDlgError,'MessageDlg','Type.Error','Error');
+  AddStringRec(NR_MsgDlgInformation,'MessageDlg','Type.Information','Information');
+  AddStringRec(NR_MsgDlgConfirm,'MessageDlg','Type.Confirm','Confirmation');
+  AddStringRec(NR_MsgDlgYes,'MessageDlg','Button.Yes','&Yes');
+  AddStringRec(NR_MsgDlgNo,'MessageDlg','Button.No','&No');
+  AddStringRec(NR_MsgDlgOK,'MessageDlg','Button.OK','OK');
+  AddStringRec(NR_MsgDlgCancel,'MessageDlg','Button.Cancel','Cancel');
+  AddStringRec(NR_MsgDlgAbort,'MessageDlg','Button.Abort','&Abort');
+  AddStringRec(NR_MsgDlgRetry,'MessageDlg','Button.Retry','&Retry');
+  AddStringRec(NR_MsgDlgIgnore,'MessageDlg','Button.Ignore','&Ignore');
+  AddStringRec(NR_MsgDlgAll,'MessageDlg','Button.All','&All');
+  AddStringRec(NR_MsgDlgNoToAll,'MessageDlg','Button.NoToAll','No to &all');
+  AddStringRec(NR_MsgDlgYesToAll,'MessageDlg','Button.YesToAll','Yes to a&ll');
 
   AddStringRec(NR_MessageCouldNotDeleteFile,'Messages','CouldNotDeleteFile','Could not delete file %s.');
   AddStringRec(NR_MessageCouldNotDeleteDir,'Messages','CouldNotDeleteFile','Could not delete folder %s.');
@@ -1030,6 +1160,8 @@ begin
   AddStringRec(NR_PopupDeinstall,'Menu','Popup.Deinstall','&Deinstall...');
   AddStringRec(NR_ScreenshotPopupOpen,'Menu','ScreenshotPopup.Open','&Open...');
   AddStringRec(NR_ScreenshotPopupRefresh,'Menu','ScreenshotPopup.Refresh','&Update');
+  AddStringRec(NR_ScreenshotPopupCopy,'Menu','ScreenshotPopup.Copy','&Copy');
+  AddStringRec(NR_ScreenshotPopupSave,'Menu','ScreenshotPopup.Save','&Save...');
   AddStringRec(NR_ScreenshotPopupDelete,'Menu','ScreenshotPopup.Delete','&Delete');
   AddStringRec(NR_ScreenshotPopupDeleteAll,'Menu','ScreenshotPopup.DeleteAll','Delete &all');
 
@@ -1156,6 +1288,12 @@ begin
   AddStringRec(NR_SetupFormReopenLastActiveProfileSheet,'SetupForm','ReopenLastActiveProfileSheet','Reopen last active profile editor page');
   AddStringRec(NR_SetupFormRestoreWindowSize,'SetupForm','RestoreWindowSize','Restore window size on program start');
   AddStringRec(NR_SetupFormMinimizeToTray,'SetupForm','MinimizeToTray','Minimize to tray area');
+  AddStringRec(NR_SetupFormStartWithWindows,'SetupForm','StartWithWindows','Start with Windows');
+  AddStringRec(NR_SetupFormStartMinimized,'SetupForm','StartMinimized','Start minimized');
+  AddStringRec(NR_SetupFormAddButtonFunctionLabel,'SetupForm','AddButtonFunction','Function of the add button:');
+  AddStringRec(NR_SetupFormAddButtonFunctionAdd,'SetupForm','AddButtonFunction.Add','Add dialog');
+  AddStringRec(NR_SetupFormAddButtonFunctionWizard,'SetupForm','AddButtonFunction.Wizard','profile wizard');
+  AddStringRec(NR_SetupFormAddButtonFunctionMenu,'SetupForm','AddButtonFunction.Menu','Selection menu');
   AddStringRec(NR_SetupFormLanguage,'SetupForm','ProgramLanguage','Program language');
   AddStringRec(NR_SetupFormDosBoxLang,'SetupForm','DosBoxLanguage','DosBox language file');
   AddStringRec(NR_SetupFormDosBoxSDLVideodriver,'SetupForm','DosBoxVideoDriver','SDL Videodriver:');
@@ -1261,10 +1399,13 @@ begin
 
   AddStringRec(NR_InfoForm,'InfoForm','Caption','Program info');
   AddStringRec(NR_InfoFormMain,'InfoForm','MainSheet','Info');
+  AddStringRec(NR_InfoFormLanguage,'InfoForm','LanguageSheet','Language files');
   AddStringRec(NR_InfoFormLicense,'InfoForm','LicenseSheet','License');
   AddStringRec(NR_InfoFormCompLicense,'InfoForm','CompLicenseSheet','Used components');
   AddStringRec(NR_InfoFormChangeLog,'InfoForm','ChangeLogSheet','Change log');
   AddStringRec(NR_InfoFormWrittenBy,'InfoForm','WrittenBy','written by');
+  AddStringRec(NR_InfoFormLanguageFile,'InfoForm','Language.File','Language file');
+  AddStringRec(NR_InfoFormLanguageAuthor,'InfoForm','Language.Author','Author');
 
   AddStringRec(NR_TransferForm,'TransferForm','Caption','Transfer programs to another D-Fend Reloaded installation');
   AddStringRec(NR_TransferFormInfo,'TransferForm','Info','Please select the programs to transfer:');

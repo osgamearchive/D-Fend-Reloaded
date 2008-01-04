@@ -1,10 +1,10 @@
 object TemplateForm: TTemplateForm
   Left = 0
   Top = 0
-  BorderStyle = bsDialog
+  BorderIcons = [biSystemMenu]
   Caption = 'Vorlagen'
-  ClientHeight = 302
-  ClientWidth = 564
+  ClientHeight = 361
+  ClientWidth = 634
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -20,21 +20,24 @@ object TemplateForm: TTemplateForm
   object ListView: TListView
     Left = 0
     Top = 22
-    Width = 564
-    Height = 280
+    Width = 634
+    Height = 339
     Align = alClient
     Columns = <>
     PopupMenu = PopupMenu
     SmallImages = ListViewImageList
     TabOrder = 0
     ViewStyle = vsReport
+    OnColumnClick = ListViewColumnClick
     OnKeyDown = ListViewKeyDown
     OnSelectItem = ListViewSelectItem
+    ExplicitWidth = 564
+    ExplicitHeight = 280
   end
   object CoolBar: TCoolBar
     Left = 0
     Top = 0
-    Width = 564
+    Width = 634
     Height = 22
     AutoSize = True
     BandBorderStyle = bsNone
@@ -43,15 +46,16 @@ object TemplateForm: TTemplateForm
         Control = ToolBar
         ImageIndex = -1
         MinHeight = 22
-        Width = 562
+        Width = 632
       end>
     EdgeBorders = []
     FixedSize = True
     FixedOrder = True
+    ExplicitWidth = 564
     object ToolBar: TToolBar
       Left = 2
       Top = 0
-      Width = 562
+      Width = 632
       Height = 22
       AutoSize = True
       ButtonWidth = 90

@@ -30,12 +30,13 @@ Function GetShortFileVersionAsString : String;
 Function GetFileDateAsString : String;
 
 Procedure CreateLink(const TargetName, Parameters, LinkFile : String);
+Procedure SetStartWithWindows(const Enabled : Boolean);
 
 Var TempPrgDir : String = ''; {Temporary overwrite normal PrgDir}
 
 implementation
 
-uses SysUtils, Forms, ShlObj, ActiveX, Math, ComObj;
+uses SysUtils, Forms, ShlObj, ActiveX, Math, ComObj, Registry;
 
 
 Function ExtUpperCase(const S : String) : String;
@@ -325,6 +326,23 @@ begin
 
    WLinkFile:=LinkFile;
    IPFile.Save(PWChar(WLinkFile), false) ;
+end;
+
+Procedure SetStartWithWindows(const Enabled : Boolean);
+Var Reg : TRegistry;
+begin
+  Reg:=TRegistry.Create;
+  try
+  Reg.RootKey:=HKEY_CURRENT_USER;
+    If not Reg.OpenKey('Software\Microsoft\Windows\CurrentVersion\Run',True) then exit;
+    If Enabled then begin
+      Reg.WriteString('D-Fend Reloaded',ExpandFileName(Application.ExeName));
+    end else begin
+      Reg.DeleteValue('D-Fend Reloaded');
+    end;
+  finally
+    Reg.Free;
+  end;
 end;
 
 end.

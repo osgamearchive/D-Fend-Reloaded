@@ -355,7 +355,7 @@ begin
   CloseHandle(ProcessInformation.hProcess);
   CloseHandle(ProcessInformation.hThread);
 
-  //ShellExecute(Application.MainForm.Handle,'open',PChar(IncludeTrailingPathDelimiter(PrgSetup.DosBoxDir)+DosBoxFileName),PChar('-CONF '+ConfFile+Add),PChar(IncludeTrailingPathDelimiter((ExtractFilePath(ConfFile)))),SW_SHOW);
+  {ShellExecute(Application.MainForm.Handle,'open',PChar(IncludeTrailingPathDelimiter(PrgSetup.DosBoxDir)+DosBoxFileName),PChar('-CONF '+ConfFile+Add),PChar(IncludeTrailingPathDelimiter((ExtractFilePath(ConfFile)))),SW_SHOW);}
 end;
 
 Procedure RunGame(const Game : TGame; const RunSetup : Boolean; const DosBoxCommandLine : String);

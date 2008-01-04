@@ -2,7 +2,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
   Left = 0
   Top = 0
   Caption = 'D-Fend Reloaded'
-  ClientHeight = 756
+  ClientHeight = 776
   ClientWidth = 796
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -48,7 +48,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
   object Splitter: TSplitter
     Left = 169
     Top = 24
-    Height = 732
+    Height = 752
     ResizeStyle = rsUpdate
     ExplicitLeft = 224
     ExplicitTop = 192
@@ -58,7 +58,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
     Left = 0
     Top = 24
     Width = 169
-    Height = 732
+    Height = 752
     Align = alLeft
     HideSelection = False
     Images = ImageList
@@ -66,7 +66,6 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
     ReadOnly = True
     TabOrder = 0
     OnChange = TreeViewChange
-    ExplicitHeight = 712
   end
   object CoolBar: TCoolBar
     Left = 0
@@ -115,7 +114,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
         Style = tbsSeparator
       end
       object ButtonAdd: TToolButton
-        Tag = 4001
+        Tag = 4000
         Left = 89
         Top = 0
         Caption = 'Hinzuf'#252'gen'
@@ -161,14 +160,13 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
     Left = 172
     Top = 24
     Width = 624
-    Height = 732
+    Height = 752
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 2
-    ExplicitHeight = 712
     object Splitter1: TSplitter
       Left = 0
-      Top = 549
+      Top = 569
       Width = 624
       Height = 3
       Cursor = crVSplit
@@ -181,7 +179,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
       Left = 0
       Top = 0
       Width = 624
-      Height = 549
+      Height = 569
       Align = alClient
       Columns = <>
       LargeImages = ListviewIconImageList
@@ -191,18 +189,17 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
       PopupMenu = PopupMenu
       ShowHint = True
       SmallImages = ListviewImageList
-      SortType = stText
       TabOrder = 0
       ViewStyle = vsReport
       OnAdvancedCustomDrawItem = ListViewAdvancedCustomDrawItem
+      OnColumnClick = ListViewColumnClick
       OnDblClick = ListViewDblClick
       OnInfoTip = ListViewInfoTip
       OnSelectItem = ListViewSelectItem
-      ExplicitHeight = 529
     end
     object ScreenshotListView: TListView
       Left = 0
-      Top = 552
+      Top = 572
       Width = 624
       Height = 180
       Align = alBottom
@@ -214,7 +211,6 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
       OnDblClick = ScreenshotListViewDblClick
       OnKeyDown = ScreenshotListViewKeyDown
       OnSelectItem = ScreenshotListViewSelectItem
-      ExplicitTop = 532
     end
   end
   object XPManifest: TXPManifest
@@ -1276,5 +1272,26 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
     Width = 32
     Left = 440
     Top = 48
+  end
+  object AddButtonPopupMenu: TPopupMenu
+    Left = 472
+    Top = 48
+    object AddButtonMenuAdd: TMenuItem
+      Tag = 4001
+      Caption = '&Hinzuf'#252'gen...'
+      ImageIndex = 3
+      ShortCut = 45
+      OnClick = MenuWork
+    end
+    object AddButtonMenuAddFromTemplate: TMenuItem
+      Caption = 'Hinzuf'#252'gen von &Vorlage'
+      OnClick = MenuWork
+    end
+    object AddButtonMenuAddWithWizard: TMenuItem
+      Tag = 4002
+      Caption = 'Hinzuf'#252'gen mit Assistent...'
+      ShortCut = 114
+      OnClick = MenuWork
+    end
   end
 end

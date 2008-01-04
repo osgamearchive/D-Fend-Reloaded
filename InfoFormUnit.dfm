@@ -62,10 +62,11 @@ object InfoForm: TInfoForm
       object HomepageLabel: TLabel
         Left = 16
         Top = 136
-        Width = 231
-        Height = 13
+        Width = 377
+        Height = 17
         Cursor = crHandPoint
-        Caption = 'http://sourceforge.net/projects/dfendreloaded/'
+        AutoSize = False
+        Caption = 'http://dfendreloaded.sourceforge.net/'
         Color = clBtnFace
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clNavy
@@ -77,9 +78,30 @@ object InfoForm: TInfoForm
         OnClick = HomepageLabelClick
       end
     end
+    object LanguageSheet: TTabSheet
+      Caption = 'LanguageSheet'
+      ImageIndex = 4
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
+      object LanguageAuthorsTab: TStringGrid
+        Left = 3
+        Top = 3
+        Width = 563
+        Height = 175
+        ColCount = 2
+        RowCount = 3
+        TabOrder = 0
+      end
+    end
     object LicenseSheet: TTabSheet
       Caption = 'LicenseSheet'
       ImageIndex = 1
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object LicenseMemo: TRichEdit
         Left = 0
         Top = 0
@@ -94,6 +116,10 @@ object InfoForm: TInfoForm
     object CompLicenseSheet: TTabSheet
       Caption = 'CompLicenseSheet'
       ImageIndex = 2
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object CompLicenseMemo: TRichEdit
         Left = 0
         Top = 0
@@ -108,6 +134,10 @@ object InfoForm: TInfoForm
     object ChangeLogTabSheet: TTabSheet
       Caption = 'ChangeLogTabSheet'
       ImageIndex = 3
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object ChangeLogMemo: TRichEdit
         Left = 0
         Top = 0

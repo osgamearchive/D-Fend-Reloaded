@@ -32,7 +32,8 @@ uses
   InfoFormUnit in 'InfoFormUnit.pas' {InfoForm},
   TransferFormUnit in 'TransferFormUnit.pas' {TransferForm},
   BuildInstallerFormUnit in 'BuildInstallerFormUnit.pas' {BuildInstallerForm},
-  ProgressFormUnit in 'ProgressFormUnit.pas' {ProgressForm};
+  ProgressFormUnit in 'ProgressFormUnit.pas' {ProgressForm},
+  ResHookUnit in 'ResHookUnit.pas';
 
 {$R *.res}
 

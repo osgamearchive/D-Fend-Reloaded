@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, ImgList, ComCtrls, ToolWin, Menus, GameDBUnit;
+  Dialogs, ImgList, ComCtrls, ToolWin, Menus, GameDBUnit, GameDBToolsUnit;
 
 type
   TTemplateForm = class(TForm)
@@ -42,9 +42,12 @@ type
     procedure FormDestroy(Sender: TObject);
     procedure ListViewSelectItem(Sender: TObject; Item: TListItem;
       Selected: Boolean);
+    procedure ListViewColumnClick(Sender: TObject; Column: TListColumn);
   private
     { Private-Deklarationen }
     TemplateDB : TGameDB;
+    ListSort : TSortListBy;
+    ListSortReverse : Boolean;
     Procedure LoadList;
     procedure SelectGame(const AGame: TGame);
   public
@@ -60,13 +63,16 @@ Function ShowTemplateDialog(const AOwner : TComponent; const AGameDB : TGameDB) 
 
 implementation
 
-uses VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgConsts, GameDBToolsUnit,
+uses VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgConsts,
      ProfileEditorFormUnit, PrgSetupUnit, TemplateSelectProfileFormUnit;
 
 {$R *.dfm}
 
 procedure TTemplateForm.FormCreate(Sender: TObject);
 begin
+  ListSort:=slbName;
+  ListSortReverse:=False;
+
   DoubleBuffered:=True;
   ToolBar.DoubleBuffered:=True;
   SetVistaFonts(self);
@@ -120,7 +126,7 @@ begin
   try
     If ListView.Selected<>nil then G:=TGame(ListView.Selected.Data) else G:=nil;
     ListView.Items.Clear;
-    AddGamesToList(ListView,ListViewImageList,ListViewIconImageList,ImageList,TemplateDB,RemoveUnderline(LanguageSetup.All),'','',True);
+    AddGamesToList(ListView,ListViewImageList,ListViewIconImageList,ImageList,TemplateDB,RemoveUnderline(LanguageSetup.All),'','',True,ListSort,ListSortReverse);
     SelectGame(G);
     If (ListView.Selected=nil) and (ListView.Items.Count>0) then ListView.Selected:=ListView.Items[0]; 
   finally
@@ -140,6 +146,12 @@ begin
   PopupUse.Enabled:=B;
   PopupEdit.Enabled:=B;
   PopupDel.Enabled:=B;
+end;
+
+procedure TTemplateForm.ListViewColumnClick(Sender: TObject; Column: TListColumn);
+begin
+  SetSortTypeByListViewCol(Column.Index,ListSort,ListSortReverse);
+  LoadList;
 end;
 
 procedure TTemplateForm.ListViewKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);

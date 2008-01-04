@@ -5,13 +5,18 @@ uses Classes, ComCtrls, Controls, GameDBUnit;
 
 { Load Data to GUI }
 
+Type TSortListBy=(slbName, slbSetup, slbGenre, slbDeveloper, slbPublisher, slbYear, slbLanguage);
+
 Procedure InitTreeViewForGamesList(const ATreeView : TTreeView; const GameDB : TGameDB);
 Procedure InitListViewForGamesList(const AListView : TListView; const ShowExtraInfo : Boolean);
 
 Procedure AddGameToList(const AListView : TListView; const AListViewImageList, AListViewIconImageList, AImageList : TImageList; const Game : TGame; const ShowExtraInfo : Boolean);
-Procedure AddGamesToList(const AListView : TListView; const AListViewImageList, AListViewIconImageList, AImageList : TImageList; const GameDB : TGameDB; const Group, SubGroup, SearchString : String; const ShowExtraInfo : Boolean);
+Procedure AddGamesToList(const AListView : TListView; const AListViewImageList, AListViewIconImageList, AImageList : TImageList; const GameDB : TGameDB; const Group, SubGroup, SearchString : String; const ShowExtraInfo : Boolean; const SortBy : TSortListBy; const ReverseOrder : Boolean);
 
 Procedure AddScreenshotsToList(const AListView : TListView; const AImageList : TImageList; Dir : String);
+
+Procedure GetColOrderAndVisible(var O,V : String);
+Procedure SetSortTypeByListViewCol(const ColumnIndex : Integer; var ListSort : TSortListBy; var ListSortReverse : Boolean);
 
 { Upgrade from D-Fend }
 
@@ -130,6 +135,41 @@ begin
   PrgSetup.ColOrder:=O;
 end;
 
+Procedure SetSortTypeByListViewCol(const ColumnIndex : Integer; var ListSort : TSortListBy; var ListSortReverse : Boolean);
+Procedure SetListSort(const L : TSortListBy);
+begin
+  If ListSort=L then ListSortReverse:=not ListSortReverse else begin ListSort:=L; ListSortReverse:=False; end;
+end;
+Var O,V : String;
+    I,Nr,C : Integer;
+begin
+  GetColOrderAndVisible(O,V);
+
+  If ColumnIndex=0 then SetListSort(slbName) else begin
+    If not PrgSetup.ShowExtraInfo then SetListSort(slbSetup) else begin
+      C:=0;
+      For I:=0 to 5 do begin
+        try Nr:=StrToInt(O[I+1]); except Nr:=-1; end;
+        If (Nr<1) or (Nr>6) then continue;
+        If V[Nr]='0' then continue;
+        inc(C);
+        If C=ColumnIndex then begin
+          Case Nr-1 of
+            0 : SetListSort(slbSetup);
+            1 : SetListSort(slbGenre);
+            2 : SetListSort(slbDeveloper);
+            3 : SetListSort(slbPublisher);
+            4 : SetListSort(slbYear);
+            5 : SetListSort(slbLanguage);
+          end;
+          break;
+        end;
+      end;
+    end;
+  end;
+end;
+
+
 Procedure InitListViewForGamesList(const AListView : TListView; const ShowExtraInfo : Boolean);
 Var C : TListColumn;
     I,Nr : Integer;
@@ -235,55 +275,84 @@ begin
   end;
 end;
 
-Procedure AddGamesToList(const AListView : TListView; const AListViewImageList, AListViewIconImageList, AImageList : TImageList; const GameDB : TGameDB; const Group, SubGroup, SearchString : String; const ShowExtraInfo : Boolean);
+Procedure AddGamesToList(const AListView : TListView; const AListViewImageList, AListViewIconImageList, AImageList : TImageList; const GameDB : TGameDB; const Group, SubGroup, SearchString : String; const ShowExtraInfo : Boolean; const SortBy : TSortListBy; const ReverseOrder : Boolean);
 Var I,Nr : Integer;
     SubGroupUpper, SearchStringUpper : String;
     B : Boolean;
     C : Array of Integer;
+    List : TList;
+    St : TStringList;
 begin
+  {Prepare ListView}
   AListViewImageList.Clear;
   AListViewImageList.AddImage(AImageList,0);
   AListViewIconImageList.Clear;
   AListViewIconImageList.AddImage(AImageList,0);
-
   SetLength(C,AListView.Columns.Count);
   For I:=0 to length(C)-1 do begin C[I]:=AListView.Columns[I].Width; AListView.Columns[I].Width:=1; end;
-  try
-    SearchStringUpper:=ExtUpperCase(Trim(SearchString));
 
+  List:=TList.Create;
+  try
+    {Select game to add}
+    SearchStringUpper:=ExtUpperCase(Trim(SearchString));
     If SubGroup='' then begin
       B:=(Group=LanguageSetup.GameFavorites);
       for I:=0 to GameDB.Count-1 do begin
         If B and (not GameDB[I].Favorite) then continue;
         If (SearchStringUpper<>'') and (Pos(SearchStringUpper,ExtUpperCase(GameDB[I].Name))=0) then continue;
-        AddGameToList(AListView,AListViewImageList,AListViewIconImageList,AImageList,GameDB[I],ShowExtraInfo);
+        List.Add(GameDB[I]);
       end;
-      exit;
+    end else begin
+      If SubGroup=LanguageSetup.NotSet then SubGroupUpper:='' else SubGroupUpper:=ExtUpperCase(SubGroup);
+      Nr:=0;
+      If Group=LanguageSetup.GameGenre then Nr:=0;
+      If Group=LanguageSetup.GameDeveloper then Nr:=1;
+      If Group=LanguageSetup.GamePublisher then Nr:=2;
+      If Group=LanguageSetup.GameYear then Nr:=3;
+      If Group=LanguageSetup.GameLanguage then Nr:=4;
+
+      For I:=0 to GameDB.Count-1 do begin
+        B:=False;
+        Case Nr of
+          0 : B:=(ExtUpperCase(GameDB[I].CacheGenre)=SubGroupUpper);
+          1 : B:=(ExtUpperCase(GameDB[I].CacheDeveloper)=SubGroupUpper);
+          2 : B:=(ExtUpperCase(GameDB[I].CachePublisher)=SubGroupUpper);
+          3 : B:=(ExtUpperCase(GameDB[I].CacheYear)=SubGroupUpper);
+          4 : B:=(ExtUpperCase(GameDB[I].CacheLanguage)=SubGroupUpper);
+        end;
+        If not B then continue;
+        If (SearchStringUpper<>'') and (Pos(SearchStringUpper,ExtUpperCase(GameDB[I].CacheName))=0) then continue;
+        List.Add(GameDB[I]);
+      end;
     end;
 
-    If SubGroup=LanguageSetup.NotSet then SubGroupUpper:='' else SubGroupUpper:=ExtUpperCase(SubGroup);
+    {Sort games}
+    St:=TStringList.Create;
+    try
+      For I:=0 to List.Count-1 do Case SortBy of
+        slbName : St.AddObject(TGame(List[I]).Name,TGame(List[I]));
+        slbSetup : If Trim(TGame(List[I]).SetupExe)<>''
+                     then St.AddObject(RemoveUnderline(LanguageSetup.Yes),TGame(List[I]))
+                     else St.AddObject(RemoveUnderline(LanguageSetup.No),TGame(List[I]));
+        slbGenre : St.AddObject(TGame(List[I]).Genre,TGame(List[I]));
+        slbDeveloper : St.AddObject(TGame(List[I]).Developer,TGame(List[I]));
+        slbPublisher : St.AddObject(TGame(List[I]).Publisher,TGame(List[I]));
+        slbYear : St.AddObject(TGame(List[I]).Year,TGame(List[I]));
+        slbLanguage : St.AddObject(TGame(List[I]).Language,TGame(List[I]));
+      End;
+      St.Sort;
 
-    Nr:=0;
-    If Group=LanguageSetup.GameGenre then Nr:=0;
-    If Group=LanguageSetup.GameDeveloper then Nr:=1;
-    If Group=LanguageSetup.GamePublisher then Nr:=2;
-    If Group=LanguageSetup.GameYear then Nr:=3;
-    If Group=LanguageSetup.GameLanguage then Nr:=4;
-
-    For I:=0 to GameDB.Count-1 do begin
-      B:=False;
-      Case Nr of
-        0 : B:=(ExtUpperCase(GameDB[I].CacheGenre)=SubGroupUpper);
-        1 : B:=(ExtUpperCase(GameDB[I].CacheDeveloper)=SubGroupUpper);
-        2 : B:=(ExtUpperCase(GameDB[I].CachePublisher)=SubGroupUpper);
-        3 : B:=(ExtUpperCase(GameDB[I].CacheYear)=SubGroupUpper);
-        4 : B:=(ExtUpperCase(GameDB[I].CacheLanguage)=SubGroupUpper);
+      {Add games to List}
+      If ReverseOrder then begin
+        For I:=St.Count-1 downto 0 do AddGameToList(AListView,AListViewImageList,AListViewIconImageList,AImageList,TGame(St.Objects[I]),ShowExtraInfo);
+      end else begin
+        For I:=0 to St.Count-1 do AddGameToList(AListView,AListViewImageList,AListViewIconImageList,AImageList,TGame(St.Objects[I]),ShowExtraInfo);
       end;
-      If not B then continue;
-      If (SearchStringUpper<>'') and (Pos(SearchStringUpper,ExtUpperCase(GameDB[I].CacheName))=0) then continue;
-      AddGameToList(AListView,AListViewImageList,AListViewIconImageList,AImageList,GameDB[I],ShowExtraInfo);
+    finally
+      St.Free;
     end;
   finally
+    List.Free;
     For I:=0 to length(C)-1 do AListView.Columns[I].Width:=C[I];
   end;
 end;

@@ -65,6 +65,10 @@ type
     SDLVideodriverLabel: TLabel;
     SDLVideoDriverComboBox: TComboBox;
     SDLVideodriverInfoLabel: TLabel;
+    AddButtonFunctionLabel: TLabel;
+    AddButtonFunctionComboBox: TComboBox;
+    StartWithWindowsCheckBox: TCheckBox;
+    StartMinimizedCheckBox: TCheckBox;
     procedure OKButtonClick(Sender: TObject);
     procedure ButtonWork(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -127,6 +131,7 @@ begin
 end;
 
 procedure TSetupForm.InitGUI;
+Var I : Integer;
 begin
   Caption:=LanguageSetup.SetupForm;
   GeneralSheet.Caption:=LanguageSetup.SetupFormGeneralSheet;
@@ -148,6 +153,15 @@ begin
   ReopenLastActiveProfileSheetCheckBox.Caption:=LanguageSetup.SetupFormReopenLastActiveProfileSheet;
   RestoreWindowSizeCheckBox.Caption:=LanguageSetup.SetupFormRestoreWindowSize;
   MinimizeToTrayCheckBox.Caption:=LanguageSetup.SetupFormMinimizeToTray;
+  StartWithWindowsCheckBox.Caption:=LanguageSetup.SetupFormStartWithWindows;
+  StartMinimizedCheckBox.Caption:=LanguageSetup.SetupFormStartMinimized;
+
+  AddButtonFunctionLabel.Caption:=LanguageSetup.SetupFormAddButtonFunctionLabel;
+  I:=AddButtonFunctionComboBox.ItemIndex;
+  AddButtonFunctionComboBox.Items[0]:=LanguageSetup.SetupFormAddButtonFunctionAdd;
+  AddButtonFunctionComboBox.Items[1]:=LanguageSetup.SetupFormAddButtonFunctionWizard;
+  AddButtonFunctionComboBox.Items[2]:=LanguageSetup.SetupFormAddButtonFunctionMenu;
+  AddButtonFunctionComboBox.ItemIndex:=I;
 
   LanguageLabel.Caption:=LanguageSetup.SetupFormLanguage;
   DosBoxLangLabel.Caption:=LanguageSetup.SetupFormDosBoxLang;
@@ -176,6 +190,8 @@ begin
   DefaultValueSpeedButton.Hint:=LanguageSetup.SetupFormDefaultValueReset;
   PopupThisValue.Caption:=LanguageSetup.SetupFormDefaultValueResetThis;
   PopupAllValues.Caption:=LanguageSetup.SetupFormDefaultValueResetAll;
+  I:=DefaultValueComboBox.ItemIndex;
+  DefaultValueComboBox.Items.Clear;
   DefaultValueComboBox.Items.AddObject(LanguageSetup.GameResolution,ValueToList(GameDB.ConfOpt.Resolution,';,'));
   DefaultValueComboBox.Items.AddObject(LanguageSetup.GameJoysticks,ValueToList(GameDB.ConfOpt.Joysticks,';,'));
   DefaultValueComboBox.Items.AddObject(LanguageSetup.GameScale,ValueToList(GameDB.ConfOpt.Scale,';,'));
@@ -188,6 +204,7 @@ begin
   DefaultValueComboBox.Items.AddObject(LanguageSetup.GameSblaster,ValueToList(GameDB.ConfOpt.Sblaster,';,'));
   DefaultValueComboBox.Items.AddObject(LanguageSetup.GameOplmode,ValueToList(GameDB.ConfOpt.Oplmode,';,'));
   DefaultValueComboBox.Items.AddObject(LanguageSetup.GameKeyboardLayout,ValueToList(GameDB.ConfOpt.KeyboardLayout,';,'));
+  DefaultValueComboBox.ItemIndex:=I;
 
   Service1Button.Caption:=LanguageSetup.SetupFormService1;
   Service2Button.Caption:=LanguageSetup.SetupFormService2;
@@ -215,6 +232,9 @@ begin
     ReopenLastActiveProfileSheetCheckBox.Checked:=PrgSetup.ReopenLastProfileEditorTab;
     RestoreWindowSizeCheckBox.Checked:=PrgSetup.RestoreWindowSize;
     MinimizeToTrayCheckBox.Checked:=PrgSetup.MinimizeToTray;
+    StartWithWindowsCheckBox.Checked:=PrgSetup.StartWithWindows;
+    StartMinimizedCheckBox.Checked:=PrgSetup.StartMinimized;
+    AddButtonFunctionComboBox.ItemIndex:=Min(2,Max(0,PrgSetup.AddButtonFunction));
 
     GetColOrderAndVisible(S,T);
     For I:=0 to 5 do begin
@@ -290,12 +310,17 @@ procedure TSetupForm.OKButtonClick(Sender: TObject);
 Var I : Integer;
     S : String;
 begin
+  SetStartWithWindows(PrgSetup.StartWithWindows);
+
   PrgSetup.BaseDir:=IncludeTrailingPathDelimiter(BaseDirEdit.Text);
   PrgSetup.GameDir:=IncludeTrailingPathDelimiter(GameDirEdit.Text);
   PrgSetup.DataDir:=IncludeTrailingPathDelimiter(DataDirEdit.Text);
   PrgSetup.ReopenLastProfileEditorTab:=ReopenLastActiveProfileSheetCheckBox.Checked;
   PrgSetup.RestoreWindowSize:=RestoreWindowSizeCheckBox.Checked;
   PrgSetup.MinimizeToTray:=MinimizeToTrayCheckBox.Checked;
+  PrgSetup.StartWithWindows:=StartWithWindowsCheckBox.Checked;
+  PrgSetup.StartMinimized:=StartMinimizedCheckBox.Checked;
+  PrgSetup.AddButtonFunction:=AddButtonFunctionComboBox.ItemIndex;
 
   PrgSetup.Language:=LanguageComboBox.Text+'.ini';
 

@@ -3,7 +3,7 @@ object SetupForm: TSetupForm
   Top = 0
   BorderStyle = bsDialog
   Caption = 'SetupForm'
-  ClientHeight = 345
+  ClientHeight = 431
   ClientWidth = 457
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -20,7 +20,7 @@ object SetupForm: TSetupForm
   TextHeight = 13
   object OKButton: TBitBtn
     Left = 8
-    Top = 311
+    Top = 398
     Width = 97
     Height = 25
     TabOrder = 1
@@ -29,7 +29,7 @@ object SetupForm: TSetupForm
   end
   object CancelButton: TBitBtn
     Left = 120
-    Top = 311
+    Top = 398
     Width = 97
     Height = 25
     TabOrder = 2
@@ -39,7 +39,7 @@ object SetupForm: TSetupForm
     Left = -1
     Top = 0
     Width = 459
-    Height = 305
+    Height = 392
     ActivePage = GeneralSheet
     TabOrder = 0
     object GeneralSheet: TTabSheet
@@ -115,6 +115,13 @@ object SetupForm: TSetupForm
         ShowHint = True
         OnClick = ButtonWork
       end
+      object AddButtonFunctionLabel: TLabel
+        Left = 16
+        Top = 337
+        Width = 183
+        Height = 13
+        Caption = 'Funktion der Hinzuf'#252'gen-Schaltfl'#228'che:'
+      end
       object BaseDirEdit: TLabeledEdit
         Left = 16
         Top = 24
@@ -168,6 +175,37 @@ object SetupForm: TSetupForm
         EditLabel.Height = 13
         EditLabel.Caption = 'DataDirEdit'
         TabOrder = 2
+      end
+      object AddButtonFunctionComboBox: TComboBox
+        Left = 259
+        Top = 333
+        Width = 179
+        Height = 21
+        Style = csDropDownList
+        ItemHeight = 13
+        ItemIndex = 2
+        TabOrder = 8
+        Text = 'Auswahlmen'#252
+        Items.Strings = (
+          'Hinzuf'#252'gen-Dialog'
+          'Assistent'
+          'Auswahlmen'#252)
+      end
+      object StartWithWindowsCheckBox: TCheckBox
+        Left = 16
+        Top = 272
+        Width = 422
+        Height = 17
+        Caption = 'Mit Windows starten'
+        TabOrder = 6
+      end
+      object StartMinimizedCheckBox: TCheckBox
+        Left = 16
+        Top = 304
+        Width = 422
+        Height = 17
+        Caption = 'Beim Starten minimieren'
+        TabOrder = 7
       end
     end
     object LanguageSheet: TTabSheet
@@ -536,7 +574,7 @@ object SetupForm: TSetupForm
         Left = 11
         Top = 44
         Width = 260
-        Height = 221
+        Height = 309
         PlainText = True
         ScrollBars = ssVertical
         TabOrder = 1

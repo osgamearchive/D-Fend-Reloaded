@@ -5,16 +5,16 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, XPMan, StdCtrls, ComCtrls, ExtCtrls, ToolWin, ImgList, Menus,
-  AppEvnts, GameDBUnit;
+  AppEvnts, GameDBUnit, GameDBToolsUnit;
 
 {
 0.2:
 - Game library for autocreate profiles
 - Alternative profile dialog
 - Dialog for changing multiple profiles at once (genre, year, ...)
-- Start at Windows boot
-- Start minimized
+- Ziped profiles
 - More options for serial port
+- XML-Support
 }
 
 type
@@ -136,6 +136,10 @@ type
     MenuRunRunDosBoxKeyMapper: TMenuItem;
     MenuHelpDemoCompatibility: TMenuItem;
     MenuProfileAddFromTemplate: TMenuItem;
+    AddButtonPopupMenu: TPopupMenu;
+    AddButtonMenuAdd: TMenuItem;
+    AddButtonMenuAddFromTemplate: TMenuItem;
+    AddButtonMenuAddWithWizard: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure TreeViewChange(Sender: TObject; Node: TTreeNode);
@@ -161,9 +165,13 @@ type
     procedure ListViewInfoTip(Sender: TObject; Item: TListItem;
       var InfoTip: string);
     procedure ApplicationEventsIdle(Sender: TObject; var Done: Boolean);
+    procedure ListViewColumnClick(Sender: TObject; Column: TListColumn);
   private
     { Private-Deklarationen }
     hChangeNotification : THandle;
+    JustStarted : Boolean;
+    ListSort : TSortListBy;
+    ListSortReverse : Boolean;
     Procedure StartCaptureChangeNotify;
     Procedure StopCaptureChangeNotify;
     Procedure LoadMenuLanguage;
@@ -174,6 +182,7 @@ type
     Procedure UpdateScreenshotList;
     Procedure UpdateAddFromTemplateMenu;
     Procedure AddFromTemplateClick(Sender: TObject);
+    Procedure PostShow(var Msg : TMessage); Message WM_USER+1;
   public
     { Public-Deklarationen }
     GameDB : TGameDB;
@@ -185,17 +194,22 @@ var
 implementation
 
 uses ShellAPI, ClipBrd, Math, PNGImage, CommonTools, LanguageSetupUnit,
-     PrgConsts, GameDBToolsUnit, VistaToolsUnit, PrgSetupUnit,
-     SetupDosBoxFormUnit, ProfileEditorFormUnit, SetupFormUnit,
-     IconManagerFormUnit, DosBoxUnit, HistoryFormUnit, TemplateFormUnit,
-     UninstallFormUnit, ViewImageFormUnit, UninstallSelectFormUnit,
-     CreateConfFormUnit, WizardFormUnit, CreateShortcutFormUnit,
-     CreateImageUnit, InfoFormUnit, TransferFormUnit, BuildInstallerFormUnit;
+     PrgConsts, VistaToolsUnit, PrgSetupUnit, SetupDosBoxFormUnit,
+     ProfileEditorFormUnit, SetupFormUnit, IconManagerFormUnit, DosBoxUnit,
+     HistoryFormUnit, TemplateFormUnit, UninstallFormUnit, ViewImageFormUnit,
+     UninstallSelectFormUnit, CreateConfFormUnit, WizardFormUnit,
+     CreateShortcutFormUnit, CreateImageUnit, InfoFormUnit, TransferFormUnit,
+     BuildInstallerFormUnit, ResHookUnit;
 
 {$R *.dfm}
 
 procedure TDFendReloadedMainForm.FormCreate(Sender: TObject);
 begin
+  JustStarted:=True;
+
+  ListSort:=slbName;
+  ListSortReverse:=False;
+
   try ForceDirectories(PrgDataDir+CaptureSubDir); except end;
   StartCaptureChangeNotify;
 
@@ -209,6 +223,9 @@ end;
 procedure TDFendReloadedMainForm.FormShow(Sender: TObject);
 Var G : TGame;
 begin
+  If not JustStarted then exit;
+  JustStarted:=False;
+
   SearchDosBox(self);
   LoadHelpLinks;
   if not TreeView.Visible then TreeViewChange(Sender,TreeView.Selected);
@@ -231,6 +248,8 @@ begin
       ListView.Items.EndUpdate;
     end;
   end;
+
+  PostMessage(Handle,WM_USER+1,0,0);
 end;
 
 procedure TDFendReloadedMainForm.FormDestroy(Sender: TObject);
@@ -306,6 +325,10 @@ begin
   MenuHelpAbandonware.Caption:=LanguageSetup.MenuHelpAbandonware;
   MenuHelpAbout.Caption:=LanguageSetup.MenuHelpAbout;
 
+  AddButtonMenuAdd.Caption:=LanguageSetup.MenuProfileAdd;
+  AddButtonMenuAddFromTemplate.Caption:=LanguageSetup.MenuProfileAddFromTemplate;
+  AddButtonMenuAddWithWizard.Caption:=LanguageSetup.MenuProfileAddWithWizard;
+
   ButtonRun.Caption:=LanguageSetup.ButtonRun;
   ButtonAdd.Caption:=LanguageSetup.ButtonAdd;
   ButtonEdit.Caption:=LanguageSetup.ButtonEdit;
@@ -316,6 +339,7 @@ begin
   PopupEdit.Caption:=LanguageSetup.PopupEdit;
   PopupCopy.Caption:=LanguageSetup.PopupCopy;
   PopupDelete.Caption:=LanguageSetup.PopupDelete;
+  PopupDeinstall.Caption:=LanguageSetup.PopupDeinstall;
   PopupOpenFolder.Caption:=LanguageSetup.PopupOpenFolder;
   PopupOpenDataFolder.Caption:=LanguageSetup.PopupOpenDataFolder;
   PopupWWW.Caption:=LanguageSetup.GameWWW;
@@ -324,11 +348,47 @@ begin
 
   ScreenshotPopupOpen.Caption:=LanguageSetup.ScreenshotPopupOpen;
   ScreenshotPopupRefresh.Caption:=LanguageSetup.ScreenshotPopupRefresh;
+  ScreenshotPopupCopy.Caption:=LanguageSetup.ScreenshotPopupCopy;
+  ScreenshotPopupSave.Caption:=LanguageSetup.ScreenshotPopupSave;
   ScreenshotPopupDelete.Caption:=LanguageSetup.ScreenshotPopupDelete;
   ScreenshotPopupDeleteAll.Caption:=LanguageSetup.ScreenshotPopupDeleteAll;
 
   ScreenshotImageList.Height:=Max(20,Min(500,PrgSetup.ScreenshotPreviewSize));
   ScreenshotImageList.Width:=ScreenshotImageList.Height*16 div 10;
+
+  MenuKeyCaps[mkcBkSp]:=LanguageSetup.KeyBackspace;
+  MenuKeyCaps[mkcTab]:=LanguageSetup.KeyTab;
+  MenuKeyCaps[mkcEsc]:=LanguageSetup.KeyEscape;
+  MenuKeyCaps[mkcEnter]:=LanguageSetup.KeyEnter;
+  MenuKeyCaps[mkcSpace]:=LanguageSetup.KeySpace;
+  MenuKeyCaps[mkcPgUp]:=LanguageSetup.KeyPageUp;
+  MenuKeyCaps[mkcPgDn]:=LanguageSetup.KeyPageDown;
+  MenuKeyCaps[mkcEnd]:=LanguageSetup.KeyEnd;
+  MenuKeyCaps[mkcHome]:=LanguageSetup.KeyHome;
+  MenuKeyCaps[mkcLeft]:=LanguageSetup.KeyLeft;
+  MenuKeyCaps[mkcUp]:=LanguageSetup.KeyUp;
+  MenuKeyCaps[mkcRight]:=LanguageSetup.KeyRight;
+  MenuKeyCaps[mkcDown]:=LanguageSetup.KeyDown;
+  MenuKeyCaps[mkcIns]:=LanguageSetup.KeyInsert;
+  MenuKeyCaps[mkcDel]:=LanguageSetup.KeyDelete;
+  MenuKeyCaps[mkcShift]:=LanguageSetup.KeyShift;
+  MenuKeyCaps[mkcCtrl]:=LanguageSetup.KeyCtrl;
+  MenuKeyCaps[mkcAlt]:=LanguageSetup.KeyAlt;
+
+  MsgDlgWarning:=LanguageSetup.MsgDlgWarning;
+  MsgDlgError:=LanguageSetup.MsgDlgError;
+  MsgDlgInformation:=LanguageSetup.MsgDlgInformation;
+  MsgDlgConfirm:=LanguageSetup.MsgDlgConfirm;
+  MsgDlgYes:=LanguageSetup.MsgDlgYes;
+  MsgDlgNo:=LanguageSetup.MsgDlgNo;
+  MsgDlgOK:=LanguageSetup.MsgDlgOK;
+  MsgDlgCancel:=LanguageSetup.MsgDlgCancel;
+  MsgDlgAbort:=LanguageSetup.MsgDlgAbort;
+  MsgDlgRetry:=LanguageSetup.MsgDlgRetry;
+  MsgDlgIgnore:=LanguageSetup.MsgDlgIgnore;
+  MsgDlgAll:=LanguageSetup.MsgDlgAll;
+  MsgDlgNoToAll:=LanguageSetup.MsgDlgNoToAll;
+  MsgDlgYesToAll:=LanguageSetup.MsgDlgYesToAll;
 end;
 
 procedure TDFendReloadedMainForm.InitGUI;
@@ -437,6 +497,11 @@ begin
   end;
 end;
 
+procedure TDFendReloadedMainForm.PostShow(var Msg: TMessage);
+begin
+  If PrgSetup.StartMinimized then Application.Minimize;
+end;
+
 procedure TDFendReloadedMainForm.ProcessParams;
 Var I : Integer;
     S,T : String;
@@ -501,11 +566,11 @@ begin
     If SearchEdit.Font.Color<>clGray then S:=SearchEdit.Text else S:='';
 
     If TreeView.Selected=nil then begin
-      AddGamesToList(ListView,ListviewImageList,ListviewIconImageList,ImageList,GameDB,RemoveUnderline(LanguageSetup.All),'',S,PrgSetup.ShowExtraInfo);
+      AddGamesToList(ListView,ListviewImageList,ListviewIconImageList,ImageList,GameDB,RemoveUnderline(LanguageSetup.All),'',S,PrgSetup.ShowExtraInfo,ListSort,ListSortReverse);
     end else begin
       If TreeView.Selected.Parent=nil
-        then AddGamesToList(ListView,ListviewImageList,ListviewIconImageList,ImageList,GameDB,TreeView.Selected.Text,'',S,PrgSetup.ShowExtraInfo)
-        else AddGamesToList(ListView,ListviewImageList,ListviewIconImageList,ImageList,GameDB,TreeView.Selected.Parent.Text,TreeView.Selected.Text,S,PrgSetup.ShowExtraInfo);
+        then AddGamesToList(ListView,ListviewImageList,ListviewIconImageList,ImageList,GameDB,TreeView.Selected.Text,'',S,PrgSetup.ShowExtraInfo,ListSort,ListSortReverse)
+        else AddGamesToList(ListView,ListviewImageList,ListviewIconImageList,ImageList,GameDB,TreeView.Selected.Parent.Text,TreeView.Selected.Text,S,PrgSetup.ShowExtraInfo,ListSort,ListSortReverse);
     end;
     If G<>nil then SelectGame(G);
   finally
@@ -517,6 +582,12 @@ procedure TDFendReloadedMainForm.ListViewAdvancedCustomDrawItem(Sender: TCustomL
 begin
   DefaultDraw:=True;
   If (Item<>nil) and (Item.Data<>nil) and TGame(Item.Data).Favorite then TListview(Sender).Canvas.Font.Style:=[fsBold] else TListview(Sender).Canvas.Font.Style:=[];
+end;
+
+procedure TDFendReloadedMainForm.ListViewColumnClick(Sender: TObject; Column: TListColumn);
+begin
+  SetSortTypeByListViewCol(Column.Index,ListSort,ListSortReverse);
+  TreeViewChange(Sender,TreeView.Selected);
 end;
 
 procedure TDFendReloadedMainForm.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -612,16 +683,24 @@ Var TemplateDB : TGameDB;
     M : TMenuItem;
 begin
   while MenuProfileAddFromTemplate.Count>0 do MenuProfileAddFromTemplate.Items[0].Free;
+  while AddButtonMenuAddFromTemplate.Count>0 do AddButtonMenuAddFromTemplate.Items[0].Free;
 
   TemplateDB:=TGameDB.Create(PrgDataDir+TemplateSubDir);
   try
     MenuProfileAddFromTemplate.Visible:=(TemplateDB.Count>0);
+    AddButtonMenuAddFromTemplate.Visible:=(TemplateDB.Count>0);
     For I:=0 to TemplateDB.Count-1 do begin
       M:=TMenuItem.Create(MenuProfileAddFromTemplate);
       M.Caption:=TemplateDB[I].Name;
       M.Tag:=I;
       M.OnClick:=AddFromTemplateClick;
       MenuProfileAddFromTemplate.Add(M);
+
+      M:=TMenuItem.Create(AddButtonMenuAddFromTemplate);
+      M.Caption:=TemplateDB[I].Name;
+      M.Tag:=I;
+      M.OnClick:=AddFromTemplateClick;
+      AddButtonMenuAddFromTemplate.Add(M);
     end;
   finally
     TemplateDB.Free;
@@ -633,6 +712,7 @@ Var G,DefaultGame : TGame;
     S : String;
     L : TList;
     I : Integer;
+    P : TPoint;
 begin
   Case (Sender as TComponent).Tag of
     {File}
@@ -758,6 +838,14 @@ begin
              then ShellExecute(Handle,'open','notepad.exe',PChar(IncludeTrailingPathDelimiter(PrgSetup.DosBoxDir)+DosBoxConfFileName),PChar(IncludeTrailingPathDelimiter(PrgSetup.DosBoxDir)),SW_SHOW)
              else MessageDlg(Format(LanguageSetup.MessageCouldNotFindFile,[IncludeTrailingPathDelimiter(PrgSetup.DosBoxDir)+DosBoxConfFileName]),mtError,[mbOK],0);
     {Profile}
+    4000 : Case PrgSetup.AddButtonFunction of
+             0 : MenuWork(MenuProfileAdd);
+             1 : MenuWork(MenuProfileAddWithWizard);
+             2 : begin
+                   P:=ButtonAdd.Parent.ClientToScreen(Point(ButtonAdd.Left,ButtonAdd.Top));
+                   AddButtonPopupMenu.Popup(P.X+5,P.Y+5);
+                 end;
+           end;
     4001 : begin
              G:=nil;
              DefaultGame:=TGame.Create(PrgSetup);

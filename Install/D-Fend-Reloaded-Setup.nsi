@@ -16,7 +16,7 @@
 
 !define VER_MAYOR 0
 !define VER_MINOR1 1
-!define VER_MINOR2 1
+!define VER_MINOR2 2
 
 !define PrgName "D-Fend Reloaded ${VER_MAYOR}.${VER_MINOR1}.${VER_MINOR2}"
 OutFile "D-Fend-Reloaded-${VER_MAYOR}.${VER_MINOR1}.${VER_MINOR2}-Setup.exe"
