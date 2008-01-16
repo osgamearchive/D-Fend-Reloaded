@@ -32,6 +32,7 @@ Type TPrgSetup=class(TBasePrgSetup)
     property ColVisible : String index 8 read GetString write SetString;
     property ListViewStyle : String index 9 read GetString write SetString;
     property SDLVideodriver : String index 10 read GetString write SetString;
+    property PathToFREEDOS : String index 11 read GetString write SetString;
 
     property AskBeforeDelete : Boolean index 0 read GetBoolean write SetBoolean;
     property ReopenLastProfileEditorTab : Boolean index 1 read GetBoolean write SetBoolean;
@@ -47,6 +48,7 @@ Type TPrgSetup=class(TBasePrgSetup)
     property ShowExtraInfo : Boolean index 11 read GetBoolean write SetBoolean;
     property StartWithWindows : Boolean index 12 read GetBoolean write SetBoolean;
     property StartMinimized : Boolean index 13 read GetBoolean write SetBoolean;
+    property ShowTooltips : Boolean index 14 read GetBoolean write SetBoolean;
 
     property MainLeft : Integer index 0 read GetInteger write SetInteger;
     property MainTop : Integer index 1 read GetInteger write SetInteger;
@@ -86,6 +88,7 @@ begin
   AddStringRec(8,'ProgramSets','ColVisible','111111');
   AddStringRec(9,'ProgramSets','ILVS','List');
   AddStringRec(10,'ProgramSets','SDLVideodriver','DirectX');
+  AddStringRec(11,'ProgramSets','PathToFREEDOS','.\VirtualHD\FREEDOS\');
 
   AddBooleanRec(0,'ProgramSets','AskBeforeDelete',True);
   AddBooleanRec(1,'ProgramSets','ShowLastTab',False);
@@ -101,6 +104,7 @@ begin
   AddBooleanRec(11,'ProgramSets','ShowExtrainfo',True);
   AddBooleanRec(12,'ProgramSets','StartWithWindows',False);
   AddBooleanRec(13,'ProgramSets','StartMinimized',False);
+  AddBooleanRec(14,'ProgramSets','TooltipsInGamesList',True);
 
   AddIntegerRec(0,'ProgramSets','MainLeft',-1);
   AddIntegerRec(1,'ProgramSets','MainTop',-1);

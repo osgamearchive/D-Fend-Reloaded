@@ -33,7 +33,10 @@ uses
   TransferFormUnit in 'TransferFormUnit.pas' {TransferForm},
   BuildInstallerFormUnit in 'BuildInstallerFormUnit.pas' {BuildInstallerForm},
   ProgressFormUnit in 'ProgressFormUnit.pas' {ProgressForm},
-  ResHookUnit in 'ResHookUnit.pas';
+  ResHookUnit in 'ResHookUnit.pas',
+  SerialEditFormUnit in 'SerialEditFormUnit.pas' {SerialEditForm},
+  ChangeProfilesFormUnit in 'ChangeProfilesFormUnit.pas' {ChangeProfilesForm},
+  BuildInstallerForSingleGameFormUnit in 'BuildInstallerForSingleGameFormUnit.pas' {BuildInstallerForSingleGameForm};
 
 {$R *.res}
 

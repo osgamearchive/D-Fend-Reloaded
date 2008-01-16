@@ -19,7 +19,6 @@ Type TConfOpt=class(TBasePrgSetup)
     property Sblaster : String index 9 read GetString write SetString;
     property Oplmode : String index 10 read GetString write SetString;
     property KeyboardLayout : String index 11 read GetString write SetString;
-    property Serial : String index 12 read GetString write SetString;
 end;
 
 const NR_Name=1;
@@ -76,6 +75,8 @@ const NR_Name=1;
       NR_IPXType=417;
       NR_IPXAddress=418;
       NR_IPXPort=419;
+      NR_Use4DOS=420;
+      NR_UseDOS32A=421;
 
       NR_NrOfMounts=501;
       NR_Mount0=502;
@@ -204,6 +205,8 @@ Type TGame=class(TBasePrgSetup)
     property IPXType : String index NR_IPXType read GetString write SetString;
     property IPXAddress : String index NR_IPXAddress read GetString write SetString;
     property IPXPort : String index NR_IPXPort read GetString write SetString;
+    property Use4DOS : Boolean index NR_Use4DOS read GetBoolean write SetBoolean;
+    property UseDOS32A : Boolean index NR_UseDOS32A read GetBoolean write SetBoolean;
 
     property NrOfMounts : Integer index NR_NrOfMounts read GetInteger write SetInteger;
     property Mount0 : String index NR_Mount0 read GetString write SetString;
@@ -307,7 +310,7 @@ begin
   inherited Create(PrgDataDir+ConfOptFile);
 
   AddStringRec(0,'resolution','value','original,320x200,640x432,640x480,720x480,800x600,1024x768,1152x864,1280x720,1280x768,1280x860,1280x1024,1600x1200,1920x1080,1920x1200');
-  AddStringRec(1,'joysticks','value','none,2axis,4axis,fcs,ch');
+  AddStringRec(1,'joysticks','value','none,auto,2axis,4axis,fcs,ch');
   AddStringRec(2,
     'scale','value','No Scaling (none),Nearest neighbor upscaling with factor 2 (normal2x),Nearest neighbor upscaling with factor 3 (normal3x),'+
     'Advanced upscaling with factor 2 (advmame2x),Advanced upscaling with factor 3 (advmame3x),Advanced interpoling with factor 2 (advinterp2x),Advanced interpoling with factor 3 (advinterp3x),'+
@@ -332,7 +335,6 @@ begin
     'Serbia & Montenegro (YC),Serbia & Montenegro (SR),Slovakia (SK),Slovenia (YU),Slovenia (SI),South Africa (US),Spain (SP),'+
     'Spain (ES),Sweden (SV),Switzerland - French (SF),Switzerland - German (SG),Switzerland - German (SD),Tadjikistan (TJ),'+
     'Turkmenistan (TM),Turkey (TR),UK (UK),Ukraine (UR),Ukraine (UA),US (US),Uzbekistan (UZ),Venezuela (LA),Vietnam (VI)');
-  AddStringRec(12,'serial','value','disabled,dummy,modem,nullmodem,directserial');
 end;
 
 destructor TConfOpt.Destroy;
@@ -424,6 +426,8 @@ begin
   AddStringRec(NR_IPXType,'ipx','type','none');
   AddStringRec(NR_IPXAddress,'ipx','address','');
   AddStringRec(NR_IPXPort,'ipx','port','213');
+  AddBooleanRec(NR_Use4DOS,'dos','4DOS',False);
+  AddBooleanRec(NR_UseDOS32A,'dos','DOS32A',False);
 
   AddIntegerRec(NR_NrOfMounts,'Extra','NrOfMounts',0);
   AddStringRec(NR_Mount0,'Extra','0','');

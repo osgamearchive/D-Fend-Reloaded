@@ -67,7 +67,6 @@ type
     AutoexecBootHDImage: TRadioButton;
     AutoexecBootFloppyImage: TRadioButton;
     AutoexecBootHDImageComboBox: TComboBox;
-    AutoexecBootFloppyImageEdit: TEdit;
     AutoexecBootFloppyImageButton: TSpeedButton;
     CustomSetsValueListEditor: TValueListEditor;
     CustomSetsEnvAdd: TBitBtn;
@@ -81,6 +80,12 @@ type
     MountingAutoCreateButton: TBitBtn;
     PreviousButton: TBitBtn;
     NextButton: TBitBtn;
+    AutoexecLabel: TLabel;
+    AutoexecUse4DOSCheckBox: TCheckBox;
+    AutoexecBootFloppyImageTab: TStringGrid;
+    AutoexecBootFloppyImageAddButton: TSpeedButton;
+    AutoexecBootFloppyImageDelButton: TSpeedButton;
+    AutoexecBootFloppyImageInfoLabel: TLabel;
     procedure OKButtonClick(Sender: TObject);
     procedure ButtonWork(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -98,6 +103,7 @@ type
       ARow: Integer; const Value: string);
     procedure ProfileSettingsValueListEditorKeyUp(Sender: TObject;
       var Key: Word; Shift: TShiftState);
+    procedure EnvironmentValueListEditorEditButtonClick(Sender: TObject);
   private
     { Private-Deklarationen }
     IconName : String;
@@ -123,7 +129,8 @@ Function EditGameProfil(const AOwner : TComponent; const AGameDB : TGameDB; var 
 implementation
 
 uses Math, LanguageSetupUnit, VistaToolsUnit, CommonTools, PrgConsts,
-     PrgSetupUnit, IconManagerFormUnit, ProfileMountEditorFormUnit;
+     PrgSetupUnit, IconManagerFormUnit, ProfileMountEditorFormUnit,
+     SerialEditFormUnit;
 
 {$R *.dfm}
 
@@ -136,6 +143,8 @@ Var St : TStringList;
 begin
   DoubleBuffered:=True;
   SetVistaFonts(self);
+
+  AutoexecBootFloppyImageTab.ColWidths[0]:=AutoexecBootFloppyImageTab.ClientWidth-25;
 
   MoveStatus:=0;
 
@@ -305,6 +314,10 @@ begin
     ItemProps[Strings.Count-1].ReadOnly:=True;
     ItemProps[Strings.Count-1].PickList.Add(RemoveUnderline(LanguageSetup.Yes));
     ItemProps[Strings.Count-1].PickList.Add(RemoveUnderline(LanguageSetup.No));
+    Strings.Add(LanguageSetup.GameDOS32A+'=');
+    ItemProps[Strings.Count-1].ReadOnly:=True;
+    ItemProps[Strings.Count-1].PickList.Add(RemoveUnderline(LanguageSetup.Yes));
+    ItemProps[Strings.Count-1].PickList.Add(RemoveUnderline(LanguageSetup.No));
     Strings.Add(LanguageSetup.GameCycles+'=');
     ItemProps[Strings.Count-1].EditStyle:=esPickList;
     St:=ValueToList(GameDB.ConfOpt.Cycles,';,'); try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
@@ -330,17 +343,13 @@ begin
     ItemProps[Strings.Count-1].EditStyle:=esPickList;
     St:=ValueToList(GameDB.ConfOpt.KeyboardLayout,';,'); try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
     Strings.Add(LanguageSetup.GameSerial+' 1=');
-    ItemProps[Strings.Count-1].EditStyle:=esPickList;
-    St:=ValueToList(GameDB.ConfOpt.Serial,';,'); try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
+    ItemProps[Strings.Count-1].EditStyle:=esEllipsis;
     Strings.Add(LanguageSetup.GameSerial+' 2=');
-    ItemProps[Strings.Count-1].EditStyle:=esPickList;
-    St:=ValueToList(GameDB.ConfOpt.Serial,';,'); try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
+    ItemProps[Strings.Count-1].EditStyle:=esEllipsis;
     Strings.Add(LanguageSetup.GameSerial+' 3=');
-    ItemProps[Strings.Count-1].EditStyle:=esPickList;
-    St:=ValueToList(GameDB.ConfOpt.Serial,';,'); try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
+    ItemProps[Strings.Count-1].EditStyle:=esEllipsis;
     Strings.Add(LanguageSetup.GameSerial+' 4=');
-    ItemProps[Strings.Count-1].EditStyle:=esPickList;
-    St:=ValueToList(GameDB.ConfOpt.Serial,';,'); try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
+    ItemProps[Strings.Count-1].EditStyle:=esEllipsis;
     Strings.Add(LanguageSetup.GameIPX+'=');
     ItemProps[Strings.Count-1].ReadOnly:=True;
     ItemProps[Strings.Count-1].PickList.Add(RemoveUnderline(LanguageSetup.Yes));
@@ -596,13 +605,18 @@ begin
   AutoexecSheet.Caption:=LanguageSetup.ProfileEditorAutoexecSheet;
   AutoexecOverrideGameStartCheckBox.Caption:=LanguageSetup.ProfileEditorAutoexecOverrideGameStart;
   AutoexecOverrideMountingCheckBox.Caption:=LanguageSetup.ProfileEditorAutoexecOverrideMounting;
+  AutoexecUse4DOSCheckBox.Caption:=LanguageSetup.ProfileEditorAutoexecUse4DOS;
+  AutoexecLabel.Caption:=LanguageSetup.ProfileEditorAutoexecBat;
   AutoexecClearButton.Caption:=LanguageSetup.Del;
   AutoexecLoadButton.Caption:=LanguageSetup.Load;
   AutoexecSaveButton.Caption:=LanguageSetup.Save;
   AutoexecBootNormal.Caption:=LanguageSetup.ProfileEditorAutoexecBootNormal;
   AutoexecBootHDImage.Caption:=LanguageSetup.ProfileEditorAutoexecBootHDImage;
   AutoexecBootFloppyImage.Caption:=LanguageSetup.ProfileEditorAutoexecBootFloppyImage;
+  AutoexecBootFloppyImageInfoLabel.Caption:=LanguageSetup.ProfileMountingSwitchImage;
   AutoexecBootFloppyImageButton.Hint:=LanguageSetup.ChooseFile;
+  AutoexecBootFloppyImageAddButton.Hint:=LanguageSetup.ProfileMountingAddImage;
+  AutoexecBootFloppyImageDelButton.Hint:=LanguageSetup.ProfileMountingDelImage;
 
   { CustomSets Sheet }
 
@@ -644,7 +658,7 @@ begin
 end;
 
 procedure TProfileEditorForm.LoadData;
-Var St : TStringList;
+Var St,St2 : TStringList;
     S,T : String;
     I : Integer;
 begin
@@ -775,18 +789,20 @@ begin
       ValueFromIndex[1]:=RemoveUnderline(LanguageSetup.Yes);
       ValueFromIndex[2]:=RemoveUnderline(LanguageSetup.Yes);
       ValueFromIndex[3]:=RemoveUnderline(LanguageSetup.Yes);
-      ValueFromIndex[4]:='auto';
-      ValueFromIndex[5]:='500';
-      ValueFromIndex[6]:='20';
-      ValueFromIndex[7]:='auto';
-      ValueFromIndex[8]:='0';
-      ValueFromIndex[9]:='vga';
-      ValueFromIndex[10]:='default';
-      ValueFromIndex[11]:='dummy';
+      ValueFromIndex[4]:=RemoveUnderline(LanguageSetup.No);
+      ValueFromIndex[5]:='auto';
+      ValueFromIndex[6]:='500';
+      ValueFromIndex[7]:='20';
+      ValueFromIndex[8]:='auto';
+      ValueFromIndex[9]:='0';
+      ValueFromIndex[10]:='vga';
+      ValueFromIndex[11]:='default';
       ValueFromIndex[12]:='dummy';
-      ValueFromIndex[13]:='disabled';
+      ValueFromIndex[13]:='dummy';
       ValueFromIndex[14]:='disabled';
-      ValueFromIndex[15]:=RemoveUnderline(LanguageSetup.No);
+      ValueFromIndex[15]:='disabled';
+      ValueFromIndex[16]:=RemoveUnderline(LanguageSetup.No);
+      {17-19: ''}
     end;
   end else begin
     with EnvironmentValueListEditor.Strings do begin
@@ -794,24 +810,25 @@ begin
       If Game.XMS then ValueFromIndex[1]:=RemoveUnderline(LanguageSetup.Yes) else ValueFromIndex[1]:=RemoveUnderline(LanguageSetup.No);
       If Game.EMS then ValueFromIndex[2]:=RemoveUnderline(LanguageSetup.Yes) else ValueFromIndex[2]:=RemoveUnderline(LanguageSetup.No);
       If Game.UMB then ValueFromIndex[3]:=RemoveUnderline(LanguageSetup.Yes) else ValueFromIndex[3]:=RemoveUnderline(LanguageSetup.No);
-      ValueFromIndex[4]:=Game.Cycles;
-      ValueFromIndex[5]:=IntToStr(Game.CyclesUp);
-      ValueFromIndex[6]:=IntToStr(Game.CyclesDown);
-      if Game.Core<>'' then ValueFromIndex[7]:=Game.Core;
-      ValueFromIndex[8]:=IntToStr(Game.FrameSkip);
-      If Game.VideoCard<>'' then ValueFromIndex[9]:=Game.VideoCard;
-      If Game.KeyboardLayout<>'' then ValueFromIndex[10]:=Game.KeyboardLayout else ValueFromIndex[10]:='default';
-      ValueFromIndex[11]:=Game.Serial1;
-      ValueFromIndex[12]:=Game.Serial2;
-      ValueFromIndex[13]:=Game.Serial3;
-      ValueFromIndex[14]:=Game.Serial4;
-      If Game.IPX then ValueFromIndex[15]:=RemoveUnderline(LanguageSetup.Yes) else ValueFromIndex[15]:=RemoveUnderline(LanguageSetup.No);
-      ValueFromIndex[16]:=LanguageSetup.GameIPXEstablishConnectionNone;
+      If Game.UseDOS32A then ValueFromIndex[4]:=RemoveUnderline(LanguageSetup.Yes) else ValueFromIndex[4]:=RemoveUnderline(LanguageSetup.No);
+      ValueFromIndex[5]:=Game.Cycles;
+      ValueFromIndex[6]:=IntToStr(Game.CyclesUp);
+      ValueFromIndex[7]:=IntToStr(Game.CyclesDown);
+      if Game.Core<>'' then ValueFromIndex[8]:=Game.Core;
+      ValueFromIndex[9]:=IntToStr(Game.FrameSkip);
+      If Game.VideoCard<>'' then ValueFromIndex[10]:=Game.VideoCard;
+      If Game.KeyboardLayout<>'' then ValueFromIndex[11]:=Game.KeyboardLayout else ValueFromIndex[11]:='default';
+      ValueFromIndex[12]:=Game.Serial1;
+      ValueFromIndex[13]:=Game.Serial2;
+      ValueFromIndex[14]:=Game.Serial3;
+      ValueFromIndex[15]:=Game.Serial4;
+      If Game.IPX then ValueFromIndex[16]:=RemoveUnderline(LanguageSetup.Yes) else ValueFromIndex[16]:=RemoveUnderline(LanguageSetup.No);
+      ValueFromIndex[17]:=LanguageSetup.GameIPXEstablishConnectionNone;
       S:=Trim(ExtUpperCase(Game.IPXType));
-      If S='CLIENT' then ValueFromIndex[16]:=LanguageSetup.GameIPXEstablishConnectionClient;
-      If S='SERVER' then ValueFromIndex[16]:=LanguageSetup.GameIPXEstablishConnectionServer;
-      If Game.IPXAddress<>'' then ValueFromIndex[17]:=Game.IPXAddress;
-      If Game.IPXPort<>'' then ValueFromIndex[18]:=Game.IPXPort;
+      If S='CLIENT' then ValueFromIndex[17]:=LanguageSetup.GameIPXEstablishConnectionClient;
+      If S='SERVER' then ValueFromIndex[17]:=LanguageSetup.GameIPXEstablishConnectionServer;
+      If Game.IPXAddress<>'' then ValueFromIndex[18]:=Game.IPXAddress;
+      If Game.IPXPort<>'' then ValueFromIndex[19]:=Game.IPXPort;
     end;
   end;
 
@@ -932,9 +949,11 @@ begin
   If Game=nil then begin
     AutoexecOverrideGameStartCheckBox.Checked:=False;
     AutoexecOverrideMountingCheckBox.Checked:=False;
+    AutoexecUse4DOSCheckBox.Checked:=False;
   end else begin
     AutoexecOverrideGameStartCheckBox.Checked:=Game.AutoexecOverridegamestart;
     AutoexecOverrideMountingCheckBox.Checked:=Game.AutoexecOverrideMount;
+    AutoexecUse4DOSCheckBox.Checked:=Game.Use4DOS;
     St:=StringToStringList(Game.Autoexec);
     try
       AutoexecMemo.Lines.Assign(St);
@@ -947,7 +966,17 @@ begin
       If S='2' then AutoexecBootHDImageComboBox.ItemIndex:=0 else AutoexecBootHDImageComboBox.ItemIndex:=1;
     end else If S<>'' then begin
       AutoexecBootFloppyImage.Checked:=True;
-      AutoexecBootFloppyImageEdit.Text:=S;
+      St2:=TStringList.Create;
+      try
+        S:=Trim(S);
+        I:=Pos('$',S);
+        While I>0 do begin St2.Add(Trim(Copy(S,1,I-1))); S:=Trim(Copy(S,I+1,MaxInt)); I:=Pos('$',S); end;
+        St2.Add(S);
+        AutoexecBootFloppyImageTab.RowCount:=St2.Count;
+        For I:=0 to St2.Count-1 do AutoexecBootFloppyImageTab.Cells[0,I]:=St2[I];
+      finally
+        St2.Free;
+      end;
     end;
   end;
 
@@ -1001,6 +1030,7 @@ procedure TProfileEditorForm.LoadMountingList;
 Var I : Integer;
     St : TStringList;
     L : TListItem;
+    S : String;
 begin
   MountingListView.Items.BeginUpdate;
   try
@@ -1009,12 +1039,14 @@ begin
       St:=ValueToList(Mounting[I]);
       try
         L:=MountingListView.Items.Add;
-        L.Caption:=St[0];
+        S:=Trim(St[0]);
+        If Pos('$',S)<>0 then S:=Copy(S,1,Pos('$',S)-1)+' (+'+LanguageSetup.More+')';
+        L.Caption:=S;
         If St.Count>1 then L.SubItems.Add(St[1]) else L.SubItems.Add('');
         If St.Count>2 then L.SubItems.Add(St[2]) else L.SubItems.Add('');
         If St.Count>4 then L.SubItems.Add(St[4]) else L.SubItems.Add('');
         If St.Count>3 then begin
-          If Trim(ExtUpperCase(St[2]))='TRUE' then L.SubItems.Add(RemoveUnderline(LanguageSetup.Yes)) else L.SubItems.Add(RemoveUnderline(LanguageSetup.No));
+          If Trim(ExtUpperCase(St[3]))='TRUE' then L.SubItems.Add(RemoveUnderline(LanguageSetup.Yes)) else L.SubItems.Add(RemoveUnderline(LanguageSetup.No));
         end else L.SubItems.Add(RemoveUnderline(LanguageSetup.No));
       finally
         St.Free;
@@ -1052,7 +1084,7 @@ begin
     Game.SetupExe:=ValueFromIndex[4];
     Game.SetupParameters:=ValueFromIndex[5];
     Game.LoadFix:=(ValueFromIndex[6]=RemoveUnderline(LanguageSetup.Yes));
-    try Game.LoadFixMemory:=StrToInt(ValueFromIndex[7]); except end;
+    try Game.LoadFixMemory:=StrToInt(Trim(ValueFromIndex[7])); except end;
     Game.CaptureFolder:=ValueFromIndex[8];
   end;
   Game.ExtraDirs:=ListToValue(ExtraDirsListBox.Items);
@@ -1080,7 +1112,7 @@ begin
     Game.UseDoublebuffering:=(ValueFromIndex[3]=RemoveUnderline(LanguageSetup.Yes));
     Game.AspectCorrection:=(ValueFromIndex[4]=RemoveUnderline(LanguageSetup.Yes));
     Game.UseScanCodes:=(ValueFromIndex[5]=RemoveUnderline(LanguageSetup.Yes));
-    try Game.MouseSensitivity:=StrToInt(ValueFromIndex[6]); except end;
+    try Game.MouseSensitivity:=StrToInt(Trim(ValueFromIndex[6])); except end;
     Game.Render:=ValueFromIndex[7];
     Game.WindowResolution:=ValueFromIndex[8];
     Game.FullscreenResolution:=ValueFromIndex[9];
@@ -1095,28 +1127,29 @@ begin
   { Environment Sheet }
 
   with EnvironmentValueListEditor.Strings do begin
-    try Game.Memory:=StrToInt(ValueFromIndex[0]); except end;
+    try Game.Memory:=StrToInt(Trim(ValueFromIndex[0])); except end;
     Game.XMS:=(ValueFromIndex[1]=RemoveUnderline(LanguageSetup.Yes));
     Game.EMS:=(ValueFromIndex[2]=RemoveUnderline(LanguageSetup.Yes));
     Game.UMB:=(ValueFromIndex[3]=RemoveUnderline(LanguageSetup.Yes));
-    Game.Cycles:=ValueFromIndex[4];
-    try Game.CyclesUp:=StrToInt(ValueFromIndex[5]); except end;
-    try Game.CyclesDown:=StrToInt(ValueFromIndex[6]); except end;
-    Game.Core:=ValueFromIndex[7];
-    try Game.FrameSkip:=StrToInt(ValueFromIndex[8]); except end;
-    Game.VideoCard:=ValueFromIndex[9];
-    Game.KeyboardLayout:=ValueFromIndex[10];
+    Game.UseDOS32A:=(ValueFromIndex[4]=RemoveUnderline(LanguageSetup.Yes));
+    Game.Cycles:=ValueFromIndex[5];
+    try Game.CyclesUp:=StrToInt(Trim(ValueFromIndex[6])); except end;
+    try Game.CyclesDown:=StrToInt(Trim(ValueFromIndex[7])); except end;
+    Game.Core:=ValueFromIndex[8];
+    try Game.FrameSkip:=StrToInt(Trim(ValueFromIndex[9])); except end;
+    Game.VideoCard:=ValueFromIndex[10];
+    Game.KeyboardLayout:=ValueFromIndex[11];
 
-    Game.Serial1:=ValueFromIndex[11];
-    Game.Serial2:=ValueFromIndex[12];
-    Game.Serial3:=ValueFromIndex[13];
-    Game.Serial4:=ValueFromIndex[14];
-    Game.IPX:=(ValueFromIndex[15]=RemoveUnderline(LanguageSetup.Yes));
-    If ValueFromIndex[16]=LanguageSetup.GameIPXEstablishConnectionNone then Game.IPXType:='none';
-    If ValueFromIndex[16]=LanguageSetup.GameIPXEstablishConnectionClient then Game.IPXType:='client';
-    If ValueFromIndex[16]=LanguageSetup.GameIPXEstablishConnectionServer then Game.IPXType:='server';
-    Game.IPXAddress:=ValueFromIndex[17];
-    Game.IPXPort:=ValueFromIndex[18];
+    Game.Serial1:=ValueFromIndex[12];
+    Game.Serial2:=ValueFromIndex[13];
+    Game.Serial3:=ValueFromIndex[14];
+    Game.Serial4:=ValueFromIndex[15];
+    Game.IPX:=(ValueFromIndex[16]=RemoveUnderline(LanguageSetup.Yes));
+    If ValueFromIndex[17]=LanguageSetup.GameIPXEstablishConnectionNone then Game.IPXType:='none';
+    If ValueFromIndex[17]=LanguageSetup.GameIPXEstablishConnectionClient then Game.IPXType:='client';
+    If ValueFromIndex[17]=LanguageSetup.GameIPXEstablishConnectionServer then Game.IPXType:='server';
+    Game.IPXAddress:=ValueFromIndex[18];
+    Game.IPXPort:=ValueFromIndex[19];
   end;
 
   { Mounting Sheet }
@@ -1137,28 +1170,28 @@ begin
 
   with SoundValueListEditor.Strings do begin
     Game.MixerNosound:=(ValueFromIndex[1]=RemoveUnderline(LanguageSetup.No));
-    try Game.MixerRate:=StrToInt(ValueFromIndex[1]); except end;
-    try Game.MixerBlocksize:=StrToInt(ValueFromIndex[2]); except end;
-    try Game.MixerPrebuffer:=StrToInt(ValueFromIndex[3]); except end;
+    try Game.MixerRate:=StrToInt(Trim(ValueFromIndex[1])); except end;
+    try Game.MixerBlocksize:=StrToInt(Trim(ValueFromIndex[2])); except end;
+    try Game.MixerPrebuffer:=StrToInt(Trim(ValueFromIndex[3])); except end;
   end;
   with SoundSBValueListEditor.Strings do begin
     Game.SBType:=ValueFromIndex[0];
-    try Game.SBBase:=StrToInt(ValueFromIndex[1]); except end;
-    try Game.SBIRQ:=StrToInt(ValueFromIndex[2]); except end;
-    try Game.SBDMA:=StrToInt(ValueFromIndex[3]); except end;
-    try Game.SBHDMA:=StrToInt(ValueFromIndex[4]); except end;
+    try Game.SBBase:=StrToInt(Trim(ValueFromIndex[1])); except end;
+    try Game.SBIRQ:=StrToInt(Trim(ValueFromIndex[2])); except end;
+    try Game.SBDMA:=StrToInt(Trim(ValueFromIndex[3])); except end;
+    try Game.SBHDMA:=StrToInt(Trim(ValueFromIndex[4])); except end;
     Game.SBOplMode:=ValueFromIndex[5];
-    try Game.SBOplRate:=StrToInt(ValueFromIndex[6]); except end;
+    try Game.SBOplRate:=StrToInt(Trim(ValueFromIndex[6])); except end;
     Game.SBMixer:=(ValueFromIndex[7]=RemoveUnderline(LanguageSetup.Yes));
   end;
   with SoundGUSValueListEditor.Strings do begin
     Game.GUS:=(ValueFromIndex[0]=RemoveUnderline(LanguageSetup.Yes));
-    Game.GUSBase:=StrToInt(ValueFromIndex[1]);
-    Game.GUSIRQ1:=StrToInt(ValueFromIndex[2]);
-    Game.GUSIRQ2:=StrToInt(ValueFromIndex[3]);
-    Game.GUSDMA1:=StrToInt(ValueFromIndex[4]);
-    Game.GUSDMA2:=StrToInt(ValueFromIndex[5]);
-    Game.GUSRate:=StrToInt(ValueFromIndex[6]);
+    Game.GUSBase:=StrToInt(Trim(ValueFromIndex[1]));
+    Game.GUSIRQ1:=StrToInt(Trim(ValueFromIndex[2]));
+    Game.GUSIRQ2:=StrToInt(Trim(ValueFromIndex[3]));
+    Game.GUSDMA1:=StrToInt(Trim(ValueFromIndex[4]));
+    Game.GUSDMA2:=StrToInt(Trim(ValueFromIndex[5]));
+    Game.GUSRate:=StrToInt(Trim(ValueFromIndex[6]));
     Game.GUSUltraDir:=ValueFromIndex[7];
   end;
   with SoundMIDIValueListEditor.Strings do begin
@@ -1175,9 +1208,9 @@ begin
   end;
   with SoundMiscValueListEditor.Strings do begin
     Game.SpeakerPC:=(ValueFromIndex[0]=RemoveUnderline(LanguageSetup.Yes));
-    try Game.SpeakerRate:=StrToInt(ValueFromIndex[1]); except end;
+    try Game.SpeakerRate:=StrToInt(Trim(ValueFromIndex[1])); except end;
     ValueFromIndex[2]:=Game.SpeakerTandy;
-    try Game.SpeakerTandyRate:=StrToInt(ValueFromIndex[3]); except end;
+    try Game.SpeakerTandyRate:=StrToInt(Trim(ValueFromIndex[3])); except end;
     Game.SpeakerDisney:=(ValueFromIndex[4]=RemoveUnderline(LanguageSetup.Yes));
   end;
 
@@ -1185,12 +1218,17 @@ begin
 
   Game.AutoexecOverridegamestart:=AutoexecOverrideGameStartCheckBox.Checked;
   Game.AutoexecOverrideMount:=AutoexecOverrideMountingCheckBox.Checked;
+  Game.Use4DOS:=AutoexecUse4DOSCheckBox.Checked;
   Game.Autoexec:=StringListToString(AutoexecMemo.Lines);
   If AutoexecBootNormal.Checked then Game.AutoexecBootImage:='';
   If AutoexecBootHDImage.Checked then begin
     If AutoexecBootHDImageComboBox.ItemIndex=0 then Game.AutoexecBootImage:='2' else Game.AutoexecBootImage:='3';
   end;
-  If AutoexecBootFloppyImage.Checked then Game.AutoexecBootImage:=AutoexecBootFloppyImageEdit.Text;
+  If AutoexecBootFloppyImage.Checked then begin
+    S:=AutoexecBootFloppyImageTab.Cells[0,0];
+    For I:=1 to AutoexecBootFloppyImageTab.RowCount-1 do S:=S+'$'+AutoexecBootFloppyImageTab.Cells[0,I];
+    Game.AutoexecBootImage:=S;
+  end;
 
   { Custom Sets }
 
@@ -1318,13 +1356,33 @@ begin
            end;
          end;
     13 : begin
-          S:=MakeAbsPath(AutoexecBootFloppyImageEdit.Text,PrgSetup.BaseDir);
+          If AutoexecBootFloppyImageTab.Row<0 then begin
+            MessageDlg(LanguageSetup.MessageNoImageSelected,mtError,[mbOK],0);
+            exit;
+          end;
+          S:=MakeAbsPath(AutoexecBootFloppyImageTab.Cells[0,AutoexecBootFloppyImageTab.Row],PrgSetup.BaseDir);
           OpenDialog.DefaultExt:='img';
           OpenDialog.InitialDir:=ExtractFilePath(S);
           OpenDialog.Title:=LanguageSetup.ProfileMountingFile;
           OpenDialog.Filter:=LanguageSetup.ProfileMountingFileFilter;
           if not OpenDialog.Execute then exit;
-          AutoexecBootFloppyImageEdit.Text:=MakeRelPath(OpenDialog.FileName,PrgSetup.BaseDir);
+          AutoexecBootFloppyImageTab.Cells[0,AutoexecBootFloppyImageTab.Row]:=MakeRelPath(OpenDialog.FileName,PrgSetup.BaseDir);
+         end;
+    21 : begin
+          AutoexecBootFloppyImageTab.RowCount:=AutoexecBootFloppyImageTab.RowCount+1;
+          AutoexecBootFloppyImageTab.Row:=AutoexecBootFloppyImageTab.RowCount-1;
+         end;
+    22 : begin
+          If AutoexecBootFloppyImageTab.Row<0 then begin
+            MessageDlg(LanguageSetup.MessageNoImageSelected,mtError,[mbOK],0);
+            exit;
+          end;
+          If AutoexecBootFloppyImageTab.RowCount=1 then begin
+            AutoexecBootFloppyImageTab.Cells[0,0]:='';
+          end else begin
+            For I:=AutoexecBootFloppyImageTab.Row+1 to AutoexecBootFloppyImageTab.RowCount-1 do AutoexecBootFloppyImageTab.Cells[0,I-1]:=AutoexecBootFloppyImageTab.Cells[0,I];
+            AutoexecBootFloppyImageTab.RowCount:=AutoexecBootFloppyImageTab.RowCount-1;
+          end;
          end;
     {CustomSets}
     14 : CustomSetsMemo.Lines.Clear;
@@ -1468,6 +1526,14 @@ begin
           GameInfoValueListEditor.Strings.ValueFromIndex[6]:=S;
         end;
   end;
+end;
+
+procedure TProfileEditorForm.EnvironmentValueListEditorEditButtonClick(Sender: TObject);
+Var S : String;
+begin
+  S:=EnvironmentValueListEditor.Strings.ValueFromIndex[EnvironmentValueListEditor.Row-1];
+  if not ShowSerialEditDialog(self,S) then exit;
+  If S<>'' then EnvironmentValueListEditor.Strings.ValueFromIndex[EnvironmentValueListEditor.Row-1]:=S;
 end;
 
 procedure TProfileEditorForm.ExtraDirsListBoxClick(Sender: TObject);

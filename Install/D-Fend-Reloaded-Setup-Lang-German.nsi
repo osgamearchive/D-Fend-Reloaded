@@ -1,7 +1,10 @@
 LangString LANGNAME_ioFile ${LANG_GERMAN} "ioFileGerman.ini"
 
 LangString LANGNAME_NeedAdminRights ${LANG_GERMAN} "Ohne Admin-Rechte kann das Installationsprogramm keine Dateien in den Programmeordner schreiben; nur die USB-Stick-Installation wird in diesem Fall funktionieren. Wollen Sie erneut versuchen, in den Admin-Modus zu wechseln ?"
+LangString LANGNAME_NeedAdminRightsUpdate ${LANG_GERMAN} "Ohne Admin-Rechte kann das Installationsprogramm keine Dateien in den Programmeordner schreiben; nur USB-Stick-Installationen können in diesem Fall aktualisiert werden. Wollen Sie erneut versuchen, in den Admin-Modus zu wechseln ?"
+
 LangString LANGNAME_WelcomeText ${LANG_GERMAN} "Dieser Assistent wird Sie durch die Installation von ${PrgName} begleiten.\r\n\r\nKlicken Sie auf Weiter, um fortzufahren."
+LangString LANGNAME_WelcomeTextUpdate ${LANG_GERMAN} "Dieser Assistent wird Sie durch die Update-Installation von ${PrgName} begleiten.\r\n\r\nBitte beachten Sie, dass dieses Installationsprogramm eine bestehende D-Fend Reloaded Installation voraussetzt !\r\n\r\nKlicken Sie auf Weiter, um fortzufahren."
 LangString LANGNAME_Next ${LANG_GERMAN} "Weiter"
 LicenseLangString LANGNAME_License ${LANG_GERMAN} "..\License.txt"
 LangString LANGNAME_LICENSE_TITLE ${LANG_GERMAN} "Informationen"
@@ -17,12 +20,13 @@ LangString LANGNAME_GamesFolder ${LANG_GERMAN} "Spieleordner"
 LangString LANGNAME_GameDataFolder ${LANG_GERMAN} "Handbücherordner"
 LangString LANGNAME_Deinstall ${LANG_GERMAN} "deinstallieren"
 LangString LANGNAME_ConfirmDelUserData ${LANG_GERMAN} "Soll der Datenordner $DataInstDir ebenfalls gelöscht werden ?"
+
+LangString LANGNAME_NoInstallationFound ${LANG_GERMAN} "An dem angegebenen Pfad konnte keine D-Fend Reloaded installation gefunden werden, die aktualisiert werden könnte."
+
 LangString LANGNAME_ProgramFiles ${LANG_GERMAN} "Programmdateien"
 LangString LANGNAME_LanguageFiles ${LANG_GERMAN} "Sprachdateien"
 LangString LANGNAME_DOSBox ${LANG_GERMAN} "DOSBox"
-LangString LANGNAME_Tools ${LANG_GERMAN} "Tools"
 LangString LANGNAME_FreeDosTools ${LANG_GERMAN} "FreeDos Kommandozeilen Programme"
-LangString LANGNAME_FreeDosImage ${LANG_GERMAN} "FreeDos Festplattenimage"
 LangString LANGNAME_OpenGEM ${LANG_GERMAN} "OpenGEM"
 LangString LANGNAME_DesktopShortcut ${LANG_GERMAN} "Desktop Verknüpfung"
 

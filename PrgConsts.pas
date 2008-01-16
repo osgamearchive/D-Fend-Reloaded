@@ -16,6 +16,8 @@ const DosBoxFileName='DOSBOX.EXE';
       CustomConfigsSubDir='CustomConfigs';
       TemplateSubDir='Templates';
 
+      NSIInstallerHelpFile='D-Fend Reloaded DataInstaller.nsi';
+
 var MainSetupFile : String;
     OperationModeConfig : String;
 

@@ -19,13 +19,67 @@ begin
   If B then result:='true' else result:='false';
 end;
 
-Function BuildMountData(const ProfString : String) : String;
-Var St : TStringList;
+Function ShortName(const LongName : String) : String;
+begin
+  SetLength(result,MAX_PATH+10);
+  GetShortPathName(PChar(LongName),PChar(result),MAX_PATH);
+  SetLength(result,StrLen(PChar(result)));
+end;
+
+Function AllSameDir(const St : TStringList) : Boolean;
+Var I : Integer;
+    S : String;
+begin
+  result:=False;
+  If St.Count<2 then exit; {No benefit if less than 2 files to mount}
+  S:=Trim(ExtUpperCase(IncludeTrailingPathDelimiter(ExtractFilePath(St[0]))));
+  For I:=1 to St.Count-1 do if S<>Trim(ExtUpperCase(IncludeTrailingPathDelimiter(ExtractFilePath(St[I])))) then exit;
+  result:=True;
+end;
+
+Function SpecialMultiImgMount(const DriveLetter : String; const Imgs : TStringList; const FreeDriveLetters : String) : String;
+Var I : Integer;
+    TempDrive : Char;
+    Path,S : String;
+begin
+  TempDrive:='Y';
+  For I:=length(FreeDriveLetters) downto 1 do If FreeDriveLetters[I]<>'-' then begin TempDrive:=FreeDriveLetters[I]; break; end;
+  {There must be free drive letters, because there are only 10 mounts}
+
+  Path:=IncludeTrailingPathDelimiter(ExtractFilePath(ShortName(Imgs[0])));
+
+  S:='"'+TempDrive+':\'+ExtractFileName(ShortName(Imgs[0]))+'"';
+  For I:=1 to Imgs.Count-1 do S:=S+' "'+TempDrive+':\'+ExtractFileName(ShortName(Imgs[I]))+'"';
+
+  result:=
+    'mount '+TempDrive+' "'+Path+'"'+#13+
+    'imgmount '+DriveLetter+' '+S+' -t iso -fs iso'+#13+
+    'mount -u '+TempDrive;
+end;
+
+
+Function BuildMountData(const ProfString : String; var FreeDriveLetters : String) : String;
+Procedure MarkDriveUsed(S : String);
+begin
+  S:=Trim(ExtUpperCase(S)); If length(S)<>1 then exit;
+  If (S[1]<'A') or (S[1]>'Z') then exit;
+  FreeDriveLetters[Ord(S[1])-Ord('A')+1]:='-';
+end;
+Var St,St2 : TStringList;
     S,T,U : String;
+    I : Integer;
 begin
   St:=ValueToList(ProfString);
+  St2:=TStringList.Create;
   try
     result:='';
+
+    S:=Trim(St[0]);
+    I:=Pos('$',S);
+    While I>0 do begin St2.Add(Trim(Copy(S,1,I-1))); S:=Trim(Copy(S,I+1,MaxInt)); I:=Pos('$',S); end;
+    St2.Add(S);
+    For I:=0 to St2.Count-1 do St2[I]:=MakeAbsPath(St2[I],PrgSetup.BaseDir);
+    S:=St2[0];
 
     {general: RealFolder;Type;Letter;IO;Label;FreeSpace}
     If St.Count<3 then exit;
@@ -33,56 +87,104 @@ begin
     If St.Count=4 then St.Add('');
     If St.Count=5 then St.Add('');
 
-    S:=MakeAbsPath(St[0],PrgSetup.BaseDir);
-
     T:=Trim(ExtUpperCase(St[1]));
 
     If T='DRIVE' then begin
       {RealFolder;DRIVE;Letter;False;;FreeSpace}
-      result:='mount '+St[2]+' "'+S+'"';
+      MarkDriveUsed(St[2]);
+      result:='mount '+St[2]+' "'+ShortName(S)+'"';
       If (St.Count>=6) and (St[5]<>'') then result:=result+' -freesize '+St[5];
     end;
 
     If T='FLOPPY' then begin
       {RealFolder;FLOPPY;Letter;False;;}
-      result:='mount '+St[2]+' "'+S+'" -t floppy';
+      MarkDriveUsed(St[2]);
+      result:='mount '+St[2]+' "'+ShortName(S)+'" -t floppy';
     end;
 
     If T='CDROM' then begin
       {RealFolder;CDROM;Letter;IO;Label;}
-      result:='mount '+St[2]+' "'+S+'" -t cdrom';
+      MarkDriveUsed(St[2]);
+      result:='mount '+St[2]+' "'+ShortName(S)+'" -t cdrom';
       If Trim(UpperCase(St[3]))='TRUE' then result:=result+' -IOCTL';
       If St[4]<>'' then result:=result+' -label '+St[4];
     end;
 
     If T='FLOPPYIMAGE' then begin
       {ImageFile;FLOPPYIMAGE;Letter;;;}
-      If (Trim(St[2])='0') or (Trim(St[2])='1') then U:=' -fs none' else U:='';
-      result:='imgmount '+St[2]+' "'+S+'" -t floppy'+U;
+      MarkDriveUsed(St[2]);
+      result:='imgmount '+St[2]+' "'+ShortName(S)+'" -t floppy'+U;
     end;
 
     If T='CDROMIMAGE' then begin
       {ImageFile;CDROMIMAGE;Letter;;;}
-      result:='imgmount '+St[2]+' "'+S+'" -t iso -fs iso';
+      MarkDriveUsed(St[2]);
+      If AllSameDir(St2) then begin
+        result:=SpecialMultiImgMount(St[2],St2,FreeDriveLetters);
+      end else begin
+        S:='"'+ShortName(St2[0])+'"'; For I:=1 to St2.Count-1 do S:=S+' "'+ShortName(St2[I])+'"';
+        result:='imgmount '+St[2]+' '+S+' -t iso -fs iso';
+      end;
     end;
 
     If T='IMAGE' then begin
       {ImageFile;IMAGE;LetterOR23;;;geometry}
       If St.Count>=6 then begin
         If (Trim(St[2])='2') or (Trim(St[2])='3') then U:='none' else U:='fat';
-        result:='imgmount '+St[2]+' "'+S+'" -t hdd -fs '+U+' -size '+St[5];
+        MarkDriveUsed(St[2]);
+        result:='imgmount '+St[2]+' "'+ShortName(S)+'" -t hdd -fs '+U+' -size '+St[5];
       end;
     end;
   finally
     St.Free;
+    St2.Free;
   end;
 end;
 
-Procedure BuildRunCommands(const St : TStringList; const ProgramFile, ProgramParameters : String; const UseLoadFix : Boolean; const LoadFixMemory : Integer; const Game : TGame);
-Var Prefix,S,T,Temp : String;
+Procedure BuildRunCommands(const St : TStringList; const ProgramFile, ProgramParameters : String; const UseLoadFix : Boolean; const LoadFixMemory : Integer; const Use4DOS, UseDOS32A : Boolean; const Game : TGame);
+Var Prefix,S,T,Temp,UsePath : String;
     I : Integer;
     St2 : TStringList;
+    NoFreeDOS : Boolean;
 begin
+  NoFreeDOS:=False;
+
+  If Use4DOS or UseDOS32A then begin
+    UsePath:='';
+    T:=IncludeTrailingPathDelimiter(MakeAbsPath(PrgSetup.PathToFREEDOS,PrgSetup.BaseDir));
+    NoFreeDOS:=not DirectoryExists(T);
+    For I:=0 to Game.NrOfMounts-1 do begin
+      Case I of
+        0 : St2:=ValueToList(Game.Mount0);
+        1 : St2:=ValueToList(Game.Mount1);
+        2 : St2:=ValueToList(Game.Mount2);
+        3 : St2:=ValueToList(Game.Mount3);
+        4 : St2:=ValueToList(Game.Mount4);
+        5 : St2:=ValueToList(Game.Mount5);
+        6 : St2:=ValueToList(Game.Mount6);
+        7 : St2:=ValueToList(Game.Mount7);
+        8 : St2:=ValueToList(Game.Mount8);
+        9 : St2:=ValueToList(Game.Mount9);
+        else St2:=TStringList.Create;
+      end;
+      try
+        S:=IncludeTrailingPathDelimiter(MakeAbsPath(IncludeTrailingPathDelimiter(St2[0]),PrgSetup.BaseDir));
+        If Copy(T,1,length(S))=S then begin
+          UsePath:=St2[2]+':\'+Copy(T,length(S)+1,MaxInt);
+          break;
+        end;
+      finally
+        St2.Free;
+      end;
+    end;
+    If UsePath='' then begin
+      St.Add('mount Y: "'+T+'"');
+      UsePath:='Y:\';
+    end;
+  end else begin
+    UsePath:='';
+  end;
+
   T:=Trim(ExtractFilePath(MakeAbsPath(ProgramFile,PrgSetup.BaseDir)));
 
   SetLength(Temp,MAX_PATH+10); GetShortPathName(PChar(T),PChar(Temp),MAX_PATH); SetLength(Temp,StrLen(PChar(Temp)));
@@ -129,16 +231,74 @@ begin
     end;
   end;
   If UseLoadFix then Prefix:='loadfix -'+IntToStr(LoadFixMemory)+' ' else Prefix:='';
-  If (not UseLoadFix) and (Trim(ExtUpperCase(ExtractFileExt(ProgramFile)))='.BAT') then Prefix:='call ';
-  If Trim(ProgramParameters)<>''
-    then St.Add(Prefix+ExtractFileName(ProgramFile)+' '+ProgramParameters)
-    else St.Add(Prefix+ExtractFileName(ProgramFile));
+  If (not UseLoadFix) and (not Use4DOS) and (not UseDOS32A) and (Trim(ExtUpperCase(ExtractFileExt(ProgramFile)))='.BAT') then Prefix:='call ';
+
+  If Trim(ProgramParameters)<>'' then T:=' '+ProgramParameters else T:='';
+  T:=ExtractFileName(ProgramFile)+T;
+
+  If UseDOS32A and (not NoFreeDOS) then begin
+    St.Add(UsePath+'DOS32A.EXE '+T);
+    exit;
+  end;
+
+  If Use4DOS and (not NoFreeDOS) then begin
+    If T<>'' then T:=' /C '+T;
+    St.Add(UsePath+'4DOS.COM'+T);
+    exit;
+  end;
+
+  St.Add(Prefix+T);
+end;
+
+Procedure MultiLineAdd(const St : TStringList; NewLines : String);
+Var I : Integer;
+begin
+  I:=Pos(#13,NewLines);
+  while I<>0 do begin
+    St.Add(Copy(NewLines,1,I-1)); NewLines:=Copy(NewLines,I+1,MaxInt);
+    I:=Pos(#13,NewLines);
+  end;
+  St.Add(NewLines);
+end;
+
+Procedure BuildFloppyBoot(const Autoexec : TStringList; Images : String; const FreeDriveLetters : String);
+Var Imgs : TStringList;
+    I : Integer;
+    TempDrive : Char;
+    Path,S : String;
+begin
+  Imgs:=TStringList.Create;
+  try
+    I:=Pos('$',Images);
+    While I<>0 do begin Imgs.Add(MakeAbsPath(Copy(Images,1,I-1),PrgSetup.BaseDir)); Images:=Copy(Images,I+1,MaxInt); I:=Pos('$',Images); end;
+    Imgs.Add(MakeAbsPath(Images,PrgSetup.BaseDir));
+
+    If AllSameDir(Imgs) then begin
+      TempDrive:='Y';
+      For I:=length(FreeDriveLetters) downto 1 do If FreeDriveLetters[I]<>'-' then begin TempDrive:=FreeDriveLetters[I]; break; end;
+      {There must be free drive letters, because there are only 10 mounts}
+
+      Path:=IncludeTrailingPathDelimiter(ExtractFilePath(ShortName(Imgs[0])));
+
+
+      S:='"'+TempDrive+':\'+ExtractFileName(ShortName(Imgs[0]))+'"';
+      For I:=1 to Imgs.Count-1 do S:=S+' "'+TempDrive+':\'+ExtractFileName(ShortName(Imgs[I]))+'"';
+
+      Autoexec.Add('mount '+TempDrive+' "'+Path+'"');
+      Autoexec.Add('boot '+S);
+    end else begin
+      Autoexec.Add('boot "'+ShortName(MakeAbsPath(S,PrgSetup.BaseDir))+'"');
+    end;
+  finally
+    Imgs.Free;
+  end;
 end;
 
 Function BuildConfFile(const Game : TGame; const RunSetup : Boolean) : TStringList;
 Var St : TStringList;
     S : String;
     I : Integer;
+    FreeDriveLetters : String;
 begin
   result:=TStringList.Create;
 
@@ -154,34 +314,40 @@ begin
   result.Add('usecancodes='+BoolToStr(Game.UseScanCodes));
   result.Add('priority='+Game.Priority);
   result.Add('mapperfile='+MakeAbsPath(PrgSetup.DosBoxMapperFile,PrgDataDir));
+
   result.Add('');
   result.Add('[dosbox]');
   result.Add('language='+PrgSetup.DosBoxLanguage);
   result.Add('machine='+Game.VideoCard);
   result.Add('captures='+MakeAbsPath(Game.CaptureFolder,PrgSetup.BaseDir));
   result.Add('memsize='+IntToStr(Game.Memory));
+
   result.Add('');
   result.Add('[render]');
   result.Add('frameskip='+IntToStr(Game.FrameSkip));
   result.Add('aspect='+BoolToStr(Game.AspectCorrection));
   result.Add('scaler='+Game.Scale);
+
   result.Add('');
   result.Add('[cpu]');
   result.Add('core='+Game.Core);
   result.Add('cycles='+Game.Cycles);
   result.Add('cycleup='+IntToStr(Game.CyclesUp));
   result.Add('cycledown='+IntToStr(Game.CyclesDown));
+
   result.Add('');
   result.Add('[mixer]');
   result.Add('nosound='+BoolToStr(Game.MixerNosound));
   result.Add('rate='+IntToStr(Game.MixerRate));
   result.Add('blocksize='+IntToStr(Game.MixerBlocksize));
   result.Add('prebuffer='+IntToStr(Game.MixerBlocksize));
+
   result.Add('');
   result.Add('[midi]');
   result.Add('mpu401='+Game.MIDIType);
   result.Add('device='+Game.MIDIDevice);
   result.Add('config='+Game.MIDIConfig);
+
   result.Add('');
   result.Add('[sblaster]');
   result.Add('sbtype='+Game.SBType);
@@ -192,6 +358,7 @@ begin
   result.Add('mixer='+BoolToStr(Game.SBMixer));
   result.Add('oplmode='+Game.SBOplMode);
   result.Add('oplrate='+IntToStr(Game.SBOplRate));
+
   result.Add('');
   result.Add('[gus]');
   result.Add('gus='+BoolToStr(Game.GUS));
@@ -202,6 +369,7 @@ begin
   result.Add('dma1='+IntToStr(Game.GUSDMA1));
   result.Add('dma2='+IntToStr(Game.GUSDMA2));
   result.Add('ultradir='+Game.GUSUltraDir);
+
   result.Add('');
   result.Add('[speaker]');
   result.Add('pcspeaker='+BoolToStr(Game.SpeakerPC));
@@ -209,6 +377,7 @@ begin
   result.Add('tandy='+Game.SpeakerTandy);
   result.Add('tandyrate='+IntToStr(Game.SpeakerTandyRate));
   result.Add('disney='+BoolToStr(Game.SpeakerDisney));
+
   result.Add('');
   result.Add('[dos]');
   result.Add('xms='+BoolToStr(Game.XMS));
@@ -225,6 +394,7 @@ begin
   end else begin
     result.Add('keyboardlayout=');
   end;
+
   result.Add('');
   result.Add('[joystick]');
   result.Add('joysticktype='+Game.JoystickType);
@@ -232,6 +402,13 @@ begin
   result.Add('autofire='+BoolToStr(Game.JoystickAutoFire));
   result.Add('swap34='+BoolToStr(Game.JoystickSwap34));
   result.Add('buttonwrap='+BoolToStr(Game.JoystickButtonwrap));
+
+  result.Add('');
+  result.Add('[serial]');
+  result.Add('Serial1='+Game.Serial1);
+  result.Add('Serial2='+Game.Serial2);
+  result.Add('Serial3='+Game.Serial3);
+  result.Add('Serial4='+Game.Serial4);
 
   result.Add('');
   result.Add('[autoexec]');
@@ -253,16 +430,17 @@ begin
   end;
 
   if not Game.AutoexecOverrideMount then begin
-    If Game.NrOfMounts>=1 then result.Add(BuildMountData(Game.Mount0));
-    If Game.NrOfMounts>=2 then result.Add(BuildMountData(Game.Mount1));
-    If Game.NrOfMounts>=3 then result.Add(BuildMountData(Game.Mount2));
-    If Game.NrOfMounts>=4 then result.Add(BuildMountData(Game.Mount3));
-    If Game.NrOfMounts>=5 then result.Add(BuildMountData(Game.Mount4));
-    If Game.NrOfMounts>=6 then result.Add(BuildMountData(Game.Mount5));
-    If Game.NrOfMounts>=7 then result.Add(BuildMountData(Game.Mount6));
-    If Game.NrOfMounts>=8 then result.Add(BuildMountData(Game.Mount7));
-    If Game.NrOfMounts>=9 then result.Add(BuildMountData(Game.Mount8));
-    If Game.NrOfMounts>=10 then result.Add(BuildMountData(Game.Mount9));
+    FreeDriveLetters:='---DEFGHIJKLMNOPQRSTUVWXY-';
+    If Game.NrOfMounts>=1 then MultiLineAdd(result,BuildMountData(Game.Mount0,FreeDriveLetters));
+    If Game.NrOfMounts>=2 then MultiLineAdd(result,BuildMountData(Game.Mount1,FreeDriveLetters));
+    If Game.NrOfMounts>=3 then MultiLineAdd(result,BuildMountData(Game.Mount2,FreeDriveLetters));
+    If Game.NrOfMounts>=4 then MultiLineAdd(result,BuildMountData(Game.Mount3,FreeDriveLetters));
+    If Game.NrOfMounts>=5 then MultiLineAdd(result,BuildMountData(Game.Mount4,FreeDriveLetters));
+    If Game.NrOfMounts>=6 then MultiLineAdd(result,BuildMountData(Game.Mount5,FreeDriveLetters));
+    If Game.NrOfMounts>=7 then MultiLineAdd(result,BuildMountData(Game.Mount6,FreeDriveLetters));
+    If Game.NrOfMounts>=8 then MultiLineAdd(result,BuildMountData(Game.Mount7,FreeDriveLetters));
+    If Game.NrOfMounts>=9 then MultiLineAdd(result,BuildMountData(Game.Mount8,FreeDriveLetters));
+    If Game.NrOfMounts>=10 then MultiLineAdd(result,BuildMountData(Game.Mount9,FreeDriveLetters));
   end;
 
   St:=StringToStringList(Game.Autoexec);
@@ -271,18 +449,17 @@ begin
   S:=Trim(Game.AutoexecBootImage);
   If S<>'' then begin
     If (S='2') or (S='3') then begin
-      If S='2' then result.Add('boot -l C') else result.Add('boot -l D'); 
+      If S='2' then result.Add('boot -l C') else result.Add('boot -l D');
     end else begin
-      result.Add('boot "'+MakeAbsPath(S,PrgSetup.BaseDir)+'"');
-    end; 
-
+      BuildFloppyBoot(result,S,FreeDriveLetters);
+    end;
   end else begin
     If not Game.AutoexecOverridegamestart then begin
       If RunSetup then begin
-        BuildRunCommands(result,Game.SetupExe,Game.SetupParameters,Game.LoadFix,Game.LoadFixMemory,Game);
+        BuildRunCommands(result,Game.SetupExe,Game.SetupParameters,Game.LoadFix,Game.LoadFixMemory,Game.Use4DOS,False,Game);
         If Game.CloseDosBoxAfterGameExit and (Trim(Game.SetupExe)<>'') then result.Add('exit');
       end else begin
-        BuildRunCommands(result,Game.GameExe,Game.GameParameters,Game.LoadFix,Game.LoadFixMemory,Game);
+        BuildRunCommands(result,Game.GameExe,Game.GameParameters,Game.LoadFix,Game.LoadFixMemory,Game.Use4DOS,Game.UseDOS32A,Game);
         If Game.CloseDosBoxAfterGameExit and (Trim(Game.GameExe)<>'') then result.Add('exit');
       end;
     end;

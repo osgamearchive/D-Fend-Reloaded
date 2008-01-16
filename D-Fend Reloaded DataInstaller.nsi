@@ -100,6 +100,7 @@ Section "-CloseDFend"
   FindWindow $0 'TDFendReloadedMainform' ''
   IntCmp $0 0 DoneCloseDFend
   SendMessage $0 ${WM_CLOSE} 0 0 /TIMEOUT=${TO_MS}
+  Sleep 2000
   DoneCloseDFend:
   Pop $0
 SectionEnd

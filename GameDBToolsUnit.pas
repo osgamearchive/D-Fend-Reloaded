@@ -42,8 +42,9 @@ Function ImportConfFile(const AGameDB : TGameDB; const AFileName : String) : TGa
 
 implementation
 
-uses Windows, SysUtils, Dialogs, Graphics, Math, IniFiles, PNGImage, CommonTools,
-     LanguageSetupUnit, PrgConsts, PrgSetupUnit, ProfileEditorFormUnit;
+uses Windows, SysUtils, Dialogs, Graphics, Math, IniFiles, PNGImage, JPEG,
+     GIFImage, CommonTools, LanguageSetupUnit, PrgConsts, PrgSetupUnit,
+     ProfileEditorFormUnit;
 
 Procedure AddTypeSelector(const ATreeView : TTreeView; const Name : String; const St : TStringList);
 Var N,N2 : TTreeNode;
@@ -353,7 +354,12 @@ begin
     end;
   finally
     List.Free;
-    For I:=0 to length(C)-1 do AListView.Columns[I].Width:=C[I];
+    AListView.Columns.BeginUpdate;
+    try
+      For I:=0 to length(C)-1 do AListView.Columns[I].Width:=C[I];
+    finally
+      AListView.Columns.EndUpdate;
+    end;
   end;
 end;
 
@@ -361,10 +367,13 @@ Procedure AddScreenshotsToList(const AListView : TListView; const AImageList : T
 Var I : Integer;
     Rec : TSearchRec;
     P : TPNGObject;
+    J : TJPEGImage;
+    G : TGIFImage;
     B,B2 : TBitmap;
     L : TListItem;
 begin
   Dir:=IncludeTrailingPathDelimiter(Dir);
+
   I:=FindFirst(Dir+'*.png',faAnyFile,Rec);
   try
     while I=0 do begin
@@ -390,6 +399,128 @@ begin
         end;
       finally
         P.Free;
+      end;
+      I:=FindNext(Rec);
+    end;
+  finally
+    FindClose(Rec);
+  end;
+
+  I:=FindFirst(Dir+'*.jpg',faAnyFile,Rec);
+  try
+    while I=0 do begin
+      J:=TJPEGImage.Create;
+      try
+        J.LoadFromFile(Dir+Rec.Name);
+        B:=TBitmap.Create;
+        try
+          B.Assign(J);
+          B2:=TBitmap.Create;
+          try
+            B2.SetSize(AImageList.Width,AImageList.Height);
+            B2.Canvas.StretchDraw(Rect(0,0,AImageList.Width-1,AImageList.Height-1),B);
+            AImageList.AddMasked(B2,clNone);
+          finally
+            B2.Free;
+          end;
+          L:=AListView.Items.Add;
+          L.Caption:=Rec.Name;
+          L.ImageIndex:=AImageList.Count-1;
+        finally
+          B.Free;
+        end;
+      finally
+        J.Free;
+      end;
+      I:=FindNext(Rec);
+    end;
+  finally
+    FindClose(Rec);
+  end;
+
+  I:=FindFirst(Dir+'*.jpeg',faAnyFile,Rec);
+  try
+    while I=0 do begin
+      J:=TJPEGImage.Create;
+      try
+        J.LoadFromFile(Dir+Rec.Name);
+        B:=TBitmap.Create;
+        try
+          B.Assign(J);
+          B2:=TBitmap.Create;
+          try
+            B2.SetSize(AImageList.Width,AImageList.Height);
+            B2.Canvas.StretchDraw(Rect(0,0,AImageList.Width-1,AImageList.Height-1),B);
+            AImageList.AddMasked(B2,clNone);
+          finally
+            B2.Free;
+          end;
+          L:=AListView.Items.Add;
+          L.Caption:=Rec.Name;
+          L.ImageIndex:=AImageList.Count-1;
+        finally
+          B.Free;
+        end;
+      finally
+        J.Free;
+      end;
+      I:=FindNext(Rec);
+    end;
+  finally
+    FindClose(Rec);
+  end;
+
+  I:=FindFirst(Dir+'*.gif',faAnyFile,Rec);
+  try
+    while I=0 do begin
+      G:=TGifImage.Create;
+      try
+        G.LoadFromFile(Dir+Rec.Name);
+        B:=TBitmap.Create;
+        try
+          B.Assign(G);
+          B2:=TBitmap.Create;
+          try
+            B2.SetSize(AImageList.Width,AImageList.Height);
+            B2.Canvas.StretchDraw(Rect(0,0,AImageList.Width-1,AImageList.Height-1),B);
+            AImageList.AddMasked(B2,clNone);
+          finally
+            B2.Free;
+          end;
+          L:=AListView.Items.Add;
+          L.Caption:=Rec.Name;
+          L.ImageIndex:=AImageList.Count-1;
+        finally
+          B.Free;
+        end;
+      finally
+        G.Free;
+      end;
+      I:=FindNext(Rec);
+    end;
+  finally
+    FindClose(Rec);
+  end;
+
+  I:=FindFirst(Dir+'*.bmp',faAnyFile,Rec);
+  try
+    while I=0 do begin
+      B:=TBitmap.Create;
+      try
+        B.LoadFromFile(Dir+Rec.Name);
+        B2:=TBitmap.Create;
+        try
+          B2.SetSize(AImageList.Width,AImageList.Height);
+          B2.Canvas.StretchDraw(Rect(0,0,AImageList.Width-1,AImageList.Height-1),B);
+          AImageList.AddMasked(B2,clNone);
+        finally
+          B2.Free;
+        end;
+        L:=AListView.Items.Add;
+        L.Caption:=Rec.Name;
+        L.ImageIndex:=AImageList.Count-1;
+      finally
+        B.Free;
       end;
       I:=FindNext(Rec);
     end;
@@ -508,6 +639,7 @@ begin
   result.Publisher:='DosBox Team';
   result.Year:='2007';
   result.Language:='multilingual';
+  result.Icon:='DosBox.ico';
 
   result.LoadCache;
 end;

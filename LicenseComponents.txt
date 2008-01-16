@@ -4,8 +4,16 @@ Portable Network Graphics Delphi
 written by Gustavo Daud
 (http://pngdelphi.sourceforge.net/)
 
+GIF Graphics Object
+written by Anders Melander, Filip Larsen and Reinier Sterkenburg
+(http://www.torry.net/authorsmore.php?id=1034)
+
 Used as binary program by D-Fend Reloaded:
 
 MTOOLs for Bochs and Win32 and/or DOS
 written by Benjamin David Lunt
 (http://www.frontiernet.net/~fys/mtools.htm)
+
+FreeDOS 1.0
+FreeDOS is a trademark of Jim Hall
+(http://www.freedos.org/)

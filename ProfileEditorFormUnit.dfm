@@ -3,7 +3,7 @@ object ProfileEditorForm: TProfileEditorForm
   Top = 0
   BorderStyle = bsDialog
   Caption = 'ProfileEditorForm'
-  ClientHeight = 498
+  ClientHeight = 524
   ClientWidth = 536
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -21,7 +21,7 @@ object ProfileEditorForm: TProfileEditorForm
     Left = 0
     Top = 0
     Width = 537
-    Height = 459
+    Height = 485
     ActivePage = ProfileSettingsSheet
     Images = ImageList
     MultiLine = True
@@ -38,7 +38,7 @@ object ProfileEditorForm: TProfileEditorForm
       object ExtraDirsAddButton: TSpeedButton
         Tag = 2
         Left = 13
-        Top = 382
+        Top = 406
         Width = 23
         Height = 22
         Glyph.Data = {
@@ -62,7 +62,7 @@ object ProfileEditorForm: TProfileEditorForm
       object ExtraDirsEditButton: TSpeedButton
         Tag = 3
         Left = 42
-        Top = 382
+        Top = 406
         Width = 23
         Height = 22
         Glyph.Data = {
@@ -86,7 +86,7 @@ object ProfileEditorForm: TProfileEditorForm
       object ExtraDirsDelButton: TSpeedButton
         Tag = 4
         Left = 71
-        Top = 382
+        Top = 406
         Width = 23
         Height = 22
         Glyph.Data = {
@@ -163,7 +163,7 @@ object ProfileEditorForm: TProfileEditorForm
         Left = 13
         Top = 307
         Width = 500
-        Height = 69
+        Height = 86
         ItemHeight = 13
         TabOrder = 5
         OnClick = ExtraDirsListBoxClick
@@ -212,7 +212,7 @@ object ProfileEditorForm: TProfileEditorForm
         Left = 12
         Top = 264
         Width = 501
-        Height = 137
+        Height = 161
         PlainText = True
         ScrollBars = ssBoth
         TabOrder = 2
@@ -239,7 +239,7 @@ object ProfileEditorForm: TProfileEditorForm
         Left = 12
         Top = 16
         Width = 501
-        Height = 385
+        Height = 409
         Strings.Strings = (
           '=')
         TabOrder = 0
@@ -267,10 +267,11 @@ object ProfileEditorForm: TProfileEditorForm
         Left = 12
         Top = 16
         Width = 501
-        Height = 385
+        Height = 409
         Strings.Strings = (
           '=')
         TabOrder = 0
+        OnEditButtonClick = EnvironmentValueListEditorEditButtonClick
         ColWidths = (
           248
           247)
@@ -287,7 +288,7 @@ object ProfileEditorForm: TProfileEditorForm
         Left = 12
         Top = 16
         Width = 501
-        Height = 355
+        Height = 379
         Columns = <>
         ReadOnly = True
         TabOrder = 0
@@ -298,7 +299,7 @@ object ProfileEditorForm: TProfileEditorForm
       object MountingAddButton: TBitBtn
         Tag = 5
         Left = 12
-        Top = 377
+        Top = 401
         Width = 94
         Height = 25
         Caption = 'Hinzuf'#252'gen...'
@@ -322,7 +323,7 @@ object ProfileEditorForm: TProfileEditorForm
       object MountingEditButton: TBitBtn
         Tag = 6
         Left = 112
-        Top = 377
+        Top = 401
         Width = 94
         Height = 25
         Caption = 'Bearbeiten...'
@@ -346,7 +347,7 @@ object ProfileEditorForm: TProfileEditorForm
       object MountingDelButton: TBitBtn
         Tag = 7
         Left = 212
-        Top = 377
+        Top = 401
         Width = 94
         Height = 25
         Caption = 'L'#246'schen'
@@ -370,7 +371,7 @@ object ProfileEditorForm: TProfileEditorForm
       object MountingDeleteAllButton: TBitBtn
         Tag = 8
         Left = 312
-        Top = 377
+        Top = 401
         Width = 90
         Height = 25
         Caption = 'Alle l'#246'schen'
@@ -380,7 +381,7 @@ object ProfileEditorForm: TProfileEditorForm
       object MountingAutoCreateButton: TBitBtn
         Tag = 20
         Left = 408
-        Top = 377
+        Top = 401
         Width = 105
         Height = 25
         Caption = 'Autom. erstellen'
@@ -525,7 +526,7 @@ object ProfileEditorForm: TProfileEditorForm
       object AutoexecBootFloppyImageButton: TSpeedButton
         Tag = 13
         Left = 490
-        Top = 374
+        Top = 360
         Width = 23
         Height = 22
         Glyph.Data = {
@@ -546,6 +547,70 @@ object ProfileEditorForm: TProfileEditorForm
         ShowHint = True
         OnClick = ButtonWork
       end
+      object AutoexecLabel: TLabel
+        Left = 12
+        Top = 92
+        Width = 70
+        Height = 13
+        Caption = 'Autoexec.bat:'
+      end
+      object AutoexecBootFloppyImageAddButton: TSpeedButton
+        Tag = 21
+        Left = 490
+        Top = 388
+        Width = 23
+        Height = 22
+        Glyph.Data = {
+          76010000424D7601000000000000760000002800000020000000100000000100
+          04000000000000010000130B0000130B00001000000000000000000000000000
+          800000800000008080008000000080008000808000007F7F7F00BFBFBF000000
+          FF0000FF000000FFFF00FF000000FF00FF00FFFF0000FFFFFF00333333333333
+          33333333FF33333333FF333993333333300033377F3333333777333993333333
+          300033F77FFF3333377739999993333333333777777F3333333F399999933333
+          33003777777333333377333993333333330033377F3333333377333993333333
+          3333333773333333333F333333333333330033333333F33333773333333C3333
+          330033333337FF3333773333333CC333333333FFFFF77FFF3FF33CCCCCCCCCC3
+          993337777777777F77F33CCCCCCCCCC3993337777777777377333333333CC333
+          333333333337733333FF3333333C333330003333333733333777333333333333
+          3000333333333333377733333333333333333333333333333333}
+        NumGlyphs = 2
+        ParentShowHint = False
+        ShowHint = True
+        OnClick = ButtonWork
+      end
+      object AutoexecBootFloppyImageDelButton: TSpeedButton
+        Tag = 22
+        Left = 490
+        Top = 412
+        Width = 23
+        Height = 22
+        Glyph.Data = {
+          76010000424D7601000000000000760000002800000020000000100000000100
+          04000000000000010000130B0000130B00001000000000000000000000000000
+          800000800000008080008000000080008000808000007F7F7F00BFBFBF000000
+          FF0000FF000000FFFF00FF000000FF00FF00FFFF0000FFFFFF00333333333333
+          333333333333333333FF33333333333330003333333333333777333333333333
+          300033FFFFFF3333377739999993333333333777777F3333333F399999933333
+          3300377777733333337733333333333333003333333333333377333333333333
+          3333333333333333333F333333333333330033333F33333333773333C3333333
+          330033337F3333333377333CC3333333333333F77FFFFFFF3FF33CCCCCCCCCC3
+          993337777777777F77F33CCCCCCCCCC399333777777777737733333CC3333333
+          333333377F33333333FF3333C333333330003333733333333777333333333333
+          3000333333333333377733333333333333333333333333333333}
+        NumGlyphs = 2
+        ParentShowHint = False
+        ShowHint = True
+        OnClick = ButtonWork
+      end
+      object AutoexecBootFloppyImageInfoLabel: TLabel
+        Left = 32
+        Top = 387
+        Width = 194
+        Height = 42
+        AutoSize = False
+        Caption = 'AutoexecBootFloppyImageInfoLabel'
+        WordWrap = True
+      end
       object AutoexecOverrideGameStartCheckBox: TCheckBox
         Left = 16
         Top = 16
@@ -565,7 +630,7 @@ object ProfileEditorForm: TProfileEditorForm
       object AutoexecClearButton: TBitBtn
         Tag = 10
         Left = 12
-        Top = 271
+        Top = 279
         Width = 105
         Height = 25
         Caption = 'L'#246'schen'
@@ -589,7 +654,7 @@ object ProfileEditorForm: TProfileEditorForm
       object AutoexecLoadButton: TBitBtn
         Tag = 11
         Left = 125
-        Top = 271
+        Top = 279
         Width = 105
         Height = 25
         Caption = 'Laden...'
@@ -613,7 +678,7 @@ object ProfileEditorForm: TProfileEditorForm
       object AutoexecSaveButton: TBitBtn
         Tag = 12
         Left = 236
-        Top = 271
+        Top = 279
         Width = 105
         Height = 25
         Caption = 'Speichern...'
@@ -636,7 +701,7 @@ object ProfileEditorForm: TProfileEditorForm
       end
       object AutoexecBootNormal: TRadioButton
         Left = 16
-        Top = 320
+        Top = 310
         Width = 457
         Height = 17
         Caption = 'DosBox normal starten'
@@ -646,7 +711,7 @@ object ProfileEditorForm: TProfileEditorForm
       end
       object AutoexecBootHDImage: TRadioButton
         Left = 16
-        Top = 347
+        Top = 337
         Width = 210
         Height = 17
         Caption = 'Festplattenimage starten'
@@ -654,7 +719,7 @@ object ProfileEditorForm: TProfileEditorForm
       end
       object AutoexecBootFloppyImage: TRadioButton
         Left = 16
-        Top = 374
+        Top = 364
         Width = 210
         Height = 17
         Caption = 'Diskettenimage starten'
@@ -662,7 +727,7 @@ object ProfileEditorForm: TProfileEditorForm
       end
       object AutoexecBootHDImageComboBox: TComboBox
         Left = 236
-        Top = 343
+        Top = 333
         Width = 248
         Height = 21
         Style = csDropDownList
@@ -674,21 +739,35 @@ object ProfileEditorForm: TProfileEditorForm
           'Master (2)'
           'Slave (3)')
       end
-      object AutoexecBootFloppyImageEdit: TEdit
-        Left = 236
-        Top = 374
-        Width = 248
-        Height = 21
-        TabOrder = 10
-      end
       object AutoexecMemo: TRichEdit
         Left = 12
-        Top = 72
+        Top = 107
         Width = 501
-        Height = 193
+        Height = 166
         PlainText = True
         ScrollBars = ssBoth
         TabOrder = 2
+        WordWrap = False
+      end
+      object AutoexecUse4DOSCheckBox: TCheckBox
+        Left = 16
+        Top = 65
+        Width = 497
+        Height = 17
+        Caption = 'Use 4DOS as command line interpreter'
+        TabOrder = 10
+      end
+      object AutoexecBootFloppyImageTab: TStringGrid
+        Left = 236
+        Top = 360
+        Width = 248
+        Height = 74
+        ColCount = 1
+        FixedCols = 0
+        RowCount = 1
+        FixedRows = 0
+        Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goEditing, goAlwaysShowEditor, goThumbTracking]
+        TabOrder = 11
       end
     end
     object CustomSetsSheet: TTabSheet
@@ -781,7 +860,7 @@ object ProfileEditorForm: TProfileEditorForm
         Left = 12
         Top = 222
         Width = 501
-        Height = 147
+        Height = 171
         KeyOptions = [keyEdit, keyAdd, keyDelete]
         TabOrder = 4
         ColWidths = (
@@ -790,8 +869,8 @@ object ProfileEditorForm: TProfileEditorForm
       end
       object CustomSetsEnvAdd: TBitBtn
         Tag = 17
-        Left = 12
-        Top = 375
+        Left = 13
+        Top = 399
         Width = 105
         Height = 25
         Caption = 'Hinzuf'#252'gen'
@@ -814,8 +893,8 @@ object ProfileEditorForm: TProfileEditorForm
       end
       object CustomSetsEnvDel: TBitBtn
         Tag = 18
-        Left = 125
-        Top = 375
+        Left = 126
+        Top = 399
         Width = 105
         Height = 25
         Caption = 'L'#246'schen'
@@ -844,12 +923,13 @@ object ProfileEditorForm: TProfileEditorForm
         PlainText = True
         ScrollBars = ssBoth
         TabOrder = 0
+        WordWrap = False
       end
     end
   end
   object OKButton: TBitBtn
     Left = 8
-    Top = 465
+    Top = 491
     Width = 97
     Height = 25
     TabOrder = 1
@@ -858,7 +938,7 @@ object ProfileEditorForm: TProfileEditorForm
   end
   object CancelButton: TBitBtn
     Left = 120
-    Top = 465
+    Top = 491
     Width = 97
     Height = 25
     TabOrder = 2
@@ -867,7 +947,7 @@ object ProfileEditorForm: TProfileEditorForm
   object PreviousButton: TBitBtn
     Tag = 1
     Left = 232
-    Top = 465
+    Top = 491
     Width = 97
     Height = 25
     Caption = 'Vorheriges'
@@ -893,7 +973,7 @@ object ProfileEditorForm: TProfileEditorForm
   object NextButton: TBitBtn
     Tag = 2
     Left = 344
-    Top = 465
+    Top = 491
     Width = 97
     Height = 25
     Caption = 'N'#228'chstes'
@@ -917,16 +997,16 @@ object ProfileEditorForm: TProfileEditorForm
     NumGlyphs = 2
   end
   object OpenDialog: TOpenDialog
-    Left = 416
-    Top = 442
+    Left = 440
+    Top = 490
   end
   object SaveDialog: TSaveDialog
-    Left = 448
-    Top = 442
+    Left = 472
+    Top = 490
   end
   object ImageList: TImageList
-    Left = 480
-    Top = 440
+    Left = 504
+    Top = 488
     Bitmap = {
       494C010108000C00040010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000003000000001002000000000000030

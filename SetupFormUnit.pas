@@ -69,6 +69,9 @@ type
     AddButtonFunctionComboBox: TComboBox;
     StartWithWindowsCheckBox: TCheckBox;
     StartMinimizedCheckBox: TCheckBox;
+    PathFREEDOSEdit: TLabeledEdit;
+    PathFREEDOSButton: TSpeedButton;
+    DosBoxPrgOpenDialog: TOpenDialog;
     procedure OKButtonClick(Sender: TObject);
     procedure ButtonWork(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -182,6 +185,9 @@ begin
   SDLVideodriverLabel.Caption:=LanguageSetup.SetupFormDosBoxSDLVideodriver;
   SDLVideodriverInfoLabel.Caption:=LanguageSetup.SetupFormDosBoxSDLVideodriverInfo;
 
+  PathFREEDOSEdit.EditLabel.Caption:=LanguageSetup.SetupFormDosBoxFREEDOSPath;
+  PathFREEDOSButton.Hint:=LanguageSetup.ChooseFile;
+
   AskBeforeDeleteCheckBox.Caption:=LanguageSetup.SetupFormAskBeforeDelete;
   DeleteProectionCheckBox.Caption:=LanguageSetup.SetupFormDeleteOnlyInBaseDir;
   DeleteProectionLabel.Caption:=LanguageSetup.SetupFormDeleteOnlyInBaseDirLabel;
@@ -273,6 +279,7 @@ begin
     HideDosBoxConsoleCheckBox.Checked:=PrgSetup.HideDosBoxConsole;
     MinimizeDFendCheckBox.Checked:=PrgSetup.MinimizeOnDosBoxStart;
     If Trim(ExtUpperCase(PrgSetup.SDLVideodriver))='WINDIB' then SDLVideoDriverComboBox.ItemIndex:=1 else SDLVideoDriverComboBox.ItemIndex:=0;
+    PathFREEDOSEdit.Text:=PrgSetup.PathToFREEDOS;
 
     AskBeforeDeleteCheckBox.Checked:=PrgSetup.AskBeforeDelete;
     DeleteProectionCheckBox.Checked:=PrgSetup.DeleteOnlyInBaseDir;
@@ -342,6 +349,7 @@ begin
   PrgSetup.HideDosBoxConsole:=HideDosBoxConsoleCheckBox.Checked;
   PrgSetup.MinimizeOnDosBoxStart:=MinimizeDFendCheckBox.Checked;
   If SDLVideoDriverComboBox.ItemIndex=1 then PrgSetup.SDLVideodriver:='WinDIB' else PrgSetup.SDLVideodriver:='DirectX';
+  PrgSetup.PathToFREEDOS:=PathFREEDOSEdit.Text;
 
   PrgSetup.AskBeforeDelete:=AskBeforeDeleteCheckBox.Checked;  
   PrgSetup.DeleteOnlyInBaseDir:=DeleteProectionCheckBox.Checked;
@@ -378,7 +386,7 @@ begin
         end;
     3 : begin
           S:=DosBoxDirEdit.Text;
-          if SelectDirectory(Handle,LanguageSetup.SetupFormBaseDir,S) then begin
+          if SelectDirectory(Handle,LanguageSetup.SetupFormDosBoxDir,S) then begin
             DosBoxDirEdit.Text:=S;
             DosBoxDirEditChange(Sender);
           end;
@@ -395,6 +403,14 @@ begin
             else DosBoxTxtOpenDialog.InitialDir:=ExtractFilePath(MakeAbsPath(DosBoxMapperEdit.Text,PrgDataDir));
           if not DosBoxTxtOpenDialog.Execute then exit;
           DosBoxMapperEdit.Text:=MakeRelPath(DosBoxTxtOpenDialog.FileName,PrgDataDir);
+        end;
+    6 : begin
+          S:=PathFREEDOSEdit.Text;
+          If Trim(S)='' then S:=IncludeTrailingPathDelimiter(BaseDirEdit.Text);
+          S:=MakeAbsPath(S,IncludeTrailingPathDelimiter(BaseDirEdit.Text));
+          if SelectDirectory(Handle,LanguageSetup.SetupFormFreeDOSDir,S) then begin
+            PathFREEDOSEdit.Text:=MakeRelPath(S,IncludeTrailingPathDelimiter(BaseDirEdit.Text));
+          end;
         end;
   end;
 end;
@@ -434,7 +450,7 @@ begin
 
   If (I=1) or All then begin
     TStringList(DefaultValueComboBox.Items.Objects[1]).Free;
-    DefaultValueComboBox.Items.Objects[1]:=ValueToList('none,2axis,4axis,fcs,ch',';,');
+    DefaultValueComboBox.Items.Objects[1]:=ValueToList('none,auto,2axis,4axis,fcs,ch',';,');
   end;
 
   If (I=2) or All then begin

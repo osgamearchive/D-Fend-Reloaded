@@ -35,7 +35,7 @@ Procedure ShowImageDialog(const AOwner : TComponent; const AImageFile : String);
 
 implementation
 
-uses ClipBrd, VistaToolsUnit, LanguageSetupUnit, PNGImage;
+uses ClipBrd, VistaToolsUnit, LanguageSetupUnit, PNGImage, CommonTools;
 
 {$R *.dfm}
 
@@ -53,7 +53,7 @@ end;
 
 procedure TViewImageForm.FormShow(Sender: TObject);
 begin
-  Image.Picture.LoadFromFile(ImageFile);
+  Image.Picture:=LoadImageFromFile(ImageFile);
 end;
 
 procedure TViewImageForm.ButtonWork(Sender: TObject);
@@ -65,7 +65,7 @@ begin
           SaveDialog.Title:=LanguageSetup.ViewImageFormSaveTitle;
           SaveDialog.Filter:=LanguageSetup.ViewImageFormSaveFilter;
           if not SaveDialog.Execute then exit;
-          Image.Picture.SaveToFile(SaveDialog.FileName);
+          SaveImageToFile(Image.Picture,SaveDialog.FileName);
         end;
     3 : begin
           if not DeleteFile(ImageFile) then begin

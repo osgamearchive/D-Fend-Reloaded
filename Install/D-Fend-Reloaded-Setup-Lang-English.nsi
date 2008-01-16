@@ -1,7 +1,10 @@
 LangString LANGNAME_ioFile ${LANG_ENGLISH} "ioFileEnglish.ini"
 
-LangString LANGNAME_NeedAdminRights ${LANG_ENGLISH} "Without admin rights the installer can't write to the programs folder. Only USB stick installation will work. Do ou want to retry changing to admin state ?"
+LangString LANGNAME_NeedAdminRights ${LANG_ENGLISH} "Without admin rights the installer can't write to the programs folder. Only USB stick installation will work. Do you want to retry changing to admin state ?"
+LangString LANGNAME_NeedAdminRightsUpdate ${LANG_ENGLISH} "Without admin rights the installer can't write to the programs folder. Only USB stick installations can be updated then. Do you want to retry changing to admin state ?"
+
 LangString LANGNAME_WelcomeText ${LANG_ENGLISH} "This wizard will guide you through the installation of ${PrgName}.\r\n\r\nClick Next to continue."
+LangString LANGNAME_WelcomeTextUpdate ${LANG_ENGLISH} "This wizard will guide you through the update installation of ${PrgName}.\r\n\r\nThis installer requires an existing D-Fend Reloaded installation !\r\n\r\nClick Next to continue."
 LangString LANGNAME_Next ${LANG_ENGLISH} "Next"
 LicenseLangString LANGNAME_License ${LANG_ENGLISH} "..\License.txt"
 LangString LANGNAME_LICENSE_TITLE ${LANG_ENGLISH} "Information"
@@ -17,16 +20,17 @@ LangString LANGNAME_GamesFolder ${LANG_ENGLISH} "Games folder"
 LangString LANGNAME_GameDataFolder ${LANG_ENGLISH} "Manuals folder"
 LangString LANGNAME_Deinstall ${LANG_ENGLISH} "deinstall"
 LangString LANGNAME_ConfirmDelUserData ${LANG_ENGLISH} "Do you want to delete the data folder $DataInstDir too ?"
+
+LangString LANGNAME_NoInstallationFound ${LANG_ENGLISH} "There is no D-Fend Reloaded installation in the choosen folder which could be updated."
+
 LangString LANGNAME_ProgramFiles ${LANG_ENGLISH} "Program files"
 LangString LANGNAME_LanguageFiles ${LANG_ENGLISH} "Language files"
 LangString LANGNAME_DOSBox ${LANG_ENGLISH} "DOSBox"
-LangString LANGNAME_Tools ${LANG_ENGLISH} "Tools"
 LangString LANGNAME_FreeDosTools ${LANG_ENGLISH} "FreeDos Tools for use in DosBox"
-LangString LANGNAME_FreeDosImage ${LANG_ENGLISH} "FreeDos Boot-Image"
 LangString LANGNAME_OpenGEM ${LANG_ENGLISH} "OpenGEM"
 LangString LANGNAME_DesktopShortcut ${LANG_ENGLISH} "Desktop Shortcut"
 
-LangString DESC_DFend ${LANG_ENGLISH} "D-Fend Reloaded is the graphical user interface for administrating the DOS games."
+LangString DESC_DFend ${LANG_ENGLISH} "D-Fend Reloaded is the graphical user interface for administrating DOS games."
 LangString DESC_DosBox ${LANG_ENGLISH} "DOSBox is the DOS emulator used by D-Fend Reloaded."
 LangString DESC_DosBoxProgramFiles ${LANG_ENGLISH} "Program files of the DOS emulator."
 LangString DESC_DosBoxLanguageFiles ${LANG_ENGLISH} "Language files for different languages for DOSBox."

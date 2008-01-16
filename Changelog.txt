@@ -1,5 +1,41 @@
 D-Fend Reloaded Changelog
 
+Version 0.2.0 (01/16/2008)
+==========================
+- New dialog for changing multiple profiles at once.
+- The serial port settings can be changed via a dialog now.
+- If installed with the FreeDOS commandline tools, 4DOS can be set up as
+  commandline interpreter in profile editor.
+- If installed with the FreeDOS commandline tools, DOS32A can be used as a
+  replacement for the DOS/4GW protected mode extender.
+- Now you can specify multiple CD images for one drive mount and switch between
+  them at DOSBox runtime.
+- Now you can specify multiple floppy images for booting from floppy image
+  and switch between them at DOSBox runtime.
+- If a game has a data folder, D-Fend Reloaded can not only open this folder
+  but also open a specific file in the data folder now (selectable via a
+  directory list in form of menu).
+- Installer packages for single games can be built directly from the the
+  profile context menu.
+- The DOSBox png screenshots can be saved as jpeg, gif or bmp image files now.
+- The creation of the games list is much faster now.
+- The DosBox program icon is used for the "DosBox DOS" default profile.
+- The game info tooltips in the games list can be turned off and on now.
+- More icons in the menu.
+- Updated DOSBox links in the help menu.
+- Added the vogons to the "Old games" link collection.
+- [Fix] The serial port settings were ignored when starting DosBox.
+- [Fix] Long lines in "Autoexec.bat" and "Custom setting" were split into two
+  lines which can damage commandlines.
+- [Fix] Numerial values were not stored when closing profile editor if you
+  entered less digits than the edit field allows.  
+- [Fix] Added missing default value "auto" for joysticks.
+- [Fix] Fixed some spelling mistakes in the English language file.
+- [Fix] Wrong info text in DOSBox folder select dialog in setup dialog.
+- [Fix] I/O control is always shown as "No" in the drives list
+  independend of the real state of I/O control.
+
+
 Version 0.1.2 (01/04/2008)
 ==========================
 - [Fix] Missing translations for Shortcuts

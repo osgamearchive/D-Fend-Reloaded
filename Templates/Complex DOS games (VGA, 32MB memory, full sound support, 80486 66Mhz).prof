@@ -11,10 +11,10 @@ WWW=
 Language=
 
 [sdl]
-fulldouble=1
 output=overlay
 fullscreen=1
 autolock=0
+fulldouble=1
 usecancodes=1
 sensitivity=100
 windowresolution=original
@@ -22,16 +22,16 @@ fullresolution=original
 priority=higher,normal
 
 [cpu]
-cycles=20000
+cycles=auto
+core=normal
 cyclesup=500
 cyclesdown=20
-core=normal
 
 [Extra]
 NrOfMounts=1
 0=.\VirtualHD\;Drive;C;false;
 Environment=PATH[61]Z:\[13]
-Tab=5
+Tab=3
 Loadhigh=0
 CloseOnExit=1
 Overridegamestart=0
@@ -65,6 +65,8 @@ scaler=normal2x
 xms=1
 ems=1
 umb=1
+4DOS=0
+DOS32A=0
 keyboardlayout=default
 
 [ipx]
@@ -100,11 +102,11 @@ dma2=1
 ultradir=C:\ULTRASND
 
 [speaker]
+tandy=auto
 pcspeaker=1
 disney=1
 pcrate=22050
 tandyrate=22050
-tandy=auto
 
 [joystick]
 timed=1
@@ -115,7 +117,7 @@ joysticktype=none
 
 [dosbox]
 memsize=32
-captures=
+captures=.\Capture\
 machine=vga
 
 [serial]

@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, Buttons, StdCtrls, ExtCtrls, ComCtrls, ImgList;
+  Dialogs, Buttons, StdCtrls, ExtCtrls, ComCtrls, ImgList, Grids;
 
 type
   TProfileMountEditorForm = class(TForm)
@@ -35,11 +35,9 @@ type
     FloppyDriveLetterLabel: TLabel;
     CDROMIOCtrlCheckBox: TCheckBox;
     ImageList: TImageList;
-    FloppyImageEdit: TLabeledEdit;
     FloppyImageButton: TSpeedButton;
     FloppyImageDriveLetterComboBox: TComboBox;
     FloppyImageDriveLetterLabel: TLabel;
-    CDROMImageEdit: TLabeledEdit;
     CDROMImageDriveLetterLabel: TLabel;
     CDROMImageDriveLetterComboBox: TComboBox;
     CDROMImageButton: TSpeedButton;
@@ -52,6 +50,12 @@ type
     ImageCreateButton: TSpeedButton;
     DriveLetterInfoLabel1: TLabel;
     DriveLetterInfoLabel2: TLabel;
+    CDROMImageLabel: TLabel;
+    CDROMImageTab: TStringGrid;
+    CDROMImageSwitchLabel: TLabel;
+    CDROMImageAddButton: TSpeedButton;
+    CDROMImageDelButton: TSpeedButton;
+    FloppyImageEdit: TLabeledEdit;
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure OKButtonClick(Sender: TObject);
@@ -102,7 +106,10 @@ begin
   FloppyImageEdit.EditLabel.Caption:=LanguageSetup.ProfileMountingFile;
   FloppyImageDriveLetterLabel.Caption:=LanguageSetup.ProfileMountingLetter;
   DriveLetterInfoLabel1.Caption:=LanguageSetup.ProfileMountingLetterInfo;
-  CDROMImageEdit.EditLabel.Caption:=LanguageSetup.ProfileMountingFile;
+  CDROMImageLabel.Caption:=LanguageSetup.ProfileMountingFile;
+  CDROMImageAddButton.Hint:=LanguageSetup.ProfileMountingAddImage;
+  CDROMImageDelButton.Hint:=LanguageSetup.ProfileMountingDelImage;
+  CDROMImageSwitchLabel.Caption:=LanguageSetup.ProfileMountingSwitchImage;
   CDROMImageDriveLetterLabel.Caption:=LanguageSetup.ProfileMountingLetter;
   ImageEdit.EditLabel.Caption:=LanguageSetup.ProfileMountingFile;
   ImageGeometryEdit.EditLabel.Caption:=LanguageSetup.ProfileMountingGeometry;
@@ -177,10 +184,12 @@ begin
 end;
 
 procedure TProfileMountEditorForm.FormShow(Sender: TObject);
-Var St : TStringList;
+Var St,St2 : TStringList;
     S : String;
     I : Integer;
 begin
+  CDROMImageTab.ColWidths[0]:=CDROMImageTab.ClientWidth-25;
+
   {general: RealFolder;Type;Letter;IO;Label;FreeSpace}
 
   St:=ValueToList(Data);
@@ -241,7 +250,17 @@ begin
     If S='CDROMIMAGE' then begin
       {ImageFile;CDROMIMAGE;Letter;;;}
       PageControl.ActivePageIndex:=4;
-      CDROMImageEdit.Text:=St[0];
+      St2:=TStringList.Create;
+      try
+        S:=Trim(St[0]);
+        I:=Pos('$',S);
+        While I>0 do begin St2.Add(Trim(Copy(S,1,I-1))); S:=Trim(Copy(S,I+1,MaxInt)); I:=Pos('$',S); end;
+        St2.Add(S);
+        CDROMImageTab.RowCount:=St2.Count;
+        For I:=0 to St2.Count-1 do CDROMImageTab.Cells[0,I]:=St2[I];
+      finally
+        St2.Free;
+      end;
       If St.Count>=3 then begin
         I:=CDROMImageDriveLetterComboBox.Items.IndexOf(Trim(UpperCase(St[2]))); If I<0 then I:=2;
         CDROMImageDriveLetterComboBox.ItemIndex:=I;
@@ -275,6 +294,7 @@ end;
 
 procedure TProfileMountEditorForm.OKButtonClick(Sender: TObject);
 Var S : String;
+    I : Integer;
 begin
   Case PageControl.ActivePageIndex of
     0 : begin
@@ -296,8 +316,9 @@ begin
           Data:=FloppyImageEdit.Text+';Floppyimage;'+FloppyImageDriveLetterComboBox.Text+';;;';
         end;
     4 : begin
-         {ImageFile;CDROMIMAGE;Letter;;;}
-         Data:=CDROMImageEdit.Text+';CDROMImage;'+CDROMImageDriveLetterComboBox.Text+';;;';
+          {ImageFile;CDROMIMAGE;Letter;;;}
+          S:=CDROMImageTab.Cells[0,0]; For I:=1 to CDROMImageTab.RowCount-1 do S:=S+'$'+CDROMImageTab.Cells[0,I];
+          Data:=S+';CDROMImage;'+CDROMImageDriveLetterComboBox.Text+';;;';
         end;
     5 : begin
           {ImageFile;IMAGE;LetterOR23;;;geometry}
@@ -329,6 +350,7 @@ end;
 
 procedure TProfileMountEditorForm.FolderButtonClick(Sender: TObject);
 Var S : String;
+    I : Integer;
 begin
   Case (Sender as TComponent).Tag of
     0 : begin
@@ -361,13 +383,17 @@ begin
         end;
     4 : begin
           {CDROM Image}
-          S:=MakeAbsPath(CDROMImageEdit.Text,PrgSetup.BaseDir);
+          If CDROMImageTab.Row<0 then begin
+            MessageDlg(LanguageSetup.MessageNoImageSelected,mtError,[mbOK],0);
+            exit;
+          end;
+          S:=MakeAbsPath(CDROMImageTab.Cells[0,CDROMImageTab.Row],PrgSetup.BaseDir);
           OpenDialog.DefaultExt:='iso';
           OpenDialog.InitialDir:=ExtractFilePath(S);
           OpenDialog.Title:=LanguageSetup.ProfileMountingFile;
           OpenDialog.Filter:=LanguageSetup.ProfileMountingFileFilter;
           if not OpenDialog.Execute then exit;
-          CDROMImageEdit.Text:=MakeRelPath(OpenDialog.FileName,PrgSetup.BaseDir);
+          CDROMImageTab.Cells[0,CDROMImageTab.Row]:=MakeRelPath(OpenDialog.FileName,PrgSetup.BaseDir);
         end;
     5 : begin
           {HD Image}
@@ -388,10 +414,32 @@ begin
         end;
     7 : begin
           {Create HD Image}
+          If CDROMImageTab.Row<0 then begin
+            MessageDlg(LanguageSetup.MessageNoImageSelected,mtError,[mbOK],0);
+            exit;
+          end;
           S:=ShowCreateImageFileDialog(self,False,True);
           If S='' then exit;
           ImageEdit.Text:=MakeRelPath(S,PrgSetup.BaseDir);
-          ImageGeometryEdit.Text:=GetGeometryFromFile(S);
+          CDROMImageTab.Cells[0,CDROMImageTab.Row]:=GetGeometryFromFile(S);
+        end;
+    8 : begin
+          {Add CDROM Image}
+          CDROMImageTab.RowCount:=CDROMImageTab.RowCount+1;
+          CDROMImageTab.Row:=CDROMImageTab.RowCount-1;
+        end;
+    9 : begin
+          {Remove CDROM Image}
+          If CDROMImageTab.Row<0 then begin
+            MessageDlg(LanguageSetup.MessageNoImageSelected,mtError,[mbOK],0);
+            exit;
+          end;
+          If CDROMImageTab.RowCount=1 then begin
+            CDROMImageTab.Cells[0,0]:='';
+          end else begin
+            For I:=CDROMImageTab.Row+1 to CDROMImageTab.RowCount-1 do CDROMImageTab.Cells[0,I-1]:=CDROMImageTab.Cells[0,I];
+            CDROMImageTab.RowCount:=CDROMImageTab.RowCount-1;
+          end;
         end;
   End;
 end;

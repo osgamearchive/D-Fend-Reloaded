@@ -8,6 +8,7 @@
 
 !include "MUI.nsh"
 !include "Sections.nsh"
+!include "WinMessages.nsh"
 
 
 
@@ -15,8 +16,8 @@
 ; ============================================================
 
 !define VER_MAYOR 0
-!define VER_MINOR1 1
-!define VER_MINOR2 2
+!define VER_MINOR1 2
+!define VER_MINOR2 0
 
 !define PrgName "D-Fend Reloaded ${VER_MAYOR}.${VER_MINOR1}.${VER_MINOR2}"
 OutFile "D-Fend-Reloaded-${VER_MAYOR}.${VER_MINOR1}.${VER_MINOR2}-Setup.exe"
@@ -25,6 +26,8 @@ OutFile "D-Fend-Reloaded-${VER_MAYOR}.${VER_MINOR1}.${VER_MINOR2}-Setup.exe"
 
 ; Initial settings
 ; ============================================================
+
+!packhdr "$%TEMP%\exehead.tmp" 'upx.exe "$%TEMP%\exehead.tmp"'
 
 Name "${PrgName}"
 BrandingText "${PrgName}"
@@ -121,6 +124,18 @@ Var DataInstDir
 ; Definition of install sections
 ; ============================================================
 
+Section "-CloseDFend"
+  SectionIn RO
+
+  Push $0
+  FindWindow $0 'TDFendReloadedMainform' ''
+  IntCmp $0 0 DoneCloseDFend
+  SendMessage $0 ${WM_CLOSE} 0 0 /TIMEOUT=${TO_MS}
+  Sleep 2000
+  DoneCloseDFend:
+  Pop $0
+SectionEnd
+
 Section "$(LANGNAME_DFendReloaded)" ID_DFend
   SectionIn RO
   
@@ -144,6 +159,7 @@ Section "$(LANGNAME_DFendReloaded)" ID_DFend
   File "..\Links.txt"
   File "..\ChangeLog.txt"
   File "..\Readme_OperationMode.txt"
+  File "..\D-Fend Reloaded DataInstaller.nsi"
   
   SetOutPath "$DataInstDir"
   File "..\D-Fend Reloaded DataInstaller.nsi"
@@ -154,13 +170,16 @@ Section "$(LANGNAME_DFendReloaded)" ID_DFend
   File "..\Capture\DOSBox DOS\*.*"
   
   SetOutPath "$INSTDIR\Lang"
-  File "..\Lang\*.ini"  
+  File /x English.ini "..\Lang\*.ini"  ; English.ini will be auto created at first launch
   
   SetOutPath "$DataInstDir\Templates"
   File "..\Templates\*.prof"
   
   CreateDirectory "$DataInstDir\GameData"
-  CreateDirectory "$DataInstDir\IconLibrary"
+  
+  SetOutPath "$DataInstDir\IconLibrary"
+  File "..\IconLibrary\*.*"
+  
   CreateDirectory "$DataInstDir\VirtualHD"
 
   ClearErrors

@@ -1,7 +1,7 @@
 unit CommonTools;
 interface
 
-uses Windows, Classes;
+uses Windows, Classes, Graphics;
 
 Function ExtUpperCase(const S : String) : String;
 
@@ -32,12 +32,15 @@ Function GetFileDateAsString : String;
 Procedure CreateLink(const TargetName, Parameters, LinkFile : String);
 Procedure SetStartWithWindows(const Enabled : Boolean);
 
+Function LoadImageFromFile(const FileName : String) : TPicture;
+Procedure SaveImageToFile(const Picture : TPicture; const FileName : String);
+
 Var TempPrgDir : String = ''; {Temporary overwrite normal PrgDir}
 
 implementation
 
-uses SysUtils, Forms, ShlObj, ActiveX, Math, ComObj, Registry;
-
+uses SysUtils, Forms, ShlObj, ActiveX, Math, ComObj, Registry, JPEG, GIFImage,
+     PNGImage;
 
 Function ExtUpperCase(const S : String) : String;
 Var I : Integer;
@@ -280,7 +283,7 @@ Var I,J : Integer;
 begin
   I:=GetFileVersion(ExpandFileName(Application.ExeName));
   J:=GetFileVersionEx(ExpandFileName(Application.ExeName));
-  result:=Format('Version %d.%d.%d Build %d',[I div 65536,I mod 65536, J div 65536, J mod 65536]);
+  result:=Format('Version %d.%d.%d (Build %d)',[I div 65536,I mod 65536, J div 65536, J mod 65536]);
 end;
 
 Function GetShortFileVersionAsString : String;
@@ -343,6 +346,87 @@ begin
   finally
     Reg.Free;
   end;
+end;
+
+Procedure SaveImageToFile(const Picture : TPicture; const FileName : String);
+Var Ext : String;
+    JPEGImage : TJPEGImage;
+    Bitmap : TBitmap;
+    GifImage : TGIFImage;
+    PNGObject : TPNGObject;
+begin
+  Ext:=Trim(ExtUpperCase(ExtractFileExt(FileName)));
+
+  Bitmap:=TBitmap.Create;
+  try
+    Bitmap.Assign(Picture.Graphic);
+
+  If (Ext='.JPG') or (Ext='.JPEG') then begin
+    JPEGImage:=TJPEGImage.Create;
+    try
+      JPEGImage.Assign(Bitmap);
+      JPEGImage.CompressionQuality:=95;
+      JPEGImage.SaveToFile(FileName);
+    finally
+      JPEGImage.Free;
+    end;
+    exit;
+  end;
+
+  If (Ext='.BMP') then begin
+    Bitmap.SaveToFile(FileName);
+    exit;
+  end;
+
+  If (Ext='.GIF') then begin
+    GifImage:=TGIFImage.Create;
+    try
+      GifImage.ColorReduction:=rmQuantizeWindows;
+      GifImage.Assign(Bitmap);
+      GifImage.SaveToFile(FileName);
+    finally
+      GifImage.Free;
+    end;
+    exit;
+  end;
+
+  If (Ext='.PNG') then begin
+    PNGObject:=TPNGObject.Create;
+    try
+      PNGObject.Assign(Bitmap);
+      PNGObject.SaveToFile(FileName);
+    finally
+      PNGObject.Free;
+    end;
+    exit;
+  end;
+
+    Picture.SaveToFile(FileName);
+  finally
+    Bitmap.Free;
+  end;
+end;
+
+Function LoadImageFromFile(const FileName : String) : TPicture;
+Var Ext : String;
+    GIFImage : TGIFImage;
+begin
+  Ext:=Trim(ExtUpperCase(ExtractFileExt(FileName)));
+
+  If Ext='.GIF' then begin
+    GIFImage:=TGIFImage.Create;
+    try
+      GIFImage.LoadFromFile(FileName);
+      result:=TPicture.Create;
+      result.Assign(GIFImage);
+    finally
+      GIFImage.Free;
+    end;
+    exit;
+  end;
+
+  result:=TPicture.Create;
+  result.LoadFromFile(FileName);
 end;
 
 end.
