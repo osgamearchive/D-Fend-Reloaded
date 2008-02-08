@@ -31,8 +31,6 @@ object TemplateForm: TTemplateForm
     OnColumnClick = ListViewColumnClick
     OnKeyDown = ListViewKeyDown
     OnSelectItem = ListViewSelectItem
-    ExplicitWidth = 564
-    ExplicitHeight = 280
   end
   object CoolBar: TCoolBar
     Left = 0
@@ -51,7 +49,6 @@ object TemplateForm: TTemplateForm
     EdgeBorders = []
     FixedSize = True
     FixedOrder = True
-    ExplicitWidth = 564
     object ToolBar: TToolBar
       Left = 2
       Top = 0

@@ -56,16 +56,16 @@ object TransferForm: TTransferForm
   object SelectAllButton: TBitBtn
     Left = 8
     Top = 303
-    Width = 97
+    Width = 107
     Height = 25
     Caption = 'SelectAllButton'
     TabOrder = 1
   end
   object SelectNoneButton: TBitBtn
     Tag = 1
-    Left = 111
+    Left = 121
     Top = 303
-    Width = 97
+    Width = 107
     Height = 25
     Caption = 'SelectNoneButton'
     TabOrder = 2
@@ -100,22 +100,16 @@ object TransferForm: TTransferForm
   end
   object SelectGenreButton: TBitBtn
     Tag = 2
-    Left = 214
+    Left = 234
     Top = 303
-    Width = 97
+    Width = 107
     Height = 25
     Caption = 'By Genre'
     TabOrder = 3
     OnClick = SelectButtonClick
   end
   object PopupMenu: TPopupMenu
-    Left = 320
-    Top = 312
-    object MenuSelect: TMenuItem
-      Caption = '&Select'
-    end
-    object MenuUnselect: TMenuItem
-      Caption = '&Unselect'
-    end
+    Left = 232
+    Top = 392
   end
 end

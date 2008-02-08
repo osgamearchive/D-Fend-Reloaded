@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, GameDBUnit, StdCtrls, Buttons, ComCtrls, ExtCtrls, Grids, ValEdit,
-  ImgList;
+  ImgList, Spin;
 
 type
   TProfileEditorForm = class(TForm)
@@ -86,6 +86,28 @@ type
     AutoexecBootFloppyImageAddButton: TSpeedButton;
     AutoexecBootFloppyImageDelButton: TSpeedButton;
     AutoexecBootFloppyImageInfoLabel: TLabel;
+    GameInfoMetaDataButton: TBitBtn;
+    SoundVolumeSheet: TTabSheet;
+    SoundVolumeLeftLabel: TLabel;
+    SoundVolumeRightLabel: TLabel;
+    SoundVolumeMasterLabel: TLabel;
+    SoundVolumeMasterLeftEdit: TSpinEdit;
+    SoundVolumeMasterRightEdit: TSpinEdit;
+    SoundVolumeDisneyLeftEdit: TSpinEdit;
+    SoundVolumeDisneyRightEdit: TSpinEdit;
+    SoundVolumeSpeakerLeftEdit: TSpinEdit;
+    SoundVolumeSpeakerRightEdit: TSpinEdit;
+    SoundVolumeGUSLeftEdit: TSpinEdit;
+    SoundVolumeGUSRightEdit: TSpinEdit;
+    SoundVolumeSBLeftEdit: TSpinEdit;
+    SoundVolumeSBRightEdit: TSpinEdit;
+    SoundVolumeFMLeftEdit: TSpinEdit;
+    SoundVolumeFMRightEdit: TSpinEdit;
+    SoundVolumeDisneyLabel: TLabel;
+    SoundVolumeSpeakerLabel: TLabel;
+    SoundVolumeGUSLabel: TLabel;
+    SoundVolumeSBLabel: TLabel;
+    SoundVolumeFMLabel: TLabel;
     procedure OKButtonClick(Sender: TObject);
     procedure ButtonWork(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -104,15 +126,18 @@ type
     procedure ProfileSettingsValueListEditorKeyUp(Sender: TObject;
       var Key: Word; Shift: TShiftState);
     procedure EnvironmentValueListEditorEditButtonClick(Sender: TObject);
+    procedure GeneralValueListEditorEditButtonClick(Sender: TObject);
   private
     { Private-Deklarationen }
     IconName : String;
     Mounting : TStringList;
+    OldFileName : String;
     Procedure LoadIcon;
     Procedure InitGUI;
     Procedure LoadData;
     Procedure LoadMountingList;
     Function NextFreeDriveLetter : Char;
+    Function CheckProfile : Boolean;
   public
     { Public-Deklarationen }
     MoveStatus : Integer;
@@ -130,7 +155,7 @@ implementation
 
 uses Math, LanguageSetupUnit, VistaToolsUnit, CommonTools, PrgConsts,
      PrgSetupUnit, IconManagerFormUnit, ProfileMountEditorFormUnit,
-     SerialEditFormUnit;
+     SerialEditFormUnit, UserInfoFormUnit, IconLoaderUnit;
 
 {$R *.dfm}
 
@@ -151,8 +176,8 @@ begin
   Caption:=LanguageSetup.ProfileEditor;
   OKButton.Caption:=LanguageSetup.OK;
   CancelButton.Caption:=LanguageSetup.Cancel;
-  PreviousButton.Caption:=LanguageSetup.Previous;
-  NextButton.Caption:=LanguageSetup.Next;
+  PreviousButton.Caption:=RemoveUnderline(LanguageSetup.OK)+' && '+LanguageSetup.Previous;
+  NextButton.Caption:=RemoveUnderline(LanguageSetup.OK)+' && '+LanguageSetup.Next;
 
   {Profile Settings Sheet}
 
@@ -222,6 +247,7 @@ begin
     ItemProps[Strings.Count-1].PickList.Add(RemoveUnderline(LanguageSetup.No));
   end;
   GenerateGameDataFolderNameButton.Caption:=LanguageSetup.ProfileEditorGenerateGameDataFolder;
+  GameInfoMetaDataButton.Caption:=LanguageSetup.ProfileEditorUserdefinedInfo;
   NotesLabel.Caption:=LanguageSetup.GameNotes+':';
 
   { General Sheet }
@@ -244,6 +270,14 @@ begin
     ItemProps[Strings.Count-1].ReadOnly:=True;
     ItemProps[Strings.Count-1].PickList.Add(RemoveUnderline(LanguageSetup.Yes));
     ItemProps[Strings.Count-1].PickList.Add(RemoveUnderline(LanguageSetup.No));
+    Strings.Add(LanguageSetup.GameForce2ButtonMouseMode+'=');
+    ItemProps[Strings.Count-1].ReadOnly:=True;
+    ItemProps[Strings.Count-1].PickList.Add(RemoveUnderline(LanguageSetup.Yes));
+    ItemProps[Strings.Count-1].PickList.Add(RemoveUnderline(LanguageSetup.No));
+    Strings.Add(LanguageSetup.GameSwapMouseButtons+'=');
+    ItemProps[Strings.Count-1].ReadOnly:=True;
+    ItemProps[Strings.Count-1].PickList.Add(RemoveUnderline(LanguageSetup.Yes));
+    ItemProps[Strings.Count-1].PickList.Add(RemoveUnderline(LanguageSetup.No));
     Strings.Add(LanguageSetup.GameUseDoublebuffering+'=');
     ItemProps[Strings.Count-1].ReadOnly:=True;
     ItemProps[Strings.Count-1].PickList.Add(RemoveUnderline(LanguageSetup.Yes));
@@ -258,10 +292,7 @@ begin
     ItemProps[Strings.Count-1].PickList.Add(RemoveUnderline(LanguageSetup.No));
     Strings.Add(LanguageSetup.GameMouseSensitivity+'=');
     ItemProps[Strings.Count-1].EditMask:='9000';
-    For I:=1 to 10 do ItemProps[Strings.Count-1].PickList.Add(IntToStr(I*10));
-    For I:=1 to 4 do ItemProps[Strings.Count-1].PickList.Add(IntToStr(100+I*25));
-    For I:=1 to 8 do ItemProps[Strings.Count-1].PickList.Add(IntToStr(200+I*50));
-    For I:=7 to 10 do ItemProps[Strings.Count-1].PickList.Add(IntToStr(I*100));
+    St:=ValueToList(GameDB.ConfOpt.MouseSensitivity,';,'); try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
     Strings.Add(LanguageSetup.GameRender+'=');
     ItemProps[Strings.Count-1].EditStyle:=esPickList;
     St:=ValueToList(GameDB.ConfOpt.Render,';,'); try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
@@ -275,6 +306,13 @@ begin
     ItemProps[Strings.Count-1].ReadOnly:=True;
     ItemProps[Strings.Count-1].EditStyle:=esPickList;
     St:=ValueToList(GameDB.ConfOpt.Scale,';,'); try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
+    If PrgSetup.AllowTextModeLineChange then begin
+      Strings.Add(LanguageSetup.GameTextModeLines+'=');
+      ItemProps[Strings.Count-1].ReadOnly:=True;
+      ItemProps[Strings.Count-1].PickList.Add('25');
+      ItemProps[Strings.Count-1].PickList.Add('28');
+      ItemProps[Strings.Count-1].PickList.Add('50');
+    end;
     Strings.Add(LanguageSetup.GamePriorityForeground+'=');
     ItemProps[Strings.Count-1].ReadOnly:=True;
     ItemProps[Strings.Count-1].PickList.Add('lower');
@@ -287,6 +325,8 @@ begin
     ItemProps[Strings.Count-1].PickList.Add('normal');
     ItemProps[Strings.Count-1].PickList.Add('higher');
     ItemProps[Strings.Count-1].PickList.Add('highest');
+    Strings.Add(LanguageSetup.GameDOSBoxVersion+'=');
+    ItemProps[Strings.Count-1].EditStyle:=esEllipsis;
   end;
 
   { Environment Sheet }
@@ -322,9 +362,11 @@ begin
     ItemProps[Strings.Count-1].EditStyle:=esPickList;
     St:=ValueToList(GameDB.ConfOpt.Cycles,';,'); try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
     Strings.Add(LanguageSetup.GameCyclesUp+'=');
-    ItemProps[Strings.Count-1].EditMask:='9000';
+    ItemProps[Strings.Count-1].EditMask:='90000';
+    St:=ValueToList(GameDB.ConfOpt.CyclesUp,';,'); try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
     Strings.Add(LanguageSetup.GameCyclesDown+'=');
-    ItemProps[Strings.Count-1].EditMask:='9000';
+    ItemProps[Strings.Count-1].EditMask:='90000';
+    St:=ValueToList(GameDB.ConfOpt.CyclesDown,';,'); try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
     Strings.Add(LanguageSetup.GameCore+'=');
     ItemProps[Strings.Count-1].EditStyle:=esPickList;
     St:=ValueToList(GameDB.ConfOpt.Core,';,'); try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
@@ -334,14 +376,23 @@ begin
     Strings.Add(LanguageSetup.GameVideoCard+'=');
     ItemProps[Strings.Count-1].ReadOnly:=True;
     ItemProps[Strings.Count-1].EditStyle:=esPickList;
-    ItemProps[Strings.Count-1].PickList.Add('hercules');
-    ItemProps[Strings.Count-1].PickList.Add('cga');
-    ItemProps[Strings.Count-1].PickList.Add('tandy');
-    ItemProps[Strings.Count-1].PickList.Add('vga');
+    St:=ValueToList(GameDB.ConfOpt.Video,';,'); try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
     Strings.Add(LanguageSetup.GameKeyboardLayout+'=');
     ItemProps[Strings.Count-1].ReadOnly:=True;
     ItemProps[Strings.Count-1].EditStyle:=esPickList;
     St:=ValueToList(GameDB.ConfOpt.KeyboardLayout,';,'); try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
+    Strings.Add(LanguageSetup.GameKeyboardNumLock+'=');
+    ItemProps[Strings.Count-1].ReadOnly:=True;
+    ItemProps[Strings.Count-1].EditStyle:=esPickList;
+    with ItemProps[Strings.Count-1].PickList do begin Add(LanguageSetup.DoNotChange); Add(LanguageSetup.Off); Add(LanguageSetup.On); end;
+    Strings.Add(LanguageSetup.GameKeyboardCapsLock+'=');
+    ItemProps[Strings.Count-1].ReadOnly:=True;
+    ItemProps[Strings.Count-1].EditStyle:=esPickList;
+    with ItemProps[Strings.Count-1].PickList do begin Add(LanguageSetup.DoNotChange); Add(LanguageSetup.Off); Add(LanguageSetup.On); end;
+    Strings.Add(LanguageSetup.GameKeyboardScrollLock+'=');
+    ItemProps[Strings.Count-1].ReadOnly:=True;
+    ItemProps[Strings.Count-1].EditStyle:=esPickList;
+    with ItemProps[Strings.Count-1].PickList do begin Add(LanguageSetup.DoNotChange); Add(LanguageSetup.Off); Add(LanguageSetup.On); end;
     Strings.Add(LanguageSetup.GameSerial+' 1=');
     ItemProps[Strings.Count-1].EditStyle:=esEllipsis;
     Strings.Add(LanguageSetup.GameSerial+' 2=');
@@ -361,6 +412,8 @@ begin
     ItemProps[Strings.Count-1].PickList.Add(RemoveUnderline(LanguageSetup.GameIPXEstablishConnectionServer));
     Strings.Add(LanguageSetup.GameIPXAddress+'=');
     Strings.Add(LanguageSetup.GameIPXPort+'=');
+    Strings.Add(LanguageSetup.GameReportedDOSVersion+'=');
+    St:=ValueToList(GameDB.ConfOpt.ReportedDOSVersion,';,'); try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
   end;
 
   { Mounting Sheet }
@@ -369,7 +422,6 @@ begin
   MountingAddButton.Caption:=LanguageSetup.ProfileEditorMountingAdd;
   MountingEditButton.Caption:=LanguageSetup.ProfileEditorMountingEdit;
   MountingDelButton.Caption:=LanguageSetup.ProfileEditorMountingDel;
-  MountingDeleteAllButton.Caption:=LanguageSetup.ProfileEditorMountingDelAll;
   MountingDeleteAllButton.Caption:=LanguageSetup.ProfileEditorMountingDelAll;
   MountingAutoCreateButton.Caption:=LanguageSetup.ProfileEditorMountingAutoCreate;
   L:=MountingListView.Columns.Add; L.Width:=-2; L.Caption:=LanguageSetup.ProfileEditorMountingFolderImage;
@@ -392,17 +444,9 @@ begin
     ItemProps[Strings.Count-1].PickList.Add(RemoveUnderline(LanguageSetup.No));
     Strings.Add(LanguageSetup.ProfileEditorSoundSampleRate+'=');
     ItemProps[Strings.Count-1].ReadOnly:=True;
-    ItemProps[Strings.Count-1].PickList.Add('8000');
-    ItemProps[Strings.Count-1].PickList.Add('11025');
-    ItemProps[Strings.Count-1].PickList.Add('22050');
-    ItemProps[Strings.Count-1].PickList.Add('32000');
-    ItemProps[Strings.Count-1].PickList.Add('44100');
+    St:=ValueToList(GameDB.ConfOpt.Rate,';,'); try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
     Strings.Add(LanguageSetup.ProfileEditorSoundBlockSize+'=');
-    ItemProps[Strings.Count-1].PickList.Add('512');
-    ItemProps[Strings.Count-1].PickList.Add('1024');
-    ItemProps[Strings.Count-1].PickList.Add('2048');
-    ItemProps[Strings.Count-1].PickList.Add('4096');
-    ItemProps[Strings.Count-1].PickList.Add('8192');
+    St:=ValueToList(GameDB.ConfOpt.Blocksize,';,'); try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
     Strings.Add(LanguageSetup.ProfileEditorSoundPrebuffer+'=');
     ItemProps[Strings.Count-1].PickList.Add('1');
     ItemProps[Strings.Count-1].PickList.Add('5');
@@ -429,39 +473,23 @@ begin
     St:=ValueToList(GameDB.ConfOpt.Sblaster,';,'); try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
     Strings.Add(LanguageSetup.ProfileEditorSoundSBAddress+'=');
     ItemProps[Strings.Count-1].ReadOnly:=True;
-    ItemProps[Strings.Count-1].PickList.Add('210');
-    ItemProps[Strings.Count-1].PickList.Add('220');
-    ItemProps[Strings.Count-1].PickList.Add('240');
-    ItemProps[Strings.Count-1].PickList.Add('260');
-    ItemProps[Strings.Count-1].PickList.Add('280');
+    St:=ValueToList(GameDB.ConfOpt.SBBase,';,'); try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
     Strings.Add(LanguageSetup.ProfileEditorSoundSBIRQ+'=');
     ItemProps[Strings.Count-1].ReadOnly:=True;
-    ItemProps[Strings.Count-1].PickList.Add('3');
-    ItemProps[Strings.Count-1].PickList.Add('5');
-    ItemProps[Strings.Count-1].PickList.Add('7');
-    ItemProps[Strings.Count-1].PickList.Add('10');
-    ItemProps[Strings.Count-1].PickList.Add('11');
+    St:=ValueToList(GameDB.ConfOpt.IRQ,';,'); try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
     Strings.Add(LanguageSetup.ProfileEditorSoundSBDMA+'=');
     ItemProps[Strings.Count-1].ReadOnly:=True;
-    ItemProps[Strings.Count-1].PickList.Add('0');
-    ItemProps[Strings.Count-1].PickList.Add('1');
-    ItemProps[Strings.Count-1].PickList.Add('3');
+    St:=ValueToList(GameDB.ConfOpt.Dma,';,'); try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
     Strings.Add(LanguageSetup.ProfileEditorSoundSBHDMA+'=');
     ItemProps[Strings.Count-1].ReadOnly:=True;
-    ItemProps[Strings.Count-1].PickList.Add('5');
-    ItemProps[Strings.Count-1].PickList.Add('6');
-    ItemProps[Strings.Count-1].PickList.Add('7');
+    St:=ValueToList(GameDB.ConfOpt.HDMA,';,'); try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
     Strings.Add(LanguageSetup.ProfileEditorSoundSBOplMode+'=');
     ItemProps[Strings.Count-1].ReadOnly:=True;
     ItemProps[Strings.Count-1].EditStyle:=esPickList;
     St:=ValueToList(GameDB.ConfOpt.Oplmode,';,'); try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
     Strings.Add(LanguageSetup.ProfileEditorSoundSBOplRate+'=');
     ItemProps[Strings.Count-1].ReadOnly:=True;
-    ItemProps[Strings.Count-1].PickList.Add('8000');
-    ItemProps[Strings.Count-1].PickList.Add('11025');
-    ItemProps[Strings.Count-1].PickList.Add('22050');
-    ItemProps[Strings.Count-1].PickList.Add('32000');
-    ItemProps[Strings.Count-1].PickList.Add('44100');
+    St:=ValueToList(GameDB.ConfOpt.OPLRate,';,'); try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
     Strings.Add(LanguageSetup.ProfileEditorSoundSBUseMixer+'=');
     ItemProps[Strings.Count-1].ReadOnly:=True;
     ItemProps[Strings.Count-1].PickList.Add(RemoveUnderline(LanguageSetup.Yes));
@@ -479,42 +507,22 @@ begin
     ItemProps[Strings.Count-1].PickList.Add(RemoveUnderline(LanguageSetup.No));
     Strings.Add(LanguageSetup.ProfileEditorSoundGUSAddress+'=');
     ItemProps[Strings.Count-1].ReadOnly:=True;
-    ItemProps[Strings.Count-1].PickList.Add('210');
-    ItemProps[Strings.Count-1].PickList.Add('220');
-    ItemProps[Strings.Count-1].PickList.Add('240');
-    ItemProps[Strings.Count-1].PickList.Add('260');
-    ItemProps[Strings.Count-1].PickList.Add('280');
+    St:=ValueToList(GameDB.ConfOpt.GUSBase,';,'); try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
     Strings.Add(LanguageSetup.ProfileEditorSoundGUSIRQ1+'=');
     ItemProps[Strings.Count-1].ReadOnly:=True;
-    ItemProps[Strings.Count-1].PickList.Add('3');
-    ItemProps[Strings.Count-1].PickList.Add('5');
-    ItemProps[Strings.Count-1].PickList.Add('7');
-    ItemProps[Strings.Count-1].PickList.Add('10');
-    ItemProps[Strings.Count-1].PickList.Add('11');
+    St:=ValueToList(GameDB.ConfOpt.IRQ1,';,'); try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
     Strings.Add(LanguageSetup.ProfileEditorSoundGUSIRQ2+'=');
+    St:=ValueToList(GameDB.ConfOpt.IRQ2,';,'); try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
     ItemProps[Strings.Count-1].ReadOnly:=True;
-    ItemProps[Strings.Count-1].PickList.Add('3');
-    ItemProps[Strings.Count-1].PickList.Add('5');
-    ItemProps[Strings.Count-1].PickList.Add('7');
-    ItemProps[Strings.Count-1].PickList.Add('10');
-    ItemProps[Strings.Count-1].PickList.Add('11');
     Strings.Add(LanguageSetup.ProfileEditorSoundGUSDMA1+'=');
     ItemProps[Strings.Count-1].ReadOnly:=True;
-    ItemProps[Strings.Count-1].PickList.Add('0');
-    ItemProps[Strings.Count-1].PickList.Add('1');
-    ItemProps[Strings.Count-1].PickList.Add('3');
+    St:=ValueToList(GameDB.ConfOpt.Dma1,';,'); try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
     Strings.Add(LanguageSetup.ProfileEditorSoundGUSDMA2+'=');
     ItemProps[Strings.Count-1].ReadOnly:=True;
-    ItemProps[Strings.Count-1].PickList.Add('0');
-    ItemProps[Strings.Count-1].PickList.Add('1');
-    ItemProps[Strings.Count-1].PickList.Add('3');
+    St:=ValueToList(GameDB.ConfOpt.Dma2,';,'); try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
     Strings.Add(LanguageSetup.ProfileEditorSoundGUSRate+'=');
     ItemProps[Strings.Count-1].ReadOnly:=True;
-    ItemProps[Strings.Count-1].PickList.Add('8000');
-    ItemProps[Strings.Count-1].PickList.Add('11025');
-    ItemProps[Strings.Count-1].PickList.Add('22050');
-    ItemProps[Strings.Count-1].PickList.Add('32000');
-    ItemProps[Strings.Count-1].PickList.Add('44100');
+    St:=ValueToList(GameDB.ConfOpt.GUSRate,';,'); try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
     Strings.Add(LanguageSetup.ProfileEditorSoundGUSPath+'=');
   end;
 
@@ -525,17 +533,10 @@ begin
     Strings.Delete(0);
     Strings.Add(LanguageSetup.ProfileEditorSoundMIDIType+'=');
     ItemProps[Strings.Count-1].ReadOnly:=True;
-    ItemProps[Strings.Count-1].PickList.Add('intelligent');
-    ItemProps[Strings.Count-1].PickList.Add('none');
-    ItemProps[Strings.Count-1].PickList.Add('uart');
+    St:=ValueToList(GameDB.ConfOpt.MPU401,';,'); try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
     Strings.Add(LanguageSetup.ProfileEditorSoundMIDIDevice+'=');
     ItemProps[Strings.Count-1].ReadOnly:=True;
-    ItemProps[Strings.Count-1].PickList.Add('default');
-    ItemProps[Strings.Count-1].PickList.Add('alsa');
-    ItemProps[Strings.Count-1].PickList.Add('oss');
-    ItemProps[Strings.Count-1].PickList.Add('win32');
-    ItemProps[Strings.Count-1].PickList.Add('coreaudio');
-    ItemProps[Strings.Count-1].PickList.Add('none');
+    St:=ValueToList(GameDB.ConfOpt.MIDIDevice,';,'); try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
     Strings.Add(LanguageSetup.ProfileEditorSoundMIDIConfigInfo+'=');
   end;
 
@@ -577,11 +578,7 @@ begin
     ItemProps[Strings.Count-1].PickList.Add(RemoveUnderline(LanguageSetup.No));
     Strings.Add(LanguageSetup.ProfileEditorSoundMiscPCSpeakerRate+'=');
     ItemProps[Strings.Count-1].ReadOnly:=True;
-    ItemProps[Strings.Count-1].PickList.Add('8000');
-    ItemProps[Strings.Count-1].PickList.Add('11025');
-    ItemProps[Strings.Count-1].PickList.Add('22050');
-    ItemProps[Strings.Count-1].PickList.Add('32000');
-    ItemProps[Strings.Count-1].PickList.Add('44100');
+    St:=ValueToList(GameDB.ConfOpt.PCRate,';,'); try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
     Strings.Add(LanguageSetup.ProfileEditorSoundMiscEnableTandy+'=');
     ItemProps[Strings.Count-1].ReadOnly:=True;
     ItemProps[Strings.Count-1].PickList.Add('auto');
@@ -589,16 +586,22 @@ begin
     ItemProps[Strings.Count-1].PickList.Add('on');
     Strings.Add(LanguageSetup.ProfileEditorSoundMiscTandyRate+'=');
     ItemProps[Strings.Count-1].ReadOnly:=True;
-    ItemProps[Strings.Count-1].PickList.Add('8000');
-    ItemProps[Strings.Count-1].PickList.Add('11025');
-    ItemProps[Strings.Count-1].PickList.Add('22050');
-    ItemProps[Strings.Count-1].PickList.Add('32000');
-    ItemProps[Strings.Count-1].PickList.Add('44100');
+    St:=ValueToList(GameDB.ConfOpt.TandyRate,';,'); try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
     Strings.Add(LanguageSetup.ProfileEditorSoundMiscEnableDisneySoundsSource+'=');
     ItemProps[Strings.Count-1].ReadOnly:=True;
     ItemProps[Strings.Count-1].PickList.Add(RemoveUnderline(LanguageSetup.Yes));
     ItemProps[Strings.Count-1].PickList.Add(RemoveUnderline(LanguageSetup.No));
   end;
+
+  SoundVolumeSheet.Caption:=LanguageSetup.ProfileEditorSoundVolumeSheet;
+  SoundVolumeLeftLabel.Caption:=LanguageSetup.Left;
+  SoundVolumeRightLabel.Caption:=LanguageSetup.Right;
+  SoundVolumeMasterLabel.Caption:=LanguageSetup.ProfileEditorSoundMasterVolume;
+  SoundVolumeDisneyLabel.Caption:=LanguageSetup.ProfileEditorSoundMiscDisneySoundsSource;
+  SoundVolumeSpeakerLabel.Caption:=LanguageSetup.ProfileEditorSoundMiscPCSpeaker;
+  SoundVolumeGUSLabel.Caption:=LanguageSetup.ProfileEditorSoundGUS;
+  SoundVolumeSBLabel.Caption:=LanguageSetup.ProfileEditorSoundSoundBlaster;
+  SoundVolumeFMLabel.Caption:=LanguageSetup.ProfileEditorSoundFM;
 
   { Autoexec Sheet }
 
@@ -607,6 +610,7 @@ begin
   AutoexecOverrideMountingCheckBox.Caption:=LanguageSetup.ProfileEditorAutoexecOverrideMounting;
   AutoexecUse4DOSCheckBox.Caption:=LanguageSetup.ProfileEditorAutoexecUse4DOS;
   AutoexecLabel.Caption:=LanguageSetup.ProfileEditorAutoexecBat;
+  AutoexecMemo.Font.Name:='Courier New';
   AutoexecClearButton.Caption:=LanguageSetup.Del;
   AutoexecLoadButton.Caption:=LanguageSetup.Load;
   AutoexecSaveButton.Caption:=LanguageSetup.Save;
@@ -621,6 +625,7 @@ begin
   { CustomSets Sheet }
 
   CustomSetsSheet.Caption:=LanguageSetup.ProfileEditorCustomSetsSheet;
+  CustomSetsMemo.Font.Name:='Courier New';
   CustomSetsClearButton.Caption:=LanguageSetup.Del;
   CustomSetsLoadButton.Caption:=LanguageSetup.Load;
   CustomSetsSaveButton.Caption:=LanguageSetup.Save;
@@ -637,6 +642,8 @@ begin
   Mounting:=TStringList.Create;
 
   InitGUI;
+
+  LoadUserIcons(ImageList,'ClassicProfileEditor');
 
   If (Game=nil) and (LoadTemplate<>nil) then begin
     Game:=LoadTemplate;
@@ -660,8 +667,10 @@ end;
 procedure TProfileEditorForm.LoadData;
 Var St,St2 : TStringList;
     S,T : String;
-    I : Integer;
+    I,ShiftNr : Integer;
 begin
+  OldFileName:='';
+
   {Profile Settings Sheet}
 
   If Game=nil then begin
@@ -682,7 +691,9 @@ begin
         ValueFromIndex[1]:=LanguageSetup.ProfileEditorNoFilename;
       end else begin
         If Game.SetupFile<>'' then begin
-          ValueFromIndex[1]:=ExtractFileName(Game.SetupFile)
+          OldFileName:=Game.SetupFile;
+          ValueFromIndex[1]:=ChangeFileExt(ExtractFileName(Game.SetupFile),'');
+          ProfileSettingsValueListEditor.ItemProps[1].ReadOnly:=False;
         end else begin
           ProfileSettingsValueListEditor.ItemProps[0].ReadOnly:=True;
           ValueFromIndex[0]:=LanguageSetup.ProfileEditorNoFilename;
@@ -728,34 +739,45 @@ begin
       ValueFromIndex[0]:=RemoveUnderline(LanguageSetup.Yes);
       ValueFromIndex[1]:=RemoveUnderline(LanguageSetup.Yes);
       ValueFromIndex[2]:=RemoveUnderline(LanguageSetup.No);
-      ValueFromIndex[3]:=RemoveUnderline(LanguageSetup.Yes);
+      ValueFromIndex[3]:=RemoveUnderline(LanguageSetup.No);
       ValueFromIndex[4]:=RemoveUnderline(LanguageSetup.No);
       ValueFromIndex[5]:=RemoveUnderline(LanguageSetup.Yes);
-      ValueFromIndex[6]:='100';
-      ValueFromIndex[7]:='surface';
-      ValueFromIndex[8]:='original';
-      ValueFromIndex[9]:='original';
-      ValueFromIndex[10]:='normal2x';
-      ValueFromIndex[11]:='higher';
-      ValueFromIndex[12]:='normal';
+      ValueFromIndex[6]:=RemoveUnderline(LanguageSetup.No);
+      ValueFromIndex[7]:=RemoveUnderline(LanguageSetup.Yes);
+      ValueFromIndex[8]:='100';
+      ValueFromIndex[9]:='surface';
+      ValueFromIndex[10]:='original';
+      ValueFromIndex[11]:='original';
+      ValueFromIndex[12]:='normal2x';
+      If PrgSetup.AllowTextModeLineChange then begin
+        ValueFromIndex[13]:='25';
+        ShiftNr:=1;
+      end else begin
+        ShiftNr:=0;
+      end;
+      ValueFromIndex[13+ShiftNr]:='higher';
+      ValueFromIndex[14+ShiftNr]:='normal';
+      ValueFromIndex[15+ShiftNr]:='default';
     end;
   end else begin
     with GeneralValueListEditor.Strings do begin
       If Game.CloseDosBoxAfterGameExit then ValueFromIndex[0]:=RemoveUnderline(LanguageSetup.Yes) else ValueFromIndex[0]:=RemoveUnderline(LanguageSetup.No);
       If Game.StartFullscreen then ValueFromIndex[1]:=RemoveUnderline(LanguageSetup.Yes) else ValueFromIndex[1]:=RemoveUnderline(LanguageSetup.No);
       If Game.AutoLockMouse then ValueFromIndex[2]:=RemoveUnderline(LanguageSetup.Yes) else ValueFromIndex[2]:=RemoveUnderline(LanguageSetup.No);
-      If Game.UseDoublebuffering then ValueFromIndex[3]:=RemoveUnderline(LanguageSetup.Yes) else ValueFromIndex[3]:=RemoveUnderline(LanguageSetup.No);
-      If Game.AspectCorrection then ValueFromIndex[4]:=RemoveUnderline(LanguageSetup.Yes) else ValueFromIndex[4]:=RemoveUnderline(LanguageSetup.No);
-      If Game.UseScanCodes then ValueFromIndex[5]:=RemoveUnderline(LanguageSetup.Yes) else ValueFromIndex[5]:=RemoveUnderline(LanguageSetup.No);
-      ValueFromIndex[6]:=IntToStr(Game.MouseSensitivity);
-      If Game.Render<>'' then ValueFromIndex[7]:=Game.Render;
-      If Game.WindowResolution<>'' then ValueFromIndex[8]:=Game.WindowResolution;
-      If Game.FullscreenResolution<>'' then ValueFromIndex[9]:=Game.FullscreenResolution;
+      If Game.Force2ButtonMouseMode then ValueFromIndex[3]:=RemoveUnderline(LanguageSetup.Yes) else ValueFromIndex[3]:=RemoveUnderline(LanguageSetup.No);
+      If Game.SwapMouseButtons then ValueFromIndex[4]:=RemoveUnderline(LanguageSetup.Yes) else ValueFromIndex[4]:=RemoveUnderline(LanguageSetup.No);
+      If Game.UseDoublebuffering then ValueFromIndex[5]:=RemoveUnderline(LanguageSetup.Yes) else ValueFromIndex[5]:=RemoveUnderline(LanguageSetup.No);
+      If Game.AspectCorrection then ValueFromIndex[6]:=RemoveUnderline(LanguageSetup.Yes) else ValueFromIndex[6]:=RemoveUnderline(LanguageSetup.No);
+      If Game.UseScanCodes then ValueFromIndex[7]:=RemoveUnderline(LanguageSetup.Yes) else ValueFromIndex[7]:=RemoveUnderline(LanguageSetup.No);
+      ValueFromIndex[8]:=IntToStr(Game.MouseSensitivity);
+      If Game.Render<>'' then ValueFromIndex[9]:=Game.Render;
+      If Game.WindowResolution<>'' then ValueFromIndex[10]:=Game.WindowResolution;
+      If Game.FullscreenResolution<>'' then ValueFromIndex[11]:=Game.FullscreenResolution;
 
       St:=ValueToList(GameDB.ConfOpt.Scale,';,');
       try
         If Game.Scale='' then begin
-          If St.Count>0 then ValueFromIndex[10]:=St[0];
+          If St.Count>0 then ValueFromIndex[12]:=St[0];
         end else begin
           S:=Trim(ExtUpperCase(Game.Scale));
           For I:=0 to St.Count-1 do begin
@@ -764,20 +786,31 @@ begin
             T:=Copy(T,Pos('(',T)+1,MaxInt);
             If Pos(')',T)=0 then continue;
             T:=Copy(T,1,Pos(')',T)-1);
-            If Trim(T)=S then ValueFromIndex[10]:=St[I];
+            If Trim(T)=S then ValueFromIndex[12]:=St[I];
           end;
         end;
       finally
         St.Free;
       end;
 
+      If PrgSetup.AllowTextModeLineChange then begin
+        If (Game.TextModeLines=25) or (Game.TextModeLines=28) or (Game.TextModeLines=50)
+          then ValueFromIndex[13]:=IntToStr(Game.TextModeLines)
+          else ValueFromIndex[13]:='25';
+        ShiftNr:=1;
+      end else begin
+        ShiftNr:=0;
+      end;
+
       St:=ValueToList(Game.Priority,',');
       try
-        If (St.Count>=1) and (St[0]<>'') then ValueFromIndex[11]:=St[0];
-        If (St.Count>=2) and (St[1]<>'') then ValueFromIndex[12]:=St[1];
+        If (St.Count>=1) and (St[0]<>'') then ValueFromIndex[13+ShiftNr]:=St[0];
+        If (St.Count>=2) and (St[1]<>'') then ValueFromIndex[14+ShiftNr]:=St[1];
       finally
         St.Free;
       end;
+
+      If Game.CustomDOSBoxDir<>'' then ValueFromIndex[15+ShiftNr]:=Game.CustomDOSBoxDir else ValueFromIndex[15]:='default';
     end;
   end;
 
@@ -797,12 +830,16 @@ begin
       ValueFromIndex[9]:='0';
       ValueFromIndex[10]:='vga';
       ValueFromIndex[11]:='default';
-      ValueFromIndex[12]:='dummy';
-      ValueFromIndex[13]:='dummy';
-      ValueFromIndex[14]:='disabled';
-      ValueFromIndex[15]:='disabled';
-      ValueFromIndex[16]:=RemoveUnderline(LanguageSetup.No);
-      {17-19: ''}
+      ValueFromIndex[12]:=LanguageSetup.DoNotChange;
+      ValueFromIndex[13]:=LanguageSetup.DoNotChange;
+      ValueFromIndex[14]:=LanguageSetup.DoNotChange;
+      ValueFromIndex[15]:='dummy';
+      ValueFromIndex[16]:='dummy';
+      ValueFromIndex[17]:='disabled';
+      ValueFromIndex[18]:='disabled';
+      ValueFromIndex[19]:=RemoveUnderline(LanguageSetup.No);
+      {20-22: ''}
+      ValueFromIndex[23]:='default';
     end;
   end else begin
     with EnvironmentValueListEditor.Strings do begin
@@ -818,17 +855,31 @@ begin
       ValueFromIndex[9]:=IntToStr(Game.FrameSkip);
       If Game.VideoCard<>'' then ValueFromIndex[10]:=Game.VideoCard;
       If Game.KeyboardLayout<>'' then ValueFromIndex[11]:=Game.KeyboardLayout else ValueFromIndex[11]:='default';
-      ValueFromIndex[12]:=Game.Serial1;
-      ValueFromIndex[13]:=Game.Serial2;
-      ValueFromIndex[14]:=Game.Serial3;
-      ValueFromIndex[15]:=Game.Serial4;
-      If Game.IPX then ValueFromIndex[16]:=RemoveUnderline(LanguageSetup.Yes) else ValueFromIndex[16]:=RemoveUnderline(LanguageSetup.No);
-      ValueFromIndex[17]:=LanguageSetup.GameIPXEstablishConnectionNone;
+
+      S:=Trim(ExtUpperCase(Game.NumLockStatus));
+      If (S='ON') or (S='1') or (S='TRUE') then ValueFromIndex[12]:=LanguageSetup.On else begin
+        If (S='OFF') or (S='0') or (S='FALSE') then ValueFromIndex[12]:=LanguageSetup.Off else ValueFromIndex[12]:=LanguageSetup.DoNotChange;
+      end;
+      S:=Trim(ExtUpperCase(Game.CapsLockStatus));
+      If (S='ON') or (S='1') or (S='TRUE') then ValueFromIndex[13]:=LanguageSetup.On else begin
+        If (S='OFF') or (S='0') or (S='FALSE') then ValueFromIndex[13]:=LanguageSetup.Off else ValueFromIndex[13]:=LanguageSetup.DoNotChange;
+      end;
+      S:=Trim(ExtUpperCase(Game.ScrollLockStatus));
+      If (S='ON') or (S='1') or (S='TRUE') then ValueFromIndex[14]:=LanguageSetup.On else begin
+        If (S='OFF') or (S='0') or (S='FALSE') then ValueFromIndex[14]:=LanguageSetup.Off else ValueFromIndex[14]:=LanguageSetup.DoNotChange;
+      end;
+      ValueFromIndex[15]:=Game.Serial1;
+      ValueFromIndex[16]:=Game.Serial2;
+      ValueFromIndex[17]:=Game.Serial3;
+      ValueFromIndex[18]:=Game.Serial4;
+      If Game.IPX then ValueFromIndex[19]:=RemoveUnderline(LanguageSetup.Yes) else ValueFromIndex[19]:=RemoveUnderline(LanguageSetup.No);
+      ValueFromIndex[20]:=LanguageSetup.GameIPXEstablishConnectionNone;
       S:=Trim(ExtUpperCase(Game.IPXType));
-      If S='CLIENT' then ValueFromIndex[17]:=LanguageSetup.GameIPXEstablishConnectionClient;
-      If S='SERVER' then ValueFromIndex[17]:=LanguageSetup.GameIPXEstablishConnectionServer;
-      If Game.IPXAddress<>'' then ValueFromIndex[18]:=Game.IPXAddress;
-      If Game.IPXPort<>'' then ValueFromIndex[19]:=Game.IPXPort;
+      If S='CLIENT' then ValueFromIndex[20]:=LanguageSetup.GameIPXEstablishConnectionClient;
+      If S='SERVER' then ValueFromIndex[20]:=LanguageSetup.GameIPXEstablishConnectionServer;
+      If Game.IPXAddress<>'' then ValueFromIndex[21]:=Game.IPXAddress;
+      If Game.IPXPort<>'' then ValueFromIndex[22]:=Game.IPXPort;
+      If Game.ReportedDOSVersion<>'' then ValueFromIndex[23]:=Game.ReportedDOSVersion;
     end;
   end;
 
@@ -942,6 +993,18 @@ begin
       ValueFromIndex[3]:=IntToStr(Game.SpeakerTandyRate);
       If Game.SpeakerDisney then ValueFromIndex[4]:=RemoveUnderline(LanguageSetup.Yes) else ValueFromIndex[4]:=RemoveUnderline(LanguageSetup.No);
     end;
+    SoundVolumeMasterLeftEdit.Value:=Game.MixerVolumeMasterLeft;
+    SoundVolumeMasterRightEdit.Value:=Game.MixerVolumeMasterRight;
+    SoundVolumeDisneyLeftEdit.Value:=Game.MixerVolumeDisneyLeft;
+    SoundVolumeDisneyRightEdit.Value:=Game.MixerVolumeDisneyRight;
+    SoundVolumeSpeakerLeftEdit.Value:=Game.MixerVolumeSpeakerLeft;
+    SoundVolumeSpeakerRightEdit.Value:=Game.MixerVolumeSpeakerRight;
+    SoundVolumeGUSLeftEdit.Value:=Game.MixerVolumeGUSLeft;
+    SoundVolumeGUSRightEdit.Value:=Game.MixerVolumeGUSRight;
+    SoundVolumeSBLeftEdit.Value:=Game.MixerVolumeSBLeft;
+    SoundVolumeSBRightEdit.Value:=Game.MixerVolumeSBRight;
+    SoundVolumeFMLeftEdit.Value:=Game.MixerVolumeFMLeft;
+    SoundVolumeFMRightEdit.Value:=Game.MixerVolumeFMRight;
   end;
 
   { Autoexec Sheet }
@@ -1013,6 +1076,10 @@ begin
   end else begin
     PageControl.ActivePageIndex:=0;
   end;
+
+  {Set profile name in caption}
+
+  ProfileSettingsValueListEditorSetEditText(ProfileSettingsValueListEditor,ProfileSettingsValueListEditor.Col,ProfileSettingsValueListEditor.Row,'');
 end;
 
 procedure TProfileEditorForm.LoadIcon;
@@ -1040,7 +1107,11 @@ begin
       try
         L:=MountingListView.Items.Add;
         S:=Trim(St[0]);
-        If Pos('$',S)<>0 then S:=Copy(S,1,Pos('$',S)-1)+' (+'+LanguageSetup.More+')';
+        If (St.Count>1) and (Trim(ExtUpperCase(St[1]))='PHYSFS') then begin
+          If Pos('$',S)<>0 then S:=Copy(S,Pos('$',S)+1,MaxInt)+' (+ '+Copy(S,1,Pos('$',S)-1)+')';
+        end else begin
+          If Pos('$',S)<>0 then S:=Copy(S,1,Pos('$',S)-1)+' (+'+LanguageSetup.More+')';
+        end;
         L.Caption:=S;
         If St.Count>1 then L.SubItems.Add(St[1]) else L.SubItems.Add('');
         If St.Count>2 then L.SubItems.Add(St[2]) else L.SubItems.Add('');
@@ -1058,11 +1129,187 @@ begin
   end;
 end;
 
-procedure TProfileEditorForm.OKButtonClick(Sender: TObject);
+function TProfileEditorForm.CheckProfile: Boolean;
 Var I : Integer;
-    St : TStringList;
-    S : String;
+    S1,S2 : String;
+    B : Boolean;
 begin
+  result:=False;
+
+  { Profile Settings Sheet }
+
+  S1:=ProfileSettingsValueListEditor.Strings.ValueFromIndex[7];
+  If not TryStrToInt(Trim(S1),I) then begin
+    If Game<>nil then S2:=IntToStr(Game.LoadFixMemory) else S2:=IntToStr(DefaultValueReaderGame.LoadFixMemory);
+    If MessageDlg(Format(LanguageSetup.MessageInvalidValue,[S1,LanguageSetup.ProfileEditorLoadFixMemory,S2]),mtWarning,[mbYes,mbNo],0)<>mrYes then begin
+      PageControl.ActivePageIndex:=0; exit;
+    end;
+  end;
+
+  { General Sheet }
+
+  S1:=GeneralValueListEditor.Strings.ValueFromIndex[8];
+  If not TryStrToInt(Trim(S1),I) then begin
+    If Game<>nil then S2:=IntToStr(Game.MouseSensitivity) else S2:=IntToStr(DefaultValueReaderGame.MouseSensitivity);
+    If MessageDlg(Format(LanguageSetup.MessageInvalidValue,[S1,LanguageSetup.GameMouseSensitivity,S2]),mtWarning,[mbYes,mbNo],0)<>mrYes then begin
+      PageControl.ActivePageIndex:=2; exit;
+    end;
+  end;
+
+  S1:=GeneralValueListEditor.Strings.ValueFromIndex[12];
+  If Pos('(',S1)=0 then B:=False else begin
+    S1:=Copy(S1,Pos('(',S1)+1,MaxInt);
+    B:=(Pos(')',S1)<>0);
+  end;
+  If not B then begin
+    S1:=GeneralValueListEditor.Strings.ValueFromIndex[12];
+    If Game<>nil then S2:=Game.Scale else S2:=DefaultValueReaderGame.Scale;
+    If MessageDlg(Format(LanguageSetup.MessageInvalidValue,[S1,LanguageSetup.GameScale,S2]),mtWarning,[mbYes,mbNo],0)<>mrYes then begin
+      PageControl.ActivePageIndex:=2; exit;
+    end;
+  end;
+
+  { Environment Sheet }
+
+  S1:=EnvironmentValueListEditor.Strings.ValueFromIndex[0];
+  If not TryStrToInt(Trim(S1),I) then begin
+    If Game<>nil then S2:=IntToStr(Game.Memory) else S2:=IntToStr(DefaultValueReaderGame.Memory);
+    If MessageDlg(Format(LanguageSetup.MessageInvalidValue,[S1,LanguageSetup.GameMemory,S2]),mtWarning,[mbYes,mbNo],0)<>mrYes then begin
+      PageControl.ActivePageIndex:=3; exit;
+    end;
+  end;
+
+  S1:=EnvironmentValueListEditor.Strings.ValueFromIndex[6];
+  If not TryStrToInt(Trim(S1),I) then begin
+    If Game<>nil then S2:=IntToStr(Game.CyclesUp) else S2:=IntToStr(DefaultValueReaderGame.CyclesUp);
+    If MessageDlg(Format(LanguageSetup.MessageInvalidValue,[S1,LanguageSetup.GameCyclesUp,S2]),mtWarning,[mbYes,mbNo],0)<>mrYes then begin
+      PageControl.ActivePageIndex:=3; exit;
+    end;
+  end;
+
+  S1:=EnvironmentValueListEditor.Strings.ValueFromIndex[7];
+  If not TryStrToInt(Trim(S1),I) then begin
+    If Game<>nil then S2:=IntToStr(Game.CyclesDown) else S2:=IntToStr(DefaultValueReaderGame.CyclesDown);
+    If MessageDlg(Format(LanguageSetup.MessageInvalidValue,[S1,LanguageSetup.GameCyclesDown,S2]),mtWarning,[mbYes,mbNo],0)<>mrYes then begin
+      PageControl.ActivePageIndex:=3; exit;
+    end;
+  end;
+
+  S1:=EnvironmentValueListEditor.Strings.ValueFromIndex[9];
+  If not TryStrToInt(Trim(S1),I) then begin
+    If Game<>nil then S2:=IntToStr(Game.FrameSkip) else S2:=IntToStr(DefaultValueReaderGame.FrameSkip);
+    If MessageDlg(Format(LanguageSetup.MessageInvalidValue,[S1,LanguageSetup.GameFrameskip,S2]),mtWarning,[mbYes,mbNo],0)<>mrYes then begin
+      PageControl.ActivePageIndex:=3; exit;
+    end;
+  end;
+
+  S1:=Trim(ExtUpperCase(EnvironmentValueListEditor.Strings.ValueFromIndex[20]));
+  If S1=Trim(ExtUpperCase(LanguageSetup.GameIPXEstablishConnectionNone)) then B:=True;
+  If S1=Trim(ExtUpperCase(LanguageSetup.GameIPXEstablishConnectionClient)) then B:=True;
+  If S1=Trim(ExtUpperCase(LanguageSetup.GameIPXEstablishConnectionServer)) then B:=True;
+  If not B then begin
+    S1:=EnvironmentValueListEditor.Strings.ValueFromIndex[20];
+    If Game<>nil then S2:=Game.IPXType else S2:=DefaultValueReaderGame.IPXType;
+    If MessageDlg(Format(LanguageSetup.MessageInvalidValue,[S1,LanguageSetup.GameIPX,S2]),mtWarning,[mbYes,mbNo],0)<>mrYes then begin
+      PageControl.ActivePageIndex:=3; exit;
+    end;
+  end;
+
+  { Sound Sheet }
+
+  S1:=SoundValueListEditor.Strings.ValueFromIndex[1];
+  If not TryStrToInt(Trim(S1),I) then begin
+    If Game<>nil then S2:=IntToStr(Game.MixerRate) else S2:=IntToStr(DefaultValueReaderGame.MixerRate);
+    If MessageDlg(Format(LanguageSetup.MessageInvalidValue,[S1,LanguageSetup.ProfileEditorSoundSampleRate,S2]),mtWarning,[mbYes,mbNo],0)<>mrYes then begin
+      PageControl.ActivePageIndex:=5; exit;
+    end;
+  end;
+
+  S1:=SoundValueListEditor.Strings.ValueFromIndex[2];
+  If not TryStrToInt(Trim(S1),I) then begin
+    If Game<>nil then S2:=IntToStr(Game.MixerBlocksize) else S2:=IntToStr(DefaultValueReaderGame.MixerBlocksize);
+    If MessageDlg(Format(LanguageSetup.MessageInvalidValue,[S1,LanguageSetup.ProfileEditorSoundBlockSize,S2]),mtWarning,[mbYes,mbNo],0)<>mrYes then begin
+      PageControl.ActivePageIndex:=5; exit;
+    end;
+  end;
+
+  S1:=SoundValueListEditor.Strings.ValueFromIndex[3];
+  If not TryStrToInt(Trim(S1),I) then begin
+    If Game<>nil then S2:=IntToStr(Game.MixerPrebuffer) else S2:=IntToStr(DefaultValueReaderGame.MixerPrebuffer);
+    If MessageDlg(Format(LanguageSetup.MessageInvalidValue,[S1,LanguageSetup.ProfileEditorSoundPrebuffer,S2]),mtWarning,[mbYes,mbNo],0)<>mrYes then begin
+      PageControl.ActivePageIndex:=5; exit;
+    end;
+  end;
+
+  S1:=SoundSBValueListEditor.Strings.ValueFromIndex[1];
+  If not TryStrToInt(Trim(S1),I) then begin
+    If Game<>nil then S2:=IntToStr(Game.SBBase) else S2:=IntToStr(DefaultValueReaderGame.SBBase);
+    If MessageDlg(Format(LanguageSetup.MessageInvalidValue,[S1,LanguageSetup.ProfileEditorSoundSBAddress,S2]),mtWarning,[mbYes,mbNo],0)<>mrYes then begin
+      PageControl.ActivePageIndex:=5; exit;
+    end;
+  end;
+
+  S1:=SoundSBValueListEditor.Strings.ValueFromIndex[2];
+  If not TryStrToInt(Trim(S1),I) then begin
+    If Game<>nil then S2:=IntToStr(Game.SBIRQ) else S2:=IntToStr(DefaultValueReaderGame.SBIRQ);
+    If MessageDlg(Format(LanguageSetup.MessageInvalidValue,[S1,LanguageSetup.ProfileEditorSoundSBIRQ,S2]),mtWarning,[mbYes,mbNo],0)<>mrYes then begin
+      PageControl.ActivePageIndex:=5; exit;
+    end;
+  end;
+
+  S1:=SoundSBValueListEditor.Strings.ValueFromIndex[3];
+  If not TryStrToInt(Trim(S1),I) then begin
+    If Game<>nil then S2:=IntToStr(Game.SBDMA) else S2:=IntToStr(DefaultValueReaderGame.SBDMA);
+    If MessageDlg(Format(LanguageSetup.MessageInvalidValue,[S1,LanguageSetup.ProfileEditorSoundSBDMA,S2]),mtWarning,[mbYes,mbNo],0)<>mrYes then begin
+      PageControl.ActivePageIndex:=5; exit;
+    end;
+  end;
+
+  S1:=SoundSBValueListEditor.Strings.ValueFromIndex[4];
+  If not TryStrToInt(Trim(S1),I) then begin
+    If Game<>nil then S2:=IntToStr(Game.SBHDMA) else S2:=IntToStr(DefaultValueReaderGame.SBHDMA);
+    If MessageDlg(Format(LanguageSetup.MessageInvalidValue,[S1,LanguageSetup.ProfileEditorSoundSBHDMA,S2]),mtWarning,[mbYes,mbNo],0)<>mrYes then begin
+      PageControl.ActivePageIndex:=5; exit;
+    end;
+  end;
+
+  S1:=SoundSBValueListEditor.Strings.ValueFromIndex[6];
+  If not TryStrToInt(Trim(S1),I) then begin
+    If Game<>nil then S2:=IntToStr(Game.SBOplRate) else S2:=IntToStr(DefaultValueReaderGame.SBOplRate);
+    If MessageDlg(Format(LanguageSetup.MessageInvalidValue,[S1,LanguageSetup.ProfileEditorSoundSBOplRate,S2]),mtWarning,[mbYes,mbNo],0)<>mrYes then begin
+      PageControl.ActivePageIndex:=5; exit;
+    end;
+  end;
+
+  S1:=SoundMiscValueListEditor.Strings.ValueFromIndex[1];
+  If not TryStrToInt(Trim(S1),I) then begin
+    If Game<>nil then S2:=IntToStr(Game.SpeakerRate) else S2:=IntToStr(DefaultValueReaderGame.SpeakerRate);
+    If MessageDlg(Format(LanguageSetup.MessageInvalidValue,[S1,LanguageSetup.ProfileEditorSoundMiscPCSpeakerRate,S2]),mtWarning,[mbYes,mbNo],0)<>mrYes then begin
+      PageControl.ActivePageIndex:=5; exit;
+    end;
+  end;
+
+  S1:=SoundMiscValueListEditor.Strings.ValueFromIndex[3];
+  If not TryStrToInt(Trim(S1),I) then begin
+    If Game<>nil then S2:=IntToStr(Game.SpeakerTandyRate) else S2:=IntToStr(DefaultValueReaderGame.SpeakerTandyRate);
+    If MessageDlg(Format(LanguageSetup.MessageInvalidValue,[S1,LanguageSetup.ProfileEditorSoundMiscTandyRate,S2]),mtWarning,[mbYes,mbNo],0)<>mrYes then begin
+      PageControl.ActivePageIndex:=5; exit;
+    end;
+  end;
+
+  result:=True;
+end;
+
+procedure TProfileEditorForm.OKButtonClick(Sender: TObject);
+Var I,ShiftNr : Integer;
+    St : TStringList;
+    S, NewFileName : String;
+begin
+  if not CheckProfile then begin
+    ModalResult:=mrNone;
+    exit;
+  end;
+
   Case (Sender as TComponent).Tag of
     0 : MoveStatus:=0;
     1 : MoveStatus:=-1;
@@ -1074,7 +1321,7 @@ begin
     Game:=GameDB[I];
   end;
 
-  {Profile Settings Sheet}
+  { Profile Settings Sheet }
 
   Game.Icon:=IconName;
   with ProfileSettingsValueListEditor.Strings do begin
@@ -1089,7 +1336,7 @@ begin
   end;
   Game.ExtraDirs:=ListToValue(ExtraDirsListBox.Items);
 
-  { Game Info Sheet}
+  { Game Info Sheet }
 
   with GameInfoValueListEditor.Strings do begin
     Game.Genre:=ValueFromIndex[0];
@@ -1109,19 +1356,29 @@ begin
     Game.CloseDosBoxAfterGameExit:=(ValueFromIndex[0]=RemoveUnderline(LanguageSetup.Yes));
     Game.StartFullscreen:=(ValueFromIndex[1]=RemoveUnderline(LanguageSetup.Yes));
     Game.AutoLockMouse:=(ValueFromIndex[2]=RemoveUnderline(LanguageSetup.Yes));
-    Game.UseDoublebuffering:=(ValueFromIndex[3]=RemoveUnderline(LanguageSetup.Yes));
-    Game.AspectCorrection:=(ValueFromIndex[4]=RemoveUnderline(LanguageSetup.Yes));
-    Game.UseScanCodes:=(ValueFromIndex[5]=RemoveUnderline(LanguageSetup.Yes));
-    try Game.MouseSensitivity:=StrToInt(Trim(ValueFromIndex[6])); except end;
-    Game.Render:=ValueFromIndex[7];
-    Game.WindowResolution:=ValueFromIndex[8];
-    Game.FullscreenResolution:=ValueFromIndex[9];
-    S:=ValueFromIndex[10];
+    Game.Force2ButtonMouseMode:=(ValueFromIndex[3]=RemoveUnderline(LanguageSetup.Yes));
+    Game.SwapMouseButtons:=(ValueFromIndex[4]=RemoveUnderline(LanguageSetup.Yes));
+    Game.UseDoublebuffering:=(ValueFromIndex[5]=RemoveUnderline(LanguageSetup.Yes));
+    Game.AspectCorrection:=(ValueFromIndex[6]=RemoveUnderline(LanguageSetup.Yes));
+    Game.UseScanCodes:=(ValueFromIndex[7]=RemoveUnderline(LanguageSetup.Yes));
+    try Game.MouseSensitivity:=StrToInt(Trim(ValueFromIndex[8])); except end;
+    Game.Render:=ValueFromIndex[9];
+    Game.WindowResolution:=ValueFromIndex[10];
+    Game.FullscreenResolution:=ValueFromIndex[11];
+    S:=ValueFromIndex[12];
     If Pos('(',S)=0 then Game.Scale:='' else begin
       S:=Copy(S,Pos('(',S)+1,MaxInt);
       If Pos(')',S)=0 then Game.Scale:=''  else Game.Scale:=Copy(S,1,Pos(')',S)-1);
     end;
-    Game.Priority:=ValueFromIndex[11]+','+ValueFromIndex[12];
+
+    If PrgSetup.AllowTextModeLineChange then begin
+      try Game.TextModeLines:=StrToInt(ValueFromIndex[13]); except end;
+      ShiftNr:=1;
+    end else begin
+      ShiftNr:=0;
+    end;
+    Game.Priority:=ValueFromIndex[13+ShiftNr]+','+ValueFromIndex[14+ShiftNr];
+    Game.CustomDOSBoxDir:=ValueFromIndex[15+ShiftNr];
   end;
 
   { Environment Sheet }
@@ -1139,17 +1396,26 @@ begin
     try Game.FrameSkip:=StrToInt(Trim(ValueFromIndex[9])); except end;
     Game.VideoCard:=ValueFromIndex[10];
     Game.KeyboardLayout:=ValueFromIndex[11];
-
-    Game.Serial1:=ValueFromIndex[12];
-    Game.Serial2:=ValueFromIndex[13];
-    Game.Serial3:=ValueFromIndex[14];
-    Game.Serial4:=ValueFromIndex[15];
-    Game.IPX:=(ValueFromIndex[16]=RemoveUnderline(LanguageSetup.Yes));
-    If ValueFromIndex[17]=LanguageSetup.GameIPXEstablishConnectionNone then Game.IPXType:='none';
-    If ValueFromIndex[17]=LanguageSetup.GameIPXEstablishConnectionClient then Game.IPXType:='client';
-    If ValueFromIndex[17]=LanguageSetup.GameIPXEstablishConnectionServer then Game.IPXType:='server';
-    Game.IPXAddress:=ValueFromIndex[18];
-    Game.IPXPort:=ValueFromIndex[19];
+    If ValueFromIndex[12]=LanguageSetup.DoNotChange then Game.NumLockStatus:='';
+    If ValueFromIndex[12]=LanguageSetup.Off then Game.NumLockStatus:='off';
+    If ValueFromIndex[12]=LanguageSetup.On then Game.NumLockStatus:='on';
+    If ValueFromIndex[13]=LanguageSetup.DoNotChange then Game.CapsLockStatus:='';
+    If ValueFromIndex[13]=LanguageSetup.Off then Game.CapsLockStatus:='off';
+    If ValueFromIndex[13]=LanguageSetup.On then Game.CapsLockStatus:='on';
+    If ValueFromIndex[14]=LanguageSetup.DoNotChange then Game.ScrollLockStatus:='';
+    If ValueFromIndex[14]=LanguageSetup.Off then Game.ScrollLockStatus:='off';
+    If ValueFromIndex[14]=LanguageSetup.On then Game.ScrollLockStatus:='on';
+    Game.Serial1:=ValueFromIndex[15];
+    Game.Serial2:=ValueFromIndex[16];
+    Game.Serial3:=ValueFromIndex[17];
+    Game.Serial4:=ValueFromIndex[18];
+    Game.IPX:=(ValueFromIndex[19]=RemoveUnderline(LanguageSetup.Yes));
+    If Trim(ExtUpperCase(ValueFromIndex[20]))=Trim(ExtUpperCase(LanguageSetup.GameIPXEstablishConnectionNone)) then Game.IPXType:='none';
+    If Trim(ExtUpperCase(ValueFromIndex[20]))=Trim(ExtUpperCase(LanguageSetup.GameIPXEstablishConnectionClient)) then Game.IPXType:='client';
+    If Trim(ExtUpperCase(ValueFromIndex[20]))=Trim(ExtUpperCase(LanguageSetup.GameIPXEstablishConnectionServer)) then Game.IPXType:='server';
+    Game.IPXAddress:=ValueFromIndex[21];
+    Game.IPXPort:=ValueFromIndex[22];
+    Game.ReportedDOSVersion:=ValueFromIndex[23];
   end;
 
   { Mounting Sheet }
@@ -1213,6 +1479,18 @@ begin
     try Game.SpeakerTandyRate:=StrToInt(Trim(ValueFromIndex[3])); except end;
     Game.SpeakerDisney:=(ValueFromIndex[4]=RemoveUnderline(LanguageSetup.Yes));
   end;
+  Game.MixerVolumeMasterLeft:=SoundVolumeMasterLeftEdit.Value;
+  Game.MixerVolumeMasterRight:=SoundVolumeMasterRightEdit.Value;
+  Game.MixerVolumeDisneyLeft:=SoundVolumeDisneyLeftEdit.Value;
+  Game.MixerVolumeDisneyRight:=SoundVolumeDisneyRightEdit.Value;
+  Game.MixerVolumeSpeakerLeft:=SoundVolumeSpeakerLeftEdit.Value;
+  Game.MixerVolumeSpeakerRight:=SoundVolumeSpeakerRightEdit.Value;
+  Game.MixerVolumeGUSLeft:=SoundVolumeGUSLeftEdit.Value;
+  Game.MixerVolumeGUSRight:=SoundVolumeGUSRightEdit.Value;
+  Game.MixerVolumeSBLeft:=SoundVolumeSBLeftEdit.Value;
+  Game.MixerVolumeSBRight:=SoundVolumeSBRightEdit.Value;
+  Game.MixerVolumeFMLeft:=SoundVolumeFMLeftEdit.Value;
+  Game.MixerVolumeFMRight:=SoundVolumeFMRightEdit.Value;
 
   { Autoexec Sheet }
 
@@ -1251,6 +1529,11 @@ begin
 
   Game.StoreAllValues;
   Game.LoadCache;
+
+  If (OldFileName<>'') and (ProfileSettingsValueListEditor.Strings.ValueFromIndex[1]<>ChangeFileExt(ExtractFileName(OldFileName),'')) then begin
+    NewFileName:=IncludeTrailingPathDelimiter(ExtractFilePath(OldFileName))+ChangeFileExt(ProfileSettingsValueListEditor.Strings.ValueFromIndex[1],'.prof');
+    Game.RenameINI(NewFileName);
+  end;
 end;
 
 procedure TProfileEditorForm.ButtonWork(Sender: TObject);
@@ -1426,6 +1709,8 @@ begin
            If MessageDlg(Format(LanguageSetup.MessageConfirmationCreateDir,[S]),mtConfirmation,[mbYes,mbNo],0)<>mrYes then exit;
            ForceDirectories(S);
          end;
+    {Userdefined meta information}
+    23 : ShowUserInfoDialog(self,Game);
   end;
 end;
 
@@ -1526,6 +1811,21 @@ begin
           GameInfoValueListEditor.Strings.ValueFromIndex[6]:=S;
         end;
   end;
+end;
+
+procedure TProfileEditorForm.GeneralValueListEditorEditButtonClick(Sender: TObject);
+Var S : String;
+    ShiftNr : Integer;
+begin
+  If PrgSetup.AllowTextModeLineChange then ShiftNr:=1 else ShiftNr:=0;
+
+  S:=Trim(GeneralValueListEditor.Strings.ValueFromIndex[15+ShiftNr]);
+  If (S='') or (ExtUpperCase(S)='DEFAULT') then S:=PrgSetup.DosBoxDir;
+  S:=MakeAbsPath(S,PrgSetup.BaseDir);
+  if not SelectDirectory(Handle,LanguageSetup.ChooseFolder,S) then exit;
+  S:=MakeRelPath(S,PrgSetup.BaseDir);
+  If S='' then exit;
+  GeneralValueListEditor.Strings.ValueFromIndex[15+ShiftNr]:=IncludeTrailingPathDelimiter(S);
 end;
 
 procedure TProfileEditorForm.EnvironmentValueListEditorEditButtonClick(Sender: TObject);

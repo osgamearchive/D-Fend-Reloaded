@@ -1,5 +1,74 @@
 D-Fend Reloaded Changelog
 
+Version 0.3.0 (02/08/2008)
+==========================
+- Completely new designed and more clearly arranged profile editor (the classic
+  D-Fend style profile editor is still available and can be activated in the
+  setup dialog).
+- D-Fend Reloaded can look for updates on start up and via menu now.
+- Captured wave sounds for each game can be listed, saved, deleted, played and
+  encoded to mp3 (encoder not included) or ogg.
+- For each profile a DOS version number which should be reported by DOSBox
+  can be configurated.
+- You can (optional) define a custom DOSBox installation for each profile to be
+  used to start the game.
+- You can define additional information of the type key=value for each profile
+  and filter the games by this new categories.
+- Font sizes and colors and balckground colors and images in the main window
+  can be configurated.
+- The multi profile editor can change window resulution, fullscreen resolution
+  and scaling method now.
+- If a conf file on disk is changed using a text editor while D-Fend Reloaded
+  is running, it can load and keep these changes or overwrite them with the
+  copy in memory.
+- You can define for each profile to activate, deactivate or keep the status
+  of the num lock, the caps lock and the scroll lock when starting DOSBox.
+- New profile settings: Switch mouse to 2-button mode and change mouse buttons.
+- New profile settings: Sound volume for the different virtuel sound devices
+  (master, disney sound system, speaker, GUS, SoundBlaster and FM).
+- The conf file, which will be used when opening DOSBox, can be opend in a
+  text editor now.
+- Making translations of D-Fend Reloaded is now much easier with the new
+  buildin language editor.
+- The icons in the program (toolbar, menu and profile editor) are not
+  exchangeable via an ini file.
+- The profile icon can be used as the link icon when making desktop or
+  startmenu links now.
+- External image files can be added to the screenshots list via the screenshots
+  popup menu now.
+- The file names of the profile files can be changed from within the profile
+  editor now.
+- In all dialogs with a games selection list where games could be selected
+  by genre, now games can also be selected by developer, publisher, year and
+  language.
+- More view options for the games list (simple list, report, small icons,
+  icons; simple list and report with and without icons).
+- The setup dialog has two different feature sets "easy" and "advanced" now.
+- New menu item for direct D-Fend prof file import.
+- New setup option: Start maximized.
+- A new statistics window has information about the number of profiles,
+  the number of templates, the number of icons and the number of profiles
+  per genre.
+- Some more icons in the menu and the dialogs.
+- [Fix] The path comparison for making paths relative worked case sensitive,
+  so some paths abbreviations may be missed until now.
+- [Fix] The select buttons in the multiple profile change dialog had no
+  function.
+- [Fix] The "Free virtual space" value in the "Folder as hard disk" section of
+  the mount edit dialog was not saved.
+- [Fix] Changed genre, publisher, ... in the multiple profile editor did not
+  appear in the games list until a restart of D-Fend Reloaded.
+- [Fix] Changed default values in the setup dialog were may not saved.
+- [Fix] When resetting the default values in the setup dialog not all avaible
+  values were written to the lists.
+- [Fix] The setup dialog function "Make absolute to relative paths" did not
+  change the extra directories if more than one extra directory was defined.
+- [Fix] The setup dialog default values for the video card types were ignored
+  in the profile editor.
+- [Fix] Misaligend window elements when stating maximized.
+- [Fix] Corrected untranslated menu item.  
+
+
 Version 0.2.0 (01/16/2008)
 ==========================
 - New dialog for changing multiple profiles at once.
@@ -41,7 +110,7 @@ Version 0.1.2 (01/04/2008)
 - [Fix] Missing translations for Shortcuts
 - The function of the add button in the toolbar is now configurable
   (normal add, add with wizard or popup menu for operation).
-- [Fix] After changing the program language the categorys list on the
+- [Fix] After changing the program language the categories list on the
   "default values" page of the setup dialog contained the values in the
   old and the new language.
 - New setup option: Start on Windows boot (default: off)

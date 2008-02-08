@@ -68,7 +68,7 @@ object CreateConfForm: TCreateConfForm
   object SelectAllButton: TBitBtn
     Left = 16
     Top = 305
-    Width = 97
+    Width = 107
     Height = 25
     Caption = 'SelectAllButton'
     TabOrder = 1
@@ -76,9 +76,9 @@ object CreateConfForm: TCreateConfForm
   end
   object SelectNoneButton: TBitBtn
     Tag = 1
-    Left = 119
+    Left = 129
     Top = 305
-    Width = 97
+    Width = 107
     Height = 25
     Caption = 'SelectNoneButton'
     TabOrder = 2
@@ -103,22 +103,16 @@ object CreateConfForm: TCreateConfForm
   end
   object SelectGenreButton: TBitBtn
     Tag = 2
-    Left = 222
+    Left = 242
     Top = 305
-    Width = 97
+    Width = 107
     Height = 25
-    Caption = 'By Genre'
+    Caption = 'By ...'
     TabOrder = 3
     OnClick = SelectButtonClick
   end
   object PopupMenu: TPopupMenu
-    Left = 328
-    Top = 304
-    object MenuSelect: TMenuItem
-      Caption = '&Select'
-    end
-    object MenuUnselect: TMenuItem
-      Caption = '&Unselect'
-    end
+    Left = 232
+    Top = 400
   end
 end

@@ -1,7 +1,7 @@
 unit CommonComponents;
 interface
 
-uses Classes, IniFiles, Math, Variants;
+uses Windows, Classes, IniFiles, Math, Variants;
 
 Type ConfigRec=record
   Nr : Integer;
@@ -28,6 +28,7 @@ Type TBasePrgSetup=class
     BooleanIndex, IntegerIndex, StringIndex : TConfigIndexArray;
     FStoreConfigOnExit : Boolean;
     FOnChanged : TNotifyEvent;
+    FLastTimeStamp : DWord;
     Procedure ClearLists;
     Function IndexOf(const Nr : Integer; const List : TConfigRecArray; var Index : TConfigIndexArray) : Integer; inline;
     Procedure AddRec(const Nr : Integer; const Section, Key : String; const Default : Variant; var List : TConfigRecArray);
@@ -49,6 +50,9 @@ Type TBasePrgSetup=class
     Procedure AssignFrom(const ABasePrgSetup : TBasePrgSetup);
     Procedure StoreAllValues;
     Procedure ResetToDefault;
+    Function CheckAndUpdateTimeStamp : Boolean; {True=changed}
+    Procedure ReloadINI;
+    Procedure RenameINI(const NewFile : String);
     property SetupFile : String read FSetupFile;
     property FirstRun : Boolean read FFirstRun;
     property StoreConfigOnExit : Boolean read FStoreConfigOnExit write FStoreConfigOnExit;
@@ -61,13 +65,35 @@ uses SysUtils, CommonTools;
 
 { TBasePrgSetup }
 
+Function GetSimpleFileTime(const FileName : String) : DWord;
+Var hFile : THandle;
+    FileTime1, FileTime2, FileTime3 : TFileTime;
+    FatDate, FatTime : Word;
+begin
+  hFile:=CreateFile(PChar(FileName),GENERIC_READ,FILE_SHARE_DELETE or FILE_SHARE_READ or FILE_SHARE_WRITE,nil,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,0);
+  If hFile=INVALID_HANDLE_VALUE then begin result:=0; exit; end;
+  try
+    GetFileTime(hFile,@FileTime1,@FileTime2,@FileTime3);
+  finally
+    CloseHandle(hFile)
+  end;
+  FileTimeToDosDateTime(FileTime3,FatDate,FatTime);
+  result:=FatDate*65536+FatTime;
+end;
+
 constructor TBasePrgSetup.Create(const ASetupFile: String);
 begin
   inherited Create;
   FSetupFile:=ASetupFile;
+  FLastTimeStamp:=0;
   FFirstRun:=not FileExists(ASetupFile);
-  Ini:=TMemIniFile.Create(ASetupFile);
   OwnINI:=True;
+  If ASetupFile<>'' then begin
+    Ini:=TMemIniFile.Create(ASetupFile);
+    CheckAndUpdateTimeStamp;
+  end else begin
+    Ini:=nil; OwnIni:=False;
+  end;
   ClearLists;
   FStoreConfigOnExit:=True;
 end;
@@ -115,6 +141,41 @@ begin
   inherited Destroy;
 end;
 
+function TBasePrgSetup.CheckAndUpdateTimeStamp: Boolean;
+Var NewFileTime : DWord;
+begin
+  If FSetupFile='' then begin result:=False; exit; end;
+
+  If not FileExists(FSetupFile) then begin
+    Ini.UpdateFile;
+    FLastTimeStamp:=GetSimpleFileTime(FSetupFile);
+    result:=False;
+    exit;
+  end;
+
+  NewFileTime:=GetSimpleFileTime(FSetupFile);
+  result:=(NewFileTime<>FLastTimeStamp);
+  FLastTimeStamp:=NewFileTime;
+end;
+
+Procedure TBasePrgSetup.ReloadINI;
+Var I : Integer;
+begin
+  Ini.Free;
+  Ini:=TMemIniFile.Create(FSetupFile);
+  for I:=0 to length(BooleanList)-1 do BooleanList[I].Cached:=False;
+  for I:=0 to length(IntegerList)-1 do IntegerList[I].Cached:=False;
+  for I:=0 to length(StringList)-1 do StringList[I].Cached:=False;
+end;
+
+procedure TBasePrgSetup.RenameINI(const NewFile: String);
+begin
+  Ini.UpdateFile;
+  Ini.Free;
+  if RenameFile(FSetupFile,NewFile) then FSetupFile:=NewFile;
+  Ini:=TMemIniFile.Create(FSetupFile); 
+end;
+
 procedure TBasePrgSetup.ClearLists;
 begin
   SetLength(BooleanList,0);
@@ -154,6 +215,8 @@ end;
 procedure TBasePrgSetup.StoreAllValues;
 Var I : Integer;
 begin
+  if Ini=nil then exit;
+
   For I:=0 to length(BooleanList)-1 do
     Ini.WriteBool(BooleanList[I].Section,BooleanList[I].Key,GetBoolean(BooleanList[I].Nr));
 
@@ -164,6 +227,8 @@ begin
     Ini.WriteString(StringList[I].Section,StringList[I].Key,GetString(StringList[I].Nr));
 
   try Ini.UpdateFile; except end; {Language Files may be read only in program foldes}
+
+  CheckAndUpdateTimeStamp;
 end;
 
 procedure TBasePrgSetup.ResetToDefault;
@@ -179,6 +244,8 @@ begin
     SetString(StringList[I].Nr,StringList[I].DefaultString);
 
   try Ini.UpdateFile; except end; {Language Files may be read only in program foldes}
+
+  CheckAndUpdateTimeStamp;
 end;
 
 procedure TBasePrgSetup.AddRec(const Nr: Integer; const Section, Key: String; const Default : Variant; var List: TConfigRecArray);
@@ -229,7 +296,7 @@ begin
     If Cached then begin result:=CacheValueBool; exit; end;
 
     If DefaultBool then S:='true' else S:='false';
-    S:=Trim(ExtUpperCase(Ini.ReadString(Section,Key,S)));
+    If Ini<>nil then S:=Trim(ExtUpperCase(Ini.ReadString(Section,Key,S)));
     B:=False; result:=False;
     If (S='0') or (S='FALSE') then begin result:=False; B:=True; end;
     If (S='1') or (S='TRUE') then begin result:=True; B:=True; end;
@@ -248,7 +315,7 @@ begin
   if I<0 then begin result:=0; exit; end;
   with IntegerList[I] do begin
     If Cached then begin result:=CacheValueInteger; exit; end;
-    result:=Ini.ReadInteger(Section,Key,DefaultInteger);
+    If Ini<>nil then result:=Ini.ReadInteger(Section,Key,DefaultInteger) else result:=DefaultInteger;
     Cached:=True;
     CacheValueInteger:=result;
   end;
@@ -258,7 +325,7 @@ Procedure TBasePrgSetup.ReadStringFromINI(const I : Integer);
 begin
   with StringList[I] do begin
     Cached:=True;
-    CacheValueString:=Ini.ReadString(Section,Key,DefaultString);
+    if Ini<>nil then CacheValueString:=Ini.ReadString(Section,Key,DefaultString) else CacheValueString:=DefaultString;
   end;
 end;
 

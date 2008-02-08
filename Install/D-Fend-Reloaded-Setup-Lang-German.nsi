@@ -21,7 +21,7 @@ LangString LANGNAME_GameDataFolder ${LANG_GERMAN} "Handbücherordner"
 LangString LANGNAME_Deinstall ${LANG_GERMAN} "deinstallieren"
 LangString LANGNAME_ConfirmDelUserData ${LANG_GERMAN} "Soll der Datenordner $DataInstDir ebenfalls gelöscht werden ?"
 
-LangString LANGNAME_NoInstallationFound ${LANG_GERMAN} "An dem angegebenen Pfad konnte keine D-Fend Reloaded installation gefunden werden, die aktualisiert werden könnte."
+LangString LANGNAME_NoInstallationFound ${LANG_GERMAN} "An dem angegebenen Pfad konnte keine D-Fend Reloaded Installation gefunden werden, die aktualisiert werden könnte."
 
 LangString LANGNAME_ProgramFiles ${LANG_GERMAN} "Programmdateien"
 LangString LANGNAME_LanguageFiles ${LANG_GERMAN} "Sprachdateien"

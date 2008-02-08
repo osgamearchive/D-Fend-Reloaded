@@ -19,6 +19,27 @@ Type TConfOpt=class(TBasePrgSetup)
     property Sblaster : String index 9 read GetString write SetString;
     property Oplmode : String index 10 read GetString write SetString;
     property KeyboardLayout : String index 11 read GetString write SetString;
+    property ReportedDOSVersion : String index 12 read GetString write SetString;
+    property MIDIDevice : String index 13 read GetString write SetString;
+    property Blocksize : String index 14 read GetString write SetString;
+    property CyclesDown : String index 15 read GetString write SetString;
+    property CyclesUp : String index 16 read GetString write SetString;
+    property Dma : String index 17 read GetString write SetString;
+    property Dma1 : String index 18 read GetString write SetString;
+    property Dma2 : String index 19 read GetString write SetString;
+    property GUSBase : String index 20 read GetString write SetString;
+    property GUSRate : String index 21 read GetString write SetString;
+    property HDMA : String index 22 read GetString write SetString;
+    property IRQ : String index 23 read GetString write SetString;
+    property IRQ1 : String index 24 read GetString write SetString;
+    property IRQ2 : String index 25 read GetString write SetString;
+    property MPU401 : String index 26 read GetString write SetString;
+    property OPLRate : String index 27 read GetString write SetString;
+    property PCRate : String index 28 read GetString write SetString;
+    property Rate : String index 29 read GetString write SetString;
+    property SBBase : String index 30 read GetString write SetString;
+    property MouseSensitivity : String index 31 read GetString write SetString;
+    property TandyRate : String index 32 read GetString write SetString;
 end;
 
 const NR_Name=1;
@@ -42,19 +63,24 @@ const NR_Name=1;
       NR_Notes=207;
       NR_WWW=208;
       NR_Language=209;
+      NR_UserInfo=210;
 
       NR_CloseDosBoxAfterGameExit=301;
       NR_StartFullscreen=302;
       NR_AutoLockMouse=303;
-      NR_UseDoublebuffering=304;
-      NR_AspectCorrection=305;
-      NR_UseScanCodes=306;
-      NR_MouseSensitivity=307;
-      NR_Render=308;
-      NR_WindowResolution=309;
-      NR_FullscreenResolution=310;
-      NR_Scale=311;
-      NR_Priority=312;
+      NR_Force2ButtonMouseMode=304;
+      NR_SwapMouseButtons=305;
+      NR_UseDoublebuffering=306;
+      NR_AspectCorrection=307;
+      NR_UseScanCodes=308;
+      NR_MouseSensitivity=309;
+      NR_Render=310;
+      NR_WindowResolution=311;
+      NR_FullscreenResolution=312;
+      NR_Scale=313;
+      NR_TextModeLines=314;
+      NR_Priority=315;
+      NR_CustomDOSBoxDir=316;
 
       NR_Memory=401;
       NR_XMS=402;
@@ -77,6 +103,10 @@ const NR_Name=1;
       NR_IPXPort=419;
       NR_Use4DOS=420;
       NR_UseDOS32A=421;
+      NR_ReportedDOSVersion=422;
+      NR_NumLockStatus=423;
+      NR_CapsLockStatus=424;
+      NR_ScrollLockStatus=425;
 
       NR_NrOfMounts=501;
       NR_Mount0=502;
@@ -94,6 +124,18 @@ const NR_Name=1;
       NR_MixerRate=602;
       NR_MixerBlocksize=603;
       NR_MixerPrebuffer=604;
+      NR_MixerVolumeMasterLeft=605;
+      NR_MixerVolumeMasterRight=606;
+      NR_MixerVolumeDisneyLeft=607;
+      NR_MixerVolumeDisneyRight=608;
+      NR_MixerVolumeSpeakerLeft=609;
+      NR_MixerVolumeSpeakerRight=610;
+      NR_MixerVolumeGUSLeft=611;
+      NR_MixerVolumeGUSRight=612;
+      NR_MixerVolumeSBLeft=613;
+      NR_MixerVolumeSBRight=614;
+      NR_MixerVolumeFMLeft=615;
+      NR_MixerVolumeFMRight=616;
       NR_SBType=701;
       NR_SBBase=702;
       NR_SBIRQ=703;
@@ -144,6 +186,7 @@ Type TGame=class(TBasePrgSetup)
     CachePublisher : String;
     CacheYear : String;
     CacheLanguage : String;
+    CacheUserInfo : String;
 
     Constructor Create(const ASetupFile : String); overload;
     Constructor Create(const ABasePrgSetup : TBasePrgSetup); overload;
@@ -172,10 +215,13 @@ Type TGame=class(TBasePrgSetup)
     property Notes : String index NR_Notes read GetString write SetString;
     property WWW : String index NR_WWW read GetString write SetString;
     property Language : String index NR_Language read GetString write SetString;
+    property UserInfo : String index NR_UserInfo read GetString write SetString;
 
     property CloseDosBoxAfterGameExit : Boolean index NR_CloseDosBoxAfterGameExit read GetBoolean write SetBoolean;
     property StartFullscreen : Boolean index NR_StartFullscreen read GetBoolean write SetBoolean;
     property AutoLockMouse : Boolean index NR_AutoLockMouse read GetBoolean write SetBoolean;
+    property Force2ButtonMouseMode : Boolean index NR_Force2ButtonMouseMode read GetBoolean write SetBoolean;
+    property SwapMouseButtons : Boolean index NR_SwapMouseButtons read GetBoolean write SetBoolean;
     property UseDoublebuffering : Boolean index NR_UseDoublebuffering read GetBoolean write SetBoolean;
     property AspectCorrection : Boolean index NR_AspectCorrection read GetBoolean write SetBoolean;
     property UseScanCodes : Boolean index NR_UseScanCodes read GetBoolean write SetBoolean;
@@ -184,7 +230,9 @@ Type TGame=class(TBasePrgSetup)
     property WindowResolution : String index NR_WindowResolution read GetString write SetString;
     property FullscreenResolution : String index NR_FullscreenResolution read GetString write SetString;
     property Scale : String index NR_Scale read GetString write SetString;
+    property TextModeLines : Integer index NR_TextModeLines read GetInteger write SetInteger;
     property Priority : String index NR_Priority read GetString write SetString;
+    property CustomDOSBoxDir : String index NR_CustomDOSBoxDir read GetString write SetString;
 
     property Memory : Integer index NR_Memory read Getinteger write SetInteger;
     property XMS : Boolean index NR_XMS read GetBoolean write SetBoolean;
@@ -207,6 +255,10 @@ Type TGame=class(TBasePrgSetup)
     property IPXPort : String index NR_IPXPort read GetString write SetString;
     property Use4DOS : Boolean index NR_Use4DOS read GetBoolean write SetBoolean;
     property UseDOS32A : Boolean index NR_UseDOS32A read GetBoolean write SetBoolean;
+    property ReportedDOSVersion : String index NR_ReportedDOSVersion read GetString write SetString;
+    property NumLockStatus : String index NR_NumLockStatus read GetString write SetString;
+    property CapsLockStatus : String index NR_CapsLockStatus read GetString write SetString;
+    property ScrollLockStatus : String index NR_ScrollLockStatus read GetString write SetString;
 
     property NrOfMounts : Integer index NR_NrOfMounts read GetInteger write SetInteger;
     property Mount0 : String index NR_Mount0 read GetString write SetString;
@@ -224,6 +276,18 @@ Type TGame=class(TBasePrgSetup)
     property MixerRate : Integer index NR_MixerRate read GetInteger write SetInteger;
     property MixerBlocksize : Integer index NR_MixerBlocksize read GetInteger write SetInteger;
     property MixerPrebuffer : integer index NR_MixerPrebuffer read GetInteger write SetInteger;
+    property MixerVolumeMasterLeft : Integer index NR_MixerVolumeMasterLeft read GetInteger write SetInteger;
+    property MixerVolumeMasterRight : Integer index NR_MixerVolumeMasterRight read GetInteger write SetInteger;
+    property MixerVolumeDisneyLeft : Integer index NR_MixerVolumeDisneyLeft read GetInteger write SetInteger;
+    property MixerVolumeDisneyRight : Integer index NR_MixerVolumeDisneyRight read GetInteger write SetInteger;
+    property MixerVolumeSpeakerLeft : Integer index NR_MixerVolumeSpeakerLeft read GetInteger write SetInteger;
+    property MixerVolumeSpeakerRight : Integer index NR_MixerVolumeSpeakerRight read GetInteger write SetInteger;
+    property MixerVolumeGUSLeft : Integer index NR_MixerVolumeGUSLeft read GetInteger write SetInteger;
+    property MixerVolumeGUSRight : Integer index NR_MixerVolumeGUSRight read GetInteger write SetInteger;
+    property MixerVolumeSBLeft : Integer index NR_MixerVolumeSBLeft read GetInteger write SetInteger;
+    property MixerVolumeSBRight : Integer index NR_MixerVolumeSBRight read GetInteger write SetInteger;
+    property MixerVolumeFMLeft : Integer index NR_MixerVolumeFMLeft read GetInteger write SetInteger;
+    property MixerVolumeFMRight : Integer index NR_MixerVolumeFMRight read GetInteger write SetInteger;
     property SBType : String index NR_SBType read GetString write SetString;
     property SBBase : Integer index NR_SBBase read GetInteger write SetInteger;
     property SBIRQ : Integer index NR_SBIRQ read GetInteger write SetInteger;
@@ -282,22 +346,75 @@ Type TGameDB=class
     Constructor Create(const ADir : String);
     Destructor Destroy; override;
     Procedure Clear;
-    Function Add(const AName : String) : Integer;
+    Function Add(const AName : String) : Integer; overload;
+    Function Add(const AGame : TGame) : Integer; overload;
     Function Delete(const Index : Integer) : Boolean; overload;
     Function Delete(const AGame : TGame) : Boolean; overload;
     Function IndexOf(const AGame : TGame) : Integer; overload;
     Function IndexOf(const AGame : String) : Integer; overload;
     Function GetGenreList(WithDefaultProfile : Boolean =True) : TStringList;
-    Function GetDeveloperList : TStringList;
-    Function GetPublisherList : TStringList;
-    Function GetYearList : TStringList;
-    Function GetLanguageList : TStringList;
+    Function GetDeveloperList(WithDefaultProfile : Boolean =True) : TStringList;
+    Function GetPublisherList(WithDefaultProfile : Boolean =True) : TStringList;
+    Function GetYearList(WithDefaultProfile : Boolean =True) : TStringList;
+    Function GetLanguageList(WithDefaultProfile : Boolean =True) : TStringList;
+    Function GetKeyValueList(const Key : String; WithDefaultProfile : Boolean =True) : TStringList;
     Function GetSortedGamesList : TList;
+    Procedure StoreAllValues;
+    Procedure LoadCache;
+    Function ProfFileName(const AName : String) : String;
     property Count : Integer read GetCount;
     property Game[I : Integer] : TGame read GetGame; default;
     property ConfOpt : TConfOpt read FConfOpt;
     property OnChanged : TNotifyEvent read FOnChanged write FOnChanged;
 end;
+
+Var DefaultValueReaderGame : TGame = nil;
+
+Const DefaultValuesResolution='original,320x200,640x432,640x480,720x480,800x600,1024x768,1152x864,1280x720,1280x768,1280x860,1280x1024,1600x1200,1920x1080,1920x1200';
+      DefaultValuesJoysticks='none,auto,2axis,4axis,fcs,ch';
+      DefaultValuesScale='No Scaling (none),Nearest neighbor upscaling with factor 2 (normal2x),Nearest neighbor upscaling with factor 3 (normal3x),'+
+                         'Advanced upscaling with factor 2 (advmame2x),Advanced upscaling with factor 3 (advmame3x),Advanced interpoling with factor 2 (advinterp2x),Advanced interpoling with factor 3 (advinterp3x),'+
+                         'Advanced upscaling with sharpening with factor 2 (tv2x),Advanced upscaling with sharpening with factor 3 (tv3x),Simulates the phopsphors on a dot trio CRT with factor 2 (rgb2x),Simulates the phopsphors on a dot trio CRT with factor 3 (rgb3x),'+
+                         'Nearest neighbor with black lines with factor 2 (scan2x),Nearest neighbor with black lines with factor 3 (scan3x)';
+      DefaultValueRender='surface,overlay,opengl,openglnb,ddraw';
+      DefaultValueCycles='auto,max,500,1000,1500,2000,2500,3000,3500,4000,4500,5000,6000,7000,8000,9000,10000,11000,12000,12000,13000,14000,15000,16000,17000,18000,19000,20000';
+      DefaultValuesVideo='hercules,cga,tandy,vga';
+      DefaultValuesMemory='0,1,2,4,8,16,32,63';
+      DefaultValuesFrameSkip='0,1,2,3,4,5,6,7,8,9,10';
+      DefaultValuesCore='auto,normal,dynamic,simple';
+      DefaultValueSBlaster='none,sb1,sb2,sbpro1,sbpro2,sb16';
+      DefaultValuesOPLModes='auto,cms,opl2,dualopl2,opl3';
+      DefaultValuesKeyboardLayout='none,default,Albania (SQ),Argentina (LA),Armenia (HY),Australia (US),Austria (GR),Azerbaijan (AZ),'+
+                                  'Belarus (BL),Belarus (BY),Belgium (BE),Bosnia & Herzegovina (YU),Bosnia & Herzegovina (BA),Brazil BR),Brazil (br274),'+
+                                  'Bulgaria (BG),Canada (CF),Canada (CA),Chile (LA),Colombia (LA),Croatia (YU),Croatia (HR),Czech Republic (CZ243),Denmark (DK),'+
+                                  'Ecuador (LA),Estonia (ET),Estonia (EE),Faeroe Islands (FO),Finland (SU),Finland (FI),France (FR),Greece (GK),Germany (GR),'+
+                                  'Croatia (HR),Hungary (HU),Iceland (IS),Ireland (UK),Italy (IT),Japan (JP),Kazakhstan (KK),Kyrgyzstan (KY),Latvia (LV),'+
+                                  'Lithuania (LT221),Macedonia (MK),Malta (MT),Malta (ML),Mexico (LA),Mongolia (MN),Mongolia (MO),Netherlands (NL),'+
+                                  'New Zealand (US),Niger (NE),Nigeria (NG),Norway (NO),Philippines (PH),Poland (PL),Portugal (PO),Romania (RO),Russia (RU),'+
+                                  'Serbia & Montenegro (YC),Serbia & Montenegro (SR),Slovakia (SK),Slovenia (YU),Slovenia (SI),South Africa (US),Spain (SP),'+
+                                  'Spain (ES),Sweden (SV),Switzerland - French (SF),Switzerland - German (SG),Switzerland - German (SD),Tadjikistan (TJ),'+
+                                  'Turkmenistan (TM),Turkey (TR),UK (UK),Ukraine (UR),Ukraine (UA),US (US),Uzbekistan (UZ),Venezuela (LA),Vietnam (VI)';
+      DefaultValuesReportedDOSVersion='default,6.2,6.0,5.0,4.0,3.3';
+      DefaultValuesMIDIDevice='default,alsa,oss,win32,coreaudio,none';
+      DefaultValuesBlocksize='512,1024,2048,3072,4096,8192';
+      DefaultValuesCyclesDown='20,50,100,500,1000,2000,5000,10000';
+      DefaultValuesCyclesUp='20,50,100,500,1000,2000,5000,10000';
+      DefaultValuesDMA='0,1,3';
+      DefaultValuesDMA1='0,1,3';
+      DefaultValuesDMA2='0,1,3';
+      DefaultValuesGUSBase='210,220,240,260,280';
+      DefaultValuesGUSRate='8000,11025,22050,32000,44100';
+      DefaultValuesHDMA='5,6,7';
+      DefaultValuesIRQ='3,5,7,10,11';
+      DefaultValuesIRQ1='3,5,7,10,11';
+      DefaultValuesIRQ2='3,5,7,10,11';
+      DefaultValuesMPU401='none,intelligent,uart';
+      DefaultValuesOPLRate='8000,11025,22050,32000,44100';
+      DefaultValuesPCRate='8000,11025,22050,32000,44100';
+      DefaultValuesRate='8000,11025,22050,32000,44100';
+      DefaultValuesSBBase='210,220,240,260,280';
+      DefaultValuesMouseSensitivity='10,20,30,40,50,60,70,80,90,100,125,150,175,200,250,300,350,400,450,500,550,600,700,800,900,1000';
+      DefaultValuesTandyRate='8000,11025,22050,32000,44100';
 
 implementation
 
@@ -309,32 +426,39 @@ constructor TConfOpt.Create;
 begin
   inherited Create(PrgDataDir+ConfOptFile);
 
-  AddStringRec(0,'resolution','value','original,320x200,640x432,640x480,720x480,800x600,1024x768,1152x864,1280x720,1280x768,1280x860,1280x1024,1600x1200,1920x1080,1920x1200');
-  AddStringRec(1,'joysticks','value','none,auto,2axis,4axis,fcs,ch');
-  AddStringRec(2,
-    'scale','value','No Scaling (none),Nearest neighbor upscaling with factor 2 (normal2x),Nearest neighbor upscaling with factor 3 (normal3x),'+
-    'Advanced upscaling with factor 2 (advmame2x),Advanced upscaling with factor 3 (advmame3x),Advanced interpoling with factor 2 (advinterp2x),Advanced interpoling with factor 3 (advinterp3x),'+
-    'Advanced upscaling with sharpening with factor 2 (tv2x),Advanced upscaling with sharpening with factor 3 (tv3x),Simulates the phopsphors on a dot trio CRT with factor 2 (rgb2x),Simulates the phopsphors on a dot trio CRT with factor 3 (rgb3x),'+
-    'Nearest neighbor with black lines with factor 2(scan2x),Nearest neighbor with black lines with factor 2(scan3x)');
-  AddStringRec(3,'render','value','surface,overlay,opengl,openglnb,ddraw');
-  AddStringRec(4,'cycles','value','auto,max,500,1000,1500,2000,2500,3000,3500,4000,4500,5000,6000,7000,8000,9000,10000,11000,12000,12000,13000,14000,15000,16000,17000,18000,19000,20000');
-  AddStringRec(5,'video','value','hercules,cga,tandy,vga');
-  AddStringRec(6,'memory','value','0,1,2,4,8,16,32,63');
-  AddStringRec(7,'frameskip','value','0,1,2,3,4,5,6,7,8,9,10');
-  AddStringRec(8,'core','value','auto,normal,dynamic,simple');
-  AddStringRec(9,'sblaster','value','none,sb1,sb2,sbpro1,sbpro2,sb16');
-  AddStringRec(10,'oplmode','value','auto,cms,opl2,dualopl2,opl3');
-  AddStringRec(11,
-    'keyboardlayout','value','none,default,Albania (SQ),Argentina (LA),Armenia (HY),Australia (US),Austria (GR),Azerbaijan (AZ),'+
-    'Belarus (BL),Belarus (BY),Belgium (BE),Bosnia & Herzegovina (YU),Bosnia & Herzegovina (BA),Brazil BR),Brazil (br274),'+
-    'Bulgaria (BG),Canada (CF),Canada (CA),Chile (LA),Colombia (LA),Croatia (YU),Croatia (HR),Czech Republic (CZ243),Denmark (DK),'+
-    'Ecuador (LA),Estonia (ET),Estonia (EE),Faeroe Islands (FO),Finland (SU),Finland (FI),France (FR),Greece (GK),Germany (GR),'+
-    'Croatia (HR),Hungary (HU),Iceland (IS),Ireland (UK),Italy (IT),Japan (JP),Kazakhstan (KK),Kyrgyzstan (KY),Latvia (LV),'+
-    'Lithuania (LT221),Macedonia (MK),Malta (MT),Malta (ML),Mexico (LA),Mongolia (MN),Mongolia (MO),Netherlands (NL),'+
-    'New Zealand (US),Niger (NE),Nigeria (NG),Norway (NO),Philippines (PH),Poland (PL),Portugal (PO),Romania (RO),Russia (RU),'+
-    'Serbia & Montenegro (YC),Serbia & Montenegro (SR),Slovakia (SK),Slovenia (YU),Slovenia (SI),South Africa (US),Spain (SP),'+
-    'Spain (ES),Sweden (SV),Switzerland - French (SF),Switzerland - German (SG),Switzerland - German (SD),Tadjikistan (TJ),'+
-    'Turkmenistan (TM),Turkey (TR),UK (UK),Ukraine (UR),Ukraine (UA),US (US),Uzbekistan (UZ),Venezuela (LA),Vietnam (VI)');
+  AddStringRec(0,'resolution','value',DefaultValuesResolution);
+  AddStringRec(1,'joysticks','value',DefaultValuesJoysticks);
+  AddStringRec(2,'scale','value',DefaultValuesScale);
+  AddStringRec(3,'render','value',DefaultValueRender);
+  AddStringRec(4,'cycles','value',DefaultValueCycles);
+  AddStringRec(5,'video','value',DefaultValuesVideo);
+  AddStringRec(6,'memory','value',DefaultValuesMemory);
+  AddStringRec(7,'frameskip','value',DefaultValuesFrameSkip);
+  AddStringRec(8,'core','value',DefaultValuesCore);
+  AddStringRec(9,'sblaster','value',DefaultValueSBlaster);
+  AddStringRec(10,'oplmode','value',DefaultValuesOPLModes);
+  AddStringRec(11,'keyboardlayout','value',DefaultValuesKeyboardLayout);
+  AddStringRec(12,'ReportedDOSVersion','value',DefaultValuesReportedDOSVersion);
+  AddStringRec(13,'MIDIDevice','value',DefaultValuesMIDIDevice);
+  AddStringRec(14,'Blocksize','value',DefaultValuesBlocksize);
+  AddStringRec(15,'CyclesDown','value',DefaultValuesCyclesDown);
+  AddStringRec(16,'CyclesUp','value',DefaultValuesCyclesUp);
+  AddStringRec(17,'DMA','value',DefaultValuesDMA);
+  AddStringRec(18,'DMA1','value',DefaultValuesDMA1);
+  AddStringRec(19,'DMA2','value',DefaultValuesDMA2);
+  AddStringRec(20,'GUSBase','value',DefaultValuesGUSBase);
+  AddStringRec(21,'GUSRate','value',DefaultValuesGUSRate);
+  AddStringRec(22,'HDMA','value',DefaultValuesHDMA);
+  AddStringRec(23,'IRQ','value',DefaultValuesIRQ);
+  AddStringRec(24,'IRQ1','value',DefaultValuesIRQ1);
+  AddStringRec(25,'IRQ2','value',DefaultValuesIRQ2);
+  AddStringRec(26,'MPU401','value',DefaultValuesMPU401);
+  AddStringRec(27,'OPLRate','value',DefaultValuesOPLRate);
+  AddStringRec(28,'PCRate','value',DefaultValuesPCRate);
+  AddStringRec(29,'Rate','value',DefaultValuesRate);
+  AddStringRec(30,'SBBase','value',DefaultValuesSBBase);
+  AddStringRec(31,'MouseSensitivity','value',DefaultValuesMouseSensitivity);
+  AddStringRec(32,'TandyRate','value',DefaultValuesTandyRate);
 end;
 
 destructor TConfOpt.Destroy;
@@ -361,7 +485,7 @@ end;
 
 destructor TGame.Destroy;
 begin
-  StoreAllValues;
+  {not needed: StoreAllValues;}
   inherited Destroy;
 end;
 
@@ -393,10 +517,13 @@ begin
   AddStringRec(NR_Notes,'ExtraInfo','Notes','');
   AddStringRec(NR_WWW,'ExtraInfo','WWW','');
   AddStringRec(NR_Language,'ExtraInfo','Language','');
+  AddStringRec(NR_UserInfo,'ExtraInfo','UserInfo','');
 
   AddBooleanRec(NR_CloseDosBoxAfterGameExit,'Extra','CloseOnExit',True);
   AddBooleanRec(NR_StartFullscreen,'sdl','fullscreen',True);
   AddBooleanRec(NR_AutoLockMouse,'sdl','autolock',False);
+  AddBooleanRec(NR_Force2ButtonMouseMode,'dos','Force2ButtonMouseMode',False);
+  AddBooleanRec(NR_SwapMouseButtons,'dos','SwapMouseButtons',False);
   AddBooleanRec(NR_UseDoublebuffering,'sdl','fulldouble',True);
   AddBooleanRec(NR_AspectCorrection,'render','aspect',False);
   AddBooleanRec(NR_UseScanCodes,'sdl','usecancodes',True);
@@ -405,7 +532,9 @@ begin
   AddStringRec(NR_WindowResolution,'sdl','windowresolution','original');
   AddStringRec(NR_FullscreenResolution,'sdl','fullresolution','original');
   AddStringRec(NR_Scale,'render','scaler','normal2x');
+  AddIntegerRec(NR_TextModeLines,'render','TextModeLines',25);
   AddStringRec(NR_Priority,'sdl','priority','higher,normal');
+  AddStringRec(NR_CustomDOSBoxDir,'dosbox','DOSBoxDirectory','default');
 
   AddIntegerRec(NR_Memory,'dosbox','memsize',32);
   AddBooleanRec(NR_XMS,'dos','xms',True);
@@ -428,6 +557,10 @@ begin
   AddStringRec(NR_IPXPort,'ipx','port','213');
   AddBooleanRec(NR_Use4DOS,'dos','4DOS',False);
   AddBooleanRec(NR_UseDOS32A,'dos','DOS32A',False);
+  AddStringRec(NR_ReportedDOSVersion,'dos','ReportedDOSVersion','default');
+  AddStringRec(NR_NumLockStatus,'dos','NumLockStatus','');
+  AddStringRec(NR_CapsLockStatus,'dos','CapsLockStatus','');
+  AddStringRec(NR_ScrollLockStatus,'dos','ScrollLockStatus','');
 
   AddIntegerRec(NR_NrOfMounts,'Extra','NrOfMounts',0);
   AddStringRec(NR_Mount0,'Extra','0','');
@@ -445,6 +578,18 @@ begin
   AddIntegerRec(NR_MixerRate,'mixer','rate',22050);
   AddIntegerRec(NR_MixerBlocksize,'mixer','blocksize',2048);
   AddIntegerRec(NR_MixerPrebuffer,'mixer','prebuffer',10);
+  AddIntegerRec(NR_MixerVolumeMasterLeft,'mixer','VolumeMasterLeft',100);
+  AddIntegerRec(NR_MixerVolumeMasterRight,'mixer','VolumeMasterRight',100);
+  AddIntegerRec(NR_MixerVolumeDisneyLeft,'mixer','VolumeDisneyLeft',100);
+  AddIntegerRec(NR_MixerVolumeDisneyRight,'mixer','VolumeDisneyRight',100);
+  AddIntegerRec(NR_MixerVolumeSpeakerLeft,'mixer','VolumeSpeakerLeft',100);
+  AddIntegerRec(NR_MixerVolumeSpeakerRight,'mixer','VolumeSpeakerRight',100);
+  AddIntegerRec(NR_MixerVolumeGUSLeft,'mixer','VolumeGUSLeft',100);
+  AddIntegerRec(NR_MixerVolumeGUSRight,'mixer','VolumeGUSRight',100);
+  AddIntegerRec(NR_MixerVolumeSBLeft,'mixer','VolumeSBLeft',100);
+  AddIntegerRec(NR_MixerVolumeSBRight,'mixer','VolumeSBRight',100);
+  AddIntegerRec(NR_MixerVolumeFMLeft,'mixer','VolumeFMLeft',100);
+  AddIntegerRec(NR_MixerVolumeFMRight,'mixer','VolumeFMRight',100);
   AddStringRec(NR_SBType,'sblaster','sbtype','sb16');
   AddIntegerRec(NR_SBBase,'sblaster','sbbase',220);
   AddIntegerRec(NR_SBIRQ,'sblaster','irq',7);
@@ -493,6 +638,7 @@ begin
   CachePublisher:=Publisher;
   CacheYear:=Year;
   CacheLanguage:=Language;
+  CacheUserInfo:=UserInfo;
 end;
 
 { TGameDB }
@@ -594,6 +740,18 @@ begin
   end;
 end;
 
+Function TGameDB.ProfFileName(const AName : String) : String;
+Var S : String;
+begin
+  S:=Trim(ExtUpperCase(AName));
+  If (Copy(S,length(S)-4,5)='.PROF') or (Copy(S,length(S)-4,5)='.CONF') then begin
+    S:=Trim(AName); S:=Trim(Copy(S,1,length(S)-5));
+  end else begin
+    S:=AName;
+  end;
+  result:=MakePROFFileName(Trim(S),FDir);
+end;
+
 function TGameDB.Add(const AName: String): Integer;
 Var Game : TGame;
 begin
@@ -601,6 +759,12 @@ begin
   Game.Name:=AName;
   Game.OnChanged:=GameChanged;
   result:=FGameList.Add(Game);
+end;
+
+Function TGameDB.Add(const AGame : TGame) : Integer;
+begin
+  AGame.OnChanged:=GameChanged;
+  result:=FGameList.Add(AGame);
 end;
 
 function TGameDB.Delete(const Index: Integer): Boolean;
@@ -672,7 +836,8 @@ begin
       S:=ExtUpperCase(TGame(FGameList[I]).CacheGenre);
       If StUpper.IndexOf(S)<0 then begin
         StUpper.Add(S);
-        result.Add(TGame(FGameList[I]).CacheGenre);
+        S:=TGame(FGameList[I]).CacheGenre; If Trim(S)='' then S:=LanguageSetup.NotSet;
+        result.Add(S);
       end;
     end;
   finally
@@ -681,7 +846,7 @@ begin
   result.Sort;
 end;
 
-function TGameDB.GetDeveloperList: TStringList;
+function TGameDB.GetDeveloperList(WithDefaultProfile : Boolean): TStringList;
 Var StUpper : TStringList;
     I : Integer;
     S : String;
@@ -689,11 +854,12 @@ begin
   result:=TStringList.Create;
   StUpper:=TStringList.Create;
   try
-    For I:=0 to FGameList.Count-1 do begin
+    For I:=0 to FGameList.Count-1 do If WithDefaultProfile or (TGame(FGameList[I]).Name<>DosBoxDOSProfile) then begin
       S:=ExtUpperCase(TGame(FGameList[I]).CacheDeveloper);
       If StUpper.IndexOf(S)<0 then begin
         StUpper.Add(S);
-        result.Add(TGame(FGameList[I]).CacheDeveloper);
+        S:=TGame(FGameList[I]).CacheDeveloper; If Trim(S)='' then S:=LanguageSetup.NotSet;
+        result.Add(S);
       end;
     end;
   finally
@@ -702,7 +868,7 @@ begin
   result.Sort;
 end;
 
-function TGameDB.GetPublisherList: TStringList;
+function TGameDB.GetPublisherList(WithDefaultProfile : Boolean): TStringList;
 Var StUpper : TStringList;
     I : Integer;
     S : String;
@@ -710,11 +876,12 @@ begin
   result:=TStringList.Create;
   StUpper:=TStringList.Create;
   try
-    For I:=0 to FGameList.Count-1 do begin
+    For I:=0 to FGameList.Count-1 do If WithDefaultProfile or (TGame(FGameList[I]).Name<>DosBoxDOSProfile) then begin
       S:=ExtUpperCase(TGame(FGameList[I]).CachePublisher);
       If StUpper.IndexOf(S)<0 then begin
         StUpper.Add(S);
-        result.Add(TGame(FGameList[I]).CachePublisher);
+        S:=TGame(FGameList[I]).CachePublisher; If Trim(S)='' then S:=LanguageSetup.NotSet;
+        result.Add(S);
       end;
     end;
   finally
@@ -723,7 +890,7 @@ begin
   result.Sort;
 end;
 
-function TGameDB.GetYearList: TStringList;
+function TGameDB.GetYearList(WithDefaultProfile : Boolean): TStringList;
 Var StUpper : TStringList;
     I : Integer;
     S : String;
@@ -731,11 +898,13 @@ begin
   result:=TStringList.Create;
   StUpper:=TStringList.Create;
   try
-    For I:=0 to FGameList.Count-1 do begin
+    For I:=0 to FGameList.Count-1 do If WithDefaultProfile or (TGame(FGameList[I]).Name<>DosBoxDOSProfile) then begin
       S:=ExtUpperCase(TGame(FGameList[I]).CacheYear);
+      If Trim(S)='' then S:=LanguageSetup.NotSet;
       If StUpper.IndexOf(S)<0 then begin
         StUpper.Add(S);
-        result.Add(TGame(FGameList[I]).CacheYear);
+        S:=TGame(FGameList[I]).CacheYear; If Trim(S)='' then S:=LanguageSetup.NotSet;
+        result.Add(S);
       end;
     end;
   finally
@@ -744,7 +913,7 @@ begin
   result.Sort;
 end;
 
-function TGameDB.GetLanguageList: TStringList;
+function TGameDB.GetLanguageList(WithDefaultProfile : Boolean): TStringList;
 Var StUpper : TStringList;
     I : Integer;
     S : String;
@@ -752,11 +921,42 @@ begin
   result:=TStringList.Create;
   StUpper:=TStringList.Create;
   try
-    For I:=0 to FGameList.Count-1 do begin
+    For I:=0 to FGameList.Count-1 do If WithDefaultProfile or (TGame(FGameList[I]).Name<>DosBoxDOSProfile) then begin
       S:=ExtUpperCase(TGame(FGameList[I]).CacheLanguage);
+      If Trim(S)='' then S:=LanguageSetup.NotSet;
       If StUpper.IndexOf(S)<0 then begin
         StUpper.Add(S);
-        result.Add(TGame(FGameList[I]).CacheLanguage);
+        S:=TGame(FGameList[I]).CacheLanguage; If Trim(S)='' then S:=LanguageSetup.NotSet;
+        result.Add(S);
+      end;
+    end;
+  finally
+    StUpper.Free;
+  end;
+  result.Sort;
+end;
+
+Function TGameDB.GetKeyValueList(const Key : String; WithDefaultProfile : Boolean =True) : TStringList;
+Var StUpper,St : TStringList;
+    I,J,K : Integer;
+    S,T,KeyUpper,Val : String;
+begin
+  result:=TStringList.Create;
+  StUpper:=TStringList.Create;
+  try
+    KeyUpper:=Trim(ExtUpperCase(Key)); If KeyUpper='' then exit;
+    For I:=0 to FGameList.Count-1 do If WithDefaultProfile or (TGame(FGameList[I]).Name<>DosBoxDOSProfile) then begin
+      St:=StringToStringList(TGame(FGameList[I]).CacheUserInfo);
+      try
+        Val:='';
+        For K:=0 to St.Count-1 do begin
+          S:=St[K]; J:=Pos('=',S); If J=0 then T:='' else begin T:=Trim(Copy(S,J+1,MaxInt)); S:=Trim(Copy(S,1,J-1)); end;
+          If Trim(ExtUpperCase(S))=KeyUpper then begin Val:=Trim(T); break; end;
+        end;
+        If Val='' then Val:=LanguageSetup.NotSet;
+        If StUpper.IndexOf(ExtUpperCase(Val))<0 then begin StUpper.Add(ExtUpperCase(Val)); result.Add(Val); end;
+      finally
+        St.Free;
       end;
     end;
   finally
@@ -770,4 +970,20 @@ begin
   If Assigned(FOnChanged) then FOnChanged(self);
 end;
 
+procedure TGameDB.StoreAllValues;
+Var I : Integer;
+begin
+  For I:=0 to FGameList.Count-1 do TGame(FGameList[I]).StoreAllValues;
+end;
+
+procedure TGameDB.LoadCache;
+Var I : Integer;
+begin
+  For I:=0 to FGameList.Count-1 do TGame(FGameList[I]).LoadCache;
+end;
+
+initialization
+  DefaultValueReaderGame:=TGame.Create('');
+finalization
+  If Assigned(DefaultValueReaderGame) then DefaultValueReaderGame.Free;
 end.

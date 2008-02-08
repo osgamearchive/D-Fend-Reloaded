@@ -6,6 +6,8 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, Buttons, ComCtrls;
 
+Type TSearchType=(stDOSBox, stOggEnc, stLame);
+
 type
   TSetupDosBoxForm = class(TForm)
     InfoLabel: TLabel;
@@ -13,6 +15,7 @@ type
     procedure FormShow(Sender: TObject);
     procedure AbortButtonClick(Sender: TObject);
     Procedure StartSearch(var Msg : TMessage); message WM_USER+1;
+    procedure FormCreate(Sender: TObject);
   private
     { Private-Deklarationen }
     Aborted : Boolean;
@@ -20,18 +23,26 @@ type
     Function SearchDir(const Dir : String) : Boolean;
   public
     { Public-Deklarationen }
+    SearchType : TSearchType;
   end;
 
 var
   SetupDosBoxForm: TSetupDosBoxForm;
 
 Function SearchDosBox(const AOwner : TComponent) : Boolean;
+Function SearchOggEnc(const AOwner : TComponent) : Boolean;
+Function SearchLame(const AOwner : TComponent) : Boolean;
 
 implementation
 
 uses PrgSetupUnit, LanguageSetupUnit, PrgConsts, CommonTools, VistaToolsUnit;
 
 {$R *.dfm}
+
+procedure TSetupDosBoxForm.FormCreate(Sender: TObject);
+begin
+  SearchType:=stDOSBox;
+end;
 
 procedure TSetupDosBoxForm.FormShow(Sender: TObject);
 begin
@@ -47,7 +58,11 @@ begin
   Aborted:=False;
   Count:=0;
 
-  Caption:=LanguageSetup.SetupDosBoxForm;
+  Case SearchType of
+    stDOSBox : Caption:=LanguageSetup.SetupDosBoxForm;
+    stOggEnc : Caption:=LanguageSetup.SetupDosBoxFormOggEnc;
+    stLame   : Caption:=LanguageSetup.SetupDosBoxFormLame;
+  end;
   AbortButton.Caption:=LanguageSetup.Abort;
 
   try
@@ -72,10 +87,12 @@ function TSetupDosBoxForm.SearchDir(const Dir: String): Boolean;
 Var Rec : TSearchRec;
     I : Integer;
 begin
-  result:=FileExists(Dir+DosBoxFileName);
-  if result then begin
-    PrgSetup.DosBoxDir:=Dir;
-    exit;
+  result:=False;
+
+  Case SearchType of
+    stDOSBox : begin result:=FileExists(Dir+DosBoxFileName); if result then begin PrgSetup.DosBoxDir:=Dir; exit; end; end;
+    stOggEnc : begin result:=FileExists(Dir+OggEncPrgFile); if result then begin PrgSetup.WaveEncOgg:=Dir+OggEncPrgFile; exit; end; end;
+    stLame   : begin result:=FileExists(Dir+LamePrgFile); if result then begin PrgSetup.WaveEncMp3:=Dir+LamePrgFile; exit; end; end;
   end;
 
   inc(Count);
@@ -115,7 +132,45 @@ begin
 
   SetupDosBoxForm:=TSetupDosBoxForm.Create(AOwner);
   try
-    result:=(SetupDosBoxForm.ShowModal=mrOK);
+    result:=(SetupDosBoxForm.ShowModal<>mrAbort);
+  finally
+    SetupDosBoxForm.Free;
+  end;
+end;
+
+Function SearchOggEnc(const AOwner : TComponent) : Boolean;
+begin
+  If FileExists(PrgSetup.WaveEncOgg) then begin
+    result:=True;
+    exit;
+  end;
+
+  If FileExists(PrgDir+OggEncPrgFile) then begin
+    PrgSetup.WaveEncOgg:=PrgDir+OggEncPrgFile;
+    result:=True;
+    exit;
+  end;
+
+  SetupDosBoxForm:=TSetupDosBoxForm.Create(AOwner);
+  try
+    SetupDosBoxForm.SearchType:=stOggEnc;
+    result:=(SetupDosBoxForm.ShowModal<>mrAbort);
+  finally
+    SetupDosBoxForm.Free;
+  end;
+end;
+
+Function SearchLame(const AOwner : TComponent) : Boolean;
+begin
+  If FileExists(PrgSetup.WaveEncMp3) then begin
+    result:=True;
+    exit;
+  end;
+
+  SetupDosBoxForm:=TSetupDosBoxForm.Create(AOwner);
+  try
+    SetupDosBoxForm.SearchType:=stLame;
+    result:=(SetupDosBoxForm.ShowModal<>mrAbort);
   finally
     SetupDosBoxForm.Free;
   end;

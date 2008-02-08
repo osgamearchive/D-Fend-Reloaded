@@ -19,8 +19,6 @@ type
     ListBox: TCheckListBox;
     InfoLabel: TLabel;
     PopupMenu: TPopupMenu;
-    MenuSelect: TMenuItem;
-    MenuUnselect: TMenuItem;
     GenreCheckBox: TCheckBox;
     GenreComboBox: TComboBox;
     DeveloperCheckBox: TCheckBox;
@@ -51,13 +49,19 @@ type
     EmulationCoreComboBox: TComboBox;
     KeyboardLayoutCheckBox: TCheckBox;
     KeyboardLayoutComboBox: TComboBox;
+    WindowResolutionCheckBox: TCheckBox;
+    WindowResolutionComboBox: TComboBox;
+    FullscreenResolutionComboBox: TComboBox;
+    ScaleComboBox: TComboBox;
+    FullscreenResolutionCheckBox: TCheckBox;
+    ScaleCheckBox: TCheckBox;
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure OKButtonClick(Sender: TObject);
     procedure CheckBoxClick(Sender: TObject);
+    procedure SelectButtonClick(Sender: TObject);
   private
     { Private-Deklarationen }
-    procedure SelectButtonClick(Sender: TObject);
   public
     { Public-Deklarationen }
     GameDB : TGameDB;
@@ -70,7 +74,8 @@ Function ShowChangeProfilesDialog(const AOwner : TComponent; const AGameDB : TGa
 
 implementation
 
-uses Math, VistaToolsUnit, LanguageSetupUnit, PrgConsts, CommonTools;
+uses Math, VistaToolsUnit, LanguageSetupUnit, PrgConsts, CommonTools,
+     GameDBToolsUnit;
 
 {$R *.dfm}
 
@@ -80,37 +85,10 @@ begin
 end;
 
 procedure TChangeProfilesForm.FormShow(Sender: TObject);
-Var I : Integer;
-    St : TStringList;
-    M : TMenuItem;
+Var St : TStringList;
 begin
-  St:=TStringList.Create;
-  try
-    For I:=0 to GameDB.Count-1 do If GameDB[I].Name<>DosBoxDOSProfile then St.AddObject(GameDB[I].Name,GameDB[I]);
-    St.Sort;
-    ListBox.Items.Assign(St);
-    For I:=0 to ListBox.Items.Count-1 do ListBox.Checked[I]:=True;
-  finally
-    St.Free;
-  end;
-
-  St:=GameDB.GetGenreList(False);
-  try
-    For I:=0 to St.Count-1 do begin
-      M:=TMenuItem.Create(self);
-      M.Caption:=St[I];
-      M.Tag:=3;
-      M.OnClick:=SelectButtonClick;
-      MenuSelect.Add(M);
-      M:=TMenuItem.Create(self);
-      M.Caption:=St[I];
-      M.Tag:=4;
-      M.OnClick:=SelectButtonClick;
-      MenuUnselect.Add(M);
-    end;
-  finally
-    St.Free;
-  end;
+  BuildCheckList(ListBox,GameDB,False);
+  BuildSelectPopupMenu(PopupMenu,GameDB,SelectButtonClick,False);
 
   Caption:=LanguageSetup.ChangeProfilesFormCaption;
   TabSheet1.Caption:=LanguageSetup.ChangeProfilesFormSelectGamesSheet;
@@ -120,9 +98,7 @@ begin
   CancelButton.Caption:=LanguageSetup.Cancel;
   SelectAllButton.Caption:=LanguageSetup.All;
   SelectNoneButton.Caption:=LanguageSetup.None;
-  SelectGenreButton.Caption:=LanguageSetup.GameByGenre;
-  MenuSelect.Caption:=LanguageSetup.Select;
-  MenuUnselect.Caption:=LanguageSetup.Unselect;
+  SelectGenreButton.Caption:=LanguageSetup.GameBy;
 
   GenreCheckBox.Caption:=LanguageSetup.GameGenre;
   St:=GameDB.GetGenreList; try GenreComboBox.Items.Assign(St); finally St.Free; end;
@@ -146,6 +122,12 @@ begin
   with UseDoublebufferComboBox do begin Items.Add(RemoveUnderline(LanguageSetup.No)); Items.Add(RemoveUnderline(LanguageSetup.Yes)); ItemIndex:=0; end;
   RenderCheckBox.Caption:=LanguageSetup.GameRender;
   St:=ValueToList(GameDB.ConfOpt.Render,';,'); try RenderComboBox.Items.Assign(St); finally St.Free; end; RenderComboBox.ItemIndex:=0;
+  WindowResolutionCheckBox.Caption:=LanguageSetup.GameWindowResolution;
+  St:=ValueToList(GameDB.ConfOpt.Resolution,';,'); try WindowResolutionComboBox.Items.Assign(St); finally St.Free; end; WindowResolutionComboBox.ItemIndex:=0;
+  FullscreenResolutionCheckBox.Caption:=LanguageSetup.GameFullscreenResolution;
+  St:=ValueToList(GameDB.ConfOpt.Resolution,';,'); try FullscreenResolutionComboBox.Items.Assign(St); finally St.Free; end; FullscreenResolutionComboBox.ItemIndex:=0;
+  ScaleCheckBox.Caption:=LanguageSetup.GameScale;
+  St:=ValueToList(GameDB.ConfOpt.Scale,';,'); try ScaleComboBox.Items.Assign(St); finally St.Free; end; ScaleComboBox.ItemIndex:=1;
   MemoryCheckBox.Caption:=LanguageSetup.GameMemory;
   St:=ValueToList(GameDB.ConfOpt.Memory,';,'); try MemoryComboBox.Items.Assign(St); finally St.Free; end; MemoryComboBox.Text:='32';
   CPUCyclesCheckBox.Caption:=LanguageSetup.GameCycles;
@@ -162,17 +144,18 @@ procedure TChangeProfilesForm.SelectButtonClick(Sender: TObject);
 Var I : Integer;
     P : TPoint;
 begin
-  Case (Sender as TComponent).Tag of
-    0,1 : For I:=0 to ListBox.Count-1 do ListBox.Checked[I]:=((Sender as TComponent).Tag=0);
-      2 : begin
-            P:=ClientToScreen(Point(SelectGenreButton.Left,SelectGenreButton.Top));
-            PopupMenu.Popup(P.X+5,P.Y+5);
-          end;
-    3,4 : For I:=0 to ListBox.Items.Count-1 do begin
-            If ((RemoveUnderline(TMenuItem(Sender).Caption)=LanguageSetup.NotSet) and (TGame(ListBox.Items.Objects[I]).Genre=''))
-            or (RemoveUnderline(TMenuItem(Sender).Caption)=TGame(ListBox.Items.Objects[I]).Genre) then ListBox.Checked[I]:=((Sender as TComponent).Tag=3);
-          end;
+  If Sender is TBitBtn then begin
+    Case (Sender as TComponent).Tag of
+      0,1 : For I:=0 to ListBox.Count-1 do ListBox.Checked[I]:=((Sender as TComponent).Tag=0);
+        2 : begin
+              P:=ClientToScreen(Point(SelectGenreButton.Left,SelectGenreButton.Top));
+              PopupMenu.Popup(P.X+5,P.Y+5);
+            end;
+    end;
+    exit;
   end;
+
+  SelectGamesByPopupMenu(Sender,ListBox);
 end;
 
 procedure TChangeProfilesForm.CheckBoxClick(Sender: TObject);
@@ -188,6 +171,9 @@ begin
   LockMouseComboBox.Enabled:=LockMouseCheckBox.Checked;
   UseDoublebufferComboBox.Enabled:=UseDoublebufferCheckBox.Checked;
   RenderComboBox.Enabled:=RenderCheckBox.Checked;
+  WindowResolutionComboBox.Enabled:=WindowResolutionCheckBox.Checked;
+  FullscreenResolutionComboBox.Enabled:=FavouriteCheckBox.Checked;
+  ScaleComboBox.Enabled:=ScaleCheckBox.Checked;
   MemoryComboBox.Enabled:=MemoryCheckBox.Checked;
   CPUCyclesComboBox.Enabled:=CPUCyclesCheckBox.Checked;
   EmulationCoreComboBox.Enabled:=EmulationCoreCheckBox.Checked;
@@ -216,6 +202,9 @@ begin
     If EmulationCoreCheckBox.Checked then G.Core:=EmulationCoreComboBox.Text;
     If KeyboardLayoutCheckBox.Checked then G.KeyboardLayout:=KeyboardLayoutComboBox.Text;
   end;
+
+  GameDB.StoreAllValues;
+  GameDB.LoadCache;
 end;
 
 { global }

@@ -18,6 +18,9 @@ const DosBoxFileName='DOSBOX.EXE';
 
       NSIInstallerHelpFile='D-Fend Reloaded DataInstaller.nsi';
 
+      OggEncPrgFile='oggenc2.exe';
+      LamePrgFile='lame.exe';
+
 var MainSetupFile : String;
     OperationModeConfig : String;
 

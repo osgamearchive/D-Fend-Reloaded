@@ -64,7 +64,8 @@ Function ShowTemplateDialog(const AOwner : TComponent; const AGameDB : TGameDB) 
 implementation
 
 uses VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgConsts,
-     ProfileEditorFormUnit, PrgSetupUnit, TemplateSelectProfileFormUnit;
+     ProfileEditorFormUnit, PrgSetupUnit, TemplateSelectProfileFormUnit,
+     ModernProfileEditorFormUnit;
 
 {$R *.dfm}
 
@@ -190,7 +191,11 @@ begin
           try
             For I:=0 to ListView.Items.Count-1 do L.Add(ListView.Items[I].Data);
             G:=TGame(ListView.Selected.Data);
-            if not EditGameProfil(self,TemplateDB,G,nil,L) then exit;
+            If PrgSetup.DFendStyleProfileEditor then begin
+              if not EditGameProfil(self,TemplateDB,G,nil,L) then exit;
+            end else begin
+              if not ModernEditGameProfil(self,TemplateDB,G,nil,L) then exit;
+            end;
             LoadList;
             SelectGame(G);
           finally
@@ -230,7 +235,11 @@ begin
           G:=nil;
           DefaultGame:=TGame.Create(PrgSetup);
           try
-            if not EditGameProfil(self,TemplateDB,G,DefaultGame) then exit;
+            If PrgSetup.DFendStyleProfileEditor then begin
+              if not EditGameProfil(self,TemplateDB,G,DefaultGame) then exit;
+            end else begin
+              if not ModernEditGameProfil(self,TemplateDB,G,DefaultGame) then exit;
+            end;
           finally
             DefaultGame.Free;
           end;
@@ -241,7 +250,11 @@ begin
           DefaultGame:=SelectProfile(self,GameDB);
           If DefaultGame=nil then exit;
           G:=nil;
-          if not EditGameProfil(self,TemplateDB,G,DefaultGame) then exit;
+          If PrgSetup.DFendStyleProfileEditor then begin
+            if not EditGameProfil(self,TemplateDB,G,DefaultGame) then exit;
+          end else begin
+            if not ModernEditGameProfil(self,TemplateDB,G,DefaultGame) then exit;
+          end;
           LoadList;
           SelectGame(G);
         end;
@@ -269,7 +282,11 @@ begin
     TemplateForm.GameDB:=AGameDB;
     TemplateForm.ShowModal;
     if TemplateForm.Template=nil then exit;
-    EditGameProfil(AOwner,AGameDB,result,TemplateForm.Template);
+    If PrgSetup.DFendStyleProfileEditor then begin
+      EditGameProfil(AOwner,AGameDB,result,TemplateForm.Template);
+    end else begin
+      ModernEditGameProfil(AOwner,AGameDB,result,TemplateForm.Template);
+    end;
   finally
     TemplateForm.Free;
   end;

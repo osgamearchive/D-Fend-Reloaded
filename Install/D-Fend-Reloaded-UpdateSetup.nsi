@@ -15,7 +15,7 @@
 ; ============================================================
 
 !define VER_MAYOR 0
-!define VER_MINOR1 2
+!define VER_MINOR1 3
 !define VER_MINOR2 0
 
 !define PrgName "D-Fend Reloaded ${VER_MAYOR}.${VER_MINOR1}.${VER_MINOR2}"
@@ -128,16 +128,20 @@ Section "$(LANGNAME_DFendReloaded)" ID_DFend
   
   SetOutPath "$INSTDIR"
   File "..\DFend.exe"
+  File "..\oggenc2.exe"
   File "..\LicenseComponents.txt"
   File "..\Links.txt"
   File "..\ChangeLog.txt"
+  File "..\FAQs.txt"
   File "..\D-Fend Reloaded DataInstaller.nsi"
+  File "..\UpdateCheck\UpdateCheck.exe"
   
   SetOutPath "$DataInstDir"
   File "..\D-Fend Reloaded DataInstaller.nsi"
+  File "..\Icons.ini"
     
   SetOutPath "$INSTDIR\Lang"
-  File /x English.ini "..\Lang\*.ini"  ; English.ini will be auto created at first launch
+  File "..\Lang\*.ini"
   
   SetOutPath "$DataInstDir\Templates"
   File "..\Templates\*.prof"

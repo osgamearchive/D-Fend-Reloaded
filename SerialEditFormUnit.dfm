@@ -123,19 +123,19 @@ object SerialEditForm: TSerialEditForm
     Top = 54
     Width = 268
     Height = 296
+    PageIndex = 3
     TabOrder = 4
     object TPage
       Left = 0
       Top = 0
       Caption = 'Empty'
-      ExplicitWidth = 226
+      ExplicitWidth = 0
+      ExplicitHeight = 0
     end
     object TPage
       Left = 0
       Top = 0
       Caption = 'Modem'
-      ExplicitWidth = 258
-      ExplicitHeight = 225
       object ModemPortLabel: TLabel
         Left = 17
         Top = 48
@@ -177,8 +177,6 @@ object SerialEditForm: TSerialEditForm
       Left = 0
       Top = 0
       Caption = 'NullModem'
-      ExplicitWidth = 258
-      ExplicitHeight = 225
       object NullModemPortLabel: TLabel
         Left = 17
         Top = 8
@@ -286,7 +284,6 @@ object SerialEditForm: TSerialEditForm
       Left = 0
       Top = 0
       Caption = 'DirectSerial'
-      ExplicitWidth = 226
       object DirectSerialRXDelayLabel: TLabel
         Left = 17
         Top = 61

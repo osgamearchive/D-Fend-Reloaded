@@ -1,7 +1,7 @@
 object SetupDosBoxForm: TSetupDosBoxForm
   Left = 0
   Top = 0
-  BorderIcons = [biMinimize, biMaximize]
+  BorderIcons = []
   BorderStyle = bsDialog
   Caption = 'SetupDosBoxForm'
   ClientHeight = 81
@@ -14,6 +14,7 @@ object SetupDosBoxForm: TSetupDosBoxForm
   Font.Style = []
   OldCreateOrder = False
   Position = poOwnerFormCenter
+  OnCreate = FormCreate
   OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
@@ -30,6 +31,7 @@ object SetupDosBoxForm: TSetupDosBoxForm
     Width = 89
     Height = 25
     Caption = 'Abbruch'
+    ModalResult = 3
     TabOrder = 0
     OnClick = AbortButtonClick
     Glyph.Data = {

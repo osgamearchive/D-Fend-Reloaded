@@ -17,3 +17,7 @@ written by Benjamin David Lunt
 FreeDOS 1.0
 FreeDOS is a trademark of Jim Hall
 (http://www.freedos.org/)
+
+OggEnc v2.84 (libvorbis 1.2.0)
+(c) 2000-2005 Michael Smith & portions by John Edwards
+(http://www.vorbis.com/)

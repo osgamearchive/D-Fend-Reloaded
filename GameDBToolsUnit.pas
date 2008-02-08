@@ -1,7 +1,7 @@
 unit GameDBToolsUnit;
 interface
 
-uses Classes, ComCtrls, Controls, GameDBUnit;
+uses Classes, ComCtrls, Controls, Menus, CheckLst, GameDBUnit;
 
 { Load Data to GUI }
 
@@ -14,9 +14,16 @@ Procedure AddGameToList(const AListView : TListView; const AListViewImageList, A
 Procedure AddGamesToList(const AListView : TListView; const AListViewImageList, AListViewIconImageList, AImageList : TImageList; const GameDB : TGameDB; const Group, SubGroup, SearchString : String; const ShowExtraInfo : Boolean; const SortBy : TSortListBy; const ReverseOrder : Boolean);
 
 Procedure AddScreenshotsToList(const AListView : TListView; const AImageList : TImageList; Dir : String);
+Procedure AddSoundsToList(const AListView : TListView; Dir : String; ImageListIndex : Integer);
 
 Procedure GetColOrderAndVisible(var O,V : String);
 Procedure SetSortTypeByListViewCol(const ColumnIndex : Integer; var ListSort : TSortListBy; var ListSortReverse : Boolean);
+
+{ Selection lists }
+
+Procedure BuildCheckList(const CheckListBox : TCheckListBox; const GameDB : TGameDB; const WithDefaultProfile : Boolean);
+Procedure BuildSelectPopupMenu(const Popup : TPopupMenu; const GameDB : TGameDB; const OnClick : TNotifyEvent; const WithDefaultProfile : Boolean);
+Procedure SelectGamesByPopupMenu(const Sender : TObject; const CheckListBox : TCheckListBox);
 
 { Upgrade from D-Fend }
 
@@ -44,7 +51,7 @@ implementation
 
 uses Windows, SysUtils, Dialogs, Graphics, Math, IniFiles, PNGImage, JPEG,
      GIFImage, CommonTools, LanguageSetupUnit, PrgConsts, PrgSetupUnit,
-     ProfileEditorFormUnit;
+     ProfileEditorFormUnit, ModernProfileEditorFormUnit;
 
 Procedure AddTypeSelector(const ATreeView : TTreeView; const Name : String; const St : TStringList);
 Var N,N2 : TTreeNode;
@@ -72,6 +79,7 @@ Var N : TTreeNode;
     Group, SubGroup : String;
     I : Integer;
     OnChange : TTVChangedEvent;
+    UserGroups : TStringList;
 begin
   OnChange:=ATreeView.OnChange;
   ATreeView.OnChange:=nil;
@@ -104,6 +112,13 @@ begin
       AddTypeSelector(ATreeView,LanguageSetup.GamePublisher,GameDB.GetPublisherList);
       AddTypeSelector(ATreeView,LanguageSetup.GameYear,GameDB.GetYearList);
       AddTypeSelector(ATreeView,LanguageSetup.GameLanguage,GameDB.GetLanguageList);
+      UserGroups:=StringToStringList(PrgSetup.UserGroups);
+      try
+        For I:=0 to UserGroups.Count-1 do
+          AddTypeSelector(ATreeView,UserGroups[I],GameDB.GetKeyValueList(UserGroups[I]));
+      finally
+        UserGroups.Free;
+      end;
 
       If Group='' then exit;
 
@@ -170,6 +185,128 @@ begin
   end;
 end;
 
+Procedure BuildSelectPopupSubMenu(const Popup : TPopupMenu; const Name : String; const MenuSelect, MenuUnselect : TMenuItem; const Tag : Integer; const OnClick : TNotifyEvent; const Items : TStringList);
+Var SubSelect, SubUnselect,M : TMenuItem;
+    I : Integer;
+begin
+  SubSelect:=TMenuItem.Create(Popup);
+  SubSelect.Caption:=Name;
+  SubSelect.Tag:=Tag;
+  MenuSelect.Add(SubSelect);
+
+  SubUnselect:=TMenuItem.Create(Popup);
+  SubUnselect.Caption:=Name;
+  SubUnselect.Tag:=Tag;
+  MenuUnselect.Add(SubUnselect);
+
+  For I:=0 to Items.Count-1 do begin
+      M:=TMenuItem.Create(Popup);
+      M.Caption:=Items[I];
+      M.Tag:=I;
+      M.OnClick:=OnClick;
+      SubSelect.Add(M);
+      M:=TMenuItem.Create(Popup);
+      M.Caption:=Items[I];
+      M.Tag:=I;
+      M.OnClick:=OnClick;
+      SubUnselect.Add(M);
+  end;
+end;
+
+Procedure BuildCheckList(const CheckListBox : TCheckListBox; const GameDB : TGameDB; const WithDefaultProfile : Boolean);
+Var I : Integer;
+    St : TStringList;
+begin
+  St:=TStringList.Create;
+  try
+    For I:=0 to GameDB.Count-1 do If GameDB[I].Name<>DosBoxDOSProfile then St.AddObject(GameDB[I].Name,GameDB[I]);
+    St.Sort;
+    CheckListBox.Items.Assign(St);
+    For I:=0 to CheckListBox.Items.Count-1 do CheckListBox.Checked[I]:=True;
+  finally
+    St.Free;
+  end;
+end;
+
+Procedure BuildSelectPopupMenu(const Popup : TPopupMenu; const GameDB : TGameDB; const OnClick : TNotifyEvent; const WithDefaultProfile : Boolean);
+Var MenuSelect, MenuUnselect : TMenuItem;
+    St : TStringList;
+begin
+  MenuSelect:=TMenuItem.Create(Popup);
+  MenuSelect.Caption:=LanguageSetup.Select;
+  MenuSelect.Tag:=1;
+  Popup.Items.Add(MenuSelect);
+  MenuUnselect:=TMenuItem.Create(Popup);
+  MenuUnselect.Caption:=LanguageSetup.Unselect;
+  MenuUnselect.Tag:=0;
+  Popup.Items.Add(MenuUnselect);
+
+  St:=GameDB.GetGenreList(WithDefaultProfile);
+  try
+    BuildSelectPopupSubMenu(Popup,LanguageSetup.GameGenre,MenuSelect,MenuUnselect,0,OnClick,St);
+  finally
+    St.Free;
+  end;
+
+  St:=GameDB.GetDeveloperList(WithDefaultProfile);
+  try
+    BuildSelectPopupSubMenu(Popup,LanguageSetup.GameDeveloper,MenuSelect,MenuUnselect,1,OnClick,St);
+  finally
+    St.Free;
+  end;
+
+  St:=GameDB.GetPublisherList(WithDefaultProfile);
+  try
+    BuildSelectPopupSubMenu(Popup,LanguageSetup.GamePublisher,MenuSelect,MenuUnselect,2,OnClick,St);
+  finally
+    St.Free;
+  end;
+
+  St:=GameDB.GetYearList(WithDefaultProfile);
+  try
+    BuildSelectPopupSubMenu(Popup,LanguageSetup.GameYear,MenuSelect,MenuUnselect,3,OnClick,St);
+  finally
+    St.Free;
+  end;
+
+  St:=GameDB.GetLanguageList(WithDefaultProfile);
+  try
+    BuildSelectPopupSubMenu(Popup,LanguageSetup.GameLanguage,MenuSelect,MenuUnselect,4,OnClick,St);
+  finally
+    St.Free;
+  end;
+end;
+
+Procedure SelectGamesByPopupMenu(const Sender : TObject; const CheckListBox : TCheckListBox);
+Var Select : Boolean;
+    Category : Integer;
+    CategoryValue : String;
+    I : Integer;
+    M : TMenuItem;
+    G : TGame;
+    S : String;
+begin
+  If not (Sender is TMenuItem) then exit;
+  M:=Sender as TMenuItem;
+  CategoryValue:=RemoveUnderline(Trim(ExtUpperCase(M.Caption)));
+  Category:=M.Parent.Tag;
+  Select:=(M.Parent.Parent.Tag=1);
+
+  For I:=0 to CheckListBox.Items.Count-1 do begin
+    G:=TGame(CheckListBox.Items.Objects[I]);
+    Case Category of
+      0 : S:=G.CacheGenre;
+      1 : S:=G.CacheDeveloper;
+      2 : S:=G.CachePublisher;
+      3 : S:=G.CacheYear;
+      4 : S:=G.CacheLanguage;
+    end;
+    S:=Trim(S);
+    If S='' then continue;
+    If ExtUpperCase(S)<>CategoryValue then continue;
+    CheckListBox.Checked[I]:=Select;
+  end;
+end;
 
 Procedure InitListViewForGamesList(const AListView : TListView; const ShowExtraInfo : Boolean);
 Var C : TListColumn;
@@ -277,12 +414,13 @@ begin
 end;
 
 Procedure AddGamesToList(const AListView : TListView; const AListViewImageList, AListViewIconImageList, AImageList : TImageList; const GameDB : TGameDB; const Group, SubGroup, SearchString : String; const ShowExtraInfo : Boolean; const SortBy : TSortListBy; const ReverseOrder : Boolean);
-Var I,Nr : Integer;
-    SubGroupUpper, SearchStringUpper : String;
+Var I,J,K,Nr : Integer;
+    GroupUpper, SubGroupUpper, SearchStringUpper : String;
     B : Boolean;
     C : Array of Integer;
     List : TList;
-    St : TStringList;
+    St,St2 : TStringList;
+    S,T : String;
 begin
   {Prepare ListView}
   AListViewImageList.Clear;
@@ -304,8 +442,9 @@ begin
         List.Add(GameDB[I]);
       end;
     end else begin
+      GroupUpper:=Trim(ExtUpperCase(Group));
       If SubGroup=LanguageSetup.NotSet then SubGroupUpper:='' else SubGroupUpper:=ExtUpperCase(SubGroup);
-      Nr:=0;
+      Nr:=5;
       If Group=LanguageSetup.GameGenre then Nr:=0;
       If Group=LanguageSetup.GameDeveloper then Nr:=1;
       If Group=LanguageSetup.GamePublisher then Nr:=2;
@@ -320,6 +459,18 @@ begin
           2 : B:=(ExtUpperCase(GameDB[I].CachePublisher)=SubGroupUpper);
           3 : B:=(ExtUpperCase(GameDB[I].CacheYear)=SubGroupUpper);
           4 : B:=(ExtUpperCase(GameDB[I].CacheLanguage)=SubGroupUpper);
+          5 : begin
+                B:=(SubGroupUpper='');
+                St2:=StringToStringList(GameDB[I].CacheUserInfo);
+                try
+                  For J:=0 to St2.Count-1 do begin
+                    S:=St2[J]; K:=Pos('=',S); If K=0 then T:='' else begin T:=Trim(Copy(S,K+1,MaxInt)); S:=Trim(Copy(S,1,K-1)); end;
+                    If Trim(ExtUpperCase(S))=GroupUpper then begin B:=(Trim(ExtUpperCase(T))=SubGroupUpper); break; end;
+                  end;
+                finally
+                  St2.Free;
+                end;
+              end;
         end;
         If not B then continue;
         If (SearchStringUpper<>'') and (Pos(SearchStringUpper,ExtUpperCase(GameDB[I].CacheName))=0) then continue;
@@ -371,6 +522,7 @@ Var I : Integer;
     G : TGIFImage;
     B,B2 : TBitmap;
     L : TListItem;
+    OK : Boolean;
 begin
   Dir:=IncludeTrailingPathDelimiter(Dir);
 
@@ -379,23 +531,25 @@ begin
     while I=0 do begin
       P:=TPNGObject.Create;
       try
-        P.LoadFromFile(Dir+Rec.Name);
-        B:=TBitmap.Create;
-        try
-          B.Assign(P);
-          B2:=TBitmap.Create;
+        OK:=True; try P.LoadFromFile(Dir+Rec.Name); except OK:=False; end;
+        IF OK then begin
+          B:=TBitmap.Create;
           try
-            B2.SetSize(AImageList.Width,AImageList.Height);
-            B2.Canvas.StretchDraw(Rect(0,0,AImageList.Width-1,AImageList.Height-1),B);
-            AImageList.AddMasked(B2,clNone);
+            B.Assign(P);
+            B2:=TBitmap.Create;
+            try
+              B2.SetSize(AImageList.Width,AImageList.Height);
+              B2.Canvas.StretchDraw(Rect(0,0,AImageList.Width-1,AImageList.Height-1),B);
+              AImageList.AddMasked(B2,clNone);
+            finally
+              B2.Free;
+            end;
+            L:=AListView.Items.Add;
+            L.Caption:=Rec.Name;
+            L.ImageIndex:=AImageList.Count-1;
           finally
-            B2.Free;
+            B.Free;
           end;
-          L:=AListView.Items.Add;
-          L.Caption:=Rec.Name;
-          L.ImageIndex:=AImageList.Count-1;
-        finally
-          B.Free;
         end;
       finally
         P.Free;
@@ -411,23 +565,25 @@ begin
     while I=0 do begin
       J:=TJPEGImage.Create;
       try
-        J.LoadFromFile(Dir+Rec.Name);
-        B:=TBitmap.Create;
-        try
-          B.Assign(J);
-          B2:=TBitmap.Create;
+        OK:=True; try J.LoadFromFile(Dir+Rec.Name); except OK:=False; end;
+        If OK then begin
+          B:=TBitmap.Create;
           try
-            B2.SetSize(AImageList.Width,AImageList.Height);
-            B2.Canvas.StretchDraw(Rect(0,0,AImageList.Width-1,AImageList.Height-1),B);
-            AImageList.AddMasked(B2,clNone);
+            B.Assign(J);
+            B2:=TBitmap.Create;
+            try
+              B2.SetSize(AImageList.Width,AImageList.Height);
+              B2.Canvas.StretchDraw(Rect(0,0,AImageList.Width-1,AImageList.Height-1),B);
+              AImageList.AddMasked(B2,clNone);
+            finally
+              B2.Free;
+            end;
+            L:=AListView.Items.Add;
+            L.Caption:=Rec.Name;
+            L.ImageIndex:=AImageList.Count-1;
           finally
-            B2.Free;
+            B.Free;
           end;
-          L:=AListView.Items.Add;
-          L.Caption:=Rec.Name;
-          L.ImageIndex:=AImageList.Count-1;
-        finally
-          B.Free;
         end;
       finally
         J.Free;
@@ -443,23 +599,25 @@ begin
     while I=0 do begin
       J:=TJPEGImage.Create;
       try
-        J.LoadFromFile(Dir+Rec.Name);
-        B:=TBitmap.Create;
-        try
-          B.Assign(J);
-          B2:=TBitmap.Create;
+        OK:=True; try J.LoadFromFile(Dir+Rec.Name); except OK:=False; end;
+        If OK then begin
+          B:=TBitmap.Create;
           try
-            B2.SetSize(AImageList.Width,AImageList.Height);
-            B2.Canvas.StretchDraw(Rect(0,0,AImageList.Width-1,AImageList.Height-1),B);
-            AImageList.AddMasked(B2,clNone);
+            B.Assign(J);
+            B2:=TBitmap.Create;
+            try
+              B2.SetSize(AImageList.Width,AImageList.Height);
+              B2.Canvas.StretchDraw(Rect(0,0,AImageList.Width-1,AImageList.Height-1),B);
+              AImageList.AddMasked(B2,clNone);
+            finally
+              B2.Free;
+            end;
+            L:=AListView.Items.Add;
+            L.Caption:=Rec.Name;
+            L.ImageIndex:=AImageList.Count-1;
           finally
-            B2.Free;
+            B.Free;
           end;
-          L:=AListView.Items.Add;
-          L.Caption:=Rec.Name;
-          L.ImageIndex:=AImageList.Count-1;
-        finally
-          B.Free;
         end;
       finally
         J.Free;
@@ -475,23 +633,25 @@ begin
     while I=0 do begin
       G:=TGifImage.Create;
       try
-        G.LoadFromFile(Dir+Rec.Name);
-        B:=TBitmap.Create;
-        try
-          B.Assign(G);
-          B2:=TBitmap.Create;
+        OK:=True; try G.LoadFromFile(Dir+Rec.Name); except OK:=False; end;
+        If OK then begin
+          B:=TBitmap.Create;
           try
-            B2.SetSize(AImageList.Width,AImageList.Height);
-            B2.Canvas.StretchDraw(Rect(0,0,AImageList.Width-1,AImageList.Height-1),B);
-            AImageList.AddMasked(B2,clNone);
+            B.Assign(G);
+            B2:=TBitmap.Create;
+            try
+              B2.SetSize(AImageList.Width,AImageList.Height);
+              B2.Canvas.StretchDraw(Rect(0,0,AImageList.Width-1,AImageList.Height-1),B);
+              AImageList.AddMasked(B2,clNone);
+            finally
+              B2.Free;
+            end;
+            L:=AListView.Items.Add;
+            L.Caption:=Rec.Name;
+            L.ImageIndex:=AImageList.Count-1;
           finally
-            B2.Free;
+            B.Free;
           end;
-          L:=AListView.Items.Add;
-          L.Caption:=Rec.Name;
-          L.ImageIndex:=AImageList.Count-1;
-        finally
-          B.Free;
         end;
       finally
         G.Free;
@@ -507,21 +667,67 @@ begin
     while I=0 do begin
       B:=TBitmap.Create;
       try
-        B.LoadFromFile(Dir+Rec.Name);
-        B2:=TBitmap.Create;
-        try
-          B2.SetSize(AImageList.Width,AImageList.Height);
-          B2.Canvas.StretchDraw(Rect(0,0,AImageList.Width-1,AImageList.Height-1),B);
-          AImageList.AddMasked(B2,clNone);
-        finally
-          B2.Free;
+        OK:=True; try B.LoadFromFile(Dir+Rec.Name); except OK:=False; end;
+        If OK then begin
+          B2:=TBitmap.Create;
+          try
+            B2.SetSize(AImageList.Width,AImageList.Height);
+            B2.Canvas.StretchDraw(Rect(0,0,AImageList.Width-1,AImageList.Height-1),B);
+            AImageList.AddMasked(B2,clNone);
+          finally
+            B2.Free;
+          end;
+          L:=AListView.Items.Add;
+          L.Caption:=Rec.Name;
+          L.ImageIndex:=AImageList.Count-1;
         end;
-        L:=AListView.Items.Add;
-        L.Caption:=Rec.Name;
-        L.ImageIndex:=AImageList.Count-1;
       finally
         B.Free;
       end;
+      I:=FindNext(Rec);
+    end;
+  finally
+    FindClose(Rec);
+  end;
+end;
+
+Procedure AddSoundsToList(const AListView : TListView; Dir : String; ImageListIndex : Integer);
+Var I : Integer;
+    Rec : TSearchRec;
+    L : TListItem;
+begin
+  Dir:=IncludeTrailingPathDelimiter(Dir);
+
+  I:=FindFirst(Dir+'*.wav',faAnyFile,Rec);
+  try
+    while I=0 do begin
+      L:=AListView.Items.Add;
+      L.Caption:=Rec.Name;
+      L.ImageIndex:=ImageListIndex;
+      I:=FindNext(Rec);
+    end;
+  finally
+    FindClose(Rec);
+  end;
+
+  I:=FindFirst(Dir+'*.mp3',faAnyFile,Rec);
+  try
+    while I=0 do begin
+      L:=AListView.Items.Add;
+      L.Caption:=Rec.Name;
+      L.ImageIndex:=ImageListIndex;
+      I:=FindNext(Rec);
+    end;
+  finally
+    FindClose(Rec);
+  end;
+
+  I:=FindFirst(Dir+'*.ogg',faAnyFile,Rec);
+  try
+    while I=0 do begin
+      L:=AListView.Items.Add;
+      L.Caption:=Rec.Name;
+      L.ImageIndex:=ImageListIndex;
       I:=FindNext(Rec);
     end;
   finally
@@ -568,9 +774,10 @@ begin
 end;
 
 Procedure ReplaceAbsoluteDirs(const GameDB : TGameDB);
-Var I,J : Integer;
+Var I,J,K : Integer;
     G : TGame;
     St : TStringList;
+    S,T : String;
 begin
   For I:=0 to GameDB.Count-1 do begin
     G:=GameDB[I];
@@ -578,7 +785,13 @@ begin
     G.GameExe:=RemoveBackslash(MakeRelPath(G.GameExe,PrgSetup.BaseDir));
     G.SetupExe:=RemoveBackslash(MakeRelPath(G.SetupExe,PrgSetup.BaseDir));
     G.CaptureFolder:=RemoveBackslash(MakeRelPath(G.CaptureFolder,PrgSetup.BaseDir));
-    G.ExtraDirs:=RemoveBackslash(MakeRelPath(G.ExtraDirs,PrgSetup.BaseDir));
+    St:=ValueToList(G.ExtraDirs);
+    try
+      For J:=0 to St.Count-1 do G.ExtraDirs:=RemoveBackslash(MakeRelPath(St[J],PrgSetup.BaseDir));
+      G.ExtraDirs:=StringListToString(St);
+    finally
+      St.Free;
+    end;
     G.DataDir:=RemoveBackslash(MakeRelPath(G.DataDir,PrgSetup.BaseDir));
 
     For J:=0 to G.NrOfMounts-1 do begin
@@ -596,7 +809,15 @@ begin
         else St:=nil;
       end;
       try
-        St[0]:=RemoveBackslash(MakeRelPath(St[0],PrgSetup.BaseDir));
+        S:=Trim(St[0]); T:='';
+        K:=Pos('$',S);
+        while K>0 do begin
+          T:=T+RemoveBackslash(MakeRelPath(Trim(Copy(S,1,K-1)),PrgSetup.BaseDir))+'$';
+          S:=Trim(Copy(S,K+1,MaxInt));
+          K:=Pos('$',S);
+        end;
+        T:=T+RemoveBackslash(MakeRelPath(Trim(S),PrgSetup.BaseDir));
+        St[0]:=T;
         Case J of
           0 : G.Mount0:=ListToValue(St);
           1 : G.Mount1:=ListToValue(St);
@@ -613,6 +834,9 @@ begin
         St.Free;
       end;
     end;
+
+    G.StoreAllValues;
+    G.LoadCache;
   end;
 end;
 
@@ -632,11 +856,11 @@ begin
   result.StartFullscreen:=False;
   result.CaptureFolder:='.\'+CaptureSubDir+'\'+DosBoxDOSProfile;
   result.Genre:='Program';
-  result.WWW:='http://dosbox.sourceforge.net/';
+  result.WWW:='http://www.dosbox.com';
   result.Name:=DosBoxDOSProfile;
   result.Favorite:=True;
-  result.Developer:='DosBox Team';
-  result.Publisher:='DosBox Team';
+  result.Developer:='DOSBox Team';
+  result.Publisher:='DOSBox Team';
   result.Year:='2007';
   result.Language:='multilingual';
   result.Icon:='DosBox.ico';
@@ -824,7 +1048,11 @@ Var DefaultGame : TGame;
 begin
   DefaultGame:=TGame.Create(PrgSetup);
   try
-    EditGameProfil(AOwner,GameDB,DefaultGame,nil);
+    If PrgSetup.DFendStyleProfileEditor then begin
+      EditGameProfil(AOwner,GameDB,DefaultGame,nil);
+    end else begin
+      ModernEditGameProfil(AOwner,GameDB,DefaultGame,nil);
+    end;
   finally
     DefaultGame.Free;
   end;
@@ -956,7 +1184,7 @@ Var INI : TINIFile;
 begin
   INI:=TIniFile.Create(AFileName);
   try
-    result:=AGameDB[AGameDB.Add(ChangeFileExt(ExtractFileName(AFileName),''))];
+    result:=AGameDB[AGameDB.Add(AGameDB.ProfFileName(ExtractFileName(AFileName)))];
 
     result.StartFullscreen:=StrToBool(INI.ReadString('sdl','fullscreen','false'));
     result.UseDoublebuffering:=StrToBool(INI.ReadString('sdl','fulldouble','false'));

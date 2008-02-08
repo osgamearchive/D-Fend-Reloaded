@@ -37,7 +37,7 @@ begin
   result:=True;
 end;
 
-Function SpecialMultiImgMount(const DriveLetter : String; const Imgs : TStringList; const FreeDriveLetters : String) : String;
+Function SpecialMultiImgMount(const DriveLetter : String; const Imgs : TStringList; const FreeDriveLetters : String; const MountCommandAdd : String) : String;
 Var I : Integer;
     TempDrive : Char;
     Path,S : String;
@@ -53,7 +53,7 @@ begin
 
   result:=
     'mount '+TempDrive+' "'+Path+'"'+#13+
-    'imgmount '+DriveLetter+' '+S+' -t iso -fs iso'+#13+
+    'imgmount '+DriveLetter+' '+S+' '+MountCommandAdd+#13+
     'mount -u '+TempDrive;
 end;
 
@@ -69,11 +69,11 @@ Var St,St2 : TStringList;
     S,T,U : String;
     I : Integer;
 begin
+  result:='';
+
   St:=ValueToList(ProfString);
   St2:=TStringList.Create;
   try
-    result:='';
-
     S:=Trim(St[0]);
     I:=Pos('$',S);
     While I>0 do begin St2.Add(Trim(Copy(S,1,I-1))); S:=Trim(Copy(S,I+1,MaxInt)); I:=Pos('$',S); end;
@@ -112,15 +112,21 @@ begin
 
     If T='FLOPPYIMAGE' then begin
       {ImageFile;FLOPPYIMAGE;Letter;;;}
+      If (Trim(St[2])='0') or (Trim(St[2])='1') then U:='none' else U:='fat';
       MarkDriveUsed(St[2]);
-      result:='imgmount '+St[2]+' "'+ShortName(S)+'" -t floppy'+U;
+      If AllSameDir(St2) then begin
+        result:=SpecialMultiImgMount(St[2],St2,FreeDriveLetters,'-t floppy -fs '+U);
+      end else begin
+        S:='"'+ShortName(St2[0])+'"'; For I:=1 to St2.Count-1 do S:=S+' "'+ShortName(St2[I])+'"';
+        result:='imgmount '+St[2]+' '+S+' -t floppy -fs '+U;
+      end;
     end;
 
     If T='CDROMIMAGE' then begin
       {ImageFile;CDROMIMAGE;Letter;;;}
       MarkDriveUsed(St[2]);
       If AllSameDir(St2) then begin
-        result:=SpecialMultiImgMount(St[2],St2,FreeDriveLetters);
+        result:=SpecialMultiImgMount(St[2],St2,FreeDriveLetters,'-t iso -fs iso');
       end else begin
         S:='"'+ShortName(St2[0])+'"'; For I:=1 to St2.Count-1 do S:=S+' "'+ShortName(St2[I])+'"';
         result:='imgmount '+St[2]+' '+S+' -t iso -fs iso';
@@ -135,54 +141,81 @@ begin
         result:='imgmount '+St[2]+' "'+ShortName(S)+'" -t hdd -fs '+U+' -size '+St[5];
       end;
     end;
+
+    If T='PHYSFS' then begin
+      {RealFolder$ZipFile;PHYSFS;Letter;False;;FreeSpace}
+      If St2.Count=2 then begin
+        MarkDriveUsed(St[2]);
+        result:='mount '+St[2]+' '+ShortName(St2[0])+':'+ShortName(St2[1])+':/';
+        If (St.Count>=6) and (St[5]<>'') then result:=result+' -freesize '+St[5];
+      end;
+    end;
+
   finally
     St.Free;
     St2.Free;
   end;
 end;
 
-Procedure BuildRunCommands(const St : TStringList; const ProgramFile, ProgramParameters : String; const UseLoadFix : Boolean; const LoadFixMemory : Integer; const Use4DOS, UseDOS32A : Boolean; const Game : TGame);
-Var Prefix,S,T,Temp,UsePath : String;
+Procedure TempMountFreeDOSDir(const Game : TGame; FreeDriveLetters : String; var UseDir, Mount, UnMount : String);
+Var FreeDOSPath : String;
+    I : Integer;
+    St : TStringList;
+    S : String;
+    TempDrive : Char;
+begin
+  UseDir:=''; Mount:=''; UnMount:='';
+
+  FreeDOSPath:=IncludeTrailingPathDelimiter(MakeAbsPath(PrgSetup.PathToFREEDOS,PrgSetup.BaseDir));
+  If not DirectoryExists(FreeDOSPath) then exit;
+
+  UseDir:='';
+  For I:=0 to Game.NrOfMounts-1 do begin
+    Case I of
+      0 : St:=ValueToList(Game.Mount0);
+      1 : St:=ValueToList(Game.Mount1);
+      2 : St:=ValueToList(Game.Mount2);
+      3 : St:=ValueToList(Game.Mount3);
+      4 : St:=ValueToList(Game.Mount4);
+      5 : St:=ValueToList(Game.Mount5);
+      6 : St:=ValueToList(Game.Mount6);
+      7 : St:=ValueToList(Game.Mount7);
+      8 : St:=ValueToList(Game.Mount8);
+      9 : St:=ValueToList(Game.Mount9);
+      else St:=TStringList.Create;
+    end;
+    try
+      S:=IncludeTrailingPathDelimiter(MakeAbsPath(IncludeTrailingPathDelimiter(St[0]),PrgSetup.BaseDir));
+      If ExtUpperCase(Copy(FreeDOSPath,1,length(S)))=ExtUpperCase(S) then begin
+        UseDir:=St[2]+':\'+Copy(FreeDOSPath,length(S)+1,MaxInt);
+        break;
+      end;
+    finally
+      St.Free;
+    end;
+  end;
+  If UseDir='' then begin
+    TempDrive:='Y';
+    For I:=length(FreeDriveLetters) downto 1 do If FreeDriveLetters[I]<>'-' then begin TempDrive:=FreeDriveLetters[I]; break; end;
+    {There must be free drive letters, because there are only 10 mounts}
+
+    Mount:='mount '+TempDrive+': "'+ShortName(FreeDOSPath)+'"';
+    UseDir:=''+TempDrive+':\';
+    Unmount:='mount -u '+TempDrive;
+  end;
+end;
+
+Procedure BuildRunCommands(const St : TStringList; const ProgramFile, ProgramParameters : String; const UseLoadFix : Boolean; const LoadFixMemory : Integer; const Use4DOS, UseDOS32A : Boolean; const Game : TGame; const FreeDriveLetters : String);
+Var Prefix,S,T,Temp,UsePath,Mount,Unmount : String;
     I : Integer;
     St2 : TStringList;
     NoFreeDOS : Boolean;
+    TempDrive : Char;
 begin
-  NoFreeDOS:=False;
-
+  TempMountFreeDOSDir(Game,FreeDriveLetters,UsePath,Mount,Unmount);
+  NoFreeDOS:=(UsePath='');
   If Use4DOS or UseDOS32A then begin
-    UsePath:='';
-    T:=IncludeTrailingPathDelimiter(MakeAbsPath(PrgSetup.PathToFREEDOS,PrgSetup.BaseDir));
-    NoFreeDOS:=not DirectoryExists(T);
-    For I:=0 to Game.NrOfMounts-1 do begin
-      Case I of
-        0 : St2:=ValueToList(Game.Mount0);
-        1 : St2:=ValueToList(Game.Mount1);
-        2 : St2:=ValueToList(Game.Mount2);
-        3 : St2:=ValueToList(Game.Mount3);
-        4 : St2:=ValueToList(Game.Mount4);
-        5 : St2:=ValueToList(Game.Mount5);
-        6 : St2:=ValueToList(Game.Mount6);
-        7 : St2:=ValueToList(Game.Mount7);
-        8 : St2:=ValueToList(Game.Mount8);
-        9 : St2:=ValueToList(Game.Mount9);
-        else St2:=TStringList.Create;
-      end;
-      try
-        S:=IncludeTrailingPathDelimiter(MakeAbsPath(IncludeTrailingPathDelimiter(St2[0]),PrgSetup.BaseDir));
-        If Copy(T,1,length(S))=S then begin
-          UsePath:=St2[2]+':\'+Copy(T,length(S)+1,MaxInt);
-          break;
-        end;
-      finally
-        St2.Free;
-      end;
-    end;
-    If UsePath='' then begin
-      St.Add('mount Y: "'+T+'"');
-      UsePath:='Y:\';
-    end;
-  end else begin
-    UsePath:='';
+    If Mount<>'' then St.Add(Mount);
   end;
 
   T:=Trim(ExtractFilePath(MakeAbsPath(ProgramFile,PrgSetup.BaseDir)));
@@ -294,11 +327,127 @@ begin
   end;
 end;
 
+Procedure BuildAutoexec(const Game : TGame; const RunSetup : Boolean; const St : TStringList);
+  Procedure SetVolume(const Channel : String; const Left,Right : Integer);
+  begin If (Left<>100) or (Right<>100) then St.Add('mixer '+Channel+' '+IntToStr(Left)+':'+IntToStr(Right)+' /NOSHOW'); end;
+Var S,T,NumCommands,MouseCommands,UsePath,Mount,UnMount : String;
+    I : Integer;
+    FreeDriveLetters : String;
+    St2 : TStringList;
+begin
+  St.Add('');
+  St.Add('[autoexec]');
+  St.Add('@echo off');
+
+  { Environment variables }
+
+  St2:=StringToStringList(Game.Environment);
+  try
+    For I:=0 to St2.Count-1 do If Trim(St2[I])<>'' then St.Add('SET '+St2[I]);
+  finally
+    St2.Free;
+  end;
+
+  { Reported DOS version }
+
+  S:=Trim(ExtUpperCase(Game.ReportedDOSVersion));
+  If (S<>'') and (S<>'DEFAULT') and (S<>'AUTO') then begin
+    If Pos('.',S)<>0 then begin T:=Trim(Copy(S,Pos('.',S)+1,MaxInt)); S:=Trim(Copy(S,1,Pos('.',S)-1)); end else begin T:=''; end;
+    St.Add('ver set '+S+' '+T);
+  end;
+
+  { Mixer }
+
+  SetVolume('MASTER',Game.MixerVolumeMasterLeft,Game.MixerVolumeMasterRight);
+  SetVolume('DISNEY',Game.MixerVolumeDisneyLeft,Game.MixerVolumeDisneyRight);
+  SetVolume('SPKR',Game.MixerVolumeSpeakerLeft,Game.MixerVolumeSpeakerRight);
+  SetVolume('GUS',Game.MixerVolumeGUSLeft,Game.MixerVolumeGUSRight);
+  SetVolume('SB',Game.MixerVolumeSBLeft,Game.MixerVolumeSBRight);
+  SetVolume('FM',Game.MixerVolumeFMLeft,Game.MixerVolumeFMRight);
+
+  { Text mode lines }
+
+  If Game.TextModeLines=28 then St.Add('Z:\28.COM');
+  If Game.TextModeLines=50 then St.Add('Z:\50.COM');
+
+  { IPX connect }
+
+  S:=Trim(ExtUpperCase(Game.IPXType));
+  If S='CLIENT' then St.Add('IPXNET CONNECT '+Game.IPXAddress+' '+Game.IPXPort);
+  If S='SERVER' then St.Add('IPXNET STARTSERVER '+Game.IPXPort);
+
+  { Mounting }
+
+  FreeDriveLetters:='---DEFGHIJKLMNOPQRSTUVWXY-';
+  if not Game.AutoexecOverrideMount then begin
+    If Game.NrOfMounts>=1 then MultiLineAdd(St,BuildMountData(Game.Mount0,FreeDriveLetters));
+    If Game.NrOfMounts>=2 then MultiLineAdd(St,BuildMountData(Game.Mount1,FreeDriveLetters));
+    If Game.NrOfMounts>=3 then MultiLineAdd(St,BuildMountData(Game.Mount2,FreeDriveLetters));
+    If Game.NrOfMounts>=4 then MultiLineAdd(St,BuildMountData(Game.Mount3,FreeDriveLetters));
+    If Game.NrOfMounts>=5 then MultiLineAdd(St,BuildMountData(Game.Mount4,FreeDriveLetters));
+    If Game.NrOfMounts>=6 then MultiLineAdd(St,BuildMountData(Game.Mount5,FreeDriveLetters));
+    If Game.NrOfMounts>=7 then MultiLineAdd(St,BuildMountData(Game.Mount6,FreeDriveLetters));
+    If Game.NrOfMounts>=8 then MultiLineAdd(St,BuildMountData(Game.Mount7,FreeDriveLetters));
+    If Game.NrOfMounts>=9 then MultiLineAdd(St,BuildMountData(Game.Mount8,FreeDriveLetters));
+    If Game.NrOfMounts>=10 then MultiLineAdd(St,BuildMountData(Game.Mount9,FreeDriveLetters));
+  end;
+
+  { Setting num, caps and scroll lock and CuteMouse }
+
+  NumCommands:='';
+  S:=Trim(ExtUpperCase(Game.NumLockStatus));
+  If (S='ON') or (S='1') or (S='TRUE') then NumCommands:='/N1';
+  If (S='OFF') or (S='0') or (S='FALSE') then NumCommands:='/N0';
+  S:=Trim(ExtUpperCase(Game.CapsLockStatus));
+  If (S='ON') or (S='1') or (S='TRUE') then begin If NumCommands<>'' then NumCommands:=NumCommands+' '; NumCommands:=NumCommands+'/C1'; end;
+  If (S='OFF') or (S='0') or (S='FALSE') then begin If NumCommands<>'' then NumCommands:=NumCommands+' '; NumCommands:=NumCommands+'/C0'; end;
+  S:=Trim(ExtUpperCase(Game.ScrollLockStatus));
+  If (S='ON') or (S='1') or (S='TRUE') then begin If NumCommands<>'' then NumCommands:=NumCommands+' '; NumCommands:=NumCommands+'/S1'; end;
+  If (S='OFF') or (S='0') or (S='FALSE') then begin If NumCommands<>'' then NumCommands:=NumCommands+' '; NumCommands:=NumCommands+'/S0'; end;
+
+  MouseCommands:='';
+  If Game.Force2ButtonMouseMode then MouseCommands:='/Y';
+  If Game.SwapMouseButtons then begin If MouseCommands<>'' then MouseCommands:=MouseCommands+' '; MouseCommands:=MouseCommands+'/L'; end;
+
+  TempMountFreeDOSDir(Game,FreeDriveLetters,UsePath,Mount,UnMount);
+
+  If ((NumCommands<>'') or (MouseCommands<>'')) and (UsePath<>'') then begin
+    If Mount<>'' then St.Add(Mount);
+    If NumCommands<>'' then St.Add(UsePath+'4dos.com /C Keybd '+NumCommands);
+    If MouseCommands<>'' then St.Add(UsePath+'ctmouse '+MouseCommands);
+    If UnMount<>'' then St.Add(UnMount);
+  end;
+
+  { User defined Autoexec }
+
+  St2:=StringToStringList(Game.Autoexec);
+  try St.AddStrings(St2); finally St2.Free; end;
+
+  { Run command }
+
+  S:=Trim(Game.AutoexecBootImage);
+  If S<>'' then begin
+    If (S='2') or (S='3') then begin
+      If S='2' then St.Add('boot -l C') else St.Add('boot -l D');
+    end else begin
+      BuildFloppyBoot(St,S,FreeDriveLetters);
+    end;
+  end else begin
+    If not Game.AutoexecOverridegamestart then begin
+      If RunSetup then begin
+        BuildRunCommands(St,Game.SetupExe,Game.SetupParameters,Game.LoadFix,Game.LoadFixMemory,Game.Use4DOS,False,Game,FreeDriveLetters);
+        If Game.CloseDosBoxAfterGameExit and (Trim(Game.SetupExe)<>'') then St.Add('exit');
+      end else begin
+        BuildRunCommands(St,Game.GameExe,Game.GameParameters,Game.LoadFix,Game.LoadFixMemory,Game.Use4DOS,Game.UseDOS32A,Game,FreeDriveLetters);
+        If Game.CloseDosBoxAfterGameExit and (Trim(Game.GameExe)<>'') then St.Add('exit');
+      end;
+    end;
+  end;
+end;
+
 Function BuildConfFile(const Game : TGame; const RunSetup : Boolean) : TStringList;
 Var St : TStringList;
     S : String;
-    I : Integer;
-    FreeDriveLetters : String;
 begin
   result:=TStringList.Create;
 
@@ -410,69 +559,31 @@ begin
   result.Add('Serial3='+Game.Serial3);
   result.Add('Serial4='+Game.Serial4);
 
-  result.Add('');
-  result.Add('[autoexec]');
-  result.Add('@echo off');
-
-  S:=Trim(ExtUpperCase(Game.IPXType));
-  If S='CLIENT' then begin
-    result.Add('IPXNET CONNECT '+Game.IPXAddress+' '+Game.IPXPort);
-  end;
-  If S='SERVER' then begin
-    result.Add('IPXNET STARTSERVER '+Game.IPXPort);
-  end;
-
-  St:=StringToStringList(Game.Environment);
-  try
-    For I:=0 to St.Count-1 do If Trim(St[I])<>'' then result.Add('SET '+St[I]);
-  finally
-    St.Free;
-  end;
-
-  if not Game.AutoexecOverrideMount then begin
-    FreeDriveLetters:='---DEFGHIJKLMNOPQRSTUVWXY-';
-    If Game.NrOfMounts>=1 then MultiLineAdd(result,BuildMountData(Game.Mount0,FreeDriveLetters));
-    If Game.NrOfMounts>=2 then MultiLineAdd(result,BuildMountData(Game.Mount1,FreeDriveLetters));
-    If Game.NrOfMounts>=3 then MultiLineAdd(result,BuildMountData(Game.Mount2,FreeDriveLetters));
-    If Game.NrOfMounts>=4 then MultiLineAdd(result,BuildMountData(Game.Mount3,FreeDriveLetters));
-    If Game.NrOfMounts>=5 then MultiLineAdd(result,BuildMountData(Game.Mount4,FreeDriveLetters));
-    If Game.NrOfMounts>=6 then MultiLineAdd(result,BuildMountData(Game.Mount5,FreeDriveLetters));
-    If Game.NrOfMounts>=7 then MultiLineAdd(result,BuildMountData(Game.Mount6,FreeDriveLetters));
-    If Game.NrOfMounts>=8 then MultiLineAdd(result,BuildMountData(Game.Mount7,FreeDriveLetters));
-    If Game.NrOfMounts>=9 then MultiLineAdd(result,BuildMountData(Game.Mount8,FreeDriveLetters));
-    If Game.NrOfMounts>=10 then MultiLineAdd(result,BuildMountData(Game.Mount9,FreeDriveLetters));
-  end;
-
-  St:=StringToStringList(Game.Autoexec);
-  try result.AddStrings(St); finally St.Free; end;
-
-  S:=Trim(Game.AutoexecBootImage);
-  If S<>'' then begin
-    If (S='2') or (S='3') then begin
-      If S='2' then result.Add('boot -l C') else result.Add('boot -l D');
-    end else begin
-      BuildFloppyBoot(result,S,FreeDriveLetters);
-    end;
-  end else begin
-    If not Game.AutoexecOverridegamestart then begin
-      If RunSetup then begin
-        BuildRunCommands(result,Game.SetupExe,Game.SetupParameters,Game.LoadFix,Game.LoadFixMemory,Game.Use4DOS,False,Game);
-        If Game.CloseDosBoxAfterGameExit and (Trim(Game.SetupExe)<>'') then result.Add('exit');
-      end else begin
-        BuildRunCommands(result,Game.GameExe,Game.GameParameters,Game.LoadFix,Game.LoadFixMemory,Game.Use4DOS,Game.UseDOS32A,Game);
-        If Game.CloseDosBoxAfterGameExit and (Trim(Game.GameExe)<>'') then result.Add('exit');
-      end;
-    end;
-  end;
+  BuildAutoexec(Game,RunSetup,result);
 
   St:=StringToStringList(Game.CustomSettings);
   try result.AddStrings(St); finally St.Free; end;
 end;
 
+Procedure CenterWindow(Const hWindow : HWnd);
+Var R : TRect;
+begin
+ GetWindowRect(hWindow,R);
+ SetWindowPos(
+   hWindow,
+   HWND_TOP,
+   (Screen.Width div 2)-((R.Right-R.Left) div 2),
+   (Screen.Height div 2)-((R.Bottom-R.Top) div 2),
+   0,
+   0,
+   SWP_SHOWWINDOW or SWP_NOSIZE
+ );
+end;
+
 Type TCharArray=Array[0..MaxInt-1] of Char;
      PCharArray=^TCharArray;
 
-Procedure RunDosBox(const ConfFile : String; const DosBoxCommandLine : String ='');
+Procedure RunDosBox(const DOSBoxPath : String; const ConfFile : String; const DosBoxCommandLine : String ='');
 Var Add : String;
     PrgFile, Params, Env : String;
     StartupInfo : TStartupInfo;
@@ -484,7 +595,16 @@ begin
   if PrgSetup.HideDosBoxConsole then Add:=' -NOCONSOLE';
   If DosBoxCommandLine<>'' then Add:=Add+' '+DosBoxCommandLine;
 
-  PrgFile:=IncludeTrailingPathDelimiter(PrgSetup.DosBoxDir)+DosBoxFileName;
+  PrgFile:=Trim(DOSBoxPath);
+  If (PrgFile='') or (ExtUpperCase(PrgFile)='DEFAULT') then PrgFile:=IncludeTrailingPathDelimiter(PrgSetup.DosBoxDir)+DosBoxFileName else begin
+    If ExtUpperCase(Copy(PrgFile,length(PrgFile)-3,4))<>'.EXE' then PrgFile:=IncludeTrailingPathDelimiter(PrgFile)+DosBoxFileName;
+  end;
+
+  if not FileExists(PrgFile) then begin
+    MessageDlg(Format(LanguageSetup.MessageCouldNotFindDosBox,[PrgFile]),mtError,[mbOK],0);
+    exit;
+  end;
+
   Params:='-CONF '+ConfFile+Add;
 
   If Trim(ExtUpperCase(PrgSetup.SDLVideodriver))='WINDIB' then begin
@@ -537,13 +657,8 @@ end;
 
 Procedure RunGame(const Game : TGame; const RunSetup : Boolean; const DosBoxCommandLine : String);
 Var St : TStringList;
-    S : String;
+    S,T : String;
 begin
-  if not FileExists(PrgSetup.DosBoxDir+DosBoxFileName) then begin
-    MessageDlg(Format(LanguageSetup.MessageCouldNotFindDosBox,[PrgSetup.DosBoxDir+DosBoxFileName]),mtError,[mbOK],0);
-    exit;
-  end;
-
   If PrgSetup.MinimizeOnDosBoxStart then Application.Minimize;
 
   ForceDirectories(MakeAbsPath(Game.CaptureFolder,PrgSetup.BaseDir));
@@ -559,7 +674,10 @@ begin
       exit;
     end;
     AddToHistory(Game.Name);
-    RunDosBox(S+DosBoxConfFileName,DosBoxCommandLine);
+
+    T:=Trim(Game.CustomDOSBoxDir);
+    If (T='') or (ExtUpperCase(T)='DEFAULT') then T:='' else T:=MakeAbsPath(T,PrgSetup.BaseDir);
+    RunDosBox(T,S+DosBoxConfFileName,DosBoxCommandLine);
   finally
     St.Free;
   end;

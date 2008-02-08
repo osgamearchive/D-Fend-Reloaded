@@ -68,7 +68,7 @@ object UninstallSelectForm: TUninstallSelectForm
   object SelectAllButton: TBitBtn
     Left = 8
     Top = 303
-    Width = 97
+    Width = 107
     Height = 25
     Caption = 'SelectAllButton'
     TabOrder = 1
@@ -76,9 +76,9 @@ object UninstallSelectForm: TUninstallSelectForm
   end
   object SelectNoneButton: TBitBtn
     Tag = 1
-    Left = 111
+    Left = 127
     Top = 303
-    Width = 97
+    Width = 107
     Height = 25
     Caption = 'SelectNoneButton'
     TabOrder = 2
@@ -86,22 +86,16 @@ object UninstallSelectForm: TUninstallSelectForm
   end
   object SelectGenreButton: TBitBtn
     Tag = 2
-    Left = 214
+    Left = 246
     Top = 303
-    Width = 97
+    Width = 107
     Height = 25
-    Caption = 'By Genre'
+    Caption = 'By ...'
     TabOrder = 3
     OnClick = SelectButtonClick
   end
   object PopupMenu: TPopupMenu
-    Left = 320
-    Top = 312
-    object MenuSelect: TMenuItem
-      Caption = '&Select'
-    end
-    object MenuUnselect: TMenuItem
-      Caption = '&Unselect'
-    end
+    Left = 240
+    Top = 464
   end
 end

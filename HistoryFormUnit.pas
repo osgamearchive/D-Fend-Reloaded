@@ -35,6 +35,8 @@ begin
   SetVistaFonts(self);
 
   Caption:=LanguageSetup.HistoryForm;
+  CloseButton.Caption:=LanguageSetup.Close;
+  ClearButton.Caption:=LanguageSetup.Clear;
 
   LoadHistory(ListView);
 end;

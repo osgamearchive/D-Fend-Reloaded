@@ -16,7 +16,7 @@
 ; ============================================================
 
 !define VER_MAYOR 0
-!define VER_MINOR1 2
+!define VER_MINOR1 3
 !define VER_MINOR2 0
 
 !define PrgName "D-Fend Reloaded ${VER_MAYOR}.${VER_MINOR1}.${VER_MINOR2}"
@@ -152,17 +152,21 @@ Section "$(LANGNAME_DFendReloaded)" ID_DFend
   NoRegistryWhenUSBStickInstall:
 
   SetOutPath "$INSTDIR"
-  File "..\DFend.exe"
+  File "..\DFend.exe"  
   File "..\mkdosfs.exe"  
+  File "..\oggenc2.exe"
   File "..\License.txt"
   File "..\LicenseComponents.txt"
   File "..\Links.txt"
   File "..\ChangeLog.txt"
+  File "..\FAQs.txt"
   File "..\Readme_OperationMode.txt"
   File "..\D-Fend Reloaded DataInstaller.nsi"
+  File "..\UpdateCheck\UpdateCheck.exe"
   
   SetOutPath "$DataInstDir"
   File "..\D-Fend Reloaded DataInstaller.nsi"
+  File "..\Icons.ini"
   
   CreateDirectory "$DataInstDir\Confs"
   
@@ -170,7 +174,7 @@ Section "$(LANGNAME_DFendReloaded)" ID_DFend
   File "..\Capture\DOSBox DOS\*.*"
   
   SetOutPath "$INSTDIR\Lang"
-  File /x English.ini "..\Lang\*.ini"  ; English.ini will be auto created at first launch
+  File "..\Lang\*.ini"
   
   SetOutPath "$DataInstDir\Templates"
   File "..\Templates\*.prof"

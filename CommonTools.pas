@@ -25,11 +25,12 @@ function GetSpecialFolder(hWindow: HWND; Folder: Integer): String;
 
 Function GetFileVersionEx(const AFileName: string) : Cardinal;
 Function GetFileVersionAsString : String;
+Function GetNormalFileVersionAsString : String;
 Function GetShortFileVersionAsString : String;
 
 Function GetFileDateAsString : String;
 
-Procedure CreateLink(const TargetName, Parameters, LinkFile : String);
+Procedure CreateLink(const TargetName, Parameters, LinkFile, IconFile : String);
 Procedure SetStartWithWindows(const Enabled : Boolean);
 
 Function LoadImageFromFile(const FileName : String) : TPicture;
@@ -160,7 +161,7 @@ begin
     Path:=IncludeTrailingPathDelimiter(ExtractFilePath(Path));
   end;
 
-  If (length(Path)>=length(Rel)) and (Copy(Path,1,length(Rel))=Rel) then Path:='.\'+Copy(Path,length(Rel)+1,MaxInt);
+  If (length(Path)>=length(Rel)) and (ExtUpperCase(Copy(Path,1,length(Rel)))=ExtUpperCase(Rel)) then Path:='.\'+Copy(Path,length(Rel)+1,MaxInt);
   If Path='.\' then Path:='';
   result:=Path+FileName;
 end;
@@ -286,6 +287,14 @@ begin
   result:=Format('Version %d.%d.%d (Build %d)',[I div 65536,I mod 65536, J div 65536, J mod 65536]);
 end;
 
+Function GetNormalFileVersionAsString : String;
+Var I,J : Integer;
+begin
+  I:=GetFileVersion(ExpandFileName(Application.ExeName));
+  J:=GetFileVersionEx(ExpandFileName(Application.ExeName));
+  result:=Format('%d.%d.%d',[I div 65536,I mod 65536, J div 65536]);
+end;
+
 Function GetShortFileVersionAsString : String;
 Var I : Integer;
 begin
@@ -311,7 +320,7 @@ begin
   end;
 end;
 
-Procedure CreateLink(const TargetName, Parameters, LinkFile : String);
+Procedure CreateLink(const TargetName, Parameters, LinkFile, IconFile : String);
 Var IObject : IUnknown;
    ISLink : IShellLink;
    IPFile : IPersistFile;
@@ -324,7 +333,8 @@ begin
    with ISLink do begin
      SetPath(PChar(TargetName));
      SetWorkingDirectory(PChar(ExtractFilePath(TargetName)));
-     SetArguments(PChar(Parameters))
+     SetArguments(PChar(Parameters));
+     If IconFile<>'' then SetIconLocation(PChar(IconFile),0);
    end;
 
    WLinkFile:=LinkFile;

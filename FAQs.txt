@@ -1,0 +1,147 @@
+D-Fend Reloaded
+Frquently asked questions
+
+
+
+Questions:
+
+1.) How does the update checker operates ?
+2.) I get an "DFend.dat not found" error when running a selfmade installer
+    package.
+3.) I know excactly which setting is on which tab in the D-Fend profile editor
+    dialog. Where is this dialog gone in D-Fend Reloaded ?
+4.) I am using a special DOSBox build with some more features. Does D-Fend
+    Reloaded support some of this features ?
+5.) I want to use a different mp3 and ogg encoders than lame and oggenc2. Can
+    I change the commandline D-Fend Reloaded uses to call the encoders ?
+
+
+
+Answers:
+
+1.) How does the update checker operates ?
+
+The update checker is reading this file from Sourceforge:
+"http://dfendreloaded.sourceforge.net/UpdateInfo.txt" The file contains two
+lines; in the first line the version number of the current D-Fend Reloaded
+version on the server is given ("0.3.0" for example) and in the second line
+the download URL of the update installer for this version is given
+("http://downloads.sourceforge.net/dfendreloaded/D-Fend-Reloaded-0.3.0-UpdateSetup.exe"
+for example). If the version number in the UpdateInfo.txt is bigger than the
+version number of the currently installed D-Fend Reloaded version, the update
+checker will ask you, if you want to update to the new version. If you say
+"yes", it will download the file from the second line of the UpdateInfo.txt to
+your temporary directory and wil launch it. As the last step it tells Windows
+to delete this file as soon as possible. Because the installer is just running,
+Windows cannot delete the file and will put it on its "delete on next system
+start" list.
+
+At the moment the UpdateInfo.txt is a static file, but in the future there
+could be version depending updates (smaller file to bring you from 0.4.0 to
+0.4.1 and a bigger file to bring you from 0.3.0 to 0.4.1). Therefore D-Fend
+Reloaded is adding a "?Version=0.3.0" (or whatever the current version is) to
+the request URL. If you do not want the php script on Sourceforge to know
+your current D-Fend Reloaded version, you can add the line
+"VersionSpecificUpdateCheck=0" to the [ProgramSets] section of the "DFend.ini"
+(which can be found in the D-Fend Reloaded data directory). There is not
+privacy risk in sending the current version number beacuse php scripts on
+Sourceforge are not allowed to write anything to a file and therefor cannot
+log any request. 
+
+The update checker does nothing else you would do when you look for updates.
+The update checker can automatically check for updates when D-Fend Reloaded
+is started. But because many people do not like applications "phoning home"
+without their permission, this feature is turned off by default. (You can turn
+it on in the category "service" in the setup dialog. And you can manually start
+the update checker at any time by choosing "Check for updates..." from the
+"Help" menu.)
+
+The update checker will use the windows connection settings (which you can edit
+in the Internet Explorer). This means: If you have setup a proxy server in the
+Internet Explorer, the D-Fend Reloaded update checker will use this proxy, too.
+
+
+
+2.) I get an "DFend.dat not found" error when running a selfmade installer
+    package.
+
+The selfmade installer packes do not include D-Fend Reloaded or DOSBox. This
+means you have to install D-Fend Reloaded on the computer before you can use
+an installer package.
+
+If you have installed D-Fend Reloaded in "user directory" mode (the default
+installation type), the target directory is still the D-Fend Reloaded program
+folder ("C:\Program Files\D-Fend Reloaded" for example) and not the data
+directory (something like "C:\Users\you\D-Fend Reloaded"). The data package
+installer will only read from this directory and only copy files to the
+data directory, so it can run without admin rights under Vista.
+
+If you want to have an all inclusive package, install D-Fend Reloaded in
+portable mode to a directory, install or transfer the games to this installation
+and then make a zip archive of this directory or simply copy the whole folder
+to an USB stick. So you can show your games to others without any installation.
+
+
+
+3.) I know excactly which setting is on which tab in the D-Fend profile editor
+    dialog. Where is this dialog gone in D-Fend Reloaded ?
+	
+D-Fend Reloaded has two profile editor dialogs integrated: The classical D-Fend
+style profile editor and the modern profile editor. Both dialogs offer all 
+avaible settings, so there is no need two chosse one of them to be able to
+access all features. Which profile editor should be used can be configurated in
+the setup dialog in the category "profile editor". This category will only be
+visible, if you chosse "Advanced" as mode in the dialog.
+
+
+
+4.) I am using a special DOSBox build with some more features. Does D-Fend
+    Reloaded support some of this features ?
+
+These special builds often have more scalers or render methods. The values
+which D-Fend Reloaded offers in its profile editors for this settings can be
+configurated in the setup dialog in the category "Default values". This
+category will only be visible, if you chosse "Advanced" as mode in the dialog.
+
+Some builds support the mounting of multiple floppy images for one drive
+(like the normal build offers for CDROM images). Because the "imgmount" command
+of the official DOSBox version can not handle multiple floppy images for one
+drive and will show an error message and not mount anything at all, D-Fend
+Reloaded offers no option to mount multiple floppy images for one drive to
+avoid errors. (For booting from a floppy images via the "boot" command
+DOSBox supports multiple images and so does D-Fend Reloaded.) But D-Fend
+Reloaded has a buildin but by default disabled option for mounting multiple
+floppy images for one drive. For activating this option you have to add in
+the [ProgramSets] section of the "DFend.ini" (which can be found in the
+D-Fend Reloaded data directory) the line "AllowMultiFloppyImagesMount=1".
+
+D-Fend Reloaded can also manage PhysFS drives. Set "AllowPhysFSUsage=1" in
+the [ProgramSets] section of the "DFend.ini" and the mount edit dialog
+will have a new "Folder and zip file as hard disk" sheet. But you cannot select
+a program file or a setup file within a zip file to be run by D-Fend Reloaded.
+If you want to run a file from a PhysFS drive, you have to leave the
+"Program file" field blank and enter the run command in the autoexec section.
+
+The ability to set the lines in text mode from 25 to 28 or 50 can be activated
+the same way by writing "AllowTextModeLineChange=1" in the [ProgramSets]
+section of the "DFend.ini".
+
+All other special functions of the custom builds are not supported directly at
+the moment. But you can tell D-Fend Reloaded to write custom strings in the
+DOSBox conf file: All you have to do is writing the lines you want to have
+in the conf file in the "Custom settings" edit field in the "DOSBox settings"
+category (or in the edit field in the "Custom settings" sheet if you use the
+classic profile editor).
+
+
+
+5.) I want to use a different mp3 and ogg encoders than lame and oggenc2. Can
+    I change the commandline D-Fend Reloaded uses to call the encoders ?
+	
+Yes. Just setup the encoder file names in the setup dialog, close D-Fend
+Reloaded, open the DFend.ini (which can be found in the D-Fend Reloaded data
+directory) and add / customize this two lines in the [ProgramSets] section:
+WaveEncMp3Parameters=-h -V 0 "%s" "%s"
+WaveEncOggParameters="%s" --output="%s" --quality=10
+The first %s stands for the input wave file (including full path) and the
+second will be replaced by the output file (including full path).

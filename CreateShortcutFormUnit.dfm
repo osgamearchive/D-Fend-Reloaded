@@ -3,7 +3,7 @@ object CreateShortcutForm: TCreateShortcutForm
   Top = 0
   BorderStyle = bsDialog
   Caption = 'CreateShortcut'
-  ClientHeight = 148
+  ClientHeight = 184
   ClientWidth = 249
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -14,6 +14,7 @@ object CreateShortcutForm: TCreateShortcutForm
   OldCreateOrder = False
   Position = poOwnerFormCenter
   OnCreate = FormCreate
+  OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
   object DesktopRadioButton: TRadioButton
@@ -45,19 +46,27 @@ object CreateShortcutForm: TCreateShortcutForm
   end
   object OKButton: TBitBtn
     Left = 8
-    Top = 117
+    Top = 147
     Width = 97
     Height = 25
-    TabOrder = 3
+    TabOrder = 4
     OnClick = OKButtonClick
     Kind = bkOK
   end
   object CancelButton: TBitBtn
     Left = 120
-    Top = 117
+    Top = 149
     Width = 97
     Height = 25
-    TabOrder = 4
+    TabOrder = 5
     Kind = bkCancel
+  end
+  object UseProfileIconCheckBox: TCheckBox
+    Left = 16
+    Top = 112
+    Width = 225
+    Height = 17
+    Caption = 'UseProfileIconCheckBox'
+    TabOrder = 3
   end
 end

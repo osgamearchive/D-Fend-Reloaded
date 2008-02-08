@@ -3,7 +3,7 @@ object ProfileEditorForm: TProfileEditorForm
   Top = 0
   BorderStyle = bsDialog
   Caption = 'ProfileEditorForm'
-  ClientHeight = 524
+  ClientHeight = 634
   ClientWidth = 536
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -21,13 +21,17 @@ object ProfileEditorForm: TProfileEditorForm
     Left = 0
     Top = 0
     Width = 537
-    Height = 485
-    ActivePage = ProfileSettingsSheet
+    Height = 595
+    ActivePage = GeneralSheet
     Images = ImageList
     MultiLine = True
     TabOrder = 0
     object ProfileSettingsSheet: TTabSheet
       Caption = 'ProfileSettingsSheet'
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object ExtraDirsLabel: TLabel
         Left = 12
         Top = 288
@@ -37,8 +41,8 @@ object ProfileEditorForm: TProfileEditorForm
       end
       object ExtraDirsAddButton: TSpeedButton
         Tag = 2
-        Left = 13
-        Top = 406
+        Left = 12
+        Top = 522
         Width = 23
         Height = 22
         Glyph.Data = {
@@ -61,8 +65,8 @@ object ProfileEditorForm: TProfileEditorForm
       end
       object ExtraDirsEditButton: TSpeedButton
         Tag = 3
-        Left = 42
-        Top = 406
+        Left = 41
+        Top = 522
         Width = 23
         Height = 22
         Glyph.Data = {
@@ -85,8 +89,8 @@ object ProfileEditorForm: TProfileEditorForm
       end
       object ExtraDirsDelButton: TSpeedButton
         Tag = 4
-        Left = 71
-        Top = 406
+        Left = 70
+        Top = 522
         Width = 23
         Height = 22
         Glyph.Data = {
@@ -163,7 +167,7 @@ object ProfileEditorForm: TProfileEditorForm
         Left = 13
         Top = 307
         Width = 500
-        Height = 86
+        Height = 209
         ItemHeight = 13
         TabOrder = 5
         OnClick = ExtraDirsListBoxClick
@@ -212,10 +216,10 @@ object ProfileEditorForm: TProfileEditorForm
         Left = 12
         Top = 264
         Width = 501
-        Height = 161
+        Height = 273
         PlainText = True
         ScrollBars = ssBoth
-        TabOrder = 2
+        TabOrder = 3
       end
       object GenerateGameDataFolderNameButton: TBitBtn
         Tag = 19
@@ -227,22 +231,29 @@ object ProfileEditorForm: TProfileEditorForm
         TabOrder = 1
         OnClick = ButtonWork
       end
+      object GameInfoMetaDataButton: TBitBtn
+        Tag = 23
+        Left = 278
+        Top = 199
+        Width = 235
+        Height = 25
+        Caption = 'Benutzerdefinierte Informationen'
+        TabOrder = 2
+        OnClick = ButtonWork
+      end
     end
     object GeneralSheet: TTabSheet
       Caption = 'GeneralSheet'
       ImageIndex = 2
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object GeneralValueListEditor: TValueListEditor
-        Left = 12
+        Left = 11
         Top = 16
         Width = 501
-        Height = 409
+        Height = 521
         Strings.Strings = (
           '=')
         TabOrder = 0
+        OnEditButtonClick = GeneralValueListEditorEditButtonClick
         ColWidths = (
           248
           247)
@@ -257,7 +268,7 @@ object ProfileEditorForm: TProfileEditorForm
       ExplicitHeight = 0
       object KeyboardLayoutInfoLabel: TLabel
         Left = 12
-        Top = 353
+        Top = 498
         Width = 468
         Height = 49
         AutoSize = False
@@ -267,7 +278,7 @@ object ProfileEditorForm: TProfileEditorForm
         Left = 12
         Top = 16
         Width = 501
-        Height = 409
+        Height = 480
         Strings.Strings = (
           '=')
         TabOrder = 0
@@ -288,7 +299,7 @@ object ProfileEditorForm: TProfileEditorForm
         Left = 12
         Top = 16
         Width = 501
-        Height = 379
+        Height = 491
         Columns = <>
         ReadOnly = True
         TabOrder = 0
@@ -299,7 +310,7 @@ object ProfileEditorForm: TProfileEditorForm
       object MountingAddButton: TBitBtn
         Tag = 5
         Left = 12
-        Top = 401
+        Top = 513
         Width = 94
         Height = 25
         Caption = 'Hinzuf'#252'gen...'
@@ -323,7 +334,7 @@ object ProfileEditorForm: TProfileEditorForm
       object MountingEditButton: TBitBtn
         Tag = 6
         Left = 112
-        Top = 401
+        Top = 513
         Width = 94
         Height = 25
         Caption = 'Bearbeiten...'
@@ -347,7 +358,7 @@ object ProfileEditorForm: TProfileEditorForm
       object MountingDelButton: TBitBtn
         Tag = 7
         Left = 212
-        Top = 401
+        Top = 513
         Width = 94
         Height = 25
         Caption = 'L'#246'schen'
@@ -371,7 +382,7 @@ object ProfileEditorForm: TProfileEditorForm
       object MountingDeleteAllButton: TBitBtn
         Tag = 8
         Left = 312
-        Top = 401
+        Top = 513
         Width = 90
         Height = 25
         Caption = 'Alle l'#246'schen'
@@ -381,7 +392,7 @@ object ProfileEditorForm: TProfileEditorForm
       object MountingAutoCreateButton: TBitBtn
         Tag = 20
         Left = 408
-        Top = 401
+        Top = 513
         Width = 105
         Height = 25
         Caption = 'Autom. erstellen'
@@ -410,7 +421,7 @@ object ProfileEditorForm: TProfileEditorForm
       end
       object PageControl2: TPageControl
         Left = 12
-        Top = 160
+        Top = 152
         Width = 501
         Height = 241
         ActivePage = SoundSBSheet
@@ -514,6 +525,190 @@ object ProfileEditorForm: TProfileEditorForm
               233)
           end
         end
+        object SoundVolumeSheet: TTabSheet
+          Caption = 'SoundVolumeSheet'
+          ImageIndex = 5
+          ExplicitLeft = 0
+          ExplicitTop = 0
+          ExplicitWidth = 0
+          ExplicitHeight = 0
+          object SoundVolumeLeftLabel: TLabel
+            Left = 148
+            Top = 13
+            Width = 23
+            Height = 13
+            Caption = 'Links'
+          end
+          object SoundVolumeRightLabel: TLabel
+            Left = 212
+            Top = 13
+            Width = 33
+            Height = 13
+            Caption = 'Rechts'
+          end
+          object SoundVolumeMasterLabel: TLabel
+            Left = 16
+            Top = 36
+            Width = 33
+            Height = 13
+            Caption = 'Master'
+          end
+          object SoundVolumeDisneyLabel: TLabel
+            Left = 16
+            Top = 64
+            Width = 103
+            Height = 13
+            Caption = 'Disney Sound System'
+          end
+          object SoundVolumeSpeakerLabel: TLabel
+            Left = 16
+            Top = 92
+            Width = 80
+            Height = 13
+            Caption = 'Internal Speaker'
+          end
+          object SoundVolumeGUSLabel: TLabel
+            Left = 16
+            Top = 120
+            Width = 20
+            Height = 13
+            Caption = 'GUS'
+          end
+          object SoundVolumeSBLabel: TLabel
+            Left = 16
+            Top = 148
+            Width = 63
+            Height = 13
+            Caption = 'SoundBlaster'
+          end
+          object SoundVolumeFMLabel: TLabel
+            Left = 16
+            Top = 176
+            Width = 14
+            Height = 13
+            Caption = 'FM'
+          end
+          object SoundVolumeMasterLeftEdit: TSpinEdit
+            Left = 148
+            Top = 32
+            Width = 49
+            Height = 22
+            MaxValue = 100
+            MinValue = 0
+            TabOrder = 0
+            Value = 100
+          end
+          object SoundVolumeMasterRightEdit: TSpinEdit
+            Left = 212
+            Top = 32
+            Width = 49
+            Height = 22
+            MaxValue = 100
+            MinValue = 0
+            TabOrder = 1
+            Value = 100
+          end
+          object SoundVolumeDisneyLeftEdit: TSpinEdit
+            Left = 148
+            Top = 60
+            Width = 49
+            Height = 22
+            MaxValue = 100
+            MinValue = 0
+            TabOrder = 2
+            Value = 100
+          end
+          object SoundVolumeDisneyRightEdit: TSpinEdit
+            Left = 212
+            Top = 60
+            Width = 49
+            Height = 22
+            MaxValue = 100
+            MinValue = 0
+            TabOrder = 3
+            Value = 100
+          end
+          object SoundVolumeSpeakerLeftEdit: TSpinEdit
+            Left = 148
+            Top = 88
+            Width = 49
+            Height = 22
+            MaxValue = 100
+            MinValue = 0
+            TabOrder = 4
+            Value = 100
+          end
+          object SoundVolumeSpeakerRightEdit: TSpinEdit
+            Left = 212
+            Top = 88
+            Width = 49
+            Height = 22
+            MaxValue = 100
+            MinValue = 0
+            TabOrder = 5
+            Value = 100
+          end
+          object SoundVolumeGUSLeftEdit: TSpinEdit
+            Left = 148
+            Top = 116
+            Width = 49
+            Height = 22
+            MaxValue = 100
+            MinValue = 0
+            TabOrder = 6
+            Value = 100
+          end
+          object SoundVolumeGUSRightEdit: TSpinEdit
+            Left = 212
+            Top = 116
+            Width = 49
+            Height = 22
+            MaxValue = 100
+            MinValue = 0
+            TabOrder = 7
+            Value = 100
+          end
+          object SoundVolumeSBLeftEdit: TSpinEdit
+            Left = 148
+            Top = 144
+            Width = 49
+            Height = 22
+            MaxValue = 100
+            MinValue = 0
+            TabOrder = 8
+            Value = 100
+          end
+          object SoundVolumeSBRightEdit: TSpinEdit
+            Left = 212
+            Top = 144
+            Width = 49
+            Height = 22
+            MaxValue = 100
+            MinValue = 0
+            TabOrder = 9
+            Value = 100
+          end
+          object SoundVolumeFMLeftEdit: TSpinEdit
+            Left = 148
+            Top = 172
+            Width = 49
+            Height = 22
+            MaxValue = 100
+            MinValue = 0
+            TabOrder = 10
+            Value = 100
+          end
+          object SoundVolumeFMRightEdit: TSpinEdit
+            Left = 212
+            Top = 172
+            Width = 49
+            Height = 22
+            MaxValue = 100
+            MinValue = 0
+            TabOrder = 11
+            Value = 100
+          end
+        end
       end
     end
     object AutoexecSheet: TTabSheet
@@ -525,8 +720,8 @@ object ProfileEditorForm: TProfileEditorForm
       ExplicitHeight = 0
       object AutoexecBootFloppyImageButton: TSpeedButton
         Tag = 13
-        Left = 490
-        Top = 360
+        Left = 498
+        Top = 456
         Width = 23
         Height = 22
         Glyph.Data = {
@@ -556,8 +751,8 @@ object ProfileEditorForm: TProfileEditorForm
       end
       object AutoexecBootFloppyImageAddButton: TSpeedButton
         Tag = 21
-        Left = 490
-        Top = 388
+        Left = 498
+        Top = 484
         Width = 23
         Height = 22
         Glyph.Data = {
@@ -580,8 +775,8 @@ object ProfileEditorForm: TProfileEditorForm
       end
       object AutoexecBootFloppyImageDelButton: TSpeedButton
         Tag = 22
-        Left = 490
-        Top = 412
+        Left = 498
+        Top = 508
         Width = 23
         Height = 22
         Glyph.Data = {
@@ -603,8 +798,8 @@ object ProfileEditorForm: TProfileEditorForm
         OnClick = ButtonWork
       end
       object AutoexecBootFloppyImageInfoLabel: TLabel
-        Left = 32
-        Top = 387
+        Left = 40
+        Top = 483
         Width = 194
         Height = 42
         AutoSize = False
@@ -630,7 +825,7 @@ object ProfileEditorForm: TProfileEditorForm
       object AutoexecClearButton: TBitBtn
         Tag = 10
         Left = 12
-        Top = 279
+        Top = 359
         Width = 105
         Height = 25
         Caption = 'L'#246'schen'
@@ -654,7 +849,7 @@ object ProfileEditorForm: TProfileEditorForm
       object AutoexecLoadButton: TBitBtn
         Tag = 11
         Left = 125
-        Top = 279
+        Top = 359
         Width = 105
         Height = 25
         Caption = 'Laden...'
@@ -678,7 +873,7 @@ object ProfileEditorForm: TProfileEditorForm
       object AutoexecSaveButton: TBitBtn
         Tag = 12
         Left = 236
-        Top = 279
+        Top = 359
         Width = 105
         Height = 25
         Caption = 'Speichern...'
@@ -700,8 +895,8 @@ object ProfileEditorForm: TProfileEditorForm
         NumGlyphs = 2
       end
       object AutoexecBootNormal: TRadioButton
-        Left = 16
-        Top = 310
+        Left = 24
+        Top = 406
         Width = 457
         Height = 17
         Caption = 'DosBox normal starten'
@@ -710,24 +905,24 @@ object ProfileEditorForm: TProfileEditorForm
         TabStop = True
       end
       object AutoexecBootHDImage: TRadioButton
-        Left = 16
-        Top = 337
+        Left = 24
+        Top = 433
         Width = 210
         Height = 17
         Caption = 'Festplattenimage starten'
         TabOrder = 7
       end
       object AutoexecBootFloppyImage: TRadioButton
-        Left = 16
-        Top = 364
+        Left = 24
+        Top = 460
         Width = 210
         Height = 17
         Caption = 'Diskettenimage starten'
         TabOrder = 8
       end
       object AutoexecBootHDImageComboBox: TComboBox
-        Left = 236
-        Top = 333
+        Left = 244
+        Top = 429
         Width = 248
         Height = 21
         Style = csDropDownList
@@ -743,7 +938,7 @@ object ProfileEditorForm: TProfileEditorForm
         Left = 12
         Top = 107
         Width = 501
-        Height = 166
+        Height = 238
         PlainText = True
         ScrollBars = ssBoth
         TabOrder = 2
@@ -758,8 +953,8 @@ object ProfileEditorForm: TProfileEditorForm
         TabOrder = 10
       end
       object AutoexecBootFloppyImageTab: TStringGrid
-        Left = 236
-        Top = 360
+        Left = 244
+        Top = 456
         Width = 248
         Height = 74
         ColCount = 1
@@ -779,15 +974,15 @@ object ProfileEditorForm: TProfileEditorForm
       ExplicitHeight = 0
       object CustomSetsEnvLabel: TLabel
         Left = 13
-        Top = 203
+        Top = 275
         Width = 104
         Height = 13
         Caption = 'Umgebungsvariablen:'
       end
       object CustomSetsClearButton: TBitBtn
         Tag = 14
-        Left = 12
-        Top = 167
+        Left = 13
+        Top = 223
         Width = 105
         Height = 25
         Caption = 'L'#246'schen'
@@ -810,8 +1005,8 @@ object ProfileEditorForm: TProfileEditorForm
       end
       object CustomSetsLoadButton: TBitBtn
         Tag = 15
-        Left = 125
-        Top = 167
+        Left = 126
+        Top = 223
         Width = 105
         Height = 25
         Caption = 'Laden...'
@@ -834,8 +1029,8 @@ object ProfileEditorForm: TProfileEditorForm
       end
       object CustomSetsSaveButton: TBitBtn
         Tag = 16
-        Left = 236
-        Top = 167
+        Left = 237
+        Top = 223
         Width = 105
         Height = 25
         Caption = 'Speichern...'
@@ -858,9 +1053,9 @@ object ProfileEditorForm: TProfileEditorForm
       end
       object CustomSetsValueListEditor: TValueListEditor
         Left = 12
-        Top = 222
+        Top = 294
         Width = 501
-        Height = 171
+        Height = 211
         KeyOptions = [keyEdit, keyAdd, keyDelete]
         TabOrder = 4
         ColWidths = (
@@ -870,7 +1065,7 @@ object ProfileEditorForm: TProfileEditorForm
       object CustomSetsEnvAdd: TBitBtn
         Tag = 17
         Left = 13
-        Top = 399
+        Top = 511
         Width = 105
         Height = 25
         Caption = 'Hinzuf'#252'gen'
@@ -894,7 +1089,7 @@ object ProfileEditorForm: TProfileEditorForm
       object CustomSetsEnvDel: TBitBtn
         Tag = 18
         Left = 126
-        Top = 399
+        Top = 511
         Width = 105
         Height = 25
         Caption = 'L'#246'schen'
@@ -919,7 +1114,7 @@ object ProfileEditorForm: TProfileEditorForm
         Left = 13
         Top = 16
         Width = 500
-        Height = 145
+        Height = 201
         PlainText = True
         ScrollBars = ssBoth
         TabOrder = 0
@@ -929,7 +1124,7 @@ object ProfileEditorForm: TProfileEditorForm
   end
   object OKButton: TBitBtn
     Left = 8
-    Top = 491
+    Top = 601
     Width = 97
     Height = 25
     TabOrder = 1
@@ -938,7 +1133,7 @@ object ProfileEditorForm: TProfileEditorForm
   end
   object CancelButton: TBitBtn
     Left = 120
-    Top = 491
+    Top = 601
     Width = 97
     Height = 25
     TabOrder = 2
@@ -947,8 +1142,8 @@ object ProfileEditorForm: TProfileEditorForm
   object PreviousButton: TBitBtn
     Tag = 1
     Left = 232
-    Top = 491
-    Width = 97
+    Top = 601
+    Width = 113
     Height = 25
     Caption = 'Vorheriges'
     ModalResult = 1
@@ -972,9 +1167,9 @@ object ProfileEditorForm: TProfileEditorForm
   end
   object NextButton: TBitBtn
     Tag = 2
-    Left = 344
-    Top = 491
-    Width = 97
+    Left = 360
+    Top = 601
+    Width = 113
     Height = 25
     Caption = 'N'#228'chstes'
     ModalResult = 1
@@ -998,15 +1193,15 @@ object ProfileEditorForm: TProfileEditorForm
   end
   object OpenDialog: TOpenDialog
     Left = 440
-    Top = 490
+    Top = 600
   end
   object SaveDialog: TSaveDialog
     Left = 472
-    Top = 490
+    Top = 600
   end
   object ImageList: TImageList
     Left = 504
-    Top = 488
+    Top = 598
     Bitmap = {
       494C010108000C00040010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000003000000001002000000000000030
@@ -1270,129 +1465,129 @@ object ProfileEditorForm: TProfileEditorForm
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      00000000000000000000FFFFFF00FFFFFF000000000000000000000000000000
-      FF00000080000000FF0000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000204000002040000020
+      4000002040000020400000204000002040000020400000204000002040000020
+      4000002040000020400000204000002040000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       000000000000FFFFFF007F7F7F000000FF007F7F7F00FFFFFF00000000000000
-      000000000000000000000000000000000000000000007F7F7F00000000000000
-      000000000000FFFFFF00FFFFFF00000000000000000000000000000000000000
-      FF00000080000000FF0000000000008080000000000000000000FFFFFF00FFFF
+      0000000000000000000000000000000000000020400000408000004080000020
+      6000002040000040800000408000004080000020600000206000004080000040
+      8000002060000020600000204000002040000000000000000000FFFFFF00FFFF
       FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
       FF00FFFFFF0000000000000000000000000000000000FFFFFF00FFFFFF00FFFF
       FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
       FF00FFFFFF00FFFFFF00FFFFFF000000000000000000000000000000000000FF
       FF00FFFFFF0000FFFF000000FF000000FF000000FF0000FFFF00FFFFFF0000FF
-      FF00000000000000000000000000000000007F7F7F0000000000FFFFFF00FFFF
-      FF00FFFFFF00FFFFFF0000000000000000000000000000000000000000000000
-      FF00000080000000FF000080800000808000000000000000000000000000FFFF
+      FF0000000000000000000000000000000000002040000040A00040E0E00040E0
+      E00000204000006060000040600040E0E00040E0E000004040000040600040E0
+      E0000040400040E0E0000000000000204000000000000000000000000000FFFF
       FF0000000000FFFFFF0000000000FFFFFF0000000000FFFFFF0000000000FFFF
       FF000000000000000000000000000000000000000000FFFFFF00000000000000
       0000FFFFFF000000000000000000FFFFFF00000000000000000000000000FFFF
       FF000000000000000000FFFFFF0000000000000000000000000000FFFF00FFFF
       FF0000FFFF00FFFFFF007F7F7F000000FF007F7F7F00FFFFFF0000FFFF00FFFF
-      FF0000FFFF0000000000000000000000000000000000FFFFFF00000000000000
-      0000FFFFFF00FFFFFF0000000000000000000000000000000000000000000000
-      FF00000080000000FF0000808000008080000000000000000000000000000000
+      FF0000FFFF00000000000000000000000000002040000040800040E0E0000000
+      000040E0E0000040600040E0E000004040000040600040E0E0000040400040E0
+      E0000020400040E0E00000204000002040000000000000000000000000000000
       0000FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF000000
       00000000000000000000000000000000000000000000FFFFFF00FFFFFF00FFFF
       FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
       FF00FFFFFF00FFFFFF00FFFFFF00000000000000000000FFFF00FFFFFF0000FF
       FF00FFFFFF0000FFFF00FFFFFF0000FFFF00FFFFFF0000FFFF00FFFFFF0000FF
-      FF00FFFFFF0000FFFF0000000000000000000000000000000000000000000000
-      000000000000FFFFFF0000000000000000000000000000000000000000000000
-      FF00000080000000FF00008080000000000000000000FFFFFF00FFFFFF00BFBF
+      FF00FFFFFF0000FFFF000000000000000000004060000040800040E0E00040E0
+      E000002040000040600040E0E000000000004060600000FFFF00002040000040
+      600040E0E00000204000002040000020400000000000FFFFFF00FFFFFF00BFBF
       BF0000000000000000000000000000000000000000000000000000000000BFBF
       BF00FFFFFF00FFFFFF00000000000000000000000000FFFFFF00000000000000
       0000FFFFFF000000000000000000FFFFFF00FFFFFF0000000000000000000000
       00000000000000000000FFFFFF000000000000000000FFFFFF0000FFFF00FFFF
       FF0000FFFF00FFFFFF0000FFFF000000FF0000FFFF00FFFFFF0000FFFF00FFFF
-      FF0000FFFF00FFFFFF000000000000000000000000007F7F7F00000000000000
-      000000000000FFFFFF00000000000000000000000000000000000000FF000000
-      FF000000FF000000FF000000FF000000000000000000FFFFFF000000FF00FFFF
+      FF0000FFFF00FFFFFF000000000000000000002040000040800000FFFF000040
+      600040E0E0004040600000E0E000000000000040600040E0E0000040600000E0
+      E0000040400040E0E000002040000020400000000000FFFFFF000000FF00FFFF
       FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF000000
       00000000000000000000000000000000000000000000FFFFFF00FFFF0000FFFF
       0000FFFF0000FFFF0000FFFF0000FFFFFF00FFFFFF0000000000FFFFFF000000
       FF00FFFFFF00FF000000FFFFFF0000000000FFFFFF0000FFFF00FFFFFF0000FF
       FF00FFFFFF0000FFFF00FFFFFF000000FF007F7F7F0000FFFF00FFFFFF0000FF
-      FF00FFFFFF0000FFFF00FFFFFF000000000000000000000000007F7F7F000000
-      0000FFFFFF00000000007F7F7F00000000000000000000000000000080000000
-      80000000800000008000000080000000000000000000FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF0000FFFF00FFFFFF0000000000002040000040A00040E0E00040E0
+      E00040608000406080004060800040E0E00040E0E000406080004060800040E0
+      E0000040600040E0E000004060000020600000000000FFFFFF00FFFFFF00FFFF
       FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
       FF00FFFFFF00FFFFFF00000000000000000000000000FFFFFF00FFFFFF00FFFF
       FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF0000000000FFFFFF000000
       FF00FFFFFF00FF000000FFFFFF000000000000FFFF00FFFFFF0000FFFF00FFFF
       FF0000FFFF00FFFFFF0000FFFF000000FF000000FF00FFFFFF0000FFFF00FFFF
-      FF0000FFFF00FFFFFF0000FFFF00000000000000000000000000000000000000
-      0000000000007F7F7F0000000000000000000000000000808000008080000080
-      8000000000000000000000000000000000000000000000000000000000000000
+      FF0000FFFF00FFFFFF0000FFFF0000000000004060004060A000406080004060
+      8000406080004080800040808000406080004060800040808000408080004060
+      8000406080004060800000408000002060000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       00000000000000000000000000000000000000000000FFFFFF00000000000000
       00000000000000000000FFFFFF00FFFFFF00FFFFFF0000000000FFFFFF00FFFF
       FF00FFFFFF00FF000000FFFFFF0000000000FFFFFF0000FFFF00FFFFFF0000FF
       FF00FFFFFF0000FFFF00FFFFFF0000FFFF000000FF000000FF00FFFFFF0000FF
-      FF00FFFFFF0000FFFF00FFFFFF00000000000000000000000000000000000000
-      0000000000000000000000000000000000000080800000808000008080000000
-      0000000000000000000000000000000000000000000000000000000000000000
+      FF00FFFFFF0000FFFF00FFFFFF0000000000004060000060A000406080000020
+      4000004040004080800040608000406080000020400000404000406080004060
+      8000004040000040400000406000002060000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       00000000000000000000000000000000000000000000FFFFFF00000000000000
       00000000000000000000FFFFFF00FFFFFF00FFFFFF0000000000FFFFFF00FFFF
       FF00FFFFFF00FFFFFF00FFFFFF000000000000FFFF00FFFFFF0000FFFF00FFFF
       FF007F7F7F007F7F7F0000FFFF00FFFFFF007F7F7F000000FF000000FF00FFFF
-      FF0000FFFF00FFFFFF0000FFFF00000000000000000000000000000000000000
-      0000000000000000000000000000008080000080800000808000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
+      FF0000FFFF00FFFFFF0000FFFF0000000000002040000040A00040E0E00040E0
+      E00000204000006060000040600040E0E00040E0E000002040004060800040E0
+      E00040E0E0000020400000204000002060000000000000000000000000000000
       0000FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF000000
       00000000000000000000000000000000000000000000FFFFFF00FFFFFF00FFFF
       FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
       FF00FFFFFF00FFFFFF00FFFFFF0000000000FFFFFF0000FFFF00FFFFFF0000FF
       FF000000FF000000FF00FFFFFF0000FFFF007F7F7F000000FF000000FF0000FF
-      FF00FFFFFF0000FFFF00FFFFFF00000000000000000000000000000000000000
-      0000000000000000000000808000008080000080800000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
+      FF00FFFFFF0000FFFF00FFFFFF0000000000004060000040800040E0E0000000
+      000040E0E0000040400040E0E000004040000040600040E0E000000000004060
+      60000040600040E0E00000204000002060000000000000000000000000000000
       0000FFFFFF000000000000000000000000000000000000000000FFFFFF000000
       00000000000000000000000000000000000000000000FF000000FF000000FF00
       0000FF000000FF000000FF000000FF000000FF000000FF000000FF000000FF00
       0000FF000000FF000000FF0000000000000000000000FFFFFF0000FFFF00FFFF
       FF000000FF000000FF007F7F7F00FFFFFF007F7F7F000000FF000000FF00FFFF
-      FF0000FFFF00FFFFFF0000000000000000000000000000000000000000000000
-      0000000000000080800000808000008080000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
+      FF0000FFFF00FFFFFF000000000000000000004060000040A00040E0E0000000
+      000040E0E0000020400040E0E000000000004060600040E0E000000000004060
+      600040E0E0004040600000406000002060000000000000000000000000000000
       0000FFFFFF000000000000FF000000FF0000FFFF000000000000FFFFFF000000
       00000000000000000000000000000000000000000000BFBFBF00BFBFBF00FF00
       0000FF000000FF000000FF000000FF000000FF000000FF000000FF000000FF00
       0000FF000000BFBFBF00BFBFBF00000000000000000000FFFF00FFFFFF0000FF
       FF00FFFFFF000000FF000000FF000000FF000000FF000000FF00FFFFFF0000FF
-      FF00FFFFFF0000FFFF0000000000000000000000000000000000000000000000
-      0000000000000000000000808000000000000000000000000000000000007F7F
-      7F00000000007F7F7F0000000000000000000000000000000000000000000000
+      FF00FFFFFF0000FFFF000000000000000000002040000040A00000FFFF000040
+      600040E0E0000040600040E0E000000000000040600040E0E0004040600000E0
+      E000002040000020400000204000002040000000000000000000000000000000
       0000FFFFFF0000000000FF00FF0000FF0000FF00FF0000000000FFFFFF000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       000000000000000000000000000000000000000000000000000000FFFF00FFFF
       FF0000FFFF00FFFFFF000000FF000000FF000000FF00FFFFFF0000FFFF00FFFF
-      FF0000FFFF000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000007F7F
-      7F00000000007F7F7F0000000000000000000000000000000000000000000000
+      FF0000FFFF00000000000000000000000000002040000040A00000FFFF0040E0
+      E000406080004080A0004060800040E0E00040E0E00040608000408080004060
+      800040E0E00040E0E00000206000002060000000000000000000000000000000
       0000FFFFFF000000000000000000000000000000000000000000FFFFFF000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       00000000000000000000000000000000000000000000000000000000000000FF
       FF00FFFFFF0000FFFF00FFFFFF0000FFFF00FFFFFF0000FFFF00FFFFFF0000FF
-      FF00000000000000000000000000000000000000000000000000008080000000
-      00000000000000000000000000007F7F7F000000000000000000000000007F7F
-      7F00000000007F7F7F0000000000000000000000000000000000000000000000
+      FF0000000000000000000000000000000000004060004060A0000040A0000040
+      8000004080004060A00000408000004080000040800000408000406080000040
+      8000004080000040800040408000004060000000000000000000000000000000
       0000FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       000000000000FFFFFF0000FFFF00FFFFFF0000FFFF00FFFFFF00000000000000
-      0000000000000000000000000000000000000000000000000000008080000080
-      8000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000020400000406000004060000040
+      6000004060000040600000406000004060000040600000406000004060000040
+      6000004060000040600000406000002040000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       000000000000000000000000000000000000424D3E000000000000003E000000
       2800000040000000300000000100010000000000800100000000000000000000
@@ -1404,11 +1599,11 @@ object ProfileEditorForm: TProfileEditorForm
       FFFFF8370001C0030000F03E0001C0030000E01D1FF1C0030000E01B1DF1C003
       000080171CF1C0030000001F1C71C003000000101C31C0030000001F1C71C003
       000080171CF1C0030000E01B1DF1C0030000E01D1FF1C003FFFFF03E0001C003
-      FFFFF8370001C003FFFFFC7B0001C003FFFFFFFFF86280030000F83F80E08003
-      0000E00F01E0C0070000C00701E000010000800331E100010000800331C10001
-      00000001C181000100000001C307800300000001FE17E00F00000001CC37E00F
-      00000001A877E00F0000800340F7E00F0000800301E3E00F0000C007C1E3E00F
-      FFFFE00FC0E3E00FFFFFF83FC83FE00F00000000000000000000000000000000
+      FFFFF8370001C003FFFFFC7B0001C003FFFFFFFF800080030000F83F00008003
+      0000E00F0000C0070000C0070000000100008003000000010000800300000001
+      00000001000000010000000100008003000000010000E00F000000010000E00F
+      000000010000E00F000080030000E00F000080030000E00F0000C0070000E00F
+      FFFFE00F0000E00FFFFFF83F0000E00F00000000000000000000000000000000
       000000000000}
   end
 end

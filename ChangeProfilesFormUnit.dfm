@@ -3,7 +3,7 @@ object ChangeProfilesForm: TChangeProfilesForm
   Top = 0
   BorderStyle = bsDialog
   Caption = 'Change profiles'
-  ClientHeight = 549
+  ClientHeight = 583
   ClientWidth = 561
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -21,7 +21,7 @@ object ChangeProfilesForm: TChangeProfilesForm
     Left = 8
     Top = 8
     Width = 545
-    Height = 502
+    Height = 536
     ActivePage = TabSheet1
     TabOrder = 0
     object TabSheet1: TTabSheet
@@ -35,35 +35,38 @@ object ChangeProfilesForm: TChangeProfilesForm
       end
       object SelectAllButton: TBitBtn
         Left = 8
-        Top = 439
-        Width = 97
+        Top = 480
+        Width = 107
         Height = 25
         Caption = 'SelectAllButton'
         TabOrder = 0
+        OnClick = SelectButtonClick
       end
       object SelectNoneButton: TBitBtn
         Tag = 1
-        Left = 111
-        Top = 439
-        Width = 97
+        Left = 121
+        Top = 480
+        Width = 107
         Height = 25
         Caption = 'SelectNoneButton'
         TabOrder = 1
+        OnClick = SelectButtonClick
       end
       object SelectGenreButton: TBitBtn
         Tag = 2
-        Left = 214
-        Top = 439
-        Width = 97
+        Left = 234
+        Top = 480
+        Width = 107
         Height = 25
-        Caption = 'By Genre'
+        Caption = 'By ...'
         TabOrder = 2
+        OnClick = SelectButtonClick
       end
       object ListBox: TCheckListBox
         Left = 8
         Top = 27
         Width = 521
-        Height = 406
+        Height = 447
         ItemHeight = 13
         TabOrder = 3
       end
@@ -265,32 +268,91 @@ object ChangeProfilesForm: TChangeProfilesForm
       end
       object MemoryCheckBox: TCheckBox
         Left = 16
-        Top = 313
+        Top = 393
         Width = 232
         Height = 17
         Caption = 'Memory'
-        TabOrder = 22
+        TabOrder = 28
         OnClick = CheckBoxClick
       end
       object MemoryComboBox: TComboBox
         Left = 247
-        Top = 311
+        Top = 391
         Width = 106
         Height = 21
         Style = csDropDownList
         ItemHeight = 13
-        TabOrder = 23
+        TabOrder = 29
       end
       object CPUCyclesCheckBox: TCheckBox
         Left = 16
-        Top = 340
+        Top = 420
         Width = 232
         Height = 17
         Caption = 'CPU cycles'
-        TabOrder = 24
+        TabOrder = 30
         OnClick = CheckBoxClick
       end
       object CPUCyclesComboBox: TComboBox
+        Left = 248
+        Top = 418
+        Width = 105
+        Height = 21
+        ItemHeight = 13
+        TabOrder = 31
+      end
+      object EmulationCoreCheckBox: TCheckBox
+        Left = 16
+        Top = 447
+        Width = 232
+        Height = 17
+        Caption = 'Emulation core'
+        TabOrder = 32
+        OnClick = CheckBoxClick
+      end
+      object EmulationCoreComboBox: TComboBox
+        Left = 248
+        Top = 445
+        Width = 105
+        Height = 21
+        ItemHeight = 13
+        TabOrder = 33
+      end
+      object KeyboardLayoutCheckBox: TCheckBox
+        Left = 16
+        Top = 474
+        Width = 232
+        Height = 17
+        Caption = 'Keyboard layout'
+        TabOrder = 34
+        OnClick = CheckBoxClick
+      end
+      object KeyboardLayoutComboBox: TComboBox
+        Left = 248
+        Top = 472
+        Width = 105
+        Height = 21
+        ItemHeight = 13
+        TabOrder = 35
+      end
+      object WindowResolutionCheckBox: TCheckBox
+        Left = 16
+        Top = 313
+        Width = 225
+        Height = 17
+        Caption = 'Fenster-Aufl'#246'sung'
+        TabOrder = 22
+        OnClick = CheckBoxClick
+      end
+      object WindowResolutionComboBox: TComboBox
+        Left = 247
+        Top = 311
+        Width = 106
+        Height = 21
+        ItemHeight = 13
+        TabOrder = 23
+      end
+      object FullscreenResolutionComboBox: TComboBox
         Left = 248
         Top = 338
         Width = 105
@@ -298,45 +360,38 @@ object ChangeProfilesForm: TChangeProfilesForm
         ItemHeight = 13
         TabOrder = 25
       end
-      object EmulationCoreCheckBox: TCheckBox
-        Left = 16
-        Top = 367
-        Width = 232
-        Height = 17
-        Caption = 'Emulation core'
-        TabOrder = 26
-        OnClick = CheckBoxClick
-      end
-      object EmulationCoreComboBox: TComboBox
-        Left = 248
+      object ScaleComboBox: TComboBox
+        Left = 247
         Top = 365
-        Width = 105
+        Width = 274
         Height = 21
+        Style = csDropDownList
         ItemHeight = 13
         TabOrder = 27
       end
-      object KeyboardLayoutCheckBox: TCheckBox
+      object FullscreenResolutionCheckBox: TCheckBox
         Left = 16
-        Top = 394
-        Width = 232
+        Top = 340
+        Width = 226
         Height = 17
-        Caption = 'Keyboard layout'
-        TabOrder = 28
+        Caption = 'Vollbild-Aufl'#246'sung'
+        TabOrder = 24
         OnClick = CheckBoxClick
       end
-      object KeyboardLayoutComboBox: TComboBox
-        Left = 248
-        Top = 392
-        Width = 105
-        Height = 21
-        ItemHeight = 13
-        TabOrder = 29
+      object ScaleCheckBox: TCheckBox
+        Left = 16
+        Top = 367
+        Width = 97
+        Height = 17
+        Caption = 'Skalierung'
+        TabOrder = 26
+        OnClick = CheckBoxClick
       end
     end
   end
   object OKButton: TBitBtn
     Left = 8
-    Top = 516
+    Top = 550
     Width = 97
     Height = 25
     TabOrder = 1
@@ -345,7 +400,7 @@ object ChangeProfilesForm: TChangeProfilesForm
   end
   object CancelButton: TBitBtn
     Left = 120
-    Top = 516
+    Top = 550
     Width = 97
     Height = 25
     TabOrder = 2
@@ -353,12 +408,6 @@ object ChangeProfilesForm: TChangeProfilesForm
   end
   object PopupMenu: TPopupMenu
     Left = 232
-    Top = 512
-    object MenuSelect: TMenuItem
-      Caption = '&Select'
-    end
-    object MenuUnselect: TMenuItem
-      Caption = '&Unselect'
-    end
+    Top = 546
   end
 end

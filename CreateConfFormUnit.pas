@@ -18,8 +18,6 @@ type
     CancelButton: TBitBtn;
     SelectGenreButton: TBitBtn;
     PopupMenu: TPopupMenu;
-    MenuSelect: TMenuItem;
-    MenuUnselect: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure SelectButtonClick(Sender: TObject);
@@ -40,7 +38,7 @@ Function ExportConfFiles(const AOwner : TComponent; const AGameDB : TGameDB) : B
 implementation
 
 uses ShlObj, VistaToolsUnit, LanguageSetupUnit, DosBoxUnit, CommonTools,
-     PrgSetupUnit;
+     PrgSetupUnit, GameDBToolsUnit;
 
 {$R *.dfm}
 
@@ -56,41 +54,13 @@ begin
   CancelButton.Caption:=LanguageSetup.Cancel;
   SelectAllButton.Caption:=LanguageSetup.All;
   SelectNoneButton.Caption:=LanguageSetup.None;
-  SelectGenreButton.Caption:=LanguageSetup.GameByGenre;
+  SelectGenreButton.Caption:=LanguageSetup.GameBy;
 end;
 
 procedure TCreateConfForm.FormShow(Sender: TObject);
-Var I : Integer;
-    St : TStringList;
-    M : TMenuItem;
 begin
-  St:=TStringList.Create;
-  try
-    For I:=0 to GameDB.Count-1 do {If GameDB[I].Name<>DosBoxDOSProfile then} St.AddObject(GameDB[I].Name,GameDB[I]);
-    St.Sort;
-    ListBox.Items.Assign(St);
-    For I:=0 to ListBox.Items.Count-1 do ListBox.Checked[I]:=True;
-  finally
-    St.Free;
-  end;
-
-  St:=GameDB.GetGenreList;
-  try
-    For I:=0 to St.Count-1 do begin
-      M:=TMenuItem.Create(self);
-      M.Caption:=St[I];
-      M.Tag:=3;
-      M.OnClick:=SelectButtonClick;
-      MenuSelect.Add(M);
-      M:=TMenuItem.Create(self);
-      M.Caption:=St[I];
-      M.Tag:=4;
-      M.OnClick:=SelectButtonClick;
-      MenuUnselect.Add(M);
-    end;
-  finally
-    St.Free;
-  end;
+  BuildCheckList(ListBox,GameDB,True);
+  BuildSelectPopupMenu(PopupMenu,GameDB,SelectButtonClick,True);
 
   FolderEdit.Text:=GetSpecialFolder(Handle,CSIDL_DESKTOPDIRECTORY);
 end;
@@ -99,17 +69,18 @@ procedure TCreateConfForm.SelectButtonClick(Sender: TObject);
 Var I : Integer;
     P : TPoint;
 begin
-  Case (Sender as TComponent).Tag of
-    0,1 : For I:=0 to ListBox.Count-1 do ListBox.Checked[I]:=((Sender as TComponent).Tag=0);
-      2 : begin
-            P:=ClientToScreen(Point(SelectGenreButton.Left,SelectGenreButton.Top));
-            PopupMenu.Popup(P.X+5,P.Y+5);
-          end;
-    3,4 : For I:=0 to ListBox.Items.Count-1 do begin
-            If ((RemoveUnderline(TMenuItem(Sender).Caption)=LanguageSetup.NotSet) and (TGame(ListBox.Items.Objects[I]).Genre=''))
-            or (RemoveUnderline(TMenuItem(Sender).Caption)=TGame(ListBox.Items.Objects[I]).Genre) then ListBox.Checked[I]:=((Sender as TComponent).Tag=3);
-          end;
+  If Sender is TBitBtn then begin
+    Case (Sender as TComponent).Tag of
+      0,1 : For I:=0 to ListBox.Count-1 do ListBox.Checked[I]:=((Sender as TComponent).Tag=0);
+        2 : begin
+              P:=ClientToScreen(Point(SelectGenreButton.Left,SelectGenreButton.Top));
+              PopupMenu.Popup(P.X+5,P.Y+5);
+            end;
+    end;
+    exit;
   end;
+
+  SelectGamesByPopupMenu(Sender,ListBox);
 end;
 
 procedure TCreateConfForm.SelectFolderButtonClick(Sender: TObject);
