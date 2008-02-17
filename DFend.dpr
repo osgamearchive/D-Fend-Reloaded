@@ -67,7 +67,11 @@ uses
   IconLoaderUnit in 'IconLoaderUnit.pas',
   LanguageEditorStartFormUnit in 'LanguageEditorStartFormUnit.pas' {LanguageEditorStartForm},
   LanguageEditorFormUnit in 'LanguageEditorFormUnit.pas' {LanguageEditorForm},
-  PlaySoundFormUnit in 'PlaySoundFormUnit.pas' {PlaySoundForm};
+  PlaySoundFormUnit in 'PlaySoundFormUnit.pas' {PlaySoundForm},
+  WallpaperStyleFormUnit in 'WallpaperStyleFormUnit.pas' {WallpaperStyleForm},
+  CreateISOImageFormUnit in 'CreateISOImageFormUnit.pas' {CreateISOImageForm},
+  ReadDriveUnit in 'ReadDriveUnit.pas',
+  DriveReadFormUnit in 'DriveReadFormUnit.pas' {DriveReadForm};
 
 {$R *.res}
 
@@ -76,5 +80,6 @@ begin
   Application.MainFormOnTaskbar := True;
   Application.Title := 'D-Fend Reloaded';
   Application.CreateForm(TDFendReloadedMainForm, DFendReloadedMainForm);
+  Application.CreateForm(TDriveReadForm, DriveReadForm);
   Application.Run;
 end.

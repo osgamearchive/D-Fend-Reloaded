@@ -18,6 +18,8 @@ type
     ImageList: TImageList;
     Image: TImage;
     SaveDialog: TSaveDialog;
+    ToolButton1: TToolButton;
+    BackgroundButton: TToolButton;
     procedure FormCreate(Sender: TObject);
     procedure ButtonWork(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -35,7 +37,8 @@ Procedure ShowImageDialog(const AOwner : TComponent; const AImageFile : String);
 
 implementation
 
-uses ClipBrd, VistaToolsUnit, LanguageSetupUnit, PNGImage, CommonTools;
+uses ClipBrd, VistaToolsUnit, LanguageSetupUnit, PNGImage, CommonTools,
+     WallpaperStyleFormUnit;
 
 {$R *.dfm}
 
@@ -49,6 +52,7 @@ begin
   CopyButton.Caption:=LanguageSetup.Copy;
   SaveButton.Caption:=LanguageSetup.Save;
   ClearButton.Caption:=LanguageSetup.Clear;
+  BackgroundButton.Caption:=LanguageSetup.ViewImageFormBackgroundButton;
 end;
 
 procedure TViewImageForm.FormShow(Sender: TObject);
@@ -57,6 +61,7 @@ begin
 end;
 
 procedure TViewImageForm.ButtonWork(Sender: TObject);
+Var WPStype : TWallpaperStyle;
 begin
   Case (Sender as TComponent).Tag of
     0 : Close;
@@ -73,6 +78,10 @@ begin
             exit;
           end;
           Close;
+        end;
+    4 : begin
+          If not ShowWallpaperStyleDialog(self,WPStype) then exit;
+          SetDesktopWallpaper(ImageFile,WPStype);
         end;
   end;
 end;

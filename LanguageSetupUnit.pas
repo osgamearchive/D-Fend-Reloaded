@@ -43,33 +43,33 @@ const NR_Author=1;
       NR_LanguageOutdated=10502;
 
       NR_KeyBackspace=11001;
-      NR_KeyTab=110012;
-      NR_KeyEscape=110013;
-      NR_KeyEnter=110014;
-      NR_KeySpace=110015;
-      NR_KeyPageUp=110016;
-      NR_KeyPageDown=110017;
-      NR_KeyEnd=110018;
-      NR_KeyHome=110019;
-      NR_KeyLeft=110020;
-      NR_KeyUp=110021;
-      NR_KeyRight=110022;
-      NR_KeyDown=110023;
-      NR_KeyInsert=110024;
-      NR_KeyDelete=110025;
-      NR_KeyShift=110026;
-      NR_KeyCtrl=110027;
-      NR_KeyAlt=110028;
+      NR_KeyTab=11012;
+      NR_KeyEscape=11013;
+      NR_KeyEnter=11014;
+      NR_KeySpace=11015;
+      NR_KeyPageUp=11016;
+      NR_KeyPageDown=11017;
+      NR_KeyEnd=11018;
+      NR_KeyHome=11019;
+      NR_KeyLeft=11020;
+      NR_KeyUp=11021;
+      NR_KeyRight=11022;
+      NR_KeyDown=11023;
+      NR_KeyInsert=11024;
+      NR_KeyDelete=11025;
+      NR_KeyShift=11026;
+      NR_KeyCtrl=11027;
+      NR_KeyAlt=11028;
 
-      NR_MsgDlgWarning=120001;
-      NR_MsgDlgError=120002;
-      NR_MsgDlgInformation=120003;
-      NR_MsgDlgConfirm=120004;
-      NR_MsgDlgYes=120005;
-      NR_MsgDlgNo=120006;
-      NR_MsgDlgOK=120007;
-      NR_MsgDlgCancel=120008;
-      NR_MsgDlgAbort=120009;
+      NR_MsgDlgWarning=1201;
+      NR_MsgDlgError=1202;
+      NR_MsgDlgInformation=1203;
+      NR_MsgDlgConfirm=1204;
+      NR_MsgDlgYes=1205;
+      NR_MsgDlgNo=1206;
+      NR_MsgDlgOK=1207;
+      NR_MsgDlgCancel=1208;
+      NR_MsgDlgAbort=1209;
       NR_MsgDlgRetry=120010;
       NR_MsgDlgIgnore=120011;
       NR_MsgDlgAll=120012;
@@ -101,6 +101,13 @@ const NR_Author=1;
       NR_MessageNoRecordSelected=20023;
       NR_MessageNoProfileName=20024;
       NR_MessageInvalidValue=20025;
+      NR_MessageCouldNotRenameFile=20026;
+      NR_MessageFileNotFound=20027;
+      NR_MessageNoDriveSelected=20028;
+      NR_MessageCouldNotDriveOpen=20029;
+      NR_MessageCouldNotDriveGetData=20030;
+      NR_MessageCouldNotDriveSetExtAccess=20031;
+      NR_MessageCouldNotDriveReadError=20032;
 
       NR_MenuFile=30001;
       NR_MenuFileImport=30002;
@@ -115,8 +122,10 @@ const NR_Author=1;
       NR_MenuFileExportGamesListDialog=30011;
       NR_MenuFileExportGamesListFilter=30012;
       NR_MenuFileCreateConf=30013;
-      NR_MenuFileSetup=30014;
-      NR_MenuFileQuit=30015;
+      NR_MenuFileCreateProf=30014;
+      NR_MenuFileSetup=30015;
+      NR_MenuFileQuit=30016;
+
       NR_MenuView=31001;
       NR_MenuViewShowTree=31002;
       NR_MenuViewShowScreenshots=31003;
@@ -161,10 +170,12 @@ const NR_Author=1;
       NR_MenuExtrasEditDefaultProfile=34007;
       NR_MenuExtrasTemplates=34008;
       NR_MenuExtrasDeinstallMultipleGames=34009;
-      NR_MenuExtrasCreateImageFile=34010;
-      NR_MenuExtrasTransferProfiles=34011;
-      NR_MenuExtrasBuildInstaller=34012;
-      NR_MenuExtrasChangeProfiles=34013;
+      NR_MenuExtrasCreateIMGImageFile=34010;
+      NR_MenuExtrasCreateImageFile=34011;
+      NR_MenuExtrasCreateISOImageFile=34012;
+      NR_MenuExtrasTransferProfiles=34013;
+      NR_MenuExtrasBuildInstaller=34014;
+      NR_MenuExtrasChangeProfiles=34015;
       NR_MenuHelp=35001;
       NR_MenuHelpDosBox=35002;
       NR_MenuHelpDosBoxFAQ=35003;
@@ -214,8 +225,12 @@ const NR_Author=1;
       NR_ScreenshotPopupImportFilter=39105;
       NR_ScreenshotPopupCopy=39106;
       NR_ScreenshotPopupSave=39107;
-      NR_ScreenshotPopupDelete=39108;
-      NR_ScreenshotPopupDeleteAll=39109;
+      NR_ScreenshotPopupRename=39108;
+      NR_ScreenshotPopupRenameCaption=39109;
+      NR_ScreenshotPopupRenameLabel=39110;
+      NR_ScreenshotPopupDelete=39111;
+      NR_ScreenshotPopupDeleteAll=39112;
+      NR_ScreenshotPopupUseAsBackground=39113;
 
       NR_SoundsPopupSaveMp3=39151;
       NR_SoundsPopupSaveOgg=39152;
@@ -369,6 +384,8 @@ const NR_Author=1;
       NR_ProfileMountingAddImage=42115;
       NR_ProfileMountingDelImage=42116;
       NR_ProfileMountingSwitchImage=42117;
+      NR_ProfileMountingFloppyImageCreate=42118;
+      NR_ProfileMountingFloppyImageRead=42119;
 
       NR_SetupForm=43001;
       NR_SetupFormGeneralSheet=43002;
@@ -453,6 +470,7 @@ const NR_Author=1;
       NR_SetupFormWaveEncOgg=43919;
       NR_SetupFormSearchLame=43920;
       NR_SetupFormSearchOggEnc=43921;
+      NR_SetupFormCenterDOSBoxWindow=43922;
 
       NR_HistoryForm=44001;
       NR_HistoryGame=44002;
@@ -489,10 +507,12 @@ const NR_Author=1;
       NR_ViewImageForm=48001;
       NR_ViewImageFormSaveTitle=48002;
       NR_ViewImageFormSaveFilter=48003;
+      NR_ViewImageFormBackgroundButton=48004;
 
       NR_CreateConfForm=49001;
-      NR_CreateConfFormInfo=49002;
-      NR_CreateConfFormSelectFolder=49003;
+      NR_CreateConfFormProfMode=49002;
+      NR_CreateConfFormInfo=49003;
+      NR_CreateConfFormSelectFolder=49004;
 
       NR_WizardForm=50001;
       NR_WizardFormButtonPrevious=50002;
@@ -694,6 +714,23 @@ const NR_Author=1;
       NR_SoundCaptureImportTitle=73005;
       NR_SoundCaptureImportFilter=73006;
 
+      NR_WallpaperCaption=74001;
+      NR_WallpaperTile=74002;
+      NR_WallpaperCenter=74003;
+      NR_WallpaperStretch=74004;
+
+      NR_ReadImageCaptionISO=75001;
+      NR_ReadImageCaptionIMG=75002;
+      NR_ReadImageDriveLabelCD=75003;
+      NR_ReadImageDriveLabelFloppy=75004;
+      NR_ReadImageFileName=75005;
+      NR_ReadImageFileNameFilterISO=75006;
+      NR_ReadImageFileNameTitleISO=75007;
+      NR_ReadImageFileNameFilterIMG=75008;
+      NR_ReadImageFileNameTitleIMG=75009;
+      NR_ReadImageInfo1=75010;
+      NR_ReadImageInfo2=75011;
+
 Type TLanguageSetup=class(TBasePrgSetup)
   public
     Constructor Create(FileName : String ='');
@@ -796,6 +833,13 @@ Type TLanguageSetup=class(TBasePrgSetup)
     property MessageNoRecordSelected : String index NR_MessageNoRecordSelected read GetString write SetString;
     property MessageNoProfileName : String index NR_MessageNoProfileName read GetString write SetString;
     property MessageInvalidValue : String index NR_MessageInvalidValue read GetString write SetString;
+    property MessageCouldNotRenameFile : String index NR_MessageCouldNotRenameFile read GetString write SetString;
+    property MessageFileNotFound : String index NR_MessageFileNotFound read GetString write SetString;
+    property MessageNoDriveSelected : String index NR_MessageNoDriveSelected read GetString write SetString;
+    property MessageCouldNotDriveOpen : String index NR_MessageCouldNotDriveOpen read GetString write SetString;
+    property MessageCouldNotDriveGetData : String index NR_MessageCouldNotDriveGetData read GetString write SetString;
+    property MessageCouldNotDriveSetExtAccess : String index NR_MessageCouldNotDriveSetExtAccess read GetString write SetString;
+    property MessageCouldNotDriveReadError : String index NR_MessageCouldNotDriveReadError read GetString write SetString;
 
     property MenuFile : String index NR_MenuFile read GetString write SetString;
     property MenuFileImport : String index NR_MenuFileImport read GetString write SetString;
@@ -810,6 +854,7 @@ Type TLanguageSetup=class(TBasePrgSetup)
     property MenuFileExportGamesListDialog : String index NR_MenuFileExportGamesListDialog read GetString write SetString;
     property MenuFileExportGamesListFilter : String index NR_MenuFileExportGamesListFilter read GetString write SetString;
     property MenuFileCreateConf : String index NR_MenuFileCreateConf read GetString write SetString;
+    property MenuFileCreateProf : String index NR_MenuFileCreateProf read GetString write SetString;    
     property MenuFileSetup : String index NR_MenuFileSetup read GetString write SetString;
     property MenuFileQuit : String index NR_MenuFileQuit read GetString write SetString;
     property MenuView : String index NR_MenuView read GetString write SetString;
@@ -856,7 +901,9 @@ Type TLanguageSetup=class(TBasePrgSetup)
     property MenuExtrasEditDefaultProfile : String index NR_MenuExtrasEditDefaultProfile read GetString write SetString;
     property MenuExtrasTemplates : String index NR_MenuExtrasTemplates read GetString write SetString;
     property MenuExtrasDeinstallMultipleGames : String index NR_MenuExtrasDeinstallMultipleGames read GetString write SetString;
+    property MenuExtrasCreateIMGImageFile : String index NR_MenuExtrasCreateIMGImageFile read GetString write SetString;
     property MenuExtrasCreateImageFile : String index NR_MenuExtrasCreateImageFile read GetString write SetString;
+    property MenuExtrasCreateISOImageFile : String index NR_MenuExtrasCreateISOImageFile read GetString write SetString;
     property MenuExtrasTransferProfiles : String index NR_MenuExtrasTransferProfiles read GetString write SetString;
     property MenuExtrasBuildInstaller : String index NR_MenuExtrasBuildInstaller read GetString write SetString;
     property MenuExtrasChangeProfiles : String index NR_MenuExtrasChangeProfiles read GetString write SetString;
@@ -908,8 +955,12 @@ Type TLanguageSetup=class(TBasePrgSetup)
     property ScreenshotPopupImportFilter : String index NR_ScreenshotPopupImportFilter read GetString write SetString;
     property ScreenshotPopupCopy : String index NR_ScreenshotPopupCopy read GetString write SetString;
     property ScreenshotPopupSave : String index NR_ScreenshotPopupSave read GetString write SetString;
+    property ScreenshotPopupRename : String index NR_ScreenshotPopupRename read GetString write SetString;
+    property ScreenshotPopupRenameCaption : String index NR_ScreenshotPopupRenameCaption read GetString write SetString;
+    property ScreenshotPopupRenameLabel : String index NR_ScreenshotPopupRenameLabel read GetString write SetString;
     property ScreenshotPopupDelete : String index NR_ScreenshotPopupDelete read GetString write SetString;
     property ScreenshotPopupDeleteAll : String index NR_ScreenshotPopupDeleteAll read GetString write SetString;
+    property ScreenshotPopupUseAsBackground : String index NR_ScreenshotPopupUseAsBackground read GetString write SetString;
 
     property SoundsPopupSaveMp3 : String index NR_SoundsPopupSaveMp3 read GetString write SetString;
     property SoundsPopupSaveOgg : String index NR_SoundsPopupSaveOgg read GetString write SetString;
@@ -1063,6 +1114,8 @@ Type TLanguageSetup=class(TBasePrgSetup)
     property ProfileMountingAddImage : String index NR_ProfileMountingAddImage read GetString write SetString;
     property ProfileMountingDelImage : String index NR_ProfileMountingDelImage read GetString write SetString;
     property ProfileMountingSwitchImage : String index NR_ProfileMountingSwitchImage read GetString write SetString;
+    property ProfileMountingFloppyImageCreate : String index NR_ProfileMountingFloppyImageCreate read GetString write SetString;
+    property ProfileMountingFloppyImageRead : String index NR_ProfileMountingFloppyImageRead read GetString write SetString;
 
     property SetupForm : String index NR_SetupForm read GetString write SetString;
     property SetupFormGeneralSheet : String index NR_SetupFormGeneralSheet read GetString write SetString;
@@ -1144,6 +1197,7 @@ Type TLanguageSetup=class(TBasePrgSetup)
     property SetupFormWaveEncOgg : String index NR_SetupFormWaveEncOgg read GetString write SetString;
     property SetupFormSearchLame : String index NR_SetupFormSearchLame read GetString write SetString;
     property SetupFormSearchOggEnc : String index NR_SetupFormSearchOggEnc read GetString write SetString;
+    property SetupFormCenterDOSBoxWindow : String index NR_SetupFormCenterDOSBoxWindow read GetString write SetString;
 
     property HistoryForm : String index NR_HistoryForm read GetString write SetString;
     property HistoryGame : String index NR_HistoryGame read GetString write SetString;
@@ -1180,8 +1234,10 @@ Type TLanguageSetup=class(TBasePrgSetup)
     property ViewImageForm : String index NR_ViewImageForm read GetString write SetString;
     property ViewImageFormSaveTitle : String index NR_ViewImageFormSaveTitle read GetString write SetString;
     property ViewImageFormSaveFilter : String index NR_ViewImageFormSaveFilter read GetString write SetString;
+    property ViewImageFormBackgroundButton : String index NR_ViewImageFormBackgroundButton read GetString write SetString;
 
     property CreateConfForm : String index NR_CreateConfForm read GetString write SetString;
+    property CreateConfFormProfMode : String index NR_CreateConfFormProfMode read GetString write SetString;
     property CreateConfFormInfo : String index NR_CreateConfFormInfo read GetString write SetString;
     property CreateConfFormSelectFolder : String index NR_CreateConfFormSelectFolder read GetString write SetString;
 
@@ -1384,6 +1440,23 @@ Type TLanguageSetup=class(TBasePrgSetup)
     property SoundCaptureSaveOGGFilter : String index NR_SoundCaptureSaveOGGFilter read GetString write SetString;
     property SoundCaptureImportTitle : String index NR_SoundCaptureImportTitle read GetString write SetString;
     property SoundCaptureImportFilter : String index NR_SoundCaptureImportFilter read GetString write SetString;
+
+    property WallpaperCaption : String index NR_WallpaperCaption read GetString write SetString;
+    property WallpaperTile : String index NR_WallpaperTile read GetString write SetString;
+    property WallpaperCenter : String index NR_WallpaperCenter read GetString write SetString;
+    property WallpaperStretch : String index NR_WallpaperStretch read GetString write SetString;
+
+    property ReadImageCaptionISO : String index NR_ReadImageCaptionISO read GetString write SetString;
+    property ReadImageCaptionIMG : String index NR_ReadImageCaptionIMG read GetString write SetString;
+    property ReadImageDriveLabelCD : String index NR_ReadImageDriveLabelCD read GetString write SetString;
+    property ReadImageDriveLabelFloppy : String index NR_ReadImageDriveLabelFloppy read GetString write SetString;
+    property ReadImageFileName : String index NR_ReadImageFileName read GetString write SetString;
+    property ReadImageFileNameFilterISO : String index NR_ReadImageFileNameFilterISO read GetString write SetString;
+    property ReadImageFileNameTitleISO : String index NR_ReadImageFileNameTitleISO read GetString write SetString;
+    property ReadImageFileNameFilterIMG : String index NR_ReadImageFileNameFilterIMG read GetString write SetString;
+    property ReadImageFileNameTitleIMG : String index NR_ReadImageFileNameTitleIMG read GetString write SetString;
+    property ReadImageInfo1 : String index NR_ReadImageInfo1 read GetString write SetString;
+    property ReadImageInfo2 : String index NR_ReadImageInfo2 read GetString write SetString;
 end;
 
 Function RemoveUnderline(const S : String) : String;
@@ -1451,7 +1524,7 @@ begin
   AddStringRec(NR_GlobalRight,'Global','Right','Right');
 
   AddStringRec(NR_LanguageNoVersion,'LanguageInfo','NoVersionGiven','The choosen language file has no version information. Perhaps not all needed strings are available in this file.');
-  AddStringRec(NR_LanguageOutdated,'LanguageInfo','Outdated','The choosen language was made for D-Fend Reloaded %s. You are using version %s, this means there will be some untranslated strings in the program if you use this langauge file.');
+  AddStringRec(NR_LanguageOutdated,'LanguageInfo','Outdated','The choosen language file was made for D-Fend Reloaded %s. You are using version %s, this means there will be some untranslated strings in the program if you use this langauge file.');
 
   AddStringRec(NR_KeyBackspace,'Keys','Backspace','Back');
   AddStringRec(NR_KeyTab,'Keys','Tab','Tab');
@@ -1489,7 +1562,7 @@ begin
 
   AddStringRec(NR_MessageCouldNotDeleteFile,'Messages','CouldNotDeleteFile','Could not delete file %s.');
   AddStringRec(NR_MessageCouldNotDeleteDir,'Messages','CouldNotDeleteFile','Could not delete folder %s.');
-  AddStringRec(NR_MessageNoGameSelected,'Messages','NoGameSelected','No game ist selected in list.');
+  AddStringRec(NR_MessageNoGameSelected,'Messages','NoGameSelected','No game is selected in list.');
   AddStringRec(NR_MessageCouldNotFindFile,'Messages','CouldNotFindFile','The file %s does not exists.');
   AddStringRec(NR_MessageConfirmationDeleteRecord,'Messages','ConfirmationDeleteRecord','Do you really want to delete %s ?');
   AddStringRec(NR_MessageConfirmationDeleteRecordOnly,'Messages','ConfirmationDeleteRecordOnly','Do you really want to delete %s ? (Only the list-record will be deleted. No game-files on hard disk will be deleted.)');
@@ -1512,6 +1585,13 @@ begin
   AddStringRec(NR_MessageNoRecordSelected,'Messages','NoRecordSelected','No record has been selected.');
   AddStringRec(NR_MessageNoProfileName,'Messages','NoProfileName','You have to define a name for the new game.');
   AddStringRec(NR_MessageInvalidValue,'Messages','InvalidValue','Das value "%s" is invalid for "%%". If you continue the value will be ignored and the old value "%s" will be kept.');
+  AddStringRec(NR_MessageCouldNotRenameFile,'Messages','CouldNotRenameFile','Cound not rename file from %s to %s.');
+  AddStringRec(NR_MessageFileNotFound,'Messages','FileNotFound','The file %s does not exists.');
+  AddStringRec(NR_MessageNoDriveSelected,'Messages','NoDriveSelected','No drive has been selected.');
+  AddStringRec(NR_MessageCouldNotDriveOpen,'Messages','CoundNotDrive.Open','Could not open drive %s for direct reading.');
+  AddStringRec(NR_MessageCouldNotDriveGetData,'Messages','CoundNotDrive.GetData','Could not read drive information from drive %s.');
+  AddStringRec(NR_MessageCouldNotDriveSetExtAccess,'Messages','CoundNotDrive.ExtAccess','Could not activate extended read access for drive %s.');
+  AddStringRec(NR_MessageCouldNotDriveReadError,'Messages','CoundNotDrive.ReadError','Read error reading from drive %s.');
 
   AddStringRec(NR_MenuFile,'Menu','File','&File');
   AddStringRec(NR_MenuFileImport,'Menu','File.Import','Import');
@@ -1526,6 +1606,7 @@ begin
   AddStringRec(NR_MenuFileExportGamesListDialog,'Menu','File.Export.GamesList.DialogTitle','Export gamelist');
   AddStringRec(NR_MenuFileExportGamesListFilter,'Menu','File.Export.GamesList.Filter','Text files (*.txt)|*.txt|Tabular files (*.csv)|*.csv|HTML-Files (*.html)|*.html|All files (*.*)|*.*');
   AddStringRec(NR_MenuFileCreateConf,'Menu','File.Export.CreateConf','Create &conf-files...');
+  AddStringRec(NR_MenuFileCreateProf,'Menu','File.Export.CreateProf','Create &prof-files...');
   AddStringRec(NR_MenuFileSetup,'Menu','File.Setup','&Program options...');
   AddStringRec(NR_MenuFileQuit,'Menu','File.Quit','&Quit');
   AddStringRec(NR_MenuView,'Menu','View','&View');
@@ -1572,7 +1653,9 @@ begin
   AddStringRec(NR_MenuExtrasEditDefaultProfile,'Menu','Extras.EditDefaultProfile','Edit &default profile...');
   AddStringRec(NR_MenuExtrasTemplates,'Menu','Extras.Templates','&Templates...');
   AddStringRec(NR_MenuExtrasDeinstallMultipleGames,'Menu','Extras.DeinstallMultipleGames','Deinstall &multiple games...');
+  AddStringRec(NR_MenuExtrasCreateIMGImageFile,'Menu','Extras.CreateIMGImageFile','Create I&MG image from floppy...');
   AddStringRec(NR_MenuExtrasCreateImageFile,'Menu','Extras.CreateImageFile','&Create image file...');
+  AddStringRec(NR_MenuExtrasCreateISOImageFile,'Menu','Extras.CreateISOImageFile','Create &ISO image from CD...');
   AddStringRec(NR_MenuExtrasTransferProfiles,'Menu','Extras.TransferProfiles','&Transfer profiles...');
   AddStringRec(NR_MenuExtrasBuildInstaller,'Menu','Extras.BuildInstaller','&Build installer for multiple games...');
   AddStringRec(NR_MenuExtrasChangeProfiles,'Menu','Extras.ChangeProfiles','Edit multiple profiles...');
@@ -1627,8 +1710,12 @@ begin
   AddStringRec(NR_ScreenshotPopupImportFilter,'Menu','ScreenshotPopup.Import.Filter','All readable image files|*.png;*.jpeg;*.jpg;*.gif;*.bmp|JPEG image (*.jpeg)|*.jpeg;*.jpg|GIF image (*.gif)|*.gif|Windows BMP image (*.bmp)|*.bmp|Portable Network Graphics (*.png)|*.png|All files (*.*)|*.*');
   AddStringRec(NR_ScreenshotPopupCopy,'Menu','ScreenshotPopup.Copy','&Copy');
   AddStringRec(NR_ScreenshotPopupSave,'Menu','ScreenshotPopup.Save','&Save...');
+  AddStringRec(NR_ScreenshotPopupRename,'Menu','ScreenshotPopup.Rename','&Rename...');
+  AddStringRec(NR_ScreenshotPopupRenameCaption,'Menu','ScreenshotPopup.Rename.Caption','Rename file');
+  AddStringRec(NR_ScreenshotPopupRenameLabel,'Menu','ScreenshotPopup.Rename.Label','New filename (without Extension)');
   AddStringRec(NR_ScreenshotPopupDelete,'Menu','ScreenshotPopup.Delete','&Delete');
   AddStringRec(NR_ScreenshotPopupDeleteAll,'Menu','ScreenshotPopup.DeleteAll','Delete &all');
+  AddStringRec(NR_ScreenshotPopupUseAsBackground,'Menu','ScreenshotPopup.UseAsBackground','Use as &background...');
   AddStringRec(NR_SoundsPopupSaveMp3,'Menu','SoundsPopup.SaveMp3','Save as &mp3 file...');
   AddStringRec(NR_SoundsPopupSaveOgg,'Menu','SoundsPopup.SaveOgg','Save as &ogg file...');
   AddStringRec(NR_SoundsPopupSaveMp3All,'Menu','SoundsPopup.SaveMp3All','Save all wave files as mp3 files');
@@ -1781,6 +1868,8 @@ begin
   AddStringRec(NR_ProfileMountingAddImage,'ProfileMountingForm','AddImageToList','Add image file to list');
   AddStringRec(NR_ProfileMountingDelImage,'ProfileMountingForm','DelImageFromList','Remove image file from list');
   AddStringRec(NR_ProfileMountingSwitchImage,'ProfileMountingForm','SwitchImageInfo','(You can switch between the images by pressing Ctrl+F4 in DOSBox.)');
+  AddStringRec(NR_ProfileMountingFloppyImageCreate,'ProfileMountingForm','FloppyImage.Create','Create empty image...');
+  AddStringRec(NR_ProfileMountingFloppyImageRead,'ProfileMountingForm','FloppyImage.Read','Read image from floppy disk...');
 
   AddStringRec(NR_SetupForm,'SetupForm','Caption','Program settings');
   AddStringRec(NR_SetupFormGeneralSheet,'SetupForm','GeneralSheet','General');
@@ -1861,6 +1950,7 @@ begin
   AddStringRec(NR_SetupFormWaveEncOgg,'SetupForm','WaveEnc.Ogg','Wave to ogg encoder');
   AddStringRec(NR_SetupFormSearchLame,'SetupForm','SearchLame','Search Lame program file');
   AddStringRec(NR_SetupFormSearchOggEnc,'SetupForm','SearchOggEnc','Search OggEnc program file');
+  AddStringRec(NR_SetupFormCenterDOSBoxWindow,'SetupForm','CenterDOSBoxWindow','Center DOSBox window');
 
   AddStringRec(NR_HistoryForm,'HistoryForm','Caption','History');
   AddStringRec(NR_HistoryGame,'HistoryForm','Game','Game');
@@ -1897,8 +1987,10 @@ begin
   AddStringRec(NR_ViewImageForm,'ViewImageForm','Caption','View screenshot');
   AddStringRec(NR_ViewImageFormSaveTitle,'ViewImageForm','SaveDialog.Title','Save screenshot');
   AddStringRec(NR_ViewImageFormSaveFilter,'ViewImageForm','SaveDialog.Filter','JPEG image (*.jpeg)|*.jpeg;*.jpg|GIF image (*.gif)|*.gif|Windows BMP image (*.bmp)|*.bmp|Portable Network Graphics (*.png)|*.png|All files (*.*)|*.*');
+  AddStringRec(NR_ViewImageFormBackgroundButton,'ViewImageForm','BackgroundImage','As background');
 
   AddStringRec(NR_CreateConfForm,'CreateConfForm','Caption','Create conf-files');
+  AddStringRec(NR_CreateConfFormProfMode,'CreateConfForm','CaptionProf','Create prof-files');
   AddStringRec(NR_CreateConfFormInfo,'CreateConfForm','Info','Please select the games for which conf-Dateien shall be created:');
   AddStringRec(NR_CreateConfFormSelectFolder,'CreateConfForm','SelectFolder','Destination folder for conf files:');
 
@@ -2103,6 +2195,23 @@ begin
   AddStringRec(NR_SoundCaptureSaveOGGFilter,'SoundCapure','SaveOGGFilter','Ogg Vorbis files (*.ogg)|*.ogg|All files (*.*)|*.*');
   AddStringRec(NR_SoundCaptureImportTitle,'SoundCapure','ImportTitle','Import sound file');
   AddStringRec(NR_SoundCaptureImportFilter,'SoundCapure','ImpottFilter','All readable audio files|*.wav;*.mp3;*.ogg;*.wma|Wave files (*.wav)|*.wav|mp3 files (*.mp3)|*.mp3|Ogg Vorbis files (*.ogg)|*.ogg|Windows media audio (*.wma)|*.wma|All files (*.*)|*.*');
+
+  AddStringRec(NR_WallpaperCaption,'WallpaperForm','Caption','Wallpaper style');
+  AddStringRec(NR_WallpaperTile,'WallpaperForm','Style.Tile','Tile');
+  AddStringRec(NR_WallpaperCenter,'WallpaperForm','Style.Center','Center');
+  AddStringRec(NR_WallpaperStretch,'WallpaperForm','Style.Stretch','Stretch');
+
+  AddStringRec(NR_ReadImageCaptionISO,'ReadImage','CaptionISO','Create ISO image from CD');
+  AddStringRec(NR_ReadImageCaptionIMG,'ReadImage','CaptionIMG','Create IMG image from floppy');
+  AddStringRec(NR_ReadImageDriveLabelCD,'ReadImage','DriveLabelCD','CD drive');
+  AddStringRec(NR_ReadImageDriveLabelFloppy,'ReadImage','DriveLabelFloppy','Floppy drive');
+  AddStringRec(NR_ReadImageFileName,'ReadImage','FileName','Image filename');
+  AddStringRec(NR_ReadImageFileNameFilterISO,'ReadImage','FileName.FilterISO','ISO images (*.iso)|*.iso|All files (*.*)|*.*');
+  AddStringRec(NR_ReadImageFileNameTitleISO,'ReadImage','FileName.TitleISO','Save ISO image');
+  AddStringRec(NR_ReadImageFileNameFilterIMG,'ReadImage','FileName.FilterIMG','IMG images (*.img)|*.img|All files (*.*)|*.*');
+  AddStringRec(NR_ReadImageFileNameTitleIMG,'ReadImage','FileName.TitleIMG','Save IMG image');
+  AddStringRec(NR_ReadImageInfo1,'ReadImage','Info1','%s KB read');
+  AddStringRec(NR_ReadImageInfo2,'ReadImage','Info2','total %s KB to read');
 end;
 
 destructor TLanguageSetup.Destroy;

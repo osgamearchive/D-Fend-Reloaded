@@ -22,7 +22,7 @@ object ChangeProfilesForm: TChangeProfilesForm
     Top = 8
     Width = 545
     Height = 536
-    ActivePage = TabSheet1
+    ActivePage = TabSheet2
     TabOrder = 0
     object TabSheet1: TTabSheet
       Caption = 'Step 1: Select games'

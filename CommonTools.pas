@@ -36,6 +36,10 @@ Procedure SetStartWithWindows(const Enabled : Boolean);
 Function LoadImageFromFile(const FileName : String) : TPicture;
 Procedure SaveImageToFile(const Picture : TPicture; const FileName : String);
 
+Type TWallpaperStyle=(WSTile=0,WSCenter=1,WSStretch=2);
+
+Procedure SetDesktopWallpaper(const FileName : String; const WPStyle : TWallpaperStyle);
+
 Var TempPrgDir : String = ''; {Temporary overwrite normal PrgDir}
 
 implementation
@@ -437,6 +441,46 @@ begin
 
   result:=TPicture.Create;
   result.LoadFromFile(FileName);
+end;
+
+const CLSID_ActiveDesktop : TGUID = '{75048700-EF1F-11D0-9888-006097DEACF9}';
+
+Procedure SetDesktopWallpaper(const FileName : String; const WPStyle : TWallpaperStyle);
+Var S : String;
+    P : TPicture;
+    WS: PWideChar;
+    ActiveDesktop: IActiveDesktop;
+    WallpaperOptions: TWallpaperOpt;
+begin
+  S:=FileName;
+
+  If ExtUpperCase(ExtractFileExt(S))='.PNG' then begin
+    P:=LoadImageFromFile(FileName);
+    try
+      S:=TempDir+ChangeFileExt(ExtractFileName(S),'.bmp');
+      SaveImageToFile(P,S);
+    finally
+      P.Free;
+    end;
+  end;
+
+  ActiveDesktop:=CreateComObject(CLSID_ActiveDesktop) as IActiveDesktop;
+  WS:=AllocMem(MAX_PATH);
+  try
+    StringToWideChar(S,WS,MAX_PATH);
+    if not ActiveDesktop.SetWallpaper(WS,0)=S_OK then exit;
+    WallpaperOptions.dwSize:=SizeOf(TWallpaperOpt);
+    case WPStyle of
+      WSTile    : WallpaperOptions.dwStyle:=WPSTYLE_TILE;
+      WSCenter  : WallpaperOptions.dwStyle:=WPSTYLE_CENTER;
+      WSStretch : WallpaperOptions.dwStyle:=WPSTYLE_STRETCH;
+      else        WallpaperOptions.dwStyle:=WPSTYLE_CENTER;
+    end;
+    ActiveDesktop.SetWallpaperOptions(WallpaperOptions,0);
+    ActiveDesktop.ApplyChanges(AD_APPLY_ALL or AD_APPLY_FORCE);
+  finally
+    FreeMem(WS);
+  end;
 end;
 
 end.

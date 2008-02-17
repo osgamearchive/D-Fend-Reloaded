@@ -172,7 +172,7 @@ begin
   UseDoublebufferComboBox.Enabled:=UseDoublebufferCheckBox.Checked;
   RenderComboBox.Enabled:=RenderCheckBox.Checked;
   WindowResolutionComboBox.Enabled:=WindowResolutionCheckBox.Checked;
-  FullscreenResolutionComboBox.Enabled:=FavouriteCheckBox.Checked;
+  FullscreenResolutionComboBox.Enabled:=FullscreenResolutionCheckBox.Checked;
   ScaleComboBox.Enabled:=ScaleCheckBox.Checked;
   MemoryComboBox.Enabled:=MemoryCheckBox.Checked;
   CPUCyclesComboBox.Enabled:=CPUCyclesCheckBox.Checked;

@@ -370,7 +370,7 @@ end;
 
 Var DefaultValueReaderGame : TGame = nil;
 
-Const DefaultValuesResolution='original,320x200,640x432,640x480,720x480,800x600,1024x768,1152x864,1280x720,1280x768,1280x860,1280x1024,1600x1200,1920x1080,1920x1200';
+Const DefaultValuesResolution='original,320x200,640x432,640x480,720x480,800x600,1024x768,1152x864,1280x720,1280x768,1280x960,1280x1024,1600x1200,1920x1080,1920x1200';
       DefaultValuesJoysticks='none,auto,2axis,4axis,fcs,ch';
       DefaultValuesScale='No Scaling (none),Nearest neighbor upscaling with factor 2 (normal2x),Nearest neighbor upscaling with factor 3 (normal3x),'+
                          'Advanced upscaling with factor 2 (advmame2x),Advanced upscaling with factor 3 (advmame3x),Advanced interpoling with factor 2 (advinterp2x),Advanced interpoling with factor 3 (advinterp3x),'+
@@ -677,6 +677,9 @@ begin
   Game:=TGame.Create(FileName);
   Game.OnChanged:=GameChanged;
   FGameList.Add(Game);
+
+  If Game.Cycles='Max' then Game.Cycles:='max';
+  If Game.Cycles='Auto' then Game.Cycles:='auto';
 end;
 
 procedure TGameDB.LoadList;

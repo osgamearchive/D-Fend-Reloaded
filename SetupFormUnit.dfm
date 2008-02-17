@@ -357,7 +357,7 @@ object SetupForm: TSetupForm
         Left = 6
         Top = 11
         Width = 588
-        Height = 298
+        Height = 288
         ActivePage = ListViewSheet1
         Anchors = [akLeft, akTop, akRight, akBottom]
         MultiLine = True
@@ -555,7 +555,7 @@ object SetupForm: TSetupForm
           ImageIndex = 2
           DesignSize = (
             580
-            252)
+            242)
           object TreeViewFontSizeLabel: TLabel
             Left = 16
             Top = 88
@@ -885,7 +885,7 @@ object SetupForm: TSetupForm
       end
       object SDLVideodriverLabel: TLabel
         Left = 16
-        Top = 244
+        Top = 252
         Width = 113
         Height = 18
         AutoSize = False
@@ -893,9 +893,9 @@ object SetupForm: TSetupForm
       end
       object SDLVideodriverInfoLabel: TLabel
         Left = 16
-        Top = 268
+        Top = 276
         Width = 572
-        Height = 58
+        Height = 50
         Anchors = [akLeft, akTop, akRight]
         AutoSize = False
         Caption = 
@@ -942,7 +942,7 @@ object SetupForm: TSetupForm
       end
       object HideDosBoxConsoleCheckBox: TCheckBox
         Left = 16
-        Top = 172
+        Top = 160
         Width = 572
         Height = 17
         Anchors = [akLeft, akTop, akRight]
@@ -951,7 +951,7 @@ object SetupForm: TSetupForm
       end
       object MinimizeDFendCheckBox: TCheckBox
         Left = 16
-        Top = 204
+        Top = 183
         Width = 572
         Height = 17
         Anchors = [akLeft, akTop, akRight]
@@ -972,13 +972,13 @@ object SetupForm: TSetupForm
       end
       object SDLVideoDriverComboBox: TComboBox
         Left = 117
-        Top = 241
+        Top = 249
         Width = 145
         Height = 21
         Style = csDropDownList
         ItemHeight = 13
         ItemIndex = 0
-        TabOrder = 5
+        TabOrder = 6
         Text = 'Direct X (default)'
         Items.Strings = (
           'Direct X (default)'
@@ -995,6 +995,14 @@ object SetupForm: TSetupForm
         EditLabel.Caption = 'PathFREEDOSEdit'
         TabOrder = 1
         OnChange = DosBoxDirEditChange
+      end
+      object CenterDOSBoxCheckBox: TCheckBox
+        Left = 16
+        Top = 206
+        Width = 572
+        Height = 17
+        Caption = 'CenterDOSBoxCheckBox'
+        TabOrder = 5
       end
     end
     object WaveEncSheet: TTabSheet

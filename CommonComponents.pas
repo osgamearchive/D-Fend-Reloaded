@@ -136,6 +136,13 @@ begin
       end;
     except end;
     Ini.Free;
+  end else begin
+    try
+      If FStoreConfigOnExit and (Ini<>nil) then begin
+        ForceDirectories(ExtractFilePath(Ini.FileName));
+        Ini.UpdateFile;
+      end;
+    except end;
   end;
   
   inherited Destroy;
@@ -147,6 +154,7 @@ begin
   If FSetupFile='' then begin result:=False; exit; end;
 
   If not FileExists(FSetupFile) then begin
+    ForceDirectories(ExtractFilePath(FSetupFile));
     Ini.UpdateFile;
     FLastTimeStamp:=GetSimpleFileTime(FSetupFile);
     result:=False;
@@ -198,6 +206,8 @@ begin
     StringList[I].Cached:=True;
     StringList[I].CacheValueString:=ABasePrgSetup.GetString(StringList[I].Nr);
   end;
+
+  StoreAllValues;
 end;
 
 Function TBasePrgSetup.IndexOf(const Nr : Integer; const List : TConfigRecArray; var Index : TConfigIndexArray) : Integer;

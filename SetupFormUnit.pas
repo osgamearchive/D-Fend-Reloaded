@@ -135,6 +135,7 @@ type
     Update1RadioButton: TRadioButton;
     Update0RadioButton: TRadioButton;
     LanguageInfoLabel: TLabel;
+    CenterDOSBoxCheckBox: TCheckBox;
     procedure OKButtonClick(Sender: TObject);
     procedure ButtonWork(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -214,8 +215,10 @@ begin
   OKButton.Caption:=LanguageSetup.OK;
   CancelButton.Caption:=LanguageSetup.Cancel;
   ModeLabel.Caption:=LanguageSetup.SetupFormMode;
+  I:=ModeComboBox.ItemIndex;
   ModeComboBox.Items[0]:=LanguageSetup.SetupFormModeEasy;
   ModeComboBox.Items[1]:=LanguageSetup.SetupFormModeAdvanced;
+  ModeComboBox.ItemIndex:=I;
 
   {General}
 
@@ -323,6 +326,7 @@ begin
   DosBoxMapperButton.Hint:=LanguageSetup.ChooseFile;
   HideDosBoxConsoleCheckBox.Caption:=LanguageSetup.SetupFormHideDosBoxConsole;
   MinimizeDFendCheckBox.Caption:=LanguageSetup.SetupFormMinimizeDFend;
+  CenterDOSBoxCheckBox.Caption:=LanguageSetup.SetupFormCenterDOSBoxWindow;
   SDLVideodriverLabel.Caption:=LanguageSetup.SetupFormDosBoxSDLVideodriver;
   SDLVideodriverInfoLabel.Caption:=LanguageSetup.SetupFormDosBoxSDLVideodriverInfo;
   PathFREEDOSEdit.EditLabel.Caption:=LanguageSetup.SetupFormDosBoxFREEDOSPath;
@@ -453,14 +457,16 @@ begin
     finally
       FindClose(Rec);
     end;
-    I:=FindFirst(PrgDataDir+LanguageSubDir+'\*.ini',faAnyFile,Rec);
-    try
-      while I=0 do begin
-        LanguageComboBox.Items.Add(Copy(Rec.Name,1,length(Rec.Name)-4));
-        I:=FindNext(Rec);
+    If PrgDataDir<>PrgDir then begin
+      I:=FindFirst(PrgDataDir+LanguageSubDir+'\*.ini',faAnyFile,Rec);
+      try
+        while I=0 do begin
+          LanguageComboBox.Items.Add(Copy(Rec.Name,1,length(Rec.Name)-4));
+          I:=FindNext(Rec);
+        end;
+      finally
+        FindClose(Rec);
       end;
-    finally
-      FindClose(Rec);
     end;
 
     S:=Trim(PrgSetup.Language);
@@ -478,6 +484,8 @@ begin
 
     I:=DosBoxLang.IndexOf(PrgSetup.DosBoxLanguage);
     If I>=0 then DosBoxLangEditComboBox.ItemIndex:=I else DosBoxLangEditComboBox.ItemIndex:=0;
+
+    LanguageComboBoxChange(Sender); {to setup outdated warning}
 
     {Game list}
 
@@ -568,6 +576,7 @@ begin
     DosBoxMapperEdit.Text:=PrgSetup.DosBoxMapperFile;
     HideDosBoxConsoleCheckBox.Checked:=PrgSetup.HideDosBoxConsole;
     MinimizeDFendCheckBox.Checked:=PrgSetup.MinimizeOnDosBoxStart;
+    CenterDOSBoxCheckBox.Checked:=PrgSetup.CenterDOSBoxWindow;
     If Trim(ExtUpperCase(PrgSetup.SDLVideodriver))='WINDIB' then SDLVideoDriverComboBox.ItemIndex:=1 else SDLVideoDriverComboBox.ItemIndex:=0;
     PathFREEDOSEdit.Text:=PrgSetup.PathToFREEDOS;
 
@@ -700,6 +709,7 @@ begin
   PrgSetup.DosBoxMapperFile:=DosBoxMapperEdit.Text;
   PrgSetup.HideDosBoxConsole:=HideDosBoxConsoleCheckBox.Checked;
   PrgSetup.MinimizeOnDosBoxStart:=MinimizeDFendCheckBox.Checked;
+  PrgSetup.CenterDOSBoxWindow:=CenterDOSBoxCheckBox.Checked;
   If SDLVideoDriverComboBox.ItemIndex=1 then PrgSetup.SDLVideodriver:='WinDIB' else PrgSetup.SDLVideodriver:='DirectX';
   PrgSetup.PathToFREEDOS:=PathFREEDOSEdit.Text;
 
@@ -1128,9 +1138,10 @@ end;
 procedure TSetupForm.LanguageComboBoxChange(Sender: TObject);
 Var S : String;
 begin
-  If JustLoading then exit;
-  LoadLanguage(LanguageComboBox.Text+'.ini');
-  InitGUI;
+  If not JustLoading then begin
+    LoadLanguage(LanguageComboBox.Text+'.ini');
+    InitGUI;
+  end;
 
   S:=Trim(LanguageSetup.MaxVersion);
   If (S='') or (S='0') then begin
@@ -1144,8 +1155,6 @@ begin
       LanguageInfoLabel.Visible:=False;
     end;
   end;
-
-  VersionStringToInt(LanguageSetup.MaxVersion);
 end;
 
 procedure TSetupForm.ListViewMoveButtonClick(Sender: TObject);
@@ -1201,6 +1210,7 @@ begin
   DosBoxMapperButton.Visible:=Adv;
   HideDosBoxConsoleCheckBox.Visible:=Adv;
   MinimizeDFendCheckBox.Visible:=Adv;
+  CenterDOSBoxCheckBox.Visible:=Adv;
   SDLVideodriverLabel.Visible:=Adv;
   SDLVideoDriverComboBox.Visible:=Adv;
   SDLVideodriverInfoLabel.Visible:=Adv;

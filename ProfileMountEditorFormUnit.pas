@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, Buttons, StdCtrls, ExtCtrls, ComCtrls, ImgList, Grids;
+  Dialogs, Buttons, StdCtrls, ExtCtrls, ComCtrls, ImgList, Grids, Menus;
 
 type
   TProfileMountEditorForm = class(TForm)
@@ -59,7 +59,7 @@ type
     FloppyImageSheet2: TTabSheet;
     FloppyImageTab: TStringGrid;
     FloppyImageLabel: TLabel;
-    SpeedButton1: TSpeedButton;
+    FloppyImageButton2: TSpeedButton;
     FloppyImageAddButton: TSpeedButton;
     FloppyImageDelButton: TSpeedButton;
     FloppyImageDriveLetterComboBox2: TComboBox;
@@ -75,12 +75,18 @@ type
     ZipFolderFreeSpaceLabel: TLabel;
     ZipFileEdit: TLabeledEdit;
     ZipFileButton: TSpeedButton;
+    ISOImageCreateButton: TSpeedButton;
+    FloppyImageCreateButton2: TSpeedButton;
+    FloppyPopupMenu: TPopupMenu;
+    FloppyPopupCreateImage: TMenuItem;
+    FloppyPopupReadImage: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure OKButtonClick(Sender: TObject);
     procedure FolderButtonClick(Sender: TObject);
     procedure FolderFreeSpaceTrackBarChange(Sender: TObject);
     procedure ZipFolderFreeSpaceTrackBarChange(Sender: TObject);
+    procedure FloppyPopupWork(Sender: TObject);
   private
     { Private-Deklarationen }
   public
@@ -96,7 +102,7 @@ Function ShowProfileMountEditorDialog(const AOwner : TComponent; var AData : Str
 implementation
 
 uses LanguageSetupUnit, VistaToolsUnit, CommonTools, PrgSetupUnit,
-     CreateImageUnit;
+     CreateImageUnit, CreateISOImageFormUnit;
 
 {$R *.dfm}
 
@@ -151,6 +157,9 @@ begin
   ZipFolderDriveLetterLabel.Caption:=LanguageSetup.ProfileMountingLetter;
   ZipFileEdit.EditLabel.Caption:=LanguageSetup.ProfileMountingZipFile;
 
+  FloppyPopupCreateImage.Caption:=LanguageSetup.ProfileMountingFloppyImageCreate;
+  FloppyPopupReadImage.Caption:=LanguageSetup.ProfileMountingFloppyImageRead;
+
   OKButton.Caption:=LanguageSetup.OK;
   CancelButton.Caption:=LanguageSetup.Cancel;
   FolderButton.Hint:=LanguageSetup.ChooseFolder;
@@ -158,7 +167,10 @@ begin
   CDROMButton.Hint:=LanguageSetup.ChooseFolder;
   FloppyImageButton.Hint:=LanguageSetup.ChooseFile;
   FloppyImageCreateButton.Hint:=LanguageSetup.ProfileMountingCreateImage;
+  FloppyImageButton2.Hint:=LanguageSetup.ChooseFile;
+  FloppyImageCreateButton2.Hint:=LanguageSetup.ProfileMountingCreateImage;
   CDROMImageButton.Hint:=LanguageSetup.ChooseFile;
+  ISOImageCreateButton.Hint:=LanguageSetup.ProfileMountingCreateImage;
   ImageButton.Hint:=LanguageSetup.ChooseFile;
   ImageCreateButton.Hint:=LanguageSetup.ProfileMountingCreateImage;
   ZipFolderButton.Hint:=LanguageSetup.ChooseFolder;
@@ -457,6 +469,7 @@ end;
 procedure TProfileMountEditorForm.FolderButtonClick(Sender: TObject);
 Var S : String;
     I : Integer;
+    P : TPoint;
 begin
   Case (Sender as TComponent).Tag of
     0 : begin
@@ -513,21 +526,16 @@ begin
           ImageGeometryEdit.Text:=GetGeometryFromFile(OpenDialog.FileName);
         end;
     6 : begin
-          {Create Floppy Image}
-          S:=ShowCreateImageFileDialog(self,True,False);
-          If S='' then exit;
-          FloppyImageEdit.Text:=MakeRelPath(S,PrgSetup.BaseDir);;
+          {Create floppy Image}
+          P:=FloppyImageSheet.ClientToScreen(Point(FloppyImageCreateButton.Left,FloppyImageCreateButton.Top));
+          FloppyPopupMenu.Popup(P.X+5,P.Y+5);
         end;
     7 : begin
           {Create HD Image}
-          If CDROMImageTab.Row<0 then begin
-            MessageDlg(LanguageSetup.MessageNoImageSelected,mtError,[mbOK],0);
-            exit;
-          end;
           S:=ShowCreateImageFileDialog(self,False,True);
           If S='' then exit;
           ImageEdit.Text:=MakeRelPath(S,PrgSetup.BaseDir);
-          CDROMImageTab.Cells[0,CDROMImageTab.Row]:=GetGeometryFromFile(S);
+          ImageGeometryEdit.Text:=GetGeometryFromFile(S);
         end;
     8 : begin
           {Add CDROM Image}
@@ -594,6 +602,58 @@ begin
           OpenDialog.Filter:=LanguageSetup.ProfileMountingZipFileFilter;
           if not OpenDialog.Execute then exit;
           ZipFileEdit.Text:=MakeRelPath(OpenDialog.FileName,PrgSetup.BaseDir);
+        end;
+   15 : begin
+          {Create ISO Image}
+          If CDROMImageTab.Row<0 then begin
+            MessageDlg(LanguageSetup.MessageNoImageSelected,mtError,[mbOK],0);
+            exit;
+          end;
+          if not ShowCreateISOImageDialog(self,S,False) then exit;
+          If S='' then exit;
+          CDROMImageTab.Cells[0,CDROMImageTab.Row]:=MakeRelPath(S,PrgSetup.BaseDir);
+       end;
+   16 : begin
+          {Create floppy Image 2}
+          If FloppyImageTab.Row<0 then begin
+            MessageDlg(LanguageSetup.MessageNoImageSelected,mtError,[mbOK],0);
+            exit;
+          end;
+          P:=FloppyImageSheet2.ClientToScreen(Point(FloppyImageCreateButton2.Left,FloppyImageCreateButton2.Top));
+          FloppyPopupMenu.Popup(P.X+5,P.Y+5);
+       end;
+  end;
+end;
+
+procedure TProfileMountEditorForm.FloppyPopupWork(Sender: TObject);
+Var S : String;
+begin
+  Case (Sender as TComponent).Tag of
+    0 : If PageControl.ActivePageIndex=FloppyImageSheet.PageIndex then begin
+          S:=ShowCreateImageFileDialog(self,True,False);
+          If S='' then exit;
+          FloppyImageEdit.Text:=MakeRelPath(S,PrgSetup.BaseDir);;
+        end else begin
+          If FloppyImageTab.Row<0 then begin
+            MessageDlg(LanguageSetup.MessageNoImageSelected,mtError,[mbOK],0);
+            exit;
+          end;
+          S:=ShowCreateImageFileDialog(self,True,False);
+          If S='' then exit;
+          FloppyImageTab.Cells[0,FloppyImageTab.Row]:=MakeRelPath(S,PrgSetup.BaseDir);
+        end;
+    1 : If PageControl.ActivePageIndex=FloppyImageSheet.PageIndex then begin
+          if not ShowCreateISOImageDialog(self,S,True) then exit;
+          If S='' then exit;
+          FloppyImageEdit.Text:=MakeRelPath(S,PrgSetup.BaseDir);
+        end else begin
+          If FloppyImageTab.Row<0 then begin
+            MessageDlg(LanguageSetup.MessageNoImageSelected,mtError,[mbOK],0);
+            exit;
+          end;
+          if not ShowCreateISOImageDialog(self,S,True) then exit;
+          If S='' then exit;
+          FloppyImageTab.Cells[0,FloppyImageTab.Row]:=MakeRelPath(S,PrgSetup.BaseDir);
         end;
   end;
 end;

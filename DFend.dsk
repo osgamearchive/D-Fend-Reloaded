@@ -1,14 +1,14 @@
 [Closed Files]
-File_0=TSourceModule,'C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\DosBoxUnit.pas',0,1,620,6,639,0,0,,
-File_1=TSourceModule,'C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\ModernProfileEditorCPUFrameUnit.pas',0,1,6,1,1,0,0,,
-File_2=TSourceModule,'C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\ModernProfileEditorGUSFrameUnit.pas',0,1,36,106,67,0,0,,
-File_3=TSourceModule,'C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\ModernProfileEditorMouseFrameUnit.pas',0,1,28,19,37,0,0,,
-File_4=TSourceModule,'C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\ModernProfileEditorSoundBlasterFrameUnit.pas',0,1,42,1,69,0,0,,
-File_5=TSourceModule,'C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\ModernProfileEditorMIDIFrameUnit.pas',0,1,21,108,42,0,0,,
-File_6=TSourceModule,'C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\ModernProfileEditorSoundFrameUnit.pas',0,1,42,112,73,0,0,,
-File_7=TSourceModule,'C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\ProfileEditorFormUnit.pas',0,1,1,1,1,0,0,,
-File_8=TSourceModule,'C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\GameDBUnit.pas',0,1,379,52,406,0,0,,
-File_9=TSourceModule,'C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\SetupFormUnit.pas',0,1,984,11,1051,0,0,,
+File_0=TSourceModule,'C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\InfoFormUnit.pas',0,1,46,52,67,0,0,,
+File_1=TSourceModule,'C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\ProfileMountEditorFormUnit.pas',0,1,494,41,508,0,0,,{0,601,42}
+File_2=TSourceModule,'C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\DosBoxUnit.pas',0,1,118,1,141,0,0,,
+File_3=TSourceModule,'C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\CreateISOImageFormUnit.pas',0,1,92,50,115,0,0,,
+File_4=TSourceModule,'C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\CreateConfFormUnit.pas',0,1,43,31,51,0,0,,
+File_5=TSourceModule,'C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\LanguageSetupUnit.pas',0,1,1936,91,1960,0,0,,
+File_6=TSourceModule,'C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\GameDBUnit.pas',0,1,661,42,682,0,0,,
+File_7=TSourceModule,'C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\SetupFormUnit.pas',0,1,306,3,329,0,0,,
+File_8=TSourceModule,'C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\CommonComponents.pas',0,1,279,1,309,0,0,,
+File_9=TSourceModule,'c:\program files\codegear\rad studio\5.0\source\Win32\rtl\win\Windows.pas',0,1,2404,3,2427,0,0,,
 
 [Modules]
 Module0=C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\MainUnit.pas
@@ -57,12 +57,12 @@ BottomMiddelPanelData=0000080001000100000009000000446F636B5369746530301900000000
 [View0]
 CustomEditViewType=TEditView
 Module=C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\MainUnit.pas
-CursorX=42
-CursorY=26
+CursorX=32
+CursorY=13
 TopLine=1
 LeftCol=1
 Elisions=
-Bookmarks={0,1880,8}{9,259,1}
+Bookmarks={0,1785,13}{9,271,1}
 EditViewName=C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\MainUnit.pas
 
 [Watches]
@@ -582,7 +582,7 @@ Dockable=1
 StayOnTop=0
 TabPosition=1
 ActiveTabID=RefactoringForm
-TabDockClients=RefactoringForm,FindReferencsForm,ToDo List,RefactoringsView,UsagesView,QAView,MetricsView
+TabDockClients=RefactoringForm,FindReferencsForm,ToDo List,QAView,MetricsView,RefactoringsView,UsagesView
 
 [DockSite1]
 HostDockSite=DockBottomPanel
@@ -630,7 +630,7 @@ Dockable=1
 StayOnTop=0
 TabPosition=0
 ActiveTabID=ProjectManager
-TabDockClients=PropertyInspector,ProjectManager,DataExplorer,ModelViewTool
+TabDockClients=PropertyInspector,ProjectManager,ModelViewTool,DataExplorer
 
 [DockSite3]
 HostDockSite=DockRightPanel

@@ -28,12 +28,14 @@ type
   public
     { Public-Deklarationen }
     GameDB : TGameDB;
+    ProfFileMode : Boolean;
   end;
 
 var
   CreateConfForm: TCreateConfForm;
 
 Function ExportConfFiles(const AOwner : TComponent; const AGameDB : TGameDB) : Boolean;
+Function ExportProfFiles(const AOwner : TComponent; const AGameDB : TGameDB) : Boolean;
 
 implementation
 
@@ -55,10 +57,14 @@ begin
   SelectAllButton.Caption:=LanguageSetup.All;
   SelectNoneButton.Caption:=LanguageSetup.None;
   SelectGenreButton.Caption:=LanguageSetup.GameBy;
+
+  ProfFileMode:=False;
 end;
 
 procedure TCreateConfForm.FormShow(Sender: TObject);
 begin
+  If ProfFileMode then Caption:=LanguageSetup.CreateConfFormProfMode;
+
   BuildCheckList(ListBox,GameDB,True);
   BuildSelectPopupMenu(PopupMenu,GameDB,SelectButtonClick,True);
 
@@ -106,16 +112,25 @@ begin
 
   For I:=0 to ListBox.Items.Count-1 do If ListBox.Checked[I] then begin
     G:=TGame(ListBox.Items.Objects[I]);
-    St:=BuildConfFile(G,False);
-    try
-      S:=Dir+ChangeFileExt(ExtractFileName(G.SetupFile),'.conf');
-      try St.SaveToFile(S); except
-        MessageDlg(Format(LanguageSetup.MessageCouldNotSaveFile,[S]),mtError,[mbOK],0);
+    If ProfFileMode then begin
+      G.StoreAllValues;
+      If not CopyFile(PChar(G.SetupFile),PChar(Dir+ExtractFileName(G.SetupFile)),True) then begin
+        MessageDlg(Format(LanguageSetup.MessageCouldNotCopyFile,[G.SetupFile,Dir+ExtractFileName(G.SetupFile)]),mtError,[mbOK],0);
         ModalResult:=mrNone;
         exit;
       end;
-    finally
-      St.Free;
+    end else begin
+      St:=BuildConfFile(G,False);
+      try
+        S:=Dir+ChangeFileExt(ExtractFileName(G.SetupFile),'.conf');
+        try St.SaveToFile(S); except
+          MessageDlg(Format(LanguageSetup.MessageCouldNotSaveFile,[S]),mtError,[mbOK],0);
+          ModalResult:=mrNone;
+          exit;
+        end;
+      finally
+        St.Free;
+      end;
     end;
   end;
 end;
@@ -133,5 +148,16 @@ begin
   end;
 end;
 
+Function ExportProfFiles(const AOwner : TComponent; const AGameDB : TGameDB) : Boolean;
+begin
+  CreateConfForm:=TCreateConfForm.Create(AOwner);
+  try
+    CreateConfForm.ProfFileMode:=True;
+    CreateConfForm.GameDB:=AGameDB;
+    result:=(CreateConfForm.ShowModal=mrOK);
+  finally
+    CreateConfForm.Free;
+  end;
+end;
 
 end.

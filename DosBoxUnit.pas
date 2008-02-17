@@ -580,10 +580,28 @@ begin
  );
 end;
 
+Function EnumWindowsFunc(const hWindow : THandle; const lParam : Integer) : Boolean; StdCall;
+Var S : String;
+begin
+  result:=True;
+
+  SetLength(S,255);
+  If GetWindowText(hWindow,PChar(S),250)=0 then exit;
+  SetLength(S,StrLen(PChar(S)));
+  If Copy(Trim(ExtUpperCase(S)),1,6)<>'DOSBOX' then exit;
+
+  CenterWindow(hWindow);
+end;
+
+Procedure CenterDOSBoxWindow;
+begin
+  EnumWindows(@EnumWindowsFunc,0);
+end;
+
 Type TCharArray=Array[0..MaxInt-1] of Char;
      PCharArray=^TCharArray;
 
-Procedure RunDosBox(const DOSBoxPath : String; const ConfFile : String; const DosBoxCommandLine : String ='');
+Procedure RunDosBox(const DOSBoxPath : String; const ConfFile : String; const FullScreen : Boolean; const DosBoxCommandLine : String ='');
 Var Add : String;
     PrgFile, Params, Env : String;
     StartupInfo : TStartupInfo;
@@ -644,7 +662,7 @@ begin
     False,
     0,
     P,
-    PChar(TempDir),
+    PChar(ExtractFilePath(PrgFile)),
     StartupInfo,
     ProcessInformation
   );
@@ -653,6 +671,11 @@ begin
   CloseHandle(ProcessInformation.hThread);
 
   {ShellExecute(Application.MainForm.Handle,'open',PChar(IncludeTrailingPathDelimiter(PrgSetup.DosBoxDir)+DosBoxFileName),PChar('-CONF '+ConfFile+Add),PChar(IncludeTrailingPathDelimiter((ExtractFilePath(ConfFile)))),SW_SHOW);}
+
+  If PrgSetup.CenterDOSBoxWindow and (not FullScreen) then begin
+    Sleep(1000);
+    CenterDOSBoxWindow;
+  end;
 end;
 
 Procedure RunGame(const Game : TGame; const RunSetup : Boolean; const DosBoxCommandLine : String);
@@ -677,7 +700,7 @@ begin
 
     T:=Trim(Game.CustomDOSBoxDir);
     If (T='') or (ExtUpperCase(T)='DEFAULT') then T:='' else T:=MakeAbsPath(T,PrgSetup.BaseDir);
-    RunDosBox(T,S+DosBoxConfFileName,DosBoxCommandLine);
+    RunDosBox(T,S+DosBoxConfFileName,Game.StartFullscreen,DosBoxCommandLine);
   finally
     St.Free;
   end;

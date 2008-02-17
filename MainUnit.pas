@@ -8,19 +8,19 @@ uses
   AppEvnts, GameDBUnit, GameDBToolsUnit;
 
 {
-- Making a besser demo package
+Special:
+- Making a better demo package
+- csv-Build upgrade
 
 0.4:
+- Write images to floppies
 - Game library for autocreate profiles
-  - with updates from server
   - Protection: Warn if non relative path folders are mounted or autoexec/custom sets
+  - Build installer packages for autosetup templates 
 - "Include D-Fend Reloaded and DOSBox" option in "Build installer"
 - Im- and Exporting using DBGL and DOG XML-files
 - Running games from within PhysFS zip file
-- Rip CD to ISO and floppy to IMG
-- Set screenshot as wallpaper
-- More special DOSBox build settings
-- Optional center DOSBox window if not fullscreen
+- More special DOSBox build settings (vga-chipset & memory, ...)
 
 0.5:
 - ScummVM support
@@ -206,6 +206,13 @@ type
     N23: TMenuItem;
     TreeViewPopupMenu: TPopupMenu;
     TreeViewPopupEditUserFilters: TMenuItem;
+    N24: TMenuItem;
+    ScreenshotPopupUseAsBackground: TMenuItem;
+    ScreenshotPopupRename: TMenuItem;
+    SoundPopupRename: TMenuItem;
+    MenuExtrasCreateISOImage: TMenuItem;
+    MenuFileCreateProf: TMenuItem;
+    MenuExtrasCreateIMGImage: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure TreeViewChange(Sender: TObject; Node: TTreeNode);
@@ -287,7 +294,8 @@ uses ShellAPI, ClipBrd, Math, PNGImage, CommonTools, LanguageSetupUnit,
      BuildInstallerFormUnit, ResHookUnit, ChangeProfilesFormUnit,
      BuildInstallerForSingleGameFormUnit, ModernProfileEditorFormUnit,
      ListViewImageUnit, StatisticsFormUnit, CacheChooseFormUnit, IconLoaderUnit,
-     LanguageEditorStartFormUnit, LanguageEditorFormUnit, PlaySoundFormUnit;
+     LanguageEditorStartFormUnit, LanguageEditorFormUnit, PlaySoundFormUnit,
+     WallpaperStyleFormUnit, CreateISOImageFormUnit;
 
 {$R *.dfm}
 
@@ -305,10 +313,15 @@ begin
   StartCaptureChangeNotify;
 
   GameDB:=TGameDB.Create(PrgDataDir+GameListSubDir);
-  
+
   LoadMenuLanguage;
   InitGUI;
   UpdateAddFromTemplateMenu;
+
+  If PrgSetup.FirstRun then begin
+    SearchDosBox(self);
+    ShowSetupDialog(self,GameDB,True);
+  end;
 end;
 
 procedure TDFendReloadedMainForm.FormShow(Sender: TObject);
@@ -324,7 +337,6 @@ begin
   ProcessParams;
 
   If PrgSetup.FirstRun then begin
-    ShowSetupDialog(self,GameDB,True);
     BuildDefaultProfile;
     G:=BuildDefaultDosProfile(GameDB);
     LoadLanguage(PrgSetup.Language);
@@ -379,6 +391,7 @@ begin
   MenuFileExport.Caption:=LanguageSetup.MenuFileExport;
   MenuFileExportGamesList.Caption:=LanguageSetup.MenuFileExportGamesList;
   MenuFileCreateConf.Caption:=LanguageSetup.MenuFileCreateConf;
+  MenuFileCreateProf.Caption:=LanguageSetup.MenuFileCreateProf;
   MenuFileSetup.Caption:=LanguageSetup.MenuFileSetup;
   MenuFileQuit.Caption:=LanguageSetup.MenuFileQuit;
   MenuView.Caption:=LanguageSetup.MenuView;
@@ -393,7 +406,6 @@ begin
   MenuViewsList.Caption:=LanguageSetup.MenuViewReport;
   MenuViewsSmallIcons.Caption:=LanguageSetup.MenuViewSmallIcons;
   MenuViewsIcons.Caption:=LanguageSetup.MenuViewIcons;
-
   MenuRun.Caption:=LanguageSetup.MenuRun;
   MenuRunGame.Caption:=LanguageSetup.MenuRunGame;
   MenuRunSetup.Caption:=LanguageSetup.MenuRunSetup;
@@ -423,7 +435,9 @@ begin
   MenuExtrasEditDefaultProfile.Caption:=LanguageSetup.MenuExtrasEditDefaultProfile;
   MenuExtrasTemplates.Caption:=LanguageSetup.MenuExtrasTemplates;
   MenuExtrasDeinstallMultipleGames.Caption:=LanguageSetup.MenuExtrasDeinstallMultipleGames;
+  MenuExtrasCreateIMGImage.Caption:=LanguageSetup.MenuExtrasCreateIMGImageFile;
   MenuExtrasCreateImage.Caption:=LanguageSetup.MenuExtrasCreateImageFile;
+  MenuExtrasCreateISOImage.Caption:=LanguageSetup.MenuExtrasCreateISOImageFile;
   MenuExtrasTransferProfiles.Caption:=LanguageSetup.MenuExtrasTransferProfiles;
   MenuExtrasBuildInstaller.Caption:=LanguageSetup.MenuExtrasBuildInstaller;
   MenuExtrasChangeProfiles.Caption:=LanguageSetup.MenuExtrasChangeProfiles;
@@ -487,8 +501,10 @@ begin
   ScreenshotPopupImport.Caption:=LanguageSetup.ScreenshotPopupImport;
   ScreenshotPopupCopy.Caption:=LanguageSetup.ScreenshotPopupCopy;
   ScreenshotPopupSave.Caption:=LanguageSetup.ScreenshotPopupSave;
+  ScreenshotPopupRename.Caption:=LanguageSetup.ScreenshotPopupRename;
   ScreenshotPopupDelete.Caption:=LanguageSetup.ScreenshotPopupDelete;
   ScreenshotPopupDeleteAll.Caption:=LanguageSetup.ScreenshotPopupDeleteAll;
+  ScreenshotPopupUseAsBackground.Caption:=LanguageSetup.ScreenshotPopupUseAsBackground;
 
   SoundPopupOpen.Caption:=LanguageSetup.ScreenshotPopupOpen;
   SoundPopupRefresh.Caption:=LanguageSetup.ScreenshotPopupRefresh;
@@ -496,6 +512,7 @@ begin
   SoundPopupSave.Caption:=LanguageSetup.ScreenshotPopupSave;
   SoundPopupSaveMp3.Caption:=LanguageSetup.SoundsPopupSaveMp3;
   SoundPopupSaveOgg.Caption:=LanguageSetup.SoundsPopupSaveOgg;
+  SoundPopupRename.Caption:=LanguageSetup.ScreenshotPopupRename;
   SoundPopupDelete.Caption:=LanguageSetup.ScreenshotPopupDelete;
   SoundPopupDeleteAll.Caption:=LanguageSetup.ScreenshotPopupDeleteAll;
   SoundPopupSaveMp3All.Caption:=LanguageSetup.SoundsPopupSaveMp3All;
@@ -546,7 +563,7 @@ begin
   DoubleBuffered:=True;
   SearchEdit.DoubleBuffered:=True;
   SetVistaFonts(self);
-  ListView.DoubleBuffered:=True;
+  {ListView.DoubleBuffered:=True; - causes problems with tooltips}
   CapturePageControl.DoubleBuffered:=True;
   ScreenshotListView.DoubleBuffered:=True;
   SoundListView.DoubleBuffered:=True;
@@ -727,7 +744,9 @@ begin
     3 : WindowState:=wsMaximized;
   end;
 
-  ListViewSelectItem(ListView,nil,false);
+  If ListView.Items.Count=0
+    then TreeViewChange(TreeView,nil)
+    else ListViewSelectItem(ListView,nil,False);
 
   {To fix misaligend ListView when stating maximized}
   UpdateBounds;
@@ -1187,7 +1206,8 @@ begin
                ExportGamesList(GameDB,SaveDialog.FileName);
              end;
       1003 : ExportConfFiles(self,GameDB);
-      1004 : if ShowSetupDialog(self,GameDB) then begin
+      1004 : ExportProfFiles(self,GameDB);
+      1005 : if ShowSetupDialog(self,GameDB) then begin
                LoadLanguage(PrgSetup.Language);
                LoadMenuLanguage;
                If SearchEdit.Font.Color=clGray then begin
@@ -1197,8 +1217,8 @@ begin
                end;
                LoadGUISetup(False);
              end;
-      1005 : Close;
-      1006 : begin
+      1006 : Close;
+      1007 : begin
                OpenDialog.Title:=LanguageSetup.MenuFileImportProfTitle;
                OpenDialog.Filter:=LanguageSetup.MenuFileImportProfFilter;
                If not OpenDialog.Execute then exit;
@@ -1478,6 +1498,8 @@ begin
                TreeViewChange(Sender,TreeView.Selected);
                SelectGame(G);
              end;
+      5011 : ShowCreateISOImageDialog(self,False);
+      5012 : ShowCreateISOImageDialog(self,True);
       {Help}
       6001 : ShellExecute(Handle,'open',PChar('http://www.dosbox.com/wiki/'),nil,nil,SW_SHOW);
       6002 : ShellExecute(Handle,'open',PChar('http://www.dosbox.com/wiki/Special_Keys'),nil,nil,SW_SHOW);
@@ -1618,8 +1640,10 @@ begin
   ScreenshotPopupOpen.Enabled:=B;
   ScreenshotPopupCopy.Enabled:=B;
   ScreenshotPopupSave.Enabled:=B;
+  ScreenshotPopupRename.Enabled:=B;
   ScreenshotPopupDelete.Enabled:=B;
   ScreenshotPopupDeleteAll.Enabled:=B;
+  ScreenshotPopupUseAsBackground.Enabled:=B;
 end;
 
 procedure TDFendReloadedMainForm.SoundListViewSelectItem(Sender: TObject; Item: TListItem; Selected: Boolean);
@@ -1680,10 +1704,11 @@ begin
 end;
 
 procedure TDFendReloadedMainForm.ScreenshotMenuWork(Sender: TObject);
-Var S : String;
+Var S,T : String;
     I : Integer;
     P : TPicture;
     G : TGame;
+    WPStype : TWallpaperStyle;
 begin
   Case (Sender as TComponent).Tag of
     0 : If ScreenshotListView.Selected<>nil then begin
@@ -1754,6 +1779,25 @@ begin
             MessageDlg(Format(LanguageSetup.MessageCouldNotCopyFile,[OpenDialog.FileName,S]),mtError,[mbOK],0);
             exit;
           end;
+          ListViewSelectItem(Sender,ListView.Selected,True);
+        end;
+    7 : If ScreenshotListView.Selected<>nil then begin
+          S:=Trim(TGame(ListView.Selected.Data).CaptureFolder);
+          If S<>'' then S:=MakeAbsPath(S,PrgSetup.BaseDir);
+          If S='' then exit;
+          If not ShowWallpaperStyleDialog(self,WPStype) then exit;
+          SetDesktopWallpaper(IncludeTrailingPathDelimiter(S)+ScreenshotListView.Selected.Caption,WPStype);
+        end;
+    8 : If ScreenshotListView.Selected<>nil then begin
+          S:=Trim(TGame(ListView.Selected.Data).CaptureFolder);
+          If S<>'' then S:=MakeAbsPath(S,PrgSetup.BaseDir);
+          If S='' then exit;
+            S:=IncludeTrailingPathDelimiter(S);
+          T:=ChangeFileExt(ScreenshotListView.Selected.Caption,'');
+          If not InputQuery(LanguageSetup.ScreenshotPopupRenameCaption,LanguageSetup.ScreenshotPopupRenameLabel,T) then exit;
+          T:=T+ExtractFileExt(ScreenshotListView.Selected.Caption);
+          If not RenameFile(S+ScreenshotListView.Selected.Caption,S+T) then
+            MessageDlg(Format(LanguageSetup.MessageCouldNotRenameFile,[S+SoundListView.Selected.Caption,S+T]),mtError,[mbOK],0);
           ListViewSelectItem(Sender,ListView.Selected,True);
         end;
   end;
@@ -1883,6 +1927,18 @@ begin
             T:=SoundListView.Items[I].Caption;
             ShellExecute(Handle,'open',PChar(PrgSetup.WaveEncOgg),PChar(Format(PrgSetup.WaveEncOggParamerers,[S+T,S+ChangeFileExt(T,'.ogg')])),nil,SW_SHOW);
           end;
+        end;
+   11 : If SoundListView.Selected<>nil then begin
+          S:=Trim(TGame(ListView.Selected.Data).CaptureFolder);
+          If S<>'' then S:=MakeAbsPath(S,PrgSetup.BaseDir);
+          If S='' then exit;
+          S:=IncludeTrailingPathDelimiter(S);
+          T:=ChangeFileExt(SoundListView.Selected.Caption,'');
+          If not InputQuery(LanguageSetup.ScreenshotPopupRenameCaption,LanguageSetup.ScreenshotPopupRenameLabel,T) then exit;
+          T:=T+ExtractFileExt(SoundListView.Selected.Caption);
+          If not RenameFile(S+SoundListView.Selected.Caption,S+T) then
+            MessageDlg(Format(LanguageSetup.MessageCouldNotRenameFile,[S+SoundListView.Selected.Caption,S+T]),mtError,[mbOK],0);
+          ListViewSelectItem(Sender,ListView.Selected,True);
         end;
   end;
 end;

@@ -22,16 +22,12 @@ object ProfileEditorForm: TProfileEditorForm
     Top = 0
     Width = 537
     Height = 595
-    ActivePage = GeneralSheet
+    ActivePage = ProfileSettingsSheet
     Images = ImageList
     MultiLine = True
     TabOrder = 0
     object ProfileSettingsSheet: TTabSheet
       Caption = 'ProfileSettingsSheet'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object ExtraDirsLabel: TLabel
         Left = 12
         Top = 288
@@ -188,10 +184,6 @@ object ProfileEditorForm: TProfileEditorForm
     object GameInfoSheet: TTabSheet
       Caption = 'GameInfoSheet'
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object NotesLabel: TLabel
         Left = 12
         Top = 245
@@ -714,10 +706,6 @@ object ProfileEditorForm: TProfileEditorForm
     object AutoexecSheet: TTabSheet
       Caption = 'AutoexecSheet'
       ImageIndex = 6
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object AutoexecBootFloppyImageButton: TSpeedButton
         Tag = 13
         Left = 498
@@ -926,7 +914,7 @@ object ProfileEditorForm: TProfileEditorForm
         Width = 248
         Height = 21
         Style = csDropDownList
-        ItemHeight = 0
+        ItemHeight = 13
         ItemIndex = 0
         TabOrder = 9
         Text = 'Master (2)'
@@ -968,10 +956,6 @@ object ProfileEditorForm: TProfileEditorForm
     object CustomSetsSheet: TTabSheet
       Caption = 'CustomSetsSheet'
       ImageIndex = 7
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object CustomSetsEnvLabel: TLabel
         Left = 13
         Top = 275

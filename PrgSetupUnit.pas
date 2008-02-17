@@ -66,6 +66,7 @@ Type TPrgSetup=class(TBasePrgSetup)
     property AllowPhysFSUsage : Boolean index 16 read GetBoolean write SetBoolean;
     property AllowTextModeLineChange : Boolean index 17 read GetBoolean write SetBoolean;
     property VersionSpecificUpdateCheck : Boolean index 18 read GetBoolean write SetBoolean;
+    property CenterDOSBoxWindow : Boolean index 19 read GetBoolean write SetBoolean;
 
     property MainLeft : Integer index 0 read GetInteger write SetInteger;
     property MainTop : Integer index 1 read GetInteger write SetInteger;
@@ -145,6 +146,7 @@ begin
   AddBooleanRec(16,'ProgramSets','AllowPhysFSUsage',False);
   AddBooleanRec(17,'ProgramSets','AllowTextModeLineChange',False);
   AddBooleanRec(18,'ProgramSets','VersionSpecificUpdateCheck',True);
+  AddBooleanRec(19,'ProgramSets','CenterDOSBoxWindow',False);
 
   AddIntegerRec(0,'ProgramSets','MainLeft',-1);
   AddIntegerRec(1,'ProgramSets','MainTop',-1);

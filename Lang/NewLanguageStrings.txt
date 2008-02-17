@@ -1,167 +1,47 @@
-[Global]
-On=On
-Off=Off
-DoNotChange=Do not change
-Left=Left
-Right=Right
+[LanguageInfo]
+NoVersionGiven=The choosen language file has no version information. Perhaps not all needed strings are available in this file.
+Outdated=The choosen language file was made for D-Fend Reloaded %s. You are using version %s, this means there will be some untranslated strings in the program if you use this langauge file.
 
 [Messages]
-NoRecordSelected=No record has been selected.
-NoProfileName=You have to define a name for the new game.
-InvalidValue=The value "%s" is invalid for "%s". If you continue the value will be ignored and the old value "%s" will be kept. Continue ?
+CouldNotRenameFile=Cound not rename file from %s to %s.
+FileNotFound=The file %s does not exist.
+NoDriveSelected=No drive has been selected.
+CoundNotDrive.Open=Could not open drive %s for direct reading.
+CoundNotDrive.GetData=Could not read drive information from drive %s.
+CoundNotDrive.ExtAccess=Could not activate extended read access for drive %s.
+CoundNotDrive.ReadError=Read error reading from drive %s.
 
 [Menu]
-View.ShowScreenshots=Show &screenshots and sound files
-View.ListNoIcons=List (no icons)
-View.ReportNoIcons=Report (no icons)
-View.Report=Report
-View.SmallIcons=Small icons
-Profile.ViewConfFile=&View DOSBox conf file
-Help.AbandonwareInfo=The website you want to open does not belong to the D-Fend Reloaded project. All linked abandonded ware sites say from themselves they offer only games for download when this is permitted. But because sites can change, D-Fend Reloaded can not guarantee this for these links for the future.
-Help.Homepage=D-Fend Reloaded Homepage
-Help.Forum=Forum
-Help.FAQs=FAQs
-Help.MakeDFendReloadedBetter=Help making D-Fend Reloaded better
-Help.MakeDFendReloadedBetter.BetterIcons=Make better icons
-Help.MakeDFendReloadedBetter.Translation=Translate the program to your language
-Help.Statistics=Statistics...
-Popup.ViewConfFile=&View DOSBox conf file
-ScreenshotPopup.Import.Title=Import screenshot
-ScreenshotPopup.Import.Filter=All readable image files|*.png;*.jpeg;*.jpg;*.gif;*.bmp|JPEG image (*.jpeg)|*.jpeg;*.jpg|GIF image (*.gif)|*.gif|Windows BMP image (*.bmp)|*.bmp|Portable Network Graphics (*.png)|*.png|All files (*.*)|*.*
-SoundsPopup.SaveMp3=Save as &mp3 file...
-SoundsPopup.SaveOgg=Save as &ogg file...
-SoundsPopup.SaveMp3All=Save all wave files as mp3 files
-SoundsPopup.SaveOggAll=Save all wave files as ogg files
-TreeViewPopup.UserDefinedCategories=Setup user-defined categories
-
-[Capture]
-Screenshots=Screenshots
-Sounds=Sounds
-
-[ProfileEditorForm]
-Game=Program
-Setup=Setup
-SetupInfo=If the game has no setup program you can leave the "Setup file" field blank.
-UserdefinedInfo=User defined information
-Sound.Mixer=Mixer
-Sound.Volume=Volume
-Sound.MasterVolume=Master
-Sound.PCSpeaker=PC speaker
-Sound.FM=FM
-DirectorySheet=Directories
-HardwareSheet=Hardware
-HardwareInfo=Select one of the subcategories to change the hardware settings.
-CPUSheet=CPU
-MemorySheet=Memory
-GraphicsSheet=Graphics
-KeyboardSheet=Keyboard
-MouseSheet=Mouse
-SerialPortsSheet=Serial ports
-SerialPortsInfo=Select one of the subcategories to change the one of the serial ports.
-NetworkSheet=Network
-DOSEnvironmentSheet=DOS environment
-StartingSheet=Starting
-NeedFreeDOS=This feature uses the FreeDOS command line tools. The FreeDOS directory can be configurated in the "DOSBox" section of the setup dialog.
+Extras.CreateIMGImageFile=Create I&MG image from floppy...
+Extras.CreateISOImageFile=Create &ISO image from CD...
+ScreenshotPopup.Rename=&Rename...
+ScreenshotPopup.Rename.Caption=Rename file
+ScreenshotPopup.Rename.Label=New filename (without Extension)
+ScreenshotPopup.UseAsBackground=Use as &background...
 
 [ProfileMountingForm]
-PhysFSSheet=Folder and zip file as hard disk
-ZipFile=Zip file for mounting
-ZipFileFilter=Zip archive files (*.zip)|*.zip|All files (*.*)|*.*
+FloppyImage.Create=Create empty image...
+FloppyImage.Read=Read image from floppy disk...
 
 [SetupForm]
-DirectoriesSheet=Directories
-StartSizeLabel=Window size at program start:
-StartSizeNormal=Default size
-StartSizeMaximized=Start maximized
-ProfileEditorDFendStyle=Use classic D-Fend style profile editor
-ProfileEditorModern=Use modern profile editor
-Update0=Only manual update checks (Menu: Help|Check for updates)
-Update1=Check once a week
-Update2=Check once every day
-Update3=Check on every program start
-UpdateInfo=While checking for updates no data is transfered to the internet. D-Fend Reloaded will only check an information file stored on SourceForge.net and offer you to download the regular update file if there is any.
-GamesListGUI.Columns=Columns in the games list
-GamesListGUI.ListAppearance=Appearance of the games list
-GamesListGUI.TreeAppearance=Appearance of the tree structure
-GamesListGUI.ScreenshotListAppearance=Appearance of the screenshot and sound file preview
-BackgroundColor.Default=Default background color
-BackgroundColor.Color=Background color
-BackgroundColor.Image=Background image
-Font.Size=Font size
-Font.Color=Font color
-Toolbar=Toolbar
-TreeView.UserDefinedGroups.Label=User-defined filter categories:
-TreeView.UserDefinedGroups.InfoLabel=The user-defined categories will be displayed in the tree structure as additional filter categories. You can setup user-defined categories for each game in the profile editor section "User defined information".');
-SetupMode=Mode:
-SetupMode.Easy=Easy
-SetupMode.Advanced=Advanced
-WaveEnc=Wave encoder
-WaveEnc.Mp3=Wave to mp3 encoder
-WaveEnc.Ogg=Wave to ogg encoder
-SearchLame=Search Lame program file
-SearchOggEnc=Search OggEnc program file
+CenterDOSBoxWindow=Center DOSBox window
 
-[CreateShortcutForm]
-UseProfileIcon=Use icon from profile
+[ViewImageForm]
+BackgroundImage=As background
 
-[InfoForm]
-DFend=D-Fend Reloaded is a complete rewrite of the discontinued good old D-Fend.[13][13]D-Fend (http://members.home.nl/mabus/) was once one of the best DOSBox frondends at all and I was very sad to see its development stopped.[13][13]But one the other side: If the development of D-Fend had not stopped, D-Fend Reloaded would never have been written.
+[WallpaperForm]
+Caption=Wallpaper style
+Style.Tile=Tile
+Style.Center=Center
+Style.Stretch=Stretch
 
-[StatisticsForm]
-Caption=Statistics
-NumberOfProfiles=Profiles
-NumberOfTemplates=Templates
-NumberOfIcons=Icons
-NumberOfProfilesByGenre=Profiles by genre
-
-[GameSetup]
-TextModeLines=Text mode lines
-CyclesInfo=When DOSBox is running, you can increase / decrease the CPU cycles by pressing Ctrl+F12 / Ctrl+F11.
-AutoLockMouseInfo=If this option is activated, the mouse will automatically lock, if you click on the screen. You can lock/unlock the mouse at any time manually by pressing Ctrl+F10.
-Force2ButtonMouseMode=Force 2-button mouse mode
-SwapMouseButtons=Swap mouse buttons
-DOSBoxVersion=DOSBox installation to use
-DOSBoxVersion.Default=Use default DOSBox installation
-DOSBoxVersion.Custom=Use this custom DOSBox installation
-KeyboardLayout.Info=If you select "default" as keyboard leayout, the default value of this D-Fend language setup will be used ("US (US)").
-Keyboard.NumLock=Num lock status
-Keyboard.CapsLock=Caps lock status
-Keyboard.ScrollLock=Scroll lock status
-ReportedDOSVersion=Reported DOS version
-
-[UpdateCheck]
-UpdateCannotFindFile=Cannot find file
-UpdateDownloadFailed=Download failed
-UpdateURL=URL
-UpdateDownloading=Downloading...
-UpdateConnecting=Connecting...
-UpdateFileName=File name
-UpdateTransfered=Transfered
-UpdateFileSize=File size
-UpdateRamainingTime=Remaining time
-UpdateTotalTime=Total time
-UpdateCannotReadFile=Cannot read file
-UpdateNoUpdates=No updates available at the moment.
-UpdateNewVersionPart1=New version
-UpdateNewVersionPart2=on server. Do you want to update now ?
-
-[CacheChoose]
-Caption=File conflict
-Info=The listed profiles have changed on disk. This changes will be overwritten with the profiles in memory when D-Fend Reloaded closes. If you want to keep the manual made changes to the files on the disk, you have to reload this files now. Please select which profiles should be reloaded from disk now.
-
-[LanguageEditor]
-Caption=Language editor
-Edit.ThisLanguage=Edit this language
-Edit.NewLanguage=Start new language
-PrgDirWarning=The choosen language file is stored in the D-Fend Reloaded program folder. This folder is may not writeable. It is recommended to edit language files from the data directory only. Continue anyway ?
-Info.AllTranslated=All strings in this section seam to be translated.
-Info.OneTranslationMissing=There is one string in this section which is may not translated.
-Info.TranslationsMissing=There are %d strings in this section which are may not translated.
-
-[SoundCapure]
-SaveTitle=Save sound file
-SaveWavFilter=Wave files (*.wav)|*.wav|All files (*.*)|*.*
-SaveMP3Filter=mp3 files (*.mp3)|*.mp3|All files (*.*)|*.*
-SaveOGGFilter=Ogg Vorbis files (*.ogg)|*.ogg|All files (*.*)|*.*
-ImportTitle=Import sound file
-ImpottFilter=All readable audio files|*.wav;*.mp3;*.ogg;*.wma|Wave files (*.wav)|*.wav|mp3 files (*.mp3)|*.mp3|Ogg Vorbis files (*.ogg)|*.ogg|Windows media audio (*.wma)|*.wma|All files (*.*)|*.*
+[ReadImage]
+CaptionISO=Create ISO image from CD
+CaptionIMG=Create IMG image from floppy
+DriveLabelCD=CD drive
+DriveLabelFloppy=Floppy drive
+FileName=Image filename
+FileName.TitleISO=Save ISO image
+FileName.TitleIMG=Save IMG image
+Info1=%s KB read
+Info2=total %s KB to read

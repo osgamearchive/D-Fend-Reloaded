@@ -125,8 +125,8 @@ procedure TModernProfileEditorCPUFrame.GetGame(const Game: TGame);
 begin
   Game.Core:=CPUCoreRadioGroup.Items[CPUCoreRadioGroup.ItemIndex];
 
-  If CyclesAutoRadioButton.Checked then Game.Cycles:='Auto';
-  If CyclesMaxRadioButton.Checked then Game.Cycles:='Max';
+  If CyclesAutoRadioButton.Checked then Game.Cycles:='auto';
+  If CyclesMaxRadioButton.Checked then Game.Cycles:='max';
   If CyclesValueRadioButton.Checked then Game.Cycles:=CyclesComboBox.Text;
 
   Game.CyclesUp:=CyclesUpEdit.Value;

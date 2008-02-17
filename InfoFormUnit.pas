@@ -51,6 +51,7 @@ Var I : Integer;
     Rec : TSearchRec;
     St : TStringList;
     Lang : TLanguageSetup;
+    S,T : String;
 begin
   SetVistaFonts(self);
 
@@ -63,7 +64,8 @@ begin
 
   VersionLabel.Caption:=GetFileVersionAsString;
   WrittenByLabel.Caption:=LanguageSetup.InfoFormWrittenBy+' Alexander Herzog';
-  eMailLabel.Caption:='alexanderherzog at users dot sourceforge dot net';
+  S:='alexanderherzog'; T:='users.sourceforge.net';
+  eMailLabel.Caption:=S+'@'+T;
   LanguageAuthorsTab.Cells[0,0]:=LanguageSetup.InfoFormLanguageFile;
   LanguageAuthorsTab.Cells[1,0]:=LanguageSetup.InfoFormLanguageAuthor;
   LanguageAuthorsTab.ColWidths[0]:=150;
