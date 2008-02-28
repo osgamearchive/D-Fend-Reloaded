@@ -21,7 +21,7 @@ type
     { Private-Deklarationen }
   public
     { Public-Deklarationen }
-    Procedure InitGUI(const OnProfileNameChange : TTextEvent; const GameDB: TGameDB; const CurrentProfileName : PString);
+    Procedure InitGUI(const OnProfileNameChange : TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup : PString);
     Procedure SetGame(const Game : TGame; const LoadFromTemplate : Boolean);
     Function CheckValue : Boolean;
     Procedure GetGame(const Game : TGame);
@@ -35,7 +35,7 @@ uses VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgSetupUnit;
 
 { TModernProfileEditorDOSEnvironmentFrame }
 
-procedure TModernProfileEditorDOSEnvironmentFrame.InitGUI(const OnProfileNameChange: TTextEvent; const GameDB: TGameDB; const CurrentProfileName: PString);
+procedure TModernProfileEditorDOSEnvironmentFrame.InitGUI(const OnProfileNameChange: TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup: PString);
 Var St : TStringList;
 begin
   NoFlicker(ReportedDOSVersionComboBox);

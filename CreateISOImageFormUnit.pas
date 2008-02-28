@@ -25,7 +25,7 @@ type
     { Public-Deklarationen }
     FileName : String;
     Drive : Char;
-    FloppyMode : Boolean;
+    FloppyMode, WriteMode : Boolean;
   end;
 
 var
@@ -33,6 +33,7 @@ var
 
 Function ShowCreateISOImageDialog(const AOwner : TComponent; var AFileName : String; const AFloppyMode : Boolean) : Boolean; overload;
 Function ShowCreateISOImageDialog(const AOwner : TComponent; const AFloppyMode : Boolean) : Boolean; overload;
+Function ShowWriteIMGImageDialog(const AOwner : TComponent) : Boolean;
 
 implementation
 
@@ -45,6 +46,9 @@ procedure TCreateISOImageForm.FormCreate(Sender: TObject);
 begin
   SetVistaFonts(self);
 
+  FloppyMode:=False;
+  WriteMode:=False;
+
   OKButton.Caption:=LanguageSetup.OK;
   CancelButton.Caption:=LanguageSetup.Cancel;
   FileNameEdit.EditLabel.Caption:=LanguageSetup.ReadImageFileName;
@@ -56,10 +60,15 @@ Var C : Char;
     I,J : Cardinal;
 begin
   If FloppyMode then begin
-    Caption:=LanguageSetup.ReadImageCaptionIMG;
+    If WriteMode then begin
+      Caption:=LanguageSetup.WriteImageCaptionIMG;
+      SaveDialog.Title:=LanguageSetup.WriteImageFileNameTitleIMG;
+    end else begin
+      Caption:=LanguageSetup.ReadImageCaptionIMG;
+      SaveDialog.Title:=LanguageSetup.ReadImageFileNameTitleIMG;
+    end;
     DriveLabel.Caption:=LanguageSetup.ReadImageDriveLabelFloppy;
     SaveDialog.Filter:=LanguageSetup.ReadImageFileNameFilterIMG;
-    SaveDialog.Title:=LanguageSetup.ReadImageFileNameTitleIMG;
     SaveDialog.DefaultExt:='img';
   end else begin
     Caption:=LanguageSetup.ReadImageCaptionISO;
@@ -147,5 +156,37 @@ Var AFileName : String;
 begin
   result:=ShowCreateISOImageDialog(AOwner,AFileName,AFloppyMode);
 end;
+
+Function ShowWriteIMGImageDialog(const AOwner : TComponent) : Boolean;
+Var ReadResult : TReadDataResult;
+    S, AFileName : String;
+    ADrive : Char;
+begin
+  CreateISOImageForm:=TCreateISOImageForm.Create(AOwner);
+  try
+    CreateISOImageForm.FloppyMode:=True;
+    CreateISOImageForm.WriteMode:=True;
+    result:=(CreateISOImageForm.ShowModal=mrOK);
+    if result then begin
+      AFileName:=CreateISOImageForm.FileName;
+      ADrive:=CreateISOImageForm.Drive;
+      ReadResult:=ShowDriveWriteDialog(AOwner,ADrive,AFileName);
+      result:=(ReadResult=RD_OK);
+      Case ReadResult of
+        RD_CannotOpen              : S:=Format(LanguageSetup.MessageCouldNotDriveOpen,[String(ADrive)]);
+        RD_CannotGetDriveData      : S:=Format(LanguageSetup.MessageCouldNotDriveGetData,[String(ADrive)]);
+        RD_CannotSetExtendedAccess : S:=Format(LanguageSetup.MessageCouldNotDriveSetExtAccess,[String(ADrive)]);
+        RD_CannotOpenInputFile     : S:=Format(LanguageSetup.MessageCouldNotOpenFile,[AFileName]);
+        RD_WriteError              : S:=Format(LanguageSetup.MessageCouldNotDriveWriteError,[String(ADrive)]);
+        else exit;
+      end;
+      MessageDlg(S,mtError,[mbOK],0);
+    end;
+  finally
+    CreateISOImageForm.Free;
+  end;
+
+end;
+
 
 end.

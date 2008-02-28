@@ -46,13 +46,16 @@ const NR_Name=1;
 
       NR_Icon=101;
       NR_GameExe=102;
-      NR_SetupExe=103;
-      NR_GameParameters=104;
-      NR_SetupParameters=105;
-      NR_LoadFix=106;
-      NR_LoadFixMemory=107;
-      NR_CaptureFolder=108;
-      NR_ExtraDirs=109;
+      NR_GameExeMD5=103;
+      NR_SetupExe=104;
+      NR_SetupExeMD5=105;
+      NR_GameParameters=106;
+      NR_SetupParameters=107;
+      NR_LoadFix=108;
+      NR_LoadFixMemory=109;
+      NR_CaptureFolder=110;
+      NR_ExtraDirs=111;
+      NR_LastModification=112;
 
       NR_Genre=201;
       NR_Developer=202;
@@ -119,6 +122,7 @@ const NR_Name=1;
       NR_Mount7=509;
       NR_Mount8=510;
       NR_Mount9=511;
+      NR_AutoMountCDs=512;
 
       NR_MixerNosound=601;
       NR_MixerRate=602;
@@ -175,10 +179,13 @@ const NR_Name=1;
       NR_Environment=1202;
 
       NR_LastOpenTab=1301;
+      NR_LastOpenTabModern=1302;
 
 Type TGame=class(TBasePrgSetup)
   private
     Procedure InitData;
+  protected
+    Procedure UpdatingFile; override;  
   public
     CacheName : String;
     CacheGenre : String;
@@ -198,13 +205,16 @@ Type TGame=class(TBasePrgSetup)
 
     property Icon : String index NR_Icon read GetString write SetString;
     property GameExe : String index NR_GameExe read GetString write SetString;
+    property GameExeMD5 : String index NR_GameExeMD5 read GetString write SetString;
     property SetupExe : String index NR_SetupExe read GetString write SetString;
+    property SetupExeMD5 : String index NR_SetupExeMD5 read GetString write SetString;
     property GameParameters : String index NR_GameParameters read GetString write SetString;
     property SetupParameters : String index NR_SetupParameters read GetString write SetString;
     property LoadFix : Boolean index NR_LoadFix read GetBoolean write SetBoolean;
     property LoadFixMemory : Integer index NR_LoadFixMemory read GetInteger write SetInteger;
     property CaptureFolder : String index NR_CaptureFolder read GetString write SetString;
     property ExtraDirs : String index NR_ExtraDirs read GetString write SetString;
+    property LastModification : String index NR_LastModification read GetString write SetString;
 
     property Genre : String index NR_Genre read GetString write SetString;
     property Developer : String index NR_Developer read GetString write SetString;
@@ -271,6 +281,7 @@ Type TGame=class(TBasePrgSetup)
     property Mount7 : String index NR_Mount7 read GetString write SetString;
     property Mount8 : String index NR_Mount8 read GetString write SetString;
     property Mount9 : String index NR_Mount9 read GetString write SetString;
+    property AutoMountCDs : Boolean index NR_AutoMountCDs read GetBoolean write SetBoolean;
 
     property MixerNosound : Boolean index NR_MixerNosound read GetBoolean write SetBoolean;
     property MixerRate : Integer index NR_MixerRate read GetInteger write SetInteger;
@@ -327,6 +338,7 @@ Type TGame=class(TBasePrgSetup)
     property Environment : String index NR_Environment read GetString write SetString;
 
     property LastOpenTab : Integer index NR_LastOpenTab read GetInteger write SetInteger;
+    property LastOpenTabModern : Integer index NR_LastOpenTabModern read GetInteger write SetInteger;
 end;
 
 Type TGameDB=class
@@ -500,13 +512,16 @@ begin
 
   AddStringRec(NR_Icon,'ExtraInfo','Icon','');
   AddStringRec(NR_GameExe,'Extra','Exe','');
+  AddStringRec(NR_GameExeMD5,'Extra','ExeMD5','');
   AddStringRec(NR_SetupExe,'Extra','Setup','');
+  AddStringRec(NR_SetupExeMD5,'Extra','SetupMD5','');
   AddStringRec(NR_GameParameters,'Extra','GameParameters','');
   AddStringRec(NR_SetupParameters,'Extra','SetupParameters','');
   AddBooleanRec(NR_LoadFix,'Extra','Loadhigh',False);
   AddIntegerRec(NR_LoadFixMemory,'Extra','LoadFixVal',64);
   AddStringRec(NR_CaptureFolder,'dosbox','captures','.\'+CaptureSubDir+'\');
   AddStringRec(NR_ExtraDirs,'Extra','ExtraDirs','');
+  AddStringRec(NR_LastModification,'Extra','LastModification','');
 
   AddStringRec(NR_Genre,'ExtraInfo','Genre','');
   AddStringRec(NR_Developer,'ExtraInfo','Developer','');
@@ -573,6 +588,7 @@ begin
   AddStringRec(NR_Mount7,'Extra','7','');
   AddStringRec(NR_Mount8,'Extra','8','');
   AddStringRec(NR_Mount9,'Extra','9','');
+  AddBooleanRec(NR_AutoMountCDs,'Extra','AutoMountCDs',False);
 
   AddBooleanRec(NR_MixerNosound,'mixer','nosound',false);
   AddIntegerRec(NR_MixerRate,'mixer','rate',22050);
@@ -628,6 +644,7 @@ begin
   AddStringRec(NR_Environment,'Extra','Environment','PATH[61]Z:\');
 
   AddIntegerRec(NR_LastOpenTab,'Extra','Tab',0);
+  AddIntegerRec(NR_LastOpenTabModern,'Extra','Tab2',-1);
 end;
 
 procedure TGame.LoadCache;
@@ -639,6 +656,11 @@ begin
   CacheYear:=Year;
   CacheLanguage:=Language;
   CacheUserInfo:=UserInfo;
+end;
+
+procedure TGame.UpdatingFile;
+begin
+  LastModification:=IntToStr(Round(Int(Now)))+'-'+IntToStr(Round(Frac(Now)*86400))
 end;
 
 { TGameDB }

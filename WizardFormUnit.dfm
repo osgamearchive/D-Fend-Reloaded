@@ -245,6 +245,10 @@ object WizardForm: TWizardForm
     object InfoSheet: TTabSheet
       Caption = 'Programminformationen'
       ImageIndex = 1
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object NotesLabel: TLabel
         Left = 12
         Top = 205
@@ -275,12 +279,22 @@ object WizardForm: TWizardForm
     object SystemSheet: TTabSheet
       Caption = 'Systemeinstellungen'
       ImageIndex = 2
+      DesignSize = (
+        449
+        448)
       object CPULabel: TLabel
         Left = 16
         Top = 152
         Width = 68
         Height = 13
         Caption = 'CPU-Leistung:'
+      end
+      object DriveSetupLabel: TLabel
+        Left = 16
+        Top = 301
+        Width = 153
+        Height = 13
+        Caption = 'Aktuell konfigurierte Laufwerke:'
       end
       object StartFullscreenCheckBox: TCheckBox
         Left = 16
@@ -322,6 +336,25 @@ object WizardForm: TWizardForm
         Height = 17
         Caption = 'Programm ben'#246'tigt viel Arbeitsspeicher'
         TabOrder = 3
+      end
+      object DriveSetupCheckBox: TCheckBox
+        Left = 16
+        Top = 415
+        Width = 409
+        Height = 17
+        Caption = 'Laufwerkseditor nach Abschluss des Assistenten '#246'ffnen'
+        TabOrder = 5
+      end
+      object DriveSetupList: TListView
+        Left = 16
+        Top = 320
+        Width = 409
+        Height = 89
+        Anchors = [akLeft, akTop, akRight, akBottom]
+        Columns = <>
+        ReadOnly = True
+        TabOrder = 4
+        ViewStyle = vsReport
       end
     end
   end

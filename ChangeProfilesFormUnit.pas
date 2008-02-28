@@ -82,6 +82,7 @@ uses Math, VistaToolsUnit, LanguageSetupUnit, PrgConsts, CommonTools,
 procedure TChangeProfilesForm.FormCreate(Sender: TObject);
 begin
   SetVistaFonts(self);
+  PageControl.ActivePageIndex:=0;
 end;
 
 procedure TChangeProfilesForm.FormShow(Sender: TObject);
@@ -183,6 +184,7 @@ end;
 procedure TChangeProfilesForm.OKButtonClick(Sender: TObject);
 Var I,J : Integer;
     G : TGame;
+    S : String;
 begin
   For I:=0 to ListBox.Items.Count-1 do If ListBox.Checked[I] then begin
     G:=TGame(ListBox.Items.Objects[I]);
@@ -197,6 +199,14 @@ begin
     If LockMouseCheckBox.Checked then G.AutoLockMouse:=(LockMouseComboBox.ItemIndex=1);
     If UseDoublebufferCheckBox.Checked then G.UseDoublebuffering:=(UseDoublebufferComboBox.ItemIndex=1);
     If RenderCheckBox.Checked then G.Render:=RenderComboBox.Text;
+    If WindowResolutionCheckBox.Checked then G.WindowResolution:=WindowResolutionComboBox.Text;
+    If FullscreenResolutionCheckBox.Checked then G.FullscreenResolution:=FullscreenResolutionComboBox.Text;
+    If ScaleCheckBox.Checked then begin
+      S:=ScaleComboBox.Text;
+      If Pos('(',S)=0 then G.Scale:='' else begin
+        S:=Copy(S,Pos('(',S)+1,MaxInt); If Pos(')',S)=0 then G.Scale:=''  else G.Scale:=Copy(S,1,Pos(')',S)-1);
+      end;
+    end;
     If MemoryCheckBox.Checked then begin try J:=Min(63,Max(1,StrToInt(MemoryComboBox.Text))); except J:=32; end; G.Memory:=J; end;
     If CPUCyclesCheckBox.Checked then G.Cycles:=CPUCyclesComboBox.Text;
     If EmulationCoreCheckBox.Checked then G.Core:=EmulationCoreComboBox.Text;

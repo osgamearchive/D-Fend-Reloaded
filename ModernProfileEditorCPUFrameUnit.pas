@@ -24,7 +24,7 @@ type
     SaveCycles : String;
   public
     { Public-Deklarationen }
-    Procedure InitGUI(const OnProfileNameChange : TTextEvent; const GameDB: TGameDB; const CurrentProfileName : PString);
+    Procedure InitGUI(const OnProfileNameChange : TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup : PString);
     Procedure SetGame(const Game : TGame; const LoadFromTemplate : Boolean);
     Function CheckValue : Boolean;
     Procedure GetGame(const Game : TGame);
@@ -38,7 +38,7 @@ uses CommonTools, LanguageSetupUnit, VistaToolsUnit;
 
 { TModernProfileEditorCPUFrame }
 
-procedure TModernProfileEditorCPUFrame.InitGUI(const OnProfileNameChange: TTextEvent; const GameDB: TGameDB; const CurrentProfileName: PString);
+procedure TModernProfileEditorCPUFrame.InitGUI(const OnProfileNameChange: TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup: PString);
 Var St : TStringList;
     I : Integer;
     S : String;

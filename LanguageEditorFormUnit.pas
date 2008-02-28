@@ -136,7 +136,7 @@ begin
       St3.Clear; Ini2.ReadSection(Section,St3);
       For I:=0 to St3.Count-1 do If St2.IndexOf(ExtUpperCase(St3[I]))<0 then begin St2.Add(ExtUpperCase(St3[I])); St.Add(St3[I]); end;
 
-      Tab.RowCount:=Max(2,St.Count);
+      Tab.RowCount:=Max(2,St.Count+1);
       Tab.Cells[0,1]:=''; Tab.Cells[1,1]:=''; Tab.Cells[2,1]:='';
       For I:=0 to St.Count-1 do begin
         Tab.Cells[0,I+1]:=St[I];

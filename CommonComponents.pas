@@ -29,6 +29,7 @@ Type TBasePrgSetup=class
     FStoreConfigOnExit : Boolean;
     FOnChanged : TNotifyEvent;
     FLastTimeStamp : DWord;
+    FChanged : Boolean;
     Procedure ClearLists;
     Function IndexOf(const Nr : Integer; const List : TConfigRecArray; var Index : TConfigIndexArray) : Integer; inline;
     Procedure AddRec(const Nr : Integer; const Section, Key : String; const Default : Variant; var List : TConfigRecArray);
@@ -43,6 +44,7 @@ Type TBasePrgSetup=class
     procedure SetBoolean(const Index: Integer; const Value: Boolean);
     procedure SetInteger(const Index, Value: Integer);
     procedure SetString(const Index: Integer; const Value: String);
+    Procedure UpdatingFile; virtual;
   public
     Constructor Create(const ASetupFile : String); overload;
     Constructor Create(const ABasePrgSetup : TBasePrgSetup); overload;
@@ -53,6 +55,7 @@ Type TBasePrgSetup=class
     Function CheckAndUpdateTimeStamp : Boolean; {True=changed}
     Procedure ReloadINI;
     Procedure RenameINI(const NewFile : String);
+    Procedure SetChanged;
     property SetupFile : String read FSetupFile;
     property FirstRun : Boolean read FFirstRun;
     property StoreConfigOnExit : Boolean read FStoreConfigOnExit write FStoreConfigOnExit;
@@ -96,6 +99,7 @@ begin
   end;
   ClearLists;
   FStoreConfigOnExit:=True;
+  FChanged:=False;
 end;
 
 constructor TBasePrgSetup.Create(const ABasePrgSetup: TBasePrgSetup);
@@ -106,6 +110,7 @@ begin
   Ini:=ABasePrgSetup.Ini;
   ClearLists;
   FStoreConfigOnExit:=True;
+  FChanged:=False;
 end;
 
 destructor TBasePrgSetup.Destroy;
@@ -128,19 +133,19 @@ begin
       St2.Free;
     end;
 
-    ClearLists;
     try
       If FStoreConfigOnExit then begin
         ForceDirectories(ExtractFilePath(Ini.FileName));
-        Ini.UpdateFile;
+        If FChanged then try UpdatingFile; Ini.UpdateFile; except end;
       end;
     except end;
+    ClearLists;
     Ini.Free;
   end else begin
     try
       If FStoreConfigOnExit and (Ini<>nil) then begin
         ForceDirectories(ExtractFilePath(Ini.FileName));
-        Ini.UpdateFile;
+        If FChanged then try UpdatingFile; Ini.UpdateFile; except end;
       end;
     except end;
   end;
@@ -156,6 +161,7 @@ begin
   If not FileExists(FSetupFile) then begin
     ForceDirectories(ExtractFilePath(FSetupFile));
     Ini.UpdateFile;
+    FChanged:=False;
     FLastTimeStamp:=GetSimpleFileTime(FSetupFile);
     result:=False;
     exit;
@@ -236,9 +242,14 @@ begin
   For I:=0 to length(StringList)-1 do
     Ini.WriteString(StringList[I].Section,StringList[I].Key,GetString(StringList[I].Nr));
 
-  try Ini.UpdateFile; except end; {Language Files may be read only in program foldes}
+  try If FChanged then UpdatingFile; Ini.UpdateFile; except end; {Language Files may be read only in program foldes}
+  FChanged:=False;
 
   CheckAndUpdateTimeStamp;
+end;
+
+procedure TBasePrgSetup.UpdatingFile;
+begin
 end;
 
 procedure TBasePrgSetup.ResetToDefault;
@@ -253,7 +264,9 @@ begin
   For I:=0 to length(StringList)-1 do
     SetString(StringList[I].Nr,StringList[I].DefaultString);
 
+  UpdatingFile;
   try Ini.UpdateFile; except end; {Language Files may be read only in program foldes}
+  FChanged:=False;
 
   CheckAndUpdateTimeStamp;
 end;
@@ -339,6 +352,11 @@ begin
   end;
 end;
 
+procedure TBasePrgSetup.SetChanged;
+begin
+  FChanged:=True;
+end;
+
 function TBasePrgSetup.GetString(const Index: Integer): String;
 Var I : Integer;
 begin
@@ -359,6 +377,7 @@ begin
     If DefaultBool=Value then Ini.DeleteKey(Section,Key) else Ini.WriteBool(Section,Key,Value);
     Cached:=True;
     CacheValueBool:=Value;
+    FChanged:=True;
   end;
 end;
 
@@ -371,6 +390,7 @@ begin
     If DefaultInteger=Value then Ini.DeleteKey(Section,Key) else Ini.WriteInteger(Section,Key,Value);
     Cached:=True;
     CacheValueInteger:=Value;
+    FChanged:=True;
   end;
 end;
 
@@ -383,6 +403,7 @@ begin
     If DefaultString=Value then Ini.DeleteKey(Section,Key) else Ini.WriteString(Section,Key,Value);
     Cached:=True;
     CacheValueString:=Value;
+    FChanged:=True;
   end;
 end;
 

@@ -32,10 +32,11 @@ type
     FOnProfileNameChange : TTextEvent;
     IconName : String;
     OldFileName : String;
+    ProfileExe,ProfileSetup : PString;
     procedure LoadIcon;
   public
     { Public-Deklarationen }
-    Procedure InitGUI(const OnProfileNameChange : TTextEvent; const GameDB: TGameDB; const CurrentProfileName : PString);
+    Procedure InitGUI(const OnProfileNameChange : TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup : PString);
     Procedure SetGame(const Game : TGame; const LoadFromTemplate : Boolean);
     Function CheckValue : Boolean;
     Procedure GetGame(const Game : TGame);
@@ -44,13 +45,13 @@ type
 implementation
 
 uses LanguageSetupUnit, VistaToolsUnit, IconManagerFormUnit, PrgSetupUnit,
-     PrgConsts, CommonTools;
+     PrgConsts, CommonTools, GameDBToolsUnit;
 
 {$R *.dfm}
 
 { TModernProfileEditorBaseFrame }
 
-procedure TModernProfileEditorBaseFrame.InitGUI(const OnProfileNameChange: TTextEvent; const GameDB: TGameDB; const CurrentProfileName : PString);
+procedure TModernProfileEditorBaseFrame.InitGUI(const OnProfileNameChange: TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup : PString);
 begin
   NoFlicker(ProfileNameEdit);
   NoFlicker(ProfileFileNameEdit);
@@ -80,6 +81,9 @@ begin
   SetupParameterEdit.EditLabel.Caption:=LanguageSetup.ProfileEditorSetupParameters;
 
   InfoLabel.Caption:=LanguageSetup.ProfileEditorSetupInfo;
+
+  ProfileExe:=CurrentProfileExe;
+  ProfileSetup:=CurrentProfileSetup;
 end;
 
 procedure TModernProfileEditorBaseFrame.SetGame(const Game: TGame; const LoadFromTemplate : Boolean);
@@ -109,6 +113,7 @@ begin
       ProfileNameEdit.Visible:=False;
       ProfileFileNameEdit.Text:=LanguageSetup.ProfileEditorNoFilename;
       ProfileFileNameEdit.Color:=Color;
+      ProfileNameEdit.ReadOnly:=True;
     end;
   end;
 
@@ -134,6 +139,7 @@ Var NewFileName : String;
 begin
   Game.Icon:=IconName;
   If not ProfileNameEdit.ReadOnly then Game.Name:=ProfileNameEdit.Text;
+  ProfileEditorCloseCheck(Game,GameExeEdit.Text,SetupExeEdit.Text);
   Game.GameExe:=GameExeEdit.Text;
   Game.GameParameters:=GameParameterEdit.Text;
   Game.SetupExe:=SetupExeEdit.Text;
@@ -147,7 +153,7 @@ end;
 
 procedure TModernProfileEditorBaseFrame.ProfileNameEditChange(Sender: TObject);
 begin
-  FOnProfileNameChange(Sender,ProfileNameEdit.Text);
+  FOnProfileNameChange(Sender,ProfileNameEdit.Text,ProfileExe^,ProfileSetup^);
 end;
 
 procedure TModernProfileEditorBaseFrame.IconButtonClick(Sender: TObject);

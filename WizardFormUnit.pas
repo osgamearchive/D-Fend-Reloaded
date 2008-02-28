@@ -39,6 +39,9 @@ type
     CPULabel: TLabel;
     CPUComboBox: TComboBox;
     MoreRAMCheckBox: TCheckBox;
+    DriveSetupLabel: TLabel;
+    DriveSetupCheckBox: TCheckBox;
+    DriveSetupList: TListView;
     procedure FormCreate(Sender: TObject);
     procedure ButtonWork(Sender: TObject);
     procedure StepButtonWork(Sender: TObject);
@@ -56,7 +59,7 @@ type
 var
   WizardForm: TWizardForm;
 
-Function ShowWizardDialog(const AOwner : TComponent; const AGameDB : TGameDB; var AGame : TGame; const ADefaultGame : TGame) : Boolean;
+Function ShowWizardDialog(const AOwner : TComponent; const AGameDB : TGameDB; var AGame : TGame; const ADefaultGame : TGame; var OpenEditorNow : Boolean) : Boolean;
 
 implementation
 
@@ -93,6 +96,8 @@ begin
   CPUComboBox.Items[1]:=LanguageSetup.WizardFormCPUType2;
   CPUComboBox.Items[2]:=LanguageSetup.WizardFormCPUType3;
   CPUComboBox.Items[3]:=LanguageSetup.WizardFormCPUType4;
+  DriveSetupLabel.Caption:=LanguageSetup.WizardFormDriveSetupLabel;
+  DriveSetupCheckBox.Caption:=LanguageSetup.WizardFormDriveSetupCheckBox;
 
   PreviousButton.Caption:=LanguageSetup.WizardFormButtonPrevious;
   NextButton.Caption:=LanguageSetup.WizardFormButtonNext;
@@ -101,10 +106,45 @@ begin
 
   GamesFolderEdit.Text:=PrgSetup.GameDir;
   BaseDataFolderEdit.Text:=PrgSetup.DataDir;
+
+  PageControl.ActivePageIndex:=0;
+end;
+
+procedure LoadMountingList(const Drive : String; const MountingListView : TListView);
+Var St : TStringList;
+    L : TListItem;
+    S : String;
+begin
+  MountingListView.Items.BeginUpdate;
+  try
+    MountingListView.Items.Clear;
+    St:=ValueToList(Drive);
+    try
+      L:=MountingListView.Items.Add;
+      S:=Trim(St[0]);
+      If (St.Count>1) and (Trim(ExtUpperCase(St[1]))='PHYSFS') then begin
+        If Pos('$',S)<>0 then S:=Copy(S,Pos('$',S)+1,MaxInt)+' (+ '+Copy(S,1,Pos('$',S)-1)+')';
+      end else begin
+        If Pos('$',S)<>0 then S:=Copy(S,1,Pos('$',S)-1)+' (+'+LanguageSetup.More+')';
+      end;
+      L.Caption:=S;
+      If St.Count>1 then L.SubItems.Add(St[1]) else L.SubItems.Add('');
+      If St.Count>2 then L.SubItems.Add(St[2]) else L.SubItems.Add('');
+      If St.Count>4 then L.SubItems.Add(St[4]) else L.SubItems.Add('');
+      If St.Count>3 then begin
+        If Trim(ExtUpperCase(St[3]))='TRUE' then L.SubItems.Add(RemoveUnderline(LanguageSetup.Yes)) else L.SubItems.Add(RemoveUnderline(LanguageSetup.No));
+      end else L.SubItems.Add(RemoveUnderline(LanguageSetup.No));
+    finally
+      St.Free;
+    end;
+  finally
+    MountingListView.Items.EndUpdate;
+  end;
 end;
 
 procedure TWizardForm.FormShow(Sender: TObject);
 Var St : TStringList;
+    L : TListColumn;
 begin
   GameInfoValueListEditor.TitleCaptions.Clear;
   GameInfoValueListEditor.TitleCaptions.Add(LanguageSetup.Key);
@@ -137,6 +177,13 @@ begin
   GameInfoValueListEditor.Strings.ValueFromIndex[6]:=RemoveUnderline(LanguageSetup.No);
 
   CPUComboBox.ItemIndex:=1;
+
+  L:=DriveSetupList.Columns.Add; L.Width:=-2; L.Caption:=LanguageSetup.ProfileEditorMountingFolderImage;
+  L:=DriveSetupList.Columns.Add; L.Width:=-2; L.Caption:=LanguageSetup.ProfileEditorMountingAs;
+  L:=DriveSetupList.Columns.Add; L.Width:=-2; L.Caption:=LanguageSetup.ProfileEditorMountingLetter;
+  L:=DriveSetupList.Columns.Add; L.Width:=-2; L.Caption:=LanguageSetup.ProfileEditorMountingLabel;
+  L:=DriveSetupList.Columns.Add; L.Width:=-2; L.Caption:=LanguageSetup.ProfileEditorMountingIOControl;
+  LoadMountingList(MakeRelPath(PrgSetup.GameDir,PrgSetup.BaseDir)+';Drive;C;false;;',DriveSetupList);
 end;
 
 procedure TWizardForm.PageControlChange(Sender: TObject);
@@ -235,12 +282,12 @@ begin
     Game.Mount0:=MakeRelPath(PrgSetup.GameDir,PrgSetup.BaseDir)+';Drive;C;false;;';
   end;
 
-  Game.CaptureFolder:='.\'+CaptureSubDir+'\'+Game.Name;
+  Game.CaptureFolder:='.\'+CaptureSubDir+'\'+MakeFileSysOKFolderName(Game.Name);
 end;
 
 { global }
 
-Function ShowWizardDialog(const AOwner : TComponent; const AGameDB : TGameDB; var AGame : TGame; const ADefaultGame : TGame) : Boolean;
+Function ShowWizardDialog(const AOwner : TComponent; const AGameDB : TGameDB; var AGame : TGame; const ADefaultGame : TGame; var OpenEditorNow : Boolean) : Boolean;
 begin
   WizardForm:=TWizardForm.Create(AOwner);
   try
@@ -248,7 +295,10 @@ begin
     WizardForm.Game:=AGame;
     WizardForm.LoadTemplate:=ADefaultGame;
     result:=(WizardForm.ShowModal=mrOK);
-    if result then AGame:=WizardForm.Game;
+    if result then begin
+      AGame:=WizardForm.Game;
+      OpenEditorNow:=WizardForm.DriveSetupCheckBox.Checked;
+    end;
   finally
     WizardForm.Free;
   end;

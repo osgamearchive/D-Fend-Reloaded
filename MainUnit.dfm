@@ -2,7 +2,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
   Left = 0
   Top = 0
   Caption = 'D-Fend Reloaded'
-  ClientHeight = 784
+  ClientHeight = 734
   ClientWidth = 774
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -48,7 +48,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
   object Splitter: TSplitter
     Left = 169
     Top = 24
-    Height = 760
+    Height = 710
     ResizeStyle = rsUpdate
     ExplicitLeft = 224
     ExplicitTop = 192
@@ -58,7 +58,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
     Left = 0
     Top = 24
     Width = 169
-    Height = 760
+    Height = 710
     Align = alLeft
     HideSelection = False
     Images = ImageList
@@ -67,7 +67,6 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
     ReadOnly = True
     TabOrder = 0
     OnChange = TreeViewChange
-    ExplicitHeight = 740
   end
   object CoolBar: TCoolBar
     Left = 0
@@ -162,14 +161,13 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
     Left = 172
     Top = 24
     Width = 602
-    Height = 760
+    Height = 710
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 2
-    ExplicitHeight = 740
     object Splitter1: TSplitter
       Left = 0
-      Top = 564
+      Top = 514
       Width = 602
       Height = 3
       Cursor = crVSplit
@@ -182,7 +180,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
       Left = 0
       Top = 0
       Width = 602
-      Height = 564
+      Height = 514
       Align = alClient
       Columns = <>
       LargeImages = ListviewIconImageList
@@ -199,18 +197,16 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
       OnDblClick = ListViewDblClick
       OnInfoTip = ListViewInfoTip
       OnSelectItem = ListViewSelectItem
-      ExplicitHeight = 544
     end
     object CapturePageControl: TPageControl
       Left = 0
-      Top = 567
+      Top = 517
       Width = 602
       Height = 193
       ActivePage = CaptureScreenshotsTab
       Align = alBottom
       MultiLine = True
       TabOrder = 1
-      ExplicitTop = 547
       object CaptureScreenshotsTab: TTabSheet
         Caption = 'Screenshots'
         ExplicitLeft = 0
@@ -1611,7 +1607,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
           OnClick = MenuWork
         end
         object MenuFileImportProfFile: TMenuItem
-          Tag = 1007
+          Tag = 1008
           Caption = 'prof-Datei importieren...'
           ImageIndex = 34
           OnClick = MenuWork
@@ -1638,12 +1634,17 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
           ImageIndex = 34
           OnClick = MenuWork
         end
+        object MenuFileCreateXML: TMenuItem
+          Tag = 1005
+          Caption = 'Create &xml file...'
+          OnClick = MenuWork
+        end
       end
       object N10: TMenuItem
         Caption = '-'
       end
       object MenuFileSetup: TMenuItem
-        Tag = 1005
+        Tag = 1006
         Caption = '&Programmeinstellungen...'
         ImageIndex = 6
         OnClick = MenuWork
@@ -1652,7 +1653,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
         Caption = '-'
       end
       object MenuFileQuit: TMenuItem
-        Tag = 1006
+        Tag = 1007
         Caption = '&Beenden'
         ImageIndex = 7
         OnClick = MenuWork
@@ -1907,6 +1908,11 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
         Tag = 5012
         Caption = 'IMG-Image von Diskette erstellen...'
         ImageIndex = 0
+        OnClick = MenuWork
+      end
+      object MenuExtrasWriteIMGImage: TMenuItem
+        Tag = 5013
+        Caption = 'IMG-Image auf Diskette schreiben...'
         OnClick = MenuWork
       end
       object MenuExtrasCreateImage: TMenuItem

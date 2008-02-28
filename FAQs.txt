@@ -1,21 +1,25 @@
 D-Fend Reloaded
-Frquently asked questions
+Frequently asked questions
 
 
 
 Questions:
 
 1.) How does the update checker operates ?
-2.) I get an "DFend.dat not found" error when running a selfmade installer
+2.) I get an "DFend.dat not found" error when running a self made installer
     package.
-3.) I know excactly which setting is on which tab in the D-Fend profile editor
+3.) I know exactly which setting is on which tab in the D-Fend profile editor
     dialog. Where is this dialog gone in D-Fend Reloaded ?
 4.) I am using a special DOSBox build with some more features. Does D-Fend
     Reloaded support some of this features ?
-5.) I want to use a different mp3 and ogg encoders than lame and oggenc2. Can
-    I change the commandline D-Fend Reloaded uses to call the encoders ?
+5.) I want to use different mp3 and ogg encoders than lame and oggenc2. Can
+    I change the command line D-Fend Reloaded uses to call the encoders ?
+6.) I have setup "C:\Users\me\D-Fend Reloaded\VritualHD" as drive C but DOSBox
+    says it has mounted "C:\Users\me\D-FEND~1\VIRTUA~1". What's wrong ?
+7.) How can I create an other language for D-Fend Reloaded ?
+8.) Is there an easy way of spell checking my new language file ?
 
-
+	
 
 Answers:
 
@@ -31,7 +35,7 @@ for example). If the version number in the UpdateInfo.txt is bigger than the
 version number of the currently installed D-Fend Reloaded version, the update
 checker will ask you, if you want to update to the new version. If you say
 "yes", it will download the file from the second line of the UpdateInfo.txt to
-your temporary directory and wil launch it. As the last step it tells Windows
+your temporary directory and will launch it. As the last step it tells Windows
 to delete this file as soon as possible. Because the installer is just running,
 Windows cannot delete the file and will put it on its "delete on next system
 start" list.
@@ -44,7 +48,7 @@ the request URL. If you do not want the php script on Sourceforge to know
 your current D-Fend Reloaded version, you can add the line
 "VersionSpecificUpdateCheck=0" to the [ProgramSets] section of the "DFend.ini"
 (which can be found in the D-Fend Reloaded data directory). There is not
-privacy risk in sending the current version number beacuse php scripts on
+privacy risk in sending the current version number because php scripts on
 Sourceforge are not allowed to write anything to a file and therefor cannot
 log any request. 
 
@@ -62,10 +66,10 @@ Internet Explorer, the D-Fend Reloaded update checker will use this proxy, too.
 
 
 
-2.) I get an "DFend.dat not found" error when running a selfmade installer
+2.) I get an "DFend.dat not found" error when running a self made installer
     package.
 
-The selfmade installer packes do not include D-Fend Reloaded or DOSBox. This
+The self made installer packages do not include D-Fend Reloaded or DOSBox. This
 means you have to install D-Fend Reloaded on the computer before you can use
 an installer package.
 
@@ -83,15 +87,15 @@ to an USB stick. So you can show your games to others without any installation.
 
 
 
-3.) I know excactly which setting is on which tab in the D-Fend profile editor
+3.) I know exactly which setting is on which tab in the D-Fend profile editor
     dialog. Where is this dialog gone in D-Fend Reloaded ?
 	
 D-Fend Reloaded has two profile editor dialogs integrated: The classical D-Fend
 style profile editor and the modern profile editor. Both dialogs offer all 
-avaible settings, so there is no need two chosse one of them to be able to
-access all features. Which profile editor should be used can be configurated in
+available settings, so there is no need two choose one of them to be able to
+access all features. Which profile editor should be used can be configured in
 the setup dialog in the category "profile editor". This category will only be
-visible, if you chosse "Advanced" as mode in the dialog.
+visible, if you choose "Advanced" as mode in the dialog.
 
 
 
@@ -100,8 +104,8 @@ visible, if you chosse "Advanced" as mode in the dialog.
 
 These special builds often have more scalers or render methods. The values
 which D-Fend Reloaded offers in its profile editors for this settings can be
-configurated in the setup dialog in the category "Default values". This
-category will only be visible, if you chosse "Advanced" as mode in the dialog.
+configured in the setup dialog in the category "Default values". This
+category will only be visible, if you choose "Advanced" as mode in the dialog.
 
 Some builds support the mounting of multiple floppy images for one drive
 (like the normal build offers for CDROM images). Because the "imgmount" command
@@ -110,7 +114,7 @@ drive and will show an error message and not mount anything at all, D-Fend
 Reloaded offers no option to mount multiple floppy images for one drive to
 avoid errors. (For booting from a floppy images via the "boot" command
 DOSBox supports multiple images and so does D-Fend Reloaded.) But D-Fend
-Reloaded has a buildin but by default disabled option for mounting multiple
+Reloaded has a build-in but by default disabled option for mounting multiple
 floppy images for one drive. For activating this option you have to add in
 the [ProgramSets] section of the "DFend.ini" (which can be found in the
 D-Fend Reloaded data directory) the line "AllowMultiFloppyImagesMount=1".
@@ -136,7 +140,7 @@ classic profile editor).
 
 
 5.) I want to use a different mp3 and ogg encoders than lame and oggenc2. Can
-    I change the commandline D-Fend Reloaded uses to call the encoders ?
+    I change the command line D-Fend Reloaded uses to call the encoders ?
 	
 Yes. Just setup the encoder file names in the setup dialog, close D-Fend
 Reloaded, open the DFend.ini (which can be found in the D-Fend Reloaded data
@@ -145,3 +149,59 @@ WaveEncMp3Parameters=-h -V 0 "%s" "%s"
 WaveEncOggParameters="%s" --output="%s" --quality=10
 The first %s stands for the input wave file (including full path) and the
 second will be replaced by the output file (including full path).
+
+
+
+6.) I have setup "C:\Users\me\D-Fend Reloaded\VritualHD" as drive C but DOSBox
+    says it has mounted "C:\Users\me\D-FEND~1\VIRTUA~1". What's wrong ?
+
+"C:\Users\me\D-FEND~1\VIRTUA~1" is the short name for "C:\Users\me\D-Fend
+Reloaded\VritualHD". D-Fend Reloaded translates the long name to the short name
+when building the DOSBox configuration file. The Cause is DOSBox can only handle
+134 chars per command. So if the path is too long DOSBox perhaps will not mount
+it. To avoid this, D-Fend Reloaded changes the path name to the short version.
+For this it uses the Windows API function, this means there can't be any
+mismatch between the way Windows makes shorts path names and D-Fend Reloaded
+does. If you want to turn this off anyway, you can write to line
+"UseShortFolderNames=0" in the [ProgramSets] section of the "DFend.ini".
+
+
+
+7.) How can I create an other language for D-Fend Reloaded ?
+
+Just choose the menu item "Translate the program to your language" from the
+"Help making D-Fend Reloaded" better sub menu of the "Help" menu. Then choose
+"Start new language" and enter the name of the new language.
+
+D-Fend Reloaded will then create a new language file and open it in the
+build-in language editor. The language editor shows tables for the different
+categories (menu, profile editor, setup dialog) with the English texts on
+the left side and (editable) your translations on the right side. All you
+have to do is make translations of the shown English strings. After closing
+the language editor you can activate your language from the setup dialog (its
+handled just like the predefined languages).
+
+If you want to have your language in the next official D-Fend Reloaded release
+just mail the language file to me. (You can find the user defined language
+files in the folder "C:\Users\me\D-Fend Reloaded\Lang".) And of course you will
+get mentioned in the language files section of the program info dialog.
+Therefor you should attend one thing: Your name and the name of the language
+file are shown in any D-Fend Reloaded installation so make sure this two
+strings appear right under any chosen codepage/charset. (This means for
+example Cyrillic letters which are not defined in the English charset should
+not be used in the language name and in the author name.)
+
+
+
+8.) Is there an easy way of spell checking my new language file ?
+
+Word processors usualy have quite good spell checkers but if you copy the whole
+language file to a word processor you will get a lot of false error messages
+because the word processor also trys to correct the "CouldNotDeleteFile=" parts
+of the records. To avoid this you can use the following trick: Open the Windows
+Notepad, press the tab key, mark the inserted tabulator (8 fields of space)
+and copy it to the clipboard. Open the language file, open the replace dialog
+in notepad, write in the "search for" field "=" and paste in the tab in the
+"replace by" field. (This means replace all "=" by tabs.) Mark the whole file
+and copy it in an spread sheet. Mark the second column (only the values
+without the "CouldNotDeleteFile=" keys) and copy them to the word processor.

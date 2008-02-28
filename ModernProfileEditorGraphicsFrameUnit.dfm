@@ -55,7 +55,7 @@ object ModernProfileEditorGraphicsFrame: TModernProfileEditorGraphicsFrame
     Width = 145
     Height = 21
     Style = csDropDownList
-    ItemHeight = 13
+    ItemHeight = 0
     TabOrder = 0
   end
   object FullscreenResolutionComboBox: TComboBox
@@ -64,7 +64,7 @@ object ModernProfileEditorGraphicsFrame: TModernProfileEditorGraphicsFrame
     Width = 145
     Height = 21
     Style = csDropDownList
-    ItemHeight = 13
+    ItemHeight = 0
     TabOrder = 1
   end
   object StartFullscreenCheckBox: TCheckBox
@@ -100,7 +100,7 @@ object ModernProfileEditorGraphicsFrame: TModernProfileEditorGraphicsFrame
     Width = 145
     Height = 21
     Style = csDropDownList
-    ItemHeight = 13
+    ItemHeight = 0
     TabOrder = 5
   end
   object VideoCardComboBox: TComboBox
@@ -109,7 +109,7 @@ object ModernProfileEditorGraphicsFrame: TModernProfileEditorGraphicsFrame
     Width = 145
     Height = 21
     Style = csDropDownList
-    ItemHeight = 13
+    ItemHeight = 0
     TabOrder = 6
   end
   object ScaleComboBox: TComboBox
@@ -118,7 +118,7 @@ object ModernProfileEditorGraphicsFrame: TModernProfileEditorGraphicsFrame
     Width = 369
     Height = 21
     Style = csDropDownList
-    ItemHeight = 13
+    ItemHeight = 0
     TabOrder = 7
   end
   object FrameSkipEdit: TSpinEdit

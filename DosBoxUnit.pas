@@ -7,7 +7,7 @@ Procedure RunGame(const Game : TGame; const RunSetup : Boolean = False; const Do
 Procedure RunCommand(const Game : TGame; const Command : String; const DisableFullscreen : Boolean = False);
 Procedure RunWithCommandline(const Game : TGame; const CommandLine : String; const DisableFullscreen : Boolean = False);
 
-Function BuildConfFile(const Game : TGame; const RunSetup : Boolean) : TStringList;
+Function BuildConfFile(const Game : TGame; const RunSetup : Boolean; const WarnIfNotReachable : Boolean) : TStringList;
 
 implementation
 
@@ -21,9 +21,14 @@ end;
 
 Function ShortName(const LongName : String) : String;
 begin
-  SetLength(result,MAX_PATH+10);
-  GetShortPathName(PChar(LongName),PChar(result),MAX_PATH);
-  SetLength(result,StrLen(PChar(result)));
+  If PrgSetup.UseShortFolderNames then begin
+    SetLength(result,MAX_PATH+10);
+    if GetShortPathName(PChar(LongName),PChar(result),MAX_PATH)=0
+      then result:=LongName
+      else SetLength(result,StrLen(PChar(result)));
+  end else begin
+    result:=LongName;
+  end;
 end;
 
 Function AllSameDir(const St : TStringList) : Boolean;
@@ -205,12 +210,13 @@ begin
   end;
 end;
 
-Procedure BuildRunCommands(const St : TStringList; const ProgramFile, ProgramParameters : String; const UseLoadFix : Boolean; const LoadFixMemory : Integer; const Use4DOS, UseDOS32A : Boolean; const Game : TGame; const FreeDriveLetters : String);
+Procedure BuildRunCommands(const St : TStringList; const ProgramFile, ProgramParameters : String; const UseLoadFix : Boolean; const LoadFixMemory : Integer; const Use4DOS, UseDOS32A : Boolean; const Game : TGame; const FreeDriveLetters : String; const WarnIfNotReachable : Boolean);
 Var Prefix,S,T,Temp,UsePath,Mount,Unmount : String;
     I : Integer;
     St2 : TStringList;
     NoFreeDOS : Boolean;
     TempDrive : Char;
+    Path, Drive : String;
 begin
   TempMountFreeDOSDir(Game,FreeDriveLetters,UsePath,Mount,Unmount);
   NoFreeDOS:=(UsePath='');
@@ -220,10 +226,13 @@ begin
 
   T:=Trim(ExtractFilePath(MakeAbsPath(ProgramFile,PrgSetup.BaseDir)));
 
-  SetLength(Temp,MAX_PATH+10); GetShortPathName(PChar(T),PChar(Temp),MAX_PATH); SetLength(Temp,StrLen(PChar(Temp)));
-  T:=Trim(ExtUpperCase(Temp));
+  SetLength(Temp,MAX_PATH+10);
+  If GetShortPathName(PChar(T),PChar(Temp),MAX_PATH)<>0 then begin
+    SetLength(Temp,StrLen(PChar(Temp))); T:=Trim(ExtUpperCase(Temp));
+  end;
 
-  If T<>'' then begin
+  If (Trim(ProgramFile)<>'') and (T<>'') then begin
+    Path:=''; Drive:='';
     For I:=0 to Game.NrOfMounts-1 do begin
       Case I of
         0 : St2:=ValueToList(Game.Mount0);
@@ -242,25 +251,34 @@ begin
         If St2.Count=3 then St2.Add('false');
         If St2.Count=4 then St2.Add('');
         If St2.Count<5 then continue;
-        If Trim(ExtUpperCase(St2[1]))<>'DRIVE' then continue;
+        If (Trim(ExtUpperCase(St2[1]))<>'DRIVE') and (Trim(ExtUpperCase(St2[1]))<>'CDROM') then continue;
         S:=MakeAbsPath(IncludeTrailingPathDelimiter(St2[0]),PrgSetup.BaseDir);
 
-        SetLength(Temp,MAX_PATH+10); GetShortPathName(PChar(S),PChar(Temp),MAX_PATH); SetLength(Temp,StrLen(PChar(Temp)));
-        S:=Trim(ExtUpperCase(Temp));
+        SetLength(Temp,MAX_PATH+10);
+        If GetShortPathName(PChar(S),PChar(Temp),MAX_PATH)<>0 then begin
+          SetLength(Temp,StrLen(PChar(Temp))); S:=Trim(ExtUpperCase(Temp));
+        end;
 
         If Copy(T,1,length(S))=S then begin
-          St.Add(St2[2]+':');
-          St.Add('cd\');
           S:=Copy(T,length(S)+1,MaxInt);
-          If S<>'' then begin
-            If S[1]<>'\' then S:='\'+S;
-            St.Add('cd '+S);
-          end;
-          break;
+          If (Drive='') or (length(S)<length(Path)) then begin Path:=S; Drive:=St2[2]+':'; end;
         end;
       finally
         St2.Free;
       end;
+    end;
+    If Drive<>'' then begin
+      St.Add(Drive);
+      St.Add('cd\');
+      S:=Path;
+      If S<>'' then begin
+        If S[1]<>'\' then S:='\'+S;
+        St.Add('cd '+S);
+      end;
+    end else begin
+      St.Add('Rem !!! The program file is not reachable via any mounted drive. !!!');
+      If WarnIfNotReachable then
+        MessageDlg(Format(LanguageSetup.MessageNoMountToReachFolder,[ExtractFilePath(MakeAbsPath(ProgramFile,PrgSetup.BaseDir))]),mtError,[mbOK],0);
     end;
   end;
   If UseLoadFix then Prefix:='loadfix -'+IntToStr(LoadFixMemory)+' ' else Prefix:='';
@@ -327,7 +345,61 @@ begin
   end;
 end;
 
-Procedure BuildAutoexec(const Game : TGame; const RunSetup : Boolean; const St : TStringList);
+Procedure AutoMountCDs(const St : TStringList; const Game : TGame; var FreeDriveLetters : String);
+Var AlreadyMounted,S : String;
+    I : Integer;
+    C,D : Char;
+    St2 : TStringList;
+    lpSectorsPerCluster,lpBytesPerSector,lpNumberOfFreeClusters,lpTotalNumberOfClusters : Cardinal;
+begin
+  {Check which CD drives are mounted regularly}
+  AlreadyMounted:='';
+  For I:=0 to Game.NrOfMounts do begin
+    Case I of
+      1 : S:=Game.Mount0;
+      2 : S:=Game.Mount1;
+      3 : S:=Game.Mount2;
+      4 : S:=Game.Mount3;
+      5 : S:=Game.Mount4;
+      6 : S:=Game.Mount5;
+      7 : S:=Game.Mount6;
+      8 : S:=Game.Mount7;
+      9 : S:=Game.Mount8;
+     10 : S:=Game.Mount9;
+    end;
+    St2:=ValueToList(S);
+    try
+      If St2.Count<2 then continue;
+      If Trim(ExtUpperCase(St2[1]))<>'CDROM' then continue;
+      S:=Trim(ExtUpperCase(St2[0]));
+      If S='' then continue;
+      If (S[1]<'A') or (S[1]>'Z') then continue;
+      If length(S)>3 then continue;
+      If (length(S)>=2) and (S[2]<>':') then continue;
+      If (length(S)>=3) and (S[2]<>'\') then continue;
+      AlreadyMounted:=AlreadyMounted+S[1];
+    finally
+      St2.Free;
+    end;
+  end;
+
+  {Find CDs and autmount them}
+  For C:='C' to 'Z' do begin
+    If GetDriveType(PChar(C+':\'))<>DRIVE_CDROM then continue;
+    If Pos(C,AlreadyMounted)<>0 then continue;
+    if not GetDiskFreeSpace(PChar(C+':\'),lpSectorsPerCluster,lpBytesPerSector,lpNumberOfFreeClusters,lpTotalNumberOfClusters) then continue;
+    If lpTotalNumberOfClusters=0 then continue;
+    If Pos(C,FreeDriveLetters)>0 then S:=C else begin
+      S:='';
+      For D:=Chr(ord(C)+1) to 'Y' do If Pos(D,FreeDriveLetters)>0 then begin S:=D; break; end;
+      If S='' then For D:='A' to Chr(ord(C)-1) do If Pos(D,FreeDriveLetters)>0 then begin S:=D; break; end;
+    end;
+    S:=C+':\;CDROM;'+S+';TRUE;;';
+    St.Add(BuildMountData(S,FreeDriveLetters));
+  end;
+end;
+
+Procedure BuildAutoexec(const Game : TGame; const RunSetup : Boolean; const St : TStringList; const WarnIfNotReachable : Boolean);
   Procedure SetVolume(const Channel : String; const Left,Right : Integer);
   begin If (Left<>100) or (Right<>100) then St.Add('mixer '+Channel+' '+IntToStr(Left)+':'+IntToStr(Right)+' /NOSHOW'); end;
 Var S,T,NumCommands,MouseCommands,UsePath,Mount,UnMount : String;
@@ -390,6 +462,7 @@ begin
     If Game.NrOfMounts>=8 then MultiLineAdd(St,BuildMountData(Game.Mount7,FreeDriveLetters));
     If Game.NrOfMounts>=9 then MultiLineAdd(St,BuildMountData(Game.Mount8,FreeDriveLetters));
     If Game.NrOfMounts>=10 then MultiLineAdd(St,BuildMountData(Game.Mount9,FreeDriveLetters));
+    If Game.AutoMountCDs then AutoMountCDs(St,Game,FreeDriveLetters);
   end;
 
   { Setting num, caps and scroll lock and CuteMouse }
@@ -435,17 +508,17 @@ begin
   end else begin
     If not Game.AutoexecOverridegamestart then begin
       If RunSetup then begin
-        BuildRunCommands(St,Game.SetupExe,Game.SetupParameters,Game.LoadFix,Game.LoadFixMemory,Game.Use4DOS,False,Game,FreeDriveLetters);
+        BuildRunCommands(St,Game.SetupExe,Game.SetupParameters,Game.LoadFix,Game.LoadFixMemory,Game.Use4DOS,False,Game,FreeDriveLetters,WarnIfNotReachable);
         If Game.CloseDosBoxAfterGameExit and (Trim(Game.SetupExe)<>'') then St.Add('exit');
       end else begin
-        BuildRunCommands(St,Game.GameExe,Game.GameParameters,Game.LoadFix,Game.LoadFixMemory,Game.Use4DOS,Game.UseDOS32A,Game,FreeDriveLetters);
+        BuildRunCommands(St,Game.GameExe,Game.GameParameters,Game.LoadFix,Game.LoadFixMemory,Game.Use4DOS,Game.UseDOS32A,Game,FreeDriveLetters,WarnIfNotReachable);
         If Game.CloseDosBoxAfterGameExit and (Trim(Game.GameExe)<>'') then St.Add('exit');
       end;
     end;
   end;
 end;
 
-Function BuildConfFile(const Game : TGame; const RunSetup : Boolean) : TStringList;
+Function BuildConfFile(const Game : TGame; const RunSetup : Boolean; const WarnIfNotReachable : Boolean) : TStringList;
 Var St : TStringList;
     S : String;
 begin
@@ -489,7 +562,7 @@ begin
   result.Add('nosound='+BoolToStr(Game.MixerNosound));
   result.Add('rate='+IntToStr(Game.MixerRate));
   result.Add('blocksize='+IntToStr(Game.MixerBlocksize));
-  result.Add('prebuffer='+IntToStr(Game.MixerBlocksize));
+  result.Add('prebuffer='+IntToStr(Game.MixerPrebuffer));
 
   result.Add('');
   result.Add('[midi]');
@@ -559,7 +632,7 @@ begin
   result.Add('Serial3='+Game.Serial3);
   result.Add('Serial4='+Game.Serial4);
 
-  BuildAutoexec(Game,RunSetup,result);
+  BuildAutoexec(Game,RunSetup,result,WarnIfNotReachable);
 
   St:=StringToStringList(Game.CustomSettings);
   try result.AddStrings(St); finally St.Free; end;
@@ -682,11 +755,13 @@ Procedure RunGame(const Game : TGame; const RunSetup : Boolean; const DosBoxComm
 Var St : TStringList;
     S,T : String;
 begin
+  If not RunCheck(Game,RunSetup) then exit;
+
   If PrgSetup.MinimizeOnDosBoxStart then Application.Minimize;
 
   ForceDirectories(MakeAbsPath(Game.CaptureFolder,PrgSetup.BaseDir));
 
-  St:=BuildConfFile(Game,RunSetup);
+  St:=BuildConfFile(Game,RunSetup,True);
   try
     SetLength(S,260); GetTempPath(250,PChar(S)); SetLength(S,StrLen(PChar(S)));
     S:=IncludeTrailingPathDelimiter(S);

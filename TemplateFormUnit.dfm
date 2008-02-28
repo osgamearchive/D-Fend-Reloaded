@@ -3,8 +3,8 @@ object TemplateForm: TTemplateForm
   Top = 0
   BorderIcons = [biSystemMenu]
   Caption = 'Vorlagen'
-  ClientHeight = 361
-  ClientWidth = 634
+  ClientHeight = 431
+  ClientWidth = 705
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -17,105 +17,213 @@ object TemplateForm: TTemplateForm
   OnDestroy = FormDestroy
   PixelsPerInch = 96
   TextHeight = 13
-  object ListView: TListView
-    Left = 0
-    Top = 22
-    Width = 634
-    Height = 339
-    Align = alClient
-    Columns = <>
-    PopupMenu = PopupMenu
-    SmallImages = ListViewImageList
-    TabOrder = 0
-    ViewStyle = vsReport
-    OnColumnClick = ListViewColumnClick
-    OnKeyDown = ListViewKeyDown
-    OnSelectItem = ListViewSelectItem
-  end
-  object CoolBar: TCoolBar
+  object PageControl: TPageControl
     Left = 0
     Top = 0
-    Width = 634
-    Height = 22
-    AutoSize = True
-    BandBorderStyle = bsNone
-    Bands = <
-      item
-        Control = ToolBar
-        ImageIndex = -1
-        MinHeight = 22
-        Width = 632
-      end>
-    EdgeBorders = []
-    FixedSize = True
-    FixedOrder = True
-    object ToolBar: TToolBar
-      Left = 2
-      Top = 0
-      Width = 632
-      Height = 22
-      AutoSize = True
-      ButtonWidth = 90
-      Caption = 'ToolBar'
-      Images = ImageList
-      List = True
-      ShowCaptions = True
-      TabOrder = 0
-      Transparent = False
-      object CloseButton: TToolButton
+    Width = 705
+    Height = 431
+    ActivePage = TemplateTab
+    Align = alClient
+    TabOrder = 0
+    object TemplateTab: TTabSheet
+      Caption = 'TemplateTab'
+      object CoolBar: TCoolBar
         Left = 0
         Top = 0
-        Caption = 'CloseButton'
-        ImageIndex = 1
-        OnClick = ButtonWork
+        Width = 697
+        Height = 22
+        AutoSize = True
+        BandBorderStyle = bsNone
+        Bands = <
+          item
+            Control = ToolBar
+            ImageIndex = -1
+            MinHeight = 22
+            Width = 695
+          end>
+        EdgeBorders = []
+        FixedSize = True
+        FixedOrder = True
+        object ToolBar: TToolBar
+          Left = 2
+          Top = 0
+          Width = 695
+          Height = 22
+          AutoSize = True
+          ButtonWidth = 90
+          Caption = 'ToolBar'
+          Images = ImageList
+          List = True
+          ShowCaptions = True
+          TabOrder = 0
+          Transparent = False
+          object CloseButton: TToolButton
+            Left = 0
+            Top = 0
+            Caption = 'CloseButton'
+            ImageIndex = 1
+            OnClick = ButtonWork
+          end
+          object ToolButton7: TToolButton
+            Left = 90
+            Top = 0
+            Width = 8
+            Caption = 'ToolButton7'
+            ImageIndex = 5
+            Style = tbsSeparator
+          end
+          object UseButton: TToolButton
+            Tag = 1
+            Left = 98
+            Top = 0
+            Caption = 'UseButton'
+            ImageIndex = 2
+            OnClick = ButtonWork
+          end
+          object ToolButton3: TToolButton
+            Left = 188
+            Top = 0
+            Width = 8
+            Caption = 'ToolButton3'
+            ImageIndex = 2
+            Style = tbsSeparator
+          end
+          object AddButton: TToolButton
+            Tag = 2
+            Left = 196
+            Top = 0
+            Caption = 'AddButton'
+            ImageIndex = 3
+            OnClick = ButtonWork
+          end
+          object EditButton: TToolButton
+            Tag = 3
+            Left = 286
+            Top = 0
+            Caption = 'EditButton'
+            ImageIndex = 4
+            OnClick = ButtonWork
+          end
+          object DeleteButton: TToolButton
+            Tag = 4
+            Left = 376
+            Top = 0
+            Caption = 'DeleteButton'
+            ImageIndex = 5
+            OnClick = ButtonWork
+          end
+        end
       end
-      object ToolButton7: TToolButton
-        Left = 90
-        Top = 0
-        Width = 8
-        Caption = 'ToolButton7'
-        ImageIndex = 5
-        Style = tbsSeparator
+      object ListView: TListView
+        Left = 0
+        Top = 22
+        Width = 697
+        Height = 381
+        Align = alClient
+        BorderStyle = bsNone
+        Columns = <>
+        PopupMenu = PopupMenu
+        SmallImages = ListViewImageList
+        TabOrder = 1
+        ViewStyle = vsReport
+        OnColumnClick = ListViewColumnClick
+        OnKeyDown = ListViewKeyDown
+        OnSelectItem = ListViewSelectItem
       end
-      object UseButton: TToolButton
-        Tag = 1
-        Left = 98
+    end
+    object AutoSetupSheet: TTabSheet
+      Caption = 'AutoSetupSheet'
+      ImageIndex = 1
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
+      object CoolBar1: TCoolBar
+        Left = 0
         Top = 0
-        Caption = 'UseButton'
-        ImageIndex = 2
-        OnClick = ButtonWork
+        Width = 697
+        Height = 22
+        AutoSize = True
+        BandBorderStyle = bsNone
+        Bands = <
+          item
+            Control = ToolBar2
+            ImageIndex = -1
+            MinHeight = 22
+            Width = 695
+          end>
+        EdgeBorders = []
+        FixedSize = True
+        FixedOrder = True
+        object ToolBar2: TToolBar
+          Left = 2
+          Top = 0
+          Width = 695
+          Height = 22
+          AutoSize = True
+          ButtonWidth = 90
+          Caption = 'ToolBar'
+          Images = ImageList
+          List = True
+          ShowCaptions = True
+          TabOrder = 0
+          Transparent = False
+          object CloseButton2: TToolButton
+            Left = 0
+            Top = 0
+            Caption = 'CloseButton'
+            ImageIndex = 1
+            OnClick = ButtonWork
+          end
+          object ToolButton2: TToolButton
+            Left = 90
+            Top = 0
+            Width = 8
+            Caption = 'ToolButton7'
+            ImageIndex = 5
+            Style = tbsSeparator
+          end
+          object AddButton2: TToolButton
+            Tag = 10
+            Left = 98
+            Top = 0
+            Caption = 'AddButton'
+            ImageIndex = 3
+            OnClick = ButtonWork
+          end
+          object EditButton2: TToolButton
+            Tag = 11
+            Left = 188
+            Top = 0
+            Caption = 'EditButton'
+            ImageIndex = 4
+            OnClick = ButtonWork
+          end
+          object DeleteButton2: TToolButton
+            Tag = 12
+            Left = 278
+            Top = 0
+            Caption = 'DeleteButton'
+            ImageIndex = 5
+            OnClick = ButtonWork
+          end
+        end
       end
-      object ToolButton3: TToolButton
-        Left = 188
-        Top = 0
-        Width = 8
-        Caption = 'ToolButton3'
-        ImageIndex = 2
-        Style = tbsSeparator
-      end
-      object AddButton: TToolButton
-        Tag = 2
-        Left = 196
-        Top = 0
-        Caption = 'AddButton'
-        ImageIndex = 3
-        OnClick = ButtonWork
-      end
-      object EditButton: TToolButton
-        Tag = 3
-        Left = 286
-        Top = 0
-        Caption = 'EditButton'
-        ImageIndex = 4
-        OnClick = ButtonWork
-      end
-      object DeleteButton: TToolButton
-        Tag = 4
-        Left = 376
-        Top = 0
-        Caption = 'DeleteButton'
-        ImageIndex = 5
-        OnClick = ButtonWork
+      object ListView2: TListView
+        Left = 0
+        Top = 22
+        Width = 697
+        Height = 381
+        Align = alClient
+        BorderStyle = bsNone
+        Columns = <>
+        PopupMenu = PopupMenu2
+        SmallImages = ListViewImageList
+        TabOrder = 1
+        ViewStyle = vsReport
+        OnColumnClick = ListView2ColumnClick
+        OnKeyDown = ListView2KeyDown
+        OnSelectItem = ListView2SelectItem
       end
     end
   end
@@ -473,5 +581,44 @@ object TemplateForm: TTemplateForm
     Width = 32
     Left = 368
     Top = 8
+  end
+  object AddPopupMenu2: TPopupMenu
+    Left = 560
+    Top = 8
+    object PopupAddNew2: TMenuItem
+      Tag = 13
+      Caption = 'neue Vorlage'
+      OnClick = ButtonWork
+    end
+    object PopupAddFromProfile2: TMenuItem
+      Tag = 14
+      Caption = 'Vorlage von Profil'
+      OnClick = ButtonWork
+    end
+  end
+  object PopupMenu2: TPopupMenu
+    Images = ImageList
+    Left = 592
+    Top = 8
+    object PopupEdit2: TMenuItem
+      Tag = 11
+      Caption = '&Bearbeiten'
+      ImageIndex = 4
+      ShortCut = 113
+      OnClick = ButtonWork
+    end
+    object PopupCopy2: TMenuItem
+      Tag = 15
+      Caption = 'Kopieren...'
+      ShortCut = 8237
+      OnClick = ButtonWork
+    end
+    object PopupDel2: TMenuItem
+      Tag = 12
+      Caption = '&L'#246'schen'
+      ImageIndex = 5
+      ShortCut = 46
+      OnClick = ButtonWork
+    end
   end
 end

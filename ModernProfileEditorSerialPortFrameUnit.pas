@@ -45,7 +45,7 @@ type
   public
     { Public-Deklarationen }
     PortNr : Integer;
-    Procedure InitGUI(const OnProfileNameChange : TTextEvent; const GameDB: TGameDB; const CurrentProfileName : PString);
+    Procedure InitGUI(const OnProfileNameChange : TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup : PString);
     Procedure SetGame(const Game : TGame; const LoadFromTemplate : Boolean);
     Function CheckValue : Boolean;
     Procedure GetGame(const Game : TGame);
@@ -59,7 +59,7 @@ uses Math, VistaToolsUnit, LanguageSetupUnit, CommonTools;
 
 { TModernProfileEditorSerialPortFrame }
 
-procedure TModernProfileEditorSerialPortFrame.InitGUI(const OnProfileNameChange: TTextEvent; const GameDB: TGameDB; const CurrentProfileName: PString);
+procedure TModernProfileEditorSerialPortFrame.InitGUI(const OnProfileNameChange: TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup: PString);
 begin
   Name:='SerialPort'+IntToStr(PortNr)+'Frame';
 

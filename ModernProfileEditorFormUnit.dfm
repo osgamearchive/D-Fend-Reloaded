@@ -13,6 +13,7 @@ object ModernProfileEditorForm: TModernProfileEditorForm
   Font.Style = []
   OldCreateOrder = False
   Position = poOwnerFormCenter
+  OnCreate = FormCreate
   OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
@@ -36,7 +37,7 @@ object ModernProfileEditorForm: TModernProfileEditorForm
       Tag = 1
       Left = 215
       Top = 6
-      Width = 114
+      Width = 130
       Height = 25
       Caption = 'Vorheriges'
       ModalResult = 1
@@ -60,9 +61,9 @@ object ModernProfileEditorForm: TModernProfileEditorForm
     end
     object NextButton: TBitBtn
       Tag = 2
-      Left = 335
+      Left = 351
       Top = 6
-      Width = 114
+      Width = 130
       Height = 25
       Caption = 'N'#228'chstes'
       ModalResult = 1
@@ -154,10 +155,10 @@ object ModernProfileEditorForm: TModernProfileEditorForm
     end
   end
   object ImageList: TImageList
-    Left = 432
-    Top = 525
+    Left = 632
+    Top = 517
     Bitmap = {
-      494C010111001400040010001000FFFFFFFFFF00FFFFFFFFFFFFFFFF424D3600
+      494C010111001400040010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000005000000001002000000000000050
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -821,6 +822,7 @@ object ModernProfileEditorForm: TModernProfileEditorForm
       0000E00F0000C0070000C0070000000100008003000000010000800300000001
       00000001000000010000000100008003000000010000E00F000000010000E00F
       000000010000E00F000080030000E00F000080030000E00F0000C0070000E00F
-      FFFFE00F0000E00FFFFFF83F0000E00F}
+      FFFFE00F0000E00FFFFFF83F0000E00F00000000000000000000000000000000
+      000000000000}
   end
 end

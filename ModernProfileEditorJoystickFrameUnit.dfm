@@ -14,12 +14,21 @@ object ModernProfileEditorJoystickFrame: TModernProfileEditorJoystickFrame
     Height = 13
     Caption = 'TypeLabel'
   end
+  object WrapInfoLabel: TLabel
+    Left = 42
+    Top = 207
+    Width = 471
+    Height = 98
+    AutoSize = False
+    Caption = 'WrapInfoLabel'
+    WordWrap = True
+  end
   object TypeComboBox: TComboBox
     Left = 24
     Top = 43
     Width = 145
     Height = 21
-    ItemHeight = 13
+    ItemHeight = 0
     TabOrder = 0
     Text = 'TypeComboBox'
   end

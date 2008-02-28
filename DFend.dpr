@@ -71,7 +71,11 @@ uses
   WallpaperStyleFormUnit in 'WallpaperStyleFormUnit.pas' {WallpaperStyleForm},
   CreateISOImageFormUnit in 'CreateISOImageFormUnit.pas' {CreateISOImageForm},
   ReadDriveUnit in 'ReadDriveUnit.pas',
-  DriveReadFormUnit in 'DriveReadFormUnit.pas' {DriveReadForm};
+  DriveReadFormUnit in 'DriveReadFormUnit.pas' {DriveReadForm},
+  HashCalc in 'HashCalc.pas',
+  SelectProfilesFormUnit in 'SelectProfilesFormUnit.pas' {SelectProfilesForm},
+  SimpleXMLUnit in 'SimpleXMLUnit.pas',
+  CreateXMLFormUnit in 'CreateXMLFormUnit.pas' {CreateXMLForm};
 
 {$R *.res}
 
@@ -80,6 +84,5 @@ begin
   Application.MainFormOnTaskbar := True;
   Application.Title := 'D-Fend Reloaded';
   Application.CreateForm(TDFendReloadedMainForm, DFendReloadedMainForm);
-  Application.CreateForm(TDriveReadForm, DriveReadForm);
   Application.Run;
 end.

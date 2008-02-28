@@ -8,6 +8,7 @@ uses
 
 type
   TModernProfileEditorDrivesFrame = class(TFrame, IModernProfileEditorFrame)
+    AutoMountCheckBox: TCheckBox;
     MountingListView: TListView;
     MountingAddButton: TBitBtn;
     MountingEditButton: TBitBtn;
@@ -25,7 +26,7 @@ type
     function NextFreeDriveLetter: Char;
   public
     { Public-Deklarationen }
-    Procedure InitGUI(const OnProfileNameChange : TTextEvent; const GameDB: TGameDB; const CurrentProfileName : PString);
+    Procedure InitGUI(const OnProfileNameChange : TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup : PString);
     Procedure SetGame(const Game : TGame; const LoadFromTemplate : Boolean);
     Function CheckValue : Boolean;
     Procedure GetGame(const Game : TGame);
@@ -40,7 +41,7 @@ uses Math, VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgSetupUnit,
 
 { TModernProfileEditorDrivesFrame }
 
-procedure TModernProfileEditorDrivesFrame.InitGUI(const OnProfileNameChange: TTextEvent; const GameDB: TGameDB; const CurrentProfileName: PString);
+procedure TModernProfileEditorDrivesFrame.InitGUI(const OnProfileNameChange: TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup: PString);
 Var L : TListColumn;
 begin
   NoFlicker(MountingListView);
@@ -49,6 +50,7 @@ begin
   NoFlicker(MountingDelButton);
   NoFlicker(MountingDeleteAllButton);
   NoFlicker(MountingAutoCreateButton);
+  NoFlicker(AutoMountCheckBox);
 
   MountingAddButton.Caption:=LanguageSetup.ProfileEditorMountingAdd;
   MountingEditButton.Caption:=LanguageSetup.ProfileEditorMountingEdit;
@@ -60,6 +62,7 @@ begin
   L:=MountingListView.Columns.Add; L.Width:=-2; L.Caption:=LanguageSetup.ProfileEditorMountingLetter;
   L:=MountingListView.Columns.Add; L.Width:=-2; L.Caption:=LanguageSetup.ProfileEditorMountingLabel;
   L:=MountingListView.Columns.Add; L.Width:=-2; L.Caption:=LanguageSetup.ProfileEditorMountingIOControl;
+  AutoMountCheckBox.Caption:=LanguageSetup.ProfileEditorMountingAutoMountCDs;
 end;
 
 procedure TModernProfileEditorDrivesFrame.SetGame(const Game: TGame; const LoadFromTemplate: Boolean);
@@ -76,6 +79,7 @@ begin
   If Game.NrOfMounts>=9 then Mounting.Add(Game.Mount8);
   If Game.NrOfMounts>=10 then Mounting.Add(Game.Mount9);
   LoadMountingList;
+  AutoMountCheckBox.Checked:=Game.AutoMountCDs;
 end;
 
 procedure TModernProfileEditorDrivesFrame.LoadMountingList;
@@ -218,8 +222,8 @@ begin
   If Mounting.Count>7 then Game.Mount7:=Mounting[7] else Game.Mount7:='';
   If Mounting.Count>8 then Game.Mount8:=Mounting[8] else Game.Mount8:='';
   If Mounting.Count>9 then Game.Mount9:=Mounting[9] else Game.Mount9:='';
-
   Mounting.Free;
+  Game.AutoMountCDs:=AutoMountCheckBox.Checked;
 end;
 
 end.

@@ -21,6 +21,7 @@ object ModernProfileEditorSerialPortFrame: TModernProfileEditorSerialPortFrame
     ItemHeight = 13
     ItemIndex = 0
     TabOrder = 0
+    Text = 'None'
     Items.Strings = (
       'None'
       '3'

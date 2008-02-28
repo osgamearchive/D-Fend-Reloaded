@@ -108,6 +108,7 @@ type
     SoundVolumeGUSLabel: TLabel;
     SoundVolumeSBLabel: TLabel;
     SoundVolumeFMLabel: TLabel;
+    AutoMountCheckBox: TCheckBox;
     procedure OKButtonClick(Sender: TObject);
     procedure ButtonWork(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -155,7 +156,7 @@ implementation
 
 uses Math, LanguageSetupUnit, VistaToolsUnit, CommonTools, PrgConsts,
      PrgSetupUnit, IconManagerFormUnit, ProfileMountEditorFormUnit,
-     SerialEditFormUnit, UserInfoFormUnit, IconLoaderUnit;
+     SerialEditFormUnit, UserInfoFormUnit, IconLoaderUnit, GameDBToolsUnit;
 
 {$R *.dfm}
 
@@ -429,6 +430,7 @@ begin
   L:=MountingListView.Columns.Add; L.Width:=-2; L.Caption:=LanguageSetup.ProfileEditorMountingLetter;
   L:=MountingListView.Columns.Add; L.Width:=-2; L.Caption:=LanguageSetup.ProfileEditorMountingLabel;
   L:=MountingListView.Columns.Add; L.Width:=-2; L.Caption:=LanguageSetup.ProfileEditorMountingIOControl;
+  AutoMountCheckBox.Caption:=LanguageSetup.ProfileEditorMountingAutoMountCDs;
 
   { Sound Sheet }
 
@@ -650,6 +652,7 @@ begin
     try LoadData; finally Game:=nil; end;
   end else begin
     LoadData;
+    ProfileEditorOpenCheck(Game);
   end;
 
   If RestoreLastPosition then begin
@@ -897,6 +900,7 @@ begin
     If Game.NrOfMounts>=9 then Mounting.Add(Game.Mount8);
     If Game.NrOfMounts>=10 then Mounting.Add(Game.Mount9);
     LoadMountingList;
+    AutoMountCheckBox.Checked:=Game.AutoMountCDs;
   end;
 
   { Sound Sheet }
@@ -1326,6 +1330,7 @@ begin
   Game.Icon:=IconName;
   with ProfileSettingsValueListEditor.Strings do begin
     If not ProfileSettingsValueListEditor.ItemProps[0].ReadOnly then Game.Name:=ValueFromIndex[0];
+    ProfileEditorCloseCheck(Game,ValueFromIndex[2],ValueFromIndex[4]);
     Game.GameExe:=ValueFromIndex[2];
     Game.GameParameters:=ValueFromIndex[3];
     Game.SetupExe:=ValueFromIndex[4];
@@ -1431,6 +1436,7 @@ begin
   If Mounting.Count>7 then Game.Mount7:=Mounting[7] else Game.Mount7:='';
   If Mounting.Count>8 then Game.Mount8:=Mounting[8] else Game.Mount8:='';
   If Mounting.Count>9 then Game.Mount9:=Mounting[9] else Game.Mount9:='';
+  Game.AutoMountCDs:=AutoMountCheckBox.Checked;
 
   { Sound Sheet }
 
@@ -1526,6 +1532,7 @@ begin
     6 : Game.LastOpenTab:=7;
     7 : Game.LastOpenTab:=6;
   end;
+  Game.LastOpenTabModern:=-1;
 
   Game.StoreAllValues;
   Game.LoadCache;
@@ -1610,7 +1617,7 @@ begin
         end;
     {GenerateScreenshotFolderName}
     9 : with ProfileSettingsValueListEditor.Strings do begin
-          ValueFromIndex[8]:='.\'+CaptureSubDir+'\'+ValueFromIndex[0]+'\';
+          ValueFromIndex[8]:='.\'+CaptureSubDir+'\'+MakeFileSysOKFolderName(ValueFromIndex[0])+'\';
         end;
     {Autoexec}
     10 : AutoexecMemo.Lines.Clear;
@@ -1786,7 +1793,9 @@ Var S : String;
 begin
   If ProfileSettingsValueListEditor.Strings.Count<2 then S:='' else S:=ProfileSettingsValueListEditor.Strings.ValueFromIndex[0];
   If Trim(S)='' then S:=LanguageSetup.NotSet;
-  Caption:=LanguageSetup.ProfileEditor+' ['+S+']';
+  If (S=LanguageSetup.ProfileEditorNoFilename) or (S=LanguageSetup.NotSet)
+    then Caption:=LanguageSetup.ProfileEditor
+    else Caption:=LanguageSetup.ProfileEditor+' ['+S+']';
 end;
 
 procedure TProfileEditorForm.ProfileSettingsValueListEditorSetEditText(Sender: TObject; ACol, ARow: Integer; const Value: string);
@@ -1794,7 +1803,9 @@ Var S : String;
 begin
   If ProfileSettingsValueListEditor.Strings.Count<2 then S:='' else S:=ProfileSettingsValueListEditor.Strings.ValueFromIndex[0];
   If Trim(S)='' then S:=LanguageSetup.NotSet;
-  Caption:=LanguageSetup.ProfileEditor+' ['+S+']';
+  If (S=LanguageSetup.ProfileEditorNoFilename) or (S=LanguageSetup.NotSet)
+    then Caption:=LanguageSetup.ProfileEditor
+    else Caption:=LanguageSetup.ProfileEditor+' ['+S+']';
 end;
 
 procedure TProfileEditorForm.GameInfoValueListEditorEditButtonClick(Sender: TObject);

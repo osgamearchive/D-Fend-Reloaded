@@ -21,7 +21,7 @@ BrandingText "D-Fend Reloaded data package"
 SetCompressor /solid lzma
 RequestExecutionLevel user
 XPStyle on
-InstallDir "$PROGRAMFILES\D-Fend Reloaded"
+InstallDir "$PROGRAMFILES\D-Fend Reloaded\"
 InstallDirRegKey HKLM "Software\D-Fend Reloaded" "ProgramFolder"
 !insertmacro MUI_RESERVEFILE_LANGDLL
 
@@ -49,18 +49,35 @@ InstallDirRegKey HKLM "Software\D-Fend Reloaded" "ProgramFolder"
 !insertmacro MUI_PAGE_FINISH
 
 !insertmacro MUI_LANGUAGE "English"
+!insertmacro MUI_LANGUAGE "French"
 !insertmacro MUI_LANGUAGE "German"
+!insertmacro MUI_LANGUAGE "Russian"
+!insertmacro MUI_LANGUAGE "Spanish"
 
 Var DataInstDir
 
 LangString LANGNAME_WelcomeText ${LANG_ENGLISH} "This wizard will guide you through the installation.\r\n\r\nPlease close D-Fend Reloaded before continuing.\r\n\r\nClick Next to continue."
 LangString LANGNAME_InstallError ${LANG_ENGLISH} "$INSTDIR\DFend.dat not found."
 LangString LANGNAME_RunDFend ${LANG_ENGLISH} "Run D-Fend Reloaded now"
+
+LangString LANGNAME_WelcomeText ${LANG_FRENCH} "Cet assistant va vous guider durant l'installation.\r\n\r\nVeuillez fermer D-Fend Reloaded avant de continuer.\r\n\r\nCliquez sur Suivant pour continuer."
+LangString LANGNAME_InstallError ${LANG_FRENCH} "$INSTDIR\DFend.dat introuvable."
+LangString LANGNAME_RunDFend ${LANG_FRENCH} "Lancer D-Fend Reloaded maintenant"
+
 LangString LANGNAME_WelcomeText ${LANG_GERMAN} "Dieser Assistent wird Sie durch die Installation begleiten.\r\n\r\nBitte beenden Sie D-Fend Reloaded, bevor Sie fortfahren.\r\n\r\nKlicken Sie auf Weiter, um fortzufahren."
 LangString LANGNAME_InstallError ${LANG_GERMAN} "Die Datei $INSTDIR\DFend.dat existiert nicht."
 LangString LANGNAME_RunDFend ${LANG_GERMAN} "Fend Reloaded jetzt ausfьhren"
 
+LangString LANGNAME_WelcomeText ${LANG_RUSSIAN} "Этот мастер поможет вам выполнить установку.\r\n\r\nПожалуйста, закройте D-Fend Reloaded перед тем, как продолжить.\r\n\r\nНажмите кнопку 'Далее' для продолжения."
+LangString LANGNAME_InstallError ${LANG_RUSSIAN} "$INSTDIR\DFend.dat не обнаружен."
+LangString LANGNAME_RunDFend ${LANG_RUSSIAN} "Запустить D-Fend Reloaded"
+
+LangString LANGNAME_WelcomeText ${LANG_SPANISH} "Este asistente le guiarб a travйs del proceso de instalaciуn.\r\n\r\nPor favor, cierre D-Fend Reloaded antes de continuar.\r\n\r\nHaga clic en $\"Siguiente$\" para continuar."
+LangString LANGNAME_InstallError ${LANG_SPANISH} "No se ha podido encontrar $INSTDIR\DFend.dat."
+LangString LANGNAME_RunDFend ${LANG_SPANISH} "Ejecutar D-Fend Reloaded ahora"
+
 Function .onInit  
+  !define MUI_LANGDLL_ALLLANGUAGES
   !insertmacro MUI_LANGDLL_DISPLAY
 FunctionEnd  
 

@@ -36,7 +36,7 @@ object ModernProfileEditorBaseFrame: TModernProfileEditorBaseFrame
   object IconSelectButton: TBitBtn
     Left = 80
     Top = 17
-    Width = 105
+    Width = 153
     Height = 25
     Caption = 'Icon ausw'#228'hlen...'
     TabOrder = 1
@@ -44,9 +44,9 @@ object ModernProfileEditorBaseFrame: TModernProfileEditorBaseFrame
   end
   object IconDeleteButton: TBitBtn
     Tag = 1
-    Left = 200
+    Left = 239
     Top = 17
-    Width = 105
+    Width = 153
     Height = 25
     Caption = 'Icon l'#246'schen'
     TabOrder = 2
@@ -196,7 +196,7 @@ object ModernProfileEditorBaseFrame: TModernProfileEditorBaseFrame
     end
   end
   object OpenDialog: TOpenDialog
-    Left = 328
+    Left = 536
     Top = 15
   end
 end

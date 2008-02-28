@@ -46,6 +46,7 @@ Type TPrgSetup=class(TBasePrgSetup)
     property WaveEncOgg : String index 22 read GetString write SetString;
     property WaveEncMp3Parameters : String index 23 read GetString write SetString;
     property WaveEncOggParamerers : String index 24 read GetString write SetString;
+    property ValueForNotSet : String index 25 read GetString write SetString;
 
     property AskBeforeDelete : Boolean index 0 read GetBoolean write SetBoolean;
     property ReopenLastProfileEditorTab : Boolean index 1 read GetBoolean write SetBoolean;
@@ -67,6 +68,10 @@ Type TPrgSetup=class(TBasePrgSetup)
     property AllowTextModeLineChange : Boolean index 17 read GetBoolean write SetBoolean;
     property VersionSpecificUpdateCheck : Boolean index 18 read GetBoolean write SetBoolean;
     property CenterDOSBoxWindow : Boolean index 19 read GetBoolean write SetBoolean;
+    property UseShortFolderNames : Boolean index 20 read GetBoolean write SetBoolean;
+    property AlwaysSetScreenshotFolderAutomatically : Boolean index 21 read GetBoolean write SetBoolean;
+    property ShowAutoSetupTemplateEdit : Boolean index 22 read GetBoolean write SetBoolean;
+    property ShowXMLExportMenuItem : Boolean index 23 read GetBoolean write SetBoolean;
 
     property MainLeft : Integer index 0 read GetInteger write SetInteger;
     property MainTop : Integer index 1 read GetInteger write SetInteger;
@@ -113,7 +118,7 @@ begin
   AddStringRec(9,'ProgramSets','ILVS','List');
   AddStringRec(10,'ProgramSets','SDLVideodriver','DirectX');
   AddStringRec(11,'ProgramSets','PathToFREEDOS','.\VirtualHD\FREEDOS\');
-  AddStringRec(12,'ProgramSets','UpdateCheckURL','http://dfendreloaded.sourceforge.net/UpdateInfo.txt');
+  AddStringRec(12,'ProgramSets','UpdateCheckURL','http:/'+'/dfendreloaded.sourceforge.net/UpdateInfo.txt');
   AddStringRec(13,'ProgramSets','GamesListViewBackground','');
   AddStringRec(14,'ProgramSets','GamesListViewFontColor','clWindowText');
   AddStringRec(15,'ProgramSets','ScreenshotsListViewBackground','');
@@ -126,6 +131,7 @@ begin
   AddStringRec(22,'ProgramSets','WaveEncOgg','');
   AddStringRec(23,'ProgramSets','WaveEncMp3Parameters','-h -V 0 "%s" "%s"');
   AddStringRec(24,'ProgramSets','WaveEncOggParameters','"%s" --output="%s" --quality=10');
+  AddStringRec(25,'ProgramSets','ValueForNotSet','');
 
   AddBooleanRec(0,'ProgramSets','AskBeforeDelete',True);
   AddBooleanRec(1,'ProgramSets','ShowLastTab',False);
@@ -147,6 +153,10 @@ begin
   AddBooleanRec(17,'ProgramSets','AllowTextModeLineChange',False);
   AddBooleanRec(18,'ProgramSets','VersionSpecificUpdateCheck',True);
   AddBooleanRec(19,'ProgramSets','CenterDOSBoxWindow',False);
+  AddBooleanRec(20,'ProgramSets','UseShortFolderNames',True);
+  AddBooleanRec(21,'ProgramSets','AlwaysSetScreenshotFolderAutomatically',True);
+  AddBooleanRec(22,'ProgramSets','ShowAutoSetupTemplateEditor',False);
+  AddBooleanRec(23,'ProgramSets','ShowXMLExportMenuItem',False);
 
   AddIntegerRec(0,'ProgramSets','MainLeft',-1);
   AddIntegerRec(1,'ProgramSets','MainTop',-1);

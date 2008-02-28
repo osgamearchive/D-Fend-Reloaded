@@ -15,6 +15,7 @@ const DosBoxFileName='DOSBOX.EXE';
       LanguageSubDir='Lang';
       CustomConfigsSubDir='CustomConfigs';
       TemplateSubDir='Templates';
+      AutoSetupSubDir='AutoSetup';
 
       NSIInstallerHelpFile='D-Fend Reloaded DataInstaller.nsi';
 

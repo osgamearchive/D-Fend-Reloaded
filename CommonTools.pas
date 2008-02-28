@@ -14,11 +14,14 @@ Function StringToStringList(S : String) : TStringList; {"[13][10]" as Divider}
 Function StringListToString(const St : TStrings) : String; {"[13][10]" as Divider}
 Function Replace(const S, FromSub, ToSub : String) : String;
 
+Function FindStringInFile(const FileName, SearchString : String) : Boolean;
+
 Function PrgDir : String;
 Function TempDir : String;
 
 Function MakeRelPath(Path, Rel : String) : String;
 Function MakeAbsPath(Path, Rel : String) : string;
+Function MakeFileSysOKFolderName(const AName : String) : String;
 
 function SelectDirectory(const AOwner : THandle; const Caption: string; var Directory: String): Boolean;
 function GetSpecialFolder(hWindow: HWND; Folder: Integer): String;
@@ -133,7 +136,26 @@ Function Replace(const S, FromSub, ToSub : String) : String;
 Var I : Integer;
 begin
   I:=Pos(FromSub,S);
-  if I=0 then result:=S else result:=Copy(S,1,I-1)+ToSub+Copy(S,I+length(FromSub),MaxInt);  
+  if I=0 then result:=S else result:=Copy(S,1,I-1)+ToSub+Copy(S,I+length(FromSub),MaxInt);
+end;
+
+Type TByteArray=Array[0..MaxInt-1] of Byte;
+
+Function FindStringInFile(const FileName, SearchString : String) : Boolean;
+Var MSt : TMemoryStream;
+    I,J : Integer;
+begin
+  result:=False;
+  If not FileExists(FileName) then exit;
+  MSt:=TMemoryStream.Create;
+  try
+    try MSt.LoadFromFile(FileName); except exit; end;
+      For I:=0 to MSt.Size-length(SearchString) do If TByteArray(MSt.Memory^)[I]=Byte(SearchString[1]) then begin
+        for J:=2 to length(SearchString) do If TByteArray(MSt.Memory^)[I+J-1]=Byte(SearchString[J]) then begin result:=True; exit; end;
+      end;
+  finally
+    MSt.Free;
+  end;
 end;
 
 Function PrgDir : String;
@@ -181,6 +203,15 @@ begin
   If Copy(Path,1,2)='.\' then Path:=Trim(Copy(Path,3,MaxInt));
 
   result:=Rel+Path;
+end;
+
+Function MakeFileSysOKFolderName(const AName : String) : String;
+const AllowedChars='ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜabcdefghijklmnopqrstuvwxyzäöüß01234567890-_=.,;!() ';
+Var I : Integer;
+begin
+  result:='';
+  For I:=1 to length(AName) do if Pos(AName[I],AllowedChars)>0 then result:=result+AName[I];
+  if result='' then result:='Game';
 end;
 
 function bffCallback(DlgHandle: HWND; Msg: Integer; lParam: Integer; lpData: Integer) : Integer; stdcall;

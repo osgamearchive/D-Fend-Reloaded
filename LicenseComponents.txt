@@ -21,3 +21,7 @@ FreeDOS is a trademark of Jim Hall
 OggEnc v2.84 (libvorbis 1.2.0)
 (c) 2000-2005 Michael Smith & portions by John Edwards
 (http://www.vorbis.com/)
+
+SDeanComponents v2.60.00
+written by Sarah Dean (sdean12@sdean12.org)
+http://www.SDean12.org/ 

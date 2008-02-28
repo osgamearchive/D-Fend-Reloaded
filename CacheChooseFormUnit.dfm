@@ -4,7 +4,7 @@ object CacheChooseForm: TCacheChooseForm
   BorderIcons = [biMinimize, biMaximize]
   BorderStyle = bsDialog
   Caption = 'CacheChooseForm'
-  ClientHeight = 329
+  ClientHeight = 412
   ClientWidth = 425
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -22,7 +22,7 @@ object CacheChooseForm: TCacheChooseForm
     Left = 16
     Top = 16
     Width = 393
-    Height = 73
+    Height = 105
     AutoSize = False
     Caption = 
       'The listed profiles have changed on disk. This changes will be o' +
@@ -34,16 +34,16 @@ object CacheChooseForm: TCacheChooseForm
   end
   object ProfileListBox: TCheckListBox
     Left = 16
-    Top = 95
+    Top = 120
     Width = 393
-    Height = 195
+    Height = 253
     ItemHeight = 13
     TabOrder = 0
   end
   object OKButton: TBitBtn
     Left = 16
-    Top = 296
-    Width = 75
+    Top = 379
+    Width = 89
     Height = 25
     TabOrder = 1
     OnClick = OKButtonClick

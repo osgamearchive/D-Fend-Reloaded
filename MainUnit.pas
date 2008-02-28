@@ -8,25 +8,26 @@ uses
   AppEvnts, GameDBUnit, GameDBToolsUnit;
 
 {
-Special:
-- Making a better demo package
-- csv-Build upgrade
-
 0.4:
-- Write images to floppies
-- Game library for autocreate profiles
-  - Protection: Warn if non relative path folders are mounted or autoexec/custom sets
-  - Build installer packages for autosetup templates 
-- "Include D-Fend Reloaded and DOSBox" option in "Build installer"
-- Im- and Exporting using DBGL and DOG XML-files
-- Running games from within PhysFS zip file
-- More special DOSBox build settings (vga-chipset & memory, ...)
+- Profile last modification date
+- New Wizard using Autosetup templates (incl. Warn if non relative path folders are mounted or autoexec/custom sets)
+- Language dependend charsets (?)
+- More special DOSBox build settings: pixelshader, vga-chipset & memory, printer, glide
+- Running games from within PhysFS zip files and images
+- ScummVM support (?)
+- New first-run wizard (language & update checks)
+- First game add help (something like vogons.zetafleet.com/viewtopic.php?t=8933 and www.dosbox.com/wiki/Basic_Setup_and_Installation_of_DosBox as template)
 
 0.5:
-- ScummVM support
-- Ziped profiles
+- Make USB stick installation from current installation (and transfer games)
+- Better handling of different DOSBox versions
+- More special DOSBox build settings
+- Im- and Exporting using DBGL and DOG XML-files
+- Ziped drives
+- Editable toolbar
 
 0.6:
+- Themes
 - XML package support
 }
 
@@ -213,6 +214,8 @@ type
     MenuExtrasCreateISOImage: TMenuItem;
     MenuFileCreateProf: TMenuItem;
     MenuExtrasCreateIMGImage: TMenuItem;
+    MenuExtrasWriteIMGImage: TMenuItem;
+    MenuFileCreateXML: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure TreeViewChange(Sender: TObject; Node: TTreeNode);
@@ -295,12 +298,13 @@ uses ShellAPI, ClipBrd, Math, PNGImage, CommonTools, LanguageSetupUnit,
      BuildInstallerForSingleGameFormUnit, ModernProfileEditorFormUnit,
      ListViewImageUnit, StatisticsFormUnit, CacheChooseFormUnit, IconLoaderUnit,
      LanguageEditorStartFormUnit, LanguageEditorFormUnit, PlaySoundFormUnit,
-     WallpaperStyleFormUnit, CreateISOImageFormUnit;
+     WallpaperStyleFormUnit, CreateISOImageFormUnit, CreateXMLFormUnit;
 
 {$R *.dfm}
 
 procedure TDFendReloadedMainForm.FormCreate(Sender: TObject);
 begin
+  Height:=790;
   JustStarted:=True;
 
   ListSort:=slbName;
@@ -320,7 +324,7 @@ begin
 
   If PrgSetup.FirstRun then begin
     SearchDosBox(self);
-    ShowSetupDialog(self,GameDB,True);
+    ShowSetupDialog(self,GameDB,True,True);
   end;
 end;
 
@@ -436,6 +440,7 @@ begin
   MenuExtrasTemplates.Caption:=LanguageSetup.MenuExtrasTemplates;
   MenuExtrasDeinstallMultipleGames.Caption:=LanguageSetup.MenuExtrasDeinstallMultipleGames;
   MenuExtrasCreateIMGImage.Caption:=LanguageSetup.MenuExtrasCreateIMGImageFile;
+  MenuExtrasWriteIMGImage.Caption:=LanguageSetup.MenuExtrasWriteIMGImageFile;
   MenuExtrasCreateImage.Caption:=LanguageSetup.MenuExtrasCreateImageFile;
   MenuExtrasCreateISOImage.Caption:=LanguageSetup.MenuExtrasCreateISOImageFile;
   MenuExtrasTransferProfiles.Caption:=LanguageSetup.MenuExtrasTransferProfiles;
@@ -618,6 +623,8 @@ begin
   SearchEdit.Text:=LanguageSetup.Search;
   SearchEdit.Font.Color:=clGray;
   SearchEdit.OnChange:=SearchEditChange;
+
+  MenuFileCreateXML.Visible:=PrgSetup.ShowXMLExportMenuItem;
 end;
 
 procedure TDFendReloadedMainForm.InitViewStyle;
@@ -1184,6 +1191,7 @@ Var G,DefaultGame : TGame;
     I : Integer;
     P : TPoint;
     St : TStringList;
+    B : Boolean;
 begin
   StopCaptureChangeNotify;
   try
@@ -1207,7 +1215,8 @@ begin
              end;
       1003 : ExportConfFiles(self,GameDB);
       1004 : ExportProfFiles(self,GameDB);
-      1005 : if ShowSetupDialog(self,GameDB) then begin
+      1005 : ExportXMLFiles(self,GameDB);
+      1006 : if ShowSetupDialog(self,GameDB) then begin
                LoadLanguage(PrgSetup.Language);
                LoadMenuLanguage;
                If SearchEdit.Font.Color=clGray then begin
@@ -1217,8 +1226,8 @@ begin
                end;
                LoadGUISetup(False);
              end;
-      1006 : Close;
-      1007 : begin
+      1007 : Close;
+      1008 : begin
                OpenDialog.Title:=LanguageSetup.MenuFileImportProfTitle;
                OpenDialog.Filter:=LanguageSetup.MenuFileImportProfFilter;
                If not OpenDialog.Execute then exit;
@@ -1348,13 +1357,24 @@ begin
                G:=nil;
                DefaultGame:=TGame.Create(PrgSetup);
                try
-                 if not ShowWizardDialog(self,GameDB,G,DefaultGame) then exit;
+                 if not ShowWizardDialog(self,GameDB,G,DefaultGame,B) then exit;
                finally
                  DefaultGame.Free;
                end;
                InitTreeViewForGamesList(TreeView,GameDB);
                TreeViewChange(Sender,TreeView.Selected);
                SelectGame(G);
+               If B then begin
+                 B:=PrgSetup.ReopenLastProfileEditorTab;
+                 PrgSetup.ReopenLastProfileEditorTab:=True;
+                 try
+                   G.LastOpenTab:=4;
+                   G.LastOpenTabModern:=15;
+                   MenuWork(ButtonEdit);
+                 finally
+                   PrgSetup.ReopenLastProfileEditorTab:=B;
+                 end;
+               end;
              end;
       4003 : begin
                If (ListView.Selected=nil) or (ListView.Selected.Data=nil) then begin
@@ -1424,7 +1444,7 @@ begin
       4009 : If (ListView.Selected<>nil) and (ListView.Selected.Data<>nil) then begin
                S:=Trim(TGame(ListView.Selected.Data).WWW);
                If S='' then exit;
-               If ExtUpperCase(Copy(S,1,7))<>'HTTP://' then S:='http://'+S;
+               If ExtUpperCase(Copy(S,1,7))<>'HTTP:/'+'/' then S:='http:/'+'/'+S;
                ShellExecute(Handle,'open',PChar(S),nil,nil,SW_SHOW);
              end;
       4010 : If (ListView.Selected<>nil) and (ListView.Selected.Data<>nil) then begin
@@ -1449,7 +1469,7 @@ begin
                end;
                G:=TGame(ListView.Selected.Data);
                S:=TempDir+ChangeFileExt(ExtractFileName(G.SetupFile),'.conf');
-               St:=BuildConfFile(G,False);
+               St:=BuildConfFile(G,False,False);
                try
                  St.Insert(0,'# This DOSBox configuration file was automatically created by D-Fend Reloaded.');
                  St.Insert(1,'# Changes made to this file will NOT be transfered to D-Rend Reloaded profiles list.');
@@ -1500,9 +1520,10 @@ begin
              end;
       5011 : ShowCreateISOImageDialog(self,False);
       5012 : ShowCreateISOImageDialog(self,True);
+      5013 : ShowWriteIMGImageDialog(self);
       {Help}
-      6001 : ShellExecute(Handle,'open',PChar('http://www.dosbox.com/wiki/'),nil,nil,SW_SHOW);
-      6002 : ShellExecute(Handle,'open',PChar('http://www.dosbox.com/wiki/Special_Keys'),nil,nil,SW_SHOW);
+      6001 : ShellExecute(Handle,'open',PChar('http:/'+'/www.dosbox.com/wiki/'),nil,nil,SW_SHOW);
+      6002 : ShellExecute(Handle,'open',PChar('http:/'+'/www.dosbox.com/wiki/Special_Keys'),nil,nil,SW_SHOW);
       6003 : If FileExists(IncludeTrailingPathDelimiter(PrgSetup.DosBoxDir)+DosBoxFileName) then begin
                DefaultGame:=TGame.Create(PrgSetup);
                try
@@ -1513,9 +1534,9 @@ begin
              end else begin
                MessageDlg(Format(LanguageSetup.MessageCouldNotFindFile,[IncludeTrailingPathDelimiter(PrgSetup.DosBoxDir)+DosBoxFileName]),mtError,[mbOK],0);
              end;
-      6004 : ShellExecute(Handle,'open',PChar('http://www.dosbox.com/comp_list.php?letter=a'),nil,nil,SW_SHOW);
-      6005 : ShellExecute(Handle,'open',PChar('http://pain.scene.org/service_dosbox.php'),nil,nil,SW_SHOW);
-      6006 : ShellExecute(Handle,'open',PChar('http://dosbox.sourceforge.net/oldwiki/index.php?page=CommandLine'),nil,nil,SW_SHOW);
+      6004 : ShellExecute(Handle,'open',PChar('http:/'+'/www.dosbox.com/comp_list.php?letter=a'),nil,nil,SW_SHOW);
+      6005 : ShellExecute(Handle,'open',PChar('http:/'+'/pain.scene.org/service_dosbox.php'),nil,nil,SW_SHOW);
+      6006 : ShellExecute(Handle,'open',PChar('http:/'+'/dosbox.sourceforge.net/oldwiki/index.php?page=CommandLine'),nil,nil,SW_SHOW);
       6007 : If FileExists(IncludeTrailingPathDelimiter(PrgSetup.DosBoxDir)+DosBoxFileName) then begin
                DefaultGame:=TGame.Create(PrgSetup);
                try
@@ -1527,7 +1548,7 @@ begin
                MessageDlg(Format(LanguageSetup.MessageCouldNotFindFile,[IncludeTrailingPathDelimiter(PrgSetup.DosBoxDir)+DosBoxFileName]),mtError,[mbOK],0);
              end;
       6008 : ShellExecute(Handle,'open',PChar(LanguageSetup.MenuHelpHomepageURL),nil,nil,SW_SHOW);
-      6009 : ShellExecute(Handle,'open',PChar('http://vogons.zetafleet.com/viewtopic.php?t=17415'),nil,nil,SW_SHOW);
+      6009 : ShellExecute(Handle,'open',PChar('http:/'+'/vogons.zetafleet.com/viewtopic.php?t=17415'),nil,nil,SW_SHOW);
       6010 : If FileExists(PrgDir+'UpdateCheck.exe')
                then RunUpdateCheck(False)
                else ShellExecute(Handle,'open',PChar(LanguageSetup.MenuHelpUpdatesURL),nil,nil,SW_SHOW);
@@ -1539,9 +1560,9 @@ begin
                else MessageDlg(Format(LanguageSetup.MessageCouldNotFindFile,[PrgDataDir+'Icons.ini']),mtError,[mbOK],0);
       6013 : begin
                if not ShowLanguageEditorStartDialog(self,S) then exit;
-                ShowLanguageEditorDialog(self,S);
-                If S=LanguageSetup.SetupFile then begin
-                  LanguageSetup.ReloadINI;
+               ShowLanguageEditorDialog(self,S);
+               If Trim(ExtUpperCase(S))=Trim(ExtUpperCase(LanguageSetup.SetupFile)) then begin
+                 LanguageSetup.ReloadINI;
                  LoadLanguage(PrgSetup.Language);
                  LoadMenuLanguage;
                  If SearchEdit.Font.Color=clGray then begin
@@ -1550,7 +1571,7 @@ begin
                    SearchEdit.OnChange:=SearchEditChange;
                  end;
                  LoadGUISetup(False);
-                end;
+               end;
              end;
       6014 : ShowStatisticsDialog(self,GameDB);
       6015 : ShowInfoDialog(self);

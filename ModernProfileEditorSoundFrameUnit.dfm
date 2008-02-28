@@ -33,7 +33,7 @@ object ModernProfileEditorSoundFrame: TModernProfileEditorSoundFrame
   object MixerGroupBox: TGroupBox
     Left = 40
     Top = 56
-    Width = 329
+    Width = 401
     Height = 97
     Caption = 'MixerGroupBox'
     TabOrder = 1
@@ -45,14 +45,14 @@ object ModernProfileEditorSoundFrame: TModernProfileEditorSoundFrame
       Caption = 'SampleRateLabel'
     end
     object BlockSizeLabel: TLabel
-      Left = 120
+      Left = 152
       Top = 32
       Width = 68
       Height = 13
       Caption = 'BlockSizeLabel'
     end
     object PreBufferLabel: TLabel
-      Left = 224
+      Left = 288
       Top = 34
       Width = 71
       Height = 13
@@ -64,23 +64,23 @@ object ModernProfileEditorSoundFrame: TModernProfileEditorSoundFrame
       Width = 82
       Height = 21
       Style = csDropDownList
-      ItemHeight = 13
+      ItemHeight = 0
       TabOrder = 0
     end
     object BlockSizeComboBox: TComboBox
-      Left = 120
+      Left = 152
       Top = 51
       Width = 82
       Height = 21
-      ItemHeight = 13
+      ItemHeight = 0
       TabOrder = 1
     end
     object PreBufferComboBox: TComboBox
-      Left = 224
+      Left = 288
       Top = 51
       Width = 82
       Height = 21
-      ItemHeight = 13
+      ItemHeight = 0
       TabOrder = 2
     end
   end
@@ -99,7 +99,7 @@ object ModernProfileEditorSoundFrame: TModernProfileEditorSoundFrame
     Width = 82
     Height = 21
     Style = csDropDownList
-    ItemHeight = 13
+    ItemHeight = 0
     TabOrder = 3
   end
   object TandyRadioGroup: TRadioGroup
@@ -120,7 +120,7 @@ object ModernProfileEditorSoundFrame: TModernProfileEditorSoundFrame
     Width = 82
     Height = 21
     Style = csDropDownList
-    ItemHeight = 13
+    ItemHeight = 0
     TabOrder = 5
   end
   object ActivateDisneyCheckBox: TCheckBox

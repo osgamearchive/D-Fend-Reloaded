@@ -24,7 +24,7 @@ type
 var
   LanguageEditorStartForm: TLanguageEditorStartForm;
 
-Function ShowLanguageEditorStartDialog(const AOwner : TComponent; var LanguageFile : String) : Boolean;
+Function ShowLanguageEditorStartDialog(const AOwner : TComponent; var LanguageFile : String; const NewOnly : Boolean = False) : Boolean;
 
 implementation
 
@@ -38,6 +38,7 @@ begin
 
   Caption:=LanguageSetup.ProfileEditor;
   OKButton.Caption:=LanguageSetup.OK;
+  CancelButton.Caption:=LanguageSetup.Cancel;
 
   Caption:=LanguageSetup.LanguageEditorCaption;
   EditThisRadioButton.Caption:=LanguageSetup.LanguageEditorEditThisLanguage;
@@ -51,12 +52,16 @@ end;
 
 { global }
 
-Function ShowLanguageEditorStartDialog(const AOwner : TComponent; var LanguageFile : String) : Boolean;
+Function ShowLanguageEditorStartDialog(const AOwner : TComponent; var LanguageFile : String; const NewOnly : Boolean) : Boolean;
 begin
   LanguageFile:='';
 
   LanguageEditorStartForm:=TLanguageEditorStartForm.Create(AOwner);
   try
+    If NewOnly then begin
+      LanguageEditorStartForm.EditThisRadioButton.Enabled:=False;
+      LanguageEditorStartForm.EditNewRadioButton.Checked:=True;
+    end;
     result:=(LanguageEditorStartForm.ShowModal=mrOK);
     if result then begin
       If LanguageEditorStartForm.EditThisRadioButton.Checked then begin

@@ -4,7 +4,7 @@ object UninstallSelectForm: TUninstallSelectForm
   BorderStyle = bsDialog
   Caption = 'Programme deinstallieren'
   ClientHeight = 503
-  ClientWidth = 396
+  ClientWidth = 439
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -27,7 +27,7 @@ object UninstallSelectForm: TUninstallSelectForm
   object ActionsRadioGroup: TRadioGroup
     Left = 8
     Top = 352
-    Width = 377
+    Width = 423
     Height = 105
     Caption = 'Aktionen'
     ItemIndex = 2
@@ -43,7 +43,7 @@ object UninstallSelectForm: TUninstallSelectForm
   object ListBox: TCheckListBox
     Left = 8
     Top = 27
-    Width = 377
+    Width = 423
     Height = 270
     ItemHeight = 13
     TabOrder = 0

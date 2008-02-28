@@ -16,10 +16,20 @@
 
 !define VER_MAYOR 0
 !define VER_MINOR1 3
-!define VER_MINOR2 1
+!define VER_MINOR2 2
 
 !define PrgName "D-Fend Reloaded ${VER_MAYOR}.${VER_MINOR1}.${VER_MINOR2}"
 OutFile "D-Fend-Reloaded-${VER_MAYOR}.${VER_MINOR1}.${VER_MINOR2}-UpdateSetup.exe"
+
+VIAddVersionKey "ProductName" "D-Fend Reloaded"
+VIAddVersionKey "ProductVersion" "${VER_MAYOR}.${VER_MINOR1}.${VER_MINOR2}"
+VIAddVersionKey "Comments" "${PrgName} is a Frontend for DOSBox"
+VIAddVersionKey "CompanyName" "Written by Alexander Herzog"
+VIAddVersionKey "LegalCopyright" "Licensed under the GPL v3"
+VIAddVersionKey "FileDescription" "Update installer for ${PrgName}"
+VIAddVersionKey "FileVersion" "${VER_MAYOR}.${VER_MINOR1}.${VER_MINOR2}"
+VIProductVersion "${VER_MAYOR}.${VER_MINOR1}.${VER_MINOR2}.0"
+
 
 
 
@@ -33,7 +43,7 @@ BrandingText "${PrgName} UPDATE"
 
 RequestExecutionLevel user
 XPStyle on
-InstallDir "$PROGRAMFILES\D-Fend Reloaded"
+InstallDir "$PROGRAMFILES\D-Fend Reloaded\"
 SetCompressor /solid lzma
 !insertmacro MUI_RESERVEFILE_LANGDLL
 
@@ -83,10 +93,16 @@ Var DataInstDir
 ; ============================================================
 
 !insertmacro MUI_LANGUAGE "English"
+!insertmacro MUI_LANGUAGE "French"
 !insertmacro MUI_LANGUAGE "German"
+!insertmacro MUI_LANGUAGE "Russian"
+!insertmacro MUI_LANGUAGE "Spanish"
 
 !include "D-Fend-Reloaded-Setup-Lang-English.nsi"
+!include "D-Fend-Reloaded-Setup-Lang-French.nsi"
 !include "D-Fend-Reloaded-Setup-Lang-German.nsi"
+!include "D-Fend-Reloaded-Setup-Lang-Russian.nsi"
+!include "D-Fend-Reloaded-Setup-Lang-Spanish.nsi"
 
 
 
@@ -135,6 +151,7 @@ Section "$(LANGNAME_DFendReloaded)" ID_DFend
   File "..\FAQs.txt"
   File "..\D-Fend Reloaded DataInstaller.nsi"
   File "..\UpdateCheck\UpdateCheck.exe"
+  File "..\SetInstLang\SetInstallerLanguage.exe"
   
   SetOutPath "$DataInstDir"
   File "..\D-Fend Reloaded DataInstaller.nsi"
@@ -178,9 +195,8 @@ Function .onInit
   Goto SelLang
   
   SelLang:
+  !define MUI_LANGDLL_ALLLANGUAGES
   !insertmacro MUI_LANGDLL_DISPLAY
-  !insertmacro MUI_INSTALLOPTIONS_EXTRACT "ioFileEnglish.ini"
-  !insertmacro MUI_INSTALLOPTIONS_EXTRACT "ioFileGerman.ini"
   
   IntCmp $AdminOK 1 InitReturn
   MessageBox MB_YESNO "$(LANGNAME_NeedAdminRightsUpdate)" IDYES UAC_Elevate IDNO InitReturn

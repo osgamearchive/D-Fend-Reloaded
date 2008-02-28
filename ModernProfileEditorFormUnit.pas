@@ -6,10 +6,10 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, ComCtrls, StdCtrls, Buttons, ExtCtrls, GameDBUnit, ImgList;
 
-Type TTextEvent=Procedure(Sender : TObject; const Text : String) of object;
+Type TTextEvent=Procedure(Sender : TObject; const ProfileName, ProfileExe, ProfileSetup : String) of object;
 
 Type IModernProfileEditorFrame=interface
-  Procedure InitGUI(const OnProfileNameChange : TTextEvent; const GameDB: TGameDB; const CurrentProfileName : PString);
+  Procedure InitGUI(const OnProfileNameChange : TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup : PString);
   Procedure SetGame(const Game : TGame; const LoadFromTemplate : Boolean);
   Function CheckValue : Boolean;
   Procedure GetGame(const Game : TGame);
@@ -19,6 +19,7 @@ Type TFrameRecord=record
   Frame : TFrame;
   IFrame : IModernProfileEditorFrame;
   PageCode : Integer;
+  ExtPageCode : Integer;
   TreeNode : TTreeNode;
 end;
 
@@ -38,16 +39,18 @@ type
     procedure FormShow(Sender: TObject);
     procedure OKButtonClick(Sender: TObject);
     procedure TreeChange(Sender: TObject; Node: TTreeNode);
+    procedure FormCreate(Sender: TObject);
   private
     { Private-Deklarationen }
-    ProfileName : String;
+    ProfileName, ProfileExe, ProfileSetup : String;
     FrameList : Array of TFrameRecord;
     Procedure InitGUI;
     Procedure LoadData;
-    Procedure SetProfileNameEvent(Sender : TObject; const Text : String);
+    Procedure SetProfileNameEvent(Sender : TObject; const AProfileName, AProfileExe, AProfileSetup : String);
     Function AddTreeNode(const ParentTreeNode : TTreeNode; const F : TFrame; const I : IModernProfileEditorFrame; const Name : String; const PageCode : Integer; const ImageIndex : Integer) : TTreeNode;
   public
     { Public-Deklarationen }
+    LastUsedPageCode : Integer;
     LastVisibleFrame : TFrame;
     MoveStatus : Integer;
     LoadTemplate, Game : TGame;
@@ -73,13 +76,18 @@ uses VistaToolsUnit, LanguageSetupUnit, ModernProfileEditorBaseFrameUnit,
      ModernProfileEditorJoystickFrameUnit, ModernProfileEditorDrivesFrameUnit,
      ModernProfileEditorSerialPortsFrameUnit, ModernProfileEditorSerialPortFrameUnit,
      ModernProfileEditorNetworkFrameUnit, ModernProfileEditorDOSEnvironmentFrameUnit,
-     ModernProfileEditorStartFrameUnit, IconLoaderUnit;
+     ModernProfileEditorStartFrameUnit, IconLoaderUnit, GameDBToolsUnit, PrgSetupUnit;
 
 {$R *.dfm}
 
-var LastPage, LastTop, LastLeft : Integer;
+var LastPage, LastPageExt, LastTop, LastLeft : Integer;
 
 { TModernProfileEditorForm }
+
+procedure TModernProfileEditorForm.FormCreate(Sender: TObject);
+begin
+  LastUsedPageCode:=-1;
+end;
 
 Function TModernProfileEditorForm.AddTreeNode(const ParentTreeNode : TTreeNode; const F : TFrame; const I : IModernProfileEditorFrame; const Name : String; const PageCode : Integer; const ImageIndex : Integer) : TTreeNode;
 Var C : Integer;
@@ -91,11 +99,12 @@ begin
   FrameList[C].Frame:=F;
   FrameList[C].IFrame:=I;
   FrameList[C].PageCode:=PageCode;
+  FrameList[C].ExtPageCode:=LastUsedPageCode; inc(LastUsedPageCode);
   FrameList[C].TreeNode:=result;
   result.ImageIndex:=ImageIndex;
   result.SelectedIndex:=ImageIndex;
   F.DoubleBuffered:=True;
-  I.InitGUI(SetProfileNameEvent,GameDB,@ProfileName);
+  I.InitGUI(SetProfileNameEvent,GameDB,@ProfileName,@ProfileExe,@ProfileSetup);
 end;
 
 procedure TModernProfileEditorForm.InitGUI;
@@ -164,19 +173,45 @@ begin
     Game:=LoadTemplate;
     try LoadData; finally Game:=nil; end;
     ProfileName:='';
+    ProfileExe:='';
+    ProfileSetup:='';
   end else begin
     LoadData;
+    ProfileEditorOpenCheck(Game);
     ProfileName:=Game.Name;
+    ProfileExe:=Game.GameExe;
+    ProfileSetup:=Game.SetupExe;
   end;
-  SetProfileNameEvent(Sender,ProfileName);
+  SetProfileNameEvent(Sender,ProfileName,ProfileExe,ProfileSetup);
 
   If RestoreLastPosition then begin
-    For I:=0 to length(FrameList)-1 do if FrameList[I].PageCode=LastPage then begin
-      Tree.Selected:=FrameList[I].TreeNode;
-      break;
+    If LastPageExt>=0 then begin
+      For I:=0 to length(FrameList)-1 do if FrameList[I].ExtPageCode=LastPageExt then begin
+        Tree.Selected:=FrameList[I].TreeNode;
+        break;
+      end;
+    end else begin
+      For I:=0 to length(FrameList)-1 do if FrameList[I].PageCode=LastPage then begin
+        Tree.Selected:=FrameList[I].TreeNode;
+        break;
+      end;
     end;
     Top:=LastTop;
     Left:=LastLeft;
+  end else begin
+    If PrgSetup.ReopenLastProfileEditorTab then begin
+      If Game.LastOpenTabModern>=0 then begin
+        For I:=0 to length(FrameList)-1 do if FrameList[I].ExtPageCode=Game.LastOpenTabModern then begin
+          Tree.Selected:=FrameList[I].TreeNode;
+          break;
+        end;
+      end else begin
+        For I:=0 to length(FrameList)-1 do if FrameList[I].PageCode=Game.LastOpenTab then begin
+          Tree.Selected:=FrameList[I].TreeNode;
+          break;
+        end;
+      end;
+    end;
   end;
 end;
 
@@ -186,12 +221,16 @@ begin
   For I:=0 to Tree.Items.Count-1 do FrameList[Integer(Tree.Items[I].Data)].IFrame.SetGame(Game,LoadTemplate<>nil);
 end;
 
-procedure TModernProfileEditorForm.SetProfileNameEvent(Sender: TObject; const Text : String);
+procedure TModernProfileEditorForm.SetProfileNameEvent(Sender: TObject; const AProfileName, AProfileExe, AProfileSetup : String);
 Var S : String;
 begin
-  ProfileName:=Text;
+  ProfileName:=AProfileName;
+  ProfileExe:=AProfileExe;
+  ProfileSetup:=AProfileSetup;
   If Trim(ProfileName)='' then S:=LanguageSetup.NotSet else S:=ProfileName;
-  Caption:=LanguageSetup.ProfileEditor+' ['+S+']';
+  If (S=LanguageSetup.ProfileEditorNoFilename) or (S=LanguageSetup.NotSet)
+    then Caption:=LanguageSetup.ProfileEditor
+    else Caption:=LanguageSetup.ProfileEditor+' ['+S+']';
 end;
 
 procedure TModernProfileEditorForm.TreeChange(Sender: TObject; Node: TTreeNode);
@@ -227,14 +266,18 @@ begin
     I:=GameDB.Add(ProfileName);
     Game:=GameDB[I];
   end;
-
+  
   For I:=0 to Tree.Items.Count-1 do FrameList[Integer(Tree.Items[I].Data)].IFrame.GetGame(Game);
 
   If Tree.Selected<>nil then begin
     LastPage:=FrameList[Integer(Tree.Selected.Data)].PageCode;
+    LastPageExt:=FrameList[Integer(Tree.Selected.Data)].ExtPageCode;
   end else begin
     LastPage:=0;
+    LastPageExt:=0;
   end;
+  Game.LastOpenTab:=LastPage;
+  Game.LastOpenTabModern:=LastPageExt;
 
   Game.StoreAllValues;
   Game.LoadCache;

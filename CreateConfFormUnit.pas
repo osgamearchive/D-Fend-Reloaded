@@ -120,7 +120,7 @@ begin
         exit;
       end;
     end else begin
-      St:=BuildConfFile(G,False);
+      St:=BuildConfFile(G,False,False);
       try
         S:=Dir+ChangeFileExt(ExtractFileName(G.SetupFile),'.conf');
         try St.SaveToFile(S); except

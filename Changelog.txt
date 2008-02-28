@@ -1,5 +1,63 @@
 D-Fend Reloaded Changelog
 
+Version 0.3.2 (02/29/2008)
+==========================
+- French language file (thanks to Christophe Bertrand)
+- Russian language file (thanks to Alexander Katz)
+- The installer and the data package installers are now also available in all
+  five currently supported languages.
+- All available CDs can automatically be mounted at DOSBox start (optional,
+  configurateable per profile).
+- Floppy images can be written back to real floppy disks.
+- The profile files will only be updated on disk on program close if this is
+  really needed. (This makes using multiple instances of D-Fend Reloaded at the
+  same time easier.)
+- A warning message will appear if you try to run a game from a profile made
+  for some other game. (With each profile checksums for the game and the setup
+  exe will be stored automatically compared with the real exe when trying to
+  run the game.)
+- A warning message will appear if you try to run a program file which is not
+  reachable via any mounted folder.
+- The function that builds the autoexec commands to run the game now also looks
+  on mounted CDs for a path to the file and when there are overlapping mounts
+  it will use the shortest path instead of the first matching path.
+- The screenshot capture folder will be chossen automatically for new profiles
+  (until now screenshot capture folder was only setup automatically when adding
+  profiles via the wizard). This feature can be turned off in the setup dialog.
+- It can be configurated now what should be shown in the games list if there
+  are undefined values for genre, developer, etc. (by default "not set").
+- [Fix] Mounting of real CD drives does not work if no CD is in the drive when
+  starting DOSBox.
+- [Fix] Changes made to "Window resolution", "Fullscreen resolution" and
+  "Scale" in the multiple profile were not saved.
+- [Fix] The default profile cannnot be changed with the modern style profile
+  editor because when closing the dialog an "You have to define a name for the
+  new game." error occurs.
+- [Fix] In the language editor the last language string of each section was not
+  shown.
+- [Fix] The "Set default screenshot folder" button in the profile editor does
+  not detect and remove illegal characters in the profile name.  
+- [Fix] The sound prebuffer value written from the profile to the DOSBox config
+  file was wrong.
+- [Fix] The "Reopen last active profile editor page" does not work when using
+  the modern profile editor.
+- [Fix] When changing the language in the setup dialog the "window size at
+  program start" dropdown box was reset to the default value.
+- [Fix] When starting the first run wizard by deleting the DFend.ini a second
+  "DOSBox DOS" profile was created instead of reseting the existing one to the
+  default values.
+- [Fix] Pressing the "Insert" and "Delete" keys in the environment variables
+  editor table may changes the the list of environment variables in unexpected
+  ways.
+- [Fix] When browsing for a installation directory in the program installer and
+  in data packages installers always a "\D-Fend Reloaded" was added to the
+  choosen folder.
+- [Fix] When opening the multi profile editor the second tab (things to change)
+  instead the first tab (selecting profiles for change) was active.
+- [Fix] Untranslated button caption in language select dialog for language
+  editor and misspelled string in profile editor.
+
+
 Version 0.3.1 (02/18/2008)
 ==========================
 - CDs can be ripped to ISO images and used as DOSBox drives.

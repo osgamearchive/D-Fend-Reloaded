@@ -312,25 +312,41 @@ object SetupForm: TSetupForm
       end
       object DosBoxLangLabel: TLabel
         Left = 16
-        Top = 72
+        Top = 112
         Width = 84
         Height = 13
         Caption = 'DosBoxLangLabel'
       end
       object LanguageInfoLabel: TLabel
-        Left = 208
-        Top = 35
-        Width = 385
-        Height = 77
+        Left = 312
+        Top = 31
+        Width = 281
+        Height = 174
         AutoSize = False
         Caption = 'LanguageInfoLabel'
         Visible = False
         WordWrap = True
       end
+      object InstallerLangLabel: TLabel
+        Left = 16
+        Top = 192
+        Width = 87
+        Height = 13
+        Caption = 'InstallerLangLabel'
+      end
+      object InstallerLangInfoLabel: TLabel
+        Left = 16
+        Top = 238
+        Width = 577
+        Height = 83
+        AutoSize = False
+        Caption = 'InstallerLangInfoLabel'
+        WordWrap = True
+      end
       object LanguageComboBox: TComboBox
         Left = 16
         Top = 32
-        Width = 169
+        Width = 290
         Height = 21
         Style = csDropDownList
         ItemHeight = 13
@@ -339,12 +355,42 @@ object SetupForm: TSetupForm
       end
       object DosBoxLangEditComboBox: TComboBox
         Left = 16
-        Top = 91
-        Width = 169
+        Top = 131
+        Width = 290
         Height = 21
         Style = csDropDownList
         ItemHeight = 13
+        TabOrder = 3
+      end
+      object LanguageOpenEditor: TBitBtn
+        Tag = 14
+        Left = 16
+        Top = 59
+        Width = 140
+        Height = 25
+        Caption = 'Spracheditor '#246'ffnen'
         TabOrder = 1
+        OnClick = ButtonWork
+      end
+      object LanguageNew: TBitBtn
+        Tag = 15
+        Left = 159
+        Top = 59
+        Width = 147
+        Height = 25
+        Caption = 'Neue Sprache anlegen'
+        TabOrder = 2
+        OnClick = ButtonWork
+      end
+      object InstallerLangEditComboBox: TComboBox
+        Left = 16
+        Top = 211
+        Width = 290
+        Height = 21
+        Style = csDropDownList
+        ItemHeight = 13
+        TabOrder = 4
+        OnChange = InstallerLangEditComboBoxChange
       end
     end
     object ListViewSheet: TTabSheet
@@ -354,10 +400,10 @@ object SetupForm: TSetupForm
         602
         329)
       object PageControl1: TPageControl
-        Left = 6
-        Top = 11
+        Left = 3
+        Top = 3
         Width = 588
-        Height = 288
+        Height = 319
         ActivePage = ListViewSheet1
         Anchors = [akLeft, akTop, akRight, akBottom]
         MultiLine = True
@@ -482,7 +528,7 @@ object SetupForm: TSetupForm
             Caption = 'Schriftgr'#246#223'e'
           end
           object GamesListFontColorLabel: TLabel
-            Left = 96
+            Left = 140
             Top = 120
             Width = 61
             Height = 13
@@ -542,12 +588,53 @@ object SetupForm: TSetupForm
             Value = 9
           end
           object GamesListFontColorBox: TColorBox
-            Left = 96
+            Left = 140
             Top = 139
             Width = 130
             Height = 22
             ItemHeight = 16
             TabOrder = 6
+          end
+          object NotSetGroupBox: TGroupBox
+            Left = 16
+            Top = 188
+            Width = 551
+            Height = 65
+            Caption = 'Anzeige f'#252'r "Nicht definiert"'
+            TabOrder = 7
+            object NotSetRadioButton1: TRadioButton
+              Left = 16
+              Top = 32
+              Width = 130
+              Height = 17
+              Caption = '"Nicht definiert"'
+              Checked = True
+              TabOrder = 0
+              TabStop = True
+            end
+            object NotSetRadioButton2: TRadioButton
+              Left = 152
+              Top = 32
+              Width = 49
+              Height = 17
+              Caption = '"-"'
+              TabOrder = 1
+            end
+            object NotSetRadioButton3: TRadioButton
+              Left = 240
+              Top = 32
+              Width = 25
+              Height = 17
+              TabOrder = 2
+            end
+            object NotSetEdit: TEdit
+              Left = 267
+              Top = 32
+              Width = 270
+              Height = 21
+              TabOrder = 3
+              OnChange = NotSetEditChange
+            end
           end
         end
         object ListViewSheet3: TTabSheet
@@ -555,7 +642,7 @@ object SetupForm: TSetupForm
           ImageIndex = 2
           DesignSize = (
             580
-            242)
+            273)
           object TreeViewFontSizeLabel: TLabel
             Left = 16
             Top = 88
@@ -564,7 +651,7 @@ object SetupForm: TSetupForm
             Caption = 'Schriftgr'#246#223'e'
           end
           object TreeViewFontColorLabel: TLabel
-            Left = 96
+            Left = 140
             Top = 88
             Width = 61
             Height = 13
@@ -629,7 +716,7 @@ object SetupForm: TSetupForm
             Value = 9
           end
           object TreeViewFontColorBox: TColorBox
-            Left = 96
+            Left = 140
             Top = 107
             Width = 130
             Height = 22
@@ -686,7 +773,7 @@ object SetupForm: TSetupForm
             Caption = 'Schriftgr'#246#223'e'
           end
           object ScreenshotsListFontColorLabel: TLabel
-            Left = 96
+            Left = 140
             Top = 120
             Width = 61
             Height = 13
@@ -746,7 +833,7 @@ object SetupForm: TSetupForm
             Value = 9
           end
           object ScreenshotsListFontColorBox: TColorBox
-            Left = 96
+            Left = 140
             Top = 139
             Width = 130
             Height = 22
@@ -800,6 +887,22 @@ object SetupForm: TSetupForm
         Checked = True
         TabOrder = 2
         TabStop = True
+      end
+      object AutoSetScreenshotFolderRadioGroup: TRadioGroup
+        Left = 16
+        Top = 136
+        Width = 569
+        Height = 65
+        Caption = 
+          'Screenshot-Ordner beim Hinzuf'#252'gen von Profilen automatisch festl' +
+          'egen'
+        ItemIndex = 1
+        Items.Strings = (
+          'Nur beim Hinzuf'#252'gen '#252'ber den Assistenten'
+          
+            'Beim Hinzuf'#252'gen '#252'ber den Assistenten und '#252'ber den modernen Profi' +
+            'leditor')
+        TabOrder = 3
       end
     end
     object DosBoxSheet: TTabSheet
@@ -885,10 +988,9 @@ object SetupForm: TSetupForm
       end
       object SDLVideodriverLabel: TLabel
         Left = 16
-        Top = 252
-        Width = 113
-        Height = 18
-        AutoSize = False
+        Top = 236
+        Width = 83
+        Height = 13
         Caption = 'SDL Videotreiber:'
       end
       object SDLVideodriverInfoLabel: TLabel
@@ -971,7 +1073,7 @@ object SetupForm: TSetupForm
         OnChange = DosBoxDirEditChange
       end
       object SDLVideoDriverComboBox: TComboBox
-        Left = 117
+        Left = 16
         Top = 249
         Width = 145
         Height = 21
@@ -1860,5 +1962,11 @@ object SetupForm: TSetupForm
     DefaultExt = 'jpeg'
     Left = 568
     Top = 384
+  end
+  object Timer: TTimer
+    Enabled = False
+    OnTimer = TimerTimer
+    Left = 568
+    Top = 352
   end
 end

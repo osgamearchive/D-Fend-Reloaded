@@ -128,7 +128,7 @@ object ProfileEditorForm: TProfileEditorForm
       object IconSelectButton: TBitBtn
         Left = 72
         Top = 9
-        Width = 105
+        Width = 141
         Height = 25
         Caption = 'Icon ausw'#228'hlen...'
         TabOrder = 1
@@ -136,9 +136,9 @@ object ProfileEditorForm: TProfileEditorForm
       end
       object IconDeleteButton: TBitBtn
         Tag = 1
-        Left = 192
+        Left = 228
         Top = 9
-        Width = 105
+        Width = 141
         Height = 25
         Caption = 'Icon l'#246'schen'
         TabOrder = 2
@@ -174,7 +174,7 @@ object ProfileEditorForm: TProfileEditorForm
         Tag = 9
         Left = 13
         Top = 247
-        Width = 260
+        Width = 300
         Height = 25
         Caption = 'Screenshot-Verzeichnis automatisch festlegen'
         TabOrder = 4
@@ -217,7 +217,7 @@ object ProfileEditorForm: TProfileEditorForm
         Tag = 19
         Left = 12
         Top = 199
-        Width = 260
+        Width = 278
         Height = 25
         Caption = 'Daten-Verzeichnis automatisch erstellen'
         TabOrder = 1
@@ -225,9 +225,9 @@ object ProfileEditorForm: TProfileEditorForm
       end
       object GameInfoMetaDataButton: TBitBtn
         Tag = 23
-        Left = 278
+        Left = 296
         Top = 199
-        Width = 235
+        Width = 217
         Height = 25
         Caption = 'Benutzerdefinierte Informationen'
         TabOrder = 2
@@ -254,10 +254,6 @@ object ProfileEditorForm: TProfileEditorForm
     object EnvironmentSheet: TTabSheet
       Caption = 'EnvironmentSheet'
       ImageIndex = 3
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object KeyboardLayoutInfoLabel: TLabel
         Left = 12
         Top = 498
@@ -270,7 +266,7 @@ object ProfileEditorForm: TProfileEditorForm
         Left = 12
         Top = 16
         Width = 501
-        Height = 480
+        Height = 513
         Strings.Strings = (
           '=')
         TabOrder = 0
@@ -283,15 +279,11 @@ object ProfileEditorForm: TProfileEditorForm
     object MountingSheet: TTabSheet
       Caption = 'MountingSheet'
       ImageIndex = 4
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object MountingListView: TListView
-        Left = 12
+        Left = 3
         Top = 16
-        Width = 501
-        Height = 491
+        Width = 523
+        Height = 465
         Columns = <>
         ReadOnly = True
         TabOrder = 0
@@ -301,8 +293,8 @@ object ProfileEditorForm: TProfileEditorForm
       end
       object MountingAddButton: TBitBtn
         Tag = 5
-        Left = 12
-        Top = 513
+        Left = 3
+        Top = 487
         Width = 94
         Height = 25
         Caption = 'Hinzuf'#252'gen...'
@@ -325,8 +317,8 @@ object ProfileEditorForm: TProfileEditorForm
       end
       object MountingEditButton: TBitBtn
         Tag = 6
-        Left = 112
-        Top = 513
+        Left = 103
+        Top = 487
         Width = 94
         Height = 25
         Caption = 'Bearbeiten...'
@@ -349,8 +341,8 @@ object ProfileEditorForm: TProfileEditorForm
       end
       object MountingDelButton: TBitBtn
         Tag = 7
-        Left = 212
-        Top = 513
+        Left = 203
+        Top = 487
         Width = 94
         Height = 25
         Caption = 'L'#246'schen'
@@ -373,8 +365,8 @@ object ProfileEditorForm: TProfileEditorForm
       end
       object MountingDeleteAllButton: TBitBtn
         Tag = 8
-        Left = 312
-        Top = 513
+        Left = 303
+        Top = 487
         Width = 90
         Height = 25
         Caption = 'Alle l'#246'schen'
@@ -383,22 +375,26 @@ object ProfileEditorForm: TProfileEditorForm
       end
       object MountingAutoCreateButton: TBitBtn
         Tag = 20
-        Left = 408
-        Top = 513
-        Width = 105
+        Left = 399
+        Top = 487
+        Width = 127
         Height = 25
         Caption = 'Autom. erstellen'
         TabOrder = 5
         OnClick = ButtonWork
       end
+      object AutoMountCheckBox: TCheckBox
+        Left = 3
+        Top = 522
+        Width = 501
+        Height = 17
+        Caption = 'Aktuell verf'#252'gbare CDs in allen Laufwerken automatisch mounten'
+        TabOrder = 6
+      end
     end
     object SoundSheet: TTabSheet
       Caption = 'SoundSheet'
       ImageIndex = 5
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object SoundValueListEditor: TValueListEditor
         Left = 12
         Top = 16
@@ -420,10 +416,6 @@ object ProfileEditorForm: TProfileEditorForm
         TabOrder = 1
         object SoundSBSheet: TTabSheet
           Caption = 'SoundSBSheet'
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
           object SoundSBValueListEditor: TValueListEditor
             Left = 3
             Top = 16
@@ -440,10 +432,6 @@ object ProfileEditorForm: TProfileEditorForm
         object SoundGUSSheet: TTabSheet
           Caption = 'SoundGUSSheet'
           ImageIndex = 1
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
           object SoundGUSValueListEditor: TValueListEditor
             Left = 3
             Top = 16
@@ -460,10 +448,6 @@ object ProfileEditorForm: TProfileEditorForm
         object SoundMIDISheet: TTabSheet
           Caption = 'SoundMIDISheet'
           ImageIndex = 2
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
           object SoundMIDIValueListEditor: TValueListEditor
             Left = 3
             Top = 16
@@ -480,10 +464,6 @@ object ProfileEditorForm: TProfileEditorForm
         object SoundJoystickSheet: TTabSheet
           Caption = 'SoundJoystickSheet'
           ImageIndex = 4
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
           object SoundJoystickValueListEditor: TValueListEditor
             Left = 3
             Top = 16
@@ -500,10 +480,6 @@ object ProfileEditorForm: TProfileEditorForm
         object SoundMiscSheet: TTabSheet
           Caption = 'SoundMiscSheet'
           ImageIndex = 3
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
           object SoundMiscValueListEditor: TValueListEditor
             Left = 3
             Top = 16
@@ -520,10 +496,6 @@ object ProfileEditorForm: TProfileEditorForm
         object SoundVolumeSheet: TTabSheet
           Caption = 'SoundVolumeSheet'
           ImageIndex = 5
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
           object SoundVolumeLeftLabel: TLabel
             Left = 148
             Top = 13
@@ -1040,7 +1012,7 @@ object ProfileEditorForm: TProfileEditorForm
         Top = 294
         Width = 501
         Height = 211
-        KeyOptions = [keyEdit, keyAdd, keyDelete]
+        KeyOptions = [keyEdit]
         TabOrder = 4
         ColWidths = (
           150

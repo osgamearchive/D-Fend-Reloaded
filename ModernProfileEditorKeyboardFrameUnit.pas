@@ -20,7 +20,7 @@ type
     { Private-Deklarationen }
   public
     { Public-Deklarationen }
-    Procedure InitGUI(const OnProfileNameChange : TTextEvent; const GameDB: TGameDB; const CurrentProfileName : PString);
+    Procedure InitGUI(const OnProfileNameChange : TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup : PString);
     Procedure SetGame(const Game : TGame; const LoadFromTemplate : Boolean);
     Function CheckValue : Boolean;
     Procedure GetGame(const Game : TGame);
@@ -34,7 +34,7 @@ uses LanguageSetupUnit, VistaToolsUnit, CommonTools, PrgSetupUnit;
 
 { TModernProfileEditorKeyboardFrame }
 
-procedure TModernProfileEditorKeyboardFrame.InitGUI(const OnProfileNameChange: TTextEvent; const GameDB: TGameDB; const CurrentProfileName: PString);
+procedure TModernProfileEditorKeyboardFrame.InitGUI(const OnProfileNameChange: TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup: PString);
 Var St : TStringList;
 begin
   NoFlicker(UseScancodesCheckBox);

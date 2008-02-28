@@ -4,7 +4,7 @@
 {It has native support for most of png features including the }
 {partial transparency, gamma and more.                        }
 {For the latest version, please be sure to check my website   }
-{http://pngdelphi.sourceforge.net                             }
+{http:/ /pngdelphi.sourceforge.net                             }
 {Gustavo Huffenbacher Daud (gustavo.daud@terra.com.br)        }
 
 
@@ -53,7 +53,7 @@
   Version 1.535
   2006-04-21 - IMPROVE 1 - Now the library uses the latest ZLIB release (1.2.3)
                            (thanks to: Roberto Della Pasqua
-                           http://www.dellapasqua.com/delphizlib/)
+                           http:/ /www.dellapasqua.com/delphizlib/)
 
   Version 1.53
   2006-04-14 -
@@ -186,7 +186,7 @@
             I'm receiving so far.}
 
 {My email is    : gustavo.daud@terra.com.br}
-{Website link   : http://pngdelphi.sourceforge.net}
+{Website link   : http:/ /pngdelphi.sourceforge.net}
 {Gustavo Huffenbacher Daud}
 
 unit pngimage;
@@ -196,12 +196,12 @@ interface
 {Triggers avaliable (edit the fields bellow)}
 {$TYPEDADDRESS OFF}
 
-{$DEFINE UseDelphi}              //Disable fat vcl units(perfect for small apps)
-{$DEFINE ErrorOnUnknownCritical} //Error when finds an unknown critical chunk
-{$DEFINE CheckCRC}               //Enables CRC checking
-{$DEFINE RegisterGraphic}        //Registers TPNGObject to use with TPicture
-{$DEFINE PartialTransparentDraw} //Draws partial transparent images
-{$DEFINE Store16bits}            //Stores the extra 8 bits from 16bits/sample
+{$DEFINE UseDelphi}              {Disable fat vcl units(perfect for small apps)}
+{$DEFINE ErrorOnUnknownCritical} {Error when finds an unknown critical chunk}
+{$DEFINE CheckCRC}               {Enables CRC checking}
+{$DEFINE RegisterGraphic}        {Registers TPNGObject to use with TPicture}
+{$DEFINE PartialTransparentDraw} {Draws partial transparent images}
+{$DEFINE Store16bits}            {Stores the extra 8 bits from 16bits/sample}
 {$RANGECHECKS OFF} {$J+}
 
 
@@ -1025,72 +1025,72 @@ begin
   {Get sizes}
   OrgSize.x := abs(srcHeader.biWidth);
   OrgSize.y := abs(srcHeader.biHeight);
-  ptSize.x := Rect.Right - Rect.Left;        // Get width of bitmap
-  ptSize.y := Rect.Bottom - Rect.Top;        // Get height of bitmap
+  ptSize.x := Rect.Right - Rect.Left;        { Get width of bitmap}
+  ptSize.y := Rect.Bottom - Rect.Top;        { Get height of bitmap}
 
   {Create some DCs to hold temporary data}
   hdcBack  := CreateCompatibleDC(dc);
   hdcObject := CreateCompatibleDC(dc);
   hdcMem   := CreateCompatibleDC(dc);
 
-  // Create a bitmap for each DC. DCs are required for a number of
-  // GDI functions.
+  { Create a bitmap for each DC. DCs are required for a number of}
+  { GDI functions.}
 
-  // Monochrome DCs
+  { Monochrome DCs}
   bmAndBack  := CreateBitmap(ptSize.x, ptSize.y, 1, 1, nil);
   bmAndObject := CreateBitmap(ptSize.x, ptSize.y, 1, 1, nil);
 
   bmAndMem   := CreateCompatibleBitmap(dc, ptSize.x, ptSize.y);
 
-  // Each DC must select a bitmap object to store pixel data.
+  { Each DC must select a bitmap object to store pixel data.}
   bmBackOld  := SelectObject(hdcBack, bmAndBack);
   bmObjectOld := SelectObject(hdcObject, bmAndObject);
   bmMemOld   := SelectObject(hdcMem, bmAndMem);
 
-  // Set the background color of the source DC to the color.
-  // contained in the parts of the bitmap that should be transparent
+  { Set the background color of the source DC to the color.}
+  { contained in the parts of the bitmap that should be transparent}
   cColor := SetBkColor(hdcTemp, cTransparentColor);
 
-  // Create the object mask for the bitmap by performing a BitBlt
-  // from the source bitmap to a monochrome bitmap.
+  { Create the object mask for the bitmap by performing a BitBlt}
+  { from the source bitmap to a monochrome bitmap.}
   StretchBlt(hdcObject, 0, 0, ptSize.x, ptSize.y, hdcTemp, 0, 0,
     orgSize.x, orgSize.y, SRCCOPY);
 
-  // Set the background color of the source DC back to the original
-  // color.
+  { Set the background color of the source DC back to the original}
+  { color.}
   SetBkColor(hdcTemp, cColor);
 
-  // Create the inverse of the object mask.
+  { Create the inverse of the object mask.}
   BitBlt(hdcBack, 0, 0, ptSize.x, ptSize.y, hdcObject, 0, 0,
        NOTSRCCOPY);
 
-  // Copy the background of the main DC to the destination.
+  { Copy the background of the main DC to the destination.}
   BitBlt(hdcMem, 0, 0, ptSize.x, ptSize.y, dc, Rect.Left, Rect.Top,
        SRCCOPY);
 
-  // Mask out the places where the bitmap will be placed.
+  { Mask out the places where the bitmap will be placed.}
   BitBlt(hdcMem, 0, 0, ptSize.x, ptSize.y, hdcObject, 0, 0, SRCAND);
 
-  // Mask out the transparent colored pixels on the bitmap.
-//  BitBlt(hdcTemp, 0, 0, ptSize.x, ptSize.y, hdcBack, 0, 0, SRCAND);
+  { Mask out the transparent colored pixels on the bitmap.}
+  {  BitBlt(hdcTemp, 0, 0, ptSize.x, ptSize.y, hdcBack, 0, 0, SRCAND);}
   StretchBlt(hdcTemp, 0, 0, OrgSize.x, OrgSize.y, hdcBack, 0, 0,
     PtSize.x, PtSize.y, SRCAND);
 
-  // XOR the bitmap with the background on the destination DC.
+  { XOR the bitmap with the background on the destination DC.}
   StretchBlt(hdcMem, 0, 0, ptSize.x, ptSize.y, hdcTemp, 0, 0,
     OrgSize.x, OrgSize.y, SRCPAINT);
 
-  // Copy the destination to the screen.
+  { Copy the destination to the screen.}
   BitBlt(dc, Rect.Left, Rect.Top, ptSize.x, ptSize.y, hdcMem, 0, 0,
        SRCCOPY);
 
-  // Delete the memory bitmaps.
+  { Delete the memory bitmaps.}
   DeleteObject(SelectObject(hdcBack, bmBackOld));
   DeleteObject(SelectObject(hdcObject, bmObjectOld));
   DeleteObject(SelectObject(hdcMem, bmMemOld));
   DeleteObject(SelectObject(hdcTemp, OldBitmap));
 
-  // Delete the memory DCs.
+  { Delete the memory DCs.}
   DeleteDC(hdcMem);
   DeleteDC(hdcBack);
   DeleteDC(hdcObject);
@@ -1846,11 +1846,11 @@ function TStream.GetSize: Longint;
   {Reads data from the stream}
   function TResourceStream.Read(var Buffer; Count: Integer): Cardinal;
   begin
-    //Returns data
+    {Returns data}
     CopyMemory(@Buffer, Ptr(Longint(Memory) + Position), Count);
-    //Update position
+    {Update position}
     inc(Position, Count);
-    //Returns
+    {Returns}
     Result := Count;
   end;
 
@@ -3145,8 +3145,8 @@ var
 begin
   FOR I := 1 TO ImageWidth DO
   begin
-    //Since windows does not supports 2 bytes for
-    //each R, G, B value, the method will read only 1 byte from it
+    {Since windows does not supports 2 bytes for}
+    {each R, G, B value, the method will read only 1 byte from it}
     {Copy pixel values}
     Byte(Dest^) := fOwner.GammaTable[pByte(Longint(Src) + 4)^]; inc(Dest);
     Byte(Dest^) := fOwner.GammaTable[pByte(Longint(Src) + 2)^]; inc(Dest);
@@ -3251,7 +3251,7 @@ var
 begin
   FOR I := 1 TO ImageWidth DO
   begin
-    //Copy rgb and alpha values (transforming from 16 bits to 8 bits)
+    {Copy rgb and alpha values (transforming from 16 bits to 8 bits)}
     {Copy pixel values}
     Trans^ := pChar(Longint(Src) + 6)^;
     Byte(Dest^)  := fOwner.GammaTable[pByte(Longint(Src) + 4)^]; inc(Dest);
@@ -3660,8 +3660,8 @@ var
 begin
   FOR I := 1 TO ImageWidth DO
   begin
-    //Now we copy from 1 byte for each sample stored to a 2 bytes (or 1 word)
-    //for sample
+    {Now we copy from 1 byte for each sample stored to a 2 bytes (or 1 word)}
+    {for sample}
     {Copy pixel values}
     pWORD(Dest)^ := fOwner.InverseGamma[pByte(Longint(Src) + 2)^]; inc(Dest, 2);
     pWORD(Dest)^ := fOwner.InverseGamma[pByte(Longint(Src) + 1)^]; inc(Dest, 2);
@@ -3686,8 +3686,8 @@ var
 begin
   FOR I := 1 TO ImageWidth DO
   begin
-    //Now we copy from 1 byte for each sample stored to a 2 bytes (or 1 word)
-    //for sample
+    {Now we copy from 1 byte for each sample stored to a 2 bytes (or 1 word)}
+    {for sample}
     pWORD(Dest)^ := pByte(Longint(Src))^; inc(Dest, 2);
     {Move to next pixel}
     inc(Src);
@@ -4888,7 +4888,7 @@ begin
             inc(i); inc(CurBit, Header.BitmapInfo.bmiHeader.biBitCount);
           until CurBit >= 8;
           {Move to next source data}
-          //inc(Data);
+          {inc(Data);}
         until i >= Integer(W);
 
         {Move pointers}

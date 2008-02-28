@@ -4,7 +4,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, 
-  Dialogs, StdCtrls, Spin, GameDBUnit, ModernProfileEditorFormUnit;
+  Dialogs, StdCtrls, Spin, GameDBUnit, ModernProfileEditorFormUnit, ExtCtrls,
+  ImgList, Buttons;
 
 type
   TModernProfileEditorMemoryFrame = class(TFrame, IModernProfileEditorFrame)
@@ -18,11 +19,18 @@ type
     LoadFixEdit: TSpinEdit;
     DOS32ACheckBox: TCheckBox;
     DOS32AInfoLabel: TLabel;
+    Timer: TTimer;
+    DOS32AInfoButton: TSpeedButton;
+    ImageList: TImageList;
+    procedure TimerTimer(Sender: TObject);
+    procedure DOS32AInfoButtonClick(Sender: TObject);
   private
     { Private-Deklarationen }
+    LastProfileExe : String;
+    ProfileExe : PString;
   public
     { Public-Deklarationen }
-    Procedure InitGUI(const OnProfileNameChange : TTextEvent; const GameDB: TGameDB; const CurrentProfileName : PString);
+    Procedure InitGUI(const OnProfileNameChange : TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup : PString);
     Procedure SetGame(const Game : TGame; const LoadFromTemplate : Boolean);
     Function CheckValue : Boolean;
     Procedure GetGame(const Game : TGame);
@@ -36,7 +44,7 @@ uses LanguageSetupUnit, VistaToolsUnit, CommonTools, PrgSetupUnit;
 
 { TModernProfileEditorMemoryFrame }
 
-procedure TModernProfileEditorMemoryFrame.InitGUI(const OnProfileNameChange: TTextEvent; const GameDB: TGameDB; const CurrentProfileName: PString);
+procedure TModernProfileEditorMemoryFrame.InitGUI(const OnProfileNameChange: TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup: PString);
 begin
   NoFlicker(MemoryEdit);
 
@@ -53,6 +61,8 @@ begin
   end else begin
     DOS32AInfoLabel.Font.Color:=clRed;
   end;
+  LastProfileExe:='-';
+  ProfileExe:=CurrentProfileExe;
 end;
 
 procedure TModernProfileEditorMemoryFrame.SetGame(const Game: TGame; const LoadFromTemplate: Boolean);
@@ -64,6 +74,7 @@ begin
   LoadFixCheckBox.Checked:=Game.LoadFix;
   LoadFixEdit.Value:=Game.LoadFixMemory;
   DOS32ACheckBox.Checked:=Game.UseDOS32A;
+  Timer.Enabled:=True;
 end;
 
 function TModernProfileEditorMemoryFrame.CheckValue: Boolean;
@@ -80,6 +91,33 @@ begin
   Game.LoadFix:=LoadFixCheckBox.Checked;
   Game.LoadFixMemory:=LoadFixEdit.Value;
   Game.UseDOS32A:=DOS32ACheckBox.Checked;
+  Timer.Enabled:=False;
+end;
+
+procedure TModernProfileEditorMemoryFrame.TimerTimer(Sender: TObject);
+Var B : Boolean;
+    S : String;
+begin
+  If ProfileExe^=LastProfileExe then exit;
+  LastProfileExe:=ProfileExe^;
+
+  If Trim(ProfileExe^)='' then B:=False else begin
+    S:=MakeAbsPath(ProfileExe^,PrgSetup.BaseDir);
+    B:=FileExists(IncludeTrailingPathDelimiter(ExtractFilePath(S))+'DOS4GW.EXE');
+    If not B then B:=FindStringInFile(MakeAbsPath(ProfileExe^,PrgSetup.BaseDir),'DOS4GW');
+  end;
+  If B then begin
+    ImageList.GetBitmap(0,DOS32AInfoButton.Glyph);
+    DOS32AInfoButton.Hint:=LanguageSetup.GameDOS32AUseable;
+  end else begin
+    ImageList.GetBitmap(1,DOS32AInfoButton.Glyph);
+    DOS32AInfoButton.Hint:=LanguageSetup.GameDOS32ANotUseable;;
+  end;
+end;
+
+procedure TModernProfileEditorMemoryFrame.DOS32AInfoButtonClick(Sender: TObject);
+begin
+MessageDlg(DOS32AInfoButton.Hint,mtInformation,[mbOK],0);
 end;
 
 end.

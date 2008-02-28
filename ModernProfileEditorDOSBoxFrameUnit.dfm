@@ -2,14 +2,14 @@ object ModernProfileEditorDOSBoxFrame: TModernProfileEditorDOSBoxFrame
   Left = 0
   Top = 0
   Width = 647
-  Height = 531
+  Height = 532
   TabOrder = 0
   DesignSize = (
     647
-    531)
+    532)
   object CustomDOSBoxInstallationButton: TSpeedButton
     Left = 608
-    Top = 279
+    Top = 247
     Width = 23
     Height = 22
     Anchors = [akTop, akRight]
@@ -33,7 +33,7 @@ object ModernProfileEditorDOSBoxFrame: TModernProfileEditorDOSBoxFrame
   end
   object CustomSetsLabel: TLabel
     Left = 24
-    Top = 320
+    Top = 288
     Width = 82
     Height = 13
     Caption = 'CustomSetsLabel'
@@ -56,7 +56,7 @@ object ModernProfileEditorDOSBoxFrame: TModernProfileEditorDOSBoxFrame
   end
   object CloseDOSBoxOnExitCheckBox: TCheckBox
     Left = 24
-    Top = 168
+    Top = 160
     Width = 601
     Height = 17
     Anchors = [akLeft, akTop, akRight]
@@ -65,7 +65,7 @@ object ModernProfileEditorDOSBoxFrame: TModernProfileEditorDOSBoxFrame
   end
   object DefaultDOSBoxInstallationRadioButton: TRadioButton
     Left = 24
-    Top = 224
+    Top = 201
     Width = 601
     Height = 17
     Anchors = [akLeft, akTop, akRight]
@@ -76,7 +76,7 @@ object ModernProfileEditorDOSBoxFrame: TModernProfileEditorDOSBoxFrame
   end
   object CustomDOSBoxInstallationRadioButton: TRadioButton
     Left = 24
-    Top = 256
+    Top = 224
     Width = 601
     Height = 17
     Anchors = [akLeft, akTop, akRight]
@@ -85,7 +85,7 @@ object ModernProfileEditorDOSBoxFrame: TModernProfileEditorDOSBoxFrame
   end
   object CustomDOSBoxInstallationEdit: TEdit
     Left = 40
-    Top = 279
+    Top = 247
     Width = 562
     Height = 21
     Anchors = [akLeft, akTop, akRight]
@@ -94,7 +94,7 @@ object ModernProfileEditorDOSBoxFrame: TModernProfileEditorDOSBoxFrame
   end
   object CustomSetsClearButton: TBitBtn
     Left = 24
-    Top = 495
+    Top = 496
     Width = 105
     Height = 25
     Anchors = [akLeft, akBottom]
@@ -115,11 +115,12 @@ object ModernProfileEditorDOSBoxFrame: TModernProfileEditorDOSBoxFrame
       BBB35555F55555575F555550555555550BBB55575555555575F5555555555555
       50BB555555555555575F555555555555550B5555555555555575}
     NumGlyphs = 2
+    ExplicitTop = 495
   end
   object CustomSetsLoadButton: TBitBtn
     Tag = 1
     Left = 137
-    Top = 495
+    Top = 496
     Width = 105
     Height = 25
     Anchors = [akLeft, akBottom]
@@ -140,11 +141,12 @@ object ModernProfileEditorDOSBoxFrame: TModernProfileEditorDOSBoxFrame
       B3333337FFFF77377FF333B000000333BB33337777777F3377FF3BB3333BB333
       3BB33773333773333773B333333B3333333B7333333733333337}
     NumGlyphs = 2
+    ExplicitTop = 495
   end
   object CustomSetsSaveButton: TBitBtn
     Tag = 2
     Left = 248
-    Top = 495
+    Top = 496
     Width = 105
     Height = 25
     Anchors = [akLeft, akBottom]
@@ -165,12 +167,13 @@ object ModernProfileEditorDOSBoxFrame: TModernProfileEditorDOSBoxFrame
       99337F3FF7F3733777F30F08F0F0337999337F7737F73F7777330FFFF0039999
       93337FFFF7737777733300000033333333337777773333333333}
     NumGlyphs = 2
+    ExplicitTop = 495
   end
   object CustomSetsMemo: TRichEdit
     Left = 24
-    Top = 339
+    Top = 304
     Width = 607
-    Height = 150
+    Height = 186
     Anchors = [akLeft, akTop, akRight, akBottom]
     PlainText = True
     ScrollBars = ssBoth

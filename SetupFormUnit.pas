@@ -136,6 +136,18 @@ type
     Update0RadioButton: TRadioButton;
     LanguageInfoLabel: TLabel;
     CenterDOSBoxCheckBox: TCheckBox;
+    AutoSetScreenshotFolderRadioGroup: TRadioGroup;
+    NotSetGroupBox: TGroupBox;
+    NotSetRadioButton1: TRadioButton;
+    NotSetRadioButton2: TRadioButton;
+    NotSetRadioButton3: TRadioButton;
+    NotSetEdit: TEdit;
+    LanguageOpenEditor: TBitBtn;
+    LanguageNew: TBitBtn;
+    InstallerLangEditComboBox: TComboBox;
+    InstallerLangLabel: TLabel;
+    Timer: TTimer;
+    InstallerLangInfoLabel: TLabel;
     procedure OKButtonClick(Sender: TObject);
     procedure ButtonWork(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -155,28 +167,37 @@ type
     procedure ScreenshotsListBackgroundEditChange(Sender: TObject);
     procedure ToolbarImageEditChange(Sender: TObject);
     procedure ModeComboBoxChange(Sender: TObject);
+    procedure NotSetEditChange(Sender: TObject);
+    procedure InstallerLangEditComboBoxChange(Sender: TObject);
+    procedure TimerTimer(Sender: TObject);
   private
     { Private-Deklarationen }
     JustLoading : Boolean;
     DosBoxLang : TStringList;
     LastIndex : Integer;
+    InstallerLang : Integer;
+    LangTimerCounter : Integer;
     Procedure InitGUI;
+    Procedure ReadCurrentInstallerLanguage;
   public
     { Public-Deklarationen }
     GameDB : TGameDB;
     SetAdvanced : Boolean;
+    FirstRun : Boolean;
+    LanguageEditorMode : Integer;
   end;
 
 var
   SetupForm: TSetupForm;
 
-Function ShowSetupDialog(const AOwner : TComponent; const AGameDB : TGameDB; const OpenLanguageTab : Boolean = False) : Boolean;
+Function ShowSetupDialog(const AOwner : TComponent; const AGameDB : TGameDB; const OpenLanguageTab : Boolean = False; const FirstRun : Boolean = False) : Boolean;
 Function ShowTreeListSetupDialog(const AOwner : TComponent; const AGameDB : TGameDB) : Boolean;
 
 implementation
 
-uses Math, LanguageSetupUnit, PrgSetupUnit, VistaToolsUnit, CommonTools,
-     SetupDosBoxFormUnit, GameDBToolsUnit, PrgConsts, IconLoaderUnit;
+uses ShellAPI, Math, IniFiles, Registry, LanguageSetupUnit, PrgSetupUnit,
+     VistaToolsUnit, CommonTools, SetupDosBoxFormUnit, GameDBToolsUnit, PrgConsts,
+     IconLoaderUnit, LanguageEditorStartFormUnit, LanguageEditorFormUnit;
 
 {$R *.dfm}
 
@@ -185,6 +206,8 @@ begin
   DosBoxLang:=TStringList.Create;
   JustLoading:=False;
   SetAdvanced:=False;
+  FirstRun:=False;
+  LanguageEditorMode:=0;
 end;
 
 procedure TSetupForm.FormDestroy(Sender: TObject);
@@ -224,11 +247,12 @@ begin
 
   GeneralSheet.Caption:=LanguageSetup.SetupFormGeneralSheet;
   StartSizeLabel.Caption:=LanguageSetup.SetupFormStartSizeLabel;
+  I:=StartSizeComboBox.ItemIndex;
   StartSizeComboBox.Items[0]:=LanguageSetup.SetupFormStartSizeNormal;
   StartSizeComboBox.Items[1]:=LanguageSetup.SetupFormStartSizeLast;
   StartSizeComboBox.Items[2]:=LanguageSetup.SetupFormStartSizeMinimized;
   StartSizeComboBox.Items[3]:=LanguageSetup.SetupFormStartSizeMaximized;
-  StartSizeComboBox.ItemIndex:=0;
+  StartSizeComboBox.ItemIndex:=I;
   MinimizeToTrayCheckBox.Caption:=LanguageSetup.SetupFormMinimizeToTray;
   StartWithWindowsCheckBox.Caption:=LanguageSetup.SetupFormStartWithWindows;
   AddButtonFunctionLabel.Caption:=LanguageSetup.SetupFormAddButtonFunctionLabel;
@@ -256,7 +280,11 @@ begin
 
   LanguageSheet.Caption:=LanguageSetup.SetupFormLanguageSheet;
   LanguageLabel.Caption:=LanguageSetup.SetupFormLanguage;
+  LanguageOpenEditor.Caption:=LanguageSetup.SetupFormLanguageOpenEditor;
+  LanguageNew.Caption:=LanguageSetup.SetupFormLanguageOpenEditorNew;
   DosBoxLangLabel.Caption:=LanguageSetup.SetupFormDosBoxLang;
+  InstallerLangLabel.Caption:=LanguageSetup.SetupFormInstallerLang;
+  InstallerLangInfoLabel.Caption:=LanguageSetup.SetupFormInstallerLangInfo;
 
   {Game list}
 
@@ -279,6 +307,8 @@ begin
   If ExtUpperCase(ExtractFileName(LanguageSetup.SetupFile))='DEUTSCH.INI'
     then GamesListFontColorBox.Style:=GamesListFontColorBox.Style+[cbPrettyNames]
     else GamesListFontColorBox.Style:=GamesListFontColorBox.Style-[cbPrettyNames];
+  NotSetGroupBox.Caption:=LanguageSetup.ValueForNotSet+' "'+LanguageSetup.NotSet+'"';
+  NotSetRadioButton1.Caption:='"'+LanguageSetup.NotSet+'"';
 
   ListViewSheet3.Caption:=LanguageSetup.SetupFormListViewSheet3;
   TreeViewBackgroundRadioButton1.Caption:=LanguageSetup.SetupFormBackgroundColorDefault;
@@ -315,6 +345,9 @@ begin
   ReopenLastActiveProfileSheetCheckBox.Caption:=LanguageSetup.SetupFormReopenLastActiveProfileSheet;
   ProfileEditorDFendRadioButton.Caption:=LanguageSetup.SetupFormProfileEditorDFendStyle;
   ProfileEditorModernRadioButton.Caption:=LanguageSetup.SetupFormProfileEditorModern;
+  AutoSetScreenshotFolderRadioGroup.Caption:=LanguageSetup.SetupFormProfileEditorAutoSetScreenshotFolder;
+  AutoSetScreenshotFolderRadioGroup.Items[0]:=LanguageSetup.SetupFormProfileEditorAutoSetScreenshotFolderOnlyWizard;
+  AutoSetScreenshotFolderRadioGroup.Items[1]:=LanguageSetup.SetupFormProfileEditorAutoSetScreenshotFolderAlways;
 
   {DOSBox}
 
@@ -412,7 +445,6 @@ begin
   UpdateLabel.Caption:=LanguageSetup.SetupFormUpdateInfo;
 end;
 
-
 procedure TSetupForm.FormShow(Sender: TObject);
 Var S,T : String;
     I,J,Nr : Integer;
@@ -420,6 +452,7 @@ Var S,T : String;
     B : Boolean;
     C : TColor;
     St : TStringList;
+    Ini : TIniFile;
 begin
   DoubleBuffered:=True;
   SetVistaFonts(self);
@@ -479,13 +512,26 @@ begin
     end;
     If (LanguageComboBox.Items.Count>0) and (LanguageComboBox.ItemIndex<0) then LanguageComboBox.ItemIndex:=0;
 
+    LanguageComboBoxChange(Sender); {to setup outdated warning}
+
     DosBoxDirEdit.Text:=PrgSetup.DosBoxDir;
     DosBoxDirEditChange(Self); {to fill the language combobox; needs DosBoxDirEdit.Text to be set}
 
     I:=DosBoxLang.IndexOf(PrgSetup.DosBoxLanguage);
     If I>=0 then DosBoxLangEditComboBox.ItemIndex:=I else DosBoxLangEditComboBox.ItemIndex:=0;
 
-    LanguageComboBoxChange(Sender); {to setup outdated warning}
+    LanguageComboBox.OnChange:=nil;
+    For I:=0 to LanguageComboBox.Items.Count-1 do begin
+      S:=LanguageComboBox.Items[I]+'.ini';
+      If FileExists(PrgDir+LanguageSubDir+'\'+S) then S:=PrgDir+LanguageSubDir+'\'+S else begin
+        If FileExists(PrgDataDir+LanguageSubDir+'\'+S) then S:=PrgDataDir+LanguageSubDir+'\'+S else continue;
+      end;
+      Ini:=TIniFile.Create(S); try S:=Ini.ReadString('LanguageFileInfo','NSISLanguageID',''); finally Ini.Free; end;
+      If S='' then continue;
+      try InstallerLangEditComboBox.Items.AddObject(LanguageComboBox.Items[I],Pointer(StrToInt(S))); except end;
+    end;
+    ReadCurrentInstallerLanguage;
+    LanguageComboBox.OnChange:=LanguageComboBoxChange;
 
     {Game list}
 
@@ -531,6 +577,11 @@ begin
       try GamesListFontColorBox.Selected:=StringToColor(S); except GamesListFontColorBox.Selected:=clWindowText; end;
     end;
     GamesListFontSizeEdit.Value:=PrgSetup.GamesListViewFontSize;
+    S:=Trim(PrgSetup.ValueForNotSet);
+    NotSetRadioButton1.Checked:=(S='');
+    NotSetRadioButton2.Checked:=(S='-');
+    NotSetRadioButton3.Checked:=(S<>'') and (S<>'-');
+    If NotSetRadioButton3.Checked then NotSetEdit.Text:=S;
 
     S:=Trim(PrgSetup.GamesTreeViewBackground);
     If S='' then TreeViewBackgroundRadioButton1.Checked:=True else begin
@@ -568,6 +619,7 @@ begin
     ReopenLastActiveProfileSheetCheckBox.Checked:=PrgSetup.ReopenLastProfileEditorTab;
     ProfileEditorDFendRadioButton.Checked:=PrgSetup.DFendStyleProfileEditor;
     ProfileEditorModernRadioButton.Checked:=not PrgSetup.DFendStyleProfileEditor;
+    If PrgSetup.AlwaysSetScreenshotFolderAutomatically then AutoSetScreenshotFolderRadioGroup.ItemIndex:=1 else AutoSetScreenshotFolderRadioGroup.ItemIndex:=0;
 
     {DOSBox}
 
@@ -611,7 +663,55 @@ begin
   end;
 
   If PrgSetup.EasySetupMode and (not SetAdvanced) then ModeComboBox.ItemIndex:=0 else ModeComboBox.ItemIndex:=1;
-  ModeComboBoxChange(Sender); 
+  ModeComboBoxChange(Sender);
+end;
+
+procedure TSetupForm.ReadCurrentInstallerLanguage;
+Var Reg : TRegistry;
+    I, SelLang : Integer;
+begin
+  InstallerLang:=-1;
+  Reg:=TRegistry.Create;
+  try
+    Reg.Access:=KEY_READ;
+    Reg.RootKey:=HKEY_LOCAL_MACHINE;
+    If Reg.OpenKey('\Software\D-Fend Reloaded',False) and Reg.ValueExists('Installer Language') then begin
+      try InstallerLang:=StrToInt(Reg.ReadString('Installer Language')); except end;
+    end;
+  finally
+    Reg.Free;
+  end;
+
+  InstallerLangEditComboBox.OnChange:=nil;
+
+  If InstallerLang>=0 then begin
+    SelLang:=-1;
+    For I:=0 to InstallerLangEditComboBox.Items.Count-1 do If Integer(InstallerLangEditComboBox.Items.Objects[I])=InstallerLang then begin
+      SelLang:=I; break;
+    end;
+  end else begin
+    SelLang:=-1;
+  end;
+
+  If (InstallerLangEditComboBox.Items.Count>0) and (Integer(InstallerLangEditComboBox.Items.Objects[InstallerLangEditComboBox.Items.Count-1])=-1) then begin
+    InstallerLangEditComboBox.Items.Delete(InstallerLangEditComboBox.Items.Count-1);
+  end;
+
+  If SelLang=-1 then begin
+    InstallerLangEditComboBox.Items.AddObject('?',TObject(-1));
+    InstallerLangEditComboBox.ItemIndex:=InstallerLangEditComboBox.Items.Count-1;
+  end else begin
+    InstallerLangEditComboBox.ItemIndex:=SelLang;
+  end;
+
+  InstallerLangEditComboBox.OnChange:=InstallerLangEditComboBoxChange;
+end;
+
+procedure TSetupForm.TimerTimer(Sender: TObject);
+begin
+  dec(LangTimerCounter);
+  If LangTimerCounter=0 then Timer.Enabled:=False;
+  ReadCurrentInstallerLanguage;
 end;
 
 procedure TSetupForm.ToolbarImageEditChange(Sender: TObject);
@@ -684,6 +784,9 @@ begin
   If GamesListBackgroundRadioButton3.Checked then PrgSetup.GamesListViewBackground:=GamesListBackgroundEdit.Text;
   PrgSetup.GamesListViewFontSize:=GamesListFontSizeEdit.Value;
   PrgSetup.GamesListViewFontColor:=ColorToString(GamesListFontColorBox.Selected);
+  If NotSetRadioButton1.Checked then PrgSetup.ValueForNotSet:='';
+  If NotSetRadioButton2.Checked then PrgSetup.ValueForNotSet:='-';
+  If NotSetRadioButton3.Checked then PrgSetup.ValueForNotSet:=NotSetEdit.Text;
 
   If TreeViewBackgroundRadioButton1.Checked then PrgSetup.GamesTreeViewBackground:='';
   If TreeViewBackgroundRadioButton2.Checked then PrgSetup.GamesTreeViewBackground:=ColorToString(TreeViewBackgroundColorBox.Selected);
@@ -702,6 +805,7 @@ begin
 
   PrgSetup.ReopenLastProfileEditorTab:=ReopenLastActiveProfileSheetCheckBox.Checked;
   PrgSetup.DFendStyleProfileEditor:=ProfileEditorDFendRadioButton.Checked;
+  PrgSetup.AlwaysSetScreenshotFolderAutomatically:=(AutoSetScreenshotFolderRadioGroup.ItemIndex=1);
 
   {DOSBox}
 
@@ -867,6 +971,16 @@ begin
           end;
         end;
    13 : if SearchOggEnc(self) then WaveEncOggEdit.Text:=PrgSetup.WaveEncOgg;
+   14 : If MessageDlg(LanguageSetup.SetupFormLanguageOpenEditorConfirmation,mtConfirmation,[mbOK,mbCancel],0)=mrOK then begin
+          LanguageEditorMode:=1;
+          ModalResult:=mrOK;
+          OKButtonClick(Sender);
+        end;
+   15 : If MessageDlg(LanguageSetup.SetupFormLanguageOpenEditorConfirmation,mtConfirmation,[mbOK,mbCancel],0)=mrOK then begin
+          LanguageEditorMode:=2;
+          ModalResult:=mrOK;
+          OKButtonClick(Sender);
+        end;
   end;
 end;
 
@@ -1157,6 +1271,19 @@ begin
   end;
 end;
 
+procedure TSetupForm.InstallerLangEditComboBoxChange(Sender: TObject);
+Var I : Integer;
+begin
+  Timer.Enabled:=False;
+  If InstallerLangEditComboBox.ItemIndex<0 then exit;
+  I:=Integer(InstallerLangEditComboBox.Items.Objects[InstallerLangEditComboBox.ItemIndex]);
+  If (I=InstallerLang) or (I=-1) then exit;
+
+  ShellExecute(Handle,'open',PChar(PrgDir+'SetInstallerLanguage.exe'),PChar(IntToStr(I)),nil,SW_SHOW);
+  LangTimerCounter:=10;
+  Timer.Enabled:=True;
+end;
+
 procedure TSetupForm.ListViewMoveButtonClick(Sender: TObject);
 Var I : Integer;
 begin
@@ -1196,6 +1323,11 @@ begin
   AddButtonFunctionComboBox.Visible:=Adv;
   ToolbarGroupBox.Visible:=Adv;
 
+  { Language }
+
+  LanguageOpenEditor.Visible:=not FirstRun;
+  LanguageNew.Visible:=not FirstRun;
+
   { Game list }
 
   ListViewSheet.TabVisible:=Adv;
@@ -1233,15 +1365,37 @@ begin
     else UpdateGroupBox.Top:=Service4Button.Top+Service4Button.Height+12
 end;
 
+procedure TSetupForm.NotSetEditChange(Sender: TObject);
+begin
+  NotSetRadioButton3.Checked:=True;
+end;
+
 { global }
 
-Function ShowSetupDialog(const AOwner : TComponent; const AGameDB : TGameDB; const OpenLanguageTab : Boolean) : Boolean;
+Procedure OpenLanguageEditor(const AOwner : TComponent; const LanguageEditorMode : Integer);
+Var S : String;
+begin
+  Case SetupForm.LanguageEditorMode of
+    1 : begin
+          ShowLanguageEditorDialog(AOwner,LanguageSetup.SetupFile);
+          LanguageSetup.ReloadINI;
+        end;
+    2 : if ShowLanguageEditorStartDialog(AOwner,S,True) then begin
+          ShowLanguageEditorDialog(AOwner,S);
+          If Trim(ExtUpperCase(S))=Trim(ExtUpperCase(LanguageSetup.SetupFile)) then LanguageSetup.ReloadINI;
+        end;
+  end;
+end;
+
+Function ShowSetupDialog(const AOwner : TComponent; const AGameDB : TGameDB; const OpenLanguageTab : Boolean; const FirstRun : Boolean) : Boolean;
 begin
   SetupForm:=TSetupForm.Create(AOwner);
   try
+    SetupForm.FirstRun:=FirstRun;
     SetupForm.GameDB:=AGameDB;
-    if OpenLanguageTab then SetupForm.PageControl.ActivePageIndex:=SetupForm.LanguageSheet.PageIndex;
+    if OpenLanguageTab then SetupForm.PageControl.ActivePageIndex:=SetupForm.LanguageSheet.PageIndex else SetupForm.PageControl.ActivePageIndex:=0;
     result:=(SetupForm.ShowModal=mrOK);
+    If result and (SetupForm.LanguageEditorMode>0) then OpenLanguageEditor(AOwner,SetupForm.LanguageEditorMode);
   finally
     SetupForm.Free;
   end;
@@ -1256,6 +1410,7 @@ begin
     SetupForm.PageControl.ActivePageIndex:=SetupForm.ListViewSheet.PageIndex;
     SetupForm.PageControl1.ActivePageIndex:=SetupForm.ListViewSheet3.PageIndex;
     result:=(SetupForm.ShowModal=mrOK);
+    If result and (SetupForm.LanguageEditorMode>0) then OpenLanguageEditor(AOwner,SetupForm.LanguageEditorMode);
   finally
     SetupForm.Free;
   end;

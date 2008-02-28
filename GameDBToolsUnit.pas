@@ -47,11 +47,21 @@ Procedure ClearHistory;
 
 Function ImportConfFile(const AGameDB : TGameDB; const AFileName : String) : TGame;
 
+{ Checksums }
+
+Function GameCheckSumOK(const AGame : TGame) : Boolean;
+Function SetupCheckSumOK(const AGame : TGame) : Boolean;
+Procedure CreateGameCheckSum(const AGame : TGame; const OverwriteExistingCheckSum : Boolean);
+Procedure CreateSetupCheckSum(const AGame : TGame; const OverwriteExistingCheckSum : Boolean);
+Procedure ProfileEditorOpenCheck(const AGame : TGame);
+Procedure ProfileEditorCloseCheck(const AGame : TGame; const NewGameExe, NewSetupExe : String);
+Function RunCheck(const AGame : TGame; const RunSetup : Boolean) : Boolean;
+
 implementation
 
 uses Windows, SysUtils, Dialogs, Graphics, Math, IniFiles, PNGImage, JPEG,
      GIFImage, CommonTools, LanguageSetupUnit, PrgConsts, PrgSetupUnit,
-     ProfileEditorFormUnit, ModernProfileEditorFormUnit;
+     ProfileEditorFormUnit, ModernProfileEditorFormUnit, HashCalc;
 
 Procedure AddTypeSelector(const ATreeView : TTreeView; const Name : String; const St : TStringList);
 Var N,N2 : TTreeNode;
@@ -370,7 +380,11 @@ begin
   end else begin
     Icon:=TIcon.Create;
     try
-      B:=True; try Icon.LoadFromFile(IncludeTrailingPathDelimiter(PrgDataDir+IconsSubDir)+Game.Icon); except B:=False; end;
+      If FileExists(IncludeTrailingPathDelimiter(PrgDataDir+IconsSubDir)+Game.Icon) then begin
+        B:=True; try Icon.LoadFromFile(IncludeTrailingPathDelimiter(PrgDataDir+IconsSubDir)+Game.Icon); except B:=False; end;
+      end else begin
+        B:=False;
+      end;
       If B then begin
         AListViewImageList.AddIcon(Icon);
         AListViewIconImageList.AddIcon(Icon);
@@ -387,7 +401,7 @@ begin
     Data:=Game;
 
     If ShowExtraInfo then begin
-      T:=LanguageSetup.NotSet;
+      If Trim(PrgSetup.ValueForNotSet)='' then T:=LanguageSetup.NotSet else T:=Trim(PrgSetup.ValueForNotSet);
       For I:=0 to 5 do begin
         try Nr:=StrToInt(O[I+1]); except Nr:=-1; end;
         If (Nr<1) or (Nr>6) then continue;
@@ -841,8 +855,10 @@ begin
 end;
 
 Function BuildDefaultDosProfile(const GameDB : TGameDB) : TGame;
+Var I : Integer;
 begin
-  result:=GameDB[GameDB.Add(DosBoxDOSProfile)];
+  I:=GameDB.IndexOf(DosBoxDOSProfile);
+  If I>=0 then result:=GameDB[I] else result:=GameDB[GameDB.Add(DosBoxDOSProfile)];
 
   result.Autoexec:=
     'C:[13][10][13][10]If exist C:\FREEDOS\COMMAND.COM goto AddFreeDos[13][10]Goto Next1[13][10]:AddFreeDos[13][10]set path=%PATH%;C:\FREEDOS[13][10]:Next1[13][10][13][10]'+
@@ -856,7 +872,7 @@ begin
   result.StartFullscreen:=False;
   result.CaptureFolder:='.\'+CaptureSubDir+'\'+DosBoxDOSProfile;
   result.Genre:='Program';
-  result.WWW:='http://www.dosbox.com';
+  result.WWW:='http:/'+'/www.dosbox.com';
   result.Name:=DosBoxDOSProfile;
   result.Favorite:=True;
   result.Developer:='DOSBox Team';
@@ -981,7 +997,7 @@ Procedure ExportGamesListHTMLFile(const GameDB : TGameDB; const St : TStringList
 Var I : Integer;
     L : TList;
 begin
-  St.Add('<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">');
+  St.Add('<!DOCTYPE HTML PUBLIC "-/'+'/W3C/'+'/DTD HTML 4.01 Transitional/'+'/EN">');
   St.Add('<html>');
   St.Add('  <head>');
   St.Add('    <title>D-Fend Reloaded</title>');
@@ -1263,6 +1279,89 @@ begin
   end;
 
   LoadSpecialData(result,AFileName);
+end;
+
+Function GameCheckSumOK(const AGame : TGame) : Boolean;
+Var S,T : String;
+begin
+  result:=True;
+  If AGame.GameExeMD5='' then exit;
+  If AGame.GameExe='' then exit;
+  T:=MakeAbsPath(AGame.GameExe,PrgSetup.BaseDir);
+  If not FileExists(T) then exit;
+  S:=GetMD5Sum(T); If S='' then exit;
+  result:=(S=AGame.GameExeMD5);
+end;
+
+Function SetupCheckSumOK(const AGame : TGame) : Boolean;
+Var S,T : String;
+begin
+  result:=True;
+  If AGame.SetupExeMD5='' then exit;
+  If AGame.SetupExe='' then exit;
+  T:=MakeAbsPath(AGame.SetupExe,PrgSetup.BaseDir);
+  If not FileExists(T) then exit;
+  S:=GetMD5Sum(T); If S='' then exit;
+  result:=(S=AGame.SetupExeMD5);
+end;
+
+Procedure CreateGameCheckSum(const AGame : TGame; const OverwriteExistingCheckSum : Boolean);
+begin
+  If (AGame.GameExeMD5<>'') and (not OverwriteExistingCheckSum) then exit;
+  AGame.GameExeMD5:=GetMD5Sum(MakeAbsPath(AGame.GameExe,PrgSetup.BaseDir));
+end;
+
+Procedure CreateSetupCheckSum(const AGame : TGame; const OverwriteExistingCheckSum : Boolean);
+begin
+  If (AGame.SetupExeMD5<>'') and (not OverwriteExistingCheckSum) then exit;
+  AGame.SetupExeMD5:=GetMD5Sum(MakeAbsPath(AGame.SetupExe,PrgSetup.BaseDir));
+end;
+
+Procedure ProfileEditorOpenCheck(const AGame : TGame);
+Var St : TStringList;
+    S : String;
+begin
+  If AGame=nil then exit;
+
+  If not GameCheckSumOK(AGame) then begin
+    St:=StringToStringList(LanguageSetup.CheckSumProfileEditorMismatch); try S:=St.Text; finally St.Free; end;
+    if MessageDlg(Format(S,[AGame.GameExe]),mtWarning,[mbYes,mbNo],0)=mrYes then CreateGameCheckSum(AGame,True);
+  end;
+  If not SetupCheckSumOK(AGame) then begin
+    St:=StringToStringList(LanguageSetup.CheckSumProfileEditorMismatch); try S:=St.Text; finally St.Free; end;
+    if MessageDlg(Format(S,[AGame.GameExe]),mtWarning,[mbYes,mbNo],0)=mrYes then CreateSetupCheckSum(AGame,True);
+  end;
+end;
+
+Procedure ProfileEditorCloseCheck(const AGame : TGame; const NewGameExe, NewSetupExe : String);
+Var NewGameFileName, NewSetupFileName : String;
+begin
+  NewGameFileName:=Trim(ExtUpperCase(ExtractFileName(NewGameExe)));
+  NewSetupFileName:=Trim(ExtUpperCase(ExtractFileName(NewSetupExe)));
+  CreateGameCheckSum(AGame,Trim(ExtUpperCase(ExtractFileName(AGame.GameExe)))<>NewGameFileName);
+  CreateSetupCheckSum(AGame,Trim(ExtUpperCase(ExtractFileName(AGame.SetupExe)))<>NewSetupFileName);
+  AGame.GameExe:=NewGameExe;
+  AGame.SetupExe:=NewSetupFileName;
+end;
+
+Function RunCheck(const AGame : TGame; const RunSetup : Boolean) : Boolean;
+Var S,T : String;
+    St : TStringList;
+begin
+  result:=True;
+  If RunSetup then begin
+    If SetupCheckSumOK(AGame) then exit;
+    S:=MakeAbsPath(AGame.SetupExe,PrgSetup.BaseDir);
+  end else begin
+    If GameCheckSumOK(AGame) then exit;
+    S:=MakeAbsPath(AGame.GameExe,PrgSetup.BaseDir);
+  end;
+
+  St:=StringToStringList(LanguageSetup.CheckSumRunMismatch); try T:=St.Text; finally St.Free; end;
+  result:=(MessageDlg(Format(T,[S]),mtWarning,[mbYes,mbNo],0)=mrYes);
+  If result then begin
+    If RunSetup then CreateSetupCheckSum(AGame,True) else CreateGameCheckSum(AGame,True);
+  end;
 end;
 
 end.

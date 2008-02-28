@@ -14,11 +14,12 @@ type
     AutofireCheckBox: TCheckBox;
     Swap34CheckBox: TCheckBox;
     WrapCheckBox: TCheckBox;
+    WrapInfoLabel: TLabel;
   private
     { Private-Deklarationen }
   public
     { Public-Deklarationen }
-    Procedure InitGUI(const OnProfileNameChange : TTextEvent; const GameDB: TGameDB; const CurrentProfileName : PString);
+    Procedure InitGUI(const OnProfileNameChange : TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup : PString);
     Procedure SetGame(const Game : TGame; const LoadFromTemplate : Boolean);
     Function CheckValue : Boolean;
     Procedure GetGame(const Game : TGame);
@@ -32,7 +33,7 @@ uses VistaToolsUnit, LanguageSetupUnit, CommonTools;
 
 { TModernProfileEditorJoystickFrame }
 
-procedure TModernProfileEditorJoystickFrame.InitGUI(const OnProfileNameChange: TTextEvent; const GameDB: TGameDB; const CurrentProfileName: PString);
+procedure TModernProfileEditorJoystickFrame.InitGUI(const OnProfileNameChange: TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup: PString);
 Var St : TStringList;
 begin
   NoFlicker(TypeComboBox);
@@ -47,6 +48,7 @@ begin
   AutofireCheckBox.Caption:=LanguageSetup.ProfileEditorSoundJoystickAutoFire;
   Swap34CheckBox.Caption:=LanguageSetup.ProfileEditorSoundJoystickSwap34;
   WrapCheckBox.Caption:=LanguageSetup.ProfileEditorSoundJoystickButtonwrap;
+  WrapInfoLabel.Caption:=LanguageSetup.ProfileEditorSoundJoystickButtonwrapInfo;
 end;
 
 Procedure SetComboBox(const ComboBox : TComboBox; const Value : String; const Default : Integer); overload;

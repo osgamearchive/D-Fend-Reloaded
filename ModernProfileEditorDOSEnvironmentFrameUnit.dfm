@@ -35,7 +35,7 @@ object ModernProfileEditorDOSEnvironmentFrame: TModernProfileEditorDOSEnvironmen
     Top = 43
     Width = 97
     Height = 21
-    ItemHeight = 13
+    ItemHeight = 0
     TabOrder = 0
   end
   object Use4DOSCheckBox: TCheckBox
@@ -53,7 +53,7 @@ object ModernProfileEditorDOSEnvironmentFrame: TModernProfileEditorDOSEnvironmen
     Width = 501
     Height = 219
     Anchors = [akLeft, akTop, akRight, akBottom]
-    KeyOptions = [keyEdit, keyAdd, keyDelete]
+    KeyOptions = [keyEdit]
     TabOrder = 2
     ColWidths = (
       150
@@ -82,7 +82,6 @@ object ModernProfileEditorDOSEnvironmentFrame: TModernProfileEditorDOSEnvironmen
       333333333337733333FF3333333C333330003333333733333777333333333333
       3000333333333333377733333333333333333333333333333333}
     NumGlyphs = 2
-    ExplicitTop = 351
   end
   object CustomSetsEnvDel: TBitBtn
     Tag = 1
@@ -108,6 +107,5 @@ object ModernProfileEditorDOSEnvironmentFrame: TModernProfileEditorDOSEnvironmen
       BBB35555F55555575F555550555555550BBB55575555555575F5555555555555
       50BB555555555555575F555555555555550B5555555555555575}
     NumGlyphs = 2
-    ExplicitTop = 351
   end
 end

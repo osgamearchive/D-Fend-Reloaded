@@ -19,6 +19,9 @@ type
     ExtraDirsAddButton: TSpeedButton;
     ExtraDirsEditButton: TSpeedButton;
     ExtraDirsDelButton: TSpeedButton;
+    ExtraDirsInfoLabel: TLabel;
+    DataFolderInfoLabel: TLabel;
+    Timer: TTimer;
     procedure ExtraDirsListBoxKeyDown(Sender: TObject; var Key: Word;
       Shift: TShiftState);
     procedure ExtraDirsListBoxClick(Sender: TObject);
@@ -26,12 +29,14 @@ type
     procedure ButtonWork(Sender: TObject);
     procedure GenerateScreenshotFolderNameButtonClick(Sender: TObject);
     procedure GenerateGameDataFolderNameButtonClick(Sender: TObject);
+    procedure TimerTimer(Sender: TObject);
   private
     { Private-Deklarationen }
     FCurrentProfileName : PString;
+    FLastCurrentProfileName : String;
   public
     { Public-Deklarationen }
-    Procedure InitGUI(const OnProfileNameChange : TTextEvent; const GameDB: TGameDB; const CurrentProfileName : PString);
+    Procedure InitGUI(const OnProfileNameChange : TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup : PString);
     Procedure SetGame(const Game : TGame; const LoadFromTemplate : Boolean);
     Function CheckValue : Boolean;
     Procedure GetGame(const Game : TGame);
@@ -46,7 +51,7 @@ uses Math, LanguageSetupUnit, VistaToolsUnit, PrgSetupUnit, CommonTools,
 
 { TModernProfileEditorDirectoryFrame }
 
-procedure TModernProfileEditorDirectoryFrame.InitGUI(const OnProfileNameChange: TTextEvent; const GameDB: TGameDB; const CurrentProfileName : PString);
+procedure TModernProfileEditorDirectoryFrame.InitGUI(const OnProfileNameChange: TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup : PString);
 begin
   NoFlicker(ScreenshotFolderEdit);
   NoFlicker(DataFolderEdit);
@@ -60,12 +65,16 @@ begin
 
   DataFolderEdit.EditLabel.Caption:=LanguageSetup.GameDataDir;
   DataFolderEditButton.Hint:=LanguageSetup.ChooseFile;
+  DataFolderInfoLabel.Caption:=LanguageSetup.GameDataDirEditInfo;
   GenerateGameDataFolderNameButton.Caption:=LanguageSetup.ProfileEditorGenerateGameDataFolder;
 
   ExtraDirsLabel.Caption:=LanguageSetup.ProfileEditorExtraDirs;
   ExtraDirsAddButton.Hint:=RemoveUnderline(LanguageSetup.Add);
   ExtraDirsEditButton.Hint:=RemoveUnderline(LanguageSetup.Edit);
   ExtraDirsDelButton.Hint:=RemoveUnderline(LanguageSetup.Del);
+  ExtraDirsInfoLabel.Caption:=LanguageSetup.ProfileEditorExtraDirsEditInfo;
+
+  FLastCurrentProfileName:='';
 end;
 
 procedure TModernProfileEditorDirectoryFrame.SetGame(const Game: TGame; const LoadFromTemplate: Boolean);
@@ -75,11 +84,32 @@ begin
     then ScreenshotFolderEdit.Text:=Game.CaptureFolder
     else ScreenshotFolderEdit.Text:=MakeRelPath(IncludeTrailingPathDelimiter(PrgDataDir+CaptureSubDir),PrgSetup.BaseDir);
 
+  FLastCurrentProfileName:=FCurrentProfileName^;
+  If LoadFromTemplate and PrgSetup.AlwaysSetScreenshotFolderAutomatically then Timer.Enabled:=True;
+
   DataFolderEdit.Text:=Game.DataDir;
 
   St:=ValueToList(Game.ExtraDirs); try ExtraDirsListBox.Items.AddStrings(St); finally St.Free; end;
   If ExtraDirsListBox.Items.Count>0 then ExtraDirsListBox.ItemIndex:=0;
   ExtraDirsListBoxClick(nil);
+end;
+
+procedure TModernProfileEditorDirectoryFrame.TimerTimer(Sender: TObject);
+Var S,DefaultFolder,OldFolder : String;
+begin
+  If FLastCurrentProfileName=FCurrentProfileName^ then exit;
+
+  S:=Trim(ExtUpperCase(ScreenshotFolderEdit.Text));
+
+  DefaultFolder:=Trim(ExtUpperCase(MakeRelPath(IncludeTrailingPathDelimiter(PrgDataDir+CaptureSubDir),PrgSetup.BaseDir)));
+  OldFolder:=Trim(ExtUpperCase('.\'+CaptureSubDir+'\'+MakeFileSysOKFolderName(FLastCurrentProfileName)+'\'));
+
+  If (S=DefaultFolder) or (S=OldFolder) then begin
+    ScreenshotFolderEdit.Text:='.\'+CaptureSubDir+'\'+MakeFileSysOKFolderName(FCurrentProfileName^)+'\';
+    FLastCurrentProfileName:=FCurrentProfileName^;
+  end else begin
+    Timer.Enabled:=False;
+  end;
 end;
 
 function TModernProfileEditorDirectoryFrame.CheckValue: Boolean;
@@ -92,6 +122,7 @@ begin
   Game.CaptureFolder:=ScreenshotFolderEdit.Text;
   Game.DataDir:=DataFolderEdit.Text;
   Game.ExtraDirs:=ListToValue(ExtraDirsListBox.Items);
+  Timer.Enabled:=False;
 end;
 
 procedure TModernProfileEditorDirectoryFrame.ExtraDirsListBoxClick(Sender: TObject);
@@ -163,7 +194,7 @@ end;
 
 procedure TModernProfileEditorDirectoryFrame.GenerateScreenshotFolderNameButtonClick(Sender: TObject);
 begin
-  ScreenshotFolderEdit.Text:='.\'+CaptureSubDir+'\'+FCurrentProfileName^+'\';
+  ScreenshotFolderEdit.Text:='.\'+CaptureSubDir+'\'+MakeFileSysOKFolderName(FCurrentProfileName^)+'\';
 end;
 
 procedure TModernProfileEditorDirectoryFrame.GenerateGameDataFolderNameButtonClick(Sender: TObject);

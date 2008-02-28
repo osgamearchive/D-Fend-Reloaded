@@ -1,33 +1,43 @@
 object ModernProfileEditorDrivesFrame: TModernProfileEditorDrivesFrame
   Left = 0
   Top = 0
-  Width = 749
-  Height = 587
+  Width = 593
+  Height = 511
   TabOrder = 0
   DesignSize = (
-    749
-    587)
+    593
+    511)
+  object AutoMountCheckBox: TCheckBox
+    Left = 12
+    Top = 487
+    Width = 390
+    Height = 17
+    Anchors = [akLeft, akBottom]
+    Caption = 'Aktuell verf'#252'gbare CDs in allen Laufwerken automatisch mounten'
+    TabOrder = 0
+  end
   object MountingListView: TListView
     Left = 12
-    Top = 16
-    Width = 725
-    Height = 531
+    Top = 17
+    Width = 572
+    Height = 432
     Anchors = [akLeft, akTop, akRight, akBottom]
     Columns = <>
     ReadOnly = True
-    TabOrder = 0
+    TabOrder = 1
     ViewStyle = vsReport
     OnDblClick = MountingListViewDblClick
     OnKeyDown = MountingListViewKeyDown
+    ExplicitWidth = 501
   end
   object MountingAddButton: TBitBtn
     Left = 12
-    Top = 553
-    Width = 94
+    Top = 455
+    Width = 98
     Height = 25
     Anchors = [akLeft, akBottom]
     Caption = 'Hinzuf'#252'gen...'
-    TabOrder = 1
+    TabOrder = 2
     OnClick = ButtonWork
     Glyph.Data = {
       76010000424D7601000000000000760000002800000020000000100000000100
@@ -46,13 +56,13 @@ object ModernProfileEditorDrivesFrame: TModernProfileEditorDrivesFrame
   end
   object MountingEditButton: TBitBtn
     Tag = 1
-    Left = 112
-    Top = 553
-    Width = 94
+    Left = 116
+    Top = 455
+    Width = 98
     Height = 25
     Anchors = [akLeft, akBottom]
     Caption = 'Bearbeiten...'
-    TabOrder = 2
+    TabOrder = 3
     OnClick = ButtonWork
     Glyph.Data = {
       76010000424D7601000000000000760000002800000020000000100000000100
@@ -71,13 +81,13 @@ object ModernProfileEditorDrivesFrame: TModernProfileEditorDrivesFrame
   end
   object MountingDelButton: TBitBtn
     Tag = 2
-    Left = 212
-    Top = 553
-    Width = 94
+    Left = 220
+    Top = 455
+    Width = 98
     Height = 25
     Anchors = [akLeft, akBottom]
     Caption = 'L'#246'schen'
-    TabOrder = 3
+    TabOrder = 4
     OnClick = ButtonWork
     Glyph.Data = {
       76010000424D7601000000000000760000002800000020000000100000000100
@@ -96,23 +106,24 @@ object ModernProfileEditorDrivesFrame: TModernProfileEditorDrivesFrame
   end
   object MountingDeleteAllButton: TBitBtn
     Tag = 3
-    Left = 312
-    Top = 553
-    Width = 90
+    Left = 324
+    Top = 455
+    Width = 98
     Height = 25
     Anchors = [akLeft, akBottom]
     Caption = 'Alle l'#246'schen'
-    TabOrder = 4
+    TabOrder = 5
     OnClick = ButtonWork
   end
   object MountingAutoCreateButton: TBitBtn
     Tag = 4
-    Left = 408
-    Top = 553
-    Width = 105
+    Left = 428
+    Top = 455
+    Width = 133
     Height = 25
     Anchors = [akLeft, akBottom]
     Caption = 'Autom. erstellen'
-    TabOrder = 5
+    TabOrder = 6
+    OnClick = ButtonWork
   end
 end

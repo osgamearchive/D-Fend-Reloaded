@@ -2,11 +2,11 @@ object ModernProfileEditorDirectoryFrame: TModernProfileEditorDirectoryFrame
   Left = 0
   Top = 0
   Width = 615
-  Height = 342
+  Height = 415
   TabOrder = 0
   DesignSize = (
     615
-    342)
+    415)
   object ScreenshotFolderEditButton: TSpeedButton
     Left = 584
     Top = 32
@@ -138,6 +138,29 @@ object ModernProfileEditorDirectoryFrame: TModernProfileEditorDirectoryFrame
     ShowHint = True
     OnClick = ButtonWork
   end
+  object ExtraDirsInfoLabel: TLabel
+    Left = 24
+    Top = 359
+    Width = 554
+    Height = 42
+    Anchors = [akLeft, akRight, akBottom]
+    AutoSize = False
+    Caption = 
+      'Das eigentliche Programmverzeichnis wird bei einer Deinstallatio' +
+      'n standardm'#228#223'ig gel'#246'scht und muss hier nicht zus'#228'tzlich aufgef'#252'h' +
+      'rt werden.'
+    WordWrap = True
+  end
+  object DataFolderInfoLabel: TLabel
+    Left = 336
+    Top = 160
+    Width = 242
+    Height = 61
+    Anchors = [akLeft, akTop, akRight]
+    AutoSize = False
+    Caption = 'In diesem Verzeichnis k'#246'nnen z.B. Handb'#252'cher abgelegt werden.'
+    WordWrap = True
+  end
   object ScreenshotFolderEdit: TLabeledEdit
     Left = 24
     Top = 32
@@ -153,7 +176,7 @@ object ModernProfileEditorDirectoryFrame: TModernProfileEditorDirectoryFrame
     Tag = 9
     Left = 24
     Top = 59
-    Width = 260
+    Width = 297
     Height = 25
     Caption = 'Screenshot-Verzeichnis automatisch festlegen'
     TabOrder = 1
@@ -174,7 +197,7 @@ object ModernProfileEditorDirectoryFrame: TModernProfileEditorDirectoryFrame
     Tag = 19
     Left = 24
     Top = 155
-    Width = 260
+    Width = 297
     Height = 25
     Caption = 'Daten-Verzeichnis automatisch erstellen'
     TabOrder = 3
@@ -184,12 +207,19 @@ object ModernProfileEditorDirectoryFrame: TModernProfileEditorDirectoryFrame
     Left = 24
     Top = 227
     Width = 554
-    Height = 102
+    Height = 126
     Anchors = [akLeft, akTop, akRight, akBottom]
     ItemHeight = 13
     TabOrder = 4
     OnClick = ExtraDirsListBoxClick
     OnDblClick = ExtraDirsListBoxDblClick
     OnKeyDown = ExtraDirsListBoxKeyDown
+  end
+  object Timer: TTimer
+    Enabled = False
+    Interval = 100
+    OnTimer = TimerTimer
+    Left = 464
+    Top = 64
   end
 end
