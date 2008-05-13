@@ -21,12 +21,13 @@ Function WriteFloppyData(const Drive : Char; const FileName : String; const OnPr
 
 implementation
 
-uses Windows, Classes, SysUtils, Math;
+uses Windows, Classes, Controls, Dialogs, SysUtils, Math, LanguageSetupUnit;
 
 function OpenVolume(const Drive: Char; const WriteMode : Boolean = False): THandle;
-var VolumeName: array [0..6] of Char;
+var VolumeName : array [0..6] of Char;
 begin
   VolumeName:='\\.\A:'; VolumeName[4]:=Drive;
+  {VolumeName:='\\.\CdRom0';}
   If WriteMode
     then result:=CreateFile(VolumeName,GENERIC_READ or GENERIC_WRITE,0,nil,OPEN_EXISTING,0,0)
     else result:=CreateFile(VolumeName,GENERIC_READ,FILE_SHARE_READ,nil,OPEN_EXISTING,0,0);
@@ -57,6 +58,9 @@ Function EnableExtendedAccess(const Volume : THandle) : Boolean;
 Var I : Cardinal;
 begin
   result:=DeviceIoControl(Volume,FSCTL_ALLOW_EXTENDED_DASD_IO, nil,0,nil,0,I,nil);
+  if not result then begin
+    result:=(MessageDlg(LanguageSetup.ReadImageNoExtendedAccessWarning,mtWarning,[mbYes,mbNo],0)=mrYes);
+  end;
 end;
 
 function CloseVolume(var Volume: THandle): Boolean;

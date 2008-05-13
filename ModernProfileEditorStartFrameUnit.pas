@@ -4,17 +4,13 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, 
-  Dialogs, Buttons, StdCtrls, Grids, ComCtrls, GameDBUnit, ModernProfileEditorFormUnit;
+  Dialogs, Buttons, StdCtrls, Grids, ComCtrls, GameDBUnit, ModernProfileEditorFormUnit,
+  ExtCtrls;
 
 type
   TModernProfileEditorStartFrame = class(TFrame, IModernProfileEditorFrame)
     AutoexecOverrideGameStartCheckBox: TCheckBox;
     AutoexecOverrideMountingCheckBox: TCheckBox;
-    AutoexecLabel: TLabel;
-    AutoexecMemo: TRichEdit;
-    AutoexecClearButton: TBitBtn;
-    AutoexecLoadButton: TBitBtn;
-    AutoexecSaveButton: TBitBtn;
     AutoexecBootNormal: TRadioButton;
     AutoexecBootHDImage: TRadioButton;
     AutoexecBootFloppyImage: TRadioButton;
@@ -26,15 +22,30 @@ type
     AutoexecBootFloppyImageDelButton: TSpeedButton;
     OpenDialog: TOpenDialog;
     SaveDialog: TSaveDialog;
+    AutoexecPageControl: TPageControl;
+    AutoexecSheet1: TTabSheet;
+    AutoexecSheet2: TTabSheet;
+    Panel12: TPanel;
+    Panel1: TPanel;
+    AutoexecMemo: TRichEdit;
+    AutoexecClearButton: TBitBtn;
+    AutoexecLoadButton: TBitBtn;
+    AutoexecSaveButton: TBitBtn;
+    FinalizationClearButton: TBitBtn;
+    FinalizationLoadButton: TBitBtn;
+    FinalizationSaveButton: TBitBtn;
+    FinalizationMemo: TRichEdit;
     procedure ButtonWork(Sender: TObject);
+    procedure AutoexecBootHDImageComboBoxChange(Sender: TObject);
   private
     { Private-Deklarationen }
   public
     { Public-Deklarationen }
-    Procedure InitGUI(const OnProfileNameChange : TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup : PString);
+    Procedure InitGUI(const OnProfileNameChange : TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup, CurrentScummVMGameName : PString);
     Procedure SetGame(const Game : TGame; const LoadFromTemplate : Boolean);
     Function CheckValue : Boolean;
     Procedure GetGame(const Game : TGame);
+    Procedure ShowFrame;
   end;
 
 implementation
@@ -45,10 +56,12 @@ uses VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgSetupUnit;
 
 { TModernProfileEditorStartFrame }
 
-procedure TModernProfileEditorStartFrame.InitGUI(const OnProfileNameChange: TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup: PString);
+procedure TModernProfileEditorStartFrame.InitGUI(const OnProfileNameChange: TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup, CurrentScummVMGameName : PString);
+Var S : String;
 begin
   NoFlicker(AutoexecOverrideGameStartCheckBox);
   NoFlicker(AutoexecOverrideMountingCheckBox);
+  NoFlicker(AutoexecPageControl);
   {NoFlicker(AutoexecMemo); - will hide text in Memo}
   NoFlicker(AutoexecClearButton);
   NoFlicker(AutoexecLoadButton);
@@ -61,11 +74,18 @@ begin
 
   AutoexecOverrideGameStartCheckBox.Caption:=LanguageSetup.ProfileEditorAutoexecOverrideGameStart;
   AutoexecOverrideMountingCheckBox.Caption:=LanguageSetup.ProfileEditorAutoexecOverrideMounting;
-  AutoexecLabel.Caption:=LanguageSetup.ProfileEditorAutoexecBat;
+  S:=LanguageSetup.ProfileEditorAutoexecBat;
+  If (S<>'') and (S[length(S)]=':') then S:=Trim(Copy(S,1,length(S)-1));
+  AutoexecSheet1.Caption:=S;
   AutoexecMemo.Font.Name:='Courier New';
   AutoexecClearButton.Caption:=LanguageSetup.Del;
   AutoexecLoadButton.Caption:=LanguageSetup.Load;
   AutoexecSaveButton.Caption:=LanguageSetup.Save;
+  AutoexecSheet2.Caption:=LanguageSetup.ProfileEditorFinalization;
+  FinalizationMemo.Font.Name:='Courier New';
+  FinalizationClearButton.Caption:=LanguageSetup.Del;
+  FinalizationLoadButton.Caption:=LanguageSetup.Load;
+  FinalizationSaveButton.Caption:=LanguageSetup.Save;
   AutoexecBootNormal.Caption:=LanguageSetup.ProfileEditorAutoexecBootNormal;
   AutoexecBootHDImage.Caption:=LanguageSetup.ProfileEditorAutoexecBootHDImage;
   AutoexecBootFloppyImage.Caption:=LanguageSetup.ProfileEditorAutoexecBootFloppyImage;
@@ -73,6 +93,8 @@ begin
   AutoexecBootFloppyImageButton.Hint:=LanguageSetup.ChooseFile;
   AutoexecBootFloppyImageAddButton.Hint:=LanguageSetup.ProfileMountingAddImage;
   AutoexecBootFloppyImageDelButton.Hint:=LanguageSetup.ProfileMountingDelImage;
+
+  AutoexecBootFloppyImageTab.ColWidths[0]:=AutoexecBootFloppyImageTab.ClientWidth-25;
 end;
 
 procedure TModernProfileEditorStartFrame.SetGame(const Game: TGame; const LoadFromTemplate: Boolean);
@@ -82,12 +104,8 @@ Var St, St2 : TStringList;
 begin
   AutoexecOverrideGameStartCheckBox.Checked:=Game.AutoexecOverridegamestart;
   AutoexecOverrideMountingCheckBox.Checked:=Game.AutoexecOverrideMount;
-  St:=StringToStringList(Game.Autoexec);
-  try
-    AutoexecMemo.Lines.Assign(St);
-  finally
-    St.Free;
-  end;
+  St:=StringToStringList(Game.Autoexec); try AutoexecMemo.Lines.Assign(St); finally St.Free; end;
+  St:=StringToStringList(Game.AutoexecFinalization); try FinalizationMemo.Lines.Assign(St); finally St.Free; end;
   S:=Trim(Game.AutoexecBootImage);
   If (S='2') or (S='3') then begin
     AutoexecBootHDImage.Checked:=True;
@@ -106,6 +124,11 @@ begin
       St2.Free;
     end;
   end;
+end;
+
+procedure TModernProfileEditorStartFrame.AutoexecBootHDImageComboBoxChange(Sender: TObject);
+begin
+  AutoexecBootHDImage.Checked:=True;
 end;
 
 procedure TModernProfileEditorStartFrame.ButtonWork(Sender: TObject);
@@ -150,6 +173,7 @@ begin
           OpenDialog.Filter:=LanguageSetup.ProfileMountingFileFilter;
           if not OpenDialog.Execute then exit;
           AutoexecBootFloppyImageTab.Cells[0,AutoexecBootFloppyImageTab.Row]:=MakeRelPath(OpenDialog.FileName,PrgSetup.BaseDir);
+          AutoexecBootFloppyImage.Checked:=True;
         end;
     4 : begin
           AutoexecBootFloppyImageTab.RowCount:=AutoexecBootFloppyImageTab.RowCount+1;
@@ -167,7 +191,36 @@ begin
             AutoexecBootFloppyImageTab.RowCount:=AutoexecBootFloppyImageTab.RowCount-1;
           end;
         end;
+    6 : FinalizationMemo.Lines.Clear;
+    7 : begin
+          OpenDialog.DefaultExt:='txt';
+          OpenDialog.Filter:=LanguageSetup.ProfileEditorAutoexecFilter;
+          OpenDialog.Title:=LanguageSetup.ProfileEditorFinalizationLoadTitle;
+          OpenDialog.InitialDir:=PrgDataDir;
+          if not OpenDialog.Execute then exit;
+          try
+            FinalizationMemo.Lines.LoadFromFile(OpenDialog.FileName);
+          except
+            MessageDlg(Format(LanguageSetup.MessageCouldNotOpenFile,[OpenDialog.FileName]),mtError,[mbOK],0);
+          end;
+        end;
+    8 : begin
+          SaveDialog.DefaultExt:='txt';
+          SaveDialog.Filter:=LanguageSetup.ProfileEditorAutoexecFilter;
+          SaveDialog.Title:=LanguageSetup.ProfileEditorFinalizationSaveTitle;
+          SaveDialog.InitialDir:=PrgDataDir;
+          if not SaveDialog.Execute then exit;
+          try
+            FinalizationMemo.Lines.SaveToFile(SaveDialog.FileName);
+          except
+            MessageDlg(Format(LanguageSetup.MessageCouldNotSaveFile,[SaveDialog.FileName]),mtError,[mbOK],0);
+          end;
+        end;
   end;
+end;
+
+procedure TModernProfileEditorStartFrame.ShowFrame;
+begin
 end;
 
 function TModernProfileEditorStartFrame.CheckValue: Boolean;
@@ -182,6 +235,7 @@ begin
   Game.AutoexecOverridegamestart:=AutoexecOverrideGameStartCheckBox.Checked;
   Game.AutoexecOverrideMount:=AutoexecOverrideMountingCheckBox.Checked;
   Game.Autoexec:=StringListToString(AutoexecMemo.Lines);
+  Game.AutoexecFinalization:=StringListToString(FinalizationMemo.Lines);
   If AutoexecBootNormal.Checked then Game.AutoexecBootImage:='';
   If AutoexecBootHDImage.Checked then begin
     If AutoexecBootHDImageComboBox.ItemIndex=0 then Game.AutoexecBootImage:='2' else Game.AutoexecBootImage:='3';

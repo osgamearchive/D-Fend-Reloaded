@@ -3,7 +3,7 @@ object TransferForm: TTransferForm
   Top = 0
   BorderStyle = bsDialog
   Caption = 'Programme '#252'bertragen'
-  ClientHeight = 430
+  ClientHeight = 462
   ClientWidth = 391
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -73,19 +73,19 @@ object TransferForm: TTransferForm
   end
   object OKButton: TBitBtn
     Left = 8
-    Top = 398
+    Top = 432
     Width = 97
     Height = 25
-    TabOrder = 5
+    TabOrder = 6
     OnClick = OKButtonClick
     Kind = bkOK
   end
   object CancelButton: TBitBtn
     Left = 120
-    Top = 398
+    Top = 432
     Width = 97
     Height = 25
-    TabOrder = 6
+    TabOrder = 7
     Kind = bkCancel
   end
   object DestPrgDirEdit: TLabeledEdit
@@ -108,8 +108,18 @@ object TransferForm: TTransferForm
     TabOrder = 3
     OnClick = SelectButtonClick
   end
+  object CopyDFRCheckBox: TCheckBox
+    Left = 8
+    Top = 387
+    Width = 375
+    Height = 17
+    Caption = 
+      'Create portable D-Fend Reloaded installation in destination fold' +
+      'er'
+    TabOrder = 5
+  end
   object PopupMenu: TPopupMenu
     Left = 232
-    Top = 392
+    Top = 426
   end
 end

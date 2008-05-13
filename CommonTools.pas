@@ -1,7 +1,7 @@
 unit CommonTools;
 interface
 
-uses Windows, Classes, Graphics;
+uses Windows, Classes, Graphics, StdCtrls;
 
 Function ExtUpperCase(const S : String) : String;
 
@@ -22,6 +22,7 @@ Function TempDir : String;
 Function MakeRelPath(Path, Rel : String) : String;
 Function MakeAbsPath(Path, Rel : String) : string;
 Function MakeFileSysOKFolderName(const AName : String) : String;
+Function MakeAbsIconName(const Icon : String) : String;
 
 function SelectDirectory(const AOwner : THandle; const Caption: string; var Directory: String): Boolean;
 function GetSpecialFolder(hWindow: HWND; Folder: Integer): String;
@@ -31,9 +32,12 @@ Function GetFileVersionAsString : String;
 Function GetNormalFileVersionAsString : String;
 Function GetShortFileVersionAsString : String;
 
+Function CheckDOSBoxVersion(const Path : String = '') : String;
+Function OldDOSBoxVersion(const Version : String) : Boolean;
+
 Function GetFileDateAsString : String;
 
-Procedure CreateLink(const TargetName, Parameters, LinkFile, IconFile : String);
+Procedure CreateLink(const TargetName, Parameters, LinkFile, IconFile, Description : String);
 Procedure SetStartWithWindows(const Enabled : Boolean);
 
 Function LoadImageFromFile(const FileName : String) : TPicture;
@@ -43,22 +47,36 @@ Type TWallpaperStyle=(WSTile=0,WSCenter=1,WSStretch=2);
 
 Procedure SetDesktopWallpaper(const FileName : String; const WPStyle : TWallpaperStyle);
 
+Function CharsetNameToFontCharSet(const Name : String) : TFontCharset;
+
+Type TPathType=(ptMount,ptScreenshot,ptMapper,ptDOSBox);
+
+Function UnmapDrive(const Path : String; const PathType : TPathType) : String;
+
+Function GetScreensaverAllowStatus : Boolean;
+Procedure SetScreensaverAllowStatus(const Enable : Boolean);
+
+procedure SetComboHint(Combo: TComboBox);
+procedure SetComboDropDownDropDownWidth(Combo: TComboBox);
+
 Var TempPrgDir : String = ''; {Temporary overwrite normal PrgDir}
 
 implementation
 
-uses SysUtils, Forms, ShlObj, ActiveX, Math, ComObj, Registry, JPEG, GIFImage,
-     PNGImage;
+uses SysUtils, Forms, ShlObj, ActiveX, Messages, Math, ComObj, Registry, JPEG,
+     GIFImage, PNGImage, LanguageSetupUnit, PrgSetupUnit, PrgConsts;
 
 Function ExtUpperCase(const S : String) : String;
-Var I : Integer;
+Var I,J : Integer;
 begin
   result:=Trim(S);
-  For I:=1 to length(result) do case result[I] of
-    'a'..'z' : result[I]:=chr(ord(result[I])-(ord('a')-ord('A')));
-    'ä' : result[I]:='Ä';
-    'ö' : result[I]:='Ö';
-    'ü' : result[I]:='Ü';
+  For I:=1 to length(result) do begin
+    If (result[I]>='a') and (result[I]<='z') then begin
+      result[I]:=chr(ord(result[I])-(ord('a')-ord('A')));
+      continue;
+    end;
+    J:=Pos(result[I],LanguageSpecialLowerCase);
+    If J>0 then result[I]:=LanguageSpecialUpperCase[J];
   end;
 end;
 
@@ -128,7 +146,7 @@ begin
   result:='';
 
   result:='';
-  For I:=1 to length(S)-1 do
+  For I:=1 to length(S) do
     If S[I]<#32 then result:=result+'['+IntToStr(Ord(S[I]))+']' else result:=result+S[I];
 end;
 
@@ -167,15 +185,25 @@ end;
 
 Function TempDir : String;
 begin
-  SetLength(result,255);
-  GetTempPath(250,PChar(result));
+  SetLength(result,515);
+  GetTempPath(512,PChar(result));
   SetLength(result,StrLen(PChar(result)));
   result:=IncludeTrailingPathDelimiter(result);
+end;
+
+Function ShortName(const LongName : String) : String;
+begin
+  SetLength(result,MAX_PATH+10);
+  if GetShortPathName(PChar(LongName),PChar(result),MAX_PATH)=0
+    then result:=LongName
+    else SetLength(result,StrLen(PChar(result)));
 end;
 
 Function MakeRelPath(Path, Rel : String) : String;
 Var FileName : String;
 begin
+  If (ExtUpperCase(Copy(Trim(Path),1,7))='DOSBOX:') or (Trim(Path)='') then begin result:=Path; exit; end;
+
   Rel:=Trim(Rel); if Rel='' then begin result:=Path; exit; end;
   Rel:=IncludeTrailingPathDelimiter(Rel);
 
@@ -187,13 +215,21 @@ begin
     Path:=IncludeTrailingPathDelimiter(ExtractFilePath(Path));
   end;
 
-  If (length(Path)>=length(Rel)) and (ExtUpperCase(Copy(Path,1,length(Rel)))=ExtUpperCase(Rel)) then Path:='.\'+Copy(Path,length(Rel)+1,MaxInt);
+  If (length(Path)>=length(Rel)) and (ExtUpperCase(Copy(Path,1,length(Rel)))=ExtUpperCase(Rel)) then begin
+    Path:='.\'+Copy(Path,length(Rel)+1,MaxInt);
+  end else begin
+    Rel:=IncludeTrailingPathDelimiter(ShortName(Rel));
+    If (length(Path)>=length(Rel)) and (ExtUpperCase(Copy(Path,1,length(Rel)))=ExtUpperCase(Rel)) then
+      Path:='.\'+Copy(Path,length(Rel)+1,MaxInt);
+  end;
   If Path='.\' then Path:='';
   result:=Path+FileName;
 end;
 
 Function MakeAbsPath(Path, Rel : String) : string;
 begin
+  If (ExtUpperCase(Copy(Trim(Path),1,7))='DOSBOX:') or (Trim(Path)='') then begin result:=Path; exit; end;
+
   Rel:=Trim(Rel); if Rel='' then begin result:=Path; exit; end;
   Rel:=IncludeTrailingPathDelimiter(Rel);
 
@@ -206,12 +242,26 @@ begin
 end;
 
 Function MakeFileSysOKFolderName(const AName : String) : String;
-const AllowedChars='ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜabcdefghijklmnopqrstuvwxyzäöüß01234567890-_=.,;!() ';
+const AllowedCharsDefault='ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜabcdefghijklmnopqrstuvwxyzäöüß01234567890-_=.,;!()';
 Var I : Integer;
+    AllowedChars : String;
 begin
   result:='';
+  AllowedChars:=LanguageSetup.CharsetAllowedFileNameChars;
+  If AllowedChars='' then AllowedChars:=AllowedCharsDefault;
+  AllowedChars:=AllowedChars+' ';
   For I:=1 to length(AName) do if Pos(AName[I],AllowedChars)>0 then result:=result+AName[I];
   if result='' then result:='Game';
+end;
+
+Function MakeAbsIconName(const Icon : String) : String;
+Var S : String;
+begin
+  If Trim(Icon)='' then begin result:=''; exit; end;
+  S:=ExtractFilePath(Icon);
+  If S=''
+    then result:=PrgDataDir+IconsSubDir+'\'+Icon
+    else result:=MakeAbsPath(Icon,PrgSetup.BaseDir);
 end;
 
 function bffCallback(DlgHandle: HWND; Msg: Integer; lParam: Integer; lpData: Integer) : Integer; stdcall;
@@ -337,6 +387,38 @@ begin
   result:=Format('%d.%d',[I div 65536,I mod 65536]);
 end;
 
+Function CheckDOSBoxVersion(const Path : String) : String;
+Var DOSBoxPath : String;
+    St : TStringList;
+    I : Integer;
+    S : String;
+begin
+  result:='';
+
+  If Trim(Path)='' then DOSBoxPath:=PrgSetup.DosBoxDir else DOSBOXPath:=Path;
+  DOSBOXPath:=IncludeTrailingPathDelimiter(MakeAbsPath(DOSBOXPath,PrgSetup.BaseDir));
+  If not FileExists(DOSBoxPath+'Readme.txt') then exit;
+
+  S:='';
+  St:=TStringList.Create;
+  try
+    try St.LoadFromFile(DOSBoxPath+'Readme.txt'); except exit; end;
+    For I:=0 to St.Count-1 do If Trim(St[I])<>'' then begin S:=St[I]; break; end;
+  finally
+    St.Free;
+  end;
+
+  For I:=1 to length(S) do If ((S[I]>='0') and (S[I]<='9')) or (S[I]='.') then result:=result+S[I];
+end;
+
+Function OldDOSBoxVersion(const Version : String) : Boolean;
+Var D : Double;
+begin
+  result:=False;
+  try D:=StrToFloat(Version); except exit; end;
+  result:=(D<0.72);
+end;
+
 Function GetFileDateAsString : String;
 Var hFile : THandle;
     CreationTime, AccessTime, WriteTime : TFileTime;
@@ -355,7 +437,7 @@ begin
   end;
 end;
 
-Procedure CreateLink(const TargetName, Parameters, LinkFile, IconFile : String);
+Procedure CreateLink(const TargetName, Parameters, LinkFile, IconFile, Description : String);
 Var IObject : IUnknown;
    ISLink : IShellLink;
    IPFile : IPersistFile;
@@ -369,6 +451,7 @@ begin
      SetPath(PChar(TargetName));
      SetWorkingDirectory(PChar(ExtractFilePath(TargetName)));
      SetArguments(PChar(Parameters));
+     SetDescription(PChar(Description));
      If IconFile<>'' then SetIconLocation(PChar(IconFile),0);
    end;
 
@@ -512,6 +595,162 @@ begin
   finally
     FreeMem(WS);
   end;
+end;
+
+Type TCharsetNameRecord=record
+  Name : String;
+  Nr : Integer;
+end;
+
+const  CharsetNamesList : Array[0..16] of TCharsetNameRecord=(
+  (Name: 'ANSI_CHARSET'; Nr: 0),
+  (Name: 'DEFAULT_CHARSET'; Nr: 1),
+  (Name: 'SYMBOL_CHARSET'; Nr: 2),
+  (Name: 'SHIFTJIS_CHARSET'; Nr: $80),
+  (Name: 'HANGEUL_CHARSET'; Nr: 129),
+  (Name: 'GB2312_CHARSET'; Nr: 134),
+  (Name: 'CHINESEBIG5_CHARSET'; Nr: 136),
+  (Name: 'OEM_CHARSET'; Nr: 255),
+  (Name: 'JOHAB_CHARSET'; Nr: 130),
+  (Name: 'HEBREW_CHARSET'; Nr: 177),
+  (Name: 'ARABIC_CHARSET'; Nr: 178),
+  (Name: 'GREEK_CHARSET'; Nr: 161),
+  (Name: 'TURKISH_CHARSET'; Nr: 162),
+  (Name: 'VIETNAMESE_CHARSET'; Nr: 163),
+  (Name: 'THAI_CHARSET'; Nr: 222),
+  (Name: 'EASTEUROPE_CHARSET'; Nr: 238),
+  (Name: 'RUSSIAN_CHARSET'; Nr: 204)
+);
+
+Function CharsetNameToFontCharSet(const Name : String) : TFontCharset;
+Var S : String;
+    I,Nr : Integer;
+begin
+  result:=DEFAULT_CHARSET;
+
+  S:=Trim(ExtUpperCase(Name));
+  If not TryStrToInt(S,Nr) then Nr:=-1;
+  For I:=Low(CharsetNamesList) to High(CharsetNamesList) do If (Trim(ExtUpperCase(CharsetNamesList[I].Name))=S) or (CharsetNamesList[I].Nr=Nr) then begin
+    result:=CharsetNamesList[I].Nr; exit;
+  end;
+end;
+
+Function UnmapDrive(const Path : String; const PathType : TPathType) : String;
+Var C : Char;
+    S : String;
+    I : Integer;
+begin
+  result:=Path;
+  If not WineSupportEnabled then exit;
+  Case PathType of
+    ptMount      : if not PrgSetup.RemapMounts then exit;
+    ptScreenshot : if not PrgSetup.RemapScreenShotFolder then exit;
+    ptMapper     : if not PrgSetup.RemapMapperFile then exit;
+    ptDOSBox     : if not PrgSetup.RemapDOSBoxFolder then exit;
+  end;
+
+  If (length(Path)<2) or (Path[2]<>':') then exit;
+  C:=UpCase(Path[1]);
+  If (C<'A') or (C>'Z') then exit;
+  S:=PrgSetup.LinuxRemap[C];
+  If S='' then exit;
+
+  For I:=1 to length(result) do If result[I]='\' then result[I]:='/';
+  If S[length(S)]<>'/' then S:=S+'/';
+  result:=S+copy(result,4,MaxInt);
+  If copy(result,length(result)-1,2)='/'+'/' then result:=Copy(result,1,length(result)-1);
+end;
+
+Function GetScreensaverAllowStatus : Boolean;
+begin
+  SystemParametersInfo(SPI_GETSCREENSAVEACTIVE,0,@result,0);
+end;
+
+Procedure SetScreensaverAllowStatus(const Enable : Boolean);
+begin
+  SystemParametersInfo(SPI_SETSCREENSAVEACTIVE,Cardinal(Enable),nil,0);
+end;
+
+function GetTextSize( const hfnt: HFONT; var str: String ):SIZE;
+{by Alexander Katz (skatz@svitonline.com)}
+var
+ hdc0: HDC;
+ hfnt_saved: HFONT;
+ txt_size : SIZE;
+begin
+  hdc0 := GetDC(0);
+  try
+    hfnt_saved := SelectObject(hdc0,hfnt);
+    txt_size.cx:=0;
+    txt_size.cy:=0;
+    GetTextExtentPoint32( hdc0 , PChar(str), Length(str), txt_size );
+    SelectObject(hdc0,hfnt_saved);
+  finally
+    ReleaseDC(0,hdc0);
+  end;
+  Result:=txt_size;
+end;
+
+procedure SetComboHint(Combo: TComboBox);
+{by Alexander Katz (skatz@svitonline.com)}
+var
+ str: String;
+ VisWidth: Integer;
+begin
+  if Combo.ItemIndex>=0 then str:=Combo.Items[Combo.ItemIndex]
+  else str:=Combo.Text;
+  VisWidth:=Combo.Width-4;
+  if Combo.Style<>csSimple then VisWidth:=VisWidth-GetSystemMetrics(SM_CXHSCROLL);
+  if GetTextSize(Combo.Font.Handle, str).cx+2<=VisWidth then str:='';
+  Combo.Hint:=str;
+  Combo.ShowHint:=str<>'';
+end;
+
+procedure SetComboDropDownDropDownWidth(Combo: TComboBox);
+{by Alexander Katz (skatz@svitonline.com)}
+var
+ DroppedWidth: Integer;
+ ScreenRight: Integer;
+ pnt: TPoint;
+ rect_size : SIZE;
+ item_str : String;
+ hdc0 :HDC;
+ hfnt : HFONT;
+ i : Integer;
+ cur_width : Integer;
+begin
+  rect_size.cx:=0;
+  rect_size.cy:=0;
+  DroppedWidth := 0;
+  hdc0 := GetDC(0);
+  try
+    hfnt := SelectObject(hdc0,Combo.Font.Handle);
+    for i:=0 to Combo.Items.Count-1 do
+    begin
+        item_str := Combo.Items[i];
+        GetTextExtentPoint32( hdc0 , PChar(item_str), Length(item_str), rect_size );
+        cur_width := rect_size.cx+8;
+        if cur_width > DroppedWidth then DroppedWidth := cur_width;
+    end;
+    SelectObject(hdc0,hfnt);
+  finally
+    ReleaseDC(0,hdc0);
+  end;
+
+  if Combo.Items.Count>Combo.DropDownCount then
+      DroppedWidth := DroppedWidth + GetSystemMetrics(SM_CXVSCROLL);
+  pnt.x:=0;
+  pnt.y:=0;
+  pnt := Combo.ClientToScreen(pnt);
+  ScreenRight := Screen.DesktopLeft+Screen.DesktopWidth;
+  if pnt.x+DroppedWidth>ScreenRight then
+  begin
+    if ScreenRight - pnt.x > Combo.Width then
+      DroppedWidth := ScreenRight - pnt.x
+    else
+      DroppedWidth := Combo.Width;
+  end;
+  SendMessage( Combo.Handle, CB_SETDROPPEDWIDTH, DroppedWidth, 0 );
 end;
 
 end.

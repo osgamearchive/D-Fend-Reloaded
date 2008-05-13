@@ -47,14 +47,22 @@ type
     CPUCyclesComboBox: TComboBox;
     EmulationCoreCheckBox: TCheckBox;
     EmulationCoreComboBox: TComboBox;
-    KeyboardLayoutCheckBox: TCheckBox;
-    KeyboardLayoutComboBox: TComboBox;
     WindowResolutionCheckBox: TCheckBox;
     WindowResolutionComboBox: TComboBox;
     FullscreenResolutionComboBox: TComboBox;
     ScaleComboBox: TComboBox;
     FullscreenResolutionCheckBox: TCheckBox;
     ScaleCheckBox: TCheckBox;
+    KeyboardLayoutCheckBox: TCheckBox;
+    KeyboardLayoutComboBox: TComboBox;
+    CodepageCheckBox: TCheckBox;
+    CodepageComboBox: TComboBox;
+    TabSheet3: TTabSheet;
+    SetUserInfoCheckBox: TCheckBox;
+    DelUserInfoCheckBox: TCheckBox;
+    SetUserInfoComboBox: TComboBox;
+    SetUserInfoEdit: TEdit;
+    DelUserInfoComboBox: TComboBox;
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure OKButtonClick(Sender: TObject);
@@ -62,15 +70,19 @@ type
     procedure SelectButtonClick(Sender: TObject);
   private
     { Private-Deklarationen }
+    Function GetAllUserInfoKeys : TStringList;
+    Procedure SetUserInfo(const G : TGame; const Key, Value : String);
+    Procedure DelUserInfo(const G : TGame; const Key : String);
   public
     { Public-Deklarationen }
+    TemplateMode : Boolean;
     GameDB : TGameDB;
   end;
 
 var
   ChangeProfilesForm: TChangeProfilesForm;
 
-Function ShowChangeProfilesDialog(const AOwner : TComponent; const AGameDB : TGameDB) : Boolean;
+Function ShowChangeProfilesDialog(const AOwner : TComponent; const AGameDB : TGameDB; const TemplateMode : Boolean = False) : Boolean;
 
 implementation
 
@@ -82,24 +94,68 @@ uses Math, VistaToolsUnit, LanguageSetupUnit, PrgConsts, CommonTools,
 procedure TChangeProfilesForm.FormCreate(Sender: TObject);
 begin
   SetVistaFonts(self);
+  Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName);
+
   PageControl.ActivePageIndex:=0;
+
+  TemplateMode:=False;
+end;
+
+Function TChangeProfilesForm.GetAllUserInfoKeys : TStringList;
+Var I,J,K : Integer;
+    St, Upper : TStringList;
+    S : String;
+begin
+  Upper:=TStringList.Create;
+  result:=TStringList.Create;
+  try
+    For I:=0 to GameDB.Count-1 do begin
+      St:=StringToStringList(GameDB[I].UserInfo);
+      try
+        For J:=0 to St.Count-1 do begin
+          S:=Trim(St[J]);
+          K:=Pos('=',S); If K=0 then continue;
+          S:=Trim(Copy(S,1,K-1));
+          If S='' then continue;
+          If Upper.IndexOf(ExtUpperCase(S))<0 then begin
+            result.Add(S);
+            Upper.Add(ExtUpperCase(S));
+          end;
+        end;
+      finally
+        St.Free;
+      end;
+    end;
+  finally
+    Upper.Free;
+  end;
 end;
 
 procedure TChangeProfilesForm.FormShow(Sender: TObject);
 Var St : TStringList;
 begin
-  BuildCheckList(ListBox,GameDB,False);
+  If TemplateMode then begin
+    Caption:=LanguageSetup.ChangeProfilesFormCaption2;
+    TabSheet1.Caption:=LanguageSetup.ChangeProfilesFormSelectGamesSheet2;
+    InfoLabel.Caption:=LanguageSetup.ChangeProfilesFormInfo2;
+  end else begin
+    Caption:=LanguageSetup.ChangeProfilesFormCaption;
+    TabSheet1.Caption:=LanguageSetup.ChangeProfilesFormSelectGamesSheet;
+    InfoLabel.Caption:=LanguageSetup.ChangeProfilesFormInfo;
+  end;
+
+  BuildCheckList(ListBox,GameDB,False,False);
   BuildSelectPopupMenu(PopupMenu,GameDB,SelectButtonClick,False);
 
-  Caption:=LanguageSetup.ChangeProfilesFormCaption;
-  TabSheet1.Caption:=LanguageSetup.ChangeProfilesFormSelectGamesSheet;
-  TabSheet2.Caption:=LanguageSetup.ChangeProfilesFormEditProfileSheet;
-  InfoLabel.Caption:=LanguageSetup.ChangeProfilesFormInfo;
+  TabSheet2.Caption:=LanguageSetup.ChangeProfilesFormEditProfileSheet+' (1)';
+  TabSheet3.Caption:=LanguageSetup.ChangeProfilesFormEditProfileSheet+' (2)';
   OKButton.Caption:=LanguageSetup.OK;
   CancelButton.Caption:=LanguageSetup.Cancel;
   SelectAllButton.Caption:=LanguageSetup.All;
   SelectNoneButton.Caption:=LanguageSetup.None;
   SelectGenreButton.Caption:=LanguageSetup.GameBy;
+
+  { Page 1}
 
   GenreCheckBox.Caption:=LanguageSetup.GameGenre;
   St:=GameDB.GetGenreList; try GenreComboBox.Items.Assign(St); finally St.Free; end;
@@ -113,6 +169,15 @@ begin
   St:=GameDB.GetLanguageList; try LanguageComboBox.Items.Assign(St); finally St.Free; end;
   FavouriteCheckBox.Caption:=LanguageSetup.GameFavorite;
   with FavouriteComboBox do begin Items.Add(RemoveUnderline(LanguageSetup.No)); Items.Add(RemoveUnderline(LanguageSetup.Yes)); ItemIndex:=0; end;
+
+  SetUserInfoCheckBox.Caption:=LanguageSetup.ChangeProfilesFormSetUserInfo;
+  DelUserInfoCheckBox.Caption:=LanguageSetup.ChangeProfilesFormDelUserInfo;
+  St:=GetAllUserInfoKeys; try SetUserInfoComboBox.Items.Assign(St); DelUserInfoComboBox.Items.Assign(St); finally St.Free; end;
+  If SetUserInfoComboBox.Items.Count>0 then SetUserInfoComboBox.ItemIndex:=0;
+  If DelUserInfoComboBox.Items.Count>0 then DelUserInfoComboBox.ItemIndex:=0 else DelUserInfoCheckBox.Enabled:=False;
+
+  { Page 2 }
+
   CloseOnExitCheckBox.Caption:=LanguageSetup.GameCloseDosBoxAfterGameExit;
   with CloseOnExitComboBox do begin Items.Add(RemoveUnderline(LanguageSetup.No)); Items.Add(RemoveUnderline(LanguageSetup.Yes)); ItemIndex:=0; end;
   StartFullscreenCheckBox.Caption:=LanguageSetup.GameStartFullscreen;
@@ -137,6 +202,8 @@ begin
   St:=ValueToList(GameDB.ConfOpt.Core,';,'); try EmulationCoreComboBox.Items.Assign(St); finally St.Free; end; EmulationCoreComboBox.Text:='auto';
   KeyboardLayoutCheckBox.Caption:=LanguageSetup.GameKeyboardLayout;
   St:=ValueToList(GameDB.ConfOpt.KeyboardLayout,';,'); try KeyboardLayoutComboBox.Items.Assign(St); finally St.Free; end; KeyboardLayoutComboBox.Text:='default';
+  CodepageCheckBox.Caption:=LanguageSetup.GameKeyboardCodepage;
+  St:=ValueToList(GameDB.ConfOpt.Codepage,';,'); try CodepageComboBox.Items.Assign(St); finally St.Free; end; CodepageComboBox.Text:='default';
 
   CheckBoxClick(Sender);
 end;
@@ -161,12 +228,20 @@ end;
 
 procedure TChangeProfilesForm.CheckBoxClick(Sender: TObject);
 begin
+  { Page 1 }
+
   GenreComboBox.Enabled:=GenreCheckBox.Checked;
   DeveloperComboBox.Enabled:=DeveloperCheckBox.Checked;
   PublisherComboBox.Enabled:=PublisherCheckBox.Checked;
   YearComboBox.Enabled:=YearCheckBox.Checked;
   LanguageComboBox.Enabled:=LanguageCheckBox.Checked;
   FavouriteComboBox.Enabled:=FavouriteCheckBox.Checked;
+  SetUserInfoComboBox.Enabled:=SetUserInfoCheckBox.Checked;
+  SetUserInfoEdit.Enabled:=SetUserInfoCheckBox.Checked;
+  DelUserInfoComboBox.Enabled:=DelUserInfoCheckBox.Checked;
+
+  { Page 2 }
+
   CloseOnExitComboBox.Enabled:=CloseOnExitCheckBox.Checked;
   StartFullscreenComboBox.Enabled:=StartFullscreenCheckBox.Checked;
   LockMouseComboBox.Enabled:=LockMouseCheckBox.Checked;
@@ -179,38 +254,97 @@ begin
   CPUCyclesComboBox.Enabled:=CPUCyclesCheckBox.Checked;
   EmulationCoreComboBox.Enabled:=EmulationCoreCheckBox.Checked;
   KeyboardLayoutComboBox.Enabled:=KeyboardLayoutCheckBox.Checked;
+  CodepageComboBox.Enabled:=CodepageCheckBox.Checked;
+end;
+
+Procedure TChangeProfilesForm.SetUserInfo(const G : TGame; const Key, Value : String);
+Var St : TStringList;
+    ValueFound : Boolean;
+    I,J : Integer;
+    KeyUpper, S : String;
+begin
+  KeyUpper:=Trim(ExtUpperCase(Key));
+  St:=StringToStringList(G.UserInfo);
+  try
+    ValueFound:=False;
+    For I:=0 to St.Count-1 do begin
+      S:=Trim(St[I]);
+      J:=Pos('=',S); If J=0 then continue;
+      S:=Trim(Copy(S,1,J-1));
+      If ExtUpperCase(S)=KeyUpper then begin St[I]:=Key+'='+Value; ValueFound:=True; break; end;
+    end;
+    If not ValueFound then St.Add(Key+'='+Value);
+    G.UserInfo:=StringListToString(St);
+  finally
+    St.Free;
+  end;
+end;
+
+Procedure TChangeProfilesForm.DelUserInfo(const G : TGame; const Key : String);
+Var St : TStringList;
+    KeyUpper,S : String;
+    I,J : Integer;
+begin
+  KeyUpper:=Trim(ExtUpperCase(Key));
+  St:=StringToStringList(G.UserInfo);
+  try
+    I:=0;
+    while I<St.Count do begin
+      S:=Trim(St[I]);
+      J:=Pos('=',S); If J=0 then begin inc(I); continue; end;
+      S:=Trim(Copy(S,1,J-1));
+      If ExtUpperCase(S)=KeyUpper then begin St.Delete(I); continue; end;
+      inc(I);
+    end;
+    G.UserInfo:=StringListToString(St);
+  finally
+    St.Free;
+  end;
 end;
 
 procedure TChangeProfilesForm.OKButtonClick(Sender: TObject);
 Var I,J : Integer;
     G : TGame;
     S : String;
+    ScummVM : Boolean;
 begin
   For I:=0 to ListBox.Items.Count-1 do If ListBox.Checked[I] then begin
     G:=TGame(ListBox.Items.Objects[I]);
+    ScummVM:=ScummVMMode(G);
+
+    { Page 1 }
+
     If GenreCheckBox.Checked then G.Genre:=GenreComboBox.Text;
     If DeveloperCheckBox.Checked then G.Developer:=DeveloperComboBox.Text;
     If PublisherCheckBox.Checked then G.Publisher:=PublisherComboBox.Text;
     If YearCheckBox.Checked then G.Year:=YearComboBox.Text;
     If LanguageCheckBox.Checked then G.Language:=LanguageComboBox.Text;
     If FavouriteCheckBox.Checked then G.Favorite:=(FavouriteComboBox.ItemIndex=1);
-    If CloseOnExitCheckBox.Checked then G.CloseDosBoxAfterGameExit:=(CloseOnExitComboBox.ItemIndex=1);
+    If SetUserInfoCheckBox.Checked then SetUserInfo(G,SetUserInfoComboBox.Text,SetUserInfoEdit.Text);
+    If DelUserInfoCheckBox.Checked then DelUserInfo(G,DelUserInfoComboBox.Text);
+
+    { Page 2 }
+
+    If CloseOnExitCheckBox.Checked and (not ScummVM) then G.CloseDosBoxAfterGameExit:=(CloseOnExitComboBox.ItemIndex=1);
     If StartFullscreenCheckBox.Checked then G.StartFullscreen:=(StartFullscreenComboBox.ItemIndex=1);
-    If LockMouseCheckBox.Checked then G.AutoLockMouse:=(LockMouseComboBox.ItemIndex=1);
-    If UseDoublebufferCheckBox.Checked then G.UseDoublebuffering:=(UseDoublebufferComboBox.ItemIndex=1);
-    If RenderCheckBox.Checked then G.Render:=RenderComboBox.Text;
-    If WindowResolutionCheckBox.Checked then G.WindowResolution:=WindowResolutionComboBox.Text;
-    If FullscreenResolutionCheckBox.Checked then G.FullscreenResolution:=FullscreenResolutionComboBox.Text;
-    If ScaleCheckBox.Checked then begin
-      S:=ScaleComboBox.Text;
-      If Pos('(',S)=0 then G.Scale:='' else begin
-        S:=Copy(S,Pos('(',S)+1,MaxInt); If Pos(')',S)=0 then G.Scale:=''  else G.Scale:=Copy(S,1,Pos(')',S)-1);
+    If not ScummVM then begin
+      If LockMouseCheckBox.Checked then G.AutoLockMouse:=(LockMouseComboBox.ItemIndex=1);
+      If UseDoublebufferCheckBox.Checked then G.UseDoublebuffering:=(UseDoublebufferComboBox.ItemIndex=1);
+      If RenderCheckBox.Checked then G.Render:=RenderComboBox.Text;
+      If WindowResolutionCheckBox.Checked then G.WindowResolution:=WindowResolutionComboBox.Text;
+      If FullscreenResolutionCheckBox.Checked then G.FullscreenResolution:=FullscreenResolutionComboBox.Text;
+      If ScaleCheckBox.Checked then begin
+        S:=ScaleComboBox.Text;
+        If Pos('(',S)=0 then G.Scale:='' else begin
+          S:=Copy(S,Pos('(',S)+1,MaxInt); If Pos(')',S)=0 then G.Scale:=''  else G.Scale:=Copy(S,1,Pos(')',S)-1);
+        end;
       end;
+      If MemoryCheckBox.Checked then begin try J:=Min(63,Max(1,StrToInt(MemoryComboBox.Text))); except J:=32; end; G.Memory:=J; end;
+      If CPUCyclesCheckBox.Checked then G.Cycles:=CPUCyclesComboBox.Text;
+      If EmulationCoreCheckBox.Checked then G.Core:=EmulationCoreComboBox.Text;
+      If KeyboardLayoutCheckBox.Checked then G.KeyboardLayout:=KeyboardLayoutComboBox.Text;
+      If CodepageCheckBox.Checked then G.Codepage:=CodepageComboBox.Text;
     end;
-    If MemoryCheckBox.Checked then begin try J:=Min(63,Max(1,StrToInt(MemoryComboBox.Text))); except J:=32; end; G.Memory:=J; end;
-    If CPUCyclesCheckBox.Checked then G.Cycles:=CPUCyclesComboBox.Text;
-    If EmulationCoreCheckBox.Checked then G.Core:=EmulationCoreComboBox.Text;
-    If KeyboardLayoutCheckBox.Checked then G.KeyboardLayout:=KeyboardLayoutComboBox.Text;
   end;
 
   GameDB.StoreAllValues;
@@ -219,11 +353,12 @@ end;
 
 { global }
 
-Function ShowChangeProfilesDialog(const AOwner : TComponent; const AGameDB : TGameDB) : Boolean;
+Function ShowChangeProfilesDialog(const AOwner : TComponent; const AGameDB : TGameDB; const TemplateMode : Boolean) : Boolean;
 begin
   ChangeProfilesForm:=TChangeProfilesForm.Create(AOwner);
   try
     ChangeProfilesForm.GameDB:=AGameDB;
+    ChangeProfilesForm.TemplateMode:=TemplateMode;
     result:=(ChangeProfilesForm.ShowModal=mrOK);
   finally
     ChangeProfilesForm.Free;

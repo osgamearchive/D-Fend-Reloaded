@@ -35,6 +35,7 @@ uses VistaToolsUnit, LanguageSetupUnit, PrgSetupUnit, PrgConsts, CommonTools;
 procedure TLanguageEditorStartForm.FormCreate(Sender: TObject);
 begin
   SetVistaFonts(self);
+  Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName);
 
   Caption:=LanguageSetup.ProfileEditor;
   OKButton.Caption:=LanguageSetup.OK;

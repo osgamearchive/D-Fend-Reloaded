@@ -27,13 +27,16 @@
     <Borland.Personality>Delphi.Personality</Borland.Personality>
     <Borland.ProjectType />
     <BorlandProject>
-<BorlandProject><Delphi.Personality><Parameters><Parameters Name="UseLauncher">False</Parameters><Parameters Name="LoadAllSymbols">True</Parameters><Parameters Name="LoadUnspecifiedSymbols">False</Parameters></Parameters><VersionInfo><VersionInfo Name="IncludeVerInfo">True</VersionInfo><VersionInfo Name="AutoIncBuild">False</VersionInfo><VersionInfo Name="MajorVer">0</VersionInfo><VersionInfo Name="MinorVer">3</VersionInfo><VersionInfo Name="Release">2</VersionInfo><VersionInfo Name="Build">7</VersionInfo><VersionInfo Name="Debug">False</VersionInfo><VersionInfo Name="PreRelease">False</VersionInfo><VersionInfo Name="Special">False</VersionInfo><VersionInfo Name="Private">False</VersionInfo><VersionInfo Name="DLL">False</VersionInfo><VersionInfo Name="Locale">1031</VersionInfo><VersionInfo Name="CodePage">1252</VersionInfo></VersionInfo><VersionInfoKeys><VersionInfoKeys Name="CompanyName"></VersionInfoKeys><VersionInfoKeys Name="FileDescription"></VersionInfoKeys><VersionInfoKeys Name="FileVersion">0.3.2.7</VersionInfoKeys><VersionInfoKeys Name="InternalName"></VersionInfoKeys><VersionInfoKeys Name="LegalCopyright"></VersionInfoKeys><VersionInfoKeys Name="LegalTrademarks"></VersionInfoKeys><VersionInfoKeys Name="OriginalFilename"></VersionInfoKeys><VersionInfoKeys Name="ProductName"></VersionInfoKeys><VersionInfoKeys Name="ProductVersion">1.0.0.0</VersionInfoKeys><VersionInfoKeys Name="Comments"></VersionInfoKeys></VersionInfoKeys><Source><Source Name="MainSource">DFend.dpr</Source></Source></Delphi.Personality><ModelSupport>False</ModelSupport></BorlandProject></BorlandProject>
+<BorlandProject><Delphi.Personality><Parameters><Parameters Name="UseLauncher">False</Parameters><Parameters Name="LoadAllSymbols">True</Parameters><Parameters Name="LoadUnspecifiedSymbols">False</Parameters></Parameters><VersionInfo><VersionInfo Name="IncludeVerInfo">True</VersionInfo><VersionInfo Name="AutoIncBuild">False</VersionInfo><VersionInfo Name="MajorVer">0</VersionInfo><VersionInfo Name="MinorVer">4</VersionInfo><VersionInfo Name="Release">0</VersionInfo><VersionInfo Name="Build">10</VersionInfo><VersionInfo Name="Debug">False</VersionInfo><VersionInfo Name="PreRelease">False</VersionInfo><VersionInfo Name="Special">False</VersionInfo><VersionInfo Name="Private">False</VersionInfo><VersionInfo Name="DLL">False</VersionInfo><VersionInfo Name="Locale">1031</VersionInfo><VersionInfo Name="CodePage">1252</VersionInfo></VersionInfo><VersionInfoKeys><VersionInfoKeys Name="CompanyName"></VersionInfoKeys><VersionInfoKeys Name="FileDescription">D-Fend Reloaded</VersionInfoKeys><VersionInfoKeys Name="FileVersion">0.4.0.10</VersionInfoKeys><VersionInfoKeys Name="InternalName">D-Fend Reloaded</VersionInfoKeys><VersionInfoKeys Name="LegalCopyright">Alexander Herzog</VersionInfoKeys><VersionInfoKeys Name="LegalTrademarks"></VersionInfoKeys><VersionInfoKeys Name="OriginalFilename">DFend.exe</VersionInfoKeys><VersionInfoKeys Name="ProductName">D-Fend Reloaded</VersionInfoKeys><VersionInfoKeys Name="ProductVersion">1.0.0.0</VersionInfoKeys><VersionInfoKeys Name="Comments">GPL v3</VersionInfoKeys></VersionInfoKeys><Source><Source Name="MainSource">DFend.dpr</Source></Source></Delphi.Personality><ModelSupport>False</ModelSupport></BorlandProject></BorlandProject>
   </ProjectExtensions>
   <Import Project="$(MSBuildBinPath)\Borland.Delphi.Targets" />
   <ItemGroup>
     <DelphiCompile Include="DFend.dpr">
       <MainSource>MainSource</MainSource>
     </DelphiCompile>
+    <DCCReference Include="BuildImageFromFolderFormUnit.pas">
+      <Form>BuildImageFromFolderForm</Form>
+    </DCCReference>
     <DCCReference Include="BuildInstallerFormUnit.pas">
       <Form>BuildInstallerForm</Form>
     </DCCReference>
@@ -45,6 +48,9 @@
     </DCCReference>
     <DCCReference Include="ChangeProfilesFormUnit.pas">
       <Form>ChangeProfilesForm</Form>
+    </DCCReference>
+    <DCCReference Include="ChecksumFormUnit.pas">
+      <Form>ChecksumForm</Form>
     </DCCReference>
     <DCCReference Include="CommonComponents.pas" />
     <DCCReference Include="CommonTools.pas" />
@@ -65,8 +71,17 @@
     </DCCReference>
     <DCCReference Include="DiskImageToolsUnit.pas" />
     <DCCReference Include="DosBoxUnit.pas" />
+    <DCCReference Include="DragNDropErrorFormUnit.pas">
+      <Form>DragNDropErrorForm</Form>
+    </DCCReference>
     <DCCReference Include="DriveReadFormUnit.pas">
       <Form>DriveReadForm</Form>
+    </DCCReference>
+    <DCCReference Include="ExpandImageFormUnit.pas">
+      <Form>ExpandImageForm</Form>
+    </DCCReference>
+    <DCCReference Include="FirstRunWizardFormUnit.pas">
+      <Form>FirstRunWizardForm</Form>
     </DCCReference>
     <DCCReference Include="GameDBToolsUnit.pas" />
     <DCCReference Include="GameDBUnit.pas" />
@@ -78,6 +93,7 @@
     <DCCReference Include="IconManagerFormUnit.pas">
       <Form>IconManagerForm</Form>
     </DCCReference>
+    <DCCReference Include="ImageTools.pas" />
     <DCCReference Include="InfoFormUnit.pas">
       <Form>InfoForm</Form>
     </DCCReference>
@@ -88,9 +104,15 @@
       <Form>LanguageEditorStartForm</Form>
     </DCCReference>
     <DCCReference Include="LanguageSetupUnit.pas" />
+    <DCCReference Include="ListScummVMGamesFormUnit.pas">
+      <Form>ListScummVMGamesForm</Form>
+    </DCCReference>
     <DCCReference Include="ListViewImageUnit.pas" />
     <DCCReference Include="MainUnit.pas">
       <Form>DFendReloadedMainForm</Form>
+    </DCCReference>
+    <DCCReference Include="MiniRunFormUnit.pas">
+      <Form>MiniRunForm</Form>
     </DCCReference>
     <DCCReference Include="ModernProfileEditorBaseFrameUnit.pas">
       <Form>ModernProfileEditorBaseFrame</Form>
@@ -143,6 +165,18 @@
     <DCCReference Include="ModernProfileEditorNetworkFrameUnit.pas">
       <Form>ModernProfileEditorNetworkFrame</Form>
     </DCCReference>
+    <DCCReference Include="ModernProfileEditorPrinterFrameUnit.pas">
+      <Form>ModernProfileEditorPrinterFrame</Form>
+    </DCCReference>
+    <DCCReference Include="ModernProfileEditorScummVMFrameUnit.pas">
+      <Form>ModernProfileEditorScummVMFrame</Form>
+    </DCCReference>
+    <DCCReference Include="ModernProfileEditorScummVMGraphicsFrameUnit.pas">
+      <Form>ModernProfileEditorScummVMGraphicsFrame</Form>
+    </DCCReference>
+    <DCCReference Include="ModernProfileEditorScummVMSoundFrameUnit.pas">
+      <Form>ModernProfileEditorScummVMSoundFrame</Form>
+    </DCCReference>
     <DCCReference Include="ModernProfileEditorSerialPortFrameUnit.pas">
       <Form>ModernProfileEditorSerialPortFrame</Form>
     </DCCReference>
@@ -161,6 +195,9 @@
     <DCCReference Include="ModernProfileEditorVolumeFrameUnit.pas">
       <Form>ModernProfileEditorVolumeFrame</Form>
     </DCCReference>
+    <DCCReference Include="OperationModeInfoFormUnit.pas">
+      <Form>OperationModeInfoForm</Form>
+    </DCCReference>
     <DCCReference Include="PlaySoundFormUnit.pas">
       <Form>PlaySoundForm</Form>
     </DCCReference>
@@ -178,6 +215,8 @@
     </DCCReference>
     <DCCReference Include="ReadDriveUnit.pas" />
     <DCCReference Include="ResHookUnit.pas" />
+    <DCCReference Include="ScummVMToolsUnit.pas" />
+    <DCCReference Include="ScummVMUnit.pas" />
     <DCCReference Include="SelectProfilesFormUnit.pas">
       <Form>SelectProfilesForm</Form>
     </DCCReference>
@@ -190,7 +229,76 @@
     <DCCReference Include="SetupFormUnit.pas">
       <Form>SetupForm</Form>
     </DCCReference>
+    <DCCReference Include="SetupFrameBaseUnit.pas">
+      <Form>SetupFrameBase</Form>
+    </DCCReference>
+    <DCCReference Include="SetupFrameDefaultValuesUnit.pas">
+      <Form>SetupFrameDefaultValues</Form>
+    </DCCReference>
+    <DCCReference Include="SetupFrameDirectoriesUnit.pas">
+      <Form>SetupFrameDirectories</Form>
+    </DCCReference>
+    <DCCReference Include="SetupFrameDOSBoxExtUnit.pas">
+      <Form>SetupFrameDOSBoxExt</Form>
+    </DCCReference>
+    <DCCReference Include="SetupFrameDOSBoxUnit.pas">
+      <Form>SetupFrameDOSBox</Form>
+    </DCCReference>
+    <DCCReference Include="SetupFrameFreeDOSUnit.pas">
+      <Form>SetupFrameFreeDOS</Form>
+    </DCCReference>
+    <DCCReference Include="SetupFrameGamesListAppearanceUnit.pas">
+      <Form>SetupFrameGamesListAppearance</Form>
+    </DCCReference>
+    <DCCReference Include="SetupFrameGamesListColumnsUnit.pas">
+      <Form>SetupFrameGamesListColumns</Form>
+    </DCCReference>
+    <DCCReference Include="SetupFrameGamesListScreenshotAppearanceUnit.pas">
+      <Form>SetupFrameGamesListScreenshotAppearance</Form>
+    </DCCReference>
+    <DCCReference Include="SetupFrameGamesListTreeAppearanceUnit.pas">
+      <Form>SetupFrameGamesListTreeAppearance</Form>
+    </DCCReference>
+    <DCCReference Include="SetupFrameLanguageUnit.pas">
+      <Form>SetupFrameLanguage</Form>
+    </DCCReference>
+    <DCCReference Include="SetupFrameProfileEditorUnit.pas">
+      <Form>SetupFrameProfileEditor</Form>
+    </DCCReference>
+    <DCCReference Include="SetupFrameProgramsUnit.pas">
+      <Form>SetupFramePrograms</Form>
+    </DCCReference>
+    <DCCReference Include="SetupFrameQBasicUnit.pas">
+      <Form>SetupFrameQBasic</Form>
+    </DCCReference>
+    <DCCReference Include="SetupFrameScummVMUnit.pas">
+      <Form>SetupFrameScummVM</Form>
+    </DCCReference>
+    <DCCReference Include="SetupFrameSecurityUnit.pas">
+      <Form>SetupFrameSecurity</Form>
+    </DCCReference>
+    <DCCReference Include="SetupFrameServiceUnit.pas">
+      <Form>SetupFrameService</Form>
+    </DCCReference>
+    <DCCReference Include="SetupFrameSurfaceUnit.pas">
+      <Form>SetupFrameSurface</Form>
+    </DCCReference>
+    <DCCReference Include="SetupFrameToolbarUnit.pas">
+      <Form>SetupFrameToolbar</Form>
+    </DCCReference>
+    <DCCReference Include="SetupFrameUpdateUnit.pas">
+      <Form>SetupFrameUpdate</Form>
+    </DCCReference>
+    <DCCReference Include="SetupFrameWaveEncoderUnit.pas">
+      <Form>SetupFrameWaveEncoder</Form>
+    </DCCReference>
+    <DCCReference Include="SetupFrameWineUnit.pas">
+      <Form>SetupFrameWine</Form>
+    </DCCReference>
     <DCCReference Include="SimpleXMLUnit.pas" />
+    <DCCReference Include="SmallWaitFormUnit.pas">
+      <Form>SmallWaitForm</Form>
+    </DCCReference>
     <DCCReference Include="StatisticsFormUnit.pas">
       <Form>StatisticsForm</Form>
     </DCCReference>
@@ -199,6 +307,9 @@
     </DCCReference>
     <DCCReference Include="TemplateSelectProfileFormUnit.pas">
       <Form>TemplateSelectProfileForm</Form>
+    </DCCReference>
+    <DCCReference Include="TextViewerFormUnit.pas">
+      <Form>TextViewerForm</Form>
     </DCCReference>
     <DCCReference Include="TransferFormUnit.pas">
       <Form>TransferForm</Form>
@@ -219,8 +330,29 @@
     <DCCReference Include="WallpaperStyleFormUnit.pas">
       <Form>WallpaperStyleForm</Form>
     </DCCReference>
+    <DCCReference Include="WizardBaseUnit.pas">
+      <Form>WizardBaseFrame</Form>
+    </DCCReference>
+    <DCCReference Include="WizardFinishUnit.pas">
+      <Form>WizardFinishFrame</Form>
+    </DCCReference>
     <DCCReference Include="WizardFormUnit.pas">
       <Form>WizardForm</Form>
+    </DCCReference>
+    <DCCReference Include="WizardGameInfoUnit.pas">
+      <Form>WizardGameInfoFrame</Form>
+    </DCCReference>
+    <DCCReference Include="WizardPrgFileUnit.pas">
+      <Form>WizardPrgFileFrame</Form>
+    </DCCReference>
+    <DCCReference Include="WizardScummVMSettingsUnit.pas">
+      <Form>WizardScummVMSettingsFrame</Form>
+    </DCCReference>
+    <DCCReference Include="WizardScummVMUnit.pas">
+      <Form>WizardScummVMFrame</Form>
+    </DCCReference>
+    <DCCReference Include="WizardTemplateUnit.pas">
+      <Form>WizardTemplateFrame</Form>
     </DCCReference>
   </ItemGroup>
 </Project>

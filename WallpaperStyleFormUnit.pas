@@ -34,6 +34,7 @@ uses VistaToolsUnit, LanguageSetupUnit;
 procedure TWallpaperStyleForm.FormCreate(Sender: TObject);
 begin
   SetVistaFonts(self);
+  Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName);
 
   Caption:=LanguageSetup.WallpaperCaption;
   TileRadioButton.Caption:=LanguageSetup.WallpaperTile;

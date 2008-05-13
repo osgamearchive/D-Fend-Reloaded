@@ -47,6 +47,7 @@ uses ShlObj, VistaToolsUnit, LanguageSetupUnit, GameDBToolsUnit, CommonTools,
 procedure TCreateXMLForm.FormCreate(Sender: TObject);
 begin
   SetVistaFonts(self);
+  Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName);
 
   //Caption:=LanguageSetup.CreateConfForm;
   //InfoLabel.Caption:=LanguageSetup.CreateConfFormInfo;
@@ -66,7 +67,7 @@ end;
 
 procedure TCreateXMLForm.FormShow(Sender: TObject);
 begin
-  BuildCheckList(ListBox,GameDB,True);
+  BuildCheckList(ListBox,GameDB,True,True);
   BuildSelectPopupMenu(PopupMenu,GameDB,SelectButtonClick,True);
 end;
 
@@ -126,6 +127,5 @@ begin
     CreateXMLForm.Free;
   end;
 end;
-
 
 end.

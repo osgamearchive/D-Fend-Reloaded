@@ -8,6 +8,10 @@ GIF Graphics Object
 written by Anders Melander, Filip Larsen and Reinier Sterkenburg
 (http://www.torry.net/authorsmore.php?id=1034)
 
+SDeanComponents v2.60.00
+written by Sarah Dean (sdean12@sdean12.org)
+http://www.SDean12.org/
+
 Used as binary program by D-Fend Reloaded:
 
 MTOOLs for Bochs and Win32 and/or DOS
@@ -22,6 +26,6 @@ OggEnc v2.84 (libvorbis 1.2.0)
 (c) 2000-2005 Michael Smith & portions by John Edwards
 (http://www.vorbis.com/)
 
-SDeanComponents v2.60.00
-written by Sarah Dean (sdean12@sdean12.org)
-http://www.SDean12.org/ 
+Doszip Commander 1.28
+(c) 1996-2007 Hjort Nidudsson
+(http://sourceforge.net/projects/doszip)

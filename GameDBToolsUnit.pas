@@ -11,7 +11,8 @@ Procedure InitTreeViewForGamesList(const ATreeView : TTreeView; const GameDB : T
 Procedure InitListViewForGamesList(const AListView : TListView; const ShowExtraInfo : Boolean);
 
 Procedure AddGameToList(const AListView : TListView; const AListViewImageList, AListViewIconImageList, AImageList : TImageList; const Game : TGame; const ShowExtraInfo : Boolean);
-Procedure AddGamesToList(const AListView : TListView; const AListViewImageList, AListViewIconImageList, AImageList : TImageList; const GameDB : TGameDB; const Group, SubGroup, SearchString : String; const ShowExtraInfo : Boolean; const SortBy : TSortListBy; const ReverseOrder : Boolean);
+Procedure AddGamesToList(const AListView : TListView; const AListViewImageList, AListViewIconImageList, AImageList : TImageList; const GameDB : TGameDB; const Group, SubGroup, SearchString : String; const ShowExtraInfo : Boolean; const SortBy : TSortListBy; const ReverseOrder : Boolean; const HideScummVMProfiles : Boolean = False); overload;
+Procedure AddGamesToList(const AListView : TListView; const AListViewImageList, AListViewIconImageList, AImageList : TImageList; const GameDB : TGameDB; const Game : TGame; const Group, SubGroup, SearchString : String; const ShowExtraInfo : Boolean; const SortBy : TSortListBy; const ReverseOrder : Boolean; const HideScummVMProfiles : Boolean = False); overload;
 
 Procedure AddScreenshotsToList(const AListView : TListView; const AImageList : TImageList; Dir : String);
 Procedure AddSoundsToList(const AListView : TListView; Dir : String; ImageListIndex : Integer);
@@ -21,16 +22,17 @@ Procedure SetSortTypeByListViewCol(const ColumnIndex : Integer; var ListSort : T
 
 { Selection lists }
 
-Procedure BuildCheckList(const CheckListBox : TCheckListBox; const GameDB : TGameDB; const WithDefaultProfile : Boolean);
+Procedure BuildCheckList(const CheckListBox : TCheckListBox; const GameDB : TGameDB; const WithDefaultProfile, HideScummVMProfiles : Boolean);
 Procedure BuildSelectPopupMenu(const Popup : TPopupMenu; const GameDB : TGameDB; const OnClick : TNotifyEvent; const WithDefaultProfile : Boolean);
 Procedure SelectGamesByPopupMenu(const Sender : TObject; const CheckListBox : TCheckListBox);
 
-{ Upgrade from D-Fend }
+{ Upgrade from D-Fend / First-run init / Repair }
 
 Procedure DeleteOldFiles;
 Procedure ReplaceAbsoluteDirs(const GameDB : TGameDB);
-Function BuildDefaultDosProfile(const GameDB : TGameDB) : TGame;
+Function BuildDefaultDosProfile(const GameDB : TGameDB; const CopyFiles : Boolean = True) : TGame;
 Procedure BuildDefaultProfile;
+Procedure ReBuildTemplates;
 
 { Extras }
 
@@ -45,23 +47,38 @@ Procedure ClearHistory;
 
 { Import }
 
+Procedure ImportConfData(const AGame : TGame; const Lines : String); overload;
+Procedure ImportConfData(const AGame : TGame; const St : TStringList); overload;
+Procedure ImportConfFileData(const AGame : TGame; const AFileName : String);
 Function ImportConfFile(const AGameDB : TGameDB; const AFileName : String) : TGame;
 
 { Checksums }
 
-Function GameCheckSumOK(const AGame : TGame) : Boolean;
-Function SetupCheckSumOK(const AGame : TGame) : Boolean;
 Procedure CreateGameCheckSum(const AGame : TGame; const OverwriteExistingCheckSum : Boolean);
 Procedure CreateSetupCheckSum(const AGame : TGame; const OverwriteExistingCheckSum : Boolean);
 Procedure ProfileEditorOpenCheck(const AGame : TGame);
 Procedure ProfileEditorCloseCheck(const AGame : TGame; const NewGameExe, NewSetupExe : String);
 Function RunCheck(const AGame : TGame; const RunSetup : Boolean) : Boolean;
+Procedure CreateCheckSumsForAllGames(const AGameDB : TGameDB);
+
+{ Last modification date }
+
+Function GetLastModificationDate(const AGame : TGame) : String;
+
+{ ScummVM }
+
+Function ScummVMMode(const Game : TGame) : Boolean;
+
+{ CheckDB }
+
+Function CheckGameDB(const GameDB : TGameDB) : TStringList;
 
 implementation
 
-uses Windows, SysUtils, Dialogs, Graphics, Math, IniFiles, PNGImage, JPEG,
-     GIFImage, CommonTools, LanguageSetupUnit, PrgConsts, PrgSetupUnit,
-     ProfileEditorFormUnit, ModernProfileEditorFormUnit, HashCalc;
+uses Windows, SysUtils, Forms, Dialogs, Graphics, Math, IniFiles, PNGImage,
+     JPEG, GIFImage, CommonTools, LanguageSetupUnit, PrgConsts, PrgSetupUnit,
+     ProfileEditorFormUnit, ModernProfileEditorFormUnit, HashCalc,
+     SmallWaitFormUnit, ChecksumFormUnit, ProgressFormUnit;
 
 Procedure AddTypeSelector(const ATreeView : TTreeView; const Name : String; const St : TStringList);
 Var N,N2 : TTreeNode;
@@ -223,13 +240,16 @@ begin
   end;
 end;
 
-Procedure BuildCheckList(const CheckListBox : TCheckListBox; const GameDB : TGameDB; const WithDefaultProfile : Boolean);
+Procedure BuildCheckList(const CheckListBox : TCheckListBox; const GameDB : TGameDB; const WithDefaultProfile, HideScummVMProfiles : Boolean);
 Var I : Integer;
     St : TStringList;
 begin
   St:=TStringList.Create;
   try
-    For I:=0 to GameDB.Count-1 do If GameDB[I].Name<>DosBoxDOSProfile then St.AddObject(GameDB[I].Name,GameDB[I]);
+    For I:=0 to GameDB.Count-1 do If WithDefaultProfile or (GameDB[I].Name<>DosBoxDOSProfile) then begin
+      If HideScummVMProfiles and ScummVMMode(GameDB[I]) then continue;
+      St.AddObject(GameDB[I].Name,GameDB[I]);
+    end;
     St.Sort;
     CheckListBox.Items.Assign(St);
     For I:=0 to CheckListBox.Items.Count-1 do CheckListBox.Checked[I]:=True;
@@ -238,10 +258,20 @@ begin
   end;
 end;
 
+Type TUserDataRecord=record
+  Name, NameUpper : String;
+  Values, ValuesUpper : TStringList;
+end;
+
 Procedure BuildSelectPopupMenu(const Popup : TPopupMenu; const GameDB : TGameDB; const OnClick : TNotifyEvent; const WithDefaultProfile : Boolean);
 Var MenuSelect, MenuUnselect : TMenuItem;
     St : TStringList;
+    I,J,K,Nr : Integer;
+    S,T,SUpper : String;
+    UserData : Array of TUserDataRecord;
 begin
+  { Base settings }
+
   MenuSelect:=TMenuItem.Create(Popup);
   MenuSelect.Caption:=LanguageSetup.Select;
   MenuSelect.Tag:=1;
@@ -251,37 +281,89 @@ begin
   MenuUnselect.Tag:=0;
   Popup.Items.Add(MenuUnselect);
 
+  { Add normal meta data submenus }
+
   St:=GameDB.GetGenreList(WithDefaultProfile);
-  try
-    BuildSelectPopupSubMenu(Popup,LanguageSetup.GameGenre,MenuSelect,MenuUnselect,0,OnClick,St);
-  finally
-    St.Free;
-  end;
+  try BuildSelectPopupSubMenu(Popup,LanguageSetup.GameGenre,MenuSelect,MenuUnselect,0,OnClick,St); finally St.Free; end;
 
   St:=GameDB.GetDeveloperList(WithDefaultProfile);
-  try
-    BuildSelectPopupSubMenu(Popup,LanguageSetup.GameDeveloper,MenuSelect,MenuUnselect,1,OnClick,St);
-  finally
-    St.Free;
-  end;
+  try BuildSelectPopupSubMenu(Popup,LanguageSetup.GameDeveloper,MenuSelect,MenuUnselect,1,OnClick,St); finally St.Free; end;
 
   St:=GameDB.GetPublisherList(WithDefaultProfile);
-  try
-    BuildSelectPopupSubMenu(Popup,LanguageSetup.GamePublisher,MenuSelect,MenuUnselect,2,OnClick,St);
-  finally
-    St.Free;
-  end;
+  try BuildSelectPopupSubMenu(Popup,LanguageSetup.GamePublisher,MenuSelect,MenuUnselect,2,OnClick,St); finally St.Free; end;
 
   St:=GameDB.GetYearList(WithDefaultProfile);
-  try
-    BuildSelectPopupSubMenu(Popup,LanguageSetup.GameYear,MenuSelect,MenuUnselect,3,OnClick,St);
-  finally
-    St.Free;
-  end;
+  try BuildSelectPopupSubMenu(Popup,LanguageSetup.GameYear,MenuSelect,MenuUnselect,3,OnClick,St); finally St.Free; end;
 
   St:=GameDB.GetLanguageList(WithDefaultProfile);
+  try BuildSelectPopupSubMenu(Popup,LanguageSetup.GameLanguage,MenuSelect,MenuUnselect,4,OnClick,St); finally St.Free; end;
+
+  { Collect user data }
+
+  SetLength(UserData,0);
+
   try
-    BuildSelectPopupSubMenu(Popup,LanguageSetup.GameLanguage,MenuSelect,MenuUnselect,4,OnClick,St);
+    For I:=0 to GameDB.Count-1 do If WithDefaultProfile or (GameDB[I].Name<>DosBoxDOSProfile) then begin
+      St:=StringToStringList(GameDB[I].UserInfo);
+      try
+        For J:=0 to St.Count-1 do begin
+          S:=Trim(St[J]);
+          If (S='') or (Pos('=',S)=0) then continue;
+          T:=Trim(Copy(S,Pos('=',S)+1,MaxInt));
+          S:=Trim(Copy(S,1,Pos('=',S)-1));
+          If (S='') or (T='') then continue;
+          SUpper:=ExtUpperCase(S);
+          Nr:=-1;
+          For K:=0 to length(UserData)-1 do If UserData[K].NameUpper=SUpper then begin Nr:=K; break; end;
+          If Nr<0 then begin
+            Nr:=length(UserData); SetLength(UserData,Nr+1);
+            UserData[Nr].Name:=S; UserData[Nr].NameUpper:=SUpper;
+            UserData[Nr].Values:=TStringList.Create;
+            UserData[Nr].ValuesUpper:=TStringList.Create;
+          end;
+          If UserData[Nr].ValuesUpper.IndexOf(ExtUpperCase(T))<0 then begin
+            UserData[Nr].Values.Add(T);
+            UserData[Nr].ValuesUpper.Add(ExtUpperCase(T));
+          end;
+        end;
+      finally
+        St.Free;
+      end;
+    end;
+
+    { Build menu from user data }
+
+    For I:=0 to length(UserData)-1 do begin
+      BuildSelectPopupSubMenu(Popup,UserData[I].Name,MenuSelect,MenuUnselect,-1,OnClick,UserData[I].Values);
+    end;
+
+  finally
+    { Free records }
+
+    For I:=0 to length(UserData)-1 do begin
+      UserData[I].Values.Free;
+      UserData[I].ValuesUpper.Free;
+    end;
+  end;
+end;
+
+Function UserDataContainValue(const UserInfo, Key, Value : String) : Boolean;
+Var St : TStringList;
+    I,J : Integer;
+    S,T : String;
+begin
+  result:=False;
+
+  St:=StringToStringList(UserInfo);
+  try
+    For I:=0 to St.Count-1 do begin
+      S:=Trim(ExtUpperCase(St[I]));
+      J:=Pos('=',S);
+      If J=0 then continue;
+      T:=Trim(Copy(S,J+1,MaxInt));
+      S:=Trim(Copy(S,1,J-1));
+      If (S=Key) and (T=Value) then begin result:=True; exit; end;
+    end;
   finally
     St.Free;
   end;
@@ -294,26 +376,31 @@ Var Select : Boolean;
     I : Integer;
     M : TMenuItem;
     G : TGame;
-    S : String;
+    S, CategoryName : String;
 begin
   If not (Sender is TMenuItem) then exit;
   M:=Sender as TMenuItem;
   CategoryValue:=RemoveUnderline(Trim(ExtUpperCase(M.Caption)));
   Category:=M.Parent.Tag;
   Select:=(M.Parent.Parent.Tag=1);
+  If Category=-1 then CategoryName:=RemoveUnderline(ExtUpperCase(M.Parent.Caption)) else CategoryName:='';
 
   For I:=0 to CheckListBox.Items.Count-1 do begin
     G:=TGame(CheckListBox.Items.Objects[I]);
-    Case Category of
-      0 : S:=G.CacheGenre;
-      1 : S:=G.CacheDeveloper;
-      2 : S:=G.CachePublisher;
-      3 : S:=G.CacheYear;
-      4 : S:=G.CacheLanguage;
+    If CategoryName<>'' then begin
+      If not UserDataContainValue(G.UserInfo,CategoryName,CategoryValue) then continue;
+    end else begin
+      Case Category of
+        0 : S:=G.CacheGenre;
+        1 : S:=G.CacheDeveloper;
+        2 : S:=G.CachePublisher;
+        3 : S:=G.CacheYear;
+        4 : S:=G.CacheLanguage;
+      end;
+      S:=Trim(S);
+      If S='' then continue;
+      If ExtUpperCase(S)<>CategoryValue then continue;
     end;
-    S:=Trim(S);
-    If S='' then continue;
-    If ExtUpperCase(S)<>CategoryValue then continue;
     CheckListBox.Checked[I]:=Select;
   end;
 end;
@@ -380,8 +467,9 @@ begin
   end else begin
     Icon:=TIcon.Create;
     try
-      If FileExists(IncludeTrailingPathDelimiter(PrgDataDir+IconsSubDir)+Game.Icon) then begin
-        B:=True; try Icon.LoadFromFile(IncludeTrailingPathDelimiter(PrgDataDir+IconsSubDir)+Game.Icon); except B:=False; end;
+      S:=MakeAbsIconName(Game.Icon);
+      If FileExists(S) then begin
+        B:=True; try Icon.LoadFromFile(S); except B:=False; end;
       end else begin
         B:=False;
       end;
@@ -395,7 +483,11 @@ begin
     If B then IconNr:=AListViewImageList.Count-1 else IconNr:=0;
   end;
 
-  AListView.AddItem(Game.CacheName,Game);
+  If (Game.CacheName='') and (not Game.OwnINI) then begin
+    AListView.AddItem(LanguageSetup.TemplateFormDefault,Game);
+  end else begin
+    AListView.AddItem(Game.CacheName,Game);
+  end;
 
   with AListView.Items[AListView.Items.Count-1] do begin
     Data:=Game;
@@ -427,7 +519,12 @@ begin
   end;
 end;
 
-Procedure AddGamesToList(const AListView : TListView; const AListViewImageList, AListViewIconImageList, AImageList : TImageList; const GameDB : TGameDB; const Group, SubGroup, SearchString : String; const ShowExtraInfo : Boolean; const SortBy : TSortListBy; const ReverseOrder : Boolean);
+Procedure AddGamesToList(const AListView : TListView; const AListViewImageList, AListViewIconImageList, AImageList : TImageList; const GameDB : TGameDB; const Group, SubGroup, SearchString : String; const ShowExtraInfo : Boolean; const SortBy : TSortListBy; const ReverseOrder : Boolean; const HideScummVMProfiles : Boolean);
+begin
+  AddGamesToList(AListView,AListViewImageList,AListViewIconImageList,AImageList,GameDB,nil,Group,SubGroup,SearchString,ShowExtraInfo,SortBy,ReverseOrder,HideScummVMProfiles);
+end;
+
+Procedure AddGamesToList(const AListView : TListView; const AListViewImageList, AListViewIconImageList, AImageList : TImageList; const GameDB : TGameDB; const Game : TGame; const Group, SubGroup, SearchString : String; const ShowExtraInfo : Boolean; const SortBy : TSortListBy; const ReverseOrder : Boolean; const HideScummVMProfiles : Boolean); overload;
 Var I,J,K,Nr : Integer;
     GroupUpper, SubGroupUpper, SearchStringUpper : String;
     B : Boolean;
@@ -452,6 +549,7 @@ begin
       B:=(Group=LanguageSetup.GameFavorites);
       for I:=0 to GameDB.Count-1 do begin
         If B and (not GameDB[I].Favorite) then continue;
+        If HideScummVMProfiles and ScummVMMode(GameDB[I]) then continue;
         If (SearchStringUpper<>'') and (Pos(SearchStringUpper,ExtUpperCase(GameDB[I].Name))=0) then continue;
         List.Add(GameDB[I]);
       end;
@@ -466,6 +564,7 @@ begin
       If Group=LanguageSetup.GameLanguage then Nr:=4;
 
       For I:=0 to GameDB.Count-1 do begin
+        If HideScummVMProfiles and ScummVMMode(GameDB[I]) then continue;
         B:=False;
         Case Nr of
           0 : B:=(ExtUpperCase(GameDB[I].CacheGenre)=SubGroupUpper);
@@ -491,6 +590,8 @@ begin
         List.Add(GameDB[I]);
       end;
     end;
+
+    If Game<>nil then List.Add(Game);
 
     {Sort games}
     St:=TStringList.Create;
@@ -799,6 +900,16 @@ begin
     G.GameExe:=RemoveBackslash(MakeRelPath(G.GameExe,PrgSetup.BaseDir));
     G.SetupExe:=RemoveBackslash(MakeRelPath(G.SetupExe,PrgSetup.BaseDir));
     G.CaptureFolder:=RemoveBackslash(MakeRelPath(G.CaptureFolder,PrgSetup.BaseDir));
+    G.DataDir:=RemoveBackslash(MakeRelPath(G.DataDir,PrgSetup.BaseDir));
+
+    St:=ValueToList(G.ExtraFiles);
+    try
+      For J:=0 to St.Count-1 do G.ExtraFiles:=RemoveBackslash(MakeRelPath(St[J],PrgSetup.BaseDir));
+      G.ExtraFiles:=StringListToString(St);
+    finally
+      St.Free;
+    end;
+
     St:=ValueToList(G.ExtraDirs);
     try
       For J:=0 to St.Count-1 do G.ExtraDirs:=RemoveBackslash(MakeRelPath(St[J],PrgSetup.BaseDir));
@@ -806,7 +917,6 @@ begin
     finally
       St.Free;
     end;
-    G.DataDir:=RemoveBackslash(MakeRelPath(G.DataDir,PrgSetup.BaseDir));
 
     For J:=0 to G.NrOfMounts-1 do begin
       Case J of
@@ -854,17 +964,110 @@ begin
   end;
 end;
 
-Function BuildDefaultDosProfile(const GameDB : TGameDB) : TGame;
+Function CopyFiles(Source, Dest : String) : Boolean;
 Var I : Integer;
+    Rec : TSearchRec;
+begin
+  result:=False;
+
+  Source:=IncludeTrailingPathDelimiter(Source);
+  Dest:=IncludeTrailingPathDelimiter(Dest);
+  if not ForceDirectories(Dest) then exit;
+
+  I:=FindFirst(Source+'*.*',faAnyFile,Rec);
+  try
+    while I=0 do begin
+      If (Rec.Attr and faDirectory)<>0 then begin
+        If (Rec.Name<>'.') and (Rec.Name<>'..') then begin
+          If not CopyFiles(Source+Rec.Name,Dest+Rec.Name) then exit;
+        end;
+      end else begin
+        Application.ProcessMessages;
+        if not CopyFile(PChar(Source+Rec.Name),PChar(Dest+Rec.Name),False) then exit;
+      end;
+
+      I:=FindNext(Rec);
+    end;
+  finally
+    FindClose(Rec);
+  end;
+
+  result:=True;
+end;
+
+Function RestoreFREEDOSFolder : Boolean;
+Var Source1, Source2, Dest1, Dest2 : String;
+    B1, B2 : Boolean;
+begin
+  result:=True;
+
+  Source1:=PrgDir+NewUserDataSubDir+'\FREEDOS';
+  Source2:=PrgDir+NewUserDataSubDir+'\DOSZIP';
+  Dest1:=IncludeTrailingPathDelimiter(PrgSetup.GameDir)+'FREEDOS';
+  Dest2:=IncludeTrailingPathDelimiter(PrgSetup.GameDir)+'DOSZIP';
+  B1:=DirectoryExists(Source1) and not DirectoryExists(Dest1);
+  B2:=DirectoryExists(Source2) and not DirectoryExists(Dest2);
+
+  If B1 or B2 then begin
+    LoadAndShowSmallWaitForm(LanguageSetup.SetupFormService3WaitInfo);
+    try
+      If B1 then result:=CopyFiles(Source1,Dest1);
+      If B2 then result:=CopyFiles(Source2,Dest2);
+    finally
+      FreeSmallWaitForm;
+    end;
+  end;
+end;
+
+Function BuildDefaultDosProfile(const GameDB : TGameDB; const CopyFiles : Boolean) : TGame;
+Var I : Integer;
+    St : TStringList;
 begin
   I:=GameDB.IndexOf(DosBoxDOSProfile);
   If I>=0 then result:=GameDB[I] else result:=GameDB[GameDB.Add(DosBoxDOSProfile)];
 
-  result.Autoexec:=
-    'C:[13][10][13][10]If exist C:\FREEDOS\COMMAND.COM goto AddFreeDos[13][10]Goto Next1[13][10]:AddFreeDos[13][10]set path=%PATH%;C:\FREEDOS[13][10]:Next1[13][10][13][10]'+
-    'If exist C:\NC55\NC.EXE goto AddNC55[13][10]Goto Next2[13][10]:AddNC55[13][10]set path=%PATH%;C:\NC55[13][10]Goto Next3[13][10]:Next2[13][10][13][10]'+
-    'If exist C:\NC551\NC.EXE goto AddNC551[13][10]Goto Next3[13][10]:AddNC551[13][10]set path=%PATH%;C:\NC551[13][10]:Next3[13][10][13][10]'+
-    'If exist C:\NDN\NDN.COM goto AddNDN[13][10]Goto Next 4[13][10]:AddNDN[13][10]set path=%PATH%;C:\NDN[13][10]:Next[13]';
+  St:=TStringList.Create;
+  try
+    St.Add('C:');
+    St.Add('');
+    St.Add('If exist C:\FREEDOS\COMMAND.COM goto AddFreeDos');
+    St.Add('Goto Next1');
+    St.Add(':AddFreeDos');
+    St.Add('set path=%PATH%;C:\FREEDOS');
+    St.Add(':Next1');
+    St.Add('');
+    St.Add('If exist C:\NC55\NC.EXE goto AddNC55');
+    St.Add('Goto Next2');
+    St.Add(':AddNC55');
+    St.Add('set path=%PATH%;C:\NC55');
+    St.Add('echo You can start Norton Commander (file manager) by typing "NC".');
+    St.Add('Goto Next3');
+    St.Add(':Next2');
+    St.Add('');
+    St.Add('If exist C:\NC551\NC.EXE goto AddNC551');
+    St.Add('Goto Next3');
+    St.Add(':AddNC551');
+    St.Add('set path=%PATH%;C:\NC551');
+    St.Add('echo You can start Norton Commander (file manager) by typing "NC".');
+    St.Add(':Next3');
+    St.Add('');
+    St.Add('If exist C:\NDN\NDN.COM goto AddNDN');
+    St.Add('Goto Next4');
+    St.Add(':AddNDN');
+    St.Add('set path=%PATH%;C:\NDN');
+    St.Add('echo You can start Necromancer''s Dos Navigator (file manager) by typing "NDN".');
+    St.Add(':Next4');
+    St.Add('');
+    St.Add('If exist C:\DOSZIP\DZ.EXE goto AddDZ');
+    St.Add('Goto Next5');
+    St.Add(':AddDZ');
+    St.Add('set path=%PATH%;C:\DOSZIP');
+    St.Add('echo You can start Doszip Commander (file manager) by typing "DZ".');
+    St.Add(':Next5');
+    result.Autoexec:=StringListToString(St);
+  finally
+    St.Free;
+  end;
   result.NrOfMounts:=1;
   result.Mount0:=MakeRelPath(PrgSetup.GameDir,PrgSetup.BaseDir)+';Drive;C;false;';
   result.CloseDosBoxAfterGameExit:=False;
@@ -879,9 +1082,24 @@ begin
   result.Publisher:='DOSBox Team';
   result.Year:='2007';
   result.Language:='multilingual';
-  result.Icon:='DosBox.ico';
+  result.UserInfo:='License=GPL[13]';
+  result.Icon:='DOSBox.ico';
 
+  result.StoreAllValues;
   result.LoadCache;
+
+  If (PrgDir<>PrgDataDir) and DirectoryExists(PrgDir+NewUserDataSubDir) then begin
+    If FileExists(PrgDir+NewUserDataSubDir+'\'+IconsSubDir+'\DOSBox.ico') then begin
+      ForceDirectories(PrgDataDir+IconsSubDir);
+      CopyFile(PChar(PrgDir+NewUserDataSubDir+'\'+IconsSubDir+'\'+'DOSBox.ico'),PChar(PrgDataDir+IconsSubDir+'\DOSBox.ico'),False);
+    end;
+    If FileExists(PrgDir+NewUserDataSubDir+'\'+CaptureSubDir+'\DOSBox DOS\dosbox_000.png') then begin
+      ForceDirectories(PrgDataDir+CaptureSubDir+'\DOSBox DOS');
+      CopyFile(PChar(PrgDir+NewUserDataSubDir+'\'+CaptureSubDir+'\DOSBox DOS\dosbox_000.png'),PChar(PrgDataDir+CaptureSubDir+'\DOSBox DOS\dosbox_000.png'),False);
+    end;
+  end;
+
+  If CopyFiles then RestoreFREEDOSFolder;
 end;
 
 Procedure BuildDefaultProfile;
@@ -898,10 +1116,40 @@ begin
   end;
 end;
 
+Procedure CopyTemplates(Dir1, Dir2 : String);
+Var Rec : TSearchRec;
+    I : Integer;
+begin
+  Dir1:=IncludeTrailingPathDelimiter(Dir1);
+  Dir2:=IncludeTrailingPathDelimiter(Dir2);
+  I:=FindFirst(Dir1+'*.prof',faAnyFile,Rec);
+  try
+    While I=0 do begin
+      CopyFile(PChar(Dir1+Rec.Name),PChar(Dir2+Rec.Name),False);
+      I:=FindNext(Rec);
+    end;
+  finally
+    FindClose(Rec);
+  end;
+end;
+
+Procedure ReBuildTemplates;
+begin
+  If PrgDir=PrgDataDir then exit;
+
+  ForceDirectories(PrgDataDir+TemplateSubDir);
+  If DirectoryExists(PrgDir+NewUserDataSubDir+'\'+TemplateSubDir) then
+    CopyTemplates(PrgDir+NewUserDataSubDir+'\'+TemplateSubDir,PrgDataDir+TemplateSubDir);
+
+  ForceDirectories(PrgDataDir+AutoSetupSubDir);
+  If DirectoryExists(PrgDir+NewUserDataSubDir+'\'+AutoSetupSubDir) then
+    CopyTemplates(PrgDir+NewUserDataSubDir+'\'+AutoSetupSubDir,PrgDataDir+AutoSetupSubDir);
+end;
+
 Procedure ExportGamesListTextFile(const GameDB : TGameDB; const St : TStringList);
 Var St2 : TStringList;
-    I,Len : Integer;
-    S1,S2,S3,S4,S5,S6 : String;
+    I,J,Len : Integer;
+    S1,S2,S3,S4,S5,S6,S7 : String;
     L : TList;
 begin
   S1:=LanguageSetup.GameGenre;
@@ -910,8 +1158,18 @@ begin
   S4:=LanguageSetup.GameYear;
   S5:=LanguageSetup.GameLanguage;
   S6:=LanguageSetup.GameWWW;
+  S7:=LanguageSetup.GameNotes;
 
   Len:=Max(Max(Max(Max(Max(length(S1),length(S2)),length(S3)),length(S4)),length(S5)),length(S6));
+
+  For I:=0 to GameDB.Count-1 do begin
+    St2:=StringToStringList(GameDB[I].UserInfo);
+    try
+      For J:=0 to St2.Count-1 do If Pos('=',St2[J])>0 then Len:=Max(Len,length(Trim(Copy(St2[J],1,Pos('=',St2[J])-1))));
+    finally
+      St2.Free;
+    end;
+  end;
 
   while length(S1)<Len do S1:=S1+' ';
   while length(S2)<Len do S2:=S2+' ';
@@ -932,14 +1190,21 @@ begin
       St.Add(S4+' : '+Year);
       St.Add(S5+' : '+Language);
       St.Add(S6+' : '+WWW);
-      If Notes<>'' then begin
-        St.Add(LanguageSetup.GameNotes+':');
-        St2:=StringToStringList(Notes);
+      If UserInfo<>'' then begin
+        St2:=StringToStringList(UserInfo);
         try
-          St.AddStrings(St2);
+          For J:=0 to St2.Count-1 do If Pos('=',St2[J])>0 then begin
+            S7:=Trim(Copy(St2[J],1,Pos('=',St2[J])-1));
+            while length(S7)<Len do S7:=S7+' ';
+            St.Add(S7+' : '+Copy(St2[J],Pos('=',St2[J])+1,MaxInt));
+          end;
         finally
           St2.Free;
         end;
+      end;
+      If Notes<>'' then begin
+        St.Add(LanguageSetup.GameNotes+':');
+        St2:=StringToStringList(Notes); try St.AddStrings(St2); finally St2.Free; end;
       end;
     end;
   finally
@@ -948,16 +1213,56 @@ begin
 end;
 
 Procedure ExportGamesListTableFile(const GameDB : TGameDB; const St : TStringList);
-Var I : Integer;
+Var I,J,K : Integer;
     L : TList;
+    UserList, UserListUpper, St2 : TStringList;
+    S,T : String;
 begin
-  St.Add(Format('"%s";"%s";"%s";"%s";"%s";"%s";"%s"',[LanguageSetup.GameName,LanguageSetup.GameGenre,LanguageSetup.GameDeveloper,LanguageSetup.GamePublisher,LanguageSetup.GameYear,LanguageSetup.GameLanguage,LanguageSetup.GameWWW]));
-  L:=GameDB.GetSortedGamesList;
+  UserList:=TStringList.Create;
+  UserListUpper:=TStringList.Create;
   try
-    For I:=0 to L.Count-1 do with TGame(L[I]) do
-      St.Add(Format('"%s";"%s";"%s";"%s";"%s";"%s";"%s"',[Name,Genre,Developer,Publisher,Year,Language,WWW]));
+
+    For I:=0 to GameDB.Count-1 do begin
+      St2:=StringToStringList(GameDB[I].UserInfo);
+      try
+        For J:=0 to St2.Count-1 do If Pos('=',St2[J])>0 then begin
+          S:=Trim(Copy(St2[J],1,Pos('=',St2[J])-1));
+          If UserListUpper.IndexOf(ExtUpperCase(S))<0 then begin UserList.Add(S); UserListUpper.Add(ExtUpperCase(S)); end;
+        end;
+      finally
+        St2.Free;
+      end;
+    end;
+
+    S:=Format('"%s";"%s";"%s";"%s";"%s";"%s";"%s"',[LanguageSetup.GameName,LanguageSetup.GameGenre,LanguageSetup.GameDeveloper,LanguageSetup.GamePublisher,LanguageSetup.GameYear,LanguageSetup.GameLanguage,LanguageSetup.GameWWW]);
+    For I:=0 to UserList.Count-1 do S:=S+';"'+UserList[I]+'"';
+    St.Add(S);
+    L:=GameDB.GetSortedGamesList;
+    try
+      For I:=0 to L.Count-1 do with TGame(L[I]) do begin
+        S:=Format('"%s";"%s";"%s";"%s";"%s";"%s";"%s"',[Name,Genre,Developer,Publisher,Year,Language,WWW]);
+        St2:=StringToStringList(UserInfo);
+        try
+          For J:=0 to UserList.Count-1 do begin
+            T:='';
+            For K:=0 to St2.Count-1 do If Pos('=',St2[K])>0 then begin
+              If Trim(ExtUpperCase(Copy(St2[K],1,Pos('=',St2[K])-1)))=UserListUpper[J] then begin
+                T:=Trim(Copy(St2[K],Pos('=',St2[K])+1,MaxInt)); break;
+              end;
+            end;
+            S:=S+';"'+T+'"';
+          end;
+        finally
+          St2.Free;
+        end;
+        St.Add(S);
+      end;
+    finally
+      L.Free;
+    end;
   finally
-    L.Free;
+    UserList.Free;
+    UserListUpper.Free;
   end;
 end;
 
@@ -994,47 +1299,86 @@ begin
 end;
 
 Procedure ExportGamesListHTMLFile(const GameDB : TGameDB; const St : TStringList);
-Var I : Integer;
+Var I,J,K : Integer;
     L : TList;
+    UserList, UserListUpper, St2 : TStringList;
+    S : String;
 begin
-  St.Add('<!DOCTYPE HTML PUBLIC "-/'+'/W3C/'+'/DTD HTML 4.01 Transitional/'+'/EN">');
-  St.Add('<html>');
-  St.Add('  <head>');
-  St.Add('    <title>D-Fend Reloaded</title>');
-  St.Add('    <meta http-equiv="content-type" content="text/html; charset=iso-8859-1">');
-  St.Add('  </head>');
-  St.Add('  <body>');
-  St.Add('    <table>');
-  St.Add('      <tr>');
-  St.Add(Format('        <th>%s</th>',[LanguageSetup.GameName]));
-  St.Add(Format('        <th>%s</th>',[LanguageSetup.GameGenre]));
-  St.Add(Format('        <th>%s</th>',[LanguageSetup.GameDeveloper]));
-  St.Add(Format('        <th>%s</th>',[LanguageSetup.GamePublisher]));
-  St.Add(Format('        <th>%s</th>',[LanguageSetup.GameYear]));
-  St.Add(Format('        <th>%s</th>',[LanguageSetup.GameLanguage]));
-  St.Add(Format('        <th>%s</th>',[LanguageSetup.GameWWW]));
-  St.Add('      </tr>');
-  L:=GameDB.GetSortedGamesList;
+  UserList:=TStringList.Create;
+  UserListUpper:=TStringList.Create;
   try
-    For I:=0 to L.Count-1 do with TGame(L[I]) do begin
-      St.Add('      <tr>');
-      St.Add(Format('        <td>%s</td>',[EncodeHTMLSymbols(Name)]));
-      St.Add(Format('        <td>%s</td>',[EncodeHTMLSymbols(Genre)]));
-      St.Add(Format('        <td>%s</td>',[EncodeHTMLSymbols(Developer)]));
-      St.Add(Format('        <td>%s</td>',[EncodeHTMLSymbols(Publisher)]));
-      St.Add(Format('        <td>%s</td>',[EncodeHTMLSymbols(Year)]));
-      St.Add(Format('        <td>%s</td>',[EncodeHTMLSymbols(Language)]));
-      If Trim(WWW)<>''
-        then St.Add(Format('        <td><a href="%s">%s</a></td>',[WWW,WWW]))
-        else St.Add('        <td></td>');
+
+    For I:=0 to GameDB.Count-1 do begin
+      St2:=StringToStringList(GameDB[I].UserInfo);
+      try
+        For J:=0 to St2.Count-1 do If Pos('=',St2[J])>0 then begin
+          S:=Trim(Copy(St2[J],1,Pos('=',St2[J])-1));
+          If UserListUpper.IndexOf(ExtUpperCase(S))<0 then begin UserList.Add(S); UserListUpper.Add(ExtUpperCase(S)); end;
+        end;
+      finally
+        St2.Free;
+      end;
     end;
+
+    St.Add('<!DOCTYPE HTML PUBLIC "-/'+'/W3C/'+'/DTD HTML 4.01 Transitional/'+'/EN">');
+    St.Add('<html>');
+    St.Add('  <head>');
+    St.Add('    <title>D-Fend Reloaded</title>');
+    St.Add('    <meta http-equiv="content-type" content="text/html; charset=iso-8859-1">');
+    St.Add('    <meta name="description" content="D-Fend Reloaded games list">');
+    St.Add('    <meta name="DC.creator" content="D-Fend Reloaded '+GetNormalFileVersionAsString+'">');
+    St.Add('  </head>');
+    St.Add('  <body>');
+    St.Add('    <table>');
+    St.Add('      <tr>');
+    St.Add(Format('        <th>%s</th>',[LanguageSetup.GameName]));
+    St.Add(Format('        <th>%s</th>',[LanguageSetup.GameGenre]));
+    St.Add(Format('        <th>%s</th>',[LanguageSetup.GameDeveloper]));
+    St.Add(Format('        <th>%s</th>',[LanguageSetup.GamePublisher]));
+    St.Add(Format('        <th>%s</th>',[LanguageSetup.GameYear]));
+    St.Add(Format('        <th>%s</th>',[LanguageSetup.GameLanguage]));
+    St.Add(Format('        <th>%s</th>',[LanguageSetup.GameWWW]));
+    For I:=0 to UserList.Count-1 do St.Add(Format('        <th>%s</th>',[UserList[I]]));
+    St.Add('      </tr>');
+    L:=GameDB.GetSortedGamesList;
+    try
+      For I:=0 to L.Count-1 do with TGame(L[I]) do begin
+        St.Add('      <tr>');
+        St.Add(Format('        <td>%s</td>',[EncodeHTMLSymbols(Name)]));
+        St.Add(Format('        <td>%s</td>',[EncodeHTMLSymbols(Genre)]));
+        St.Add(Format('        <td>%s</td>',[EncodeHTMLSymbols(Developer)]));
+        St.Add(Format('        <td>%s</td>',[EncodeHTMLSymbols(Publisher)]));
+        St.Add(Format('        <td>%s</td>',[EncodeHTMLSymbols(Year)]));
+        St.Add(Format('        <td>%s</td>',[EncodeHTMLSymbols(Language)]));
+        If Trim(WWW)<>''
+          then St.Add(Format('        <td><a href="%s">%s</a></td>',[WWW,WWW]))
+          else St.Add('        <td></td>');
+        St2:=StringToStringList(UserInfo);
+        try
+          For J:=0 to UserList.Count-1 do begin
+            S:='';
+            For K:=0 to St2.Count-1 do If Pos('=',St2[K])>0 then begin
+              If Trim(ExtUpperCase(Copy(St2[K],1,Pos('=',St2[K])-1)))=UserListUpper[J] then begin
+                S:=Trim(Copy(St2[K],Pos('=',St2[K])+1,MaxInt)); break;
+              end;
+            end;
+            St.Add(Format('        <td>%s</td>',[EncodeHTMLSymbols(S)]));
+          end;
+        finally
+          St2.Free;
+        end;
+        St.Add('      </tr>');
+      end;
+    finally
+      L.Free;
+    end;
+    St.Add('    </table>');
+    St.Add('  </body>');
+    St.Add('</html>');
   finally
-    L.Free;
+    UserList.Free;
+    UserListUpper.Free;
   end;
-  St.Add('      </tr>');
-  St.Add('    </table>');
-  St.Add('  </body>');
-  St.Add('</html>');
 end;
 
 Procedure ExportGamesList(const GameDB : TGameDB; const FileName : String);
@@ -1048,7 +1392,7 @@ begin
     If S='.CSV' then ExportGamesListTableFile(GameDB,St);
     If (S='.HTML') or (S='.HTM') then ExportGamesListHTMLFile(GameDB,St);
     If St.Count=0 then ExportGamesListTextFile(GameDB,St);
-    
+
     try
       St.SaveToFile(FileName);
     except
@@ -1065,9 +1409,9 @@ begin
   DefaultGame:=TGame.Create(PrgSetup);
   try
     If PrgSetup.DFendStyleProfileEditor then begin
-      EditGameProfil(AOwner,GameDB,DefaultGame,nil);
+      EditGameTemplate(AOwner,GameDB,DefaultGame,nil);
     end else begin
-      ModernEditGameProfil(AOwner,GameDB,DefaultGame,nil);
+      ModernEditGameTemplate(AOwner,GameDB,DefaultGame,nil);
     end;
   finally
     DefaultGame.Free;
@@ -1151,6 +1495,68 @@ begin
   result:=(S='TRUE') or (S='T') or (S='1');
 end;
 
+Procedure AddDrive(const Game : TGame; const RealFolder, Letter, FreeSpace : String);
+Var S : String;
+begin
+  {RealFolder;DRIVE;Letter;False;;FreeSpace}
+  S:=MakeRelPath(RealFolder,PrgSetup.BaseDir)+';Drive;'+Letter+';;'+FreeSpace;
+
+  Case Game.NrOfMounts of
+    0 : Game.Mount0:=S;
+    1 : Game.Mount1:=S;
+    2 : Game.Mount2:=S;
+    3 : Game.Mount3:=S;
+    4 : Game.Mount4:=S;
+    5 : Game.Mount5:=S;
+    6 : Game.Mount6:=S;
+    7 : Game.Mount7:=S;
+    8 : Game.Mount8:=S;
+    9 : Game.Mount9:=S;
+  end;
+  Game.NrOfMounts:=Game.NrOfMounts+1;
+end;
+
+Procedure MakeMountsFromAutoexec(const Game : TGame; const Autoexec : TStringList);
+Var I,J,K : Integer;
+    S,SUpper,T,U : String;
+
+begin
+  I:=0;
+  while I<Autoexec.Count do begin
+    If Game.NrOfMounts=10 then exit;
+
+    S:=Trim(Autoexec[I]);
+    If (S<>'') and (S[1]='@') then S:=Trim(Copy(S,2,MaxInt));
+    SUpper:=ExtUpperCase(S);
+    If (S='') or (Copy(SUpper,1,4)='ECHO') or (Copy(SUpper,1,3)='REM') or (Copy(SUpper,1,4)='SET ') or (Copy(SUpper,1,5)='KEYB ') then begin inc(I); continue; end;
+    If Copy(SUpper,1,6)<>'MOUNT ' then exit;
+    S:=Trim(Copy(S,7,MaxInt));
+
+    J:=Pos(' ',S); If J=0 then begin inc(I); continue; end;
+    T:=Trim(Copy(S,1,J-1)); S:=Trim(Copy(S,J+1,MaxInt));
+
+    If length(T)=3 then begin If (T[2]<>':') or (T[3]<>'\') then exit; T:=T[1]; end;
+    If length(T)=2 then begin If T[2]<>':' then exit; T:=T[1]; end;
+    T:=ExtUpperCase(T);
+    If (T<'A') or (T>'Z') then begin inc(I); continue; end;
+
+    If S[1]='"' then begin
+      S:=Trim(Copy(S,2,MaxInt));
+      K:=-1;
+      For J:=1 to length(S) do If S[J]='"' then begin K:=J; break; end;
+      If K=-1 then begin U:=S; S:=''; end else begin U:=Trim(Copy(S,1,K-1)); S:=Trim(Copy(S,K+1,MaxInt)); end;
+    end else begin
+      J:=Pos(' ',S); If J>0 then begin U:=Trim(Copy(S,1,J-1)); S:=Trim(Copy(S,J+1,MaxInt)); end else begin U:=S; S:=''; end;
+    end;
+
+    If Trim(ExtUpperCase(Copy(U,1,9)))='-FREESIZE' then U:=Trim(Copy(U,10,MaxInt));
+
+    AddDrive(Game,U,T,S);
+    Autoexec.Delete(I);
+  end;
+
+end;
+
 Procedure LoadSpecialData(const Game : TGame; const FileName : String);
 Var St,Autoexec : TStringList;
     I : Integer;
@@ -1188,6 +1594,7 @@ begin
       If Sec=1 then Autoexec.Add(St[I]);
     end;
 
+    MakeMountsFromAutoexec(Game,Autoexec);
     Game.Autoexec:=StringListToString(Autoexec);
   finally
     St.Free;
@@ -1195,97 +1602,127 @@ begin
   end;
 end;
 
-Function ImportConfFile(const AGameDB : TGameDB; const AFileName : String) : TGame;
+Procedure ImportConfData(const AGame : TGame; const Lines : String);
+Var St : TStringList;
+begin
+  St:=TStringList.Create;
+  try
+    St.Text:=Lines;
+    ImportConfData(AGame,St);
+  finally
+    St.Free;
+  end;
+end;
+
+Procedure ImportConfData(const AGame : TGame; const St : TStringList);
+Var FileName : String;
+begin
+  FileName:=TempDir+'DFRTempConfFile.conf';
+  St.SaveToFile(FileName);
+  try
+    ImportConfFileData(AGame,FileName);
+  finally
+    DeleteFile(FileName);
+  end;
+end;
+
+Procedure ImportConfFileData(const AGame : TGame; const AFileName : String);
 Var INI : TINIFile;
 begin
   INI:=TIniFile.Create(AFileName);
   try
-    result:=AGameDB[AGameDB.Add(AGameDB.ProfFileName(ExtractFileName(AFileName)))];
+    AGame.StartFullscreen:=StrToBool(INI.ReadString('sdl','fullscreen','false'));
+    AGame.UseDoublebuffering:=StrToBool(INI.ReadString('sdl','fulldouble','false'));
+    AGame.Render:=Ini.ReadString('sdl','output','surface');
+    AGame.FullscreenResolution:=Ini.ReadString('sdl','fullresolution','original');
+    AGame.WindowResolution:=Ini.ReadString('sdl','windowresolution','original');
+    AGame.AutoLockMouse:=StrToBool(INI.ReadString('sdl','autolock','true'));
+    AGame.MouseSensitivity:=INI.ReadInteger('sdl','sensitivity',100);
+    AGame.Priority:=Ini.ReadString('sdl','priority','higher,normal');
+    AGame.UseScanCodes:=StrToBool(INI.ReadString('sdl','usescancodes','true'));
+    AGame.CustomKeyMappingFile:=INI.ReadString('sdl','mapperfile','');
+    If Trim(AGame.CustomKeyMappingFile)<>'' then AGame.CustomKeyMappingFile:=MakeRelPath(AGame.CustomKeyMappingFile,PrgSetup.BaseDir);
 
-    result.StartFullscreen:=StrToBool(INI.ReadString('sdl','fullscreen','false'));
-    result.UseDoublebuffering:=StrToBool(INI.ReadString('sdl','fulldouble','false'));
-    result.Render:=Ini.ReadString('sdl','output','surface');
-    result.FullscreenResolution:=Ini.ReadString('sdl','fullresolution','original');
-    result.WindowResolution:=Ini.ReadString('sdl','windowresolution','original');
-    result.AutoLockMouse:=StrToBool(INI.ReadString('sdl','autolock','true'));
-    result.MouseSensitivity:=INI.ReadInteger('sdl','sensitivity',100);
-    result.Priority:=Ini.ReadString('sdl','priority','higher,normal');
-    result.UseScanCodes:=StrToBool(INI.ReadString('sdl','usescancodes','true'));
+    AGame.VideoCard:=Ini.ReadString('dosbox','machine','vga');
+    AGame.Memory:=INI.ReadInteger('dosbox','memsize',16);
+    AGame.CaptureFolder:=MakeRelPath(INI.ReadString('dosbox','captures','.\'+CaptureSubDir+'\'),PrgSetup.BaseDir);
 
-    result.VideoCard:=Ini.ReadString('dosbox','machine','vga');
-    result.Memory:=INI.ReadInteger('dosbox','memsize',16);
+    AGame.FrameSkip:=INI.ReadInteger('render','frameskip',0);
+    AGame.AspectCorrection:=StrToBool(INI.ReadString('render','aspect','false'));
+    AGame.Scale:=INI.ReadString('render','scaler','normal2x');
 
-    result.FrameSkip:=INI.ReadInteger('render','frameskip',0);
-    result.AspectCorrection:=StrToBool(INI.ReadString('render','aspect','false'));
-    result.Scale:=INI.ReadString('render','scaler','normal2x');
+    AGame.Core:=INI.ReadString('cpu','core','auto');
+    AGame.Cycles:=INI.ReadString('cpu','cycles','auto');
+    AGame.CyclesUp:=INI.ReadInteger('cpu','cycleup',500);
+    AGame.CyclesDown:=INI.ReadInteger('cpu','cycledown',20);
 
-    result.Core:=INI.ReadString('cpu','core','auto');
-    result.Cycles:=INI.ReadString('cpu','cycles','auto');
-    result.CyclesUp:=INI.ReadInteger('cpu','cycleup',500);
-    result.CyclesDown:=INI.ReadInteger('cpu','cycledown',20);
+    AGame.EMS:=StrToBool(INI.ReadString('dos','ems','true'));
+    AGame.XMS:=StrToBool(INI.ReadString('dos','xms','true'));
+    AGame.UMB:=StrToBool(INI.ReadString('dos','umb','true'));
+    AGame.KeyboardLayout:=INI.ReadString('dos','keyboardlayout','none');
 
-    result.EMS:=StrToBool(INI.ReadString('dos','ems','true'));
-    result.XMS:=StrToBool(INI.ReadString('dos','xms','true'));
-    result.UMB:=StrToBool(INI.ReadString('dos','umb','true'));
-    result.KeyboardLayout:=INI.ReadString('dos','keyboardlayout','none');
+    AGame.MixerNosound:=StrToBool(INI.ReadString('mixer','nosound','false'));
+    AGame.MixerRate:=Ini.ReadInteger('mixer','rate',22050);
+    AGame.MixerBlocksize:=Ini.ReadInteger('mixer','blocksize',2048);
+    AGame.MixerPrebuffer:=Ini.ReadInteger('mixer','prebuffer',10);
 
-    result.MixerNosound:=StrToBool(INI.ReadString('mixer','nosound','false'));
-    result.MixerRate:=Ini.ReadInteger('mixer','rate',22050);
-    result.MixerBlocksize:=Ini.ReadInteger('mixer','blocksize',2048);
-    result.MixerPrebuffer:=Ini.ReadInteger('mixer','prebuffer',10);
+    AGame.SBType:=Ini.ReadString('sblaster','sbtype','sb16');
+    AGame.SBBase:=Ini.ReadInteger('sblaster','sbbase',220);
+    AGame.SBIRQ:=Ini.ReadInteger('sblaster','irq',7);
+    AGame.SBDMA:=Ini.ReadInteger('sblaster','dma',1);
+    AGame.SBHDMA:=Ini.ReadInteger('sblaster','hdma',5);
+    AGame.SBMixer:=StrToBool(INI.ReadString('mixer','mixer','true'));
+    AGame.SBOplMode:=Ini.ReadString('sblaster','oplmode','auto');
+    AGame.SBOplRate:=Ini.ReadInteger('sblaster','oplrate',22050);
 
-    result.SBType:=Ini.ReadString('sblaster','sbtype','sb16');
-    result.SBBase:=Ini.ReadInteger('sblaster','sbbase',220);
-    result.SBIRQ:=Ini.ReadInteger('sblaster','irq',7);
-    result.SBDMA:=Ini.ReadInteger('sblaster','dma',1);
-    result.SBHDMA:=Ini.ReadInteger('sblaster','hdma',5);
-    result.SBMixer:=StrToBool(INI.ReadString('mixer','mixer','true'));
-    result.SBOplMode:=Ini.ReadString('sblaster','oplmode','auto');
-    result.SBOplRate:=Ini.ReadInteger('sblaster','oplrate',22050);
+    AGame.GUS:=StrToBool(INI.ReadString('gus','gus','true'));
+    AGame.GUSRate:=Ini.ReadInteger('gus','gusrate',22050);
+    AGame.GUSBase:=Ini.ReadInteger('gus','gusbase',240);
+    AGame.GUSIRQ1:=Ini.ReadInteger('gus','irg1',5);
+    AGame.GUSIRQ2:=Ini.ReadInteger('gus','irq2',5);
+    AGame.GUSDMA1:=Ini.ReadInteger('gus','dma1',3);
+    AGame.GUSDMA2:=Ini.ReadInteger('gus','dma2',3);
+    AGame.GUSUltraDir:=Ini.ReadString('gus','ultradir','C:\ULTRASND');
 
-    result.GUS:=StrToBool(INI.ReadString('gus','gus','true'));
-    result.GUSRate:=Ini.ReadInteger('gus','gusrate',22050);
-    result.GUSBase:=Ini.ReadInteger('gus','gusbase',240);
-    result.GUSIRQ1:=Ini.ReadInteger('gus','irg1',5);
-    result.GUSIRQ2:=Ini.ReadInteger('gus','irq2',5);
-    result.GUSDMA1:=Ini.ReadInteger('gus','dma1',3);
-    result.GUSDMA2:=Ini.ReadInteger('gus','dma2',3);
-    result.GUSUltraDir:=Ini.ReadString('gus','ultradir','C:\ULTRASND');
+    AGame.MIDIType:=Ini.ReadString('midi','mpu401','intelligent');
+    AGame.MIDIDevice:=Ini.ReadString('midi','device','default');
+    AGame.MIDIConfig:=Ini.ReadString('midi','config','');
 
-    result.MIDIType:=Ini.ReadString('midi','mpu401','intelligent');
-    result.MIDIDevice:=Ini.ReadString('midi','device','default');
-    result.MIDIConfig:=Ini.ReadString('midi','config','');
+    AGame.SpeakerPC:=StrToBool(INI.ReadString('speaker','pcspeaker','true'));
+    AGame.SpeakerRate:=Ini.ReadInteger('speaker','pcrate',22050);
+    AGame.SpeakerTandy:=Ini.ReadString('speaker','tandy','auto');
+    AGame.SpeakerRate:=Ini.ReadInteger('speaker','tandyrate',22050);
+    AGame.SpeakerDisney:=StrToBool(INI.ReadString('speaker','disney','true'));
 
-    result.SpeakerPC:=StrToBool(INI.ReadString('speaker','pcspeaker','true'));
-    result.SpeakerRate:=Ini.ReadInteger('speaker','pcrate',22050);
-    result.SpeakerTandy:=Ini.ReadString('speaker','tandy','auto');
-    result.SpeakerRate:=Ini.ReadInteger('speaker','tandyrate',22050);
-    result.SpeakerDisney:=StrToBool(INI.ReadString('speaker','disney','true'));
+    AGame.JoystickType:=Ini.ReadString('joystick','joysticktype','auto');
+    AGame.JoystickTimed:=StrToBool(INI.ReadString('joystick','timed','true'));
+    AGame.JoystickAutoFire:=StrToBool(INI.ReadString('joystick','autofire','false'));
+    AGame.JoystickSwap34:=StrToBool(INI.ReadString('joystick','swap34','false'));
+    AGame.JoystickButtonwrap:=StrToBool(INI.ReadString('joystick','buttonwrap','true'));
 
-    result.JoystickType:=Ini.ReadString('joystick','joysticktype','auto');
-    result.JoystickTimed:=StrToBool(INI.ReadString('joystick','timed','true'));
-    result.JoystickAutoFire:=StrToBool(INI.ReadString('joystick','autofire','false'));
-    result.JoystickSwap34:=StrToBool(INI.ReadString('joystick','swap34','false'));
-    result.JoystickButtonwrap:=StrToBool(INI.ReadString('joystick','buttonwrap','true'));
+    AGame.Serial1:=INI.ReadString('serial','serial1','dummy');
+    AGame.Serial2:=INI.ReadString('serial','serial2','dummy');
+    AGame.Serial3:=INI.ReadString('serial','serial3','disabled');
+    AGame.Serial4:=INI.ReadString('serial','serial4','disabled');
 
-    result.Serial1:=INI.ReadString('serial','serial1','dummy');
-    result.Serial2:=INI.ReadString('serial','serial2','dummy');
-    result.Serial3:=INI.ReadString('serial','serial3','disabled');
-    result.Serial4:=INI.ReadString('serial','serial4','disabled');
-
-    result.IPX:=StrToBool(INI.ReadString('ipx','ipx','false'));
+    AGame.IPX:=StrToBool(INI.ReadString('ipx','ipx','false'));
   finally
     Ini.Free;
   end;
+  LoadSpecialData(AGame,AFileName);
+end;
 
-  LoadSpecialData(result,AFileName);
+Function ImportConfFile(const AGameDB : TGameDB; const AFileName : String) : TGame;
+begin
+  result:=AGameDB[AGameDB.Add(ChangeFileExt(ExtractFileName(AGameDB.ProfFileName(ExtractFileName(AFileName))),''))];
+  ImportConfFileData(result,AFileName);
 end;
 
 Function GameCheckSumOK(const AGame : TGame) : Boolean;
 Var S,T : String;
 begin
   result:=True;
-  If AGame.GameExeMD5='' then exit;
+  If (AGame.GameExeMD5='') or (Trim(ExtUpperCase(AGame.GameExeMD5))='OFF') then exit;
   If AGame.GameExe='' then exit;
   T:=MakeAbsPath(AGame.GameExe,PrgSetup.BaseDir);
   If not FileExists(T) then exit;
@@ -1297,7 +1734,7 @@ Function SetupCheckSumOK(const AGame : TGame) : Boolean;
 Var S,T : String;
 begin
   result:=True;
-  If AGame.SetupExeMD5='' then exit;
+  If (AGame.SetupExeMD5='') or (Trim(ExtUpperCase(AGame.SetupExeMD5))='OFF') then exit;
   If AGame.SetupExe='' then exit;
   T:=MakeAbsPath(AGame.SetupExe,PrgSetup.BaseDir);
   If not FileExists(T) then exit;
@@ -1306,42 +1743,65 @@ begin
 end;
 
 Procedure CreateGameCheckSum(const AGame : TGame; const OverwriteExistingCheckSum : Boolean);
+Var S : String;
 begin
   If (AGame.GameExeMD5<>'') and (not OverwriteExistingCheckSum) then exit;
-  AGame.GameExeMD5:=GetMD5Sum(MakeAbsPath(AGame.GameExe,PrgSetup.BaseDir));
+  If Trim(ExtUpperCase(AGame.GameExeMD5))='OFF' then exit;
+  If AGame.GameExe='' then exit;
+  S:=MakeAbsPath(AGame.GameExe,PrgSetup.BaseDir);
+  if not FileExists(S) then exit;
+  AGame.GameExeMD5:=GetMD5Sum(S);
 end;
 
 Procedure CreateSetupCheckSum(const AGame : TGame; const OverwriteExistingCheckSum : Boolean);
+Var S : String;
 begin
   If (AGame.SetupExeMD5<>'') and (not OverwriteExistingCheckSum) then exit;
-  AGame.SetupExeMD5:=GetMD5Sum(MakeAbsPath(AGame.SetupExe,PrgSetup.BaseDir));
+  If Trim(ExtUpperCase(AGame.SetupExeMD5))='OFF' then exit;
+  If AGame.SetupExe='' then exit;
+  S:=MakeAbsPath(AGame.SetupExe,PrgSetup.BaseDir);
+  if not FileExists(S) then exit;
+  AGame.SetupExeMD5:=GetMD5Sum(S);
 end;
 
 Procedure ProfileEditorOpenCheck(const AGame : TGame);
 Var St : TStringList;
     S : String;
 begin
-  If AGame=nil then exit;
+  If (AGame=nil) or (not PrgSetup.UseCheckSumsForProfiles) then exit;
 
   If not GameCheckSumOK(AGame) then begin
     St:=StringToStringList(LanguageSetup.CheckSumProfileEditorMismatch); try S:=St.Text; finally St.Free; end;
-    if MessageDlg(Format(S,[AGame.GameExe]),mtWarning,[mbYes,mbNo],0)=mrYes then CreateGameCheckSum(AGame,True);
+    S:=Format(S,[AGame.GameExe]);
+    Case ShowCheckSumWarningDialog(Application.MainForm,S) of
+      cdYes : CreateGameCheckSum(AGame,True);
+      cdNo : ;
+      cdTurnOff : begin AGame.GameExeMD5:='Off'; AGame.SetupExeMD5:='Off'; end;
+    end;
   end;
   If not SetupCheckSumOK(AGame) then begin
     St:=StringToStringList(LanguageSetup.CheckSumProfileEditorMismatch); try S:=St.Text; finally St.Free; end;
-    if MessageDlg(Format(S,[AGame.GameExe]),mtWarning,[mbYes,mbNo],0)=mrYes then CreateSetupCheckSum(AGame,True);
+    S:=Format(S,[AGame.SetupExe]);
+    Case ShowCheckSumWarningDialog(Application.MainForm,S) of
+      cdYes : CreateSetupCheckSum(AGame,True);
+      cdNo : ;
+      cdTurnOff : begin AGame.GameExeMD5:='Off'; AGame.SetupExeMD5:='Off'; end;
+    end;
   end;
 end;
 
 Procedure ProfileEditorCloseCheck(const AGame : TGame; const NewGameExe, NewSetupExe : String);
 Var NewGameFileName, NewSetupFileName : String;
+    B1, B2 : Boolean;
 begin
   NewGameFileName:=Trim(ExtUpperCase(ExtractFileName(NewGameExe)));
   NewSetupFileName:=Trim(ExtUpperCase(ExtractFileName(NewSetupExe)));
-  CreateGameCheckSum(AGame,Trim(ExtUpperCase(ExtractFileName(AGame.GameExe)))<>NewGameFileName);
-  CreateSetupCheckSum(AGame,Trim(ExtUpperCase(ExtractFileName(AGame.SetupExe)))<>NewSetupFileName);
+  B1:=Trim(ExtUpperCase(ExtractFileName(AGame.GameExe)))<>NewGameFileName;
+  B2:=Trim(ExtUpperCase(ExtractFileName(AGame.SetupExe)))<>NewSetupFileName;
   AGame.GameExe:=NewGameExe;
   AGame.SetupExe:=NewSetupFileName;
+  CreateGameCheckSum(AGame,B1);
+  CreateSetupCheckSum(AGame,B2);
 end;
 
 Function RunCheck(const AGame : TGame; const RunSetup : Boolean) : Boolean;
@@ -1349,6 +1809,8 @@ Var S,T : String;
     St : TStringList;
 begin
   result:=True;
+  If not PrgSetup.UseCheckSumsForProfiles then exit;
+
   If RunSetup then begin
     If SetupCheckSumOK(AGame) then exit;
     S:=MakeAbsPath(AGame.SetupExe,PrgSetup.BaseDir);
@@ -1358,9 +1820,128 @@ begin
   end;
 
   St:=StringToStringList(LanguageSetup.CheckSumRunMismatch); try T:=St.Text; finally St.Free; end;
-  result:=(MessageDlg(Format(T,[S]),mtWarning,[mbYes,mbNo],0)=mrYes);
-  If result then begin
-    If RunSetup then CreateSetupCheckSum(AGame,True) else CreateGameCheckSum(AGame,True);
+  S:=Format(T,[S]);
+  Case ShowCheckSumWarningDialog(Application.MainForm,S) of
+    cdYes     : begin
+                  result:=True;
+                  If RunSetup then CreateSetupCheckSum(AGame,True) else CreateGameCheckSum(AGame,True);
+                end;
+    cdNo      : result:=False;
+    cdTurnOff : begin
+                  result:=True;
+                  AGame.GameExeMD5:='Off'; AGame.SetupExeMD5:='Off';
+                end;
+  end;
+end;
+
+Procedure CreateCheckSumsForAllGames(const AGameDB : TGameDB);
+Var I : Integer;
+begin
+  InitProgressWindow(Application.MainForm,AGameDB.Count);
+  try
+    For I:=0 to AGameDB.Count-1 do begin
+      CreateGameCheckSum(AGameDB[I],False);
+      CreateSetupCheckSum(AGameDB[I],False);
+      StepProgressWindow;
+    end;
+  finally
+    DoneProgressWindow;
+  end;
+end;
+
+Function GetLastModificationDate(const AGame : TGame) : String;
+Var I : Integer;
+    S,T : String;
+begin
+  result:='';
+  I:=Pos('-',AGame.LastModification); If I=0 then exit;
+  S:=''; try S:=DateToStr(StrToInt(Copy(AGame.LastModification,1,I-1))); except exit; end;
+  T:=''; try T:=TimeToStr(StrToInt(Copy(AGame.LastModification,I+1,MaxInt))/86400); except exit; end;
+  result:=S+' '+T;
+end;
+
+Function ScummVMMode(const Game : TGame) : Boolean;
+begin
+  result:=False;
+  If Game=nil then exit;
+  result:=(Trim(ExtUpperCase(Game.ProfileMode))='SCUMMVM');
+end;
+
+Function CheckGameDB(const GameDB : TGameDB) : TStringList;
+Var I,J : Integer;
+    Game : TGame;
+    S : String;
+    FirstError : Boolean;
+    St : TStringList;
+Procedure Error(const S : String); begin if FirstError then begin FirstError:=False; If result.Count>0 then result.Add(''); result.Add(Game.Name); end; result.Add('  '+S); end;
+begin
+  result:=TStringList.Create;
+
+  For I:=0 to GameDB.Count-1 do begin
+    Game:=GameDB[I];
+    FirstError:=True;
+
+    If ScummVMMode(Game) then begin
+      S:=IncludeTrailingPathDelimiter(MakeAbsPath(Trim(Game.ScummVMPath),PrgSetup.BaseDir));
+      If not DirectoryExists(S) then Error(Format('The game directory "%s" does not exist.',[S]));
+    end else begin
+      S:=Trim(Game.GameExe);
+      If (S<>'') and (ExtUpperCase(Copy(S,1,7))<>'DOSBOX:') then begin
+        S:=MakeAbsPath(S,PrgSetup.BaseDir);
+        If not FileExists(S) then Error(Format('The program file "%s" does not exist.',[S]));
+        //... checksum
+      end;
+      S:=Trim(Game.SetupExe);
+      If (S<>'') and (ExtUpperCase(Copy(S,1,7))='DOSBOX:') then begin
+        S:=MakeAbsPath(S,PrgSetup.BaseDir);
+        If not FileExists(S) then Error(Format('The setup file "%s" does not exist.',[S]));
+        //... checksum        
+      end;
+    end;
+
+    S:=Trim(Game.CaptureFolder);
+    If S<>'' then begin
+      S:=IncludeTrailingPathDelimiter(MakeAbsPath(S,PrgSetup.BaseDir));
+      If not DirectoryExists(S) then Error(Format('The capture folder "%s" does not exist.',[S]));
+    end;
+
+    S:=MakeAbsIconName(Game.Icon);
+    If S<>'' then begin
+      If not FileExists(S) then Error(Format('The icon file "%s" does not exist.',[S]));
+    end;
+
+    S:=Trim(Game.DataDir);
+    If S<>'' then begin
+      S:=IncludeTrailingPathDelimiter(MakeAbsPath(S,PrgSetup.BaseDir));
+      If not DirectoryExists(S) then Error(Format('The data directory "%s" does not exist.',[S]));
+    end;
+
+    S:=Trim(Game.ExtraFiles);
+    If S<>'' then begin
+      St:=ValueToList(S);
+      try
+        For J:=0 to St.Count-1 do If Trim(St[J])<>'' then begin
+          S:=MakeAbsPath(St[J],PrgSetup.BaseDir);
+          If not FileExists(S) then Error(Format('The extra file "%s" does not exist.',[S]));
+        end;
+      finally
+        St.Free;
+      end;
+    end;
+
+    S:=Trim(Game.ExtraDirs);
+    If S<>'' then begin
+      St:=ValueToList(S);
+      try
+        For J:=0 to St.Count-1 do If Trim(St[J])<>'' then begin
+          S:=IncludeTrailingPathDelimiter(MakeAbsPath(IncludeTrailingPathDelimiter(St[I]),PrgSetup.BaseDir));
+          If not DirectoryExists(S) then Error(Format('The extra directory "%s" does not exist.',[S]));
+        end;
+      finally
+        St.Free;
+      end;
+    end;
+
   end;
 end;
 

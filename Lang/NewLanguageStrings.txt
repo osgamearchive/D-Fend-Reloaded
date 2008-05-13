@@ -1,0 +1,306 @@
+[LanguageFileInfo]
+LocalLanguageName=English
+(Name of the language not in English like "Deutsch" instead of "German"; but use only characters available in any charset)
+
+[CharsetSettings]
+Name=DEFAULT_CHARSET
+(You can change this to "RUSSIAN_CHARSET" for example, but sadly it will have no effect on message boxes. The best should be keeping the default value.)
+SpecialLower=äöü
+SpecialUpper=ÄÖÜ
+AllowedInFileNames=ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜabcdefghijklmnopqrstuvwxyzäöüß01234567890-_=.,;!()
+
+[Messages]
+NoFolderName=No folder name was given.
+CHANGED: NoMountToReachFolder=There is no mounted drive allowing to reach the physical folder %s which is needed to run the program. D-Fend Reloaded will try to interpret the path as a DOSBox local path.
+(Added the text "D-Fend Reloaded will try to interpret the path as a DOSBox local path.")  
+MessageRootDirMountWaring=You are trying to mount the root directory of a drive. This gives programs running inside DOSBox full access to the whole drive. For security reasons only a subdirectory of a drive should be mounted in DOSBox as a drive. Do you really want to continue and mounting the whole drive ?
+MessagePathNotRelative=The folder %s used in the profile "%s" is not a directory of the %s subtree. 
+MessageTemplateInsecureWarning=The selected template has some secrity risks. It has a autoexec or finalization section, uses custom settings or trys to mount drives outside the D-Fend Reloaded data base folder. You should only use this template if you trust the creator of this template. Do you really want to continue and use this template ?
+MessageNoGameFileNameWarning=You have not defined a filename for the game or program you want to start. Do you really want to continue ?
+MessageDirectoryNotFound=The directory %s does not exist.
+QBasicNeededToExecuteFile=To execute %s the QBasic interpreter is needed. But there is no QBasic program file defined or the given program file does not exist.
+
+[Menu]
+Run.RunScummVM=Run &ScummVM
+Run.OpenScummVMConfig=Open ScummVM configuration file
+Profile.AddScummVM=Add &ScummVM profile...
+Profile.ViewIniFile=&View ScummVM ini file
+Extras.IconManager.IconType.Library=Use icon from list above
+Extras.IconManager.IconType.Custom=Use custom icon
+REMOVED: Extras.EditDefaultProfile=Edit &default profile...
+Extras.ImageFiles=Image files
+Extras.ExtractImage=Extract image file to folder...
+Extras.ImageFromFolder=Create image file from folder content...
+Help.DosBox.Homepage=DOSBox homepage
+Help.ScummVM=ScummVM
+Help.ScummVM.Readme=Manual
+Help.ScummVM.FAQ=&FAQ (Webpage)
+Help.ScummVM.Homepage=ScummVM homepage
+Help.ScummVM.Compatibility=Compatibility list (Webpage)
+Help.ScummVM.GamesList=Compatibility list (from installed ScummVM)
+Help.ScummVM.GamesList.Caption=List of supported games
+Button.Close=&Close
+Button.RunSetup=Run &setup
+
+[Capture]
+Screenshots.Info=You can save screenshots by pressing Ctrl+F5 in DOSBox.
+Sounds.Info=You can start/stop sound recording by pressing Ctrl+F6 in DOSBox.
+
+[TrayIconMenu]
+Restore=Restore
+Run=Run...
+Run.Info=Select profile to run
+Add=Add profile...
+AddFromTemplate=Add profile from template...
+AddWithWizard=Add profile with wizard...
+Quit=Quit
+
+[SearchProgramFile]
+CaptionScummVM=Searching ScummVM...
+CaptionQBasic=Searching QBasic...
+
+[ProfileEditorForm]
+EXEDialog.FilterWithBasic=All executables (*.exe, *.com, *.bat, *.bas)|*.exe;*.com;*.bat;*.bas|Basic files (*.bas)|*.bas|Program and batch files (*.exe, *.com, *.bat)|*.exe;*.com;*.bat|All files (*.*)|*.*
+RelativePath=File path is relative to the DOSBox directory structure
+ExtraFiles=Additional program files (outside the game directory):
+ExtraFiles.Caption=Select additional program file
+ExtraFiles.Filter=All files (*.*)|*.*
+Finalization=Finalization
+Finalization.LoadTitle=Load finalization batch file
+Finalization.SaveTitle=Save finalization batch file
+PrinterSheet=Printer
+ScummVMSheet=ScummVM settings
+ScummVM.Filter=Filter
+ScummVM.Game=Game
+ScummVM.GameFolder=Game folder
+ScummVM.GameFolder.Caption=Select game folder
+ScummVM.Language=Language
+ScummVM.Autosave=Autosave interval
+ScummVM.TextSpeed=Text speed
+ScummVM.Subtitles=Enable subtitles (in games with voice)
+ScummVM.MusicVolume=Music volume
+ScummVM.SpeechVolume=Speech volume
+ScummVM.SFXVolume=SFX volume
+ScummVM.MIDIGain=Gain for MIDI playback
+ScummVM.MusicDriver=Music driver
+ScummVM.NativeMT32=True Roland MT-32 (disable GM emulation)
+ScummVM.EnableGS=Enable Roland GS mode for MIDI playback
+ScummVM.MultiMIDI=Enable combination of Adlib and native MIDI
+ScummVM.SpeechMute=Mute speech
+
+[ProfileMountingForm]
+REMOVED: IOControl=Activate I/O control (recommend for Win NT/2k/XP/Vista)
+CDROMAccess=Access method
+CDROMAccess.Normal=Normal CDROM access via MSCDEX
+CDROMAccess.IOCTL=Low-level CDROM access and MSCDEX (DOSBox setting "-ioctl")
+CDROMAccess.NOIOCTL=Low-level SDL-support and MSCDEX (DOSBox setting "-ionoctl")
+DriveLetterAlreadyInUse=This drive letter is already in use by another mounted drive.
+
+[SetupForm]
+UserInterfaceSheet=User interface
+REMOVED: ListViewSheet=Game list
+ProgramsSheet=External programs
+DosBoxCSVSheet=DOSBox CSV features
+ScummVMSheet=ScummVM
+QBasicSheet=QBasic
+DirectoriesInfo=If you use a subdirectory of the base directory as games directory D-Fend Reloaded will be able to use relative paths and can make installer packages from your installed games and transfer them to other installations.
+Toolbar.Visible=Show toolbar
+Toolbar.CaptionsVisible=Show toolbar captions
+Toolbar.VisibleButtons=Visible buttons:
+ProgramsInfo=You can configurate the external programs used by D-Fend Reloaded in the sub categories of this category.
+DosBoxCSV.Warning=Please do not activate this settings unless you use a CSV build of DOSBox supporting this things. Activating one of this features can result in profiles not runnable by normal DOSBox builds !
+DosBoxCSV.MountGroup=Mounts editor features
+DosBoxCSV.MultipleFloppyImages=Allow multiple floppy images per drive
+DosBoxCSV.PhysFS=Activate PhysFS tab
+DosBoxCSV.GraphicsGroup=Graphics setup features
+DosBoxCSV.ExtendedTextMode=Activate 28 and 50 line text mode settings
+DosBoxCSV.GlideEmulation=Activate Glide emulation settings
+DosBoxCSV.VGAChipset=Activate VGA chipset settings
+DosBoxCSV.RenderModes=Add "openglhq" and "direct3d" render modes
+DosBoxCSV.VideoModes=Add "pcjr", "ega" and "demovga" graphic modes
+DosBoxCSV.SoundGroup=Sound setup features
+DosBoxCSV.MIDIModes=Add "mt32" MIDI device
+DosBoxCSV.PrinterGroup=Printer setup features
+DosBoxCSV.Printer=Activate printer settings
+FreeDOS=FreeDOS
+FreeDOS.Info=The FreeDOS tool can be used in DOSBox to make file handling easier. Additionally you can setup D-Fend Reloaded to use 4DOS as command line interpreter if FreeDOS is installed.
+FreeDOS.DownloadURL=You can download FreeDOS from
+ScummVMDir=ScummVM folder
+SearchScummVM=Search ScummVM program file
+ReadScummVMGamesList=Read list of supported games
+MinimizeDFendOnScummVMStart=Minimize D-Fend Reloaded, when ScummVM starts
+ScummVMDownloadURL=You can download ScummVM from
+QBasicProgramFile=QBasic program file
+SearchQBasic=Search QBasic program file
+QBasicParameters=Parameters when calling QBasic (%s=Name of the bas file)
+QBasicDownloadURL=You can download QBasic from
+DOSBoxDownloadURL=You can download DOSBox from
+UseChecksums=Monitor changes of the DOS program files by using checksums
+UseChecksums.Info=A checksum is calculated for the program file (and if availalbe) for the setup file. With this checksums the program can detect if an imported profile was made for the present game and if the program files of the game have changed.
+Service3WaitInfo=Creating the "DOSBox DOS" profile...
+CHANGED: Service4=Restore default templates
+(The Service4 button now restores the main template and the user defined templates from the "templates" directory.)
+UpdateVersionSpecific=Add current version number to request URL
+TreeView.UserDefinedGroups.AddButton=Add existing user key
+WaveEnc.Mp3Parameters=Parameters for mp3 encoder
+WaveEnc.OggParameters=Parameters for ogg encoder
+
+[TemplateForm]
+AutoSetupCaption=Auto setup templates
+DefaultTemplate=Default template
+EditMultipleTemplates=Edit multiple templates...
+
+[DeinstallGame]
+ExtraFile=Additional file
+
+[WizardForm]
+REMOVED: BaseSheet=Base settings
+REMOVED: InfoSheet=Program information
+REMOVED: SystemSheet=System settings
+REMOVED: InfoLabel1=Name of program / game
+REMOVED: InfoLabel2=Program file to start
+MainInfo=Information about the D-Fend Reloaded file structure
+MainInfoPart1=D-Fend Reloaded is 100% Vista compatible. This means it respects the conect of dividing the program data into program files and user data. If you have installed D-Fend Reloaded in "user profile mode", the program files are located in the program files folder ("C:\Program files\D-Fend Reloaded" by default) and the user data files are located in a subfolder of the user profile directory ("C:\Users\<you>\D-Fend Reloaded" by default). When D-Fend Reloaded is running it is not writing to the program folder any more. All setup data is stored in the user profile subfolder.
+MainInfoPart2=DOSBox and Windows do not use the same directory sturctures. The programs inside DOSBox only see a subset of the whole Windows directory sturcture. So games running in DOSBox cannot damage your system files (unless you setup DOSBox to use your real "C:\" as drive C: in DOSBox). In most cases you want to mount a folder like "C:\OldGames" as drive C: in DOSBox. This means if you store a game in "C:\OldGames\Somegame" you can access this game in DOSBox via "C:\Somegame". But you do not need to worry about mounting drives at all because D-Fend Reloaded is mounting the right folders automatically for you.
+MainInfoPart3=You can store your game where ever you want. But it is recommended to use the predefined games directory ("C:\Users\<you>\D-Fend Reloaded\VirtualHD"). If you use this directory for your games, D-Fend Reloaded can use relative paths in the profile (".\VirtualHD\NewGame" instead of "C:\Users\<you>\D-Fend Reloaded\VirtualHD\NewGame"). If D-Fend Reloaded knows where the games files are located relatively to the program data directory, it can transfer the games files to another installation or can make installer packages for you. With absolute pathes this isn't possible.
+Page1Info=Please enter a name for the game or program you want to add to the profiles list. This name will be shown in the games list. You can change the name of the profile at any time via the profile editor.
+Page2Info=Please setup where the game or program file you want to start is located. If you choose a subfolder of the given directory for the files, D-Fend Reloaded will be able to use relative paths.
+Page3Info=Please select a template for the new profile.
+Page4Info=Please define the meta information for the new game or programm. All the information are optional and can be changed and complated via the profile editor at any time. This means there is no need to fill out all this fields now.
+Page5Info=Please check if the drive mountings created by D-Fend Reloaded match your wishes and then start the profile creation process by clicking on "Ok".
+Page6Info=Please define the ScummVM configuration.
+EmulationType=Emulation type
+EmulationType.DOSBox=DOSBox (allows running any DOS program)
+EmulationType.ScummVM=Scumm based adventure
+EmulationType.ListScummVMGames=Show list of supported Scumm games
+CHANGED: GamesFolder=Recommend parent directory for the game directory
+GamesFolder.Info=You can place the games you want to use with D-Fend Reloaded in any directory. But if you put them in a subdirectory of %s D-Fend Reloaded will be able to store the paths as relative paths. Only with relative paths you can use the "Build installer" and "Transfer games" functions from the "Extras" menu.
+ProgramFolder=Folder of the game to be started
+CHANGED: BaseDataFolder=Recommend parent directory for the additional data directory
+DataFolder.Button=Setup additional files
+TemplateInfo=The auto setup templates are a special type templates. Each auto setup template was created for one special game. D-Fend Reloaded trys to find a matching auto setup template by the given game or program file. Therefor it compares a checksum calculated over the real file with the checksums stored in the auto setup templates and compares the real filename with the filenames stored in the auto setup templates.[13][13]If there is a by checksum matching auto setup template you should use this template for the new profile because this auto setup template was made exactly for the game or program you just want to add. You should only use a only by filename matching template if there is no by checksum matching template.[13][13]If there is a auto setup template for you game or program but D-Fend Reloaded does not show it in the first two dropdown boxes then you may have another not recognized version of the program.[13][13]Alternatively you can use one of your normal templates for the new profile at any time. But if you use a normal template there is no guarantee the game or program will run immediately with out any further setup.
+TemplateType1=Use compatible auto setup template (recommended)
+TemplateType1Info=This templates are made right for the selected game. They match to the program file via a checksum.
+TemplateType2=Use auto setup template which only matchs by filename
+TemplateType2Info=This templates match to the given program file by the filename but not by the checksum. May be your game version just differs from the game version the auto setup template was made from.
+TemplateType3=Use user-defined auto setup template
+TemplateType3Info=In this list you can find all available auto setup templates. If you are sure your new game is one from this list, you can choose the corresponding auto setup template.
+TemplateType4=Use user-defined template
+TemplateType4Info=In this list you will find all normal user-defined templates. You can use any of this templates for new profiles at any time. But this templates do not contain any settings specific for a special game.
+TemplateType5=Use default wizard template
+REMOVED: DriveSetup.Checkbox=Open drive editor after closing this wizard
+OpenProfileEditor=Open profile editor when wizard closes
+OpenProfileEditor.Info=The chosen template for the new profile contains possible security risks (autoexec sections etc.). If you are not the creator of this template, you should check the following section for dangerous commands: Autoexec, Finalization, Custom settings, Mounting of folders outside the D-Fend Reloaded base data folder.
+ScummVMLanguage=If the chosen language does not match the game language, ScummVM meight not be able to start the game. If the game does not start, you can change the language in the profile editor at any time.
+Explorer=Explorer
+
+[CreateShortcutForm]
+Filter=All files (*.*)|*.*
+NoLinuxScummVMLinks=Creating ScummVM shell scripts is not supported.
+
+[CreateImageForm]
+MakeFloppyBootable=Make floppy image bootable
+MakeFloppyBootable.WithKeyboardDriver=Use DOSBox default keyboard layout on bootdisk
+MakeFloppyBootable.WithMouseDriver=Include mouse driver on bootdisk
+
+[InfoForm]
+Language.Version=Version
+
+[StatisticsForm]
+NumberOfAutoSetupTemplates=Auto setup templates
+
+[TransferForm]
+CopyDFendReloadedPrgFiles=Create portable D-Fend Reloaded installation in destination folder
+CopyDFendReloadedPrgFiles.Wait=Transfering D-Fend Reloaded...
+
+[BuildInstaller]
+Type.AutoSetupTemplates=Auto setup templates
+Type.Templates=Templates
+Info.AutoSetup=Please select the auto setup templates to include in the installer:
+Info.Templates=Please select the templates to include in the installer:
+ShortInfo.AutoSetup=Auto setup
+ShortInfo.Template=Template
+
+[ChangeProfilesForm]
+Caption.Templates=Change templates
+SelectTemplatesSheet=Step 1: Select templates
+Info2=Select the templates to be changed:
+SetUserInfo=Set user-defined information
+DelUserInfo=Delete user-defined information
+
+[GameSetup]
+LastModification=Last modification of profile
+GlideEmulation=Glide emulation
+VGASettings=Settings for video card type "vga"
+VGASettings.Info=This settings are only used if video card type is "vga".
+VGAChipset=VGA chipset
+VideoRam=VideRAM (in KB)
+CHANGED: KeyboardLayout.Info=If you select "default" as keyboard layout or codepage, the default value of this D-Fend Reloaded language setup will be used ("US (US)" and "437").
+Codepage=Codepage
+Codepage.Default=437
+Keyboard.MapperFile=DOSBox key mapping file to use
+Keyboard.MapperFile.Default=Use default DOSBox key mapping file
+Keyboard.MapperFile.Custom=Use this custom DOSBox key mapping file
+EnablePrinterEmulation=Enable printer emulation
+PrinterResolution=Resolution (in dpi)
+PaperWidth=Paper width
+PaperHeight=Paper height
+PaperSizeInfo=The paper size is measured in 1/10 inch
+PrinterOutputFormat=Output format
+PrinterOutputFormatInfo=Output format "printer" means useing the real printer.
+PrinterMultiPage=Activate multipage printing
+PrinterMultiPageInfo=Adds all pages to one postscript file or printer job until Ctrl+F2 is pressed.
+
+[CacheChoose]
+CHANGED: Info=The listed profiles have changed on disk. This changes will be overwritten with the profiles in memory. If you want to keep the manual made changes to the files on the disk, you have to reload this files now. Please select which profiles should be reloaded from disk now.
+(The "when D-Fend Reloaded closes" has been removed because DFR does this immediately now. Only changed in English und German language file !)
+
+[RestoreDeletedProfiles]
+Caption=Deleted profiles
+Info=The listed profiles have been deleted on disk. But they still exist in memory. Please select the profiles you want to restore on disk from the copy in memory. The unselected profiles will be removed from memory, too.
+
+[ReadImage]
+NoExtendedAccessWarning=D-Fend Reloaded cannot get extended read access on the drive. Do you want to try to continue anyway ?
+
+[CheckSum]
+Caption=Checksum error
+TurnOffForProfile=Turn off checksums for this profile
+
+[ExtractImage]
+Caption=Extract image file to folder
+ImageFile=Image file
+DestinationFolder=Destination folder
+OpenDestinationFolderAfterUnpacking=Open destination folder after unpacking files
+ImageFile.DialogTitle=Select a image file
+ImageFile.DialogFilter=All images (*.img,*.iso)|*.img;*.iso|IMG images (*.img)|*.img|ISO images (*.iso)|*.iso|All files (*.*)|*.*
+DestinationFolder.DialogTitle=Choose a destination folder
+ImageType=Image type
+ImageType.Floppy=floppy image
+ImageType.HD=harddisk image
+ImageType.ISO=ISO image
+
+[FirstRunWizard]
+Caption=First run wizard
+InfoLanguage=Please select the language you want to use in D-Fend Reloaded. If there is already the correct language select, you can directly click on "Next".
+InfoDOSBox=Please select the folder where DOSBox is located. If the edit field is not empty, D-Fend Reloaded has already found the DOSBox directory and you can directly click on "Next".
+InfoDOSBox2=When adding games to D-Fend Reloaded, you can specify a custom DOSBox program folder for each game. The DOSBox folder from this dialog will be used as the default DOSBox folder for games.
+InfoDOSBoxLanguage=Please select the language you want to use in DOSBox. If there is already the correct language select, you can directly click on "Next".
+InfoDOSBoxLanguage2=There are more DOSBox languages than D-Fend Reloaded languages. So you may want to set DOSBox to another language than D-Fend Reloaded.
+InfoGameDir=Please select the directory you want to store your games in. This directory will be shown at first when you open the "Select file" dialog from the profile editor.
+InfoGameDir2=If you choose a subdirectory of %s as your games directory, D-Fend Reloaded can use relavtive paths. (If you set the games directory to another directory than ".\VirtualHD\" you will also have to change the predefined templates.)
+InfoUpdate=Please select when D-Fend Reloaded should search for updates:
+
+[ImageFromFolder]
+Caption=Create image file from folder content
+SourceFolder=Source folder
+ImageFile=Image file
+WriteToFloppy=Write image file to real floppy after creation
+SaveDialogTitle=Image file to create
+SaveDialogFilter=Image files (*.img)|*.img|All files (*.*)|*.*
+
+[DragDropError]
+NoProfileSelectedForScreenshots=There is currently no profile selected, where screenshots could be imported (while trying to import "%s").
+NoProfileSelectedForSoundFiles=There is currently no profile selected, where sound files could be imported (while trying to import "%s").
+UnknownExtension=Don't know how to import file "%s". (D-Fend Reloaded don't know how to handle files with this extension.)
+InfoDialog.Caption=Drag&drop errors
+InfoDialog.Label=The following errors occured while trying to import the droped files:

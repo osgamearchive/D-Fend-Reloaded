@@ -6,6 +6,7 @@ const DosBoxFileName='DOSBOX.EXE';
       MakeDOSFilesystemFileName='mkdosfs.exe';
 
       ConfOptFile='ConfOpt.dat';
+      ScummVMConfOptFile='ScummVM.dat';
       HistoryFileName='History.dat';
       DosBoxDOSProfile='DOSBox DOS';
 
@@ -16,11 +17,17 @@ const DosBoxFileName='DOSBOX.EXE';
       CustomConfigsSubDir='CustomConfigs';
       TemplateSubDir='Templates';
       AutoSetupSubDir='AutoSetup';
+      NewUserDataSubDir='NewUserData';
 
       NSIInstallerHelpFile='D-Fend Reloaded DataInstaller.nsi';
 
       OggEncPrgFile='oggenc2.exe';
       LamePrgFile='lame.exe';
+      ScummPrgFile='scummvm.exe';
+      ScummVMConfFileName='scummvm.ini';
+      QBasicPrgFile='QBasic.exe';
+      QB45PrgFile='QB.exe';
+      QB71PrgFile='QBX.exe';
 
 var MainSetupFile : String;
     OperationModeConfig : String;

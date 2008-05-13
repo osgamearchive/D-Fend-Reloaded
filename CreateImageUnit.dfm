@@ -3,7 +3,7 @@ object CreateImageForm: TCreateImageForm
   Top = 0
   BorderStyle = bsDialog
   Caption = 'CreateImage'
-  ClientHeight = 272
+  ClientHeight = 385
   ClientWidth = 555
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -20,7 +20,7 @@ object CreateImageForm: TCreateImageForm
     Left = 0
     Top = 0
     Width = 556
-    Height = 233
+    Height = 346
     ActivePage = FloppyImageSheet
     Images = ImageList
     TabOrder = 0
@@ -76,6 +76,15 @@ object CreateImageForm: TCreateImageForm
         ParentShowHint = False
         ShowHint = True
         OnClick = FloppyFileButtonClick
+      end
+      object FloppyNeedFreeDOSLabel: TLabel
+        Left = 32
+        Top = 220
+        Width = 500
+        Height = 50
+        AutoSize = False
+        Caption = 'FloppyNeedFreeDOSLabel'
+        WordWrap = True
       end
       object FloppyImageTypeComboBox: TComboBox
         Left = 16
@@ -148,10 +157,40 @@ object CreateImageForm: TCreateImageForm
         State = cbChecked
         TabOrder = 6
       end
+      object FloppyMakeBootableCheckBox: TCheckBox
+        Left = 16
+        Top = 202
+        Width = 516
+        Height = 17
+        Caption = 'Make floppy image bootable'
+        TabOrder = 7
+        OnClick = FloppyMakeBootableCheckBoxClick
+      end
+      object FloppyMakeBootableWithKeyboardDriverCheckBox: TCheckBox
+        Left = 16
+        Top = 269
+        Width = 516
+        Height = 17
+        Caption = 'Use DOSBox default keyboard layout on bootdisk'
+        Enabled = False
+        TabOrder = 8
+      end
+      object FloppyMakeBootableWithMouseDriverCheckBox: TCheckBox
+        Left = 16
+        Top = 292
+        Width = 516
+        Height = 17
+        Caption = 'Include mouse driver on bootdisk'
+        Enabled = False
+        TabOrder = 9
+      end
     end
     object HDImageSheet: TTabSheet
       Caption = 'HD Image'
       ImageIndex = 1
+      DesignSize = (
+        548
+        317)
       object HDFileButton: TSpeedButton
         Tag = 1
         Left = 522
@@ -219,11 +258,27 @@ object CreateImageForm: TCreateImageForm
         State = cbChecked
         TabOrder = 3
       end
+      object ImageTypeRadioGroup: TRadioGroup
+        Left = 16
+        Top = 152
+        Width = 500
+        Height = 89
+        Anchors = [akLeft, akTop, akRight]
+        Caption = 'Image type'
+        ItemIndex = 1
+        Items.Strings = (
+          
+            'Create plain empty file (you will need to create a partition by ' +
+            'using fdisk)'
+          'Create a preformated image')
+        TabOrder = 4
+        Visible = False
+      end
     end
   end
   object OKButton: TBitBtn
     Left = 8
-    Top = 239
+    Top = 352
     Width = 97
     Height = 25
     TabOrder = 1
@@ -232,7 +287,7 @@ object CreateImageForm: TCreateImageForm
   end
   object CancelButton: TBitBtn
     Left = 120
-    Top = 239
+    Top = 352
     Width = 97
     Height = 25
     TabOrder = 2
@@ -240,7 +295,7 @@ object CreateImageForm: TCreateImageForm
   end
   object ImageList: TImageList
     Left = 240
-    Top = 232
+    Top = 345
     Bitmap = {
       494C010102000400040010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000001000000001002000000000000010
@@ -384,6 +439,6 @@ object CreateImageForm: TCreateImageForm
   object OpenDialog: TOpenDialog
     DefaultExt = 'img'
     Left = 272
-    Top = 232
+    Top = 345
   end
 end

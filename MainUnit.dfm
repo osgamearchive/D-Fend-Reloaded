@@ -1,8 +1,9 @@
 object DFendReloadedMainForm: TDFendReloadedMainForm
   Left = 0
   Top = 0
+  ActiveControl = TreeView
   Caption = 'D-Fend Reloaded'
-  ClientHeight = 734
+  ClientHeight = 866
   ClientWidth = 774
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -48,7 +49,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
   object Splitter: TSplitter
     Left = 169
     Top = 24
-    Height = 710
+    Height = 842
     ResizeStyle = rsUpdate
     ExplicitLeft = 224
     ExplicitTop = 192
@@ -58,7 +59,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
     Left = 0
     Top = 24
     Width = 169
-    Height = 710
+    Height = 842
     Align = alLeft
     HideSelection = False
     Images = ImageList
@@ -67,6 +68,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
     ReadOnly = True
     TabOrder = 0
     OnChange = TreeViewChange
+    ExplicitHeight = 822
   end
   object CoolBar: TCoolBar
     Left = 0
@@ -77,6 +79,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
     BandBorderStyle = bsNone
     Bands = <
       item
+        Break = False
         Control = ToolBar
         ImageIndex = -1
         MinHeight = 24
@@ -98,16 +101,31 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
       List = True
       ShowCaptions = True
       TabOrder = 0
+      object ButtonClose: TToolButton
+        Tag = 1007
+        Left = 0
+        Top = 0
+        Caption = 'Beenden'
+        ImageIndex = 7
+        OnClick = MenuWork
+      end
       object ButtonRun: TToolButton
         Tag = 3001
-        Left = 0
+        Left = 81
         Top = 0
         Caption = 'Starten'
         ImageIndex = 1
         OnClick = MenuWork
       end
+      object ButtonRunSetup: TToolButton
+        Tag = 3002
+        Left = 162
+        Top = 0
+        Caption = 'Setup'
+        ImageIndex = 2
+      end
       object ToolButton2: TToolButton
-        Left = 81
+        Left = 243
         Top = 0
         Width = 8
         Caption = 'ToolButton2'
@@ -116,7 +134,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
       end
       object ButtonAdd: TToolButton
         Tag = 4000
-        Left = 89
+        Left = 251
         Top = 0
         Caption = 'Hinzuf'#252'gen'
         ImageIndex = 3
@@ -124,7 +142,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
       end
       object ButtonEdit: TToolButton
         Tag = 4003
-        Left = 170
+        Left = 332
         Top = 0
         Caption = 'Bearbeiten'
         ImageIndex = 4
@@ -132,14 +150,14 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
       end
       object ButtonDelete: TToolButton
         Tag = 4005
-        Left = 251
+        Left = 413
         Top = 0
         Caption = 'L'#246'schen'
         ImageIndex = 5
         OnClick = MenuWork
       end
       object ToolButton1: TToolButton
-        Left = 332
+        Left = 494
         Top = 0
         Width = 8
         Caption = 'ToolButton1'
@@ -147,7 +165,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
         Style = tbsSeparator
       end
       object SearchEdit: TEdit
-        Left = 340
+        Left = 502
         Top = 0
         Width = 121
         Height = 22
@@ -161,13 +179,14 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
     Left = 172
     Top = 24
     Width = 602
-    Height = 710
+    Height = 842
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 2
+    ExplicitHeight = 822
     object Splitter1: TSplitter
       Left = 0
-      Top = 514
+      Top = 646
       Width = 602
       Height = 3
       Cursor = crVSplit
@@ -180,7 +199,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
       Left = 0
       Top = 0
       Width = 602
-      Height = 514
+      Height = 646
       Align = alClient
       Columns = <>
       LargeImages = ListviewIconImageList
@@ -197,27 +216,27 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
       OnDblClick = ListViewDblClick
       OnInfoTip = ListViewInfoTip
       OnSelectItem = ListViewSelectItem
+      ExplicitHeight = 626
     end
     object CapturePageControl: TPageControl
       Left = 0
-      Top = 517
+      Top = 649
       Width = 602
       Height = 193
       ActivePage = CaptureScreenshotsTab
       Align = alBottom
+      Images = ImageList
       MultiLine = True
       TabOrder = 1
+      ExplicitTop = 629
       object CaptureScreenshotsTab: TTabSheet
         Caption = 'Screenshots'
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
+        ImageIndex = 35
         object ScreenshotListView: TListView
           Left = 0
-          Top = 0
+          Top = 17
           Width = 594
-          Height = 165
+          Height = 147
           Align = alClient
           BorderStyle = bsNone
           Columns = <>
@@ -229,19 +248,25 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
           OnKeyDown = ScreenshotListViewKeyDown
           OnSelectItem = ScreenshotListViewSelectItem
         end
-      end
-      object CaptureSoundTab: TTabSheet
-        Caption = 'Sounds'
-        ImageIndex = 1
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
-        object SoundListView: TListView
+        object ScreenshotsInfoPanel: TPanel
           Left = 0
           Top = 0
           Width = 594
-          Height = 165
+          Height = 17
+          Align = alTop
+          BevelOuter = bvNone
+          Caption = 'You can save screenshots by pressing Ctrl+F5 in DOSBox.'
+          TabOrder = 1
+        end
+      end
+      object CaptureSoundTab: TTabSheet
+        Caption = 'Sounds'
+        ImageIndex = 33
+        object SoundListView: TListView
+          Left = 0
+          Top = 17
+          Width = 594
+          Height = 147
           Align = alClient
           BorderStyle = bsNone
           Columns = <>
@@ -253,18 +278,30 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
           OnKeyDown = SoundListViewKeyDown
           OnSelectItem = SoundListViewSelectItem
         end
+        object SoundInfoPanel: TPanel
+          Left = 0
+          Top = 0
+          Width = 594
+          Height = 17
+          Align = alTop
+          BevelOuter = bvNone
+          Caption = 
+            'You can start/stop sound recording by pressing Ctrl+F6 in DOSBox' +
+            '.'
+          TabOrder = 1
+        end
       end
     end
   end
   object XPManifest: TXPManifest
     Left = 216
-    Top = 104
+    Top = 136
   end
   object ImageList: TImageList
     Left = 304
     Top = 32
     Bitmap = {
-      494C010125002C00040010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010126002C00040010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000040000000A0000000010020000000000000A0
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -285,7 +322,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
       0000000000000000000000000000000000000000000000000000000000000000
       000000000000BFBFBF00FFFFFF00BFBFBF00BFBFBF00BFBFBF00000000000000
       0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000800000008000000080000000800000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -293,87 +330,87 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
       000000000000000000000000000000000000000000000000000000000000FFFF
       FF00FFFFFF00FFFFFF00BFBFBF00FFFFFF00BFBFBF00BFBFBF00BFBFBF00FFFF
       FF00000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
+      0000008080000080800000808000008080000080800000808000008080000080
+      8000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000FF00FF00FFFF
       0000FFFFFF00FFFFFF00FFFFFF00BFBFBF00FFFFFF00BFBFBF00FFFFFF00FFFF
-      0000FF00FF000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
+      0000FF00FF000000000000000000000000000000000000000000000000000080
+      8000008080000080800000808000008080000080800000808000008080000080
+      8000008000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000FF00FF00FF00
       FF00FFFF0000FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF0000FF00
-      FF00FF00FF000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
+      FF00FF00FF000000000000000000000000000000000000000000000000008080
+      8000000000000080800000808000008000008080800000808000008080000080
+      8000008080000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000FFFF0000FFFF00FFFF
       FF00FF00FF00FFFF0000000000000000000000000000FFFF0000FF00FF00FFFF
       FF0000FFFF0000FFFF0000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
+      0000008080000000000000000000008080000080800000808000008080000080
+      8000008080000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000FF000000FF000000FF
       FF0000FFFF0000000000BFBFBF00BFBFBF00BFBFBF000000000000FFFF0000FF
       FF0000FF000000FF000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000080800000808000008080000080800000FFFF00008080000080
+      8000008080000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       00000000000000000000000000000000000000000000FFFF0000FFFF000000FF
       000000FF000000000000BFBFBF0000000000BFBFBF000000000000FF000000FF
       0000FFFF0000FFFF000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
+      0000008080000080800000808000008080000080800000808000008080000080
+      8000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000FF000000FF000000FF
       FF0000FFFF0000000000BFBFBF00BFBFBF00BFBFBF000000000000FFFF0000FF
-      FF0000FF000000FF000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
+      FF0000FF000000FF000000000000000000000000000000000000000000000080
+      8000008080000080800000808000008080000080800080808000008080000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000FFFF0000FFFF00FFFF
       FF00FF00FF00FFFF0000000000000000000000000000FFFF0000FF00FF0000FF
-      FF0000FFFF0000FFFF0000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
+      FF0000FFFF0000FFFF0000000000000000000000000000000000000000000080
+      800000FFFF000080800000808000008080000000000000000000000000000080
+      8000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000FF00FF00FF00
       FF00FFFF0000FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF0000FF00
-      FF00FF00FF000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
+      FF00FF00FF000000000000000000000000000000000000000000000000000080
+      8000008080000080800000808000008080000080800000808000008080000080
+      8000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000FF00FF00FFFF
       0000FFFFFF00BFBFBF00FFFFFF00BFBFBF00FFFFFF00FFFFFF00FFFFFF00FFFF
       0000FF00FF000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
+      000000FFFF000080800000808000008080000080800000808000008080000080
+      8000008080000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       000000000000000000000000000000000000000000000000000000000000FFFF
       FF00FFFFFF00FFFFFF00BFBFBF00FFFFFF00BFBFBF00FFFFFF00FFFFFF00FFFF
       FF00000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
+      000000800000000000000000000000FFFF0000FFFF0000FFFF00008080000080
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -1548,11 +1585,11 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
       000000000000000000000000000000FFFF000000000000000000000000000000
       000000000000000000000000000000FFFF00424D3E000000000000003E000000
       2800000040000000A00000000100010000000000000500000000000000000000
-      000000000000000000000000FFFFFF00FFFF000000000000F83F000000000000
-      E00F000000000000C00700000000000080030000000000008003000000000000
-      0001000000000000000100000000000000010000000000000001000000000000
-      000100000000000080030000000000008003000000000000C007000000000000
-      E00F000000000000F83F000000000000FFFFFFFFF00FC0070000FC7BE007E00F
+      000000000000000000000000FFFFFF00FFFFF80F00000000F83FE00300000000
+      E00F800300000000C00780010000000080038001000000008003880100000000
+      0001C001000000000001C001000000000001C003000000000001C00300000000
+      00018001000000008003C001000000008003C00100000000C007C60100000000
+      E00FE00300000000F83FF80F00000000FFFFFFFFF00FC0070000FC7BE007E00F
       0000F837C003F83F0000F03E800100010000E01D000000010000E01B00000001
       00008017000000010000001F0000000100000010000000010000001F00000001
       00008017000000010000E01B000000010000E01D800100010000F03EC0030001
@@ -1610,6 +1647,11 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
           Tag = 1008
           Caption = 'prof-Datei importieren...'
           ImageIndex = 34
+          OnClick = MenuWork
+        end
+        object MenuFileImportXMLFile: TMenuItem
+          Tag = 1009
+          Caption = 'Import xml file...'
           OnClick = MenuWork
         end
       end
@@ -1768,6 +1810,21 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
         ImageIndex = 27
         OnClick = MenuWork
       end
+      object N28: TMenuItem
+        Caption = '-'
+      end
+      object MenuRunRunScummVM: TMenuItem
+        Tag = 3006
+        Caption = 'ScummVM starten'
+        ImageIndex = 37
+        OnClick = MenuWork
+      end
+      object MenuRunOpenScummVMConfig: TMenuItem
+        Tag = 3007
+        Caption = 'ScummVM-Konfiguration '#246'ffnen'
+        ImageIndex = 27
+        OnClick = MenuWork
+      end
     end
     object MenuProfile: TMenuItem
       Caption = '&Profil'
@@ -1776,6 +1833,12 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
         Caption = '&Hinzuf'#252'gen...'
         ImageIndex = 3
         ShortCut = 45
+        OnClick = MenuWork
+      end
+      object MenuProfileAddScummVM: TMenuItem
+        Tag = 4014
+        Caption = 'ScummVM-Profil hinzuf'#252'gen...'
+        ImageIndex = 37
         OnClick = MenuWork
       end
       object MenuProfileAddFromTemplate: TMenuItem
@@ -1821,6 +1884,12 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
       object MenuProfileViewConfFile: TMenuItem
         Tag = 4013
         Caption = 'DOSBox conf-Datei anzeigen'
+        ImageIndex = 27
+        OnClick = MenuWork
+      end
+      object MenuProfileViewIniFile: TMenuItem
+        Tag = 4013
+        Caption = 'ScummVM Ini-Datei anzeigen'
         ImageIndex = 27
         OnClick = MenuWork
       end
@@ -1886,46 +1955,53 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
         ImageIndex = 11
         OnClick = MenuWork
       end
-      object N1: TMenuItem
-        Caption = '-'
-      end
-      object MenuExtrasEditDefaultProfile: TMenuItem
-        Tag = 5004
-        Caption = 'Vorgabe&profil bearbeiten...'
-        ShortCut = 116
-        OnClick = MenuWork
-      end
       object MenuExtrasTemplates: TMenuItem
         Tag = 5005
         Caption = '&Vorlagen...'
         ShortCut = 115
         OnClick = MenuWork
       end
-      object N9: TMenuItem
+      object N1: TMenuItem
         Caption = '-'
       end
-      object MenuExtrasCreateIMGImage: TMenuItem
-        Tag = 5012
-        Caption = 'IMG-Image von Diskette erstellen...'
-        ImageIndex = 0
-        OnClick = MenuWork
-      end
-      object MenuExtrasWriteIMGImage: TMenuItem
-        Tag = 5013
-        Caption = 'IMG-Image auf Diskette schreiben...'
-        OnClick = MenuWork
-      end
-      object MenuExtrasCreateImage: TMenuItem
-        Tag = 5007
-        Caption = 'Image-Datei erstellen...'
-        ImageIndex = 14
-        OnClick = MenuWork
-      end
-      object MenuExtrasCreateISOImage: TMenuItem
-        Tag = 5011
-        Caption = 'ISO-Image von CD erstellen...'
-        ImageIndex = 36
-        OnClick = MenuWork
+      object MenuExtrasImageFiles: TMenuItem
+        Caption = 'Imagedateien'
+        object MenuExtrasCreateIMGImage: TMenuItem
+          Tag = 5012
+          Caption = 'IMG-Image von Diskette erstellen...'
+          ImageIndex = 0
+          OnClick = MenuWork
+        end
+        object MenuExtrasWriteIMGImage: TMenuItem
+          Tag = 5013
+          Caption = 'IMG-Image auf Diskette schreiben...'
+          OnClick = MenuWork
+        end
+        object MenuExtrasCreateImage: TMenuItem
+          Tag = 5007
+          Caption = 'Image-Datei erstellen...'
+          ImageIndex = 14
+          OnClick = MenuWork
+        end
+        object MenuExtrasCreateISOImage: TMenuItem
+          Tag = 5011
+          Caption = 'ISO-Image von CD erstellen...'
+          ImageIndex = 36
+          OnClick = MenuWork
+        end
+        object N25: TMenuItem
+          Caption = '-'
+        end
+        object MenuExtrasExtractImage: TMenuItem
+          Tag = 5014
+          Caption = 'Imagedatei in Ordner entpacken...'
+          OnClick = MenuWork
+        end
+        object MenuExtrasImageFromFolder: TMenuItem
+          Tag = 5015
+          Caption = 'Imagedatei von Ordnerinhalt erstellen...'
+          OnClick = MenuWork
+        end
       end
       object N17: TMenuItem
         Caption = '-'
@@ -1953,15 +2029,38 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
         ImageIndex = 25
         OnClick = MenuWork
       end
+      object MenuExtrasCheckProfiles: TMenuItem
+        Tag = 5016
+        Caption = 'Check profiles for not existing files...'
+        Visible = False
+        OnClick = MenuWork
+      end
     end
     object MenuHelp: TMenuItem
       Caption = '&Hilfe'
       object MenuHelpDosBox: TMenuItem
         Caption = '&DosBox'
         ImageIndex = 16
+        object MenuHelpDosBoxReadme: TMenuItem
+          Caption = 'Handbuch'
+          ImageIndex = 13
+        end
         object MenuHelpDosBoxFAQ: TMenuItem
           Tag = 6001
           Caption = '&FAQ'
+          OnClick = MenuWork
+        end
+        object N16: TMenuItem
+          Caption = '-'
+        end
+        object MenuHelpDosBoxIntro: TMenuItem
+          Tag = 6006
+          Caption = 'Einf'#252'hrung'
+          OnClick = MenuWork
+        end
+        object MenuHelpDosBoxIntroDosBox: TMenuItem
+          Tag = 6007
+          Caption = 'Einf'#252'hrung (DosBox)'
           OnClick = MenuWork
         end
         object N13: TMenuItem
@@ -1980,6 +2079,12 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
         object N14: TMenuItem
           Caption = '-'
         end
+        object MenuHelpDosBoxHomepage: TMenuItem
+          Tag = 6016
+          Caption = 'DOSBox Homepage'
+          ImageIndex = 20
+          OnClick = MenuWork
+        end
         object MenuHelpDosBoxCompatibility: TMenuItem
           Tag = 6004
           Caption = 'Kompatibilit'#228'tsliste'
@@ -1990,25 +2095,39 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
           Caption = 'Demo-Kompatibilit'#228'tsliste'
           OnClick = MenuWork
         end
+      end
+      object MenuHelpScummVM: TMenuItem
+        Caption = 'ScummVM'
+        ImageIndex = 37
+        object MenuHelpScummVMReadme: TMenuItem
+          Tag = 6017
+          Caption = 'Handbuch'
+          ImageIndex = 13
+          OnClick = MenuWork
+        end
+        object MenuHelpScummVMFAQ: TMenuItem
+          Tag = 6018
+          Caption = '&FAQ'
+          OnClick = MenuWork
+        end
         object N15: TMenuItem
           Caption = '-'
         end
-        object MenuHelpDosBoxIntro: TMenuItem
-          Tag = 6006
-          Caption = 'Einf'#252'hrung'
+        object MenuHelpScummVMHomepage: TMenuItem
+          Tag = 6019
+          Caption = 'ScummVM Homepage'
+          ImageIndex = 20
           OnClick = MenuWork
         end
-        object MenuHelpDosBoxIntroDosBox: TMenuItem
-          Tag = 6007
-          Caption = 'Einf'#252'hrung (DosBox)'
+        object MenuHelpScummVMCompatibility: TMenuItem
+          Tag = 6020
+          Caption = 'Kompatibilit'#228'tsliste'
           OnClick = MenuWork
         end
-        object N16: TMenuItem
-          Caption = '-'
-        end
-        object MenuHelpDosBoxReadme: TMenuItem
-          Caption = 'Handbuch'
-          ImageIndex = 13
+        object MenuHelpScummVMCompatibilityIntern: TMenuItem
+          Tag = 6021
+          Caption = 'Kompatibilit'#228'tsliste'
+          OnClick = MenuWork
         end
       end
       object MenuHelpAbandonware: TMenuItem
@@ -2059,6 +2178,12 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
         Tag = 6014
         Caption = '&Statistik'
         ImageIndex = 32
+        OnClick = MenuWork
+      end
+      object MenuHelpOperationMode: TMenuItem
+        Tag = 6022
+        Caption = 'Operation mode...'
+        Visible = False
         OnClick = MenuWork
       end
       object N18: TMenuItem
@@ -2126,6 +2251,12 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
     object PopupViewConfFile: TMenuItem
       Tag = 4013
       Caption = 'DOSBox conf-Datei anzeigen'
+      ImageIndex = 27
+      OnClick = MenuWork
+    end
+    object PopupViewINIFile: TMenuItem
+      Tag = 4013
+      Caption = 'ScummVM Ini-Datei anzeigen'
       ImageIndex = 27
       OnClick = MenuWork
     end
@@ -2256,6 +2387,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
       000FF800000FFC00001FFE00001FE0000001C000000180000001800000018000
       00018000000180000001FC00001FFC00001FFE00001FFC00000FF800000FF800
       001FF800003FFC180C7FFE380EFFFFF80FFFFFF80FFFFFF80FFFFFFFFFFF}
+    PopupMenu = TrayIconPopupMenu
     OnDblClick = TrayIconDblClick
     Left = 216
     Top = 64
@@ -2370,6 +2502,12 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
       ShortCut = 45
       OnClick = MenuWork
     end
+    object AddButtonMenuAddScummVM: TMenuItem
+      Tag = 4014
+      Caption = 'ScummVM-Profil hinzuf'#252'gen...'
+      ImageIndex = 37
+      OnClick = MenuWork
+    end
     object AddButtonMenuAddFromTemplate: TMenuItem
       Caption = 'Hinzuf'#252'gen von &Vorlage'
       OnClick = MenuWork
@@ -2465,6 +2603,63 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
     object TreeViewPopupEditUserFilters: TMenuItem
       Caption = 'Benutzerdefiniere Filter bearbeiten'
       OnClick = TreeViewPopupEditUserFiltersClick
+    end
+  end
+  object IdleAddonTimer: TTimer
+    Interval = 500
+    OnTimer = IdleAddonTimerTimer
+    Left = 216
+    Top = 168
+  end
+  object TrayIconPopupMenu: TPopupMenu
+    Images = ImageList
+    Left = 216
+    Top = 96
+    object TrayIconPopupRestore: TMenuItem
+      Caption = 'Restore'
+      Default = True
+      OnClick = TrayIconPopupClick
+    end
+    object N9: TMenuItem
+      Caption = '-'
+    end
+    object TrayIconPopupRun: TMenuItem
+      Tag = 5
+      Caption = 'Run...'
+      ImageIndex = 1
+      OnClick = TrayIconPopupClick
+    end
+    object N27: TMenuItem
+      Caption = '-'
+    end
+    object TrayIconPopupAddProfile: TMenuItem
+      Tag = 1
+      Caption = '&Hinzuf'#252'gen...'
+      ImageIndex = 3
+      OnClick = TrayIconPopupClick
+    end
+    object TrayIconPopupAddScummVMProfile: TMenuItem
+      Tag = 2
+      Caption = 'ScummVM-Profil hinzuf'#252'gen...'
+      ImageIndex = 37
+      OnClick = TrayIconPopupClick
+    end
+    object TrayIconPopupAddFromTemplate: TMenuItem
+      Caption = 'Hinzuf'#252'gen von &Vorlage'
+    end
+    object TrayIconPopupAddWithWizard: TMenuItem
+      Tag = 3
+      Caption = 'Hinzuf'#252'gen mit Assistent...'
+      OnClick = TrayIconPopupClick
+    end
+    object N26: TMenuItem
+      Caption = '-'
+    end
+    object TrayIconPopupClose: TMenuItem
+      Tag = 4
+      Caption = '&Close'
+      ImageIndex = 7
+      OnClick = TrayIconPopupClick
     end
   end
 end

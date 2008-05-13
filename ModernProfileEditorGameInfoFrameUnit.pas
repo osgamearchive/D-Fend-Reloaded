@@ -24,10 +24,11 @@ type
     { Private-Deklarationen }
   public
     { Public-Deklarationen }
-    Procedure InitGUI(const OnProfileNameChange : TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup : PString);
+    Procedure InitGUI(const OnProfileNameChange : TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup, CurrentScummVMGameName : PString);
     Procedure SetGame(const Game : TGame; const LoadFromTemplate : Boolean);
     Function CheckValue : Boolean;
     Procedure GetGame(const Game : TGame);
+    Procedure ShowFrame;
   end;
 
 implementation
@@ -38,7 +39,7 @@ uses LanguageSetupUnit, VistaToolsUnit, CommonTools;
 
 { TModernProfileEditorGameInfoFrame }
 
-procedure TModernProfileEditorGameInfoFrame.InitGUI(const OnProfileNameChange: TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup : PString);
+procedure TModernProfileEditorGameInfoFrame.InitGUI(const OnProfileNameChange: TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup, CurrentScummVMGameName : PString);
 Var St : TStringList;
 begin
   NoFlicker(GameInfoValueListEditor);
@@ -121,6 +122,10 @@ begin
   try NotesMemo.Lines.Assign(St); finally St.Free; end;
 
   FrameResize(self);
+end;
+
+procedure TModernProfileEditorGameInfoFrame.ShowFrame;
+begin
 end;
 
 function TModernProfileEditorGameInfoFrame.CheckValue: Boolean;

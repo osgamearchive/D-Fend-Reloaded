@@ -43,6 +43,7 @@ uses VistaToolsUnit, LanguageSetupUnit, UninstallFormUnit, CommonTools,
 procedure TUninstallSelectForm.FormCreate(Sender: TObject);
 begin
   SetVistaFonts(self);
+  Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName);
 
   Caption:=LanguageSetup.UninstallSelectForm;
   InfoLabel.Caption:=LanguageSetup.UninstallSelectFormInfo;
@@ -60,7 +61,7 @@ end;
 
 procedure TUninstallSelectForm.FormShow(Sender: TObject);
 begin
-  BuildCheckList(ListBox,GameDB,False);
+  BuildCheckList(ListBox,GameDB,False,False);
   BuildSelectPopupMenu(PopupMenu,GameDB,SelectButtonClick,False);
 end;
 
@@ -105,30 +106,56 @@ begin
       end;
 
       If ActionsRadioGroup.ItemIndex>0 then begin
-        S:=Trim(G.GameExe);
-        If S='' then S:=Trim(G.SetupExe);
-        If (S<>'') and (not UsedByOtherGame(GameDB,G,S)) then begin
-          S:=ExtractFilePath(MakeAbsPath(S,PrgSetup.BaseDir));
-          if (not DeleteDir(S,ContinueNext)) and (not ContinueNext) then exit;
+        If ScummVMMode(G) then begin
+          S:=Trim(G.ScummVMPath);
+          If (S<>'') and (not UsedByOtherGame(GameDB,G,IncludeTrailingPathDelimiter(S))) then begin
+            S:=ExtractFilePath(MakeAbsPath(IncludeTrailingPathDelimiter(S),PrgSetup.BaseDir));
+            if (not DeleteDir(S,ContinueNext)) and (not ContinueNext) then exit;
+          end;
+        end else begin
+          S:=Trim(G.GameExe);
+          If ExtUpperCase(Copy(S,1,7))='DOSBOX:' then S:='';
+          If S='' then S:=Trim(G.SetupExe);
+          If ExtUpperCase(Copy(S,1,7))='DOSBOX:' then S:='';
+          If S<>'' then S:=ExtractFilePath(S);
+          If (S<>'') and (not UsedByOtherGame(GameDB,G,IncludeTrailingPathDelimiter(S))) then begin
+            S:=ExtractFilePath(MakeAbsPath(IncludeTrailingPathDelimiter(S),PrgSetup.BaseDir));
+            if (not DeleteDir(S,ContinueNext)) and (not ContinueNext) then exit;
+          end;
         end;
       end;
 
       If ActionsRadioGroup.ItemIndex>1 then begin
-        S:=Trim(G.CaptureFolder);
-        If (S<>'') and (not UsedByOtherGame(GameDB,G,IncludeTrailingPathDelimiter(S))) then begin
-          S:=ExtractFilePath(MakeAbsPath(IncludeTrailingPathDelimiter(S),PrgSetup.BaseDir));
-          if (not DeleteDir(S,ContinueNext)) and (not ContinueNext) then exit;
+        If not ScummVMMode(G) then begin
+          S:=Trim(G.CaptureFolder);
+          If (S<>'') and (not UsedByOtherGame(GameDB,G,IncludeTrailingPathDelimiter(S))) then begin
+            S:=ExtractFilePath(MakeAbsPath(IncludeTrailingPathDelimiter(S),PrgSetup.BaseDir));
+            if (not DeleteDir(S,ContinueNext)) and (not ContinueNext) then exit;
+          end;
         end;
 
-        S:=Trim(G.Icon);
-        If (S<>'') and FileExists(PrgDataDir+IconsSubDir+'\'+S) and (not IconUsedByOtherGame(GameDB,G,S)) then begin
-          If not DeleteSingleFile(PrgDataDir+IconsSubDir+'\'+S,ContinueNext) then exit;
+        S:=MakeAbsIconName(G.Icon);
+        If (S<>'') and FileExists(S) and (not IconUsedByOtherGame(GameDB,G,S)) then begin
+          If (not DeleteSingleFile(S,ContinueNext)) and (not ContinueNext) then exit;
         end;
 
         S:=Trim(G.DataDir);
         If (S<>'') and (not UsedByOtherGame(GameDB,G,IncludeTrailingPathDelimiter(S))) then begin
           S:=ExtractFilePath(MakeAbsPath(IncludeTrailingPathDelimiter(S),PrgSetup.BaseDir));
           if (not DeleteDir(S,ContinueNext)) and (not ContinueNext) then exit;
+        end;
+
+        S:=Trim(G.ExtraFiles);
+        If S<>'' then begin
+          St:=ValueToList(S);
+          try
+            For J:=0 to St.Count-1 do If (Trim(St[J])<>'') and (not ExtraFileUsedByOtherGame(GameDB,G,St[J])) then begin
+              S:=MakeAbsPath(St[J],PrgSetup.BaseDir);
+              If not DeleteSingleFile(S,ContinueNext) and (not ContinueNext) then exit;
+            end;
+          finally
+            St.Free;
+          end;
         end;
 
         S:=Trim(G.ExtraDirs);

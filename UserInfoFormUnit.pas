@@ -40,6 +40,9 @@ uses VistaToolsUnit, LanguageSetupUnit, CommonTools;
 
 procedure TUserInfoForm.FormCreate(Sender: TObject);
 begin
+  SetVistaFonts(self);
+  Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName);
+
   Caption:=LanguageSetup.ProfileEditorUserdefinedInfo;
   Tab.Cells[0,0]:=LanguageSetup.Key;
   Tab.Cells[1,0]:=LanguageSetup.Value;

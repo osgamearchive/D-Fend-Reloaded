@@ -19,27 +19,32 @@ Type TConfOpt=class(TBasePrgSetup)
     property Sblaster : String index 9 read GetString write SetString;
     property Oplmode : String index 10 read GetString write SetString;
     property KeyboardLayout : String index 11 read GetString write SetString;
-    property ReportedDOSVersion : String index 12 read GetString write SetString;
-    property MIDIDevice : String index 13 read GetString write SetString;
-    property Blocksize : String index 14 read GetString write SetString;
-    property CyclesDown : String index 15 read GetString write SetString;
-    property CyclesUp : String index 16 read GetString write SetString;
-    property Dma : String index 17 read GetString write SetString;
-    property Dma1 : String index 18 read GetString write SetString;
-    property Dma2 : String index 19 read GetString write SetString;
-    property GUSBase : String index 20 read GetString write SetString;
-    property GUSRate : String index 21 read GetString write SetString;
-    property HDMA : String index 22 read GetString write SetString;
-    property IRQ : String index 23 read GetString write SetString;
-    property IRQ1 : String index 24 read GetString write SetString;
-    property IRQ2 : String index 25 read GetString write SetString;
-    property MPU401 : String index 26 read GetString write SetString;
-    property OPLRate : String index 27 read GetString write SetString;
-    property PCRate : String index 28 read GetString write SetString;
-    property Rate : String index 29 read GetString write SetString;
-    property SBBase : String index 30 read GetString write SetString;
-    property MouseSensitivity : String index 31 read GetString write SetString;
-    property TandyRate : String index 32 read GetString write SetString;
+    property Codepage : String index 12 read GetString write SetString;
+    property ReportedDOSVersion : String index 13 read GetString write SetString;
+    property MIDIDevice : String index 14 read GetString write SetString;
+    property Blocksize : String index 15 read GetString write SetString;
+    property CyclesDown : String index 16 read GetString write SetString;
+    property CyclesUp : String index 17 read GetString write SetString;
+    property Dma : String index 18 read GetString write SetString;
+    property Dma1 : String index 19 read GetString write SetString;
+    property Dma2 : String index 20 read GetString write SetString;
+    property GUSBase : String index 21 read GetString write SetString;
+    property GUSRate : String index 22 read GetString write SetString;
+    property HDMA : String index 23 read GetString write SetString;
+    property IRQ : String index 24 read GetString write SetString;
+    property IRQ1 : String index 25 read GetString write SetString;
+    property IRQ2 : String index 26 read GetString write SetString;
+    property MPU401 : String index 27 read GetString write SetString;
+    property OPLRate : String index 28 read GetString write SetString;
+    property PCRate : String index 29 read GetString write SetString;
+    property Rate : String index 30 read GetString write SetString;
+    property SBBase : String index 31 read GetString write SetString;
+    property MouseSensitivity : String index 32 read GetString write SetString;
+    property TandyRate : String index 33 read GetString write SetString;
+    property ScummVMFilter : String index 34 read GetString write SetString;
+    property ScummVMMusicDriver : String index 35 read GetString write SetString;
+    property VGAChipsets : String index 36 read GetString write SetString;
+    property VGAVideoRAM : String index 37 read GetString write SetString;
 end;
 
 const NR_Name=1;
@@ -55,7 +60,8 @@ const NR_Name=1;
       NR_LoadFixMemory=109;
       NR_CaptureFolder=110;
       NR_ExtraDirs=111;
-      NR_LastModification=112;
+      NR_ExtraFiles=112;
+      NR_LastModification=113;
 
       NR_Genre=201;
       NR_Developer=202;
@@ -84,6 +90,7 @@ const NR_Name=1;
       NR_TextModeLines=314;
       NR_Priority=315;
       NR_CustomDOSBoxDir=316;
+      NR_CustomKeyMappingFile=317;
 
       NR_Memory=401;
       NR_XMS=402;
@@ -96,20 +103,31 @@ const NR_Name=1;
       NR_FrameSkip=409;
       NR_VideoCard=410;
       NR_KeyboardLayout=411;
-      NR_Serial1=412;
-      NR_Serial2=413;
-      NR_Serial3=414;
-      NR_Serial4=415;
-      NR_IPX=416;
-      NR_IPXType=417;
-      NR_IPXAddress=418;
-      NR_IPXPort=419;
-      NR_Use4DOS=420;
-      NR_UseDOS32A=421;
-      NR_ReportedDOSVersion=422;
-      NR_NumLockStatus=423;
-      NR_CapsLockStatus=424;
-      NR_ScrollLockStatus=425;
+      NR_Codepage=412;
+      NR_Serial1=413;
+      NR_Serial2=414;
+      NR_Serial3=415;
+      NR_Serial4=416;
+      NR_IPX=417;
+      NR_IPXType=418;
+      NR_IPXAddress=419;
+      NR_IPXPort=420;
+      NR_Use4DOS=421;
+      NR_UseDOS32A=422;
+      NR_ReportedDOSVersion=423;
+      NR_NumLockStatus=424;
+      NR_CapsLockStatus=425;
+      NR_ScrollLockStatus=426;
+      NR_VGAChipset=427;
+      NR_VideoRam=428;
+      NR_GlideEmulation=429;
+
+      NR_EnablePrinterEmulation=451;
+      NR_PrinterResolution=452;
+      NR_PaperWidth=453;
+      NR_PaperHeight=454;
+      NR_PrinterOutputFormat=455;
+      NR_PrinterMultiPage=456;
 
       NR_NrOfMounts=501;
       NR_Mount0=502;
@@ -174,12 +192,33 @@ const NR_Name=1;
       NR_AutoexecOverridegamestart=1102;
       NR_AutoexecOverrideMount=1103;
       NR_AutoexecBootImage=1104;
+      NR_AutoexecFinalization=1105;
 
       NR_CustomSettings=1201;
       NR_Environment=1202;
 
       NR_LastOpenTab=1301;
       NR_LastOpenTabModern=1302;
+
+      NR_ProfileMode=1351;
+
+      NR_ScummVMGame=1401;
+      NR_ScummVMPath=1402;
+      NR_ScummVMFilter=1403;
+      NR_ScummVMAutosave=1404;
+      NR_ScummVMLanguage=1405;
+      NR_ScummVMMusicVolume=1406;
+      NR_ScummVMSpeechVolume=1407;
+      NR_ScummVMSFXVolume=1408;
+      NR_ScummVMMIDIGain=1409;
+      NR_ScummVMSampleRate=1410;
+      NR_ScummVMMusicDriver=1411;
+      NR_ScummVMNativeMT32=1412;
+      NR_ScummVMEnableGS=1413;
+      NR_ScummVMMultiMIDI=1414;
+      NR_ScummVMTalkSpeed=1415;
+      NR_ScummVMSpeechMute=1416;
+      NR_ScummVMSubtitles=1417;
 
 Type TGame=class(TBasePrgSetup)
   private
@@ -200,6 +239,7 @@ Type TGame=class(TBasePrgSetup)
     Destructor Destroy; override;
 
     Procedure LoadCache;
+    Procedure ReloadINI; override;
 
     property Name : String index NR_Name read GetString write SetString;
 
@@ -214,6 +254,7 @@ Type TGame=class(TBasePrgSetup)
     property LoadFixMemory : Integer index NR_LoadFixMemory read GetInteger write SetInteger;
     property CaptureFolder : String index NR_CaptureFolder read GetString write SetString;
     property ExtraDirs : String index NR_ExtraDirs read GetString write SetString;
+    property ExtraFiles : String index NR_ExtraFiles read GetString write SetString;
     property LastModification : String index NR_LastModification read GetString write SetString;
 
     property Genre : String index NR_Genre read GetString write SetString;
@@ -243,6 +284,7 @@ Type TGame=class(TBasePrgSetup)
     property TextModeLines : Integer index NR_TextModeLines read GetInteger write SetInteger;
     property Priority : String index NR_Priority read GetString write SetString;
     property CustomDOSBoxDir : String index NR_CustomDOSBoxDir read GetString write SetString;
+    property CustomKeyMappingFile : String index NR_CustomKeyMappingFile read GetString write SetString;
 
     property Memory : Integer index NR_Memory read Getinteger write SetInteger;
     property XMS : Boolean index NR_XMS read GetBoolean write SetBoolean;
@@ -255,6 +297,7 @@ Type TGame=class(TBasePrgSetup)
     property FrameSkip : Integer index NR_FrameSkip read GetInteger write SetInteger;
     property VideoCard : String index NR_VideoCard read GetString write SetString;
     property KeyboardLayout : String index NR_KeyboardLayout read GetString write SetString;
+    property Codepage : String index NR_Codepage read GetString write SetString;
     property Serial1 : String index NR_Serial1 read GetString write SetString;
     property Serial2 : String index NR_Serial2 read GetString write SetString;
     property Serial3 : String index NR_Serial3 read GetString write SetString;
@@ -269,6 +312,16 @@ Type TGame=class(TBasePrgSetup)
     property NumLockStatus : String index NR_NumLockStatus read GetString write SetString;
     property CapsLockStatus : String index NR_CapsLockStatus read GetString write SetString;
     property ScrollLockStatus : String index NR_ScrollLockStatus read GetString write SetString;
+    property VGAChipset : String index NR_VGAChipset read GetString write SetString;
+    property VideoRam : Integer index NR_VideoRam read GetInteger write SetInteger;
+    property GlideEmulation : Boolean index NR_GlideEmulation read GetBoolean write SetBoolean;
+
+    property EnablePrinterEmulation : Boolean index NR_EnablePrinterEmulation read GetBoolean write SetBoolean;
+    property PrinterResolution : Integer index NR_PrinterResolution read GetInteger write SetInteger;
+    property PaperWidth : Integer index NR_PaperWidth read GetInteger write SetInteger;
+    property PaperHeight : Integer index NR_PaperHeight read GetInteger write SetInteger;
+    property PrinterOutputFormat : String index NR_PrinterOutputFormat read GetString write SetString;
+    property PrinterMultiPage : Boolean index NR_PrinterMultiPage read GetBoolean write SetBoolean;
 
     property NrOfMounts : Integer index NR_NrOfMounts read GetInteger write SetInteger;
     property Mount0 : String index NR_Mount0 read GetString write SetString;
@@ -333,12 +386,33 @@ Type TGame=class(TBasePrgSetup)
     property AutoexecOverridegamestart : Boolean index NR_AutoexecOverridegamestart read GetBoolean write SetBoolean;
     property AutoexecOverrideMount : Boolean index NR_AutoexecOverrideMount read GetBoolean write SetBoolean;
     property AutoexecBootImage : String index NR_AutoexecBootImage read GetString write SetString;
+    property AutoexecFinalization : String index NR_AutoexecFinalization read GetString write SetString;
 
     property CustomSettings : String index NR_CustomSettings read GetString write SetString;
     property Environment : String index NR_Environment read GetString write SetString;
 
     property LastOpenTab : Integer index NR_LastOpenTab read GetInteger write SetInteger;
     property LastOpenTabModern : Integer index NR_LastOpenTabModern read GetInteger write SetInteger;
+
+    property ProfileMode : String index NR_ProfileMode read GetString write SetString;
+
+    property ScummVMGame : String index NR_ScummVMGame read GetString write SetString;
+    property ScummVMPath : String index NR_ScummVMPath read GetString write SetString;
+    property ScummVMFilter : String index NR_ScummVMFilter read GetString write SetString;
+    property ScummVMAutosave : Integer index NR_ScummVMAutosave read GetInteger write SetInteger;
+    property ScummVMLanguage : String index NR_ScummVMLanguage read GetString write SetString;
+    property ScummVMMusicVolume : Integer index NR_ScummVMMusicVolume read GetInteger write SetInteger;
+    property ScummVMSpeechVolume : Integer index NR_ScummVMSpeechVolume read GetInteger write SetInteger;
+    property ScummVMSFXVolume : Integer index NR_ScummVMSFXVolume read GetInteger write SetInteger;
+    property ScummVMMIDIGain : Integer index NR_ScummVMMIDIGain read GetInteger write SetInteger;
+    property ScummVMSampleRate : Integer index NR_ScummVMSampleRate read GetInteger write SetInteger;
+    property ScummVMMusicDriver : String index NR_ScummVMMusicDriver read GetString write SetString;
+    property ScummVMNativeMT32 : Boolean index NR_ScummVMNativeMT32 read GetBoolean write SetBoolean;
+    property ScummVMEnableGS : Boolean index NR_ScummVMEnableGS read GetBoolean write SetBoolean;
+    property ScummVMMultiMIDI : Boolean index NR_ScummVMMultiMIDI read GetBoolean write SetBoolean;
+    property ScummVMTalkSpeed : Integer index NR_ScummVMTalkSpeed read GetInteger write SetInteger;
+    property ScummVMSpeechMute : Boolean index NR_ScummVMSpeechMute read GetBoolean write SetBoolean;
+    property ScummVMSubtitles : Boolean index NR_ScummVMSubtitles read GetBoolean write SetBoolean;
 end;
 
 Type TGameDB=class
@@ -370,6 +444,7 @@ Type TGameDB=class
     Function GetYearList(WithDefaultProfile : Boolean =True) : TStringList;
     Function GetLanguageList(WithDefaultProfile : Boolean =True) : TStringList;
     Function GetKeyValueList(const Key : String; WithDefaultProfile : Boolean =True) : TStringList;
+    Function GetUserKeys : TStringList;
     Function GetSortedGamesList : TList;
     Procedure StoreAllValues;
     Procedure LoadCache;
@@ -396,7 +471,7 @@ Const DefaultValuesResolution='original,320x200,640x432,640x480,720x480,800x600,
       DefaultValuesCore='auto,normal,dynamic,simple';
       DefaultValueSBlaster='none,sb1,sb2,sbpro1,sbpro2,sb16';
       DefaultValuesOPLModes='auto,cms,opl2,dualopl2,opl3';
-      DefaultValuesKeyboardLayout='none,default,Albania (SQ),Argentina (LA),Armenia (HY),Australia (US),Austria (GR),Azerbaijan (AZ),'+
+      DefaultValuesKeyboardLayout='default,Albania (SQ),Argentina (LA),Armenia (HY),Australia (US),Austria (GR),Azerbaijan (AZ),'+
                                   'Belarus (BL),Belarus (BY),Belgium (BE),Bosnia & Herzegovina (YU),Bosnia & Herzegovina (BA),Brazil BR),Brazil (br274),'+
                                   'Bulgaria (BG),Canada (CF),Canada (CA),Chile (LA),Colombia (LA),Croatia (YU),Croatia (HR),Czech Republic (CZ243),Denmark (DK),'+
                                   'Ecuador (LA),Estonia (ET),Estonia (EE),Faeroe Islands (FO),Finland (SU),Finland (FI),France (FR),Greece (GK),Germany (GR),'+
@@ -406,6 +481,7 @@ Const DefaultValuesResolution='original,320x200,640x432,640x480,720x480,800x600,
                                   'Serbia & Montenegro (YC),Serbia & Montenegro (SR),Slovakia (SK),Slovenia (YU),Slovenia (SI),South Africa (US),Spain (SP),'+
                                   'Spain (ES),Sweden (SV),Switzerland - French (SF),Switzerland - German (SG),Switzerland - German (SD),Tadjikistan (TJ),'+
                                   'Turkmenistan (TM),Turkey (TR),UK (UK),Ukraine (UR),Ukraine (UA),US (US),Uzbekistan (UZ),Venezuela (LA),Vietnam (VI)';
+      DefaultValuesCodepage='default,437,850,852,860,863,865,866';
       DefaultValuesReportedDOSVersion='default,6.2,6.0,5.0,4.0,3.3';
       DefaultValuesMIDIDevice='default,alsa,oss,win32,coreaudio,none';
       DefaultValuesBlocksize='512,1024,2048,3072,4096,8192';
@@ -427,6 +503,13 @@ Const DefaultValuesResolution='original,320x200,640x432,640x480,720x480,800x600,
       DefaultValuesSBBase='210,220,240,260,280';
       DefaultValuesMouseSensitivity='10,20,30,40,50,60,70,80,90,100,125,150,175,200,250,300,350,400,450,500,550,600,700,800,900,1000';
       DefaultValuesTandyRate='8000,11025,22050,32000,44100';
+      DefaultValuesScummVMFilter='No filtering. no scaling. Fastest (1x),No filtering. factor 2x. default for non 640x480 games (2x),No filtering. factor 3x (3x),2xSAI filter. factor 2x (2xsai),Enhanced 2xSAI filtering. factor 2x (super2xsai),'+
+                                 'Less blurry than 2xSAI but slower. Factor 2x (supereagle),Doesn''t rely on blurring like 2xSAI. fast. Factor 2x (advmame2x),Doesn''t rely on blurring like 2xSAI. fast. Factor 3x (advmame3x),Very nice high quality filter but slow. Factor 2x (hq2x),'+
+                                 'Very nice high quality filter but slow. Factor 3x (hq3x),Interlace filter. Tries to emulate a TV. Factor 2x (tv2x),Dot matrix effect. Factor 2x (dotmatrix)';
+      DefaultValuesScummVMMusicDriver='No music (null),Automatic (auto),Adlib emulation (adlib),FluidSynth MIDI emulation (fluidsynth),MT-32 emulation (mt32),PCjr emulation (only usable in SCUMM games) (pcjr),PC Speaker emulation (pcspk),'+
+                                      'FM-TOWNS YM2612 emulation (only usable in SCUMM FM-TOWNS games) (towns),Windows MIDI (windows)';
+      DefaultValuesVGAChipsets='s3,et4000,et4000new,et3000,pvga1a,none';
+      DefaultValuesVGAVideoRAM='512,1024,2048,4096,8192';
 
 implementation
 
@@ -450,27 +533,32 @@ begin
   AddStringRec(9,'sblaster','value',DefaultValueSBlaster);
   AddStringRec(10,'oplmode','value',DefaultValuesOPLModes);
   AddStringRec(11,'keyboardlayout','value',DefaultValuesKeyboardLayout);
-  AddStringRec(12,'ReportedDOSVersion','value',DefaultValuesReportedDOSVersion);
-  AddStringRec(13,'MIDIDevice','value',DefaultValuesMIDIDevice);
-  AddStringRec(14,'Blocksize','value',DefaultValuesBlocksize);
-  AddStringRec(15,'CyclesDown','value',DefaultValuesCyclesDown);
-  AddStringRec(16,'CyclesUp','value',DefaultValuesCyclesUp);
-  AddStringRec(17,'DMA','value',DefaultValuesDMA);
-  AddStringRec(18,'DMA1','value',DefaultValuesDMA1);
-  AddStringRec(19,'DMA2','value',DefaultValuesDMA2);
-  AddStringRec(20,'GUSBase','value',DefaultValuesGUSBase);
-  AddStringRec(21,'GUSRate','value',DefaultValuesGUSRate);
-  AddStringRec(22,'HDMA','value',DefaultValuesHDMA);
-  AddStringRec(23,'IRQ','value',DefaultValuesIRQ);
-  AddStringRec(24,'IRQ1','value',DefaultValuesIRQ1);
-  AddStringRec(25,'IRQ2','value',DefaultValuesIRQ2);
-  AddStringRec(26,'MPU401','value',DefaultValuesMPU401);
-  AddStringRec(27,'OPLRate','value',DefaultValuesOPLRate);
-  AddStringRec(28,'PCRate','value',DefaultValuesPCRate);
-  AddStringRec(29,'Rate','value',DefaultValuesRate);
-  AddStringRec(30,'SBBase','value',DefaultValuesSBBase);
-  AddStringRec(31,'MouseSensitivity','value',DefaultValuesMouseSensitivity);
-  AddStringRec(32,'TandyRate','value',DefaultValuesTandyRate);
+  AddStringRec(12,'codepage','value',DefaultValuesCodepage);
+  AddStringRec(13,'ReportedDOSVersion','value',DefaultValuesReportedDOSVersion);
+  AddStringRec(14,'MIDIDevice','value',DefaultValuesMIDIDevice);
+  AddStringRec(15,'Blocksize','value',DefaultValuesBlocksize);
+  AddStringRec(16,'CyclesDown','value',DefaultValuesCyclesDown);
+  AddStringRec(17,'CyclesUp','value',DefaultValuesCyclesUp);
+  AddStringRec(18,'DMA','value',DefaultValuesDMA);
+  AddStringRec(19,'DMA1','value',DefaultValuesDMA1);
+  AddStringRec(20,'DMA2','value',DefaultValuesDMA2);
+  AddStringRec(21,'GUSBase','value',DefaultValuesGUSBase);
+  AddStringRec(22,'GUSRate','value',DefaultValuesGUSRate);
+  AddStringRec(23,'HDMA','value',DefaultValuesHDMA);
+  AddStringRec(24,'IRQ','value',DefaultValuesIRQ);
+  AddStringRec(25,'IRQ1','value',DefaultValuesIRQ1);
+  AddStringRec(26,'IRQ2','value',DefaultValuesIRQ2);
+  AddStringRec(27,'MPU401','value',DefaultValuesMPU401);
+  AddStringRec(28,'OPLRate','value',DefaultValuesOPLRate);
+  AddStringRec(29,'PCRate','value',DefaultValuesPCRate);
+  AddStringRec(30,'Rate','value',DefaultValuesRate);
+  AddStringRec(31,'SBBase','value',DefaultValuesSBBase);
+  AddStringRec(32,'MouseSensitivity','value',DefaultValuesMouseSensitivity);
+  AddStringRec(33,'TandyRate','value',DefaultValuesTandyRate);
+  AddStringRec(34,'ScummVMFilter','value',DefaultValuesScummVMFilter);
+  AddStringRec(35,'ScummVMMusicDriver','value',DefaultValuesScummVMMusicDriver);
+  AddStringRec(36,'VGAChipsets','value',DefaultValuesVGAChipsets);
+  AddStringRec(37,'VGAVideoRAM','value',DefaultValuesVGAVideoRAM);
 end;
 
 destructor TConfOpt.Destroy;
@@ -521,6 +609,7 @@ begin
   AddIntegerRec(NR_LoadFixMemory,'Extra','LoadFixVal',64);
   AddStringRec(NR_CaptureFolder,'dosbox','captures','.\'+CaptureSubDir+'\');
   AddStringRec(NR_ExtraDirs,'Extra','ExtraDirs','');
+  AddStringRec(NR_ExtraFiles,'Extra','ExtraFiles','');
   AddStringRec(NR_LastModification,'Extra','LastModification','');
 
   AddStringRec(NR_Genre,'ExtraInfo','Genre','');
@@ -543,13 +632,14 @@ begin
   AddBooleanRec(NR_AspectCorrection,'render','aspect',False);
   AddBooleanRec(NR_UseScanCodes,'sdl','usecancodes',True);
   AddIntegerRec(NR_MouseSensitivity,'sdl','sensitivity',100);
-  AddStringRec(NR_Render,'sdl','output','surface');
+  AddStringRec(NR_Render,'sdl','output','overlay');
   AddStringRec(NR_WindowResolution,'sdl','windowresolution','original');
   AddStringRec(NR_FullscreenResolution,'sdl','fullresolution','original');
   AddStringRec(NR_Scale,'render','scaler','normal2x');
   AddIntegerRec(NR_TextModeLines,'render','TextModeLines',25);
   AddStringRec(NR_Priority,'sdl','priority','higher,normal');
   AddStringRec(NR_CustomDOSBoxDir,'dosbox','DOSBoxDirectory','default');
+  AddStringRec(NR_CustomKeyMappingFile,'sdl','mapperfile','default');
 
   AddIntegerRec(NR_Memory,'dosbox','memsize',32);
   AddBooleanRec(NR_XMS,'dos','xms',True);
@@ -562,6 +652,7 @@ begin
   AddIntegerRec(NR_FrameSkip,'render','frameskip',0);
   AddStringRec(NR_VideoCard,'dosbox','machine','vga');
   AddStringRec(NR_KeyboardLayout,'dos','keyboardlayout','default');
+  AddStringRec(NR_Codepage,'dos','codepage','default');
   AddStringRec(NR_Serial1,'serial','serial1','dummy');
   AddStringRec(NR_Serial2,'serial','serial2','dummy');
   AddStringRec(NR_Serial3,'serial','serial3','disabled');
@@ -576,6 +667,16 @@ begin
   AddStringRec(NR_NumLockStatus,'dos','NumLockStatus','');
   AddStringRec(NR_CapsLockStatus,'dos','CapsLockStatus','');
   AddStringRec(NR_ScrollLockStatus,'dos','ScrollLockStatus','');
+  AddStringRec(NR_VGAChipset,'vga','svgachipset','3s');
+  AddIntegerRec(NR_VideoRam,'vga','videoram',2048);
+  AddBooleanRec(NR_GlideEmulation,'glide','glide',False);
+
+  AddBooleanRec(NR_EnablePrinterEmulation,'printer','printer',False);
+  AddIntegerRec(NR_PrinterResolution,'printer','dpi',360);
+  AddIntegerRec(NR_PaperWidth,'printer','width',85);
+  AddIntegerRec(NR_PaperHeight,'printer','height',110);
+  AddStringRec(NR_PrinterOutputFormat,'printer','printoutput','ps');
+  AddBooleanRec(NR_PrinterMultiPage,'printer','multipage',False);
 
   AddIntegerRec(NR_NrOfMounts,'Extra','NrOfMounts',0);
   AddStringRec(NR_Mount0,'Extra','0','');
@@ -639,12 +740,34 @@ begin
   AddBooleanRec(NR_AutoexecOverridegamestart,'Extra','Overridegamestart',False);
   AddBooleanRec(NR_AutoexecOverrideMount,'Extra','OverrideMount',False);
   AddStringRec(NR_AutoexecBootImage,'Extra','BootImage','');
+  AddStringRec(NR_AutoexecFinalization,'Extra','Finalization','');
 
   AddStringRec(NR_CustomSettings,'Extra','CustomSettings','');
   AddStringRec(NR_Environment,'Extra','Environment','PATH[61]Z:\');
 
   AddIntegerRec(NR_LastOpenTab,'Extra','Tab',0);
   AddIntegerRec(NR_LastOpenTabModern,'Extra','Tab2',-1);
+
+  AddStringRec(NR_ProfileMode,'Extra','ProfileMode','DOSBox');
+
+  AddStringRec(NR_ScummVMGame,'ScummVM','GameName','');
+  AddStringRec(NR_ScummVMPath,'ScummVM','GamePath','');
+  AddStringRec(NR_ScummVMFilter,'ScummVM','Filter','2x');
+  AddIntegerRec(NR_ScummVMAutosave,'ScummVM','AutosavePeriod',300);
+  AddStringRec(NR_ScummVMLanguage,'ScummVM','Language','en');
+  AddIntegerRec(NR_ScummVMMusicVolume,'ScummVM','MusicVolume',192);
+  AddIntegerRec(NR_ScummVMSpeechVolume,'ScummVM','SpeechVolume',192);
+  AddIntegerRec(NR_ScummVMSFXVolume,'ScummVM','SFXVolume',192);
+  AddIntegerRec(NR_ScummVMMIDIGain,'ScummVM','MIDIGain',100);
+  AddIntegerRec(NR_ScummVMSampleRate,'ScummVM','SampleRate',22050);
+  AddStringRec(NR_ScummVMMusicDriver,'ScummVM','MusicDriver','auto');
+  AddBooleanRec(NR_ScummVMNativeMT32,'ScummVM','NativeMT32',False);
+  AddBooleanRec(NR_ScummVMEnableGS,'ScummVM','EnableGS',False);
+  AddBooleanRec(NR_ScummVMMultiMIDI,'ScummVM','MultiMIDI',False);
+  AddIntegerRec(NR_ScummVMTalkSpeed,'ScummVM','TalkSpeed',60);
+  AddBooleanRec(NR_ScummVMSpeechMute,'ScummVM','SpeechMute',False);
+  AddBooleanRec(NR_ScummVMSubtitles,'ScummVM','Subtitles',True);
+
 end;
 
 procedure TGame.LoadCache;
@@ -658,9 +781,16 @@ begin
   CacheUserInfo:=UserInfo;
 end;
 
+Procedure TGame.ReloadINI;
+begin
+  inherited ReloadINI;
+  LoadCache;
+end;
+
 procedure TGame.UpdatingFile;
 begin
-  LastModification:=IntToStr(Round(Int(Now)))+'-'+IntToStr(Round(Frac(Now)*86400))
+  inherited UpdatingFile;
+  LastModification:=IntToStr(Round(Int(Now)))+'-'+IntToStr(Round(Frac(Now)*86400));
 end;
 
 { TGameDB }
@@ -801,7 +931,9 @@ begin
   TGame(FGameList[Index]).Free;
   FGameList.Delete(Index);
 
-  If not DeleteFile(FileName) then MessageDlg(Format(LanguageSetup.MessageCouldNotDeleteFile,[FileName]),mtError,[mbOK],0);
+  If FileExists(FileName) then begin
+    If not DeleteFile(FileName) then MessageDlg(Format(LanguageSetup.MessageCouldNotDeleteFile,[FileName]),mtError,[mbOK],0);
+  end;
 end;
 
 function TGameDB.Delete(const AGame: TGame): Boolean;
@@ -980,6 +1112,34 @@ begin
         end;
         If Val='' then Val:=LanguageSetup.NotSet;
         If StUpper.IndexOf(ExtUpperCase(Val))<0 then begin StUpper.Add(ExtUpperCase(Val)); result.Add(Val); end;
+      finally
+        St.Free;
+      end;
+    end;
+  finally
+    StUpper.Free;
+  end;
+  result.Sort;
+end;
+
+Function TGameDB.GetUserKeys : TStringList;
+Var StUpper,St : TStringList;
+    I,J,K : Integer;
+    S : String;
+begin
+  result:=TStringList.Create;
+  StUpper:=TStringList.Create;
+  try
+    For I:=0 to FGameList.Count-1 do begin
+      St:=StringToStringList(TGame(FGameList[I]).CacheUserInfo);
+      try
+        For K:=0 to St.Count-1 do begin
+          S:=St[K]; J:=Pos('=',S); If J=0 then continue;
+          S:=Trim(Copy(S,1,J-1));
+          If StUpper.IndexOf(ExtUpperCase(S))>=0 then continue;
+          result.Add(S);
+          StUpper.Add(ExtUpperCase(S));
+        end;
       finally
         St.Free;
       end;

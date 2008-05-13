@@ -26,10 +26,11 @@ type
     { Private-Deklarationen }
   public
     { Public-Deklarationen }
-    Procedure InitGUI(const OnProfileNameChange : TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup : PString);
+    Procedure InitGUI(const OnProfileNameChange : TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup, CurrentScummVMGameName : PString);
     Procedure SetGame(const Game : TGame; const LoadFromTemplate : Boolean);
     Function CheckValue : Boolean;
     Procedure GetGame(const Game : TGame);
+    Procedure ShowFrame;
   end;
 
 implementation
@@ -40,7 +41,7 @@ uses VistaToolsUnit, LanguageSetupUnit, CommonTools;
 
 { TFrame1 }
 
-procedure TModernProfileEditorGUSFrame.InitGUI(const OnProfileNameChange: TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup: PString);
+procedure TModernProfileEditorGUSFrame.InitGUI(const OnProfileNameChange: TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup, CurrentScummVMGameName : PString);
 Var St : TStringList;
 begin
   NoFlicker(ActivateGUSCheckBox);
@@ -95,6 +96,10 @@ begin
   SetComboBox(DMA1ComboBox,IntToStr(Game.GUSDMA1),'1');
   SetComboBox(DMA2ComboBox,IntToStr(Game.GUSDMA2),'1');
   PathEdit.Text:=Game.GUSUltraDir;
+end;
+
+procedure TModernProfileEditorGUSFrame.ShowFrame;
+begin
 end;
 
 function TModernProfileEditorGUSFrame.CheckValue: Boolean;

@@ -32,13 +32,14 @@ Function ShowSelectProfilesDialog(const AOwner : TComponent; const AGameDB : TGa
 
 implementation
 
-uses VistaToolsUnit, LanguageSetupUnit, GameDBToolsUnit;
+uses VistaToolsUnit, LanguageSetupUnit, GameDBToolsUnit, CommonTools;
 
 {$R *.dfm}
 
 procedure TSelectProfilesForm.FormCreate(Sender: TObject);
 begin
   SetVistaFonts(self);
+  Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName);
 
   Caption:=LanguageSetup.UninstallSelectForm;
   OKButton.Caption:=LanguageSetup.OK;
@@ -50,7 +51,7 @@ end;
 
 procedure TSelectProfilesForm.FormShow(Sender: TObject);
 begin
-  BuildCheckList(ListBox,GameDB,False);
+  BuildCheckList(ListBox,GameDB,False,False);
   BuildSelectPopupMenu(PopupMenu,GameDB,SelectButtonClick,False);
 end;
 

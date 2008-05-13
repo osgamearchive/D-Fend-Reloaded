@@ -1,6 +1,6 @@
 LangString LANGNAME_ioFile ${LANG_ENGLISH} "ioFileEnglish.ini"
 
-LangString LANGNAME_NeedAdminRights ${LANG_ENGLISH} "Without admin rights the installer can't write to the programs folder. Only USB stick installation will work. Do you want to retry changing to admin state ?"
+LangString LANGNAME_NeedAdminRights ${LANG_ENGLISH} "Without admin rights the installer can't write to the programs folder. Only portalbe mode installation will work. Do you want to retry changing to admin state ?"
 LangString LANGNAME_NeedAdminRightsUpdate ${LANG_ENGLISH} "Without admin rights the installer can't write to the programs folder. Only USB stick installations can be updated then. Do you want to retry changing to admin state ?"
 
 LangString LANGNAME_WelcomeText ${LANG_ENGLISH} "This wizard will guide you through the installation of ${PrgName}.\r\n\r\nClick Next to continue."
@@ -26,13 +26,16 @@ LangString LANGNAME_NoInstallationFound ${LANG_ENGLISH} "There is no D-Fend Relo
 LangString LANGNAME_ProgramFiles ${LANG_ENGLISH} "Program files"
 LangString LANGNAME_LanguageFiles ${LANG_ENGLISH} "Language files"
 LangString LANGNAME_DOSBox ${LANG_ENGLISH} "DOSBox"
-LangString LANGNAME_FreeDosTools ${LANG_ENGLISH} "FreeDos Tools for use in DosBox"
-LangString LANGNAME_OpenGEM ${LANG_ENGLISH} "OpenGEM"
+LangString LANGNAME_Tools ${LANG_ENGLISH} "Tools"   # NEW !!!
+LangString LANGNAME_FreeDosTools ${LANG_ENGLISH} "FreeDOS Tools for use in DosBox"
+LangString LANGNAME_Doszip ${LANG_ENGLISH} "Doszip Commander"   # NEW !!!
 LangString LANGNAME_DesktopShortcut ${LANG_ENGLISH} "Desktop Shortcut"
 
 LangString DESC_DFend ${LANG_ENGLISH} "D-Fend Reloaded is the graphical user interface for administrating DOS games."
 LangString DESC_DosBox ${LANG_ENGLISH} "DOSBox is the DOS emulator used by D-Fend Reloaded."
 LangString DESC_DosBoxProgramFiles ${LANG_ENGLISH} "Program files of the DOS emulator."
 LangString DESC_DosBoxLanguageFiles ${LANG_ENGLISH} "Language files for different languages for DOSBox."
+LangString DESC_Tools ${LANG_ENGLISH} "Tools for use in DOSBox."      # NEW !!!
 LangString DESC_FreeDosTools ${LANG_ENGLISH} "Commandline tools form the FreeDOS collection for use in DOSBox."
+LangString DESC_Doszip ${LANG_ENGLISH} "Doszip Commander is a Norton Commander clone to be used in DOSBox."      # NEW !!!
 LangString DESC_DesktopShortcut ${LANG_ENGLISH} "Creates a desktop shortcut for D-Fend Reloaded."

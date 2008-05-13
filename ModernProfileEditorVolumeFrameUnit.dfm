@@ -1,183 +1,421 @@
 object ModernProfileEditorVolumeFrame: TModernProfileEditorVolumeFrame
   Left = 0
   Top = 0
-  Width = 529
-  Height = 479
+  Width = 468
+  Height = 475
   TabOrder = 0
-  object SoundVolumeLeftLabel: TLabel
-    Left = 148
-    Top = 13
+  object SoundVolumeLeftLabel1: TLabel
+    Left = 16
+    Top = 157
     Width = 23
     Height = 13
     Caption = 'Links'
   end
-  object SoundVolumeRightLabel: TLabel
-    Left = 212
-    Top = 13
+  object SoundVolumeRightLabel1: TLabel
+    Left = 80
+    Top = 157
     Width = 33
     Height = 13
     Caption = 'Rechts'
   end
   object SoundVolumeMasterLabel: TLabel
     Left = 16
-    Top = 36
+    Top = 12
     Width = 33
     Height = 13
     Caption = 'Master'
   end
   object SoundVolumeDisneyLabel: TLabel
-    Left = 16
-    Top = 64
+    Left = 160
+    Top = 12
     Width = 103
     Height = 13
     Caption = 'Disney Sound System'
   end
   object SoundVolumeSpeakerLabel: TLabel
-    Left = 16
-    Top = 92
+    Left = 304
+    Top = 12
     Width = 80
     Height = 13
     Caption = 'Internal Speaker'
   end
   object SoundVolumeGUSLabel: TLabel
     Left = 16
-    Top = 120
+    Top = 236
     Width = 20
     Height = 13
     Caption = 'GUS'
   end
   object SoundVolumeSBLabel: TLabel
-    Left = 16
-    Top = 148
+    Left = 160
+    Top = 236
     Width = 63
     Height = 13
     Caption = 'SoundBlaster'
   end
   object SoundVolumeFMLabel: TLabel
-    Left = 16
-    Top = 176
+    Left = 304
+    Top = 236
     Width = 14
     Height = 13
     Caption = 'FM'
   end
-  object SoundVolumeMasterLeftEdit: TSpinEdit
-    Left = 148
-    Top = 32
-    Width = 49
-    Height = 22
-    MaxValue = 100
-    MinValue = 0
-    TabOrder = 0
-    Value = 100
+  object SoundVolumeLeftLabel2: TLabel
+    Left = 160
+    Top = 157
+    Width = 23
+    Height = 13
+    Caption = 'Links'
   end
-  object SoundVolumeMasterRightEdit: TSpinEdit
-    Left = 212
-    Top = 32
+  object SoundVolumeRightLabel2: TLabel
+    Left = 224
+    Top = 157
+    Width = 33
+    Height = 13
+    Caption = 'Rechts'
+  end
+  object SoundVolumeLeftLabel3: TLabel
+    Left = 304
+    Top = 157
+    Width = 23
+    Height = 13
+    Caption = 'Links'
+  end
+  object SoundVolumeRightLabel3: TLabel
+    Left = 368
+    Top = 157
+    Width = 33
+    Height = 13
+    Caption = 'Rechts'
+  end
+  object SoundVolumeLeftLabel4: TLabel
+    Left = 16
+    Top = 381
+    Width = 23
+    Height = 13
+    Caption = 'Links'
+  end
+  object SoundVolumeRightLabel4: TLabel
+    Left = 80
+    Top = 381
+    Width = 33
+    Height = 13
+    Caption = 'Rechts'
+  end
+  object SoundVolumeLeftLabel5: TLabel
+    Left = 160
+    Top = 381
+    Width = 23
+    Height = 13
+    Caption = 'Links'
+  end
+  object SoundVolumeRightLabel5: TLabel
+    Left = 224
+    Top = 381
+    Width = 33
+    Height = 13
+    Caption = 'Rechts'
+  end
+  object SoundVolumeLeftLabel6: TLabel
+    Left = 304
+    Top = 381
+    Width = 23
+    Height = 13
+    Caption = 'Links'
+  end
+  object SoundVolumeRightLabel6: TLabel
+    Left = 368
+    Top = 381
+    Width = 33
+    Height = 13
+    Caption = 'Rechts'
+  end
+  object SoundVolumeMasterLeftEdit: TSpinEdit
+    Left = 16
+    Top = 176
     Width = 49
     Height = 22
     MaxValue = 100
     MinValue = 0
     TabOrder = 1
     Value = 100
+    OnChange = SpinEditChange
   end
-  object SoundVolumeDisneyLeftEdit: TSpinEdit
-    Left = 148
-    Top = 60
-    Width = 49
-    Height = 22
-    MaxValue = 100
-    MinValue = 0
-    TabOrder = 2
-    Value = 100
-  end
-  object SoundVolumeDisneyRightEdit: TSpinEdit
-    Left = 212
-    Top = 60
+  object SoundVolumeMasterRightEdit: TSpinEdit
+    Left = 80
+    Top = 176
     Width = 49
     Height = 22
     MaxValue = 100
     MinValue = 0
     TabOrder = 3
     Value = 100
+    OnChange = SpinEditChange
   end
-  object SoundVolumeSpeakerLeftEdit: TSpinEdit
-    Left = 148
-    Top = 88
-    Width = 49
-    Height = 22
-    MaxValue = 100
-    MinValue = 0
-    TabOrder = 4
-    Value = 100
-  end
-  object SoundVolumeSpeakerRightEdit: TSpinEdit
-    Left = 212
-    Top = 88
+  object SoundVolumeDisneyLeftEdit: TSpinEdit
+    Left = 160
+    Top = 176
     Width = 49
     Height = 22
     MaxValue = 100
     MinValue = 0
     TabOrder = 5
     Value = 100
+    OnChange = SpinEditChange
   end
-  object SoundVolumeGUSLeftEdit: TSpinEdit
-    Left = 148
-    Top = 116
-    Width = 49
-    Height = 22
-    MaxValue = 100
-    MinValue = 0
-    TabOrder = 6
-    Value = 100
-  end
-  object SoundVolumeGUSRightEdit: TSpinEdit
-    Left = 212
-    Top = 116
+  object SoundVolumeDisneyRightEdit: TSpinEdit
+    Left = 224
+    Top = 176
     Width = 49
     Height = 22
     MaxValue = 100
     MinValue = 0
     TabOrder = 7
     Value = 100
+    OnChange = SpinEditChange
   end
-  object SoundVolumeSBLeftEdit: TSpinEdit
-    Left = 148
-    Top = 144
-    Width = 49
-    Height = 22
-    MaxValue = 100
-    MinValue = 0
-    TabOrder = 8
-    Value = 100
-  end
-  object SoundVolumeSBRightEdit: TSpinEdit
-    Left = 212
-    Top = 144
+  object SoundVolumeSpeakerLeftEdit: TSpinEdit
+    Left = 304
+    Top = 176
     Width = 49
     Height = 22
     MaxValue = 100
     MinValue = 0
     TabOrder = 9
     Value = 100
+    OnChange = SpinEditChange
   end
-  object SoundVolumeFMLeftEdit: TSpinEdit
-    Left = 148
-    Top = 172
-    Width = 49
-    Height = 22
-    MaxValue = 100
-    MinValue = 0
-    TabOrder = 10
-    Value = 100
-  end
-  object SoundVolumeFMRightEdit: TSpinEdit
-    Left = 212
-    Top = 172
+  object SoundVolumeSpeakerRightEdit: TSpinEdit
+    Left = 368
+    Top = 176
     Width = 49
     Height = 22
     MaxValue = 100
     MinValue = 0
     TabOrder = 11
     Value = 100
+    OnChange = SpinEditChange
+  end
+  object SoundVolumeGUSLeftEdit: TSpinEdit
+    Left = 16
+    Top = 399
+    Width = 49
+    Height = 22
+    MaxValue = 100
+    MinValue = 0
+    TabOrder = 13
+    Value = 100
+    OnChange = SpinEditChange
+  end
+  object SoundVolumeGUSRightEdit: TSpinEdit
+    Left = 80
+    Top = 399
+    Width = 49
+    Height = 22
+    MaxValue = 100
+    MinValue = 0
+    TabOrder = 15
+    Value = 100
+    OnChange = SpinEditChange
+  end
+  object SoundVolumeSBLeftEdit: TSpinEdit
+    Left = 160
+    Top = 400
+    Width = 49
+    Height = 22
+    MaxValue = 100
+    MinValue = 0
+    TabOrder = 17
+    Value = 100
+    OnChange = SpinEditChange
+  end
+  object SoundVolumeSBRightEdit: TSpinEdit
+    Left = 224
+    Top = 400
+    Width = 49
+    Height = 22
+    MaxValue = 100
+    MinValue = 0
+    TabOrder = 19
+    Value = 100
+    OnChange = SpinEditChange
+  end
+  object SoundVolumeFMLeftEdit: TSpinEdit
+    Left = 304
+    Top = 400
+    Width = 49
+    Height = 22
+    MaxValue = 100
+    MinValue = 0
+    TabOrder = 21
+    Value = 100
+    OnChange = SpinEditChange
+  end
+  object SoundVolumeFMRightEdit: TSpinEdit
+    Left = 368
+    Top = 400
+    Width = 49
+    Height = 22
+    MaxValue = 100
+    MinValue = 0
+    TabOrder = 23
+    Value = 100
+    OnChange = SpinEditChange
+  end
+  object SoundVolumeMasterLeftTrackBar: TTrackBar
+    Left = 16
+    Top = 31
+    Width = 45
+    Height = 114
+    Max = 100
+    Orientation = trVertical
+    PageSize = 5
+    Frequency = 10
+    TabOrder = 0
+    TickMarks = tmBoth
+    OnChange = TrackBarChange
+  end
+  object SoundVolumeMasterRightTrackBar: TTrackBar
+    Left = 80
+    Top = 31
+    Width = 45
+    Height = 114
+    Max = 100
+    Orientation = trVertical
+    PageSize = 5
+    Frequency = 10
+    TabOrder = 2
+    TickMarks = tmBoth
+    OnChange = TrackBarChange
+  end
+  object SoundVolumeDisneyLeftTrackBar: TTrackBar
+    Left = 160
+    Top = 31
+    Width = 45
+    Height = 114
+    Max = 100
+    Orientation = trVertical
+    PageSize = 5
+    Frequency = 10
+    TabOrder = 4
+    TickMarks = tmBoth
+    OnChange = TrackBarChange
+  end
+  object SoundVolumeDisneyRightTrackBar: TTrackBar
+    Left = 224
+    Top = 31
+    Width = 45
+    Height = 114
+    Max = 100
+    Orientation = trVertical
+    PageSize = 5
+    Frequency = 10
+    TabOrder = 6
+    TickMarks = tmBoth
+    OnChange = TrackBarChange
+  end
+  object SoundVolumeSpeakerLeftTrackBar: TTrackBar
+    Left = 304
+    Top = 31
+    Width = 45
+    Height = 114
+    Max = 100
+    Orientation = trVertical
+    PageSize = 5
+    Frequency = 10
+    TabOrder = 8
+    TickMarks = tmBoth
+    OnChange = TrackBarChange
+  end
+  object SoundVolumeSpeakerRightTrackBar: TTrackBar
+    Left = 368
+    Top = 31
+    Width = 45
+    Height = 114
+    Max = 100
+    Orientation = trVertical
+    PageSize = 5
+    Frequency = 10
+    TabOrder = 10
+    TickMarks = tmBoth
+    OnChange = TrackBarChange
+  end
+  object SoundVolumeGUSLeftTrackBar: TTrackBar
+    Left = 16
+    Top = 255
+    Width = 45
+    Height = 114
+    Max = 100
+    Orientation = trVertical
+    PageSize = 5
+    Frequency = 10
+    TabOrder = 12
+    TickMarks = tmBoth
+    OnChange = TrackBarChange
+  end
+  object SoundVolumeGUSRightTrackBar: TTrackBar
+    Left = 80
+    Top = 255
+    Width = 45
+    Height = 114
+    Max = 100
+    Orientation = trVertical
+    PageSize = 5
+    Frequency = 10
+    TabOrder = 14
+    TickMarks = tmBoth
+    OnChange = TrackBarChange
+  end
+  object SoundVolumeSBLeftTrackBar: TTrackBar
+    Left = 160
+    Top = 255
+    Width = 45
+    Height = 114
+    Max = 100
+    Orientation = trVertical
+    PageSize = 5
+    Frequency = 10
+    TabOrder = 16
+    TickMarks = tmBoth
+    OnChange = TrackBarChange
+  end
+  object SoundVolumeSBRightTrackBar: TTrackBar
+    Left = 224
+    Top = 255
+    Width = 45
+    Height = 114
+    Max = 100
+    Orientation = trVertical
+    PageSize = 5
+    Frequency = 10
+    TabOrder = 18
+    TickMarks = tmBoth
+    OnChange = TrackBarChange
+  end
+  object SoundVolumeFMLeftTrackBar: TTrackBar
+    Left = 304
+    Top = 255
+    Width = 45
+    Height = 114
+    Max = 100
+    Orientation = trVertical
+    PageSize = 5
+    Frequency = 10
+    TabOrder = 20
+    TickMarks = tmBoth
+    OnChange = TrackBarChange
+  end
+  object SoundVolumeFMRightTrackBar: TTrackBar
+    Left = 368
+    Top = 255
+    Width = 45
+    Height = 114
+    Max = 100
+    Orientation = trVertical
+    PageSize = 5
+    Frequency = 10
+    TabOrder = 22
+    TickMarks = tmBoth
+    OnChange = TrackBarChange
   end
 end

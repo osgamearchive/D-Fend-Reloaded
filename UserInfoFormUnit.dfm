@@ -108,9 +108,5 @@ object UserInfoForm: TUserInfoForm
     RowCount = 2
     Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goEditing, goAlwaysShowEditor, goThumbTracking]
     TabOrder = 1
-    ExplicitLeft = 48
-    ExplicitTop = 48
-    ExplicitWidth = 320
-    ExplicitHeight = 120
   end
 end

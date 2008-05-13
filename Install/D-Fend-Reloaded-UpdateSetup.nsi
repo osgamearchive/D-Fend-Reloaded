@@ -15,8 +15,8 @@
 ; ============================================================
 
 !define VER_MAYOR 0
-!define VER_MINOR1 3
-!define VER_MINOR2 2
+!define VER_MINOR1 4
+!define VER_MINOR2 0
 
 !define PrgName "D-Fend Reloaded ${VER_MAYOR}.${VER_MINOR1}.${VER_MINOR2}"
 OutFile "D-Fend-Reloaded-${VER_MAYOR}.${VER_MINOR1}.${VER_MINOR2}-UpdateSetup.exe"
@@ -86,6 +86,7 @@ FunctionEnd
 ; ============================================================
 
 Var DataInstDir
+Var InstallDataType
 
 
 
@@ -96,12 +97,14 @@ Var DataInstDir
 !insertmacro MUI_LANGUAGE "French"
 !insertmacro MUI_LANGUAGE "German"
 !insertmacro MUI_LANGUAGE "Russian"
+!insertmacro MUI_LANGUAGE "SimpChinese"
 !insertmacro MUI_LANGUAGE "Spanish"
 
 !include "D-Fend-Reloaded-Setup-Lang-English.nsi"
 !include "D-Fend-Reloaded-Setup-Lang-French.nsi"
 !include "D-Fend-Reloaded-Setup-Lang-German.nsi"
 !include "D-Fend-Reloaded-Setup-Lang-Russian.nsi"
+!include "D-Fend-Reloaded-Setup-Lang-Simplified_Chinese.nsi"
 !include "D-Fend-Reloaded-Setup-Lang-Spanish.nsi"
 
 
@@ -124,6 +127,9 @@ SectionEnd
 Section "$(LANGNAME_DFendReloaded)" ID_DFend
   SectionIn RO
   
+  
+  ; Read installation type
+  
   IfFileExists "$INSTDIR\DFend.dat" StartCheck
   MessageBox MB_OK "$(LANGNAME_NoInstallationFound)"
   Quit
@@ -137,10 +143,14 @@ Section "$(LANGNAME_DFendReloaded)" ID_DFend
   FileRead $0 $1
   FileClose $0
   StrCmp $1 "USERDIRMODE" InstUserMode
+  IntOp $InstallDataType 0 + 0
   Goto ReadInstTypeEnd
   InstUserMode:
+  IntOp $InstallDataType 0 + 1
   strcpy $DataInstDir "$PROFILE\D-Fend Reloaded"
   ReadInstTypeEnd:
+  
+  ; Update main files
   
   SetOutPath "$INSTDIR"
   File "..\DFend.exe"
@@ -157,17 +167,65 @@ Section "$(LANGNAME_DFendReloaded)" ID_DFend
   File "..\D-Fend Reloaded DataInstaller.nsi"
   File "..\Icons.ini"
   
+  SetOutPath "$INSTDIR\Lang"
+  File "..\Lang\*.ini"  
+  
+  ; Update config file
+  
   WriteINIStr $DataInstDir\ConfOpt.dat resolution value original,320x200,640x432,640x480,720x480,800x600,1024x768,1152x864,1280x720,1280x768,1280x960,1280x1024,1600x1200,1920x1080,1920x1200
   WriteINIStr $DataInstDir\ConfOpt.dat joysticks value none,auto,2axis,4axis,fcs,ch
+  
+  ; Update templates
+  
+  IntCmp $InstallDataType 1 WriteNewUserDir
+    
+    SetOutPath "$DataInstDir\Capture\DOSBox DOS"
+    File "..\NewUserData\Capture\DOSBox DOS\*.*"
 
-  SetOutPath "$INSTDIR\Lang"
-  File "..\Lang\*.ini"
+    SetOutPath "$DataInstDir\Templates"
+    File "..\NewUserData\Templates\*.prof"
+	
+    SetOutPath "$DataInstDir\AutoSetup"
+    File "..\NewUserData\AutoSetup\*.prof"	
+
+    SetOutPath "$DataInstDir\IconLibrary"
+    File "..\NewUserData\IconLibrary\*.*"
   
-  SetOutPath "$DataInstDir\Templates"
-  File "..\Templates\*.prof"
+  Goto TemplateWritingFinish
+  WriteNewUserDir:  
+
+    SetOutPath "$INSTDIR\NewUserData\Capture\DOSBox DOS"
+    File "..\NewUserData\Capture\DOSBox DOS\*.*"
+
+    SetOutPath "$INSTDIR\NewUserData\Templates"
+    File "..\NewUserData\Templates\*.prof"
+	
+    SetOutPath "$INSTDIR\NewUserData\AutoSetup"
+    File "..\NewUserData\AutoSetup\*.prof"	
+
+    SetOutPath "$INSTDIR\NewUserData\IconLibrary"
+    File "..\NewUserData\IconLibrary\*.*"
+	
+	; Copy FreeDOS files to NewUserData directory
+	
+	IfFileExists "$DataInstDir\VirtualHD\FREEDOS\*.*" 0 TemplateWritingFinish
+	IfFileExists "$INSTDIR\NewUserData\FREEDOS\*.*" TemplateWritingFinish
+	
+	CreateDirectory "$INSTDIR\NewUserData\FREEDOS"
+	CopyFiles /SILENT "$DataInstDir\VirtualHD\FREEDOS\*.*" "$INSTDIR\NewUserData\FREEDOS\"
+
+  TemplateWritingFinish:
   
-  SetOutPath "$DataInstDir\IconLibrary"
-  File "..\IconLibrary\*.*"
+  ; Install DOSZip
+  
+  IntCmp $InstallDataType 1 DoszipToNewUserDir
+    SetOutPath "$DataInstDir\VirtualHD\DOSZIP"
+  Goto DoszipWritingStart
+  DoszipToNewUserDir:
+    SetOutPath "$INSTDIR\NewUserData\DOSZIP"
+  DoszipWritingStart:
+  
+  File /r "..\NewUserData\DOSZIP\*.*" 
 SectionEnd
 
 ; Definition of NSIS functions

@@ -82,6 +82,16 @@ object ProfileMountEditorForm: TProfileMountEditorForm
         Height = 13
         Caption = 'Free virtual Harddisk-Space (x MB)'
       end
+      object FolderDriveLetterWarningLabel: TLabel
+        Left = 176
+        Top = 99
+        Width = 510
+        Height = 18
+        AutoSize = False
+        Caption = 'FolderDriveLetterWarningLabel'
+        Visible = False
+        WordWrap = True
+      end
       object FolderEdit: TLabeledEdit
         Left = 16
         Top = 32
@@ -100,6 +110,7 @@ object ProfileMountEditorForm: TProfileMountEditorForm
         Style = csDropDownList
         ItemHeight = 13
         TabOrder = 1
+        OnChange = FolderDriveLetterComboBoxChange
       end
       object FolderFreeSpaceTrackBar: TTrackBar
         Left = 16
@@ -149,6 +160,16 @@ object ProfileMountEditorForm: TProfileMountEditorForm
         Height = 13
         Caption = 'Mounted drive letter'
       end
+      object FloppyDriveLetterWarningLabel: TLabel
+        Left = 176
+        Top = 99
+        Width = 510
+        Height = 18
+        AutoSize = False
+        Caption = 'FloppyDriveLetterWarningLabel'
+        Visible = False
+        WordWrap = True
+      end
       object FloppyEdit: TLabeledEdit
         Left = 16
         Top = 31
@@ -167,6 +188,7 @@ object ProfileMountEditorForm: TProfileMountEditorForm
         Style = csDropDownList
         ItemHeight = 13
         TabOrder = 1
+        OnChange = FloppyDriveLetterComboBoxChange
       end
     end
     object CDROMSheet: TTabSheet
@@ -203,6 +225,23 @@ object ProfileMountEditorForm: TProfileMountEditorForm
         Height = 13
         Caption = 'Mounted drive letter'
       end
+      object CDROMDriveLetterWarningLabel: TLabel
+        Left = 176
+        Top = 187
+        Width = 510
+        Height = 18
+        AutoSize = False
+        Caption = 'CDROMDriveLetterWarningLabel'
+        Visible = False
+        WordWrap = True
+      end
+      object CDROMDriveAccessLabel: TLabel
+        Left = 16
+        Top = 112
+        Width = 72
+        Height = 13
+        Caption = 'Access method'
+      end
       object CDROMEdit: TLabeledEdit
         Left = 16
         Top = 32
@@ -231,14 +270,22 @@ object ProfileMountEditorForm: TProfileMountEditorForm
         Style = csDropDownList
         ItemHeight = 13
         TabOrder = 3
+        OnChange = CDROMDriveLetterComboBoxChange
       end
-      object CDROMIOCtrlCheckBox: TCheckBox
+      object CDROMDriveAccessComboBox: TComboBox
         Left = 16
-        Top = 126
-        Width = 449
-        Height = 17
-        Caption = 'Enable input/output control (recommended for Win NT/2K/XP/Vista)'
+        Top = 130
+        Width = 633
+        Height = 21
+        Style = csDropDownList
+        ItemHeight = 13
+        ItemIndex = 0
         TabOrder = 2
+        Text = 'Normal CDROM access via MSCDEX'
+        Items.Strings = (
+          'Normal CDROM access via MSCDEX'
+          'Low-level CDROM access and MSCDEX'
+          'Low-level SDL-support and MSCDEX')
       end
     end
     object FloppyImageSheet: TTabSheet
@@ -300,12 +347,22 @@ object ProfileMountEditorForm: TProfileMountEditorForm
         OnClick = FolderButtonClick
       end
       object DriveLetterInfoLabel1: TLabel
-        Left = 184
-        Top = 80
-        Width = 479
-        Height = 105
+        Left = 16
+        Top = 112
+        Width = 647
+        Height = 73
         AutoSize = False
         Caption = 'DriveLetterInfoLabel1'
+        WordWrap = True
+      end
+      object FloppyImageDriveLetterWarningLabel: TLabel
+        Left = 176
+        Top = 80
+        Width = 510
+        Height = 18
+        AutoSize = False
+        Caption = 'FloppyImageDriveLetterWarningLabel'
+        Visible = False
         WordWrap = True
       end
       object FloppyImageDriveLetterComboBox: TComboBox
@@ -316,6 +373,7 @@ object ProfileMountEditorForm: TProfileMountEditorForm
         Style = csDropDownList
         ItemHeight = 13
         TabOrder = 0
+        OnChange = FloppyImageDriveLetterComboBoxChange
       end
       object FloppyImageEdit: TLabeledEdit
         Left = 16
@@ -341,7 +399,7 @@ object ProfileMountEditorForm: TProfileMountEditorForm
       object FloppyImageButton2: TSpeedButton
         Tag = 10
         Left = 640
-        Top = 31
+        Top = 24
         Width = 23
         Height = 22
         Glyph.Data = {
@@ -365,7 +423,7 @@ object ProfileMountEditorForm: TProfileMountEditorForm
       object FloppyImageAddButton: TSpeedButton
         Tag = 11
         Left = 640
-        Top = 59
+        Top = 52
         Width = 23
         Height = 22
         Glyph.Data = {
@@ -389,7 +447,7 @@ object ProfileMountEditorForm: TProfileMountEditorForm
       object FloppyImageDelButton: TSpeedButton
         Tag = 12
         Left = 669
-        Top = 59
+        Top = 52
         Width = 23
         Height = 22
         Glyph.Data = {
@@ -412,23 +470,23 @@ object ProfileMountEditorForm: TProfileMountEditorForm
       end
       object FloppyImageDriveLetterLabel2: TLabel
         Left = 16
-        Top = 125
+        Top = 118
         Width = 98
         Height = 13
         Caption = 'Mounted drive letter'
       end
       object DriveLetterInfoLabel3: TLabel
-        Left = 184
-        Top = 128
-        Width = 479
-        Height = 80
+        Left = 16
+        Top = 160
+        Width = 647
+        Height = 58
         AutoSize = False
         Caption = 'DriveLetterInfoLabel3'
         WordWrap = True
       end
       object FloppyImageSwitchLabel: TLabel
         Left = 16
-        Top = 98
+        Top = 92
         Width = 337
         Height = 13
         Caption = 
@@ -438,7 +496,7 @@ object ProfileMountEditorForm: TProfileMountEditorForm
       object FloppyImageCreateButton2: TSpeedButton
         Tag = 16
         Left = 669
-        Top = 31
+        Top = 24
         Width = 23
         Height = 22
         Glyph.Data = {
@@ -459,9 +517,19 @@ object ProfileMountEditorForm: TProfileMountEditorForm
         ShowHint = True
         OnClick = FolderButtonClick
       end
+      object FloppyImageDriveLetterWarningLabel2: TLabel
+        Left = 176
+        Top = 136
+        Width = 510
+        Height = 18
+        AutoSize = False
+        Caption = 'FloppyImageDriveLetterWarningLabel2'
+        Visible = False
+        WordWrap = True
+      end
       object FloppyImageTab: TStringGrid
         Left = 16
-        Top = 29
+        Top = 24
         Width = 618
         Height = 68
         ColCount = 1
@@ -473,12 +541,13 @@ object ProfileMountEditorForm: TProfileMountEditorForm
       end
       object FloppyImageDriveLetterComboBox2: TComboBox
         Left = 16
-        Top = 141
+        Top = 133
         Width = 145
         Height = 21
         Style = csDropDownList
         ItemHeight = 13
         TabOrder = 1
+        OnChange = FloppyImageDriveLetterComboBox2Change
       end
     end
     object CDROMImageSheet: TTabSheet
@@ -603,6 +672,16 @@ object ProfileMountEditorForm: TProfileMountEditorForm
         ShowHint = True
         OnClick = FolderButtonClick
       end
+      object CDImageDriveLetterWarningLabel: TLabel
+        Left = 176
+        Top = 163
+        Width = 510
+        Height = 18
+        AutoSize = False
+        Caption = 'CDImageDriveLetterWarningLabel'
+        Visible = False
+        WordWrap = True
+      end
       object CDROMImageDriveLetterComboBox: TComboBox
         Left = 16
         Top = 160
@@ -611,6 +690,7 @@ object ProfileMountEditorForm: TProfileMountEditorForm
         Style = csDropDownList
         ItemHeight = 13
         TabOrder = 0
+        OnChange = CDROMImageDriveLetterComboBoxChange
       end
       object CDROMImageTab: TStringGrid
         Left = 16
@@ -654,7 +734,7 @@ object ProfileMountEditorForm: TProfileMountEditorForm
       end
       object ImageDriveLetterLabel: TLabel
         Left = 16
-        Top = 125
+        Top = 115
         Width = 98
         Height = 13
         Caption = 'Mounted drive letter'
@@ -684,12 +764,22 @@ object ProfileMountEditorForm: TProfileMountEditorForm
         OnClick = FolderButtonClick
       end
       object DriveLetterInfoLabel2: TLabel
-        Left = 174
-        Top = 144
-        Width = 489
-        Height = 67
+        Left = 16
+        Top = 155
+        Width = 676
+        Height = 63
         AutoSize = False
         Caption = 'DriveLetterInfoLabel2'
+        WordWrap = True
+      end
+      object HDImageDriveLetterWarningLabel: TLabel
+        Left = 176
+        Top = 131
+        Width = 510
+        Height = 18
+        AutoSize = False
+        Caption = 'HDImageDriveLetterWarningLabel'
+        Visible = False
         WordWrap = True
       end
       object ImageEdit: TLabeledEdit
@@ -704,12 +794,13 @@ object ProfileMountEditorForm: TProfileMountEditorForm
       end
       object ImageDriveLetterComboBox: TComboBox
         Left = 16
-        Top = 144
+        Top = 128
         Width = 145
         Height = 21
         Style = csDropDownList
         ItemHeight = 13
         TabOrder = 2
+        OnChange = ImageDriveLetterComboBoxChange
       end
       object ImageGeometryEdit: TLabeledEdit
         Left = 16
@@ -766,7 +857,7 @@ object ProfileMountEditorForm: TProfileMountEditorForm
       object ZipFileButton: TSpeedButton
         Tag = 14
         Left = 663
-        Top = 159
+        Top = 183
         Width = 23
         Height = 22
         Glyph.Data = {
@@ -787,6 +878,16 @@ object ProfileMountEditorForm: TProfileMountEditorForm
         ShowHint = True
         OnClick = FolderButtonClick
       end
+      object ZipFolderDriveLetterWarningLabel: TLabel
+        Left = 16
+        Top = 127
+        Width = 670
+        Height = 18
+        AutoSize = False
+        Caption = 'ZipFolderDriveLetterWarningLabel'
+        Visible = False
+        WordWrap = True
+      end
       object ZipFolderEdit: TLabeledEdit
         Left = 16
         Top = 32
@@ -805,6 +906,7 @@ object ProfileMountEditorForm: TProfileMountEditorForm
         Style = csDropDownList
         ItemHeight = 13
         TabOrder = 1
+        OnChange = ZipFolderDriveLetterComboBoxChange
       end
       object ZipFolderFreeSpaceTrackbar: TTrackBar
         Left = 176
@@ -821,7 +923,7 @@ object ProfileMountEditorForm: TProfileMountEditorForm
       end
       object ZipFileEdit: TLabeledEdit
         Left = 16
-        Top = 160
+        Top = 184
         Width = 633
         Height = 21
         EditLabel.Width = 108

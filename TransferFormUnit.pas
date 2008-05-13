@@ -19,6 +19,7 @@ type
     DestPrgDirButton: TSpeedButton;
     SelectGenreButton: TBitBtn;
     PopupMenu: TPopupMenu;
+    CopyDFRCheckBox: TCheckBox;
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure SelectButtonClick(Sender: TObject);
@@ -26,10 +27,11 @@ type
     procedure DestPrgDirButtonClick(Sender: TObject);
   private
     { Private-Deklarationen }
+    Function CopyInstallation(const DestPrgDir : String) : Boolean;
     Function GetOperationMode(var OpMode : TOperationMode) : Boolean;
     Function GetDestPrgDataDir(const OpMode : TOperationMode; var DestPrgDataDir : String) : Boolean;
     Function CopyDir(const SourceDir, DestDir : String) : Boolean;
-    Function CopyFiles(const RelDir, SourceBaseDir, DestBaseDir : String) : Boolean;
+    function CopyFiles(const RelDir, SourceBaseDir, DestBaseDir, GameName: String): Boolean;
     Function TransferGame(const Game : TGame; const DestDataDir : String) : Boolean;
   public
     { Public-Deklarationen }
@@ -44,13 +46,14 @@ Function TransferGames(const AOwner : TComponent; const AGameDB : TGameDB) : Boo
 implementation
 
 uses ShlObj, VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgConsts,
-     ProgressFormUnit, GameDBToolsUnit;
+     ProgressFormUnit, GameDBToolsUnit, SmallWaitFormUnit;
 
 {$R *.dfm}
 
 procedure TTransferForm.FormCreate(Sender: TObject);
 begin
   SetVistaFonts(self);
+  Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName);
 
   Caption:=LanguageSetup.TransferForm;
   InfoLabel.Caption:=LanguageSetup.TransferFormInfo;
@@ -61,11 +64,12 @@ begin
   SelectAllButton.Caption:=LanguageSetup.All;
   SelectNoneButton.Caption:=LanguageSetup.None;
   SelectGenreButton.Caption:=LanguageSetup.GameBy;
+  CopyDFRCheckBox.Caption:=LanguageSetup.TransferFormCopyDFendReloadedPrgFiles;
 end;
 
 procedure TTransferForm.FormShow(Sender: TObject);
 begin
-  BuildCheckList(ListBox,GameDB,False);
+  BuildCheckList(ListBox,GameDB,False,False);
   BuildSelectPopupMenu(PopupMenu,GameDB,SelectButtonClick,False);
 end;
 
@@ -92,6 +96,180 @@ Var S : String;
 begin
   S:=DestPrgDirEdit.Text;
   if SelectDirectory(Handle,LanguageSetup.ChooseFolder,S) then DestPrgDirEdit.Text:=S;
+end;
+
+Function TTransferForm.CopyInstallation(const DestPrgDir : String) : Boolean;
+Var St : TStringList;
+    I : Integer;
+    S : String;
+    NewSetup : TPrgSetup;
+    NewGameDB : TGameDB;
+    OperationModeSave : TOperationMode;
+begin
+  result:=False;
+
+  LoadAndShowSmallWaitForm(LanguageSetup.TransferFormCopyDFendReloadedPrgFilesWait);
+  try
+
+    {Create destination folder}
+
+    If not ForceDirectories(DestPrgDir) then begin
+      MessageDlg(Format(LanguageSetup.MessageCouldNotCreateDir,[DestPrgDir]),mtError,[mbOK],0);
+      exit;
+    end;
+
+    {Transfer program files}
+
+    St:=TStringList.Create;
+    try
+      St.Add(ExtractFileName(Application.ExeName));
+      St.Add(MakeDOSFilesystemFileName);
+      St.Add(OggEncPrgFile);
+      St.Add('License.txt');
+      St.Add('LicenseComponents.txt');
+      St.Add('Links.txt');
+      St.Add('ChangeLog.txt');
+      St.Add('FAQs.txt');
+      St.Add('Readme_OperationMode.txt');
+      St.Add('D-Fend Reloaded DataInstaller.nsi');
+      St.Add('UpdateCheck.exe');
+      St.Add('SetInstallerLanguage.exe');
+      For I:=0 to St.Count-1 do CopyFile(PChar(PrgDir+St[I]),PChar(DestPrgDir+St[I]),False);
+    finally
+      St.Free;
+    end;
+    If not CopyDir(IncludeTrailingPathDelimiter(PrgDir+LanguageSubDir),IncludeTrailingPathDelimiter(DestPrgDir+LanguageSubDir)) then exit;
+
+    {Transfer settings}
+
+    St:=TStringList.Create;
+    try
+      St.Add(ConfOptFile);
+      St.Add(MainSetupFile);
+      St.Add('Icons.ini');
+      St.Add(ScummVMConfOptFile);
+      For I:=0 to St.Count-1 do CopyFile(PChar(PrgDataDir+St[I]),PChar(DestPrgDir+St[I]),False);
+    finally
+      St.Free;
+    end;
+
+    St:=TStringList.Create;
+    try
+      St.Add('PORTABLEMODE');
+      try St.SaveToFile(DestPrgDir+OperationModeConfig); except
+        MessageDlg(Format(LanguageSetup.MessageCouldNotSaveFile,[DestPrgDir+OperationModeConfig]),mtError,[mbOK],0);
+        exit;
+      end;
+    finally
+      St.Free;
+    end;
+
+    St:=TStringList.Create;
+    try
+      St.Add(IconsSubDir);
+      St.Add(GameListSubDir);
+      St.Add('VirtualHD');
+      For I:=0 to St.Count-1 do If not ForceDirectories(DestPrgDir+St[I]) then begin
+        MessageDlg(Format(LanguageSetup.MessageCouldNotCreateDir,[DestPrgDir+St[I]]),mtError,[mbOK],0);
+        exit;
+      end;
+    finally
+      St.Free;
+    end;
+
+    St:=TStringList.Create;
+    try
+      St.Add(AutoSetupSubDir);
+      St.Add(LanguageSubDir);
+      St.Add(TemplateSubDir);
+      For I:=0 to St.Count-1 do If not CopyDir(IncludeTrailingPathDelimiter(PrgDataDir+St[I]),IncludeTrailingPathDelimiter(DestPrgDir+St[I])) then exit;
+    finally
+      St.Free;
+    end;
+
+    {Transfer tools}
+
+    St:=TStringList.Create;
+    try
+      St.Add('FREEDOS');
+      St.Add('DOSZIP');
+      For I:=0 to St.Count-1 do begin
+        S:='';
+        If DirectoryExists(PrgDir+NewUserDataSubDir+'\'+St[I]) then S:=PrgDir+NewUserDataSubDir+'\'+St[I] else begin
+          If DirectoryExists(IncludeTrailingPathDelimiter(MakeAbsPath(PrgSetup.GameDir,PrgSetup.BaseDir))+St[I]) then S:=IncludeTrailingPathDelimiter(MakeAbsPath(PrgSetup.GameDir,PrgSetup.BaseDir))+St[I];
+        end;
+        If S<>'' then begin
+          If not CopyDir(IncludeTrailingPathDelimiter(S),DestPrgDir+'VirtualHD\'+St[I]+'\') then exit;
+        end;
+      end;
+    finally
+      St.Free;
+    end;
+
+    {Transfer DOSBox}
+
+    If not CopyDir(IncludeTrailingPathDelimiter(PrgSetup.DosBoxDir),IncludeTrailingPathDelimiter(DestPrgDir+'DOSBox')) then exit;
+    If Trim(PrgSetup.DosBoxMapperFile)<>'' then
+      CopyFile(PChar(MakeAbsPath(PrgSetup.DosBoxMapperFile,PrgSetup.BaseDir)),PChar(IncludeTrailingPathDelimiter(DestPrgDir+'DOSBox')+ExtractFileName(PrgSetup.DosBoxMapperFile)),False);
+
+    {Change DFend.ini}
+
+    OperationModeSave:=OperationMode;
+    try
+      NewSetup:=TPrgSetup.Create(DestPrgDir+MainSetupFile);
+      try
+        NewSetup.BaseDir:=DestPrgDir;
+        NewSetup.GameDir:=DestPrgDir+'VirtualHD';
+        NewSetup.DataDir:=DestPrgDir+'GameData';
+        NewSetup.DosBoxDir:=DestPrgDir+'DOSBox';
+        NewSetup.DosBoxLanguage:=DestPrgDir+'DOSBox\'+ExtractFileName(PrgSetup.DosBoxLanguage);
+        NewSetup.DosBoxMapperFile:='./'+ExtractFileName(PrgSetup.DosBoxMapperFile);
+        NewSetup.PathToFREEDOS:='.\VirtualHD\FREEDOS\';
+        If FileExists(DestPrgDir+OggEncPrgFile) then NewSetup.WaveEncOgg:='.\'+OggEncPrgFile;
+
+        S:=MakeRelPath(PrgSetup.QBasic,PrgSetup.BaseDir);
+        If Copy(S,1,2)='.\' then NewSetup.QBasic:=MakeAbsPath(S,DestPrgDir);
+
+        TempPrgDir:=DestPrgDir;
+
+        NewSetup.StoreAllValues;
+      finally
+        NewSetup.Free;
+      end;
+    finally
+      OperationMode:=OperationModeSave;
+      TempPrgDir:='';
+    end;
+
+    { Build "DOSBox DOS" profile }
+
+    NewGameDB:=TGameDB.Create(DestPrgDir+GameListSubDir);
+    try
+      BuildDefaultDosProfile(NewGameDB,False);
+    finally
+      NewGameDB.Free;
+    end;
+
+    St:=TStringList.Create;
+    try
+      St.Add('IconLibrary');
+      St.Add('Capture');
+      For I:=0 to St.Count-1 do begin
+        S:='';
+        If DirectoryExists(PrgDir+NewUserDataSubDir+'\'+St[I]) then S:=PrgDir+NewUserDataSubDir+'\'+St[I];
+        If S<>'' then begin
+          If not CopyDir(IncludeTrailingPathDelimiter(S),DestPrgDir+St[I]+'\') then exit;
+        end;
+      end;
+    finally
+      St.Free;
+    end;
+
+  finally
+    FreeSmallWaitForm;
+  end;
+
+  result:=True;
 end;
 
 function TTransferForm.GetOperationMode(var OpMode: TOperationMode): Boolean;
@@ -193,16 +371,21 @@ begin
   result:=True;
 end;
 
-function TTransferForm.CopyFiles(const RelDir, SourceBaseDir, DestBaseDir: String): Boolean;
+function TTransferForm.CopyFiles(const RelDir, SourceBaseDir, DestBaseDir, GameName: String): Boolean;
 Var S,T : String;
 begin
+  S:=IncludeTrailingPathDelimiter(MakeRelPath(RelDir,SourceBaseDir));
+  If Copy(S,2,2)=':\' then begin
+    MessageDlg(Format(LanguageSetup.MessagePathNotRelative,[RelDir,GameName,S]),mtError,[mbOK],0);
+    result:=False; exit;
+  end;
   S:=IncludeTrailingPathDelimiter(MakeAbsPath(IncludeTrailingPathDelimiter(RelDir),SourceBaseDir));
   T:=IncludeTrailingPathDelimiter(MakeAbsPath(IncludeTrailingPathDelimiter(RelDir),DestBaseDir));
   result:=CopyDir(S,T);
 end;
 
 function TTransferForm.TransferGame(const Game: TGame; const DestDataDir: String): Boolean;
-Var S : String;
+Var S,T : String;
     I : Integer;
     St : TStringList;
 begin
@@ -219,31 +402,77 @@ begin
     MessageDlg(Format(LanguageSetup.MessageCouldNotCopyFile,[Game.SetupFile,S]),mtError,[mbOK],0); exit;
   end;
   
-  S:=Trim(Game.GameExe);
-  If S='' then S:=Trim(Game.SetupExe);
-  If S<>'' then begin
-    S:=IncludeTrailingPathDelimiter(ExtractFilePath(S));
-    if not CopyFiles(S,PrgDataDir,DestDataDir) then exit;
+  If ScummVMMode(Game) then begin
+    S:=Trim(Game.ScummVMPath);
+    If S<>'' then begin
+      S:=IncludeTrailingPathDelimiter(S);
+      if not CopyFiles(S,PrgDataDir,DestDataDir,Game.Name) then exit;
+    end;
+  end else begin
+    S:=Trim(Game.GameExe);
+    If ExtUpperCase(Copy(S,1,7))='DOSBOX:' then S:='';
+    If S='' then S:=Trim(Game.SetupExe);
+    If ExtUpperCase(Copy(S,1,7))='DOSBOX:' then S:='';
+    If S<>'' then begin
+      S:=IncludeTrailingPathDelimiter(ExtractFilePath(S));
+      if not CopyFiles(S,PrgDataDir,DestDataDir,Game.Name) then exit;
+    end;
+
+    S:=Trim(Game.CaptureFolder);
+    If S<>'' then begin
+      S:=IncludeTrailingPathDelimiter(S);
+      if not CopyFiles(S,PrgDataDir,DestDataDir,Game.Name) then exit;
+    end;
   end;
 
-  S:=Trim(Game.CaptureFolder);
-  If S<>'' then begin
-    S:=IncludeTrailingPathDelimiter(S);
-    if not CopyFiles(S,PrgDataDir,DestDataDir) then exit;
-  end;
-
-  S:=Trim(Game.Icon);
-  If (S<>'') and FileExists(PrgDataDir+IconsSubDir+'\'+S) then begin
-    if not CopyFile(PChar(PrgDataDir+IconsSubDir+'\'+S),PChar(DestDataDir+IconsSubDir+'\'+S),False) then begin
-      MessageDlg(Format(LanguageSetup.MessageCouldNotCopyFile,[PrgDataDir+IconsSubDir+'\'+S,DestDataDir+IconsSubDir+'\'+S]),mtError,[mbOK],0); exit;
-      exit;
+  S:=MakeAbsIconName(Game.Icon);
+  If (S<>'') and FileExists(S) then begin
+    If ExtractFilePath(Game.Icon)='' then begin
+      S:=Trim(Game.Icon);
+      if not CopyFile(PChar(PrgDataDir+IconsSubDir+'\'+S),PChar(DestDataDir+IconsSubDir+'\'+S),False) then begin
+        MessageDlg(Format(LanguageSetup.MessageCouldNotCopyFile,[PrgDataDir+IconsSubDir+'\'+S,DestDataDir+IconsSubDir+'\'+S]),mtError,[mbOK],0); exit;
+        exit;
+      end;
+    end else begin
+      S:=MakeRelPath(S,PrgSetup.BaseDir);
+      If Copy(S,2,2)=':\' then begin
+        MessageDlg(Format(LanguageSetup.MessagePathNotRelative,[S,Game.Name,PrgSetup.BaseDir]),mtError,[mbOK],0);
+        result:=False; exit;
+      end;
+      T:=ExtractFilePath(S);
+      T:=IncludeTrailingPathDelimiter(MakeAbsPath(T,DestDataDir))+ExtractFileName(S);
+      S:=MakeAbsPath(S,PrgSetup.BaseDir);
+      if not CopyFile(PChar(S),PChar(T),False) then begin
+        MessageDlg(Format(LanguageSetup.MessageCouldNotCopyFile,[S,T]),mtError,[mbOK],0); exit;
+        exit;
+      end;
     end;
   end;
 
   S:=Trim(Game.DataDir);
   If S<>'' then begin
     S:=IncludeTrailingPathDelimiter(S);
-    if not CopyFiles(S,PrgDataDir,DestDataDir) then exit;
+    if not CopyFiles(S,PrgDataDir,DestDataDir,Game.Name) then exit;
+  end;
+
+  S:=Trim(Game.ExtraFiles);
+  If S<>'' then begin
+    St:=ValueToList(S);
+    try
+      For I:=0 to St.Count-1 do If Trim(St[I])<>'' then begin
+        S:=St[I];
+        If not ForceDirectories(ExtractFilePath(MakeAbsPath(S,DestDataDir))) then begin
+          MessageDlg(Format(LanguageSetup.MessageCouldNotCreateDir,[ExtractFilePath(MakeAbsPath(S,DestDataDir))]),mtError,[mbOK],0); exit;
+          exit;
+        end;
+        if not CopyFile(PChar(MakeAbsPath(S,PrgDataDir)),PChar(MakeAbsPath(S,DestDataDir)),False) then begin
+          MessageDlg(Format(LanguageSetup.MessageCouldNotCopyFile,[MakeAbsPath(S,PrgDataDir),MakeAbsPath(S,DestDataDir)]),mtError,[mbOK],0); exit;
+          exit;
+        end;
+      end;
+    finally
+      St.Free;
+    end;
   end;
 
   S:=Trim(Game.ExtraDirs);
@@ -252,7 +481,7 @@ begin
     try
       For I:=0 to St.Count-1 do If Trim(St[I])<>'' then begin
         S:=IncludeTrailingPathDelimiter(St[I]);
-        if not CopyFiles(S,PrgDataDir,DestDataDir) then exit;
+        if not CopyFiles(S,PrgDataDir,DestDataDir,Game.Name) then exit;
       end;
     finally
       St.Free;
@@ -267,6 +496,10 @@ Var OpMode : TOperationMode;
     DestPrgDataDir : String;
     I,J : Integer;
 begin
+  If CopyDFRCheckBox.Checked then begin
+    If not CopyInstallation(IncludeTrailingPathDelimiter(DestPrgDirEdit.Text)) then begin ModalResult:=mrNone; exit; end;
+  end;
+
   If not GetOperationMode(OpMode) then begin ModalResult:=mrNone; exit; end;
   if not GetDestPrgDataDir(OpMode,DestPrgDataDir) then begin ModalResult:=mrNone; exit; end;
 

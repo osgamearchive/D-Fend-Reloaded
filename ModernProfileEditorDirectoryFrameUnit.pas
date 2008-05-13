@@ -22,6 +22,12 @@ type
     ExtraDirsInfoLabel: TLabel;
     DataFolderInfoLabel: TLabel;
     Timer: TTimer;
+    ExtraFilesLabel: TLabel;
+    ExtraFilesListBox: TListBox;
+    ExtraFilesAddButton: TSpeedButton;
+    ExtraFilesEditButton: TSpeedButton;
+    ExtraFilesDelButton: TSpeedButton;
+    OpenDialog: TOpenDialog;
     procedure ExtraDirsListBoxKeyDown(Sender: TObject; var Key: Word;
       Shift: TShiftState);
     procedure ExtraDirsListBoxClick(Sender: TObject);
@@ -30,31 +36,40 @@ type
     procedure GenerateScreenshotFolderNameButtonClick(Sender: TObject);
     procedure GenerateGameDataFolderNameButtonClick(Sender: TObject);
     procedure TimerTimer(Sender: TObject);
+    procedure ExtraFilesListBoxClick(Sender: TObject);
+    procedure ExtraFilesListBoxDblClick(Sender: TObject);
+    procedure ExtraFilesListBoxKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
   private
     { Private-Deklarationen }
     FCurrentProfileName : PString;
     FLastCurrentProfileName : String;
+    ScummVM : Boolean;
   public
     { Public-Deklarationen }
-    Procedure InitGUI(const OnProfileNameChange : TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup : PString);
+    Procedure InitGUI(const OnProfileNameChange : TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup, CurrentScummVMGameName : PString);
     Procedure SetGame(const Game : TGame; const LoadFromTemplate : Boolean);
     Function CheckValue : Boolean;
     Procedure GetGame(const Game : TGame);
+    Procedure ShowFrame;
   end;
 
 implementation
 
 uses Math, LanguageSetupUnit, VistaToolsUnit, PrgSetupUnit, CommonTools,
-     PrgConsts;
+     PrgConsts, GameDBToolsUnit;
 
 {$R *.dfm}
 
 { TModernProfileEditorDirectoryFrame }
 
-procedure TModernProfileEditorDirectoryFrame.InitGUI(const OnProfileNameChange: TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup : PString);
+procedure TModernProfileEditorDirectoryFrame.InitGUI(const OnProfileNameChange: TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup, CurrentScummVMGameName : PString);
 begin
+  ScummVM:=False;
+
   NoFlicker(ScreenshotFolderEdit);
   NoFlicker(DataFolderEdit);
+  NoFlicker(ExtraFilesListBox);
   NoFlicker(ExtraDirsListBox);
 
   FCurrentProfileName:=CurrentProfileName;
@@ -68,11 +83,19 @@ begin
   DataFolderInfoLabel.Caption:=LanguageSetup.GameDataDirEditInfo;
   GenerateGameDataFolderNameButton.Caption:=LanguageSetup.ProfileEditorGenerateGameDataFolder;
 
+  ExtraFilesLabel.Caption:=LanguageSetup.ProfileEditorExtraFiles;
+  ExtraFilesAddButton.Hint:=RemoveUnderline(LanguageSetup.Add);
+  ExtraFilesEditButton.Hint:=RemoveUnderline(LanguageSetup.Edit);
+  ExtraFilesDelButton.Hint:=RemoveUnderline(LanguageSetup.Del);
+
   ExtraDirsLabel.Caption:=LanguageSetup.ProfileEditorExtraDirs;
   ExtraDirsAddButton.Hint:=RemoveUnderline(LanguageSetup.Add);
   ExtraDirsEditButton.Hint:=RemoveUnderline(LanguageSetup.Edit);
   ExtraDirsDelButton.Hint:=RemoveUnderline(LanguageSetup.Del);
   ExtraDirsInfoLabel.Caption:=LanguageSetup.ProfileEditorExtraDirsEditInfo;
+
+  OpenDialog.Title:=LanguageSetup.ProfileEditorExtraFilesCaption;
+  OpenDialog.Filter:=LanguageSetup.ProfileEditorExtraFilesFilter;
 
   FLastCurrentProfileName:='';
 end;
@@ -80,18 +103,37 @@ end;
 procedure TModernProfileEditorDirectoryFrame.SetGame(const Game: TGame; const LoadFromTemplate: Boolean);
 Var St : TStringList;
 begin
-  If Trim(Game.CaptureFolder)<>''
-    then ScreenshotFolderEdit.Text:=Game.CaptureFolder
-    else ScreenshotFolderEdit.Text:=MakeRelPath(IncludeTrailingPathDelimiter(PrgDataDir+CaptureSubDir),PrgSetup.BaseDir);
+  If ScummVMMode(Game) then begin
+    { ScummVM mode }
+    ScummVM:=True;
+  end else begin
+    { DOSBox mode }
+    If Trim(Game.CaptureFolder)<>''
+      then ScreenshotFolderEdit.Text:=Game.CaptureFolder
+      else ScreenshotFolderEdit.Text:=MakeRelPath(IncludeTrailingPathDelimiter(PrgDataDir+CaptureSubDir),PrgSetup.BaseDir);
+    If LoadFromTemplate and PrgSetup.AlwaysSetScreenshotFolderAutomatically then Timer.Enabled:=True;
+  end;
 
   FLastCurrentProfileName:=FCurrentProfileName^;
-  If LoadFromTemplate and PrgSetup.AlwaysSetScreenshotFolderAutomatically then Timer.Enabled:=True;
 
   DataFolderEdit.Text:=Game.DataDir;
 
+  St:=ValueToList(Game.ExtraFiles); try ExtraFilesListBox.Items.AddStrings(St); finally St.Free; end;
+  If ExtraFilesListBox.Items.Count>0 then ExtraFilesListBox.ItemIndex:=0;
+  ExtraFilesListBoxClick(nil);
   St:=ValueToList(Game.ExtraDirs); try ExtraDirsListBox.Items.AddStrings(St); finally St.Free; end;
   If ExtraDirsListBox.Items.Count>0 then ExtraDirsListBox.ItemIndex:=0;
   ExtraDirsListBoxClick(nil);
+end;
+
+procedure TModernProfileEditorDirectoryFrame.ShowFrame;
+begin
+  If ScummVM then begin
+    { ScummVM mode }
+    ScreenshotFolderEdit.Visible:=False;
+    ScreenshotFolderEditButton.Visible:=False;
+    GenerateScreenshotFolderNameButton.Visible:=False;
+  end;
 end;
 
 procedure TModernProfileEditorDirectoryFrame.TimerTimer(Sender: TObject);
@@ -119,8 +161,9 @@ end;
 
 procedure TModernProfileEditorDirectoryFrame.GetGame(const Game: TGame);
 begin
-  Game.CaptureFolder:=ScreenshotFolderEdit.Text;
+  If not ScummVM then Game.CaptureFolder:=ScreenshotFolderEdit.Text;
   Game.DataDir:=DataFolderEdit.Text;
+  Game.Extrafiles:=ListToValue(ExtraFilesListBox.Items);
   Game.ExtraDirs:=ListToValue(ExtraDirsListBox.Items);
   Timer.Enabled:=False;
 end;
@@ -143,6 +186,27 @@ begin
     VK_INSERT : ButtonWork(ExtraDirsAddButton);
     VK_RETURN : ButtonWork(ExtraDirsEditButton);
     VK_DELETE : ButtonWork(ExtraDirsDelButton);
+  end;
+end;
+
+procedure TModernProfileEditorDirectoryFrame.ExtraFilesListBoxClick(Sender: TObject);
+begin
+  ExtraFilesEditButton.Enabled:=(ExtraFilesListBox.ItemIndex>=0);
+  ExtraFilesDelButton.Enabled:=(ExtraFilesListBox.ItemIndex>=0);
+end;
+
+procedure TModernProfileEditorDirectoryFrame.ExtraFilesListBoxDblClick(Sender: TObject);
+begin
+  ButtonWork(ExtraFilesEditButton);
+end;
+
+procedure TModernProfileEditorDirectoryFrame.ExtraFilesListBoxKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+begin
+  If Shift<>[] then exit;
+  Case Key of
+    VK_INSERT : ButtonWork(ExtraFilesAddButton);
+    VK_RETURN : ButtonWork(ExtraFilesEditButton);
+    VK_DELETE : ButtonWork(ExtraFilesDelButton);
   end;
 end;
 
@@ -172,17 +236,40 @@ begin
         end;
     2 : begin
           If Trim(PrgSetup.GameDir)='' then S:=PrgSetup.BaseDir else S:=PrgSetup.GameDir;
+          OpenDialog.InitialDir:=S;
+          If not OpenDialog.Execute then exit;
+          S:=OpenDialog.FileName;
+          ExtraFilesListBox.Items.Add(MakeRelPath(S,PrgSetup.BaseDir));
+          ExtraFilesListBox.ItemIndex:=ExtraFilesListBox.Items.count-1;
+          ExtraFilesListBoxClick(Sender);
+        end;
+    3 : begin
+          S:=MakeAbsPath(ExtraFilesListBox.Items[ExtraFilesListBox.ItemIndex],PrgSetup.BaseDir);
+          OpenDialog.InitialDir:=ExtractFilePath(S);
+          If not OpenDialog.Execute then exit;
+          S:=OpenDialog.FileName;
+          ExtraFilesListBox.Items[ExtraFilesListBox.ItemIndex]:=MakeRelPath(S,PrgSetup.BaseDir);
+        end;
+    4 : begin
+          I:=ExtraFilesListBox.ItemIndex;
+          if I<0 then exit;
+          ExtraFilesListBox.Items.Delete(I);
+          If ExtraFilesListBox.Items.Count>0 then ExtraFilesListBox.ItemIndex:=Max(0,I-1);
+          ExtraFilesListBoxClick(Sender);
+        end;
+    5 : begin
+          If Trim(PrgSetup.GameDir)='' then S:=PrgSetup.BaseDir else S:=PrgSetup.GameDir;
           if not SelectDirectory(Handle,LanguageSetup.ChooseFolder,S) then exit;
           ExtraDirsListBox.Items.Add(MakeRelPath(S,PrgSetup.BaseDir));
           ExtraDirsListBox.ItemIndex:=ExtraDirsListBox.Items.count-1;
           ExtraDirsListBoxClick(Sender);
         end;
-    3 : If ExtraDirsListBox.ItemIndex>=0 then begin
+    6 : If ExtraDirsListBox.ItemIndex>=0 then begin
           S:=MakeAbsPath(ExtraDirsListBox.Items[ExtraDirsListBox.ItemIndex],PrgSetup.BaseDir);
           if not SelectDirectory(Handle,LanguageSetup.ChooseFolder,S) then exit;
           ExtraDirsListBox.Items[ExtraDirsListBox.ItemIndex]:=MakeRelPath(S,PrgSetup.BaseDir);
         end;
-    4 : begin
+    7 : begin
           I:=ExtraDirsListBox.ItemIndex;
           if I<0 then exit;
           ExtraDirsListBox.Items.Delete(I);

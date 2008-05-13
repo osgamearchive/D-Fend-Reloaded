@@ -15,6 +15,10 @@ type
     DelButton: TBitBtn;
     ImageList: TImageList;
     OpenDialog: TOpenDialog;
+    LibraryIconRadioButton: TRadioButton;
+    CustomIconRadioButton: TRadioButton;
+    CustomIconEdit: TEdit;
+    CustomIconButton: TSpeedButton;
     procedure FormCreate(Sender: TObject);
     procedure ListViewDblClick(Sender: TObject);
     procedure OKButtonClick(Sender: TObject);
@@ -24,6 +28,10 @@ type
     procedure DelButtonClick(Sender: TObject);
     procedure ListViewChange(Sender: TObject; Item: TListItem;
       Change: TItemChange);
+    procedure CustomIconEditChange(Sender: TObject);
+    procedure CustomIconButtonClick(Sender: TObject);
+    procedure ListViewClick(Sender: TObject);
+    procedure FormShow(Sender: TObject);
   private
     { Private-Deklarationen }
     Dir, LastIcon : String;
@@ -31,12 +39,13 @@ type
   public
     { Public-Deklarationen }
     IconName : String;
+    DefaultCustomIconFolder : String;
   end;
 
 var
   IconManagerForm: TIconManagerForm;
 
-Function ShowIconManager(const AOwner : TComponent; var AIcon : String; const NoCancel : Boolean = False) : Boolean;
+Function ShowIconManager(const AOwner : TComponent; var AIcon : String; const ADefaultCustomIconFolder : String; const NoCancel : Boolean = False) : Boolean;
 
 implementation
 
@@ -47,13 +56,24 @@ uses LanguageSetupUnit, VistaToolsUnit, CommonTools, PrgConsts, PrgSetupUnit;
 procedure TIconManagerForm.FormCreate(Sender: TObject);
 begin
   SetVistaFonts(self);
+  Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName);
 
+  LibraryIconRadioButton.Caption:=LanguageSetup.MenuExtrasIconManagerIconLibrary;
+  CustomIconRadioButton.Caption:=LanguageSetup.MenuExtrasIconManagerIconCustom;
+  CustomIconButton.Hint:=LanguageSetup.ChooseFile;
   OKButton.Caption:=LanguageSetup.OK;
   CancelButton.Caption:=LanguageSetup.Cancel;
   AddButton.Caption:=LanguageSetup.Add;
   DelButton.Caption:=LanguageSetup.Del;
 
+  OpenDialog.Title:=LanguageSetup.MenuExtrasIconManagerDialog;
+  OpenDialog.Filter:=LanguageSetup.MenuExtrasIconManagerFilter;
+
   Dir:=IncludeTrailingPathDelimiter(PrgDataDir+IconsSubDir);
+end;
+
+procedure TIconManagerForm.FormShow(Sender: TObject);
+begin
   LastIcon:=IconName;
   LoadIcons;
 end;
@@ -93,8 +113,14 @@ begin
       FindClose(Rec);
     end;
 
-    For I:=0 to ListView.Items.Count-1 do If ListView.Items[I].Caption=LastIcon then begin
-      ListView.ItemIndex:=I; break;
+    If ExtractFilePath(Trim(LastIcon))='' then begin
+      LibraryIconRadioButton.Checked:=True;
+      For I:=0 to ListView.Items.Count-1 do If ListView.Items[I].Caption=LastIcon then begin
+        ListView.ItemIndex:=I; break;
+      end;
+    end else begin
+      CustomIconRadioButton.Checked:=True;
+      CustomIconEdit.Text:=LastIcon;
     end;
 
   finally
@@ -105,10 +131,14 @@ end;
 
 procedure TIconManagerForm.OKButtonClick(Sender: TObject);
 begin
-  If ListView.ItemIndex>=0 then begin
-    IconName:=ListView.Items[ListView.ItemIndex].Caption;
+  If LibraryIconRadioButton.Checked then begin
+    If ListView.ItemIndex>=0 then begin
+      IconName:=ListView.Items[ListView.ItemIndex].Caption;
+    end else begin
+      IconName:='';
+    end;
   end else begin
-    IconName:='';
+    IconName:=CustomIconEdit.Text;
   end;
 end;
 
@@ -119,6 +149,7 @@ end;
 
 procedure TIconManagerForm.ListViewDblClick(Sender: TObject);
 begin
+  LibraryIconRadioButton.Checked:=True;
   OKButton.Click;
 end;
 
@@ -134,8 +165,6 @@ end;
 
 procedure TIconManagerForm.AddButtonClick(Sender: TObject);
 begin
-  OpenDialog.Title:=LanguageSetup.MenuExtrasIconManagerDialog;
-  OpenDialog.Filter:=LanguageSetup.MenuExtrasIconManagerFilter;
   if not OpenDialog.Execute then exit;
 
   if not CopyFile(PChar(OpenDialog.FileName),PChar(Dir+ExtractFileName(OpenDialog.FileName)),True) then begin
@@ -144,6 +173,28 @@ begin
   end;
   LastIcon:=ExtractFileName(OpenDialog.FileName);
   LoadIcons;
+end;
+
+procedure TIconManagerForm.ListViewClick(Sender: TObject);
+begin
+  LibraryIconRadioButton.Checked:=True;
+end;
+
+procedure TIconManagerForm.CustomIconEditChange(Sender: TObject);
+begin
+  CustomIconRadioButton.Checked:=True;
+end;
+
+procedure TIconManagerForm.CustomIconButtonClick(Sender: TObject);
+Var S : String;
+begin
+  S:=ExtractFilePath(MakeAbsIconName(Trim(CustomIconEdit.Text)));
+  If S='' then S:=DefaultCustomIconFolder;
+  If S='' then S:=PrgSetup.BaseDir;
+  If S<>'' then OpenDialog.InitialDir:=S;
+  if not OpenDialog.Execute then exit;
+  CustomIconEdit.Text:=MakeRelPath(OpenDialog.FileName,PrgSetup.BaseDir);
+  CustomIconRadioButton.Checked:=True;
 end;
 
 procedure TIconManagerForm.DelButtonClick(Sender: TObject);
@@ -162,12 +213,20 @@ end;
 
 { global }
 
-Function ShowIconManager(const AOwner : TComponent; var AIcon : String; const NoCancel : Boolean) : Boolean;
+Function ShowIconManager(const AOwner : TComponent; var AIcon : String; const ADefaultCustomIconFolder : String; const NoCancel : Boolean) : Boolean;
 begin
   IconManagerForm:=TIconManagerForm.Create(AOwner);
   try
     IconManagerForm.IconName:=AIcon;
-    If NoCancel then IconManagerForm.CancelButton.Visible:=False;
+    IconManagerForm.DefaultCustomIconFolder:=ADefaultCustomIconFolder;
+    If NoCancel then begin
+      IconManagerForm.CancelButton.Visible:=False;
+      IconManagerForm.LibraryIconRadioButton.Visible:=False;
+      IconManagerForm.CustomIconRadioButton.Visible:=False;
+      IconManagerForm.CustomIconEdit.Visible:=False;
+      IconManagerForm.CustomIconButton.Visible:=False;
+      IconManagerForm.ListView.Height:=IconManagerForm.OKButton.Top-10;
+    end;
     result:=(IconManagerForm.ShowModal=mrOK);
     if result then AIcon:=IconManagerForm.IconName;
   finally

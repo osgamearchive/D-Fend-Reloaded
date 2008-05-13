@@ -1,5 +1,123 @@
 D-Fend Reloaded Changelog
 
+Version 0.4.0 (05/14/2008)
+==========================
+- Simplified Chinese language file (thanks to muzuiget)
+- The new profile wizard has been completely redesigned. With the new auto
+  setup templates new profiles (for games known by the D-Fend Reloaded
+  database) can be setup by only entering the game name and the filename.
+- ScummVM based advantures can be configurated and listed together with the
+  DOSBox based profiles now.
+- If you define a QBasic interpreter in the setup dialog, you can define bas
+  files as normal program files for games. When executing a bas file profile
+  D-Fend Reloaded will automatically execute it in QBasic in DOSBox.
+- A new first run wizard makes setting up language and updates for new users
+  much easier.
+- The content of image files can be extracted to a folder now.
+- You can build a floppy image from the content of a folder now.
+- If you copy prof files to the "Confs" folder while D-Fend Reloaded is running
+  they will be added to the games list immediately.
+- Icons form outside the "IconLibrary" folder can now also be used as profile
+  icons (and can be transfered with the profile and included to installers just
+  like the icons in the default icons folder).
+- If you delete a profile file while D-Fend Reloaded is running it will ask you
+  if you want to restore the deleted file.
+- Now you can setup a codepage to be used in DOSBox for each profile. 
+  Additionally there is a default codepage stored in each language file which
+  will be used if the codepage is set to "default" in the profile.
+- Now you can (optionally) define a key mapper file for each profile. (If no
+  key mapper file is defined, the DOSBox default key mapper file will be used.)
+- A list of batch commands which DOSBox will run after the end of the game can
+  be defined now (some kind of complement of the Autoexec.bat commands).
+- Now you can also make installer packages from your profile templates.
+- The templates dialog now has an option to change multiple templates at once
+  (like the multi profile editor for normal profile).
+- More option to configurate low-level access to mounted CDROMs.
+- When creating floppy images you can choose to make the image bootable now.
+- The tray icon has a context menu for direct starting and adding of profiles.
+- The transfer profiles function can create a portable version of D-Fend
+  Reloaded (by copying files from the current installation and modifing the
+  configuration) in the destination folder before copying the profile data.
+- Now you can define if the path to the game and the setup exe file should be
+  interpreted absolute (in the physical file system) or relative (to the file
+  system in DOSBox).
+- Now you can configurate in the setup dialog if D-Fend Reloaded should show
+  configuration options in the profile editor which can only be used with
+  DOSBox CVS builds (like multiple floppy images per drive, PhysFS support,
+  setting the number of text mode lines, VGA chipset and video RAM, Glide
+  emulation and printer support).
+- When changeing multiple profiles, creating installers etc. now you can select
+  and unselect profiles also by any user defined information. (Until now
+  selecting was only possible by the predefined fields like language,
+  developer, year, etc.)
+- Profiles (conf and prof files), screenshots and captured sound can be
+  imported by drag&drop now. Dragging program files to the D-Fend Reloaded
+  program window will open the new profile wizard with the chosen file.
+- Within the multi profile editor you can add, change and delete user-defined
+  information fields now.
+- For each profile you can define some extra files which will be transfered,
+  uninstalled and packed into installer packages together with the other game
+  files (like it is already possible with the extra directories).
+- The profile editor will show a warning if the user trys to create a new
+  profile with no game program filename (and is not using a boot image option).
+- When opening the select game exe or select setup exe dialog from the profile
+  editor or the wizard the path of the setup exe or the game exe (if already
+  defined) will be used as initial directory instead of the games base
+  directory.
+- When a checksum error (changed or exchanged game program file) is detected,
+  D-Fend Reloaded now also offers the option to turn off checksums for the
+  profile (until now only keep old checksum or create new checksum).
+- The checksum driven game file change detection can be turned off in the setup
+  dialog now.
+- The mount dialog will show a warning if the users trys to use the same drive
+  letter for two mounted drives.
+- The mount dialog will show a warning message if the users trys to mount the
+  the root directory of a drive.
+- The dialog for playing captured game sounds has been improved: You can jump
+  to any position in the file via a slider and the captured wave sound can be
+  encoded to mp3 or ogg directly from the dialog now.
+- The screenshot view dialog has been improved: You can cycle though the
+  screenshots of a profile via two new toolbar buttons (or by using the cursor
+  keys or the mouse wheel) without closing the dialog. Additionally the zoom
+  level is set to 100% when a new image is loaded.
+- The import conf file function now trys to make mount records from the mount
+  commands of the autoexec section.
+- Now you can setup which icons should be visible on the toolbar.
+- The tooltips in the games list now also show the last modification time of
+  each profile.
+- Some new icons in the modern and classic profile editor (thanks to Banjo).
+- [Fix] Even if you choose "Restore profile on disk with version from memory"
+  when a file conflict occures the profile on disk will not be changed and
+  the version in memory will be lost as long as you do not make any changes to
+  the profile in memory before closing D-Fend Reloaded.
+- [Fix] The boot from floppy image function did not work if you used a single
+  image file.
+- [Fix] When using D-Fend Reloaded in portable mode the path to the DOSBox
+  language file was not updated properly what could DOSBox prevent from
+  starting.
+- [Fix] The main activation of DOSBox IPX support is not written to the
+  DOSBox conf file when starting a profile with IPX support enabled.
+- [Fix] When installing D-Fend Reloaded in user directory mode (the default
+  installation mode) the templates were only created for the user account the
+  installer was run from.
+- [Fix] The column visible status was not saved when closing the setup dialog
+  if the columns were not in default order.
+- [Fix] When changing the filename of a profile all character after the first
+   "." in the new filename were removed.
+- [Fix] The capture folder settings were ignored when importing conf files.
+- [Fix] User defined fields were ignored when exporting a games list.
+- [Fix] Wrong language in dialogs after changing the program language but
+  closing the setup dialog with "Cancel".
+- [Fix] When using the "Minimize to tray" option together with "Start
+  minimized" the application is minimized to the taskbar instead of the tray
+  area on programm start-up.
+- [Fix] When adding a new profile via the wizard the information fields (genre,
+  developer, etc.) of the new profile always showed "Not set" until restart of
+  the program.
+- [Fix] Wrong default icon in the profile select dialog which opens when
+  clicking on "Template from profile" in the templates dialog.
+
+
 Version 0.3.2 (02/29/2008)
 ==========================
 - French language file (thanks to Christophe Bertrand)
@@ -21,7 +139,7 @@ Version 0.3.2 (02/29/2008)
 - The function that builds the autoexec commands to run the game now also looks
   on mounted CDs for a path to the file and when there are overlapping mounts
   it will use the shortest path instead of the first matching path.
-- The screenshot capture folder will be chossen automatically for new profiles
+- The screenshot capture folder will be chosen automatically for new profiles
   (until now screenshot capture folder was only setup automatically when adding
   profiles via the wizard). This feature can be turned off in the setup dialog.
 - It can be configurated now what should be shown in the games list if there
@@ -204,7 +322,7 @@ Version 0.1.2 (01/04/2008)
 - The program info dialog shows the names of the authors of the language files.
 - The games list can now be sorted by any column just by clicking the
   column header.
-- Spanish language file (Thanks to Neville from vogons.zetafleet.com)
+- Spanish language file (thanks to Neville from vogons.zetafleet.com)
 
 
 Version 0.1.1 (12/18/2007)
@@ -220,7 +338,7 @@ Version 0.1.1 (12/18/2007)
 - In the transfer dialog, the uninstall dialog and the build installer dialog
   the "DosBox DOS" default entry is not shown but the genre of this
   profile has been used when building the "by genre" menu.
-- Additional start menu Link "Manuals folder" to access the manual and
+- Additional start menu link "Manuals folder" to access the manual and
   game data folder.
 - [Fix] When copying a profile "not set" was shown in the info columns
   (genre, ...) of the new profile.

@@ -36,13 +36,14 @@ Function ShowDriveWriteDialog(const AOwner : TComponent; const ADrive : Char; co
 
 implementation
 
-uses VistaToolsUnit, LanguageSetupUnit;
+uses VistaToolsUnit, LanguageSetupUnit, CommonTools;
 
 {$R *.dfm}
 
 procedure TDriveReadForm.FormCreate(Sender: TObject);
 begin
   SetVistaFonts(self);
+  Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName);
 
   WriteMode:=False;
   Count:=0;

@@ -36,13 +36,14 @@ Function SelectProfile(const AOwner : TComponent; const AGameDB : TGameDB) : TGa
 
 implementation
 
-uses VistaToolsUnit, LanguageSetupUnit;
+uses VistaToolsUnit, LanguageSetupUnit, CommonTools;
 
 {$R *.dfm}
 
 procedure TTemplateSelectProfileForm.FormCreate(Sender: TObject);
 begin
   SetVistaFonts(self);
+  Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName);
 
   ListSort:=slbName;
   ListSortReverse:=False;
@@ -57,7 +58,7 @@ begin
   ListView.Items.BeginUpdate;
   try
     ListView.Items.Clear;
-    AddGamesToList(ListView,ListViewImageList,ListviewIconImageList,ImageList,GameDB,'','','',True,ListSort,ListSortReverse);
+    AddGamesToList(ListView,ListViewImageList,ListviewIconImageList,ImageList,GameDB,'','','',True,ListSort,ListSortReverse,True);
   finally
     ListView.Items.EndUpdate;
   end;

@@ -26,13 +26,14 @@ Procedure ShowHistoryDialog(const AOwner : TComponent);
 
 implementation
 
-uses GameDBToolsUnit, LanguageSetupUnit, VistaToolsUnit;
+uses GameDBToolsUnit, LanguageSetupUnit, VistaToolsUnit, CommonTools;
 
 {$R *.dfm}
 
 procedure THistoryForm.FormShow(Sender: TObject);
 begin
   SetVistaFonts(self);
+  Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName);
 
   Caption:=LanguageSetup.HistoryForm;
   CloseButton.Caption:=LanguageSetup.Close;

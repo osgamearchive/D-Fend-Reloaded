@@ -1,7 +1,7 @@
 LangString LANGNAME_ioFile ${LANG_RUSSIAN} "ioFileRussian.ini"
 
-LangString LANGNAME_NeedAdminRights ${LANG_RUSSIAN} "Без прав администратора программа установки не может осуществить запись в папку программы. Возможна только установка на USB. Повторить попытку получения администраторского доступа ?"
-LangString LANGNAME_NeedAdminRightsUpdate ${LANG_RUSSIAN} "Без прав администратора программа установки не может осуществить запись в папку программы. Возможно только обновление на USB. Повторить попытку получения администраторского доступа ?"
+LangString LANGNAME_NeedAdminRights ${LANG_RUSSIAN} "Без прав администратора программа установки не может осуществить запись в папку программы. Возможна только мобильная установка. Повторить попытку получения администраторского доступа ?"
+LangString LANGNAME_NeedAdminRightsUpdate ${LANG_RUSSIAN} "Без прав администратора программа установки не может осуществить запись в папку программы. Возможно только обновление мобильной установки. Повторить попытку получения администраторского доступа ?"
 
 LangString LANGNAME_WelcomeText ${LANG_RUSSIAN} "Этот мастер поможет вам выполнить установку ${PrgName}.\r\n\r\nНажмите кнопку 'Далее' для продолжения."
 LangString LANGNAME_WelcomeTextUpdate ${LANG_RUSSIAN} "Этот мастер поможет вам выполнить обновление ${PrgName}.\r\n\r\nДля обновления необходима установленная программа D-Fend Reloaded !\r\n\r\nНажмите кнопку 'Далее' для продолжения."
@@ -26,13 +26,16 @@ LangString LANGNAME_NoInstallationFound ${LANG_RUSSIAN} "В указаной папке не обн
 LangString LANGNAME_ProgramFiles ${LANG_RUSSIAN} "Файлы программы"
 LangString LANGNAME_LanguageFiles ${LANG_RUSSIAN} "Языковые файлы"
 LangString LANGNAME_DOSBox ${LANG_RUSSIAN} "DOSBox"
-LangString LANGNAME_FreeDosTools ${LANG_RUSSIAN} "Утилиты FreeDos для использования в DosBox"
-LangString LANGNAME_OpenGEM ${LANG_RUSSIAN} "OpenGEM"
+LangString LANGNAME_Tools ${LANG_RUSSIAN} "Инструменты"
+LangString LANGNAME_FreeDosTools ${LANG_RUSSIAN} "Утилиты FreeDOS для использования в DosBox"
+LangString LANGNAME_Doszip ${LANG_RUSSIAN} "Doszip Commander"
 LangString LANGNAME_DesktopShortcut ${LANG_RUSSIAN} "Ярлык на рабочем столе"
 
 LangString DESC_DFend ${LANG_RUSSIAN} "D-Fend Reloaded - это пользовательский графический интерфейс для работы с DOS играми."
 LangString DESC_DosBox ${LANG_RUSSIAN} "DOSBox - это эмулятор DOS, используемый D-Fend Reloaded."
 LangString DESC_DosBoxProgramFiles ${LANG_RUSSIAN} "Файлы программы эмулятора DOS."
 LangString DESC_DosBoxLanguageFiles ${LANG_RUSSIAN} "Файлы с настройками, описанием, и интерфейсом, переведённые на различные языки."
+LangString DESC_Tools ${LANG_RUSSIAN} "Инструменты для DOSBox."
 LangString DESC_FreeDosTools ${LANG_RUSSIAN} "Утилиты командной строки из пакета FreeDOS для использования в DOSBox."
+LangString DESC_Doszip ${LANG_RUSSIAN} "Doszip Commander - это клон Norton Commander для использования в DOSBox."      # NEW !!!
 LangString DESC_DesktopShortcut ${LANG_RUSSIAN} "Создаёт для D-Fend Reloaded ярлык на рабочем столе."

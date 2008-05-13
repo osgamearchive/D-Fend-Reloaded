@@ -41,6 +41,7 @@ uses Registry, ShellAPI, VistaToolsUnit, LanguageSetupUnit, PrgSetupUnit,
 procedure TBuildInstallerForSingleGameForm.FormCreate(Sender: TObject);
 begin
   SetVistaFonts(self);
+  Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName);
 
   Caption:=LanguageSetup.BuildInstaller;
   DestFileEdit.EditLabel.Caption:=LanguageSetup.BuildInstallerDestFile;

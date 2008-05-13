@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, Buttons, ExtCtrls, CheckLst, GameDBUnit, Menus;
+  Dialogs, StdCtrls, Buttons, ExtCtrls, CheckLst, Menus, GameDBUnit;
 
 type
   TCreateConfForm = class(TForm)
@@ -40,13 +40,14 @@ Function ExportProfFiles(const AOwner : TComponent; const AGameDB : TGameDB) : B
 implementation
 
 uses ShlObj, VistaToolsUnit, LanguageSetupUnit, DosBoxUnit, CommonTools,
-     PrgSetupUnit, GameDBToolsUnit;
+     PrgSetupUnit, GameDBToolsUnit, ScummVMUnit;
 
 {$R *.dfm}
 
 procedure TCreateConfForm.FormCreate(Sender: TObject);
 begin
   SetVistaFonts(self);
+  Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName);
 
   Caption:=LanguageSetup.CreateConfForm;
   InfoLabel.Caption:=LanguageSetup.CreateConfFormInfo;
@@ -65,7 +66,7 @@ procedure TCreateConfForm.FormShow(Sender: TObject);
 begin
   If ProfFileMode then Caption:=LanguageSetup.CreateConfFormProfMode;
 
-  BuildCheckList(ListBox,GameDB,True);
+  BuildCheckList(ListBox,GameDB,True,false);
   BuildSelectPopupMenu(PopupMenu,GameDB,SelectButtonClick,True);
 
   FolderEdit.Text:=GetSpecialFolder(Handle,CSIDL_DESKTOPDIRECTORY);
@@ -120,9 +121,14 @@ begin
         exit;
       end;
     end else begin
-      St:=BuildConfFile(G,False,False);
-      try
+      If ScummVMMode(G) then begin
+        S:=Dir+ChangeFileExt(ExtractFileName(G.SetupFile),'.ini');
+        St:=BuildScummVMIniFile(G);
+      end else begin
         S:=Dir+ChangeFileExt(ExtractFileName(G.SetupFile),'.conf');
+        St:=BuildConfFile(G,False,False);
+      end;
+      try
         try St.SaveToFile(S); except
           MessageDlg(Format(LanguageSetup.MessageCouldNotSaveFile,[S]),mtError,[mbOK],0);
           ModalResult:=mrNone;

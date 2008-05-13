@@ -44,6 +44,8 @@ uses Math, IniFiles, VistaToolsUnit, LanguageSetupUnit, PrgSetupUnit, PrgConsts,
 procedure TLanguageEditorForm.FormCreate(Sender: TObject);
 begin
   SetVistaFonts(self);
+  Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName);
+
   NoFlicker(CloseButton);
   NoFlicker(SectionComboBox);
   NoFlicker(Tab);

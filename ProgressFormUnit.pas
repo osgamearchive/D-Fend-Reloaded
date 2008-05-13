@@ -25,13 +25,14 @@ Procedure DoneProgressWindow;
 
 implementation
 
-uses VistaToolsUnit, LanguageSetupUnit;
+uses VistaToolsUnit, LanguageSetupUnit, CommonTools;
 
 {$R *.dfm}
 
 procedure TProgressForm.FormShow(Sender: TObject);
 begin
   SetVistaFonts(self);
+  Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName);
 
   Caption:=LanguageSetup.ProgressFormCaption;
 end;

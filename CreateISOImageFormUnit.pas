@@ -33,7 +33,7 @@ var
 
 Function ShowCreateISOImageDialog(const AOwner : TComponent; var AFileName : String; const AFloppyMode : Boolean) : Boolean; overload;
 Function ShowCreateISOImageDialog(const AOwner : TComponent; const AFloppyMode : Boolean) : Boolean; overload;
-Function ShowWriteIMGImageDialog(const AOwner : TComponent) : Boolean;
+Function ShowWriteIMGImageDialog(const AOwner : TComponent; const ImageFileName : String ='') : Boolean;
 
 implementation
 
@@ -45,14 +45,15 @@ uses ShellAPI, VistaToolsUnit, LanguageSetupUnit, PrgSetupUnit, CommonTools,
 procedure TCreateISOImageForm.FormCreate(Sender: TObject);
 begin
   SetVistaFonts(self);
-
-  FloppyMode:=False;
-  WriteMode:=False;
+  Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName);
 
   OKButton.Caption:=LanguageSetup.OK;
   CancelButton.Caption:=LanguageSetup.Cancel;
   FileNameEdit.EditLabel.Caption:=LanguageSetup.ReadImageFileName;
   FileNameButton.Hint:=LanguageSetup.ChooseFile;
+
+  FloppyMode:=False;
+  WriteMode:=False;
 end;
 
 procedure TCreateISOImageForm.FormShow(Sender: TObject);
@@ -157,7 +158,7 @@ begin
   result:=ShowCreateISOImageDialog(AOwner,AFileName,AFloppyMode);
 end;
 
-Function ShowWriteIMGImageDialog(const AOwner : TComponent) : Boolean;
+Function ShowWriteIMGImageDialog(const AOwner : TComponent; const ImageFileName : String) : Boolean;
 Var ReadResult : TReadDataResult;
     S, AFileName : String;
     ADrive : Char;
@@ -166,6 +167,7 @@ begin
   try
     CreateISOImageForm.FloppyMode:=True;
     CreateISOImageForm.WriteMode:=True;
+    CreateISOImageForm.FileNameEdit.Text:=ImageFileName;
     result:=(CreateISOImageForm.ShowModal=mrOK);
     if result then begin
       AFileName:=CreateISOImageForm.FileName;

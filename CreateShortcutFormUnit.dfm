@@ -24,7 +24,7 @@ object CreateShortcutForm: TCreateShortcutForm
     Height = 17
     Caption = 'DesktopRadioButton'
     Checked = True
-    TabOrder = 0
+    TabOrder = 2
     TabStop = True
   end
   object StartmenuRadioButton: TRadioButton
@@ -33,14 +33,14 @@ object CreateShortcutForm: TCreateShortcutForm
     Width = 113
     Height = 17
     Caption = 'StartmenuRadioButton'
-    TabOrder = 1
+    TabOrder = 3
   end
   object StartmenuEdit: TEdit
     Left = 48
     Top = 71
     Width = 121
     Height = 21
-    TabOrder = 2
+    TabOrder = 4
     Text = 'Dosgames'
     OnChange = StartmenuEditChange
   end
@@ -49,7 +49,7 @@ object CreateShortcutForm: TCreateShortcutForm
     Top = 147
     Width = 97
     Height = 25
-    TabOrder = 4
+    TabOrder = 6
     OnClick = OKButtonClick
     Kind = bkOK
   end
@@ -58,7 +58,7 @@ object CreateShortcutForm: TCreateShortcutForm
     Top = 149
     Width = 97
     Height = 25
-    TabOrder = 5
+    TabOrder = 7
     Kind = bkCancel
   end
   object UseProfileIconCheckBox: TCheckBox
@@ -67,6 +67,28 @@ object CreateShortcutForm: TCreateShortcutForm
     Width = 225
     Height = 17
     Caption = 'UseProfileIconCheckBox'
-    TabOrder = 3
+    TabOrder = 5
+  end
+  object LinkNameEdit: TLabeledEdit
+    Left = 208
+    Top = 40
+    Width = 121
+    Height = 21
+    EditLabel.Width = 63
+    EditLabel.Height = 13
+    EditLabel.Caption = 'LinkNameEdit'
+    TabOrder = 0
+    Visible = False
+  end
+  object LinkCommentEdit: TLabeledEdit
+    Left = 208
+    Top = 85
+    Width = 121
+    Height = 21
+    EditLabel.Width = 81
+    EditLabel.Height = 13
+    EditLabel.Caption = 'LinkCommentEdit'
+    TabOrder = 1
+    Visible = False
   end
 end

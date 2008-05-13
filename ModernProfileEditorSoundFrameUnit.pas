@@ -28,10 +28,11 @@ type
     FOldSampleRate, FOldBlockSize, FOldPreBuffer, FOldSpeakerRate, FOldTandyRate : Integer;
   public
     { Public-Deklarationen }
-    Procedure InitGUI(const OnProfileNameChange : TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup : PString);
+    Procedure InitGUI(const OnProfileNameChange : TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup, CurrentScummVMGameName : PString);
     Procedure SetGame(const Game : TGame; const LoadFromTemplate : Boolean);
     Function CheckValue : Boolean;
     Procedure GetGame(const Game : TGame);
+    Procedure ShowFrame;
   end;
 
 implementation
@@ -42,7 +43,7 @@ uses VistaToolsUnit, LanguageSetupUnit, CommonTools;
 
 { TModernProfileEditorSoundFrame }
 
-procedure TModernProfileEditorSoundFrame.InitGUI(const OnProfileNameChange: TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup: PString);
+procedure TModernProfileEditorSoundFrame.InitGUI(const OnProfileNameChange: TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup, CurrentScummVMGameName : PString);
 Var St : TStringList;
 begin
   NoFlicker(ActivateSoundCheckBox);
@@ -109,6 +110,10 @@ begin
   FOldTandyRate:=Game.SpeakerTandyRate;
 
   ActivateDisneyCheckBox.Checked:=Game.SpeakerDisney;
+end;
+
+procedure TModernProfileEditorSoundFrame.ShowFrame;
+begin
 end;
 
 function TModernProfileEditorSoundFrame.CheckValue: Boolean;

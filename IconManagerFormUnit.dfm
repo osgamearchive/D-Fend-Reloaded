@@ -3,7 +3,7 @@ object IconManagerForm: TIconManagerForm
   Top = 0
   BorderStyle = bsDialog
   Caption = 'Icon Manager'
-  ClientHeight = 288
+  ClientHeight = 357
   ClientWidth = 564
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -14,14 +14,41 @@ object IconManagerForm: TIconManagerForm
   OldCreateOrder = False
   Position = poOwnerFormCenter
   OnCreate = FormCreate
+  OnShow = FormShow
+  DesignSize = (
+    564
+    357)
   PixelsPerInch = 96
   TextHeight = 13
+  object CustomIconButton: TSpeedButton
+    Left = 533
+    Top = 277
+    Width = 23
+    Height = 22
+    Anchors = [akTop, akRight]
+    Glyph.Data = {
+      76010000424D7601000000000000760000002800000020000000100000000100
+      04000000000000010000120B0000120B00001000000000000000000000000000
+      800000800000008080008000000080008000808000007F7F7F00BFBFBF000000
+      FF0000FF000000FFFF00FF000000FF00FF00FFFF0000FFFFFF00555555555555
+      555555FFFFFFFFFF55555000000000055555577777777775FFFF00B8B8B8B8B0
+      0000775F5555555777770B0B8B8B8B8B0FF07F75F555555575F70FB0B8B8B8B8
+      B0F07F575FFFFFFFF7F70BFB0000000000F07F557777777777570FBFBF0FFFFF
+      FFF07F55557F5FFFFFF70BFBFB0F000000F07F55557F777777570FBFBF0FFFFF
+      FFF075F5557F5FFFFFF750FBFB0F000000F0575FFF7F777777575700000FFFFF
+      FFF05577777F5FF55FF75555550F00FF00005555557F775577775555550FFFFF
+      0F055555557F55557F755555550FFFFF00555555557FFFFF7755555555000000
+      0555555555777777755555555555555555555555555555555555}
+    NumGlyphs = 2
+    OnClick = CustomIconButtonClick
+  end
   object ListView: TListView
     Left = 0
     Top = 0
     Width = 564
     Height = 249
     Align = alTop
+    Anchors = [akLeft, akTop, akRight, akBottom]
     Columns = <>
     IconOptions.Arrangement = iaLeft
     IconOptions.WrapText = False
@@ -32,33 +59,36 @@ object IconManagerForm: TIconManagerForm
     TabOrder = 0
     ViewStyle = vsSmallIcon
     OnChange = ListViewChange
+    OnClick = ListViewClick
     OnDblClick = ListViewDblClick
     OnKeyDown = ListViewKeyDown
   end
   object OKButton: TBitBtn
     Left = 8
-    Top = 255
+    Top = 324
     Width = 97
     Height = 25
-    TabOrder = 1
+    TabOrder = 4
     OnClick = OKButtonClick
     Kind = bkOK
   end
   object CancelButton: TBitBtn
     Left = 120
-    Top = 255
+    Top = 324
     Width = 97
     Height = 25
-    TabOrder = 2
+    Anchors = [akLeft, akBottom]
+    TabOrder = 5
     Kind = bkCancel
   end
   object AddButton: TBitBtn
     Left = 232
-    Top = 255
+    Top = 324
     Width = 97
     Height = 25
+    Anchors = [akLeft, akBottom]
     Caption = 'Hinzuf'#252'gen'
-    TabOrder = 3
+    TabOrder = 6
     OnClick = AddButtonClick
     Glyph.Data = {
       76010000424D7601000000000000760000002800000020000000100000000100
@@ -77,11 +107,12 @@ object IconManagerForm: TIconManagerForm
   end
   object DelButton: TBitBtn
     Left = 344
-    Top = 255
+    Top = 324
     Width = 97
     Height = 25
+    Anchors = [akLeft, akBottom]
     Caption = 'L'#246'schen'
-    TabOrder = 4
+    TabOrder = 7
     OnClick = DelButtonClick
     Glyph.Data = {
       76010000424D7601000000000000760000002800000020000000100000000100
@@ -98,15 +129,44 @@ object IconManagerForm: TIconManagerForm
       3000333333333333377733333333333333333333333333333333}
     NumGlyphs = 2
   end
+  object LibraryIconRadioButton: TRadioButton
+    Left = 8
+    Top = 255
+    Width = 548
+    Height = 17
+    Anchors = [akLeft, akRight, akBottom]
+    Caption = 'Use icon from list above'
+    Checked = True
+    TabOrder = 1
+    TabStop = True
+  end
+  object CustomIconRadioButton: TRadioButton
+    Left = 8
+    Top = 280
+    Width = 217
+    Height = 17
+    Anchors = [akLeft, akRight, akBottom]
+    Caption = 'Use custom icon'
+    TabOrder = 2
+  end
+  object CustomIconEdit: TEdit
+    Left = 224
+    Top = 278
+    Width = 298
+    Height = 21
+    Anchors = [akLeft, akTop, akRight]
+    TabOrder = 3
+    OnChange = CustomIconEditChange
+  end
   object ImageList: TImageList
     Height = 32
     Width = 32
     Left = 456
-    Top = 256
+    Top = 325
   end
   object OpenDialog: TOpenDialog
     DefaultExt = 'ico'
     Left = 496
-    Top = 256
+    Top = 325
   end
 end

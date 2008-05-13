@@ -24,10 +24,11 @@ type
     SaveCycles : String;
   public
     { Public-Deklarationen }
-    Procedure InitGUI(const OnProfileNameChange : TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup : PString);
+    Procedure InitGUI(const OnProfileNameChange : TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup, CurrentScummVMGameName : PString);
     Procedure SetGame(const Game : TGame; const LoadFromTemplate : Boolean);
     Function CheckValue : Boolean;
     Procedure GetGame(const Game : TGame);
+    Procedure ShowFrame;
   end;
 
 implementation
@@ -38,7 +39,7 @@ uses CommonTools, LanguageSetupUnit, VistaToolsUnit;
 
 { TModernProfileEditorCPUFrame }
 
-procedure TModernProfileEditorCPUFrame.InitGUI(const OnProfileNameChange: TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup: PString);
+procedure TModernProfileEditorCPUFrame.InitGUI(const OnProfileNameChange: TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup, CurrentScummVMGameName : PString);
 Var St : TStringList;
     I : Integer;
     S : String;
@@ -95,6 +96,10 @@ begin
 
   CyclesUpEdit.Value:=Game.CyclesUp;
   CyclesDownEdit.Value:=Game.CyclesDown;
+end;
+
+procedure TModernProfileEditorCPUFrame.ShowFrame;
+begin
 end;
 
 function TModernProfileEditorCPUFrame.CheckValue: Boolean;

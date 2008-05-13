@@ -18,6 +18,10 @@ Questions:
     says it has mounted "C:\Users\me\D-FEND~1\VIRTUA~1". What's wrong ?
 7.) How can I create an other language for D-Fend Reloaded ?
 8.) Is there an easy way of spell checking my new language file ?
+9.) Where has the "Edit default profile... (F5)" menu item gone ?
+10.) Can I use D-Fend Reloaded in Wine under Linux ?
+11.) I can't get create a bootable HD image. Any ideas ?
+12.) I have keyboard problems the DOSBox keymapper cannot fix.
 
 	
 
@@ -90,45 +94,34 @@ to an USB stick. So you can show your games to others without any installation.
 3.) I know exactly which setting is on which tab in the D-Fend profile editor
     dialog. Where is this dialog gone in D-Fend Reloaded ?
 	
-D-Fend Reloaded has two profile editor dialogs integrated: The classical D-Fend
+D-Fend Reloaded has two profile editor dialogs integrated: The classic D-Fend
 style profile editor and the modern profile editor. Both dialogs offer all 
-available settings, so there is no need two choose one of them to be able to
-access all features. Which profile editor should be used can be configured in
+normal settings, so there is no need two choose one of them to be able to
+access some features. Which profile editor should be used can be configured in
 the setup dialog in the category "profile editor". This category will only be
 visible, if you choose "Advanced" as mode in the dialog.
+
+There are only 3 (normally hidden) special CSV build setting which are only
+available in the modern style profile editor: Glide emulation, VGA chipset
+settings and printer settings.
 
 
 
 4.) I am using a special DOSBox build with some more features. Does D-Fend
     Reloaded support some of this features ?
 
-These special builds often have more scalers or render methods. The values
-which D-Fend Reloaded offers in its profile editors for this settings can be
-configured in the setup dialog in the category "Default values". This
-category will only be visible, if you choose "Advanced" as mode in the dialog.
-
-Some builds support the mounting of multiple floppy images for one drive
-(like the normal build offers for CDROM images). Because the "imgmount" command
-of the official DOSBox version can not handle multiple floppy images for one
-drive and will show an error message and not mount anything at all, D-Fend
-Reloaded offers no option to mount multiple floppy images for one drive to
-avoid errors. (For booting from a floppy images via the "boot" command
-DOSBox supports multiple images and so does D-Fend Reloaded.) But D-Fend
-Reloaded has a build-in but by default disabled option for mounting multiple
-floppy images for one drive. For activating this option you have to add in
-the [ProgramSets] section of the "DFend.ini" (which can be found in the
-D-Fend Reloaded data directory) the line "AllowMultiFloppyImagesMount=1".
-
-D-Fend Reloaded can also manage PhysFS drives. Set "AllowPhysFSUsage=1" in
-the [ProgramSets] section of the "DFend.ini" and the mount edit dialog
-will have a new "Folder and zip file as hard disk" sheet. But you cannot select
-a program file or a setup file within a zip file to be run by D-Fend Reloaded.
-If you want to run a file from a PhysFS drive, you have to leave the
-"Program file" field blank and enter the run command in the autoexec section.
-
-The ability to set the lines in text mode from 25 to 28 or 50 can be activated
-the same way by writing "AllowTextModeLineChange=1" in the [ProgramSets]
-section of the "DFend.ini".
+Yes, D-Fend Reloaded supports the following CSV build features:
+- Multiple floppy images per drive
+- Mounting zip files (PhysFS support)
+- 28 or 50 lines text mode
+- Glide emulation
+- VGA chipset and video RAM settings
+- Printer emulation
+- Some more things (new render types, new graphic cards, new MIDI device) can
+  be activated by adding new default values. 
+To activate the GUI for this settings, open the setup dialog, switch it to
+advanced more and activate the settings you want to see in the "DOSBox CSV features"
+category.
 
 All other special functions of the custom builds are not supported directly at
 the moment. But you can tell D-Fend Reloaded to write custom strings in the
@@ -191,6 +184,22 @@ strings appear right under any chosen codepage/charset. (This means for
 example Cyrillic letters which are not defined in the English charset should
 not be used in the language name and in the author name.)
 
+If your language file uses a special charset (like cyrillic) and this is the
+default charset on your computer, everything will look fine for you (and other
+people having the same Windows charset). But on systems with another default
+charset your language will look broken. To avoid this, you can tell D-Fend
+Reloaded to always use a special charset with your language file by setting
+the "Name=" key in the [CharsetSettings] section to one of the following
+values: ANSI_CHARSET, DEFAULT_CHARSET, SYMBOL_CHARSET, SHIFTJIS_CHARSET,
+HANGEUL_CHARSET, GB2312_CHARSET, CHINESEBIG5_CHARSET, OEM_CHARSET,
+JOHAB_CHARSET, HEBREW_CHARSET, ARABIC_CHARSET, GREEK_CHARSET, TURKISH_CHARSET,
+VIETNAMESE_CHARSET, THAI_CHARSET, EASTEUROPE_CHARSET, RUSSIAN_CHARSET.
+The default value "DEFAULT_CHARSET" tells D-Fend Reloaded to use the Windows
+default charset. There is one more thing to mention: The charset setting
+applys to all D-Fend Reloaded windows but sadly not to message boxes
+which are controled by Windows itself and will always use the Windows
+default charset.
+
 
 
 8.) Is there an easy way of spell checking my new language file ?
@@ -205,3 +214,119 @@ in notepad, write in the "search for" field "=" and paste in the tab in the
 "replace by" field. (This means replace all "=" by tabs.) Mark the whole file
 and copy it in an spread sheet. Mark the second column (only the values
 without the "CouldNotDeleteFile=" keys) and copy them to the word processor.
+
+
+
+9.) Where has the "Edit default profile... (F5)" menu item gone ?
+
+Because the default template is also a template the option to edit the default
+template has moved to the templates editor. The default template will appear in
+the templates list of the template editor. To distinguish it from the normal
+templates the "Default template" text will appear in blue and you can not
+delete it.
+
+Also the separate menu item to edit the default template has gone, the hotkey
+is still available. You can still reach the template profile editor via the
+F5 key.
+
+
+
+10.) Can I use D-Fend Reloaded in Wine under Linux ?
+
+Running D-Fend Reloaded in Wine is not official supported but is reported to
+work. Even so it is not official supported, D-Fend Reloaded has some
+configuration options to make using it in Wine a bit easier. To activate this
+options you have to add the line "Enable=1" to the [WineSupport] section of the
+DFend.ini. If this line is missing or is set to "Enable=0" the following
+settings are ignored by D-Fend Reloaded.
+
+When creating DOSBox configuration files (*.conf files), D-Fend Reloaded can
+remap the Wine drive letters (C:, D: etc.) to the Linux names (/mnt/sta3,
+/mnt/stb1 etc.). To remap the drive letters add lines like "C=/mnt/sta5" to the
+[WineSupport] section of the DFend.ini file. The character on the left side of
+the "=" is the Wine drive letter (without a ":") and on the right side there is
+the Linux path which is the physical representation of this drive. To activate
+the remapping, add one or more of the following lines to the [WineSupport]
+section:
+
+RemapMounts=1
+RemapScreenshotFolder=1
+RemapMapperFile=1
+RemapDOSBoxFolder=1
+
+"RemapMounts=1" will activate the remapping of all (img-)mount commands in the
+conf files, "RemapScreenshotFolder=1" will activate remapping of the captures
+command in the conf file, "RemapMapperFile=1" will activate repamming of the
+mapper command in the conf file and finally "RemapDOSBoxFolder=1" will activate
+remapping on the DOSBox run command (and the language file command in the conf
+file). If you have problems with the short names ("PROGRA~1" instead of
+"Program files") see also FAQ answer 6 for stopping D-Fend Reloaded making
+short folder names.
+
+The way the create link menu command works can also be changed for use on a
+Linux system: If you add a "LinuxLinkMode=1" to the [WineSupport] section, the
+create link menu command will create shell scripts for running DOSBox with the
+selected profile. The create link function can add a shell script preamble
+(like "#!/bin/bash") to the created script. For adding a preamble as the first
+line of the created shell script add a "ShellScriptPreamble=#!/bin/bash" line
+to the [WineSupport] section.
+
+You can use the same DFend.ini file and the same D-Fend Reloaded installation
+in Windows and Wine (even without changing the "Enable=" key in the
+[WineSupport] section): By calling D-Fend Reloaded with a command line
+parameter including "WineMode" or "WineSupportEnabled" you can override the
+setting from the DFend.ini and activate the Wine support. By calling D-Fend
+Reloaded with a command line parameter including "WindowsMode", "NoWineSupport"
+or "WineSupportDisabled"  you can override the setting from the DFend.ini and
+disable the Wine support. The parameters are case insensitive and you can also
+write a "-" or a "/" before them if you like to ("-winemode" for example will
+also be recognized).
+
+
+
+11.) I can't get create a bootable HD image. Any ideas ?
+
+Trying to run a "Sys" on an image file while running in the normal DOSBox
+environment (not booted any custom OS inside DOSBox) will not work at all.
+The "Sys" command will not be able to write to the boot sector of the image.
+So you have to boot some custom DOS inside DOSBox. The next problem is running
+a (FreeDOS or MSDOS) "Sys" command on a drive created by mkdosfs.exe (the
+image file creator used by D-Fend Reloaded) will result in a not anymore
+readable image file. You have to start with a completely blank image file. To
+create such an image file rename or temporary remove the mkdosfs.exe from the
+D-Fend Reloaded program directory. D-Fend Reloaded will use the internal simple
+image creator then (which will only create a big empty file). Mount this
+image as driveletter "2" and boot from a MSDOS bootdisk (the FreeDOS "Sys"
+command will not work on this images even this way). Call fdisk to create
+a primary partition on the image. Boot again from the MSDOS bootdisk and
+call "format C: /S". Now you should have  have an image file accessable by
+DOSBox (by simply mounting it the normal way) which is also bootable (when
+mounting it as driveletter "2").
+
+
+
+12.) I have keyboard problems the DOSBox keymapper cannot fix.
+
+First of all try setting the SDL video driver to "Win DIB" in the DOSBox
+section of the D-Fend Reloaded setup dialog. If you still experience keyboard
+problems (in particular keys not recogniced by the keymapper, even more in
+particular the right shift key) and have pluged a Microsoft eHome receiver (the
+official remote control for the Microsoft media centre) to your system, please
+follow these steps:
+
+1. Open the "Keyboards" section in the Device Manager.
+2. Right-click "Microsoft eHome MCIR 109 Keyboard" and choose "Update Driver"
+   (called "Update Driver Software" on Vista).
+3. Choose "Browse my computer for software" (XP users tell have to it not to
+   install automatically and say you will specify the location, then when it
+   asks you where you would like it to search for drivers choose the option to
+   choose from a list) then "Let me pick from a list of device drivers on my
+   computer".
+4. Make sure "show compatible hardware" is checked, then select "HID-compliant
+   device" and click next. Click any remaining "OK" or "Finish" buttons after
+   Windows has installed the driver.
+   
+The 109 keys driver is a Japanese keyboard driver. As long as you do not use a
+109 keys keyboard doing this will not influence the functionallity of your
+keyboard or your remote control. (See also http://forums.logitech.com/logitech/
+board/message?board.id=general&message.id=6123.)

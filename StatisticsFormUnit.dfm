@@ -14,7 +14,6 @@ object StatisticsForm: TStatisticsForm
   OldCreateOrder = False
   Position = poOwnerFormCenter
   OnCreate = FormCreate
-  OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
   object Panel1: TPanel
@@ -43,6 +42,5 @@ object StatisticsForm: TStatisticsForm
     ScrollBars = ssBoth
     TabOrder = 1
     WordWrap = False
-    ExplicitHeight = 475
   end
 end

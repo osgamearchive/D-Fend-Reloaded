@@ -28,7 +28,6 @@ object ModernProfileEditorDrivesFrame: TModernProfileEditorDrivesFrame
     ViewStyle = vsReport
     OnDblClick = MountingListViewDblClick
     OnKeyDown = MountingListViewKeyDown
-    ExplicitWidth = 501
   end
   object MountingAddButton: TBitBtn
     Left = 12

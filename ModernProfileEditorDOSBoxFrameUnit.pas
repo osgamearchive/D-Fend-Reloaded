@@ -30,10 +30,11 @@ type
     { Private-Deklarationen }
   public
     { Public-Deklarationen }
-    Procedure InitGUI(const OnProfileNameChange : TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup : PString);
+    Procedure InitGUI(const OnProfileNameChange : TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup, CurrentScummVMGameName : PString);
     Procedure SetGame(const Game : TGame; const LoadFromTemplate : Boolean);
     Function CheckValue : Boolean;
     Procedure GetGame(const Game : TGame);
+    Procedure ShowFrame;
   end;
 
 implementation
@@ -46,7 +47,7 @@ const Priority : Array[0..3] of String = ('lower','normal','higher','highest');
 
 { TModernProfileEditorDOSBoxFrame }
 
-procedure TModernProfileEditorDOSBoxFrame.InitGUI(const OnProfileNameChange: TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup: PString);
+procedure TModernProfileEditorDOSBoxFrame.InitGUI(const OnProfileNameChange: TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup, CurrentScummVMGameName : PString);
 Var I : Integer;
 begin
   NoFlicker(DOSBoxForegroundPriorityRadioGroup);
@@ -116,6 +117,10 @@ begin
   finally
     St.Free;
   end;
+end;
+
+procedure TModernProfileEditorDOSBoxFrame.ShowFrame;
+begin
 end;
 
 function TModernProfileEditorDOSBoxFrame.CheckValue: Boolean;

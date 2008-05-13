@@ -33,7 +33,6 @@ type
     FloppyDriveLetterComboBox: TComboBox;
     FloppyButton: TSpeedButton;
     FloppyDriveLetterLabel: TLabel;
-    CDROMIOCtrlCheckBox: TCheckBox;
     ImageList: TImageList;
     FloppyImageButton: TSpeedButton;
     FloppyImageDriveLetterComboBox: TComboBox;
@@ -80,6 +79,16 @@ type
     FloppyPopupMenu: TPopupMenu;
     FloppyPopupCreateImage: TMenuItem;
     FloppyPopupReadImage: TMenuItem;
+    FolderDriveLetterWarningLabel: TLabel;
+    FloppyDriveLetterWarningLabel: TLabel;
+    CDROMDriveLetterWarningLabel: TLabel;
+    FloppyImageDriveLetterWarningLabel: TLabel;
+    FloppyImageDriveLetterWarningLabel2: TLabel;
+    CDImageDriveLetterWarningLabel: TLabel;
+    HDImageDriveLetterWarningLabel: TLabel;
+    ZipFolderDriveLetterWarningLabel: TLabel;
+    CDROMDriveAccessComboBox: TComboBox;
+    CDROMDriveAccessLabel: TLabel;
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure OKButtonClick(Sender: TObject);
@@ -87,22 +96,32 @@ type
     procedure FolderFreeSpaceTrackBarChange(Sender: TObject);
     procedure ZipFolderFreeSpaceTrackBarChange(Sender: TObject);
     procedure FloppyPopupWork(Sender: TObject);
+    procedure FolderDriveLetterComboBoxChange(Sender: TObject);
+    procedure FloppyDriveLetterComboBoxChange(Sender: TObject);
+    procedure CDROMDriveLetterComboBoxChange(Sender: TObject);
+    procedure FloppyImageDriveLetterComboBoxChange(Sender: TObject);
+    procedure FloppyImageDriveLetterComboBox2Change(Sender: TObject);
+    procedure CDROMImageDriveLetterComboBoxChange(Sender: TObject);
+    procedure ImageDriveLetterComboBoxChange(Sender: TObject);
+    procedure ZipFolderDriveLetterComboBoxChange(Sender: TObject);
   private
     { Private-Deklarationen }
   public
     { Public-Deklarationen }
     Data : String;
+    UsedDriveLetters : String;
+    DefaultInitialDir : String;
   end;
 
 var
   ProfileMountEditorForm: TProfileMountEditorForm;
 
-Function ShowProfileMountEditorDialog(const AOwner : TComponent; var AData : String) : Boolean;
+Function ShowProfileMountEditorDialog(const AOwner : TComponent; var AData : String; const AUsedDriveLetters : String; const ADefaultInitialDir : String) : Boolean;
 
 implementation
 
 uses LanguageSetupUnit, VistaToolsUnit, CommonTools, PrgSetupUnit,
-     CreateImageUnit, CreateISOImageFormUnit;
+     CreateImageUnit, CreateISOImageFormUnit, ImageTools;
 
 {$R *.dfm}
 
@@ -111,6 +130,9 @@ Var C : Char;
 begin
   DoubleBuffered:=True;
   SetVistaFonts(self);
+  Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName);
+
+  UsedDriveLetters:='';
 
   FloppyImageSheet.TabVisible:=not PrgSetup.AllowMultiFloppyImagesMount;
   FloppyImageSheet2.TabVisible:=PrgSetup.AllowMultiFloppyImagesMount;
@@ -129,32 +151,46 @@ begin
 
   FolderEdit.EditLabel.Caption:=LanguageSetup.ProfileMountingFolder;
   FolderDriveLetterLabel.Caption:=LanguageSetup.ProfileMountingLetter;
+  FolderDriveLetterWarningLabel.Caption:=LanguageSetup.ProfileMountingDriveLetterAlreadyInUse;
   FloppyEdit.EditLabel.Caption:=LanguageSetup.ProfileMountingFolder;
   FloppyDriveLetterLabel.Caption:=LanguageSetup.ProfileMountingLetter;
+  FloppyDriveLetterWarningLabel.Caption:=LanguageSetup.ProfileMountingDriveLetterAlreadyInUse;
   CDROMEdit.EditLabel.Caption:=LanguageSetup.ProfileMountingFolder;
   CDROMLabelEdit.EditLabel.Caption:=LanguageSetup.ProfileMountingLabel;
-  CDROMIOCtrlCheckBox.Caption:=LanguageSetup.ProfileMountingIOControl;
+
+  CDROMDriveAccessLabel.Caption:=LanguageSetup.ProfileMountingCDROMAccess;
+  CDROMDriveAccessComboBox.Items[0]:=LanguageSetup.ProfileMountingCDROMAccessNormal;
+  CDROMDriveAccessComboBox.Items[1]:=LanguageSetup.ProfileMountingCDROMAccessIOCTL;
+  CDROMDriveAccessComboBox.Items[2]:=LanguageSetup.ProfileMountingCDROMAccessNOIOCTL;
+  CDROMDriveAccessComboBox.ItemIndex:=0;
+
   CDROMDriveLetterLabel.Caption:=LanguageSetup.ProfileMountingLetter;
+  CDROMDriveLetterWarningLabel.Caption:=LanguageSetup.ProfileMountingDriveLetterAlreadyInUse;
   FloppyImageEdit.EditLabel.Caption:=LanguageSetup.ProfileMountingFile;
   FloppyImageDriveLetterLabel.Caption:=LanguageSetup.ProfileMountingLetter;
+  FloppyImageDriveLetterWarningLabel.Caption:=LanguageSetup.ProfileMountingDriveLetterAlreadyInUse;
   DriveLetterInfoLabel1.Caption:=LanguageSetup.ProfileMountingLetterInfo;
   CDROMImageLabel.Caption:=LanguageSetup.ProfileMountingFile;
   CDROMImageAddButton.Hint:=LanguageSetup.ProfileMountingAddImage;
   CDROMImageDelButton.Hint:=LanguageSetup.ProfileMountingDelImage;
   CDROMImageSwitchLabel.Caption:=LanguageSetup.ProfileMountingSwitchImage;
   CDROMImageDriveLetterLabel.Caption:=LanguageSetup.ProfileMountingLetter;
+  CDImageDriveLetterWarningLabel.Caption:=LanguageSetup.ProfileMountingDriveLetterAlreadyInUse;
   ImageEdit.EditLabel.Caption:=LanguageSetup.ProfileMountingFile;
   ImageGeometryEdit.EditLabel.Caption:=LanguageSetup.ProfileMountingGeometry;
   ImageDriveLetterLabel.Caption:=LanguageSetup.ProfileMountingLetter;
+  HDImageDriveLetterWarningLabel.Caption:=LanguageSetup.ProfileMountingDriveLetterAlreadyInUse;
   DriveLetterInfoLabel2.Caption:=LanguageSetup.ProfileMountingLetterInfo;
   FloppyImageLabel.Caption:=LanguageSetup.ProfileMountingFile;
   FloppyImageAddButton.Hint:=LanguageSetup.ProfileMountingAddImage;
   FloppyImageDelButton.Hint:=LanguageSetup.ProfileMountingDelImage;
   FloppyImageSwitchLabel.Caption:=LanguageSetup.ProfileMountingSwitchImage;
   FloppyImageDriveLetterLabel2.Caption:=LanguageSetup.ProfileMountingLetter;
+  FloppyImageDriveLetterWarningLabel2.Caption:=LanguageSetup.ProfileMountingDriveLetterAlreadyInUse;
   DriveLetterInfoLabel3.Caption:=LanguageSetup.ProfileMountingLetterInfo;
   ZipFolderEdit.EditLabel.Caption:=LanguageSetup.ProfileMountingFolder;
   ZipFolderDriveLetterLabel.Caption:=LanguageSetup.ProfileMountingLetter;
+  ZipFolderDriveLetterWarningLabel.Caption:=LanguageSetup.ProfileMountingDriveLetterAlreadyInUse;
   ZipFileEdit.EditLabel.Caption:=LanguageSetup.ProfileMountingZipFile;
 
   FloppyPopupCreateImage.Caption:=LanguageSetup.ProfileMountingFloppyImageCreate;
@@ -246,8 +282,6 @@ begin
   finally
     ZipFolderDriveLetterComboBox.Items.EndUpdate;
   end;
-
-  ImageGeometryEdit.Text:='512,63,16,142';
 end;
 
 procedure TProfileMountEditorForm.FormShow(Sender: TObject);
@@ -262,7 +296,10 @@ begin
 
   St:=ValueToList(Data);
   try
-    If St.Count<2 then exit;
+    If St.Count<2 then begin
+      St.Add('');
+      St.Add('Drive');
+    end;
     S:=Trim(ExtUpperCase(St[1]));
 
     If S='DRIVE' then begin
@@ -298,7 +335,10 @@ begin
         CDROMDriveLetterComboBox.ItemIndex:=I;
       end;
       If St.Count>=4 then begin
-        CDROMIOCtrlCheckBox.Checked:=(Trim(ExtUpperCase(St[3]))='TRUE');
+        S:=Trim(ExtUpperCase(St[3]));
+        CDROMDriveAccessComboBox.ItemIndex:=0;
+        If S='TRUE' then CDROMDriveAccessComboBox.ItemIndex:=1;
+        If S='NOIOCTL' then CDROMDriveAccessComboBox.ItemIndex:=2;
       end;
       If St.Count>=5 then begin
         CDROMLabelEdit.Text:=St[4];
@@ -386,6 +426,15 @@ begin
     St.Free;
   end;
 
+  FolderDriveLetterComboBoxChange(Sender);
+  FloppyDriveLetterComboBoxChange(Sender);
+  CDROMDriveLetterComboBoxChange(Sender);
+  FloppyImageDriveLetterComboBoxChange(Sender);
+  FloppyImageDriveLetterComboBox2Change(Sender);
+  CDROMImageDriveLetterComboBoxChange(Sender);
+  ImageDriveLetterComboBoxChange(Sender);
+  ZipFolderDriveLetterComboBoxChange(Sender);
+
   FolderFreeSpaceTrackBarChange(Sender);
   ZipFolderFreeSpaceTrackBarChange(Sender);
 end;
@@ -407,6 +456,10 @@ begin
   Case PageControl.ActivePageIndex of
     0 : begin
           {RealFolder;DRIVE;Letter;False;;FreeSpace}
+          S:=Trim(IncludeTrailingPathDelimiter(FolderEdit.Text));
+          If (length(S)=3) and (Copy(S,2,2)=':\') then begin
+            If MessageDlg(LanguageSetup.MessageRootDirMountWaring,mtWarning,[mbYes,mbNo],0)<>mrYes then begin ModalResult:=mrNone; exit; end;
+          end;
           Data:=FolderEdit.Text+';Drive;'+FolderDriveLetterComboBox.Text+';False;;';
           If FolderFreeSpaceTrackBar.Position<>105 then Data:=Data+IntToStr(FolderFreeSpaceTrackBar.Position);
         end;
@@ -416,7 +469,11 @@ begin
         end;
     2 : begin
           {RealFolder;CDROM;Letter;IO;Label;}
-          If CDROMIOCtrlCheckBox.Checked then S:='true' else S:='false';
+          Case CDROMDriveAccessComboBox.ItemIndex of
+            1 : S:='true';
+            2 : S:='NoIOCTL';
+            else S:='false';
+          end;
           Data:=CDROMEdit.Text+';CDROM;'+CDROMDriveLetterComboBox.Text+';'+S+';'+CDROMLabelEdit.Text+';';
         end;
     3 : begin
@@ -426,7 +483,7 @@ begin
     4 : begin
           {ImageFile;FLOPPYIMAGE;Letter;;;}
           S:=FloppyImageTab.Cells[0,0]; For I:=1 to FloppyImageTab.RowCount-1 do S:=S+'$'+FloppyImageTab.Cells[0,I];
-          Data:=S+';FloppyImage;'+FloppyImageDriveLetterComboBox.Text+';;;';
+          Data:=S+';FloppyImage;'+FloppyImageDriveLetterComboBox2.Text+';;;';
         end;
     5 : begin
           {ImageFile;CDROMIMAGE;Letter;;;}
@@ -445,27 +502,6 @@ begin
   end;
 end;
 
-Function GetGeometryFromFile(const FileName : String) : String;
-Var hFile : THandle;
-    LoDWORD, HiDWORD : DWORD;
-    LoI, HiI : Int64;
-begin
-  hFile:=CreateFile(PChar(FileName),GENERIC_READ,0,nil,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,0);
-  If hFile=INVALID_HANDLE_VALUE then begin
-    result:='';
-  end else begin
-    try
-      LoDWORD:=GetFileSize(hFile,@HiDWORD);
-      LoI:=LoDWORD; HiI:=HiDWORD;
-      LoI:=LoI+$100000000*HiI;
-      LoI:=LoI div 512 div 63 div 16;
-      result:='512,63,16,'+IntToStr(LoI);
-    finally
-      CloseHandle(hFile);
-    end;
-  end;
-end;
-
 procedure TProfileMountEditorForm.FolderButtonClick(Sender: TObject);
 Var S : String;
     I : Integer;
@@ -474,25 +510,29 @@ begin
   Case (Sender as TComponent).Tag of
     0 : begin
           {Folder as HD-Drive}
-          S:=MakeAbsPath(FolderEdit.Text,PrgSetup.BaseDir);
+          If Trim(FolderEdit.Text)='' then S:=DefaultInitialDir else S:=FolderEdit.Text;
+          S:=MakeAbsPath(S,PrgSetup.BaseDir);
           if not SelectDirectory(Handle,LanguageSetup.ProfileMountingFolder,S) then exit;
           FolderEdit.Text:=MakeRelPath(S,PrgSetup.BaseDir);
         end;
     1 : begin
           {Folder as Floppy-Drive}
-          S:=MakeAbsPath(FloppyEdit.Text,PrgSetup.BaseDir);
+          If Trim(FloppyEdit.Text)='' then S:=DefaultInitialDir else S:=FloppyEdit.Text;
+          S:=MakeAbsPath(S,PrgSetup.BaseDir);
           if not SelectDirectory(Handle,LanguageSetup.ProfileMountingFolder,S) then exit;
           FloppyEdit.Text:=MakeRelPath(S,PrgSetup.BaseDir);
         end;
     2 : begin
           {Real CD-Drive}
-          S:=MakeAbsPath(CDROMEdit.Text,PrgSetup.BaseDir);
+          If Trim(CDROMEdit.Text)='' then S:=DefaultInitialDir else S:=CDROMEdit.Text;
+          S:=MakeAbsPath(S,PrgSetup.BaseDir);
           if not SelectDirectory(Handle,LanguageSetup.ProfileMountingFolder,S) then exit;
           CDROMEdit.Text:=MakeRelPath(S,PrgSetup.BaseDir);
         end;
     3 : begin
           {Floppy Image}
-          S:=MakeAbsPath(FloppyImageEdit.Text,PrgSetup.BaseDir);
+          If Trim(FloppyImageEdit.Text)='' then S:=DefaultInitialDir else S:=FloppyImageEdit.Text;
+          S:=MakeAbsPath(S,PrgSetup.BaseDir);
           OpenDialog.DefaultExt:='img';
           OpenDialog.InitialDir:=ExtractFilePath(S);
           OpenDialog.Title:=LanguageSetup.ProfileMountingFile;
@@ -506,7 +546,8 @@ begin
             MessageDlg(LanguageSetup.MessageNoImageSelected,mtError,[mbOK],0);
             exit;
           end;
-          S:=MakeAbsPath(CDROMImageTab.Cells[0,CDROMImageTab.Row],PrgSetup.BaseDir);
+          If Trim(CDROMImageTab.Cells[0,CDROMImageTab.Row])='' then S:=DefaultInitialDir else S:=CDROMImageTab.Cells[0,CDROMImageTab.Row];
+          S:=MakeAbsPath(S,PrgSetup.BaseDir);
           OpenDialog.DefaultExt:='iso';
           OpenDialog.InitialDir:=ExtractFilePath(S);
           OpenDialog.Title:=LanguageSetup.ProfileMountingFile;
@@ -516,7 +557,8 @@ begin
         end;
     5 : begin
           {HD Image}
-          S:=MakeAbsPath(ImageEdit.Text,PrgSetup.BaseDir);
+          If Trim(ImageEdit.Text)='' then S:=DefaultInitialDir else S:=ImageEdit.Text;
+          S:=MakeAbsPath(S,PrgSetup.BaseDir);
           OpenDialog.DefaultExt:='img';
           OpenDialog.InitialDir:=ExtractFilePath(S);
           OpenDialog.Title:=LanguageSetup.ProfileMountingFile;
@@ -561,7 +603,8 @@ begin
             MessageDlg(LanguageSetup.MessageNoImageSelected,mtError,[mbOK],0);
             exit;
           end;
-          S:=MakeAbsPath(FloppyImageTab.Cells[0,FloppyImageTab.Row],PrgSetup.BaseDir);
+          If Trim(FloppyImageTab.Cells[0,FloppyImageTab.Row])='' then S:=DefaultInitialDir else S:=FloppyImageTab.Cells[0,FloppyImageTab.Row];
+          S:=MakeAbsPath(S,PrgSetup.BaseDir);
           OpenDialog.DefaultExt:='iso';
           OpenDialog.InitialDir:=ExtractFilePath(S);
           OpenDialog.Title:=LanguageSetup.ProfileMountingFile;
@@ -589,13 +632,15 @@ begin
         end;
    13 : begin
           {Folder as (zip) HD-Drive}
-          S:=MakeAbsPath(ZipFolderEdit.Text,PrgSetup.BaseDir);
+          If Trim(ZipFolderEdit.Text)='' then S:=DefaultInitialDir else S:=ZipFolderEdit.Text;
+          S:=MakeAbsPath(S,PrgSetup.BaseDir);
           if not SelectDirectory(Handle,LanguageSetup.ProfileMountingFolder,S) then exit;
           ZipFolderEdit.Text:=MakeRelPath(S,PrgSetup.BaseDir);
         end;
    14 : begin
           {Zip-File as HD-Drive}
-          S:=MakeAbsPath(ZipFileEdit.Text,PrgSetup.BaseDir);
+          If Trim(ZipFileEdit.Text)='' then S:=DefaultInitialDir else S:=ZipFileEdit.Text;
+          S:=MakeAbsPath(S,PrgSetup.BaseDir);
           OpenDialog.DefaultExt:='zip';
           OpenDialog.InitialDir:=ExtractFilePath(S);
           OpenDialog.Title:=LanguageSetup.ProfileMountingZipFile;
@@ -623,6 +668,46 @@ begin
           FloppyPopupMenu.Popup(P.X+5,P.Y+5);
        end;
   end;
+end;
+
+procedure TProfileMountEditorForm.FolderDriveLetterComboBoxChange(Sender: TObject);
+begin
+  FolderDriveLetterWarningLabel.Visible:=(FolderDriveLetterComboBox.ItemIndex>=0) and (Pos(FolderDriveLetterComboBox.Items[FolderDriveLetterComboBox.ItemIndex],UsedDriveLetters)>0);
+end;
+
+procedure TProfileMountEditorForm.CDROMDriveLetterComboBoxChange(Sender: TObject);
+begin
+  CDROMDriveLetterWarningLabel.Visible:=(CDROMDriveLetterComboBox.ItemIndex>=0) and (Pos(CDROMDriveLetterComboBox.Items[CDROMDriveLetterComboBox.ItemIndex],UsedDriveLetters)>0);
+end;
+
+procedure TProfileMountEditorForm.CDROMImageDriveLetterComboBoxChange(Sender: TObject);
+begin
+  CDImageDriveLetterWarningLabel.Visible:=(CDROMImageDriveLetterComboBox.ItemIndex>=0) and (Pos(CDROMImageDriveLetterComboBox.Items[CDROMImageDriveLetterComboBox.ItemIndex],UsedDriveLetters)>0);
+end;
+
+procedure TProfileMountEditorForm.FloppyDriveLetterComboBoxChange(Sender: TObject);
+begin
+  FloppyDriveLetterWarningLabel.Visible:=(FloppyDriveLetterComboBox.ItemIndex>=0) and (Pos(FloppyDriveLetterComboBox.Items[FloppyDriveLetterComboBox.ItemIndex],UsedDriveLetters)>0);
+end;
+
+procedure TProfileMountEditorForm.FloppyImageDriveLetterComboBox2Change(Sender: TObject);
+begin
+  FloppyImageDriveLetterWarningLabel2.Visible:=(FloppyImageDriveLetterComboBox2.ItemIndex>=0) and (Pos(FloppyImageDriveLetterComboBox2.Items[FloppyImageDriveLetterComboBox2.ItemIndex],UsedDriveLetters)>0);
+end;
+
+procedure TProfileMountEditorForm.FloppyImageDriveLetterComboBoxChange(Sender: TObject);
+begin
+  FloppyImageDriveLetterWarningLabel.Visible:=(FloppyImageDriveLetterComboBox.ItemIndex>=0) and (Pos(FloppyImageDriveLetterComboBox.Items[FloppyImageDriveLetterComboBox.ItemIndex],UsedDriveLetters)>0);
+end;
+
+procedure TProfileMountEditorForm.ImageDriveLetterComboBoxChange(Sender: TObject);
+begin
+  HDImageDriveLetterWarningLabel.Visible:=(ImageDriveLetterComboBox.ItemIndex>=0) and (Pos(ImageDriveLetterComboBox.Items[ImageDriveLetterComboBox.ItemIndex],UsedDriveLetters)>0);
+end;
+
+procedure TProfileMountEditorForm.ZipFolderDriveLetterComboBoxChange(Sender: TObject);
+begin
+  ZipFolderDriveLetterWarningLabel.Visible:=(ZipFolderDriveLetterComboBox.ItemIndex>=0) and (Pos(ZipFolderDriveLetterComboBox.Items[ZipFolderDriveLetterComboBox.ItemIndex],UsedDriveLetters)>0);
 end;
 
 procedure TProfileMountEditorForm.FloppyPopupWork(Sender: TObject);
@@ -660,11 +745,15 @@ end;
 
 { global }
 
-Function ShowProfileMountEditorDialog(const AOwner : TComponent; var AData : String) : Boolean;
+Function ShowProfileMountEditorDialog(const AOwner : TComponent; var AData : String; const AUsedDriveLetters : String; const ADefaultInitialDir : String) : Boolean;
 begin
   ProfileMountEditorForm:=TProfileMountEditorForm.Create(AOwner);
   try
     ProfileMountEditorForm.Data:=AData;
+    If Trim(ADefaultInitialDir)<>'\'
+      then ProfileMountEditorForm.DefaultInitialDir:=ADefaultInitialDir
+      else ProfileMountEditorForm.DefaultInitialDir:=PrgSetup.GameDir;
+    ProfileMountEditorForm.UsedDriveLetters:=AUsedDriveLetters;
     result:=(ProfileMountEditorForm.ShowModal=mrOK);
     if result then AData:=ProfileMountEditorForm.Data;
   finally

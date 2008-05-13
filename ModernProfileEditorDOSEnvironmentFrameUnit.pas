@@ -21,10 +21,11 @@ type
     { Private-Deklarationen }
   public
     { Public-Deklarationen }
-    Procedure InitGUI(const OnProfileNameChange : TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup : PString);
+    Procedure InitGUI(const OnProfileNameChange : TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup, CurrentScummVMGameName : PString);
     Procedure SetGame(const Game : TGame; const LoadFromTemplate : Boolean);
     Function CheckValue : Boolean;
     Procedure GetGame(const Game : TGame);
+    Procedure ShowFrame;
   end;
 
 implementation
@@ -35,7 +36,7 @@ uses VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgSetupUnit;
 
 { TModernProfileEditorDOSEnvironmentFrame }
 
-procedure TModernProfileEditorDOSEnvironmentFrame.InitGUI(const OnProfileNameChange: TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup: PString);
+procedure TModernProfileEditorDOSEnvironmentFrame.InitGUI(const OnProfileNameChange: TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup, CurrentScummVMGameName : PString);
 Var St : TStringList;
 begin
   NoFlicker(ReportedDOSVersionComboBox);
@@ -86,6 +87,10 @@ begin
     0 : CustomSetsValueListEditor.Strings.Add('Key=');
     1 : if (CustomSetsValueListEditor.Row>0) and (CustomSetsValueListEditor.RowCount>2) then CustomSetsValueListEditor.Strings.Delete(CustomSetsValueListEditor.Row-1);
   end;
+end;
+
+procedure TModernProfileEditorDOSEnvironmentFrame.ShowFrame;
+begin
 end;
 
 function TModernProfileEditorDOSEnvironmentFrame.CheckValue: Boolean;

@@ -64,6 +64,7 @@ uses Math, VistaToolsUnit, LanguageSetupUnit, CommonTools;
 procedure TSerialEditForm.FormShow(Sender: TObject);
 begin
   SetVistaFonts(self);
+  Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName);
 
   InitGUI;
   DecodeString;

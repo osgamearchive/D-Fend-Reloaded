@@ -1,6 +1,6 @@
 LangString LANGNAME_ioFile ${LANG_FRENCH} "ioFileFrench.ini"
 
-LangString LANGNAME_NeedAdminRights ${LANG_FRENCH} "Sans droits administrateur, l'installateur ne peut pas écrire dans le répertoire de programmes. Seule une installation sur clé USB sera possible. Voulez-vous réessayer en changeant l'état administrateur ?"
+LangString LANGNAME_NeedAdminRights ${LANG_FRENCH} "Sans droits administrateur, l'installateur ne peut pas écrire dans le répertoire de programmes. Seule une installation en mode portable sera possible. Voulez-vous réessayer en changeant l'état administrateur ?"
 LangString LANGNAME_NeedAdminRightsUpdate ${LANG_FRENCH}  "Sans droits administrateur, l'installateur ne peut pas écrire dans le répertoire de programmes. Seule une mise à jour sur clé USB sera possible. Voulez-vous réessayer en changeant l'état administrateur ?"
 
 LangString LANGNAME_WelcomeText ${LANG_FRENCH} "Cet assistant va vous guider durant l'installation de ${PrgName}.\r\n\r\nCliquez sur Suivant pour continuer."
@@ -26,13 +26,16 @@ LangString LANGNAME_NoInstallationFound ${LANG_FRENCH} "Aucune installation de D
 LangString LANGNAME_ProgramFiles ${LANG_FRENCH} "Fichiers de programme"
 LangString LANGNAME_LanguageFiles ${LANG_FRENCH} "Fichiers de langues"
 LangString LANGNAME_DOSBox ${LANG_FRENCH} "DOSBox"
-LangString LANGNAME_FreeDosTools ${LANG_FRENCH} "Utilitaires FreeDos à utiliser dans DosBox"
-LangString LANGNAME_OpenGEM ${LANG_FRENCH} "OpenGEM"
+LangString LANGNAME_Tools ${LANG_FRENCH} "Outils"
+LangString LANGNAME_FreeDosTools ${LANG_FRENCH} "Utilitaires FreeDOS à utiliser dans DosBox"
+LangString LANGNAME_Doszip ${LANG_FRENCH} "Doszip Commander"
 LangString LANGNAME_DesktopShortcut ${LANG_FRENCH} "Raccourci sur le bureau"
 
 LangString DESC_DFend ${LANG_FRENCH} "D-Fend Reloaded est l'interface utilisateur graphique pour administrer les jeux DOS."
 LangString DESC_DosBox ${LANG_FRENCH} "DOSBox est l'émulateur DOS utilisé par D-Fend Reloaded."
 LangString DESC_DosBoxProgramFiles ${LANG_FRENCH} "Fichiers programme de l'émulateur DOS."
 LangString DESC_DosBoxLanguageFiles ${LANG_FRENCH} "Fichiers de langues pour les différentes langues de DOSBox."
+LangString DESC_Tools ${LANG_FRENCH} "Outils à utiliser dans DOSBox."
 LangString DESC_FreeDosTools ${LANG_FRENCH} "Utilitaires en ligne de commande tirés de la collection FreeDOS, pour utiliser dans DOSBox."
+LangString DESC_Doszip ${LANG_FRENCH} "Doszip Commander est un clone de Norton Commander destiné à être utlisé dans DOSBox."
 LangString DESC_DesktopShortcut ${LANG_FRENCH} "Crée un raccourci sur le bureau pour D-Fend Reloaded."

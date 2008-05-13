@@ -97,7 +97,7 @@ object ModernProfileEditorGameInfoFrame: TModernProfileEditorGameInfoFrame
     Left = 12
     Top = 362
     Width = 605
-    Height = 181
+    Height = 175
     Anchors = [akLeft, akTop, akRight, akBottom]
     PlainText = True
     ScrollBars = ssBoth

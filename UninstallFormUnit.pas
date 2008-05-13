@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, Buttons, CheckLst, GameDBUnit, ExtCtrls;
+  Dialogs, StdCtrls, Buttons, CheckLst, ExtCtrls, GameDBUnit;
 
 type
   TUninstallForm = class(TForm)
@@ -39,16 +39,19 @@ Function DeleteSingleFile(const FileName: String; var ContinueNext : Boolean) : 
 Function DeleteDir(const Dir: String; var ContinueNext : Boolean) : Boolean;
 Function UsedByOtherGame(const GameDB : TGameDB; const Game : TGame; Dir: String): Boolean;
 Function IconUsedByOtherGame(const GameDB : TGameDB; const Game : TGame; Icon: String): Boolean;
+Function ExtraFileUsedByOtherGame(const GameDB : TGameDB; const Game : TGame; ExtraFile: String): Boolean;
 
 implementation
 
-uses VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgSetupUnit, PrgConsts;
+uses VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgSetupUnit, PrgConsts,
+     GameDBToolsUnit;
 
 {$R *.dfm}
 
 procedure TUninstallForm.FormCreate(Sender: TObject);
 begin
   SetVistaFonts(self);
+  Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName);
 
   Caption:=LanguageSetup.UninstallForm;
   InfoLabel.Caption:=LanguageSetup.UninstallFormLabel;
@@ -71,24 +74,34 @@ begin
   ListBox.Items.Add(LanguageSetup.UninstallFormProfileRecord+': '+Game.Name);
   DirList.Add('');
 
-  S:=Trim(Game.GameExe);
-  If S='' then S:=Trim(Game.SetupExe);
-  If (S<>'') and (not UsedByOtherGame(GameDB,Game,S)) then begin
+  If ScummVMMode(Game) then begin
+    S:=Trim(Game.ScummVMPath);
+    If (S<>'') and (not UsedByOtherGame(GameDB,Game,IncludeTrailingPathDelimiter(S))) then begin
+      S:=ExtractFilePath(MakeAbsPath(IncludeTrailingPathDelimiter(S),PrgSetup.BaseDir));
+      ListBox.Items.Add(LanguageSetup.UninstallFormProgramDir+': '+S);
+      DirList.Add(S);
+    end;
+  end else begin
+    S:=Trim(Game.GameExe);
+    If ExtUpperCase(Copy(S,1,7))='DOSBOX:' then S:='';
+    If S='' then S:=Trim(Game.SetupExe);
+    If ExtUpperCase(Copy(S,1,7))='DOSBOX:' then S:='';
     S:=ExtractFilePath(MakeAbsPath(S,PrgSetup.BaseDir));
-    ListBox.Items.Add(LanguageSetup.UninstallFormProgramDir+': '+S);
-    DirList.Add(S);
+    If (S<>'') and (not UsedByOtherGame(GameDB,Game,S)) then begin
+      ListBox.Items.Add(LanguageSetup.UninstallFormProgramDir+': '+S);
+      DirList.Add(S);
+    end;
+
+    S:=Trim(Game.CaptureFolder);
+    If (S<>'') and (not UsedByOtherGame(GameDB,Game,IncludeTrailingPathDelimiter(S))) then begin
+      S:=ExtractFilePath(MakeAbsPath(IncludeTrailingPathDelimiter(S),PrgSetup.BaseDir));
+      ListBox.Items.Add(LanguageSetup.UninstallFormCaptureFolder+': '+S);
+      DirList.Add(S);
+    end;
   end;
 
-  S:=Trim(Game.CaptureFolder);
-  If (S<>'') and (not UsedByOtherGame(GameDB,Game,IncludeTrailingPathDelimiter(S))) then begin
-    S:=ExtractFilePath(MakeAbsPath(IncludeTrailingPathDelimiter(S),PrgSetup.BaseDir));
-    ListBox.Items.Add(LanguageSetup.UninstallFormCaptureFolder+': '+S);
-    DirList.Add(S);
-  end;
-
-  S:=Trim(Game.Icon);
-  If (S<>'') and FileExists(PrgDataDir+IconsSubDir+'\'+S) and (not IconUsedByOtherGame(GameDB,Game,S)) then begin
-    S:=PrgDataDir+IconsSubDir+'\'+S;
+  S:=MakeAbsIconName(Game.Icon);
+  If (S<>'') and FileExists(S) and (not IconUsedByOtherGame(GameDB,Game,S)) then begin
     ListBox.Items.Add(LanguageSetup.UninstallFormIcon+': '+S);
     DirList.AddObject(S,TObject(1));
   end;
@@ -98,6 +111,20 @@ begin
     S:=ExtractFilePath(MakeAbsPath(IncludeTrailingPathDelimiter(S),PrgSetup.BaseDir));
     ListBox.Items.Add(LanguageSetup.UninstallFormDataDir+': '+S);
     DirList.Add(S);
+  end;
+
+  S:=Trim(Game.ExtraFiles);
+  If S<>'' then begin
+    St:=ValueToList(S);
+    try
+      For I:=0 to St.Count-1 do If (Trim(St[I])<>'') and (not ExtraFileUsedByOtherGame(GameDB,Game,St[I])) then begin
+        S:=MakeAbsPath(St[I],PrgSetup.BaseDir);
+        ListBox.Items.Add(LanguageSetup.UninstallFormExtraFile+': '+S);
+        DirList.AddObject(S,TObject(1));
+      end;
+    finally
+      St.Free;
+    end;
   end;
 
   S:=Trim(Game.ExtraDirs);
@@ -233,6 +260,7 @@ Function UsedByOtherGame(const GameDB : TGameDB; const Game : TGame; Dir: String
 Function SameDir(S : String) : Boolean;
 begin
   If Trim(S)='' then begin result:=False; exit; end;
+  If ExtUpperCase(Copy(S,1,7))='DOSBOX:' then begin result:=False; exit; end;
   S:=Trim(ExtUpperCase(ExtractFilePath(MakeAbsPath(S,PrgSetup.BaseDir))));
   result:=(Copy(S,1,length(Dir))=Dir);
 end;
@@ -246,9 +274,13 @@ begin
   For I:=0 to GameDB.Count-1 do begin
     If GameDB[I]=Game then continue;
 
-    If SameDir(GameDB[I].GameExe) then exit;
-    If SameDir(GameDB[I].SetupExe) then exit;
-    If SameDir(GameDB[I].CaptureFolder) then exit;
+    If ScummVMMode(GameDB[I]) then begin
+      If SameDir(GameDB[I].ScummVMPath) then exit;
+    end else begin
+      If SameDir(GameDB[I].GameExe) then exit;
+      If SameDir(GameDB[I].SetupExe) then exit;
+      If SameDir(GameDB[I].CaptureFolder) then exit;
+    end;
     If SameDir(GameDB[I].DataDir) then exit;
 
     St:=ValueToList(GameDB[I].ExtraDirs);
@@ -269,7 +301,32 @@ begin
   result:=False;
   S:=Trim(ExtUpperCase(Icon));
   For I:=0 to GameDB.Count-1 do If GameDB[I]<>Game then
-    If Trim(ExtUpperCase(GameDB[I].Icon))=S then begin result:=False; exit; end;
+    If Trim(ExtUpperCase(MakeAbsIconName(GameDB[I].Icon)))=S then begin result:=True; exit; end;
+end;
+
+Function ExtraFileUsedByOtherGame(const GameDB : TGameDB; const Game : TGame; ExtraFile: String): Boolean;
+Function SameFile(S : String) : Boolean;
+begin
+  result:=(Trim(S)<>'') and (Trim(ExtUpperCase(MakeAbsPath(S,PrgSetup.BaseDir)))=ExtraFile);
+end;
+Var I,J : Integer;
+    St : TStringList;
+begin
+  result:=True;
+
+  ExtraFile:=Trim(ExtUpperCase(MakeAbsPath(ExtraFile,PrgSetup.BaseDir)));
+  For I:=0 to GameDB.Count-1 do begin
+    If GameDB[I]=Game then continue;
+
+    St:=ValueToList(GameDB[I].ExtraFiles);
+    try
+      For J:=0 to St.Count-1 do If SameFile(St[J]) then exit;
+    finally
+      St.Free;
+    end;
+  end;
+
+  result:=False;
 end;
 
 end.

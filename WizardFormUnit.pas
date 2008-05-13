@@ -4,300 +4,224 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, ComCtrls, StdCtrls, Buttons, Grids, ValEdit, ExtCtrls, GameDBUnit;
+  Dialogs, ComCtrls, StdCtrls, Buttons, Grids, ValEdit, ExtCtrls, GameDBUnit,
+  WizardBaseUnit, WizardPrgFileUnit, WizardTemplateUnit, WizardGameInfoUnit,
+  WizardFinishUnit, WizardScummVMUnit, WizardScummVMSettingsUnit;
 
 type
   TWizardForm = class(TForm)
-    PageControl: TPageControl;
-    BaseSheet: TTabSheet;
-    InfoSheet: TTabSheet;
-    SystemSheet: TTabSheet;
-    BaseName: TLabeledEdit;
-    GamesFolderEdit: TLabeledEdit;
-    GamesFolderButton: TSpeedButton;
-    ProgramEdit: TLabeledEdit;
-    SetupEdit: TLabeledEdit;
-    ProgramButton: TSpeedButton;
-    SetupButton: TSpeedButton;
-    GameInfoValueListEditor: TValueListEditor;
-    NotesLabel: TLabel;
-    NotesMemo: TMemo;
-    NextButton: TBitBtn;
+    BottomPanel: TPanel;
     PreviousButton: TBitBtn;
+    NextButton: TBitBtn;
     OKButton: TBitBtn;
     CancelButton: TBitBtn;
-    OpenDialog: TOpenDialog;
-    BaseInfoLabel1: TLabel;
-    BaseInfoLabel2: TLabel;
-    BaseInfoLabel3: TLabel;
-    BaseDataFolderEdit: TLabeledEdit;
-    DataFolderEdit: TLabeledEdit;
-    DataFolderButton: TSpeedButton;
-    BaseDataFolderButton: TSpeedButton;
-    StartFullscreenCheckBox: TCheckBox;
-    CloseDosBoxOnExitCheckBox: TCheckBox;
-    CPULabel: TLabel;
-    CPUComboBox: TComboBox;
-    MoreRAMCheckBox: TCheckBox;
-    DriveSetupLabel: TLabel;
-    DriveSetupCheckBox: TCheckBox;
-    DriveSetupList: TListView;
     procedure FormCreate(Sender: TObject);
-    procedure ButtonWork(Sender: TObject);
     procedure StepButtonWork(Sender: TObject);
-    procedure PageControlChange(Sender: TObject);
     procedure OKButtonClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
+    procedure FormHide(Sender: TObject);
   private
     { Private-Deklarationen }
+    ActivePage : Integer;
+    WizardBaseFrame : TWizardBaseFrame;
+    WizardPrgFileFrame : TWizardPrgFileFrame;
+    WizardTemplateFrame : TWizardTemplateFrame;
+    WizardGameInfoFrame : TWizardGameInfoFrame;
+    WizardFinishFrame : TWizardFinishFrame;
+    WizardScummVMFrame : TWizardScummVMFrame;
+    WizardScummVMSettingsFrame : TWizardScummVMSettingsFrame;
+    UserGameInfo, InsecureTemplate : Boolean;
+    ScummVM : Boolean;
+    Procedure SetActivePage(NewPage : Integer);
   public
     { Public-Deklarationen }
     GameDB : TGameDB;
-    Game, LoadTemplate : TGame;
+    Game : TGame;
+    ExeFile : String;
+    OpenEditorNow : Boolean;
   end;
 
 var
   WizardForm: TWizardForm;
 
-Function ShowWizardDialog(const AOwner : TComponent; const AGameDB : TGameDB; var AGame : TGame; const ADefaultGame : TGame; var OpenEditorNow : Boolean) : Boolean;
+Function ShowWizardDialog(const AOwner : TComponent; const AGameDB : TGameDB; const AExeFile : String; var AGame : TGame; var OpenEditorNow : Boolean) : Boolean;
 
 implementation
 
-uses ShellAPI, VistaToolsUnit, LanguageSetupUnit, PrgSetupUnit, CommonTools,
-     PrgConsts;
+uses VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgSetupUnit,
+     GameDBToolsUnit;
 
 {$R *.dfm}
 
 procedure TWizardForm.FormCreate(Sender: TObject);
 begin
   SetVistaFonts(self);
+  Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName);
 
   Caption:=LanguageSetup.WizardForm;
-
-  BaseSheet.Caption:=LanguageSetup.WizardFormBaseSheet;
-  InfoSheet.Caption:=LanguageSetup.WizardFormInfoSheet;
-  SystemSheet.Caption:=LanguageSetup.WizardFormSystemSheet;
-
-  BaseInfoLabel1.Caption:=LanguageSetup.WizardFormInfoLabel1;
-  BaseInfoLabel2.Caption:=LanguageSetup.WizardFormInfoLabel2;
-  BaseInfoLabel3.Caption:=LanguageSetup.WizardFormInfoLabel3;
-  BaseName.EditLabel.Caption:=LanguageSetup.WizardFormBaseName;
-  GamesFolderEdit.EditLabel.Caption:=LanguageSetup.WizardFormGamesFolder;
-  ProgramEdit.EditLabel.Caption:=LanguageSetup.WizardFormProgram;
-  SetupEdit.EditLabel.Caption:=LanguageSetup.WizardFormSetup;
-  BaseDataFolderEdit.EditLabel.Caption:=LanguageSetup.WizardFormBaseDataFolder;
-  DataFolderEdit.EditLabel.Caption:=LanguageSetup.WizardFormDataFolder;
-
-  StartFullscreenCheckBox.Caption:=LanguageSetup.GameStartFullscreen;
-  CloseDosBoxOnExitCheckBox.Caption:=LanguageSetup.GameCloseDosBoxAfterGameExit;
-  MoreRAMCheckBox.Caption:=LanguageSetup.WizardFormMoreRAM;
-  CPULabel.Caption:=LanguageSetup.WizardFormCPU;
-  CPUComboBox.Items[0]:=LanguageSetup.WizardFormCPUType1;
-  CPUComboBox.Items[1]:=LanguageSetup.WizardFormCPUType2;
-  CPUComboBox.Items[2]:=LanguageSetup.WizardFormCPUType3;
-  CPUComboBox.Items[3]:=LanguageSetup.WizardFormCPUType4;
-  DriveSetupLabel.Caption:=LanguageSetup.WizardFormDriveSetupLabel;
-  DriveSetupCheckBox.Caption:=LanguageSetup.WizardFormDriveSetupCheckBox;
-
   PreviousButton.Caption:=LanguageSetup.WizardFormButtonPrevious;
   NextButton.Caption:=LanguageSetup.WizardFormButtonNext;
   OKButton.Caption:=LanguageSetup.OK;
   CancelButton.Caption:=LanguageSetup.Cancel;
-
-  GamesFolderEdit.Text:=PrgSetup.GameDir;
-  BaseDataFolderEdit.Text:=PrgSetup.DataDir;
-
-  PageControl.ActivePageIndex:=0;
-end;
-
-procedure LoadMountingList(const Drive : String; const MountingListView : TListView);
-Var St : TStringList;
-    L : TListItem;
-    S : String;
-begin
-  MountingListView.Items.BeginUpdate;
-  try
-    MountingListView.Items.Clear;
-    St:=ValueToList(Drive);
-    try
-      L:=MountingListView.Items.Add;
-      S:=Trim(St[0]);
-      If (St.Count>1) and (Trim(ExtUpperCase(St[1]))='PHYSFS') then begin
-        If Pos('$',S)<>0 then S:=Copy(S,Pos('$',S)+1,MaxInt)+' (+ '+Copy(S,1,Pos('$',S)-1)+')';
-      end else begin
-        If Pos('$',S)<>0 then S:=Copy(S,1,Pos('$',S)-1)+' (+'+LanguageSetup.More+')';
-      end;
-      L.Caption:=S;
-      If St.Count>1 then L.SubItems.Add(St[1]) else L.SubItems.Add('');
-      If St.Count>2 then L.SubItems.Add(St[2]) else L.SubItems.Add('');
-      If St.Count>4 then L.SubItems.Add(St[4]) else L.SubItems.Add('');
-      If St.Count>3 then begin
-        If Trim(ExtUpperCase(St[3]))='TRUE' then L.SubItems.Add(RemoveUnderline(LanguageSetup.Yes)) else L.SubItems.Add(RemoveUnderline(LanguageSetup.No));
-      end else L.SubItems.Add(RemoveUnderline(LanguageSetup.No));
-    finally
-      St.Free;
-    end;
-  finally
-    MountingListView.Items.EndUpdate;
-  end;
+  
+  ActivePage:=0;
+  UserGameInfo:=True;
+  InsecureTemplate:=False;
+  OpenEditorNow:=False;
 end;
 
 procedure TWizardForm.FormShow(Sender: TObject);
-Var St : TStringList;
-    L : TListColumn;
 begin
-  GameInfoValueListEditor.TitleCaptions.Clear;
-  GameInfoValueListEditor.TitleCaptions.Add(LanguageSetup.Key);
-  GameInfoValueListEditor.TitleCaptions.Add(LanguageSetup.Value);
-  with GameInfoValueListEditor do begin
-    Strings.Delete(0);
-    Strings.Add(LanguageSetup.GameGenre+'=');
-    ItemProps[Strings.Count-1].EditStyle:=esPickList;
-    St:=GameDB.GetGenreList; try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
-    Strings.Add(LanguageSetup.GameDeveloper+'=');
-    ItemProps[Strings.Count-1].EditStyle:=esPickList;
-    St:=GameDB.GetDeveloperList; try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
-    Strings.Add(LanguageSetup.GamePublisher+'=');
-    ItemProps[Strings.Count-1].EditStyle:=esPickList;
-    St:=GameDB.GetPublisherList; try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
-    Strings.Add(LanguageSetup.GameYear+'=');
-    ItemProps[Strings.Count-1].EditStyle:=esPickList;
-    St:=GameDB.GetYearList; try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
-    Strings.Add(LanguageSetup.GameLanguage+'=');
-    ItemProps[Strings.Count-1].EditStyle:=esPickList;
-    St:=GameDB.GetLanguageList; try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
-    Strings.Add(LanguageSetup.GameWWW+'=');
-    Strings.Add(LanguageSetup.GameFavorite+'=');
-    ItemProps[Strings.Count-1].ReadOnly:=True;
-    ItemProps[Strings.Count-1].PickList.Add(RemoveUnderline(LanguageSetup.Yes));
-    ItemProps[Strings.Count-1].PickList.Add(RemoveUnderline(LanguageSetup.No));
+  WizardBaseFrame:=TWizardBaseFrame.Create(self); WizardBaseFrame.Parent:=self;
+  with WizardBaseFrame do begin Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName); Align:=alClient; Visible:=False; Init(GameDB); end;
+
+  WizardPrgFileFrame:=TWizardPrgFileFrame.Create(self); WizardPrgFileFrame.Parent:=self;
+  with WizardPrgFileFrame do begin Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName); Align:=alClient; Visible:=False; Init(GameDB); end;
+
+  WizardTemplateFrame:=TWizardTemplateFrame.Create(self); WizardTemplateFrame.Parent:=self;
+  with WizardTemplateFrame do begin Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName); Align:=alClient; Visible:=False; Init(GameDB); end;
+
+  WizardGameInfoFrame:=TWizardGameInfoFrame.Create(self); WizardGameInfoFrame.Parent:=self;
+  with WizardGameInfoFrame do begin Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName); Align:=alClient; Visible:=False; Init(GameDB); end;
+
+  WizardFinishFrame:=TWizardFinishFrame.Create(self); WizardFinishFrame.Parent:=self;
+  with WizardFinishFrame do begin Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName); Align:=alClient; Visible:=False; Init(GameDB); end;
+
+  WizardScummVMFrame:=TWizardScummVMFrame.Create(self); WizardScummVMFrame.Parent:=self;
+  with WizardScummVMFrame do begin Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName); Align:=alClient; Visible:=False; Init(GameDB); end;
+
+  WizardScummVMSettingsFrame:=TWizardScummVMSettingsFrame.Create(self); WizardScummVMSettingsFrame.Parent:=self;
+  with WizardScummVMSettingsFrame do begin Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName); Align:=alClient; Visible:=False; Init(GameDB); end;
+
+  WizardBaseFrame.TabOrder:=0;
+  WizardPrgFileFrame.TabOrder:=1;
+  WizardTemplateFrame.TabOrder:=2;
+  WizardGameInfoFrame.TabOrder:=3;
+  WizardFinishFrame.TabOrder:=4;
+  WizardScummVMFrame.TabOrder:=5;
+  WizardScummVMSettingsFrame.TabOrder:=6;
+  BottomPanel.TabOrder:=7;
+
+  If Trim(ExeFile)<>'' then
+    WizardPrgFileFrame.ProgramEdit.Text:=MakeRelPath(ExeFile,PrgSetup.BaseDir);
+
+  SetActivePage(0);
+end;
+
+procedure TWizardForm.FormHide(Sender: TObject);
+begin
+  WizardTemplateFrame.Done;
+  WizardFinishFrame.Done;
+end;
+
+procedure TWizardForm.SetActivePage(NewPage: Integer);
+begin
+  Case ActivePage of
+    0 : begin
+          If (NewPage=1) and (Trim(WizardBaseFrame.BaseName.Text)='') then begin
+            MessageDlg(LanguageSetup.MessageNoProfileName,mtError,[mbOK],0);
+            exit;
+          end;
+          ScummVM:=(WizardBaseFrame.EmulationTypeRadioGroup.ItemIndex=1);
+          If ScummVM then WizardScummVMFrame.ShowScummVMFrame;
+        end;
+    1 : If NewPage=2 then begin
+          If not ScummVM then begin
+            If Trim(WizardPrgFileFrame.ProgramEdit.Text)='' then begin
+              If MessageDlg(LanguageSetup.MessageNoGameFileNameWarning,mtConfirmation,[mbYes,mbNo],0)<>mrYes then exit;
+            end;
+            WizardTemplateFrame.SearchTemplates(WizardPrgFileFrame.ProgramEdit.Text);
+          end else begin
+            If Trim(WizardScummVMFrame.ProgramEdit.Text)='' then begin
+              If MessageDlg(LanguageSetup.MessageNoGameFileNameWarning,mtConfirmation,[mbYes,mbNo],0)<>mrYes then exit;
+            end;
+            WizardScummVMSettingsFrame.SetScummVMGameName(WizardScummVMFrame.GetScummVMGameName);
+          end;
+        end;
+    2 : If NewPage=3 then begin
+          If not ScummVM then begin
+            InsecureTemplate:=not WizardTemplateFrame.SelectedProfileSecure;
+            if InsecureTemplate then begin
+              If MessageDlg(LanguageSetup.MessageTemplateInsecureWarning,mtWarning,[mbYes,mbNo],0)<>mrYes then exit;
+            end;
+            UserGameInfo:=WizardTemplateFrame.TemplateType4.Checked or WizardTemplateFrame.TemplateType5.Checked;
+          end;
+        end;
+    3 : If NewPage=4 then begin
+          WizardFinishFrame.SetInsecureStatus(InsecureTemplate);
+          WizardFinishFrame.LoadData(WizardTemplateFrame.GetTemplate,WizardPrgFileFrame.ProgramEdit.Text,WizardPrgFileFrame.SetupEdit.Text);
+        end;
   end;
-  NotesLabel.Caption:=LanguageSetup.GameNotes+':';
 
-  GameInfoValueListEditor.Strings.ValueFromIndex[6]:=RemoveUnderline(LanguageSetup.No);
+  If (NewPage=3) and (not UserGameInfo) then begin
+    If ActivePage=4 then NewPage:=2 else begin
+      NewPage:=4;
+      WizardFinishFrame.SetInsecureStatus(InsecureTemplate);
+      WizardFinishFrame.LoadData(WizardTemplateFrame.GetTemplate,WizardPrgFileFrame.ProgramEdit.Text,WizardPrgFileFrame.SetupEdit.Text);
+    end;
+  end;
 
-  CPUComboBox.ItemIndex:=1;
+  WizardBaseFrame.Visible:=(NewPage=0);
+  WizardPrgFileFrame.Visible:=(NewPage=1) and (not ScummVM);
+  WizardScummVMFrame.Visible:=(NewPage=1) and ScummVM;
+  WizardTemplateFrame.Visible:=(NewPage=2) and (not ScummVM);
+  WizardScummVMSettingsFrame.Visible:=(NewPage=2) and ScummVM;
+  WizardGameInfoFrame.Visible:=(NewPage=3);
+  WizardFinishFrame.Visible:=(NewPage=4);
 
-  L:=DriveSetupList.Columns.Add; L.Width:=-2; L.Caption:=LanguageSetup.ProfileEditorMountingFolderImage;
-  L:=DriveSetupList.Columns.Add; L.Width:=-2; L.Caption:=LanguageSetup.ProfileEditorMountingAs;
-  L:=DriveSetupList.Columns.Add; L.Width:=-2; L.Caption:=LanguageSetup.ProfileEditorMountingLetter;
-  L:=DriveSetupList.Columns.Add; L.Width:=-2; L.Caption:=LanguageSetup.ProfileEditorMountingLabel;
-  L:=DriveSetupList.Columns.Add; L.Width:=-2; L.Caption:=LanguageSetup.ProfileEditorMountingIOControl;
-  LoadMountingList(MakeRelPath(PrgSetup.GameDir,PrgSetup.BaseDir)+';Drive;C;false;;',DriveSetupList);
+  ActivePage:=NewPage;
+
+  PreviousButton.Enabled:=(ActivePage>0);
+  If ScummVM then begin
+    NextButton.Enabled:=(ActivePage<3);
+    OKButton.Enabled:=(ActivePage=3);
+  end else begin
+    NextButton.Enabled:=(ActivePage<4);
+    OKButton.Enabled:=(ActivePage=4);
+  end;
 end;
 
-procedure TWizardForm.PageControlChange(Sender: TObject);
-begin
-  PreviousButton.Enabled:=(PageControl.ActivePageIndex>0);
-  NextButton.Enabled:=(PageControl.ActivePageIndex<2);
-  OKButton.Enabled:=(PageControl.ActivePageIndex=2);
-end;
 
 procedure TWizardForm.StepButtonWork(Sender: TObject);
 begin
   Case (Sender as TComponent).Tag of
-    0 : PageControl.ActivePageIndex:=PageControl.ActivePageIndex-1;
-    1 : PageControl.ActivePageIndex:=PageControl.ActivePageIndex+1;
-  end;
-  PageControlChange(Sender);
-end;
-
-procedure TWizardForm.ButtonWork(Sender: TObject);
-Var S : String;
-begin
-  Case (Sender as TComponent).Tag of
-    0 : ShellExecute(Handle,'explore',PChar(GamesFolderEdit.Text),nil,PChar(GamesFolderEdit.Text),SW_SHOW);
-    1 : begin
-          S:=MakeAbsPath(ProgramEdit.Text,PrgSetup.BaseDir);
-          OpenDialog.DefaultExt:='exe';
-          OpenDialog.Title:=LanguageSetup.ProfileEditorEXEDialog;
-          OpenDialog.Filter:=LanguageSetup.ProfileEditorEXEFilter;
-          If (S='') or (Trim(ProgramEdit.Text)='') then begin
-            If PrgSetup.GameDir=''
-              then OpenDialog.InitialDir:=PrgSetup.BaseDir
-              else OpenDialog.InitialDir:=PrgSetup.GameDir;
-          end else OpenDialog.InitialDir:=ExtractFilePath(S);
-          if not OpenDialog.Execute then exit;
-          S:=MakeRelPath(OpenDialog.FileName,PrgSetup.BaseDir);
-          If S='' then exit;
-          ProgramEdit.Text:=S;
-        end;
-    2 : begin
-          S:=MakeAbsPath(SetupEdit.Text,PrgSetup.BaseDir);
-          OpenDialog.DefaultExt:='exe';
-          OpenDialog.Title:=LanguageSetup.ProfileEditorEXEDialog;
-          OpenDialog.Filter:=LanguageSetup.ProfileEditorEXEFilter;
-          If (S='') or (Trim(SetupEdit.Text)='') then begin
-            If PrgSetup.GameDir=''
-              then OpenDialog.InitialDir:=PrgSetup.BaseDir
-              else OpenDialog.InitialDir:=PrgSetup.GameDir;
-          end else OpenDialog.InitialDir:=ExtractFilePath(S);
-          if not OpenDialog.Execute then exit;
-          S:=MakeRelPath(OpenDialog.FileName,PrgSetup.BaseDir);
-          If S='' then exit;
-          SetupEdit.Text:=S;
-        end;
-    3 : ShellExecute(Handle,'explore',PChar(BaseDataFolderEdit.Text),nil,PChar(BaseDataFolderEdit.Text),SW_SHOW);
-    4 : begin
-          If Trim(DataFolderEdit.Text)=''
-            then S:=PrgSetup.DataDir
-            else S:=MakeAbsPath(DataFolderEdit.Text,PrgSetup.BaseDir);
-          if not SelectDirectory(Handle,LanguageSetup.ChooseFolder,S) then exit;
-          S:=MakeRelPath(S,PrgSetup.BaseDir);
-          S:=DataFolderEdit.Text;
-        end;
+    0 : SetActivePage(ActivePage-1);
+    1 : SetActivePage(ActivePage+1);
   end;
 end;
 
 procedure TWizardForm.OKButtonClick(Sender: TObject);
 begin
-  Game:=GameDB[GameDB.Add(BaseName.Text)];
-  Game.AssignFrom(LoadTemplate);
-  Game.Name:=BaseName.Text;
-
-  Game.GameExe:=ProgramEdit.Text;
-  Game.SetupExe:=SetupEdit.Text;
-  Game.DataDir:=DataFolderEdit.Text;
-
-  with GameInfoValueListEditor.Strings do begin
-    Game.Genre:=ValueFromIndex[0];
-    Game.Developer:=ValueFromIndex[1];
-    Game.Publisher:=ValueFromIndex[2];
-    Game.Year:=ValueFromIndex[3];
-    Game.Language:=ValueFromIndex[4];
-    Game.WWW:=ValueFromIndex[5];
-    Game.Favorite:=(ValueFromIndex[6]=RemoveUnderline(LanguageSetup.Yes));
-  end;
-  Game.Notes:=StringListToString(NotesMemo.Lines);
-
-  Game.StartFullscreen:=StartFullscreenCheckBox.Checked;
-  Game.CloseDosBoxAfterGameExit:=CloseDosBoxOnExitCheckBox.Checked;
-  if MoreRAMCheckBox.Checked then Game.Memory:=63;
-  Case CPUComboBox.ItemIndex of
-    0 : begin Game.Core:='auto'; Game.Cycles:='auto'; end;
-  end;
-
-  If Game.NrOfMounts=0 then begin
-    Game.NrOfMounts:=1;
-    Game.Mount0:=MakeRelPath(PrgSetup.GameDir,PrgSetup.BaseDir)+';Drive;C;false;;';
-  end;
-
-  Game.CaptureFolder:='.\'+CaptureSubDir+'\'+MakeFileSysOKFolderName(Game.Name);
+  If ScummVM
+    then Game:=WizardScummVMSettingsFrame.CreateGame(WizardBaseFrame.BaseName.Text)
+    else Game:=WizardTemplateFrame.CreateGame(WizardBaseFrame.BaseName.Text);
+  WizardBaseFrame.WriteDataToGame(Game);
+  If ScummVM
+    then WizardScummVMFrame.WriteDataToGame(Game)
+    else WizardPrgFileFrame.WriteDataToGame(Game);
+  If UserGameInfo then WizardGameInfoFrame.WriteDataToGame(Game);
+  WizardFinishFrame.WriteDataToGame(Game);
+  OpenEditorNow:=WizardFinishFrame.ProfileEditorCheckBox.Checked;
+  If not ScummVM then begin
+    CreateGameCheckSum(Game,True);
+    CreateSetupCheckSum(Game,True);
+  end; 
+  Game.LoadCache;
+  Game.StoreAllValues;
 end;
 
 { global }
 
-Function ShowWizardDialog(const AOwner : TComponent; const AGameDB : TGameDB; var AGame : TGame; const ADefaultGame : TGame; var OpenEditorNow : Boolean) : Boolean;
+Function ShowWizardDialog(const AOwner : TComponent; const AGameDB : TGameDB; const AExeFile : String; var AGame : TGame; var OpenEditorNow : Boolean) : Boolean;
 begin
   WizardForm:=TWizardForm.Create(AOwner);
   try
     WizardForm.GameDB:=AGameDB;
-    WizardForm.Game:=AGame;
-    WizardForm.LoadTemplate:=ADefaultGame;
+    WizardForm.ExeFile:=AExeFile;
     result:=(WizardForm.ShowModal=mrOK);
     if result then begin
       AGame:=WizardForm.Game;
-      OpenEditorNow:=WizardForm.DriveSetupCheckBox.Checked;
+      OpenEditorNow:=WizardForm.OpenEditorNow;
     end;
   finally
     WizardForm.Free;

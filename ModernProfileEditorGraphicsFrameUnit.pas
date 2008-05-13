@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, 
-  Dialogs, StdCtrls, Spin, GameDBUnit, ModernProfileEditorFormUnit, ExtCtrls;
+  Dialogs, StdCtrls, Spin, ExtCtrls, GameDBUnit, ModernProfileEditorFormUnit;
 
 type
   TModernProfileEditorGraphicsFrame = class(TFrame, IModernProfileEditorFrame)
@@ -24,14 +24,22 @@ type
     FrameSkipLabel: TLabel;
     FrameSkipEdit: TSpinEdit;
     TextModeLinesRadioGroup: TRadioGroup;
+    GlideEmulationCheckBox: TCheckBox;
+    VGASettingsGroupBox: TGroupBox;
+    VGAChipsetLabel: TLabel;
+    VGAChipsetComboBox: TComboBox;
+    VideoRamLabel: TLabel;
+    VideoRamComboBox: TComboBox;
+    VGASettingsLabel: TLabel;
   private
     { Private-Deklarationen }
   public
     { Public-Deklarationen }
-    Procedure InitGUI(const OnProfileNameChange : TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup : PString);
+    Procedure InitGUI(const OnProfileNameChange : TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup, CurrentScummVMGameName : PString);
     Procedure SetGame(const Game : TGame; const LoadFromTemplate : Boolean);
     Function CheckValue : Boolean;
     Procedure GetGame(const Game : TGame);
+    Procedure ShowFrame;
   end;
 
 implementation
@@ -42,7 +50,7 @@ uses VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgSetupUnit;
 
 { TModernProfileEditorGraphicsFrame }
 
-procedure TModernProfileEditorGraphicsFrame.InitGUI(const OnProfileNameChange: TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup: PString);
+procedure TModernProfileEditorGraphicsFrame.InitGUI(const OnProfileNameChange: TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup, CurrentScummVMGameName : PString);
 Var St : TStringList;
 begin
   NoFlicker(WindowResolutionComboBox);
@@ -50,8 +58,12 @@ begin
   NoFlicker(StartFullscreenCheckBox);
   NoFlicker(DoublebufferingCheckBox);
   NoFlicker(KeepAspectRatioCheckBox);
+  NoFlicker(GlideEmulationCheckBox);
   NoFlicker(RenderComboBox);
   NoFlicker(VideoCardComboBox);
+  NoFlicker(VGASettingsGroupBox);
+  NoFlicker(VGAChipsetComboBox);
+  NoFlicker(VideoRamComboBox);
   NoFlicker(ScaleComboBox);
   NoFlicker(FrameSkipEdit);
   NoFlicker(TextModeLinesRadioGroup);
@@ -63,10 +75,17 @@ begin
   StartFullscreenCheckBox.Caption:=LanguageSetup.GameStartFullscreen;
   DoublebufferingCheckBox.Caption:=LanguageSetup.GameUseDoublebuffering;
   KeepAspectRatioCheckBox.Caption:=LanguageSetup.GameAspectCorrection;
+  GlideEmulationCheckBox.Caption:=LanguageSetup.GameGlideEmulation;
   RenderLabel.Caption:=LanguageSetup.GameRender;
   St:=ValueToList(GameDB.ConfOpt.Render,';,'); try RenderComboBox.Items.AddStrings(St); finally St.Free; end;
   VideoCardLabel.Caption:=LanguageSetup.GameVideoCard;
   St:=ValueToList(GameDB.ConfOpt.Video,';,'); try VideoCardComboBox.Items.AddStrings(St); finally St.Free; end;
+  VGASettingsGroupBox.Caption:=LanguageSetup.GameVGASettings;
+  VGAChipsetLabel.Caption:=LanguageSetup.GameVGAChipset;
+  St:=ValueToList(GameDB.ConfOpt.VGAChipsets,';,'); try VGAChipsetComboBox.Items.AddStrings(St); finally St.Free; end;
+  VideoRamLabel.Caption:=LanguageSetup.GameVideoRam;
+  St:=ValueToList(GameDB.ConfOpt.VGAVideoRAM,';,'); try VideoRamComboBox.Items.AddStrings(St); finally St.Free; end;
+  VGASettingsLabel.Caption:=LanguageSetup.GameVGASettingsInfo;
   ScaleLabel.Caption:=LanguageSetup.GameScale;
   St:=ValueToList(GameDB.ConfOpt.Scale,';,'); try ScaleComboBox.Items.AddStrings(St); finally St.Free; end;
   FrameSkipLabel.Caption:=LanguageSetup.GameFrameskip;
@@ -83,24 +102,48 @@ begin
   For I:=0 to WindowResolutionComboBox.Items.Count-1 do If Trim(ExtUpperCase(WindowResolutionComboBox.Items[I]))=S then begin
     WindowResolutionComboBox.ItemIndex:=I; break;
   end;
+
   S:=Trim(ExtUpperCase(Game.FullscreenResolution));
   FullscreenResolutionComboBox.ItemIndex:=0;
   For I:=0 to FullscreenResolutionComboBox.Items.Count-1 do If Trim(ExtUpperCase(FullscreenResolutionComboBox.Items[I]))=S then begin
     FullscreenResolutionComboBox.ItemIndex:=I; break;
   end;
+
   StartFullscreenCheckBox.Checked:=Game.StartFullscreen;
   DoublebufferingCheckBox.Checked:=Game.UseDoublebuffering;
   KeepAspectRatioCheckBox.Checked:=Game.AspectCorrection;
+  GlideEmulationCheckBox.Visible:=PrgSetup.AllowGlideSettings;
+  If PrgSetup.AllowGlideSettings then GlideEmulationCheckBox.Checked:=Game.GlideEmulation;
+
   S:=Trim(ExtUpperCase(Game.Render));
   RenderComboBox.ItemIndex:=0;
   For I:=0 to RenderComboBox.Items.Count-1 do If Trim(ExtUpperCase(RenderComboBox.Items[I]))=S then begin
     RenderComboBox.ItemIndex:=I; break;
   end;
+
   S:=Trim(ExtUpperCase(Game.VideoCard));
   VideoCardComboBox.ItemIndex:=VideoCardComboBox.Items.Count-1;
   For I:=0 to VideoCardComboBox.Items.Count-1 do If Trim(ExtUpperCase(VideoCardComboBox.Items[I]))=S then begin
     VideoCardComboBox.ItemIndex:=I; break;
   end;
+
+  VGASettingsGroupBox.Visible:=PrgSetup.AllowVGAChipsetSettings;
+  If PrgSetup.AllowVGAChipsetSettings then begin
+    If VGAChipsetComboBox.Items.Count>0 then VGAChipsetComboBox.ItemIndex:=0;
+    S:=Trim(ExtUpperCase(Game.VGAChipset));
+    For I:=0 to VGAChipsetComboBox.Items.Count-1 do If Trim(ExtUpperCase(VGAChipsetComboBox.Items[I]))=S then begin
+      VGAChipsetComboBox.ItemIndex:=I;
+      break;
+    end;
+    If VideoRamComboBox.Items.Count>0 then VideoRamComboBox.ItemIndex:=0;
+    S:=Trim(ExtUpperCase(IntToStr(Game.VideoRam)));
+    For I:=0 to VideoRamComboBox.Items.Count-1 do begin
+      T:=Trim(ExtUpperCase(VideoRamComboBox.Items[I]));
+      If T=S then begin VideoRamComboBox.ItemIndex:=I; break; end;
+      If T='2048' then VideoRamComboBox.ItemIndex:=I;
+    end;
+  end;  
+
   S:=Trim(ExtUpperCase(Game.Scale));
   ScaleComboBox.ItemIndex:=0;
   For I:=0 to ScaleComboBox.Items.Count-1 do begin
@@ -111,6 +154,7 @@ begin
     T:=Copy(T,1,Pos(')',T)-1);
     If Trim(T)=S then begin ScaleComboBox.ItemIndex:=I; break; end;
   end;
+
   FrameSkipEdit.Value:=Game.FrameSkip;
 
   TextModeLinesRadioGroup.Visible:=PrgSetup.AllowTextModeLineChange;
@@ -119,6 +163,10 @@ begin
     50 : TextModeLinesRadioGroup.ItemIndex:=2;
     else TextModeLinesRadioGroup.ItemIndex:=0;
   end;
+end;
+
+procedure TModernProfileEditorGraphicsFrame.ShowFrame;
+begin
 end;
 
 function TModernProfileEditorGraphicsFrame.CheckValue: Boolean;
@@ -131,11 +179,20 @@ Var S : String;
 begin
   Game.WindowResolution:=WindowResolutionComboBox.Text;
   Game.FullscreenResolution:=FullscreenResolutionComboBox.Text;
+
   Game.StartFullscreen:=StartFullscreenCheckBox.Checked;
   Game.UseDoublebuffering:=DoublebufferingCheckBox.Checked;
   Game.AspectCorrection:=KeepAspectRatioCheckBox.Checked;
+  If PrgSetup.AllowGlideSettings then Game.GlideEmulation:=GlideEmulationCheckBox.Checked;
+
   Game.Render:=RenderComboBox.Text;
   Game.VideoCard:=VideoCardComboBox.Text;
+
+  If PrgSetup.AllowVGAChipsetSettings then begin
+    Game.VGAChipset:=VGAChipsetComboBox.Text;
+    try Game.VideoRam:=StrToInt(VideoRamComboBox.Text); except Game.VideoRam:=2048; end;
+  end;  
+
   S:=ScaleComboBox.Text;
   If Pos('(',S)=0 then Game.Scale:='' else begin
     S:=Copy(S,Pos('(',S)+1,MaxInt);

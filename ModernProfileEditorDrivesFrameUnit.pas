@@ -22,14 +22,17 @@ type
   private
     { Private-Deklarationen }
     Mounting : TStringList;
+    ProfileExe : PString;
     Procedure LoadMountingList;
     function NextFreeDriveLetter: Char;
+    Function UsedDriveLetters(const AllowedNr : Integer = -1) : String;
   public
     { Public-Deklarationen }
-    Procedure InitGUI(const OnProfileNameChange : TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup : PString);
+    Procedure InitGUI(const OnProfileNameChange : TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup, CurrentScummVMGameName : PString);
     Procedure SetGame(const Game : TGame; const LoadFromTemplate : Boolean);
     Function CheckValue : Boolean;
     Procedure GetGame(const Game : TGame);
+    Procedure ShowFrame;
   end;
 
 implementation
@@ -41,7 +44,7 @@ uses Math, VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgSetupUnit,
 
 { TModernProfileEditorDrivesFrame }
 
-procedure TModernProfileEditorDrivesFrame.InitGUI(const OnProfileNameChange: TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup: PString);
+procedure TModernProfileEditorDrivesFrame.InitGUI(const OnProfileNameChange: TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup, CurrentScummVMGameName : PString);
 Var L : TListColumn;
 begin
   NoFlicker(MountingListView);
@@ -63,6 +66,8 @@ begin
   L:=MountingListView.Columns.Add; L.Width:=-2; L.Caption:=LanguageSetup.ProfileEditorMountingLabel;
   L:=MountingListView.Columns.Add; L.Width:=-2; L.Caption:=LanguageSetup.ProfileEditorMountingIOControl;
   AutoMountCheckBox.Caption:=LanguageSetup.ProfileEditorMountingAutoMountCDs;
+
+  ProfileExe:=CurrentProfileExe;
 end;
 
 procedure TModernProfileEditorDrivesFrame.SetGame(const Game: TGame; const LoadFromTemplate: Boolean);
@@ -80,6 +85,10 @@ begin
   If Game.NrOfMounts>=10 then Mounting.Add(Game.Mount9);
   LoadMountingList;
   AutoMountCheckBox.Checked:=Game.AutoMountCDs;
+end;
+
+procedure TModernProfileEditorDrivesFrame.ShowFrame;
+begin
 end;
 
 procedure TModernProfileEditorDrivesFrame.LoadMountingList;
@@ -138,6 +147,21 @@ begin
   until B;
 end;
 
+function TModernProfileEditorDrivesFrame.UsedDriveLetters(const AllowedNr : Integer): String;
+Var I : Integer;
+    St : TStringList;
+begin
+  result:='';
+  For I:=0 to Mounting.Count-1 do If I<>AllowedNr then begin
+    St:=ValueToList(Mounting[I]);
+    try
+      If St.Count>=3 then result:=result+UpperCase(St[2]);
+    finally
+      St.Free;
+    end;
+  end;
+end;
+
 procedure TModernProfileEditorDrivesFrame.ButtonWork(Sender: TObject);
 Var S : String;
     I : Integer;
@@ -146,7 +170,7 @@ begin
   Case (Sender as TComponent).Tag of
     0 : If Mounting.Count<10 then begin
           S:=';Drive;'+NextFreeDriveLetter+';false;;';
-          if not ShowProfileMountEditorDialog(self,S) then exit;
+          if not ShowProfileMountEditorDialog(self,S,UsedDriveLetters,IncludeTrailingPathDelimiter(ExtractFilePath(ProfileExe^))) then exit;
           Mounting.Add(S);
           LoadMountingList;
           MountingListView.ItemIndex:=MountingListView.Items.Count-1;
@@ -155,7 +179,7 @@ begin
           I:=MountingListView.ItemIndex;
           If I<0 then exit;
           S:=Mounting[I];
-          if not ShowProfileMountEditorDialog(self,S) then exit;
+          if not ShowProfileMountEditorDialog(self,S,UsedDriveLetters(I),IncludeTrailingPathDelimiter(ExtractFilePath(ProfileExe^))) then exit;
           Mounting[I]:=S;
           LoadMountingList;
           MountingListView.ItemIndex:=I;
@@ -183,7 +207,7 @@ begin
             end;
           end;
           If Mounting.Count<10 then
-            Mounting.Insert(0,MakeRelPath(PrgSetup.GameDir,PrgDataDir)+';Drive;C;false;');
+            Mounting.Insert(0,MakeRelPath(PrgSetup.GameDir,PrgSetup.BaseDir)+';Drive;C;false;');
           LoadMountingList;
         end;
   end;
@@ -196,6 +220,7 @@ end;
 
 procedure TModernProfileEditorDrivesFrame.MountingListViewKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
+  If (Shift=[ssCtrl]) and (Key=VK_RETURN) then begin ButtonWork(MountingEditButton); exit; end;
   If Shift<>[] then exit;
   Case Key of
     VK_INSERT : ButtonWork(MountingAddButton);

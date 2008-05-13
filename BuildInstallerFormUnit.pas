@@ -10,7 +10,7 @@ type
   TBuildInstallerForm = class(TForm)
     SaveDialog: TSaveDialog;
     PopupMenu: TPopupMenu;
-    PageControl1: TPageControl;
+    PageControl: TPageControl;
     GamesSheet: TTabSheet;
     AutoSetupSheet: TTabSheet;
     InfoLabel: TLabel;
@@ -36,21 +36,38 @@ type
     DestFileEdit2: TLabeledEdit;
     DestFileButton2: TSpeedButton;
     PopupMenu2: TPopupMenu;
+    TemplatesSheet: TTabSheet;
+    InfoLabel3: TLabel;
+    ListBox3: TCheckListBox;
+    SelectAllButton3: TBitBtn;
+    SelectNoneButton3: TBitBtn;
+    SelectGenreButton3: TBitBtn;
+    GroupGamesCheckBox3: TCheckBox;
+    InstTypeRadioGroup3: TRadioGroup;
+    DestFileButton3: TSpeedButton;
+    PopupMenu3: TPopupMenu;
+    OKButton3: TBitBtn;
+    CancelButton3: TBitBtn;
+    DestFileEdit3: TLabeledEdit;
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure SelectButtonClick(Sender: TObject);
     procedure DestFileButtonClick(Sender: TObject);
-    procedure OKButtonClick(Sender: TObject);
+    procedure OKButton3Click(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure SelectButtonClick2(Sender: TObject);
     procedure OKButton2Click(Sender: TObject);
     procedure DestFileButton2Click(Sender: TObject);
+    procedure SelectButtonClick3(Sender: TObject);
+    procedure DestFileButton3Click(Sender: TObject);
+    procedure OKButtonClick(Sender: TObject);
   private
     { Private-Deklarationen }
-    AutoSetupDB : TGameDB;
-    Function GetNSIFileName(var NSIFileName : String; const AutoSetup : Boolean) : Boolean;
+    TemplateDB, AutoSetupDB : TGameDB;
+    Function GetNSIFileName(var NSIFileName : String; const Mode : Integer) : Boolean;
     Function BuildNSIScript : Boolean;
     Function BuildNSIScript2 : Boolean;
+    function BuildNSIScript3: Boolean;
   public
     { Public-Deklarationen }
     GameDB : TGameDB;
@@ -62,7 +79,8 @@ var
 Function BuildInstaller(const AOwner : TComponent; const AGameDB : TGameDB) : Boolean;
 
 function CheckPath(NSIPath: String): Boolean;
-function AddProfileToNSIScript(const NSI: TStringList; const Game: TGame): Boolean;
+function AddTemplateToNSIScript(const NSI: TStringList; const Game: TGame): Boolean;
+function AddAutoSetupToNSIScript(const NSI: TStringList; const Game: TGame): Boolean;
 function AddGameToNSIScript(const NSI: TStringList; const Game: TGame): Boolean;
 function BuildEXEInstaller(const Handle : THandle; const FileName : String) : Boolean;
 
@@ -76,6 +94,7 @@ uses Registry, ShellAPI, VistaToolsUnit, LanguageSetupUnit, PrgSetupUnit,
 procedure TBuildInstallerForm.FormCreate(Sender: TObject);
 begin
   SetVistaFonts(self);
+  Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName);
 
   Caption:=LanguageSetup.BuildInstaller;
 
@@ -97,15 +116,8 @@ begin
 
   { AutoSetup templates }
 
-  //AutoSetupSheet.Caption:=LanguageSetup.BuildInstallerTypeAutoSetupProfiles;
-  If ExtUpperCase(ExtractFileName(LanguageSetup.SetupFile))='DEUTSCH.INI'
-    then AutoSetupSheet.Caption:='Autosetup Vorlagen'
-    else AutoSetupSheet.Caption:='Auto setup '+LowerCase(LanguageSetup.TemplateForm);
-  AutoSetupSheet.TabVisible:=PrgSetup.ShowAutoSetupTemplateEdit;
-
-  //InfoLabel2.Caption:=LanguageSetup.BuildInstallerInfo;
-  InfoLabel2.Caption:='Please select the auto setup templates to include in the installer:';
-
+  AutoSetupSheet.Caption:=LanguageSetup.BuildInstallerTypeAutoSetupProfiles;
+  InfoLabel2.Caption:=LanguageSetup.BuildInstallerInfoAutoSetupTemplates;
   DestFileEdit2.EditLabel.Caption:=LanguageSetup.BuildInstallerDestFile;
   DestFileButton2.Hint:=LanguageSetup.ChooseFile;
   OKButton2.Caption:=LanguageSetup.OK;
@@ -118,24 +130,44 @@ begin
   InstTypeRadioGroup2.Items[0]:=LanguageSetup.BuildInstallerInstTypeScriptOnly;
   InstTypeRadioGroup2.Items[1]:=LanguageSetup.BuildInstallerInstTypeFullInstaller;
 
+  { AutoSetup templates }
+
+  TemplatesSheet.Caption:=LanguageSetup.BuildInstallerTypeTemplates;
+  InfoLabel3.Caption:=LanguageSetup.BuildInstallerInfoTemplates;
+  DestFileEdit3.EditLabel.Caption:=LanguageSetup.BuildInstallerDestFile;
+  DestFileButton3.Hint:=LanguageSetup.ChooseFile;
+  OKButton3.Caption:=LanguageSetup.OK;
+  CancelButton3.Caption:=LanguageSetup.Cancel;
+  SelectAllButton3.Caption:=LanguageSetup.All;
+  SelectNoneButton3.Caption:=LanguageSetup.None;
+  SelectGenreButton3.Caption:=LanguageSetup.GameBy;
+  GroupGamesCheckBox3.Caption:=LanguageSetup.BuildInstallerGroupGames;
+  InstTypeRadioGroup3.Caption:=LanguageSetup.BuildInstallerInstType;
+  InstTypeRadioGroup3.Items[0]:=LanguageSetup.BuildInstallerInstTypeScriptOnly;
+  InstTypeRadioGroup3.Items[1]:=LanguageSetup.BuildInstallerInstTypeFullInstaller;
+
   { Dialog }
 
   SaveDialog.Title:=LanguageSetup.BuildInstallerDestFileTitle;
   SaveDialog.Filter:=LanguageSetup.BuildInstallerDestFileFilter;
 
+  TemplateDB:=TGameDB.Create(PrgDataDir+TemplateSubDir);
   AutoSetupDB:=TGameDB.Create(PrgDataDir+AutoSetupSubDir);
 end;
 
 procedure TBuildInstallerForm.FormDestroy(Sender: TObject);
 begin
+  TemplateDB.Free;
   AutoSetupDB.Free;
 end;
 
 procedure TBuildInstallerForm.FormShow(Sender: TObject);
 begin
-  BuildCheckList(ListBox,GameDB,False);
-  BuildCheckList(ListBox2,AutoSetupDB,False);
+  BuildCheckList(ListBox,GameDB,False,False);
+  BuildCheckList(ListBox3,TemplateDB,False,False);
+  BuildCheckList(ListBox2,AutoSetupDB,False,False);
   BuildSelectPopupMenu(PopupMenu,GameDB,SelectButtonClick,False);
+  BuildSelectPopupMenu(PopupMenu3,TemplateDB,SelectButtonClick3,False);
   BuildSelectPopupMenu(PopupMenu2,AutoSetupDB,SelectButtonClick2,False);
 end;
 
@@ -175,12 +207,35 @@ begin
   SelectGamesByPopupMenu(Sender,ListBox2);
 end;
 
-Function TBuildInstallerForm.GetNSIFileName(var NSIFileName : String; const AutoSetup : Boolean) : Boolean;
+procedure TBuildInstallerForm.SelectButtonClick3(Sender: TObject);
+Var I : Integer;
+    P : TPoint;
+begin
+  If Sender is TBitBtn then begin
+    Case (Sender as TComponent).Tag of
+      0,1 : For I:=0 to ListBox3.Count-1 do ListBox3.Checked[I]:=((Sender as TComponent).Tag=0);
+        2 : begin
+              P:=ClientToScreen(Point(SelectGenreButton3.Left,SelectGenreButton3.Top));
+              PopupMenu3.Popup(P.X+5,P.Y+5);
+            end;
+    end;
+    exit;
+  end;
+
+  SelectGamesByPopupMenu(Sender,ListBox3);
+end;
+
+Function TBuildInstallerForm.GetNSIFileName(var NSIFileName : String; const Mode : Integer) : Boolean;
 Var S : String;
 begin
   result:=False;
 
-  If AutoSetup then S:=DestFileEdit2.Text else S:=DestFileEdit.Text;
+  Case Mode of
+    0 : S:=DestFileEdit.Text;
+    1 : S:=DestFileEdit3.Text;
+    2 : S:=DestFileEdit2.Text;
+    else S:='';
+  end;
 
   NSIFileName:=Trim(S);
   If NSIFileName='' then begin
@@ -205,7 +260,7 @@ Var NSIFileName : String;
     S : String;
 begin
   result:=False;
-  if not GetNSIFileName(NSIFileName,False) then exit;
+  if not GetNSIFileName(NSIFileName,0) then exit;
 
   St:=TStringList.Create;
   try
@@ -256,14 +311,14 @@ Var NSIFileName : String;
     S : String;
 begin
   result:=False;
-  if not GetNSIFileName(NSIFileName,True) then exit;
+  if not GetNSIFileName(NSIFileName,2) then exit;
 
   St:=TStringList.Create;
   try
-    St.Add('OutFile "'+ExtractFileName(DestFileEdit.Text)+'"');
+    St.Add('OutFile "'+ExtractFileName(DestFileEdit2.Text)+'"');
     St.Add('!include "D-Fend Reloaded DataInstaller.nsi"');
 
-    if GroupGamesCheckBox.Checked then begin
+    if GroupGamesCheckBox2.Checked then begin
       GenreList:=TStringList.Create;
       try
         For I:=0 to ListBox2.Items.Count-1 do If ListBox2.Checked[I] then begin
@@ -273,7 +328,7 @@ begin
             St.Add('');
             St.Add('SectionGroup "'+TGame(ListBox2.Items.Objects[I]).Genre+'"');
             For J:=I to ListBox2.Items.Count-1 do If ListBox2.Checked[J] and (Trim(ExtUpperCase(TGame(ListBox2.Items.Objects[J]).Genre))=S) then begin
-              if not AddProfileToNSIScript(St,TGame(ListBox2.Items.Objects[J])) then exit;
+              if not AddAutoSetupToNSIScript(St,TGame(ListBox2.Items.Objects[J])) then exit;
             end;
             St.Add('SectionGroupEnd');
           end;
@@ -283,7 +338,58 @@ begin
       end;
     end else begin
       For I:=0 to ListBox2.Items.Count-1 do If ListBox2.Checked[I] then begin
-        if not AddProfileToNSIScript(St,TGame(ListBox2.Items.Objects[I])) then exit;
+        if not AddAutoSetupToNSIScript(St,TGame(ListBox2.Items.Objects[I])) then exit;
+      end;
+    end;
+
+    try
+      St.SaveToFile(NSIFileName);
+    except
+      MessageDlg(Format(LanguageSetup.MessageCouldNotSaveFile,[NSIFileName]),mtError,[mbOK],0);
+      exit;
+    end;
+
+  finally
+    St.Free;
+  end;
+  result:=True;
+end;
+
+function TBuildInstallerForm.BuildNSIScript3: Boolean;
+Var NSIFileName : String;
+    St,GenreList : TStringList;
+    I,J : Integer;
+    S : String;
+begin
+  result:=False;
+  if not GetNSIFileName(NSIFileName,1) then exit;
+
+  St:=TStringList.Create;
+  try
+    St.Add('OutFile "'+ExtractFileName(DestFileEdit3.Text)+'"');
+    St.Add('!include "D-Fend Reloaded DataInstaller.nsi"');
+
+    if GroupGamesCheckBox3.Checked then begin
+      GenreList:=TStringList.Create;
+      try
+        For I:=0 to ListBox3.Items.Count-1 do If ListBox3.Checked[I] then begin
+          S:=Trim(ExtUpperCase(TGame(ListBox3.Items.Objects[I]).Genre));
+          If GenreList.IndexOf(S)<0 then begin
+            GenreList.Add(S);
+            St.Add('');
+            St.Add('SectionGroup "'+TGame(ListBox3.Items.Objects[I]).Genre+'"');
+            For J:=I to ListBox3.Items.Count-1 do If ListBox3.Checked[J] and (Trim(ExtUpperCase(TGame(ListBox3.Items.Objects[J]).Genre))=S) then begin
+              if not AddTemplateToNSIScript(St,TGame(ListBox3.Items.Objects[J])) then exit;
+            end;
+            St.Add('SectionGroupEnd');
+          end;
+        end;
+      finally
+        GenreList.Free;
+      end;
+    end else begin
+      For I:=0 to ListBox3.Items.Count-1 do If ListBox3.Checked[I] then begin
+        if not AddTemplateToNSIScript(St,TGame(ListBox3.Items.Objects[I])) then exit;
       end;
     end;
 
@@ -318,6 +424,15 @@ begin
   DestFileEdit2.Text:=SaveDialog.FileName;
 end;
 
+procedure TBuildInstallerForm.DestFileButton3Click(Sender: TObject);
+Var S : String;
+begin
+  S:=Trim(DestFileEdit3.Text);
+  If (S='') or (Trim(ExtractFilePath(S))='') then SaveDialog.InitialDir:=PrgDataDir else SaveDialog.InitialDir:=Trim(ExtractFilePath(S));
+  If not SaveDialog.Execute then exit;
+  DestFileEdit3.Text:=SaveDialog.FileName;
+end;
+
 procedure TBuildInstallerForm.OKButtonClick(Sender: TObject);
 begin
   If (Trim(ExtractFilePath(DestFileEdit.Text))='') and (Trim(DestFileEdit.Text)<>'') then
@@ -338,7 +453,19 @@ begin
 
   If not BuildNSIScript2 then begin ModalResult:=mrNone; exit; end;
   If InstTypeRadioGroup2.ItemIndex=1 then begin
-    If not BuildEXEInstaller(Handle,DestFileEdit.Text) then begin ModalResult:=mrNone; exit; end;
+    If not BuildEXEInstaller(Handle,DestFileEdit2.Text) then begin ModalResult:=mrNone; exit; end;
+  end;
+end;
+
+procedure TBuildInstallerForm.OKButton3Click(Sender: TObject);
+begin
+  If (Trim(ExtractFilePath(DestFileEdit3.Text))='') and (Trim(DestFileEdit3.Text)<>'') then
+    DestFileEdit3.Text:=PrgDataDir+DestFileEdit3.Text;
+  If Trim(DestFileEdit3.Text)<>'' then DestFileEdit3.Text:=ChangeFileExt(DestFileEdit3.Text,'.exe');
+
+  If not BuildNSIScript3 then begin ModalResult:=mrNone; exit; end;
+  If InstTypeRadioGroup3.ItemIndex=1 then begin
+    If not BuildEXEInstaller(Handle,DestFileEdit3.Text) then begin ModalResult:=mrNone; exit; end;
   end;
 end;
 
@@ -364,12 +491,25 @@ begin
   result:=(MessageDlg(Format(LanguageSetup.BuildInstallerPathWarning,[ExcludeTrailingPathDelimiter(PrgDataDir),ExcludeTrailingPathDelimiter(NSIPath)]),mtConfirmation,[mbYes,mbNo],0)=mrYes);
 end;
 
-function AddProfileToNSIScript(const NSI: TStringList; const Game: TGame): Boolean;
+function AddTemplateToNSIScript(const NSI: TStringList; const Game: TGame): Boolean;
 begin
   Game.StoreAllValues;
 
   NSI.Add('');
-  NSI.Add('Section "AutoSetup: '+Game.Name+'"');
+  NSI.Add('Section "'+LanguageSetup.BuildInstallerShortInfoTemplate+': '+Game.Name+'"');
+  NSI.Add('  SetOutPath "$DataInstDir\Confs"');
+  NSI.Add('  File ".\'+TemplateSubDir+'\'+ExtractFileName(Game.SetupFile)+'"');
+  NSI.Add('SectionEnd');
+
+  result:=True;
+end;
+
+function AddAutoSetupToNSIScript(const NSI: TStringList; const Game: TGame): Boolean;
+begin
+  Game.StoreAllValues;
+
+  NSI.Add('');
+  NSI.Add('Section "'+LanguageSetup.BuildInstallerShortInfoAutoSetupTemplate+': '+Game.Name+'"');
   NSI.Add('  SetOutPath "$DataInstDir\Confs"');
   NSI.Add('  File ".\'+AutoSetupSubDir+'\'+ExtractFileName(Game.SetupFile)+'"');
   NSI.Add('SectionEnd');
@@ -387,7 +527,7 @@ begin
   NSI.Add('  SetOutPath "$DataInstDir\'+T+'"');
   NSI.Add('  File /nonfatal /r "'+IncludeTrailingPathDelimiter(S)+'*.*"');
 end;
-Var S : String;
+Var S,T : String;
     I : Integer;
     St : TStringList;
 begin
@@ -398,29 +538,104 @@ begin
   NSI.Add('  SetOutPath "$DataInstDir\Confs"');
   NSI.Add('  File ".\'+GameListSubDir+'\'+ExtractFileName(Game.SetupFile)+'"');
 
+  If ScummVMMode(Game) then begin
+    S:=Trim(Game.ScummVMPath);
+    If S<>'' then begin
+      S:=IncludeTrailingPathDelimiter(MakeRelPath(S,PrgSetup.BaseDir));
+      If Copy(S,2,2)=':\' then begin
+        MessageDlg(Format(LanguageSetup.MessagePathNotRelative,[S,Game.Name,PrgSetup.BaseDir]),mtError,[mbOK],0);
+        result:=False; exit;
+      end;
+      AddFiles(S);
+    end;
+  end else begin
+    S:=Trim(Game.GameExe);
+    If ExtUpperCase(Copy(S,1,7))='DOSBOX:' then S:='';
+    If S='' then S:=Trim(Game.SetupExe);
+    If ExtUpperCase(Copy(S,1,7))='DOSBOX:' then S:='';
+    If S<>'' then begin
+      S:=IncludeTrailingPathDelimiter(MakeRelPath(ExtractFilePath(S),PrgSetup.BaseDir));
+      If Copy(S,2,2)=':\' then begin
+        MessageDlg(Format(LanguageSetup.MessagePathNotRelative,[S,Game.Name,PrgSetup.BaseDir]),mtError,[mbOK],0);
+        result:=False; exit;
+      end;
+      AddFiles(S);
+    end;
 
-  S:=Trim(Game.GameExe);
-  If S='' then S:=Trim(Game.SetupExe);
-  If S<>'' then AddFiles(IncludeTrailingPathDelimiter(ExtractFilePath(S)));
+    S:=Trim(Game.CaptureFolder);
+    If S<>'' then begin
+      S:=IncludeTrailingPathDelimiter(MakeRelPath(S,PrgSetup.BaseDir));
+      If Copy(S,2,2)=':\' then begin
+        MessageDlg(Format(LanguageSetup.MessagePathNotRelative,[S,Game.Name,PrgSetup.BaseDir]),mtError,[mbOK],0);
+        result:=False; exit;
+      end;
+      AddFiles(S);
+    end;
+  end;
 
-  S:=Trim(Game.CaptureFolder);
-  If S<>'' then AddFiles(S);
-
-  S:=Trim(Game.Icon);
-  If (S<>'') and FileExists(PrgDataDir+IconsSubDir+'\'+S) then begin
-    NSI.Add('  SetOutPath "$DataInstDir\'+IconsSubDir+'"');
-    NSI.Add('  File /nonfatal "'+PrgDataDir+IconsSubDir+'\'+S+'"');
+  S:=MakeAbsIconName(Game.Icon);
+  If (S<>'') and FileExists(S) then begin
+    If ExtractFilePath(Game.Icon)='' then begin
+      NSI.Add('  SetOutPath "$DataInstDir\'+IconsSubDir+'"');
+      NSI.Add('  File /nonfatal ".\'+IconsSubDir+'\'+Trim(Game.Icon)+'"');
+    end else begin
+      S:=MakeRelPath(S,PrgSetup.BaseDir);
+      If Copy(S,2,2)=':\' then begin
+        MessageDlg(Format(LanguageSetup.MessagePathNotRelative,[S,Game.Name,PrgSetup.BaseDir]),mtError,[mbOK],0);
+        result:=False; exit;
+      end;
+      T:=ExtractFilePath(S);
+      If (T<>'') and (T[1]='.') then Delete(T,1,1);
+      If (T<>'') and (T[1]='\') then Delete(T,1,1);
+      If (T<>'') and (T[length(T)]='\') then Delete(T,length(T),1);
+      NSI.Add('  SetOutPath "$DataInstDir\'+T+'"');
+      NSI.Add('  File /nonfatal "'+S+'"');
+    end;
   end;
 
   S:=Trim(Game.DataDir);
-  If S<>'' then AddFiles(S);
+  If S<>'' then begin
+    S:=IncludeTrailingPathDelimiter(MakeRelPath(S,PrgSetup.BaseDir));
+    If Copy(S,2,2)=':\' then begin
+      MessageDlg(Format(LanguageSetup.MessagePathNotRelative,[S,Game.Name,PrgSetup.BaseDir]),mtError,[mbOK],0);
+      result:=False; exit;
+    end;
+    AddFiles(S);
+  end;
+
+  S:=Trim(Game.ExtraFiles);
+  If S<>'' then begin
+    St:=ValueToList(S);
+    try
+      For I:=0 to St.Count-1 do If Trim(St[I])<>'' then begin
+        S:=MakeRelPath(St[I],PrgSetup.BaseDir);
+        If Copy(S,2,2)=':\' then begin
+          MessageDlg(Format(LanguageSetup.MessagePathNotRelative,[S,Game.Name,PrgSetup.BaseDir]),mtError,[mbOK],0);
+          result:=False; exit;
+        end;
+        T:=ExtractFilePath(S);
+        If (T<>'') and (T[1]='.') then Delete(T,1,1);
+        If (T<>'') and (T[1]='\') then Delete(T,1,1);
+        If (T<>'') and (T[length(T)]='\') then Delete(T,length(T),1);
+        NSI.Add('  SetOutPath "$DataInstDir\'+T+'"');
+        NSI.Add('  File /nonfatal "'+S+'"');
+      end;
+    finally
+      St.Free;
+    end;
+  end;
 
   S:=Trim(Game.ExtraDirs);
   If S<>'' then begin
     St:=ValueToList(S);
     try
       For I:=0 to St.Count-1 do If Trim(St[I])<>'' then begin
-        AddFiles(IncludeTrailingPathDelimiter(St[I]));
+        S:=IncludeTrailingPathDelimiter(MakeRelPath(IncludeTrailingPathDelimiter(St[I]),PrgSetup.BaseDir));
+        If Copy(S,2,2)=':\' then begin
+          MessageDlg(Format(LanguageSetup.MessagePathNotRelative,[S,Game.Name,PrgSetup.BaseDir]),mtError,[mbOK],0);
+          result:=False; exit;
+        end;
+        AddFiles(S);
       end;
     finally
       St.Free;

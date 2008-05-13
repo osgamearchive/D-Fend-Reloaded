@@ -16,8 +16,8 @@
 ; ============================================================
 
 !define VER_MAYOR 0
-!define VER_MINOR1 3
-!define VER_MINOR2 2
+!define VER_MINOR1 4
+!define VER_MINOR2 0
 
 !define PrgName "D-Fend Reloaded ${VER_MAYOR}.${VER_MINOR1}.${VER_MINOR2}"
 OutFile "D-Fend-Reloaded-${VER_MAYOR}.${VER_MINOR1}.${VER_MINOR2}-Setup.exe"
@@ -59,6 +59,7 @@ ReserveFile "ioFileEnglish.ini"
 ReserveFile "ioFileFrench.ini"
 ReserveFile "ioFileGerman.ini"
 ReserveFile "ioFileRussian.ini"
+ReserveFile "ioFileSimplified_Chinese.ini"
 ReserveFile "ioFileSpanish.ini"
 
 
@@ -120,6 +121,7 @@ Page custom InstallType
 
 Var InstallDataType
 Var DataInstDir
+Var AdminOK
 
 
 
@@ -130,12 +132,14 @@ Var DataInstDir
 !insertmacro MUI_LANGUAGE "French"
 !insertmacro MUI_LANGUAGE "German"
 !insertmacro MUI_LANGUAGE "Russian"
+!insertmacro MUI_LANGUAGE "SimpChinese"
 !insertmacro MUI_LANGUAGE "Spanish"
 
 !include "D-Fend-Reloaded-Setup-Lang-English.nsi"
 !include "D-Fend-Reloaded-Setup-Lang-French.nsi"
 !include "D-Fend-Reloaded-Setup-Lang-German.nsi"
 !include "D-Fend-Reloaded-Setup-Lang-Russian.nsi"
+!include "D-Fend-Reloaded-Setup-Lang-Simplified_Chinese.nsi"
 !include "D-Fend-Reloaded-Setup-Lang-Spanish.nsi"
 
 
@@ -190,19 +194,41 @@ Section "$(LANGNAME_DFendReloaded)" ID_DFend
   
   CreateDirectory "$DataInstDir\Confs"
   
-  SetOutPath "$DataInstDir\Capture\DOSBox DOS"
-  File "..\Capture\DOSBox DOS\*.*"
-  
+  CreateDirectory "$DataInstDir\GameData"
+
   SetOutPath "$INSTDIR\Lang"
   File "..\Lang\*.ini"
   
-  SetOutPath "$DataInstDir\Templates"
-  File "..\Templates\*.prof"
+  IntCmp $InstallDataType 1 WriteNewUserDir
   
-  CreateDirectory "$DataInstDir\GameData"
+    SetOutPath "$DataInstDir\Capture\DOSBox DOS"
+    File "..\NewUserData\Capture\DOSBox DOS\*.*"
+
+    SetOutPath "$DataInstDir\Templates"
+    File "..\NewUserData\Templates\*.prof"
+	
+    SetOutPath "$DataInstDir\AutoSetup"
+    File "..\NewUserData\AutoSetup\*.prof"
+
+    SetOutPath "$DataInstDir\IconLibrary"
+    File "..\NewUserData\IconLibrary\*.*"
   
-  SetOutPath "$DataInstDir\IconLibrary"
-  File "..\IconLibrary\*.*"
+  Goto TemplateWritingFinish
+  WriteNewUserDir:  
+
+    SetOutPath "$INSTDIR\NewUserData\Capture\DOSBox DOS"
+    File "..\NewUserData\Capture\DOSBox DOS\*.*"
+
+    SetOutPath "$INSTDIR\NewUserData\Templates"
+    File "..\NewUserData\Templates\*.prof"
+	
+    SetOutPath "$INSTDIR\NewUserData\AutoSetup"
+    File "..\NewUserData\AutoSetup\*.prof"
+
+    SetOutPath "$INSTDIR\NewUserData\IconLibrary"
+    File "..\NewUserData\IconLibrary\*.*"
+  
+  TemplateWritingFinish:
   
   CreateDirectory "$DataInstDir\VirtualHD"
 
@@ -299,15 +325,38 @@ SectionGroupEnd
 
 
 
+SectionGroup "$(LANGNAME_Tools)" ID_Tools
+
 Section "$(LANGNAME_FreeDosTools)" ID_FreeDosTools
-  SetOutPath "$DataInstDir\VirtualHD\FREEDOS"
-  File /r "..\VirtualHD\FREEDOS\*.*"
+
+  IntCmp $InstallDataType 1 FreeDOSToNewUserDir
+    SetOutPath "$DataInstDir\VirtualHD\FREEDOS"
+  Goto FreeDOSWritingStart
+  FreeDOSToNewUserDir:
+    SetOutPath "$INSTDIR\NewUserData\FREEDOS"
+  FreeDOSWritingStart:
+  
+  File /r "..\NewUserData\FREEDOS\*.*"
 SectionEnd
+
+Section "$(LANGNAME_Doszip)" ID_Doszip
+
+  IntCmp $InstallDataType 1 DoszipToNewUserDir
+    SetOutPath "$DataInstDir\VirtualHD\DOSZIP"
+  Goto DoszipWritingStart
+  DoszipToNewUserDir:
+    SetOutPath "$INSTDIR\NewUserData\DOSZIP"
+  DoszipWritingStart:
+  
+  File /r "..\NewUserData\DOSZIP\*.*"
+SectionEnd
+
+SectionGroupEnd
 
 
 
 Section "$(LANGNAME_DesktopShortcut)" ID_DesktopShortcut
-  CreateShortCut "$DESKTOP\D-Fend Reloaded.lnk" "$INSTDIR\DFend.exe" 
+  CreateShortCut "$DESKTOP\$(LANGNAME_DFendReloaded).lnk" "$INSTDIR\DFend.exe" 
 SectionEnd
 
 
@@ -338,8 +387,6 @@ SectionEnd
 
 ; Definition of NSIS functions
 ; ============================================================
-
-Var AdminOK
 
 Function .onInit  
   UAC_Elevate:
@@ -409,6 +456,14 @@ FunctionEnd
 
 Function InstallType
   !insertmacro MUI_HEADER_TEXT $(PAGE_TITLE) $(PAGE_SUBTITLE)
+  
+  IntCmp $AdminOK 1 NoInstallrestrictions 
+  !insertmacro MUI_INSTALLOPTIONS_WRITE "$(LANGNAME_ioFile)" "Field 1" "Flags" "DISABLED"
+  !insertmacro MUI_INSTALLOPTIONS_WRITE "$(LANGNAME_ioFile)" "Field 3" "State" "0"
+  !insertmacro MUI_INSTALLOPTIONS_WRITE "$(LANGNAME_ioFile)" "Field 3" "Flags" "DISABLED"
+  !insertmacro MUI_INSTALLOPTIONS_WRITE "$(LANGNAME_ioFile)" "Field 5" "State" "1"
+  NoInstallrestrictions:
+  
   !insertmacro MUI_INSTALLOPTIONS_DISPLAY "$(LANGNAME_ioFile)"
   !insertmacro MUI_INSTALLOPTIONS_SHOW
 
@@ -462,6 +517,8 @@ FunctionEnd
   !insertmacro MUI_DESCRIPTION_TEXT ${ID_DosBox} $(DESC_DosBox)
   !insertmacro MUI_DESCRIPTION_TEXT ${ID_DosBoxProgramFiles} $(DESC_DosBoxProgramFiles)
   !insertmacro MUI_DESCRIPTION_TEXT ${ID_DosBoxLanguageFiles} $(DESC_DosBoxLanguageFiles)
+  !insertmacro MUI_DESCRIPTION_TEXT ${ID_Tools} $(DESC_Tools)
   !insertmacro MUI_DESCRIPTION_TEXT ${ID_FreeDosTools} $(DESC_FreeDosTools)
+  !insertmacro MUI_DESCRIPTION_TEXT ${ID_Doszip} $(DESC_Doszip)
   !insertmacro MUI_DESCRIPTION_TEXT ${ID_DesktopShortcut} $(DESC_DesktopShortcut)
 !insertmacro MUI_FUNCTION_DESCRIPTION_END

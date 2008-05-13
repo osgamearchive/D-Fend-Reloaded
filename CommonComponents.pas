@@ -18,12 +18,14 @@ end;
 Type TConfigRecArray=Array of ConfigRec;
      TConfigIndexArray=Array of Integer;
 
+Type TFileChangeStatus=(fcsNoChange,fcsChanged,fcsDeleted);
+
 Type TBasePrgSetup=class
   private
     FSetupFile : String;
     FFirstRun : Boolean;
     Ini : TMemIniFile;
-    OwnINI : Boolean;
+    FOwnINI : Boolean;
     BooleanList, IntegerList, StringList : TConfigRecArray;
     BooleanIndex, IntegerIndex, StringIndex : TConfigIndexArray;
     FStoreConfigOnExit : Boolean;
@@ -52,14 +54,15 @@ Type TBasePrgSetup=class
     Procedure AssignFrom(const ABasePrgSetup : TBasePrgSetup);
     Procedure StoreAllValues;
     Procedure ResetToDefault;
-    Function CheckAndUpdateTimeStamp : Boolean; {True=changed}
-    Procedure ReloadINI;
+    Function CheckAndUpdateTimeStamp : TFileChangeStatus;
+    Procedure ReloadINI; virtual;
     Procedure RenameINI(const NewFile : String);
     Procedure SetChanged;
     property SetupFile : String read FSetupFile;
     property FirstRun : Boolean read FFirstRun;
     property StoreConfigOnExit : Boolean read FStoreConfigOnExit write FStoreConfigOnExit;
     property OnChanged : TNotifyEvent read FOnChanged write FOnChanged;
+    property OwnINI : Boolean read FOwnINI;
 end;
 
 implementation
@@ -90,12 +93,12 @@ begin
   FSetupFile:=ASetupFile;
   FLastTimeStamp:=0;
   FFirstRun:=not FileExists(ASetupFile);
-  OwnINI:=True;
+  FOwnINI:=True;
   If ASetupFile<>'' then begin
     Ini:=TMemIniFile.Create(ASetupFile);
     CheckAndUpdateTimeStamp;
   end else begin
-    Ini:=nil; OwnIni:=False;
+    Ini:=nil; FOwnIni:=False;
   end;
   ClearLists;
   FStoreConfigOnExit:=True;
@@ -105,7 +108,7 @@ end;
 constructor TBasePrgSetup.Create(const ABasePrgSetup: TBasePrgSetup);
 begin
   inherited Create;
-  OwnINI:=False;
+  FOwnINI:=False;
   FFirstRun:=False;
   Ini:=ABasePrgSetup.Ini;
   ClearLists;
@@ -136,7 +139,7 @@ begin
     try
       If FStoreConfigOnExit then begin
         ForceDirectories(ExtractFilePath(Ini.FileName));
-        If FChanged then try UpdatingFile; Ini.UpdateFile; except end;
+        If FChanged then UpdatingFile;
       end;
     except end;
     ClearLists;
@@ -145,7 +148,7 @@ begin
     try
       If FStoreConfigOnExit and (Ini<>nil) then begin
         ForceDirectories(ExtractFilePath(Ini.FileName));
-        If FChanged then try UpdatingFile; Ini.UpdateFile; except end;
+        If FChanged then UpdatingFile;
       end;
     except end;
   end;
@@ -153,22 +156,15 @@ begin
   inherited Destroy;
 end;
 
-function TBasePrgSetup.CheckAndUpdateTimeStamp: Boolean;
+function TBasePrgSetup.CheckAndUpdateTimeStamp: TFileChangeStatus;
 Var NewFileTime : DWord;
 begin
-  If FSetupFile='' then begin result:=False; exit; end;
+  If FSetupFile='' then begin result:=fcsNoChange; exit; end;
 
-  If not FileExists(FSetupFile) then begin
-    ForceDirectories(ExtractFilePath(FSetupFile));
-    Ini.UpdateFile;
-    FChanged:=False;
-    FLastTimeStamp:=GetSimpleFileTime(FSetupFile);
-    result:=False;
-    exit;
-  end;
+  If not FileExists(FSetupFile) then begin result:=fcsDeleted; exit; end;
 
   NewFileTime:=GetSimpleFileTime(FSetupFile);
-  result:=(NewFileTime<>FLastTimeStamp);
+  If NewFileTime=FLastTimeStamp then result:=fcsNoChange else result:=fcsChanged;
   FLastTimeStamp:=NewFileTime;
 end;
 
@@ -186,7 +182,9 @@ procedure TBasePrgSetup.RenameINI(const NewFile: String);
 begin
   Ini.UpdateFile;
   Ini.Free;
-  if RenameFile(FSetupFile,NewFile) then FSetupFile:=NewFile;
+  If FSetupFile<>NewFile then begin
+    if RenameFile(FSetupFile,NewFile) then FSetupFile:=NewFile;
+  end;
   Ini:=TMemIniFile.Create(FSetupFile); 
 end;
 
@@ -242,7 +240,7 @@ begin
   For I:=0 to length(StringList)-1 do
     Ini.WriteString(StringList[I].Section,StringList[I].Key,GetString(StringList[I].Nr));
 
-  try If FChanged then UpdatingFile; Ini.UpdateFile; except end; {Language Files may be read only in program foldes}
+  If FChanged then UpdatingFile; 
   FChanged:=False;
 
   CheckAndUpdateTimeStamp;
@@ -250,6 +248,7 @@ end;
 
 procedure TBasePrgSetup.UpdatingFile;
 begin
+  try Ini.UpdateFile; except end; {Language Files may be read only in program foldes}
 end;
 
 procedure TBasePrgSetup.ResetToDefault;
@@ -265,7 +264,6 @@ begin
     SetString(StringList[I].Nr,StringList[I].DefaultString);
 
   UpdatingFile;
-  try Ini.UpdateFile; except end; {Language Files may be read only in program foldes}
   FChanged:=False;
 
   CheckAndUpdateTimeStamp;
