@@ -1980,6 +1980,7 @@ Function ShortLanguageName(const LongLanguageName : String) : String;
 
 var LanguageSetup : TLanguageSetup;
     LanguageSpecialLowerCase, LanguageSpecialUpperCase : String;
+    LanguageSetupFastYes, LanguageSetupFastNo : String;
 
 implementation
 
@@ -3055,6 +3056,9 @@ begin
   LanguageSpecialUpperCase:=LanguageSetup.CharsetUpper;
   If length(LanguageSpecialUpperCase)<length(LanguageSpecialLowerCase) then
     LanguageSpecialUpperCase:=LanguageSpecialUpperCase+Copy(LanguageSpecialLowerCase,length(LanguageSpecialUpperCase)+1,MaxInt);
+
+  LanguageSetupFastYes:=RemoveUnderline(LanguageSetup.Yes);
+  LanguageSetupFastNo:=RemoveUnderline(LanguageSetup.No);
 end;
 
 Procedure GetLanguageInfo(const LangFile : String; var LangName : String; var NSIS : Integer);

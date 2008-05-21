@@ -1,6 +1,8 @@
 unit GameDBUnit;
 interface
 
+{DEFINE LargeListTest}
+
 uses Classes, CommonComponents;
 
 Type TConfOpt=class(TBasePrgSetup)
@@ -226,12 +228,12 @@ Type TGame=class(TBasePrgSetup)
   protected
     Procedure UpdatingFile; override;  
   public
-    CacheName : String;
-    CacheGenre : String;
-    CacheDeveloper : String;
-    CachePublisher : String;
-    CacheYear : String;
-    CacheLanguage : String;
+    CacheName, CacheNameUpper : String;
+    CacheGenre, CacheGenreUpper : String;
+    CacheDeveloper, CacheDeveloperUpper : String;
+    CachePublisher, CachePublisherUpper : String;
+    CacheYear, CacheYearUpper : String;
+    CacheLanguage, CacheLanguageUpper : String;
     CacheUserInfo : String;
 
     Constructor Create(const ASetupFile : String); overload;
@@ -773,11 +775,17 @@ end;
 procedure TGame.LoadCache;
 begin
   CacheName:=Name;
+  CacheNameUpper:=ExtUpperCase(CacheName);
   CacheGenre:=Genre;
+  CacheGenreUpper:=ExtUpperCase(CacheGenre);
   CacheDeveloper:=Developer;
+  CacheDeveloperUpper:=ExtUpperCase(CacheDeveloper);
   CachePublisher:=Publisher;
+  CachePublisherUpper:=ExtUpperCase(CachePublisher);
   CacheYear:=Year;
+  CacheYearUpper:=ExtUpperCase(CacheYear);
   CacheLanguage:=Language;
+  CacheLanguageUpper:=ExtUpperCase(CacheLanguage);
   CacheUserInfo:=UserInfo;
 end;
 
@@ -836,7 +844,7 @@ end;
 
 procedure TGameDB.LoadList;
 Var Rec : TSearchRec;
-    I : Integer;
+    I{$IFDEF LargeListTest},J{$ENDIF} : Integer;
 begin
   Clear;
 
@@ -845,7 +853,15 @@ begin
   I:=FindFirst(FDir+'*.prof',faAnyFile,Rec);
   try
     while I=0 do begin
-      LoadGameFromFile(FDir+Rec.Name);
+      {$IFDEF LargeListTest}
+        If FDir=PrgDataDir+GameListSubDir+'\' then begin
+          For J:=1 to 50 do LoadGameFromFile(FDir+Rec.Name);
+        end else begin
+          LoadGameFromFile(FDir+Rec.Name);
+        end;
+      {$ELSE}
+        LoadGameFromFile(FDir+Rec.Name);
+      {$ENDIF}
       I:=FindNext(Rec);
     end;
   finally

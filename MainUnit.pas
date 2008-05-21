@@ -289,6 +289,7 @@ type
     procedure TreeViewPopupEditUserFiltersClick(Sender: TObject);
     procedure IdleAddonTimerTimer(Sender: TObject);
     procedure TrayIconPopupClick(Sender: TObject);
+    procedure FormResize(Sender: TObject);
   private
     { Private-Deklarationen }
     hScreenshotsChangeNotification, hConfsChangeNotification : THandle;
@@ -299,6 +300,8 @@ type
     OldGamesMenuUsed : Boolean;
     StartTrayMinimize : Boolean;
     FileConflictCheckRunning : Boolean;
+    SaveBoundsRect : TRect;
+    SaveMaximizedState : Boolean;
     Procedure StartCaptureChangeNotify;
     Procedure StopCaptureChangeNotify;
     Procedure LoadMenuLanguage;
@@ -395,7 +398,6 @@ begin
 
   SearchDosBox(self);
   LoadHelpLinks;
-  ProcessParams;
 
   If PrgSetup.FirstRun then begin
     BuildDefaultProfile;
@@ -876,6 +878,8 @@ begin
   Resize;
   Realign;
 
+  ProcessParams;
+
   SetProcessWorkingSetSize(GetCurrentProcess,$ffffffff,$ffffffff);
 end;
 
@@ -897,7 +901,7 @@ begin
     If ScummVMMode(GameDB[I])
       then RunScummVMGame(GameDB[I])
       else RunGame(GameDB[I]);
-    PostMessage(Handle,WM_Close,0,0);
+    PostMessage(Handle,WM_CLOSE,0,0);
     exit;
   end;
 
@@ -2002,6 +2006,8 @@ begin
           S:=Trim(TGame(ListView.Selected.Data).CaptureFolder);
           If S<>'' then S:=MakeAbsPath(S,PrgSetup.BaseDir);
           If S='' then exit;
+          St1:=TStringList.Create;
+          St2:=TStringList.Create;
           try
             For I:=0 to ScreenshotListView.Items.Count-1 do begin
               If I<ScreenshotListView.Selected.Index then St1.Add(IncludeTrailingPathDelimiter(S)+ScreenshotListView.Items[I].Caption);
@@ -2311,6 +2317,14 @@ begin
   end;
 end;
 
+procedure TDFendReloadedMainForm.FormResize(Sender: TObject);
+begin
+  If WindowState=wsMinimized then exit;
+
+  SaveBoundsRect:=BoundsRect;
+  SaveMaximizedState:=(WindowState=wsMaximized);
+end;
+
 procedure TDFendReloadedMainForm.ApplicationEventsMinimize(Sender: TObject);
 begin
   If PrgSetup.MinimizeToTray then begin
@@ -2329,6 +2343,7 @@ begin
   SetWindowPos(Handle,HWND_TOPMOST,0,0,0,0,SWP_NOMOVE or SWP_NOREPOSITION or SWP_NOSIZE or SWP_SHOWWINDOW);
   SetWindowPos(Handle,HWND_NOTOPMOST,0,0,0,0,SWP_NOMOVE or SWP_NOREPOSITION or SWP_NOSIZE or SWP_SHOWWINDOW);
   TrayIcon.Visible:=False;
+  if not SaveMaximizedState then BoundsRect:=SaveBoundsRect;
 end;
 
 procedure TDFendReloadedMainForm.TrayIconDblClick(Sender: TObject);

@@ -94,11 +94,14 @@ begin
 end;
 
 procedure TViewImageForm.FormShow(Sender: TObject);
+Var P : TPicture;
 begin
   PreviousButton.Enabled:=(PrevImages.Count>0);
   NextButton.Enabled:=(NextImages.Count>0);
 
-  Image.Picture:=LoadImageFromFile(ImageFile);
+  P:=LoadImageFromFile(ImageFile);
+  try Image.Picture.Assign(P); finally P.Free; end;
+
   Caption:=LanguageSetup.ViewImageForm+' ['+MakeRelPath(ImageFile,PrgSetup.BaseDir)+']';
 
   ClientHeight:=Min(Max(100,Image.Picture.Height+(ClientHeight-Image.Height)),Screen.WorkAreaHeight-10);

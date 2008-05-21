@@ -222,7 +222,9 @@ begin
         NewSetup.GameDir:=DestPrgDir+'VirtualHD';
         NewSetup.DataDir:=DestPrgDir+'GameData';
         NewSetup.DosBoxDir:=DestPrgDir+'DOSBox';
-        NewSetup.DosBoxLanguage:=DestPrgDir+'DOSBox\'+ExtractFileName(PrgSetup.DosBoxLanguage);
+        If Trim(PrgSetup.DosBoxLanguage)=''
+          then NewSetup.DosBoxLanguage:=''
+          else NewSetup.DosBoxLanguage:=DestPrgDir+'DOSBox\'+ExtractFileName(PrgSetup.DosBoxLanguage);
         NewSetup.DosBoxMapperFile:='./'+ExtractFileName(PrgSetup.DosBoxMapperFile);
         NewSetup.PathToFREEDOS:='.\VirtualHD\FREEDOS\';
         If FileExists(DestPrgDir+OggEncPrgFile) then NewSetup.WaveEncOgg:='.\'+OggEncPrgFile;
@@ -231,8 +233,6 @@ begin
         If Copy(S,1,2)='.\' then NewSetup.QBasic:=MakeAbsPath(S,DestPrgDir);
 
         TempPrgDir:=DestPrgDir;
-
-        NewSetup.StoreAllValues;
       finally
         NewSetup.Free;
       end;

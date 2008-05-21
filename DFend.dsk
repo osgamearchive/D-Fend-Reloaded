@@ -1,14 +1,14 @@
 [Closed Files]
-File_0=TSourceModule,'C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\SetupFormUnit.pas',0,1,157,56,177,0,0,,
-File_1=TSourceModule,'C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\ViewImageFormUnit.pas',0,1,66,63,89,0,0,,
-File_2=TSourceModule,'C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\ProfileMountEditorFormUnit.pas',0,1,713,1,716,0,0,,
-File_3=TSourceModule,'C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\StatisticsFormUnit.pas',0,1,1,109,24,0,0,,
-File_4=TSourceModule,'C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\GameDBToolsUnit.pas',0,1,1861,21,1870,0,0,,
-File_5=TSourceModule,'C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\BuildInstallerFormUnit.pas',0,1,614,1,644,0,0,,
-File_6=TSourceModule,'C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\PrgSetupUnit.pas',0,1,69,32,80,0,0,,
-File_7=TSourceModule,'C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\DosBoxUnit.pas',0,1,906,1,935,0,0,,
-File_8=TSourceModule,'C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\SetupFrameDOSBoxUnit.pas',0,1,155,1,141,0,0,,
-File_9=TSourceModule,'C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\MiniRunFormUnit.pas',0,1,91,52,114,0,0,,
+File_0=TSourceModule,'C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\ModernProfileEditorFormUnit.pas',0,30,148,153,152,0,0,,
+File_1=TSourceModule,'c:\program files\codegear\rad studio\5.0\source\Win32\rtl\win\Messages.pas',0,1,27,10,59,0,0,,
+File_2=TSourceModule,'C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\CommonTools.pas',0,1,549,6,572,0,0,,
+File_3=TSourceModule,'C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\ViewImageFormUnit.pas',0,1,75,23,102,0,0,,
+File_4=TSourceModule,'C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\IconLoaderUnit.pas',0,1,1,4,29,0,0,,
+File_5=TSourceModule,'C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\TemplateFormUnit.pas',0,1,383,1,391,0,0,,
+File_6=TSourceModule,'C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\GameDBToolsUnit.pas',0,1,1901,10,1918,0,0,,
+File_7=TSourceModule,'C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\LanguageSetupUnit.pas',0,1,3042,1,3062,0,0,,
+File_8=TSourceModule,'C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\InfoFormUnit.pas',0,1,124,19,135,0,0,,
+File_9=TSourceModule,'C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\FastMM4.pas',0,1,1,1,1,0,0,,
 
 [Modules]
 Module0=C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\MainUnit.pas
@@ -18,7 +18,7 @@ EditWindowCount=1
 [C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\MainUnit.pas]
 ModuleType=TSourceModule
 FormState=1
-FormOnTop=0
+FormOnTop=1
 
 [EditWindow0]
 ViewCount=1
@@ -57,13 +57,13 @@ BottomMiddelPanelData=0000080001000100000009000000446F636B5369746530301900000000
 [View0]
 CustomEditViewType=TEditView
 Module=C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\MainUnit.pas
-CursorX=13
-CursorY=6
-TopLine=1
+CursorX=33
+CursorY=888
+TopLine=858
 LeftCol=1
 Elisions=
-Bookmarks={0,2302,7}{9,2351,5}
-EditViewName=C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\MainUnit.pas
+Bookmarks={0,2311,7}{9,2369,5}
+EditViewName=Borland.FormDesignerView
 
 [Watches]
 Count=0
@@ -378,6 +378,11 @@ Dockable=1
 StayOnTop=0
 SplitPos=111
 
+[PropInspDesignerSelection]
+ArrangeBy=Name
+SelectedItem=Name,
+ExpandedItems=Images=0,MenuAnimation=0
+
 [ModelViewTool]
 PercentageSizes=1
 Create=1
@@ -580,7 +585,7 @@ Dockable=1
 StayOnTop=0
 TabPosition=1
 ActiveTabID=RefactoringForm
-TabDockClients=RefactoringForm,FindReferencsForm,ToDo List,QAView,MetricsView,RefactoringsView,UsagesView
+TabDockClients=RefactoringForm,FindReferencsForm,ToDo List,RefactoringsView,UsagesView,QAView,MetricsView
 
 [DockSite1]
 HostDockSite=DockBottomPanel
@@ -628,7 +633,7 @@ Dockable=1
 StayOnTop=0
 TabPosition=0
 ActiveTabID=ProjectManager
-TabDockClients=PropertyInspector,ProjectManager,ModelViewTool,DataExplorer
+TabDockClients=PropertyInspector,ProjectManager,DataExplorer,ModelViewTool
 
 [DockSite3]
 HostDockSite=DockRightPanel

@@ -23,6 +23,7 @@ type
     { Private-Deklarationen }
     GameDB : TGameDB;
     LastIndex : Integer;
+    DefaultValueLists : Array of TStringList;
   public
     { Public-Deklarationen }
     Destructor Destroy; override;
@@ -46,7 +47,7 @@ uses Math, LanguageSetupUnit, VistaToolsUnit, PrgSetupUnit, CommonTools;
 destructor TSetupFrameDefaultValues.Destroy;
 Var I : Integer;
 begin
-  for I:=0 to DefaultValueComboBox.Items.Count-1 do TStringList(DefaultValueComboBox.Items.Objects[I]).Free;
+  for I:=0 to length(DefaultValueLists)-1 do DefaultValueLists[I].Free;
   inherited Destroy;
 end;
 
@@ -80,6 +81,7 @@ begin
 
   For J:=0 to DefaultValueComboBox.Items.Count-1 do TStringList(DefaultValueComboBox.Items.Objects[J]).Free;
   DefaultValueComboBox.Items.Clear;
+  SetLength(DefaultValueLists,0);
 
   DefaultValueComboBox.Items.AddObject(LanguageSetup.GameResolution,ValueToList(GameDB.ConfOpt.Resolution,';,'));
   DefaultValueComboBox.Items.AddObject(LanguageSetup.GameJoysticks,ValueToList(GameDB.ConfOpt.Joysticks,';,'));
@@ -119,6 +121,9 @@ begin
   DefaultValueComboBox.Items.AddObject(LanguageSetup.ProfileEditorScummVMMusicDriver,ValueToList(GameDB.ConfOpt.ScummVMMusicDriver,';,'));
   DefaultValueComboBox.Items.AddObject(LanguageSetup.GameVGAChipset,ValueToList(GameDB.ConfOpt.VGAChipsets,';,'));
   DefaultValueComboBox.Items.AddObject(LanguageSetup.GameVideoRam,ValueToList(GameDB.ConfOpt.VGAVideoRAM,';,'));
+
+  SetLength(DefaultValueLists,DefaultValueComboBox.Items.Count);
+  For J:=0 to length(DefaultValueLists)-1 do DefaultValueLists[J]:=TStringList(DefaultValueComboBox.Items.Objects[J]);
 
   DefaultValueComboBox.ItemIndex:=Max(0,I);
   DefaultValueComboBoxChange(self);

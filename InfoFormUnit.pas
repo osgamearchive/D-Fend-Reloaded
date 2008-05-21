@@ -143,6 +143,7 @@ begin
 
   finally
     St.Free;
+    StShort.Free;
   end;
 
   St:=StringToStringList(LanguageSetup.InfoFormDFend);

@@ -3,7 +3,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
   Top = 0
   ActiveControl = TreeView
   Caption = 'D-Fend Reloaded'
-  ClientHeight = 866
+  ClientHeight = 741
   ClientWidth = 774
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -43,13 +43,14 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnKeyDown = FormKeyDown
+  OnResize = FormResize
   OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
   object Splitter: TSplitter
     Left = 169
     Top = 24
-    Height = 842
+    Height = 717
     ResizeStyle = rsUpdate
     ExplicitLeft = 224
     ExplicitTop = 192
@@ -59,7 +60,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
     Left = 0
     Top = 24
     Width = 169
-    Height = 842
+    Height = 717
     Align = alLeft
     HideSelection = False
     Images = ImageList
@@ -68,7 +69,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
     ReadOnly = True
     TabOrder = 0
     OnChange = TreeViewChange
-    ExplicitHeight = 822
+    ExplicitHeight = 862
   end
   object CoolBar: TCoolBar
     Left = 0
@@ -179,14 +180,14 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
     Left = 172
     Top = 24
     Width = 602
-    Height = 842
+    Height = 717
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 2
-    ExplicitHeight = 822
+    ExplicitHeight = 862
     object Splitter1: TSplitter
       Left = 0
-      Top = 646
+      Top = 521
       Width = 602
       Height = 3
       Cursor = crVSplit
@@ -199,7 +200,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
       Left = 0
       Top = 0
       Width = 602
-      Height = 646
+      Height = 521
       Align = alClient
       Columns = <>
       LargeImages = ListviewIconImageList
@@ -216,11 +217,11 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
       OnDblClick = ListViewDblClick
       OnInfoTip = ListViewInfoTip
       OnSelectItem = ListViewSelectItem
-      ExplicitHeight = 626
+      ExplicitHeight = 666
     end
     object CapturePageControl: TPageControl
       Left = 0
-      Top = 649
+      Top = 524
       Width = 602
       Height = 193
       ActivePage = CaptureScreenshotsTab
@@ -228,7 +229,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
       Images = ImageList
       MultiLine = True
       TabOrder = 1
-      ExplicitTop = 629
+      ExplicitTop = 669
       object CaptureScreenshotsTab: TTabSheet
         Caption = 'Screenshots'
         ImageIndex = 35
@@ -2526,7 +2527,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
     object SoundPopupOpen: TMenuItem
       Caption = '&'#214'ffnen...'
       Default = True
-      ImageIndex = 28
+      ImageIndex = 33
       OnClick = SoundMenuWork
     end
     object N21: TMenuItem

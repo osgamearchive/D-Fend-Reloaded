@@ -44,6 +44,7 @@ object SetupFrameDOSBoxExt: TSetupFrameDOSBoxExt
         Top = 24
         Width = 513
         Height = 17
+        Anchors = [akLeft, akTop, akRight]
         Caption = 'Allow multiple floppy images per drive'
         TabOrder = 0
       end

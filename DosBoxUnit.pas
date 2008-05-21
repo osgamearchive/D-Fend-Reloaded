@@ -670,7 +670,7 @@ begin
 
   result.Add('');
   result.Add('[dosbox]');
-  result.Add('language='+UnmapDrive(PrgSetup.DosBoxLanguage,ptDOSBox));
+  If FileExists(PrgSetup.DosBoxLanguage) then result.Add('language='+UnmapDrive(PrgSetup.DosBoxLanguage,ptDOSBox));
   result.Add('machine='+Game.VideoCard);
   result.Add('captures='+UnmapDrive(MakeAbsPath(Game.CaptureFolder,PrgSetup.BaseDir),ptScreenshot));
   result.Add('memsize='+IntToStr(Game.Memory));

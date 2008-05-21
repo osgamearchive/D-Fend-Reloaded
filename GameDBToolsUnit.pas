@@ -3,6 +3,8 @@ interface
 
 uses Classes, ComCtrls, Controls, Menus, CheckLst, GameDBUnit;
 
+{DEFINE LargeListTest}
+
 { Load Data to GUI }
 
 Type TSortListBy=(slbName, slbSetup, slbGenre, slbDeveloper, slbPublisher, slbYear, slbLanguage);
@@ -10,7 +12,8 @@ Type TSortListBy=(slbName, slbSetup, slbGenre, slbDeveloper, slbPublisher, slbYe
 Procedure InitTreeViewForGamesList(const ATreeView : TTreeView; const GameDB : TGameDB);
 Procedure InitListViewForGamesList(const AListView : TListView; const ShowExtraInfo : Boolean);
 
-Procedure AddGameToList(const AListView : TListView; const AListViewImageList, AListViewIconImageList, AImageList : TImageList; const Game : TGame; const ShowExtraInfo : Boolean);
+Procedure AddGameToList(const AListView : TListView; const AListViewImageList, AListViewIconImageList, AImageList : TImageList; const Game : TGame; const ShowExtraInfo : Boolean; const O,V,T : String); overload;
+Procedure AddGameToList(const AListView : TListView; const AListViewImageList, AListViewIconImageList, AImageList : TImageList; const Game : TGame; const ShowExtraInfo : Boolean); overload;
 Procedure AddGamesToList(const AListView : TListView; const AListViewImageList, AListViewIconImageList, AImageList : TImageList; const GameDB : TGameDB; const Group, SubGroup, SearchString : String; const ShowExtraInfo : Boolean; const SortBy : TSortListBy; const ReverseOrder : Boolean; const HideScummVMProfiles : Boolean = False); overload;
 Procedure AddGamesToList(const AListView : TListView; const AListViewImageList, AListViewIconImageList, AImageList : TImageList; const GameDB : TGameDB; const Game : TGame; const Group, SubGroup, SearchString : String; const ShowExtraInfo : Boolean; const SortBy : TSortListBy; const ReverseOrder : Boolean; const HideScummVMProfiles : Boolean = False); overload;
 
@@ -56,6 +59,8 @@ Function ImportConfFile(const AGameDB : TGameDB; const AFileName : String) : TGa
 
 Procedure CreateGameCheckSum(const AGame : TGame; const OverwriteExistingCheckSum : Boolean);
 Procedure CreateSetupCheckSum(const AGame : TGame; const OverwriteExistingCheckSum : Boolean);
+Function ChecksumForGameOK(const AGame : TGame) : Boolean;
+Function ChecksumForSetupOK(const AGame : TGame) : Boolean;
 Procedure ProfileEditorOpenCheck(const AGame : TGame);
 Procedure ProfileEditorCloseCheck(const AGame : TGame; const NewGameExe, NewSetupExe : String);
 Function RunCheck(const AGame : TGame; const RunSetup : Boolean) : Boolean;
@@ -79,6 +84,8 @@ uses Windows, SysUtils, Forms, Dialogs, Graphics, Math, IniFiles, PNGImage,
      JPEG, GIFImage, CommonTools, LanguageSetupUnit, PrgConsts, PrgSetupUnit,
      ProfileEditorFormUnit, ModernProfileEditorFormUnit, HashCalc,
      SmallWaitFormUnit, ChecksumFormUnit, ProgressFormUnit;
+
+var TempIcon : TIcon;
 
 Procedure AddTypeSelector(const ATreeView : TTreeView; const Name : String; const St : TStringList);
 Var N,N2 : TTreeNode;
@@ -453,70 +460,75 @@ begin
   end;
 end;
 
-Procedure AddGameToList(const AListView : TListView; const AListViewImageList, AListViewIconImageList, AImageList : TImageList; const Game : TGame; const ShowExtraInfo : Boolean);
+Procedure AddGameToList(const AListView : TListView; const AListViewImageList, AListViewIconImageList, AImageList : TImageList; const Game : TGame; const ShowExtraInfo : Boolean; const O,V,T : String);
 Var IconNr,I,Nr : Integer;
-    Icon : TIcon;
     B : Boolean;
-    V,O : String;
-    S,T : String;
+    S : String;
+    L : TListItem;
 begin
-  GetColOrderAndVisible(O,V);
-
   If Trim(Game.Icon)='' then begin
     IconNr:=0;
   end else begin
-    Icon:=TIcon.Create;
-    try
-      S:=MakeAbsIconName(Game.Icon);
-      If FileExists(S) then begin
-        B:=True; try Icon.LoadFromFile(S); except B:=False; end;
-      end else begin
-        B:=False;
-      end;
-      If B then begin
-        AListViewImageList.AddIcon(Icon);
-        AListViewIconImageList.AddIcon(Icon);
-      end;
-    finally
-      Icon.Free;
+    S:=MakeAbsIconName(Game.Icon);
+    If FileExists(S) then begin
+      B:=True; try TempIcon.LoadFromFile(S); except B:=False; end;
+    end else begin
+      B:=False;
+    end;
+    If B then begin
+      AListViewImageList.AddIcon(TempIcon);
+      AListViewIconImageList.AddIcon(TempIcon);
     end;
     If B then IconNr:=AListViewImageList.Count-1 else IconNr:=0;
   end;
 
+  L:=AListView.Items.Add;
   If (Game.CacheName='') and (not Game.OwnINI) then begin
-    AListView.AddItem(LanguageSetup.TemplateFormDefault,Game);
+    L.Caption:=LanguageSetup.TemplateFormDefault;
   end else begin
-    AListView.AddItem(Game.CacheName,Game);
+    L.Caption:=Game.CacheName;
   end;
 
-  with AListView.Items[AListView.Items.Count-1] do begin
+  with L do begin
     Data:=Game;
 
-    If ShowExtraInfo then begin
-      If Trim(PrgSetup.ValueForNotSet)='' then T:=LanguageSetup.NotSet else T:=Trim(PrgSetup.ValueForNotSet);
-      For I:=0 to 5 do begin
-        try Nr:=StrToInt(O[I+1]); except Nr:=-1; end;
-        If (Nr<1) or (Nr>6) then continue;
-        If V[Nr]='0' then continue;
+    SubItems.BeginUpdate;
+    try
+      If ShowExtraInfo then begin
+        For I:=0 to 5 do begin
+          try Nr:=StrToInt(O[I+1]); except Nr:=-1; end;
+          If (Nr<1) or (Nr>6) then continue;
+          If V[Nr]='0' then continue;
 
-        Case Nr-1 of
-          0 : If Trim(Game.SetupExe)<>''
-                then SubItems.Add(RemoveUnderline(LanguageSetup.Yes))
-                else SubItems.Add(RemoveUnderline(LanguageSetup.No));
-          1 : begin S:=Game.CacheGenre; If Trim(S)='' then SubItems.Add(T) else SubItems.Add(S); end;
-          2 : begin S:=Game.CacheDeveloper; If Trim(S)='' then SubItems.Add(T) else SubItems.Add(S); end;
-          3 : begin S:=Game.CachePublisher; If Trim(S)='' then SubItems.Add(T) else SubItems.Add(S); end;
-          4 : begin S:=Game.CacheYear; If Trim(S)='' then SubItems.Add(T) else SubItems.Add(S); end;
-          5 : begin S:=Game.CacheLanguage; If Trim(S)='' then SubItems.Add(T) else SubItems.Add(S); end;
+          Case Nr-1 of
+            0 : If Trim(Game.SetupExe)<>''
+                  then SubItems.Add(LanguageSetupFastYes)
+                  else SubItems.Add(LanguageSetupFastNo);
+            1 : begin S:=Game.CacheGenre; If Trim(S)='' then SubItems.Add(T) else SubItems.Add(S); end;
+            2 : begin S:=Game.CacheDeveloper; If Trim(S)='' then SubItems.Add(T) else SubItems.Add(S); end;
+            3 : begin S:=Game.CachePublisher; If Trim(S)='' then SubItems.Add(T) else SubItems.Add(S); end;
+            4 : begin S:=Game.CacheYear; If Trim(S)='' then SubItems.Add(T) else SubItems.Add(S); end;
+            5 : begin S:=Game.CacheLanguage; If Trim(S)='' then SubItems.Add(T) else SubItems.Add(S); end;
+          end;
         end;
+      end else begin
+        If Trim(Game.SetupExe)<>''
+          then SubItems.Add(LanguageSetupFastYes)
+          else SubItems.Add(LanguageSetupFastNo);
       end;
-    end else begin
-      If Trim(Game.SetupExe)<>''
-        then SubItems.Add(RemoveUnderline(LanguageSetup.Yes))
-        else SubItems.Add(RemoveUnderline(LanguageSetup.No));
+    finally
+      SubItems.EndUpdate;
     end;
     ImageIndex:=IconNr;
   end;
+end;
+
+Procedure AddGameToList(const AListView : TListView; const AListViewImageList, AListViewIconImageList, AImageList : TImageList; const Game : TGame; const ShowExtraInfo : Boolean);
+Var O,V,T : String;
+begin
+  GetColOrderAndVisible(O,V);
+  If Trim(PrgSetup.ValueForNotSet)='' then T:=LanguageSetup.NotSet else T:=Trim(PrgSetup.ValueForNotSet);
+  AddGameToList(AListView,AListViewImageList,AListViewIconImageList,AImageList,Game,ShowExtraInfo,O,V,T);
 end;
 
 Procedure AddGamesToList(const AListView : TListView; const AListViewImageList, AListViewIconImageList, AImageList : TImageList; const GameDB : TGameDB; const Group, SubGroup, SearchString : String; const ShowExtraInfo : Boolean; const SortBy : TSortListBy; const ReverseOrder : Boolean; const HideScummVMProfiles : Boolean);
@@ -532,14 +544,23 @@ Var I,J,K,Nr : Integer;
     List : TList;
     St,St2 : TStringList;
     S,T : String;
+    O,V : String;
+    {$IFDEF LargeListTest}Ca : Cardinal;{$ENDIF}
 begin
+  {$IFDEF LargeListTest}Ca:=GetTickCount;{$ENDIF}
+
   {Prepare ListView}
   AListViewImageList.Clear;
   AListViewImageList.AddImage(AImageList,0);
   AListViewIconImageList.Clear;
   AListViewIconImageList.AddImage(AImageList,0);
   SetLength(C,AListView.Columns.Count);
-  For I:=0 to length(C)-1 do begin C[I]:=AListView.Columns[I].Width; AListView.Columns[I].Width:=1; end;
+  AListView.Columns.BeginUpdate;
+  try
+    For I:=0 to length(C)-1 do begin C[I]:=AListView.Columns[I].Width; AListView.Columns[I].Width:=1; end;
+  finally
+    AListView.Columns.EndUpdate;
+  end;
 
   List:=TList.Create;
   try
@@ -550,7 +571,7 @@ begin
       for I:=0 to GameDB.Count-1 do begin
         If B and (not GameDB[I].Favorite) then continue;
         If HideScummVMProfiles and ScummVMMode(GameDB[I]) then continue;
-        If (SearchStringUpper<>'') and (Pos(SearchStringUpper,ExtUpperCase(GameDB[I].Name))=0) then continue;
+        If (SearchStringUpper<>'') and (Pos(SearchStringUpper,GameDB[I].CacheNameUpper)=0) then continue;
         List.Add(GameDB[I]);
       end;
     end else begin
@@ -567,11 +588,11 @@ begin
         If HideScummVMProfiles and ScummVMMode(GameDB[I]) then continue;
         B:=False;
         Case Nr of
-          0 : B:=(ExtUpperCase(GameDB[I].CacheGenre)=SubGroupUpper);
-          1 : B:=(ExtUpperCase(GameDB[I].CacheDeveloper)=SubGroupUpper);
-          2 : B:=(ExtUpperCase(GameDB[I].CachePublisher)=SubGroupUpper);
-          3 : B:=(ExtUpperCase(GameDB[I].CacheYear)=SubGroupUpper);
-          4 : B:=(ExtUpperCase(GameDB[I].CacheLanguage)=SubGroupUpper);
+          0 : B:=(GameDB[I].CacheGenreUpper=SubGroupUpper);
+          1 : B:=(GameDB[I].CacheDeveloperUpper=SubGroupUpper);
+          2 : B:=(GameDB[I].CachePublisherUpper=SubGroupUpper);
+          3 : B:=(GameDB[I].CacheYearUpper=SubGroupUpper);
+          4 : B:=(GameDB[I].CacheLanguageUpper=SubGroupUpper);
           5 : begin
                 B:=(SubGroupUpper='');
                 St2:=StringToStringList(GameDB[I].CacheUserInfo);
@@ -609,12 +630,21 @@ begin
       End;
       St.Sort;
 
+
       {Add games to List}
-      If ReverseOrder then begin
-        For I:=St.Count-1 downto 0 do AddGameToList(AListView,AListViewImageList,AListViewIconImageList,AImageList,TGame(St.Objects[I]),ShowExtraInfo);
-      end else begin
-        For I:=0 to St.Count-1 do AddGameToList(AListView,AListViewImageList,AListViewIconImageList,AImageList,TGame(St.Objects[I]),ShowExtraInfo);
+      GetColOrderAndVisible(O,V);
+      If Trim(PrgSetup.ValueForNotSet)='' then T:=LanguageSetup.NotSet else T:=Trim(PrgSetup.ValueForNotSet);
+      AListView.Items.BeginUpdate;
+      try
+        If ReverseOrder then begin
+          For I:=St.Count-1 downto 0 do AddGameToList(AListView,AListViewImageList,AListViewIconImageList,AImageList,TGame(St.Objects[I]),ShowExtraInfo,O,V,T);
+        end else begin
+          For I:=0 to St.Count-1 do AddGameToList(AListView,AListViewImageList,AListViewIconImageList,AImageList,TGame(St.Objects[I]),ShowExtraInfo,O,V,T);
+        end;
+      finally
+        AListView.Items.EndUpdate;
       end;
+
     finally
       St.Free;
     end;
@@ -627,7 +657,10 @@ begin
       AListView.Columns.EndUpdate;
     end;
   end;
+
+  {$IFDEF LargeListTest}Application.MainForm.Caption:=IntToStr(GetTickCount-Ca);{$ENDIF}
 end;
+
 
 Procedure AddScreenshotsToList(const AListView : TListView; const AImageList : TImageList; Dir : String);
 Var I : Integer;
@@ -1764,6 +1797,20 @@ begin
   AGame.SetupExeMD5:=GetMD5Sum(S);
 end;
 
+Function ChecksumForGameOK(const AGame : TGame) : Boolean;
+begin
+  result:=True;
+  If not PrgSetup.UseCheckSumsForProfiles then exit;
+  result:=GameCheckSumOK(AGame);
+end;
+
+Function ChecksumForSetupOK(const AGame : TGame) : Boolean;
+begin
+  result:=True;
+  If not PrgSetup.UseCheckSumsForProfiles then exit;
+  result:=SetupCheckSumOK(AGame);
+end;
+
 Procedure ProfileEditorOpenCheck(const AGame : TGame);
 Var St : TStringList;
     S : String;
@@ -1868,81 +1915,94 @@ begin
 end;
 
 Function CheckGameDB(const GameDB : TGameDB) : TStringList;
-Var I,J : Integer;
+Var I{,J} : Integer;
     Game : TGame;
-    S : String;
+    {S : String;}
     FirstError : Boolean;
-    St : TStringList;
+    {St : TStringList;}
 Procedure Error(const S : String); begin if FirstError then begin FirstError:=False; If result.Count>0 then result.Add(''); result.Add(Game.Name); end; result.Add('  '+S); end;
 begin
   result:=TStringList.Create;
 
-  For I:=0 to GameDB.Count-1 do begin
-    Game:=GameDB[I];
-    FirstError:=True;
+  InitProgressWindow(Application.MainForm,GameDB.Count);
 
-    If ScummVMMode(Game) then begin
-      S:=IncludeTrailingPathDelimiter(MakeAbsPath(Trim(Game.ScummVMPath),PrgSetup.BaseDir));
-      If not DirectoryExists(S) then Error(Format('The game directory "%s" does not exist.',[S]));
-    end else begin
-      S:=Trim(Game.GameExe);
-      If (S<>'') and (ExtUpperCase(Copy(S,1,7))<>'DOSBOX:') then begin
-        S:=MakeAbsPath(S,PrgSetup.BaseDir);
-        If not FileExists(S) then Error(Format('The program file "%s" does not exist.',[S]));
-        //... checksum
-      end;
-      S:=Trim(Game.SetupExe);
-      If (S<>'') and (ExtUpperCase(Copy(S,1,7))='DOSBOX:') then begin
-        S:=MakeAbsPath(S,PrgSetup.BaseDir);
-        If not FileExists(S) then Error(Format('The setup file "%s" does not exist.',[S]));
-        //... checksum        
-      end;
-    end;
+  try
+    For I:=0 to GameDB.Count-1 do begin
+      Game:=GameDB[I];
+      FirstError:=True;
 
-    S:=Trim(Game.CaptureFolder);
-    If S<>'' then begin
-      S:=IncludeTrailingPathDelimiter(MakeAbsPath(S,PrgSetup.BaseDir));
-      If not DirectoryExists(S) then Error(Format('The capture folder "%s" does not exist.',[S]));
-    end;
-
-    S:=MakeAbsIconName(Game.Icon);
-    If S<>'' then begin
-      If not FileExists(S) then Error(Format('The icon file "%s" does not exist.',[S]));
-    end;
-
-    S:=Trim(Game.DataDir);
-    If S<>'' then begin
-      S:=IncludeTrailingPathDelimiter(MakeAbsPath(S,PrgSetup.BaseDir));
-      If not DirectoryExists(S) then Error(Format('The data directory "%s" does not exist.',[S]));
-    end;
-
-    S:=Trim(Game.ExtraFiles);
-    If S<>'' then begin
-      St:=ValueToList(S);
-      try
-        For J:=0 to St.Count-1 do If Trim(St[J])<>'' then begin
-          S:=MakeAbsPath(St[J],PrgSetup.BaseDir);
-          If not FileExists(S) then Error(Format('The extra file "%s" does not exist.',[S]));
+      {If ScummVMMode(Game) then begin
+        S:=IncludeTrailingPathDelimiter(MakeAbsPath(Trim(Game.ScummVMPath),PrgSetup.BaseDir));
+        If not DirectoryExists(S) then Error(Format(LanguageSetup.MissingFilesGameDirectory,[S]));
+      end else begin
+        S:=Trim(Game.GameExe);
+        If (S<>'') and (ExtUpperCase(Copy(S,1,7))<>'DOSBOX:') then begin
+          S:=MakeAbsPath(S,PrgSetup.BaseDir);
+          If not FileExists(S) then Error(Format(LanguageSetup.MissingFilesGameFile,[S])) else begin
+            If not ChecksumForGameOK(Game) then Error(Format(LanguageSetup.MissingFilesGameChecksum,[S]));
+          end;
         end;
-      finally
-        St.Free;
-      end;
-    end;
-
-    S:=Trim(Game.ExtraDirs);
-    If S<>'' then begin
-      St:=ValueToList(S);
-      try
-        For J:=0 to St.Count-1 do If Trim(St[J])<>'' then begin
-          S:=IncludeTrailingPathDelimiter(MakeAbsPath(IncludeTrailingPathDelimiter(St[I]),PrgSetup.BaseDir));
-          If not DirectoryExists(S) then Error(Format('The extra directory "%s" does not exist.',[S]));
+        S:=Trim(Game.SetupExe);
+        If (S<>'') and (ExtUpperCase(Copy(S,1,7))='DOSBOX:') then begin
+          S:=MakeAbsPath(S,PrgSetup.BaseDir);
+          If not FileExists(S) then Error(Format(LanguageSetup.MissingFilesSetupFile,[S])) else begin
+            If not ChecksumForSetupOK(Game) then Error(Format(LanguageSetup.MissingFilesSetupChecksum,[S]));
+          end;
         end;
-      finally
-        St.Free;
       end;
-    end;
 
+      S:=Trim(Game.CaptureFolder);
+      If S<>'' then begin
+        S:=IncludeTrailingPathDelimiter(MakeAbsPath(S,PrgSetup.BaseDir));
+        If not DirectoryExists(S) then Error(Format(LanguageSetup.MissingFilesCaptureFolder,[S]));
+      end;
+
+      S:=MakeAbsIconName(Game.Icon);
+      If S<>'' then begin
+        If not FileExists(S) then Error(Format(LanguageSetup.MissingFilesIconFile,[S]));
+      end;
+
+      S:=Trim(Game.DataDir);
+      If S<>'' then begin
+        S:=IncludeTrailingPathDelimiter(MakeAbsPath(S,PrgSetup.BaseDir));
+        If not DirectoryExists(S) then Error(Format(LanguageSetup.MissingFilesDataDirectory,[S]));
+      end;
+
+      S:=Trim(Game.ExtraFiles);
+      If S<>'' then begin
+        St:=ValueToList(S);
+        try
+          For J:=0 to St.Count-1 do If Trim(St[J])<>'' then begin
+            S:=MakeAbsPath(St[J],PrgSetup.BaseDir);
+            If not FileExists(S) then Error(Format(LanguageSetup.MissingFilesExtraFile,[S]));
+          end;
+        finally
+          St.Free;
+        end;
+      end;
+
+      S:=Trim(Game.ExtraDirs);
+      If S<>'' then begin
+        St:=ValueToList(S);
+        try
+          For J:=0 to St.Count-1 do If Trim(St[J])<>'' then begin
+            S:=IncludeTrailingPathDelimiter(MakeAbsPath(IncludeTrailingPathDelimiter(St[J]),PrgSetup.BaseDir));
+            If not DirectoryExists(S) then Error(Format(LanguageSetup.MissingFilesExtraDirectory,[S]));
+          end;
+        finally
+          St.Free;
+        end;
+      end;}
+
+      StepProgressWindow;
+    end;
+  finally
+    DoneProgressWindow;
   end;
 end;
 
+initialization
+  TempIcon:=TIcon.Create;
+finalization
+  TempIcon.Free;
 end.

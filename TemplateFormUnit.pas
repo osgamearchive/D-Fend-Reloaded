@@ -310,7 +310,7 @@ begin
   MenuFileUse.Enabled:=B;
   MenuFileUseAsDefault.Enabled:=B2;
   MenuEditEdit.Enabled:=B;
-  MenuEditDelete.Enabled:=B;
+  MenuEditDelete.Enabled:=B2;
 end;
 
 procedure TTemplateForm.ListView2SelectItem(Sender: TObject; Item: TListItem; Selected: Boolean);

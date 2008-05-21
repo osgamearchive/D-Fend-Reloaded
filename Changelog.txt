@@ -1,5 +1,23 @@
 D-Fend Reloaded Changelog
 
+Version 0.4.1 (05/22/2008)
+==========================
+- When using the option to minimize D-Fend Reloaded while DOSBox is running and
+  DOSBox is changing the resolution, D-Fend Reloaded will no longer rely on the
+  Windows window placement and restore its correct position itself.
+- Some smaller speed improvements when working with large profile lists.
+- [Fix] Access violation when opening a screenshot from a profile containing
+  more than one screenshot.
+- [Fix] Error message when trying to run a D-Fend Reloaded desktop game link
+  while "Minimize when DOSBox starts" is activated.
+- [Fix] When selecting the default template in the template editor the "Delete"
+  menu item was not disabled (like the toolbar icon and the item in the context
+  menu).
+- [Fix] DOSBox did not start if the given DOSBox language file did not exist.
+- [Fix] Closed some memory leaks in screenshot viewer, setup dialog and program
+  info dialog.
+
+  
 Version 0.4.0 (05/14/2008)
 ==========================
 - Simplified Chinese language file (thanks to muzuiget)

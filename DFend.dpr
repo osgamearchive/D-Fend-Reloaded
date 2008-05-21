@@ -1,6 +1,7 @@
 program DFend;
 
 uses
+  FastMM4 in 'FastMM4.pas',
   Forms,
   MainUnit in 'MainUnit.pas' {DFendReloadedMainForm},
   CommonComponents in 'CommonComponents.pas',
