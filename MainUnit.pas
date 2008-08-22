@@ -5,33 +5,25 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, XPMan, StdCtrls, ComCtrls, ExtCtrls, ToolWin, ImgList, Menus,
-  AppEvnts, GameDBUnit, GameDBToolsUnit;
+  AppEvnts, GameDBUnit, GameDBToolsUnit, ViewFilesFrameUnit, LinkFileUnit,
+  HelpTools;
 
 {
-0.5
-- Add language strings and enable:
-  - Wine options in setup dialog
-  - Setup option: Use short path names
-  - Create Checksums for all profiles
-  - Option for creating simple HD images (for making bootable images via fdisk+format)
-  - When creating a shortcut: Comment field with custom string (by default "Run [Gamename] in DOSBox/ScummVM")
-  - Restore D-Fend Reloaded window when DOSBox closes
-  - Check for missing files
-  - Wizard file structure info box and program info dialog: Tell the user in which operation mode DFR is running
-- Disable screensaver when DOSBox is running
-- WizardPrgFileFrame: "?" button for manual folder edit field
-- Optional different translation for next/previous step
-- Commandline parameters when calling DOSBox
-- DOSBox language per profile
-- Better handling of different DOSBox versions
-- DOSBox: waitonerror
-- Ziped drives
-  - Option to repack PhysFS write folder to zip file
-- Option for showing captured videos (like screenshots and sounds) (?)
+Next Steps:
 
-0.6:
-- Making bootable HD images
-- ZIP package (game files + profile + screenshots etc.) (?)
+Update homepage:
+- Example games as zip archives
+
+Next Version:
+- Language strings for "Open capture folder" (menu, context and 3x viewer conext), update help file
+- Language strings for "ScummVM save path" in UninstallFormUnit, ModernProfileEditorScummVMFrameUnit and WizardScummVMSettingsUnit, update help file
+- Language string for "Show grid lines" in SetupFrameGamesListAppearanceUnit, update help file
+- Translation for mount types on mount page of profile editor (ModernProfileEditorDrivesFrameUnit and ProfileEditorFormUnit)
+- Use mediaplr.dll for playing sounds
+- Games tree: "Emulation type" node
+- Direct starting dialog
+- German online help
+- Making bootable hard disk images
 }
 
 type
@@ -122,7 +114,6 @@ type
     MenuHelpDosBoxHotkeys: TMenuItem;
     MenuHelpDosBoxCompatibility: TMenuItem;
     MenuHelpAbandonware: TMenuItem;
-    N11: TMenuItem;
     MenuHelpAbout: TMenuItem;
     ToolButton1: TToolButton;
     SearchEdit: TEdit;
@@ -159,7 +150,6 @@ type
     PopupMakeInstaller: TMenuItem;
     PopupOpenFileInDataFolder: TMenuItem;
     MenuViewsShowTooltips: TMenuItem;
-    N18: TMenuItem;
     MenuHelpUpdates: TMenuItem;
     MenuProfileViewConfFile: TMenuItem;
     PopupViewConfFile: TMenuItem;
@@ -254,6 +244,55 @@ type
     ButtonRunSetup: TToolButton;
     MenuExtrasCheckProfiles: TMenuItem;
     MenuHelpOperationMode: TMenuItem;
+    ZipInfoPanel: TPanel;
+    ZipInfoLabel: TLabel;
+    CaptureVideoTab: TTabSheet;
+    VideoListView: TListView;
+    VideoInfoPanel: TPanel;
+    VideoPopupMenu: TPopupMenu;
+    VideoPopupOpen: TMenuItem;
+    MenuItem2: TMenuItem;
+    VideoPopupRefresh: TMenuItem;
+    MenuItem4: TMenuItem;
+    VideoPopupImport: TMenuItem;
+    VideoPopupSave: TMenuItem;
+    VideoPopupRename: TMenuItem;
+    VideoPopupDelete: TMenuItem;
+    VideoPopupDeleteAll: TMenuItem;
+    VideoPopupOpenExternal: TMenuItem;
+    SoundPopupOpenExternal: TMenuItem;
+    DataFilesTab: TTabSheet;
+    MenuHelpCreateAutoSetupTemplates: TMenuItem;
+    MenuProfileSearchGame: TMenuItem;
+    PopupSearchGame: TMenuItem;
+    MenuRunExtraFile: TMenuItem;
+    PopupRunExtraFile: TMenuItem;
+    MenuViewsScreenshots: TMenuItem;
+    PopupScreenshots: TMenuItem;
+    ListviewScreenshotImageList: TImageList;
+    N29: TMenuItem;
+    ScreenshotPopupUseInScreenshotList: TMenuItem;
+    PopupMakeZipArchive: TMenuItem;
+    N30: TMenuItem;
+    MenuProfileMakeZipArchive: TMenuItem;
+    N31: TMenuItem;
+    MenuFileImportZIPFile: TMenuItem;
+    MenuFileCreateZIP: TMenuItem;
+    MenuProfileAddWindows: TMenuItem;
+    AddButtonMenuAddWindows: TMenuItem;
+    TrayIconPopupAddWindowsProfile: TMenuItem;
+    MenuHelpHelp: TMenuItem;
+    MenuHelpHelpContent: TMenuItem;
+    MenuHelpIntroduction: TMenuItem;
+    N32: TMenuItem;
+    N33: TMenuItem;
+    MenuExtrasBuildZipPackages: TMenuItem;
+    MenuHelpAddingGames: TMenuItem;
+    MenuProfileOpenCaptureFolder: TMenuItem;
+    PopupOpenCaptureFolder: TMenuItem;
+    ScreenshotPopupOpenCaptureFolder: TMenuItem;
+    SoundPopupOpenCaptureFolder: TMenuItem;
+    VideoPopupOpenCaptureFolder: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure TreeViewChange(Sender: TObject; Node: TTreeNode);
@@ -289,7 +328,15 @@ type
     procedure TreeViewPopupEditUserFiltersClick(Sender: TObject);
     procedure IdleAddonTimerTimer(Sender: TObject);
     procedure TrayIconPopupClick(Sender: TObject);
+    procedure ZipInfoPanelDblClick(Sender: TObject);
+    procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
     procedure FormResize(Sender: TObject);
+    procedure VideoListViewDblClick(Sender: TObject);
+    procedure VideoListViewKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure VideoListViewSelectItem(Sender: TObject; Item: TListItem;
+      Selected: Boolean);
+    procedure VideoMenuWork(Sender: TObject);
   private
     { Private-Deklarationen }
     hScreenshotsChangeNotification, hConfsChangeNotification : THandle;
@@ -302,13 +349,18 @@ type
     FileConflictCheckRunning : Boolean;
     SaveBoundsRect : TRect;
     SaveMaximizedState : Boolean;
+    ViewFilesFrame : TViewFilesFrame;
+    SearchLinkFile, HelpMenuLinkFile : TLinkFile;
+    HTMLhelpRouter : THTMLhelpRouter;
     Procedure StartCaptureChangeNotify;
     Procedure StopCaptureChangeNotify;
     Procedure LoadMenuLanguage;
     Procedure InitGUI;
     Procedure InitViewStyle;
     Procedure SelectGame(const AGame : TGame);
+    Procedure LoadAbandonLinks;
     Procedure LoadHelpLinks;
+    Procedure LoadSearchLinks;
     Procedure ProcessParams;
     Procedure UpdateScreenshotList;
     Procedure UpdateOpenFileInDataFolderMenu;
@@ -326,6 +378,7 @@ type
     procedure WMDropFiles(var Message: TWMDROPFILES); message WM_DROPFILES;
     Procedure DropImportFile(const FileName: String; var ErrorCode : String);
     Procedure StartWizard(const ExeFile : String);
+    Procedure ZipInfoNotify(Sender : TObject);
   public
     { Public-Deklarationen }
     GameDB : TGameDB;
@@ -350,19 +403,24 @@ uses ShellAPI, ShlObj, ClipBrd, Math, PNGImage, CommonTools, LanguageSetupUnit,
      ExpandImageFormUnit, FirstRunWizardFormUnit, CommonComponents,
      BuildImageFromFolderFormUnit, MiniRunFormUnit, ScummVMUnit,
      ListScummVMGamesFormUnit, DragNDropErrorFormUnit, SimpleXMLUnit,
-     OperationModeInfoFormUnit;
+     OperationModeInfoFormUnit, ZipManagerUnit, ZipWaitInfoFormUnit,
+     CopyProfileFormUnit, PlayVideoFormUnit, ImageCacheUnit, ZipPackageUnit,
+     WindowsProfileUnit, HelpConsts, BuildZipPackagesFormUnit;
 
 {$R *.dfm}
 
 procedure TDFendReloadedMainForm.FormCreate(Sender: TObject);
+Var S : String;
 begin
-  {Caption:=Caption+' THIS IS A BETA VERSION ! NOT FOR REGULAR USE ! (Beta 1 of version 0.4.0)';}
+  {Caption:=Caption+' RELEASE CANDIDATE 3 OF VERSION 0.5.0';}
+  {Caption:=Caption+' THIS IS A BETA VERSION ! NOT FOR REGULAR USE ! (Beta 2 of version 0.5.0)';}
 
   Height:=790;
   Width:=Min(Width,790);
   JustStarted:=True;
   FileConflictCheckRunning:=False;
   StartTrayMinimize:=False;
+  HTMLhelpRouter:=nil;
 
   ListSort:=slbName;
   ListSortReverse:=False;
@@ -370,24 +428,34 @@ begin
 
   DeleteOnExit:=TStringList.Create;
 
+  ZipManager.OnInfoBarNotify:=ZipInfoNotify;
+
   try ForceDirectories(PrgDataDir+CaptureSubDir); except end;
   StartCaptureChangeNotify;
 
   GameDB:=TGameDB.Create(PrgDataDir+GameListSubDir);
+
+  HelpMenuLinkFile:=TLinkFile.Create('Links.txt');
+  SearchLinkFile:=TLinkFile.Create('SearchLinks.txt');
+
+  ViewFilesFrame:=TViewFilesFrame.Create(self);
+  ViewFilesFrame.Parent:=DataFilesTab;
+  ViewFilesFrame.Init;
 
   LoadMenuLanguage;
   InitGUI;
   UpdateAddFromTemplateMenu;
 
   If PrgSetup.FirstRun then begin
-    If IsWindowsVista then PrgSetup.SDLVideodriver:='WinDIB';
-    SearchDosBox(self);
+    {If IsWindowsVista then PrgSetup.DOSBoxSettings[0].SDLVideodriver:='WinDIB';}
+    if SearchDosBox(self,S) then PrgSetup.DOSBoxSettings[0].DosBoxDir:=S;
     ShowFirstRunWizardDialog(self);
   end;
 end;
 
 procedure TDFendReloadedMainForm.FormShow(Sender: TObject);
 Var G : TGame;
+    S : String;
 begin
   If not JustStarted then exit;
   JustStarted:=False;
@@ -396,8 +464,10 @@ begin
 
   TreeView.OnChange:=nil;
 
-  SearchDosBox(self);
+  if SearchDosBox(self,S) then PrgSetup.DOSBoxSettings[0].DosBoxDir:=S;
   LoadHelpLinks;
+  LoadAbandonLinks;
+  LoadSearchLinks;
 
   If PrgSetup.FirstRun then begin
     BuildDefaultProfile;
@@ -452,9 +522,16 @@ begin
   PrgSetup.ScreenshotHeight:=CapturePageControl.Height;
 
   GameDB.Free;
+
+  HelpMenuLinkFile.Free;
+  SearchLinkFile.Free;
+
+  HTMLhelpRouter.Free;
 end;
 
 procedure TDFendReloadedMainForm.LoadMenuLanguage;
+Var HelpFileName : String;
+    B : Boolean;
 begin
   Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName);
 
@@ -462,10 +539,12 @@ begin
   MenuFileImport.Caption:=LanguageSetup.MenuFileImport;
   MenuFileImportConfFile.Caption:=LanguageSetup.MenuFileImportConf;
   MenuFileImportProfFile.Caption:=LanguageSetup.MenuFileImportProf;
+  MenuFileImportZIPFile.Caption:=LanguageSetup.MenuFileImportZIP;
   MenuFileExport.Caption:=LanguageSetup.MenuFileExport;
   MenuFileExportGamesList.Caption:=LanguageSetup.MenuFileExportGamesList;
   MenuFileCreateConf.Caption:=LanguageSetup.MenuFileCreateConf;
   MenuFileCreateProf.Caption:=LanguageSetup.MenuFileCreateProf;
+  MenuFileCreateZIP.Caption:=LanguageSetup.MenuFileCreateZIP;
   MenuFileSetup.Caption:=LanguageSetup.MenuFileSetup;
   MenuFileQuit.Caption:=LanguageSetup.MenuFileQuit;
   MenuView.Caption:=LanguageSetup.MenuView;
@@ -480,9 +559,11 @@ begin
   MenuViewsList.Caption:=LanguageSetup.MenuViewReport;
   MenuViewsSmallIcons.Caption:=LanguageSetup.MenuViewSmallIcons;
   MenuViewsIcons.Caption:=LanguageSetup.MenuViewIcons;
+  MenuViewsScreenshots.Caption:=LanguageSetup.MenuViewScreenshots;
   MenuRun.Caption:=LanguageSetup.MenuRun;
   MenuRunGame.Caption:=LanguageSetup.MenuRunGame;
   MenuRunSetup.Caption:=LanguageSetup.MenuRunSetup;
+  MenuRunExtraFile.Caption:=LanguageSetup.MenuRunExtraFile;
   MenuRunRunDosBox.Caption:=LanguageSetup.MenuRunRunDosBox;
   MenuRunRunDosBoxKeyMapper.Caption:=LanguageSetup.MenuRunRunDosBoxKeyMapper;
   MenuRunOpenDosBoxConfig.Caption:=LanguageSetup.MenuRunOpenDosBoxConfig;
@@ -491,6 +572,7 @@ begin
   MenuProfile.Caption:=LanguageSetup.MenuProfile;
   MenuProfileAdd.Caption:=LanguageSetup.MenuProfileAdd;
   MenuProfileAddScummVM.Caption:=LanguageSetup.MenuProfileAddScummVM;
+  MenuProfileAddWindows.Caption:=LanguageSetup.MenuProfileAddWindows;
   MenuProfileAddFromTemplate.Caption:=LanguageSetup.MenuProfileAddFromTemplate;
   MenuProfileAddWithWizard.Caption:=LanguageSetup.MenuProfileAddWithWizard;
   MenuProfileEdit.Caption:=LanguageSetup.MenuProfileEdit;
@@ -498,14 +580,17 @@ begin
   MenuProfileDelete.Caption:=LanguageSetup.MenuProfileDelete;
   MenuProfileDeinstall.Caption:=LanguageSetup.MenuProfileDeinstall;
   MenuProfileMakeInstaller.Caption:=LanguageSetup.MenuProfileMakeInstaller;
+  MenuProfileMakeZipArchive.Caption:=LanguageSetup.MenuProfileMakeZipArchive;
   MenuProfileViewConfFile.Caption:=LanguageSetup.MenuProfileViewConfFile;
   MenuProfileViewIniFile.Caption:=LanguageSetup.MenuProfileViewIniFile;
   MenuProfileOpenFolder.Caption:=LanguageSetup.MenuProfileOpenFolder;
+  // MenuProfileOpenCaptureFolder.Caption:=LanguageSetup.MenuProfileOpenCaptureFolder;
   MenuProfileOpenDataFolder.Caption:=LanguageSetup.MenuProfileOpenDataFolder;
   MenuProfileOpenFileInDataFolder.Caption:=LanguageSetup.MenuProfileOpenFileInDataFolder;
   MenuProfileWWW.Caption:=LanguageSetup.GameWWW;
   MenuProfileMarkAsFavorite.Caption:=LanguageSetup.MenuProfileMarkAsFavorite;
   MenuProfileCreateShortcut.Caption:=LanguageSetup.MenuProfileCreateShortcut;
+  MenuProfileSearchGame.Caption:=LanguageSetup.MenuProfileSearchGame;
   MenuExtras.Caption:=LanguageSetup.MenuExtras;
   MenuExtrasIconManager.Caption:=LanguageSetup.MenuExtrasIconManager;
   MenuExtrasViewLogs.Caption:=LanguageSetup.MenuExtrasViewLogs;
@@ -521,8 +606,9 @@ begin
   MenuExtrasImageFromFolder.Caption:=LanguageSetup.MenuExtrasImageFromFolder;
   MenuExtrasTransferProfiles.Caption:=LanguageSetup.MenuExtrasTransferProfiles;
   MenuExtrasBuildInstaller.Caption:=LanguageSetup.MenuExtrasBuildInstaller;
+  MenuExtrasBuildZipPackages.Caption:=LanguageSetup.MenuExtrasBuildZipPackages;
   MenuExtrasChangeProfiles.Caption:=LanguageSetup.MenuExtrasChangeProfiles;
-
+  MenuExtrasCheckProfiles.Caption:=LanguageSetup.MenuExtrasCheckProfiles;
   MenuHelp.Caption:=LanguageSetup.MenuHelp;
   MenuHelpDosBox.Caption:=LanguageSetup.MenuHelpDosBox;
   MenuHelpDosBoxReadme.Caption:=LanguageSetup.MenuHelpDosBoxReadme;
@@ -548,11 +634,18 @@ begin
   MenuHelpMakeDFRBetter.Caption:=LanguageSetup.MenuHelpMakeDFRBetter;
   MenuHelpMakeBetterIcons.Caption:=LanguageSetup.MenuHelpMakeBetterIcons;
   MenuHelpMakeTranslation.Caption:=LanguageSetup.MenuHelpMakeTranslation;
+  MenuHelpCreateAutoSetupTemplates.Caption:=LanguageSetup.MenuHelpMakeAutoSetupTemplates;
   MenuHelpStatistics.Caption:=LanguageSetup.MenuHelpStatistics;
+  MenuHelpOperationMode.Caption:=LanguageSetup.MenuHelpOperationMode;
+  MenuHelpHelp.Caption:=LanguageSetup.MenuHelpHelp;
+  MenuHelpHelpContent.Caption:=LanguageSetup.MenuHelpContent;
+  MenuHelpIntroduction.Caption:=LanguageSetup.MenuHelpIntroduction;
+  MenuHelpAddingGames.Caption:=LanguageSetup.MenuHelpAddingGames;
   MenuHelpAbout.Caption:=LanguageSetup.MenuHelpAbout;
 
   AddButtonMenuAdd.Caption:=LanguageSetup.MenuProfileAdd;
   AddButtonMenuAddScummVM.Caption:=LanguageSetup.MenuProfileAddScummVM;
+  AddButtonMenuAddWindows.Caption:=LanguageSetup.MenuProfileAddWindows;
   AddButtonMenuAddFromTemplate.Caption:=LanguageSetup.MenuProfileAddFromTemplate;
   AddButtonMenuAddWithWizard.Caption:=LanguageSetup.MenuProfileAddWithWizard;
 
@@ -571,19 +664,23 @@ begin
 
   PopupRunGame.Caption:=LanguageSetup.PopupRunGame;
   PopupRunSetup.Caption:=LanguageSetup.PopupRunSetup;
+  PopupRunExtraFile.Caption:=LanguageSetup.PopupRunExtraFile;
   PopupEdit.Caption:=LanguageSetup.PopupEdit;
   PopupCopy.Caption:=LanguageSetup.PopupCopy;
   PopupDelete.Caption:=LanguageSetup.PopupDelete;
   PopupDeinstall.Caption:=LanguageSetup.PopupDeinstall;
   PopupMakeInstaller.Caption:=LanguageSetup.PopupMakeInstaller;
+  PopupMakeZipArchive.Caption:=LanguageSetup.PopupMakeZipArchive;
   PopupViewConfFile.Caption:=LanguageSetup.MenuProfileViewConfFile;
   PopupViewINIFile.Caption:=LanguageSetup.MenuProfileViewIniFile;
   PopupOpenFolder.Caption:=LanguageSetup.PopupOpenFolder;
+  // PopupOpenCaptureFolder.Caption:=LanguageSetup.PopupOpenCaptureFolder;
   PopupOpenDataFolder.Caption:=LanguageSetup.PopupOpenDataFolder;
   PopupOpenFileInDataFolder.Caption:=LanguageSetup.PopupOpenFileInDataFolder;
   PopupWWW.Caption:=LanguageSetup.GameWWW;
   PopupMarkAsFavorite.Caption:=LanguageSetup.PopupMarkAsFavorite;
   PopupCreateShortcut.Caption:=LanguageSetup.PopupCreateShortcut;
+  PopupSearchGame.Caption:=LanguageSetup.PopupSearchGame;
   PopupViews.Caption:=LanguageSetup.PopupView;
   PopupSimpleListNoIcons.Caption:=LanguageSetup.MenuViewListNoIcons;
   PopupSimpleList.Caption:=LanguageSetup.MenuViewList;
@@ -591,13 +688,26 @@ begin
   PopupList.Caption:=LanguageSetup.MenuViewReport;
   PopupSmallIcons.Caption:=LanguageSetup.MenuViewSmallIcons;
   PopupIcons.Caption:=LanguageSetup.MenuViewIcons;
+  PopupScreenshots.Caption:=LanguageSetup.MenuViewScreenshots;
 
   CaptureScreenshotsTab.Caption:=LanguageSetup.CaptureScreenshots;
-  ScreenshotsInfoPanel.Caption:=LanguageSetup.CaptureScreenshotsInfo;
+  If ListView.Selected<>nil then begin
+    If ScummVMMode(TGame(ListView.Selected.Data)) then begin
+      ScreenshotsInfoPanel.Caption:=LanguageSetup.CaptureScreenshotsInfoScumm;
+    end else begin
+      If WindowsExeMode(TGame(ListView.Selected.Data))
+        then ScreenshotsInfoPanel.Caption:=''
+        else ScreenshotsInfoPanel.Caption:=LanguageSetup.CaptureScreenshotsInfo;
+    end;
+  end;
   CaptureSoundTab.Caption:=LanguageSetup.CaptureSounds;
+  CaptureVideoTab.Caption:=LanguageSetup.CaptureVideos;
   SoundInfoPanel.Caption:=LanguageSetup.CaptureSoundsInfo;
+  VideoInfoPanel.Caption:=LanguageSetup.CaptureVideosInfo;
+  DataFilesTab.Caption:=LanguageSetup.CaptureDataFiles;
 
   ScreenshotPopupOpen.Caption:=LanguageSetup.ScreenshotPopupOpen;
+  // ScreenshotPopupOpenCaptureFolder.Caption:=LanguageSetup.PopupOpenCaptureFolder;
   ScreenshotPopupRefresh.Caption:=LanguageSetup.ScreenshotPopupRefresh;
   ScreenshotPopupImport.Caption:=LanguageSetup.ScreenshotPopupImport;
   ScreenshotPopupCopy.Caption:=LanguageSetup.ScreenshotPopupCopy;
@@ -606,8 +716,11 @@ begin
   ScreenshotPopupDelete.Caption:=LanguageSetup.ScreenshotPopupDelete;
   ScreenshotPopupDeleteAll.Caption:=LanguageSetup.ScreenshotPopupDeleteAll;
   ScreenshotPopupUseAsBackground.Caption:=LanguageSetup.ScreenshotPopupUseAsBackground;
+  ScreenshotPopupUseInScreenshotList.Caption:=LanguageSetup.ScreenshotPopupUseInScreenshotList;
 
   SoundPopupOpen.Caption:=LanguageSetup.ScreenshotPopupOpen;
+  SoundPopupOpenExternal.Caption:=LanguageSetup.ScreenshotPopupOpenExternal;
+  // SoundPopupOpenCaptureFolder.Caption:=LanguageSetup.PopupOpenCaptureFolder;
   SoundPopupRefresh.Caption:=LanguageSetup.ScreenshotPopupRefresh;
   SoundPopupImport.Caption:=LanguageSetup.ScreenshotPopupImport;
   SoundPopupSave.Caption:=LanguageSetup.ScreenshotPopupSave;
@@ -619,10 +732,21 @@ begin
   SoundPopupSaveMp3All.Caption:=LanguageSetup.SoundsPopupSaveMp3All;
   SoundPopupSaveOggAll.Caption:=LanguageSetup.SoundsPopupSaveOggAll;
 
+  VideoPopupOpen.Caption:=LanguageSetup.ScreenshotPopupOpen;
+  VideoPopupOpenExternal.Caption:=LanguageSetup.ScreenshotPopupOpenExternal;
+  // VideoPopupOpenCaptureFolder.Caption:=LanguageSetup.PopupOpenCaptureFolder;
+  VideoPopupRefresh.Caption:=LanguageSetup.ScreenshotPopupRefresh;
+  VideoPopupImport.Caption:=LanguageSetup.ScreenshotPopupImport;
+  VideoPopupSave.Caption:=LanguageSetup.ScreenshotPopupSave;
+  VideoPopupRename.Caption:=LanguageSetup.ScreenshotPopupRename;
+  VideoPopupDelete.Caption:=LanguageSetup.ScreenshotPopupDelete;
+  VideoPopupDeleteAll.Caption:=LanguageSetup.ScreenshotPopupDeleteAll;
+
   TrayIconPopupRestore.Caption:=LanguageSetup.TrayPopupRestore;
   TrayIconPopupRun.Caption:=LanguageSetup.TrayPopupRun;
   TrayIconPopupAddProfile.Caption:=LanguageSetup.TrayPopupAdd;
   TrayIconPopupAddScummVMProfile.Caption:=LanguageSetup.MenuProfileAddScummVM;
+  TrayIconPopupAddWindowsProfile.Caption:=LanguageSetup.MenuProfileAddWindows;
   TrayIconPopupAddFromTemplate.Caption:=LanguageSetup.TrayPopupAddFromTemplate;
   TrayIconPopupAddWithWizard.Caption:=LanguageSetup.TrayPopupAddWithWizard;
   TrayIconPopupClose.Caption:=LanguageSetup.TrayPopupClose;
@@ -665,6 +789,24 @@ begin
   MsgDlgAll:=LanguageSetup.MsgDlgAll;
   MsgDlgNoToAll:=LanguageSetup.MsgDlgNoToAll;
   MsgDlgYesToAll:=LanguageSetup.MsgDlgYesToAll;
+
+  ZipInfoLabel.Caption:=LanguageSetup.ZipFormWaitInfo;
+
+  ViewFilesFrame.LoadLanguage;
+
+  HelpFileName:=PrgDataDir+LanguageSubDir+'\'+LanguageSetup.HelpFile; If FileExists(HelpFileName) then B:=True;
+  If not B then begin HelpFileName:=PrgDir+LanguageSubDir+'\'+LanguageSetup.HelpFile; If FileExists(HelpFileName) then B:=True; end;
+  If not B then begin HelpFileName:=PrgDataDir+LanguageSubDir+'\English.chm'; If FileExists(HelpFileName) then B:=True; end;
+  If not B then begin HelpFileName:=PrgDir+LanguageSubDir+'\English.chm'; If FileExists(HelpFileName) then B:=True; end;
+
+  If B then begin
+    If HTMLhelpRouter=nil then HTMLhelpRouter:=InitHTMLHelp(HelpFileName) else HTMLhelpRouter.Helpfile:=HelpFileName;
+  end;
+
+  SearchEdit.OnChange:=nil;
+  SearchEdit.Text:=LanguageSetup.Search;
+  SearchEdit.Font.Color:=clGray;
+  SearchEdit.OnChange:=SearchEditChange;
 end;
 
 procedure TDFendReloadedMainForm.InitGUI;
@@ -676,6 +818,7 @@ begin
   CapturePageControl.DoubleBuffered:=True;
   ScreenshotListView.DoubleBuffered:=True;
   SoundListView.DoubleBuffered:=True;
+  VideoListView.DoubleBuffered:=True;
   TreeView.DoubleBuffered:=True;
 
   MenuRunGame.ShortCut:=ShortCut(VK_Return,[]);
@@ -685,6 +828,10 @@ begin
   PopupRunSetup.ShortCut:=ShortCut(VK_Return,[ssShift]);
   PopupEdit.ShortCut:=ShortCut(VK_Return,[ssCtrl]);
   ScreenshotPopupOpen.ShortCut:=ShortCut(VK_Return,[]);
+  SoundPopupOpen.ShortCut:=ShortCut(VK_Return,[]);
+  SoundPopupOpenExternal.ShortCut:=ShortCut(VK_Return,[ssShift]);
+  VideoPopupOpen.ShortCut:=ShortCut(VK_Return,[]);
+  VideoPopupOpenExternal.ShortCut:=ShortCut(VK_Return,[ssShift]);
 
   InitListViewForGamesList(ListView,PrgSetup.ShowExtraInfo);
   InitTreeViewForGamesList(TreeView,GameDB);
@@ -702,7 +849,7 @@ begin
             Position:=poDesigned;
           end;
           If (PrgSetup.TreeWidth>=0) and (PrgSetup.TreeWidth<9*ClientWidth div 10) then TreeView.Width:=PrgSetup.TreeWidth;
-          If (PrgSetup.ScreenshotHeight>=0) and (PrgSetup.ScreenshotHeight<9*ClientHeight div 10) then CapturePageControl.Width:=PrgSetup.ScreenshotHeight;
+          If (PrgSetup.ScreenshotHeight>=0) and (PrgSetup.ScreenshotHeight<9*ClientHeight div 10) then CapturePageControl.Height:=PrgSetup.ScreenshotHeight;
         end;
     2 : {Minimize in OnShow};
     3 : {Maximize in OnShow};
@@ -742,6 +889,7 @@ end;
 procedure TDFendReloadedMainForm.InitViewStyle;
 Var S : String;
     I : Integer;
+    VS : TViewStyle;
 begin
   S:=Trim(ExtUpperCase(PrgSetup.ListViewStyle));
   I:=3;
@@ -751,24 +899,28 @@ begin
   If S='LIST' then I:=3;
   If S='SMALLICONS' then I:=4;
   If S='ICONS' then I:=5;
+  If S='SCREENSHOTS' then I:=6;
 
   Case I of
     0 : begin
           MenuViewsSimpleListNoIcons.Checked:=True;
           PopupSimpleListNoIcons.Checked:=True;
-          ListView.SmallImages:=nil;
           If (ListView.SmallImages<>nil) and (ListView.ViewStyle=vsList) then ListView.ViewStyle:=vsReport;
+          ListView.LargeImages:=ListviewIconImageList;
+          ListView.SmallImages:=nil;
           ListView.ViewStyle:=vsList;
         end;
     1 : begin
           MenuViewsSimpleList.Checked:=True;
           PopupSimpleList.Checked:=True;
+          ListView.LargeImages:=ListviewIconImageList;
           ListView.SmallImages:=ListviewImageList;
           ListView.ViewStyle:=vsList;
         end;
     2 : begin
           MenuViewsListNoIcons.Checked:=True;
           PopupListNoIcons.Checked:=True;
+          ListView.LargeImages:=ListviewIconImageList;
           If (ListView.SmallImages<>nil) and (ListView.ViewStyle=vsReport) then ListView.ViewStyle:=vsList;
           ListView.SmallImages:=nil;
           ListView.ViewStyle:=vsReport;
@@ -776,58 +928,50 @@ begin
     3 : begin
           MenuViewsList.Checked:=True;
           PopupList.Checked:=True;
+          ListView.LargeImages:=ListviewIconImageList;
           ListView.SmallImages:=ListviewImageList;
           ListView.ViewStyle:=vsReport;
         end;
     4 : begin
           MenuViewsSmallIcons.Checked:=True;
           PopupSmallIcons.Checked:=True;
+          ListView.LargeImages:=ListviewIconImageList;
           ListView.SmallImages:=ListviewImageList;
           ListView.ViewStyle:=vsSmallIcon;
         end;
     5 : begin
           MenuViewsIcons.Checked:=True;
           PopupIcons.Checked:=True;
+          ListView.LargeImages:=ListviewIconImageList;
           ListView.SmallImages:=ListviewImageList;
           ListView.ViewStyle:=vsIcon;
         end;
+    6 : begin
+          MenuViewsScreenshots.Checked:=True;
+          PopupScreenshots.Checked:=True;
+          ListView.LargeImages:=ListviewScreenshotImageList;
+          ListView.SmallImages:=nil;
+          ListView.ViewStyle:=vsIcon;
+        end;
   end;
+
+  TreeViewChange(TreeView,TreeView.Selected);
+  VS:=ListView.ViewStyle;
+  If ListView.ViewStyle=vsReport then ListView.ViewStyle:=vsSmallIcon else ListView.ViewStyle:=vsReport;
+  ListView.ViewStyle:=VS;
+end;
+
+Procedure TDFendReloadedMainForm.LoadAbandonLinks;
+begin
+  HelpMenuLinkFile.AddLinksToMenu(MenuHelpAbandonware,6102,6103,MenuWork,4);
 end;
 
 procedure TDFendReloadedMainForm.LoadHelpLinks;
-Var St : TStringList;
-    I : Integer;
-    S : String;
+Var I : Integer;
     M : TMenuItem;
     Rec : TSearchRec;
 begin
-  If FileExists(PrgDir+'Links.txt') then begin
-    St:=TStringList.Create;
-    try
-      try St.LoadFromFile(PrgDir+'Links.txt'); except exit; end;
-      For I:=0 to St.Count-1 do begin
-        S:=Trim(St[I]);
-        If S='' then continue;
-        If (S='-') or (S='---') then begin
-          M:=TMenuItem.Create(self);
-          M.Caption:='-';
-          MenuHelpAbandonware.Add(M);
-          continue;
-        end;
-        If Pos(';',S)=0 then continue;
-        M:=TMenuItem.Create(self);
-        M.Caption:=Trim(Copy(S,1,Pos(';',S)-1));
-        M.Hint:=Trim(Copy(S,Pos(';',S)+1,MaxInt));
-        M.Tag:=6102;
-        M.OnClick:=MenuWork;
-        MenuHelpAbandonware.Add(M);
-      end;
-    finally
-      St.Free;
-    end;
-  end;
-
-  I:=FindFirst(PrgSetup.DosBoxDir+'Readme*.txt',faAnyFile,Rec);
+  I:=FindFirst(PrgSetup.DOSBoxSettings[0].DosBoxDir+'Readme*.txt',faAnyFile,Rec);
   try
     while I=0 do begin
       M:=TMenuItem.Create(self);
@@ -841,6 +985,12 @@ begin
   finally
     FindClose(Rec);
   end;
+end;
+
+Procedure TDFendReloadedMainForm.LoadSearchLinks;
+begin
+  SearchLinkFile.AddLinksToMenu(MenuProfileSearchGame,4015,4016,MenuWork,4);
+  SearchLinkFile.AddLinksToMenu(PopupSearchGame,4015,4016,MenuWork,4);
 end;
 
 procedure TDFendReloadedMainForm.PostShow(var Msg: TMessage);
@@ -886,6 +1036,7 @@ end;
 procedure TDFendReloadedMainForm.ProcessParams;
 Var I : Integer;
     S,T : String;
+    CloseOK : Boolean;
 begin
   If ParamCount=0 then exit;
 
@@ -898,10 +1049,18 @@ begin
   T:=ExtUpperCase(S);
 
   For I:=0 to GameDB.Count-1 do If Trim(ExtUpperCase(GameDB[I].Name))=T then begin
-    If ScummVMMode(GameDB[I])
-      then RunScummVMGame(GameDB[I])
-      else RunGame(GameDB[I]);
-    PostMessage(Handle,WM_CLOSE,0,0);
+    CloseOK:=True;
+    If ScummVMMode(GameDB[I]) then begin
+      RunScummVMGame(GameDB[I]);
+    end else begin
+      If WindowsExeMode(GameDB[I]) then begin
+        RunWindowsGame(GameDB[I]);
+      end else begin
+        RunGame(GameDB[I]);
+        CloseOK:=(ZipManager.Count=0);
+      end;
+    end;
+    If CloseOK then PostMessage(Handle,WM_Close,0,0);
     exit;
   end;
 
@@ -957,20 +1116,24 @@ end;
 procedure TDFendReloadedMainForm.TreeViewChange(Sender: TObject; Node: TTreeNode);
 Var G : TGame;
     S : String;
+    IL1, IL2 : TImageList;
 begin
+  If ListView.LargeImages=nil then IL1:=ListviewIconImageList else IL1:=ListView.LargeImages as TImageList;
+  If ListView.SmallImages=nil then IL2:=ListviewImageList else IL2:=ListView.SmallImages as TImageList;
+
+
   ListView.Items.BeginUpdate;
   try
     If ListView.Selected<>nil then G:=TGame(ListView.Selected.Data) else G:=nil;
-    ListView.Items.Clear;
 
     If SearchEdit.Font.Color<>clGray then S:=SearchEdit.Text else S:='';
 
     If TreeView.Selected=nil then begin
-      AddGamesToList(ListView,ListviewImageList,ListviewIconImageList,ImageList,GameDB,RemoveUnderline(LanguageSetup.All),'',S,PrgSetup.ShowExtraInfo,ListSort,ListSortReverse);
+      AddGamesToList(ListView,IL2,IL1,ImageList,GameDB,RemoveUnderline(LanguageSetup.All),'',S,PrgSetup.ShowExtraInfo,ListSort,ListSortReverse,False,MenuViewsScreenshots.Checked);
     end else begin
       If TreeView.Selected.Parent=nil
-        then AddGamesToList(ListView,ListviewImageList,ListviewIconImageList,ImageList,GameDB,TreeView.Selected.Text,'',S,PrgSetup.ShowExtraInfo,ListSort,ListSortReverse)
-        else AddGamesToList(ListView,ListviewImageList,ListviewIconImageList,ImageList,GameDB,TreeView.Selected.Parent.Text,TreeView.Selected.Text,S,PrgSetup.ShowExtraInfo,ListSort,ListSortReverse);
+        then AddGamesToList(ListView,IL2,IL1,ImageList,GameDB,TreeView.Selected.Text,'',S,PrgSetup.ShowExtraInfo,ListSort,ListSortReverse,False,MenuViewsScreenshots.Checked)
+        else AddGamesToList(ListView,IL2,IL1,ImageList,GameDB,TreeView.Selected.Parent.Text,TreeView.Selected.Text,S,PrgSetup.ShowExtraInfo,ListSort,ListSortReverse,False,MenuViewsScreenshots.Checked);
     end;
     If G<>nil then SelectGame(G);
   finally
@@ -979,9 +1142,16 @@ begin
 end;
 
 procedure TDFendReloadedMainForm.ListViewAdvancedCustomDrawItem(Sender: TCustomListView; Item: TListItem; State: TCustomDrawState; Stage: TCustomDrawStage; var DefaultDraw: Boolean);
+Var FS : TFontStyles;
 begin
   DefaultDraw:=True;
-  If (Item<>nil) and (Item.Data<>nil) and TGame(Item.Data).Favorite then TListview(Sender).Canvas.Font.Style:=[fsBold] else TListview(Sender).Canvas.Font.Style:=[];
+  FS:=[];
+  If (Item<>nil) and (Item.Data<>nil) and TGame(Item.Data).Favorite then begin
+    If PrgSetup.FavoritesBold then FS:=FS+[fsBold];
+    If PrgSetup.FavoritesItalic then FS:=FS+[fsItalic];
+    If PrgSetup.FavoritesUnderline then FS:=FS+[fsUnderline];
+  end;
+  TListview(Sender).Canvas.Font.Style:=FS;
 end;
 
 procedure TDFendReloadedMainForm.ListViewColumnClick(Sender: TObject; Column: TListColumn);
@@ -993,7 +1163,7 @@ end;
 procedure TDFendReloadedMainForm.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
   If (Key=VK_F2) and (Shift=[]) then MenuWork(MenuProfileEdit);
-  If (Key=VK_F5) and (Shift=[]) then EditDefaultProfile(self,GameDB);
+  If (Key=VK_F5) and (Shift=[]) then begin EditDefaultProfile(self,GameDB,SearchLinkFile,DeleteOnExit); LoadSearchLinks; end;
 end;
 
 procedure TDFendReloadedMainForm.ListViewDblClick(Sender: TObject);
@@ -1039,59 +1209,80 @@ begin
 end;
 
 procedure TDFendReloadedMainForm.ListViewSelectItem(Sender: TObject; Item: TListItem; Selected: Boolean);
-Var B,B2 : Boolean;
+Var B,B2,B3,CaptureFolder : Boolean;
     S : String;
+    I,J : Integer;
+    M : TMenuItem;
 begin
   B:=Selected and (Item<>nil) and (Item.Data<>nil);
-  If B then B2:=ScummVMMode(TGame(Item.Data)) else B2:=False;
+  If B then begin
+    B2:=ScummVMMode(TGame(Item.Data));
+    B3:=WindowsExeMode(TGame(Item.Data));
+    S:=TGame(Item.Data).CaptureFolder;
+    CaptureFolder:=(Trim(S)<>'');
+    If CaptureFolder then begin S:=MakeAbsPath(S,PrgSetup.BaseDir); CaptureFolder:=DirectoryExists(S); end;
+  end else begin
+    B2:=False;
+    B3:=False;
+    CaptureFolder:=False;
+  end;
 
   MenuRunGame.Enabled:=B;
   MenuRunSetup.Enabled:=B and (Trim(TGame(Item.Data).SetupExe)<>'');
   MenuProfileEdit.Enabled:=B;
   MenuProfileCopy.Enabled:=B;
   MenuProfileDelete.Enabled:=B;
-  MenuProfileDeinstall.Enabled:=B;
-  MenuProfileMakeInstaller.Enabled:=B;
+  MenuProfileDeinstall.Enabled:=B and (not B3);
+  MenuProfileMakeInstaller.Enabled:=B and (not B3);
+  MenuProfileMakeZipArchive.Enabled:=B and (not B3);
+  MenuFileCreateZIP.Enabled:=B and (not B3);
   If not B then begin
     MenuProfileViewConfFile.Visible:=True;
     MenuProfileViewConfFile.Enabled:=False;
     MenuProfileViewIniFile.Visible:=False;
   end else begin
-    MenuProfileViewConfFile.Visible:=not B2;
-    MenuProfileViewConfFile.Enabled:=not B2;
+    MenuProfileViewConfFile.Visible:=(not B2) and (not B3);
+    MenuProfileViewConfFile.Enabled:=(not B2) and (not B3);
     MenuProfileViewIniFile.Visible:=B2;
     MenuProfileViewIniFile.Enabled:=B2;
   end;
-  MenuProfileViewConfFile.Enabled:=B;
-
   MenuProfileOpenFolder.Enabled:=B and (Trim(TGame(Item.Data).GameExe)<>'');
+  MenuProfileOpenCaptureFolder.Enabled:=CaptureFolder;
   MenuProfileOpenDataFolder.Enabled:=B and (Trim(TGame(Item.Data).DataDir)<>'');
   MenuProfileMarkAsFavorite.Enabled:=B;
   MenuProfileWWW.Enabled:=B and (Trim(TGame(Item.Data).WWW)<>'');
   MenuProfileCreateShortcut.Enabled:=B;
+  MenuProfileSearchGame.Enabled:=B;
 
   PopupRunGame.Enabled:=B;
   PopupRunSetup.Enabled:=B and (Trim(TGame(Item.Data).SetupExe)<>'');
   PopupEdit.Enabled:=B;
   PopupCopy.Enabled:=B;
   PopupDelete.Enabled:=B;
-  PopupDeinstall.Enabled:=B;
-  PopupMakeInstaller.Enabled:=B;
+  PopupDeinstall.Enabled:=B and (not B3);
+  PopupMakeInstaller.Enabled:=B and (not B3);
+  PopupMakeZipArchive.Enabled:=B and (not B3);
   If not B then begin
     PopupViewConfFile.Visible:=True;
     PopupViewConfFile.Enabled:=False;
     PopupViewINIFile.Visible:=False;
   end else begin
-    PopupViewConfFile.Visible:=not B2;
-    PopupViewConfFile.Enabled:=not B2;
+    PopupViewConfFile.Visible:=(not B2) and (not B3);
+    PopupViewConfFile.Enabled:=(not B2) and (not B3);
     PopupViewINIFile.Visible:=B2;
     PopupViewINIFile.Enabled:=B2;
   end;
   PopupOpenFolder.Enabled:=B and (Trim(TGame(Item.Data).GameExe)<>'');
+  PopupOpenCaptureFolder.Enabled:=CaptureFolder;
   PopupOpenDataFolder.Enabled:=B and (Trim(TGame(Item.Data).DataDir)<>'');
   PopupWWW.Enabled:=B and (Trim(TGame(Item.Data).WWW)<>'');
   PopupMarkAsFavorite.Enabled:=B;
   PopupCreateShortcut.Enabled:=B;
+  PopupSearchGame.Enabled:=B;
+
+  ScreenshotPopupOpenCaptureFolder.Enabled:=CaptureFolder;
+  SoundPopupOpenCaptureFolder.Enabled:=CaptureFolder;
+  VideoPopupOpenCaptureFolder.Enabled:=CaptureFolder;
 
   ButtonRun.Enabled:=B;
   ButtonRunSetup.Enabled:=B and (Trim(TGame(Item.Data).SetupExe)<>'');
@@ -1101,6 +1292,35 @@ begin
   UpdateScreenshotList;
 
   UpdateOpenFileInDataFolderMenu;
+
+  If Selected and (Item<>nil) then begin
+    ViewFilesFrame.Visible:=True;
+    ViewFilesFrame.SetGame(TGame(Item.Data));
+  end else begin
+    ViewFilesFrame.Visible:=False;
+  end;
+
+  MenuRunExtraFile.Clear;
+  PopupRunExtraFile.Clear;
+  MenuRunExtraFile.Visible:=False;
+  PopupRunExtraFile.Visible:=False;
+  If B and (not B2) then For I:=0 to 9 do begin
+    S:=Trim(TGame(Item.Data).ExtraPrgFile[I]);
+    J:=Pos(';',S);
+    If (S='') or (J=0) then continue;
+    M:=TMenuItem.Create(self);
+    M.Caption:=Copy(S,1,J-1);
+    M.OnClick:=MenuWork;
+    M.Tag:=3010+I;
+    MenuRunExtraFile.Add(M);
+    M:=TMenuItem.Create(self);
+    M.Caption:=Copy(S,1,J-1);
+    M.OnClick:=MenuWork;
+    M.Tag:=3010+I;
+    PopupRunExtraFile.Add(M);
+    MenuRunExtraFile.Visible:=True;
+    PopupRunExtraFile.Visible:=True;
+  end;
 end;
 
 Procedure TDFendReloadedMainForm.UpdateScreenshotList;
@@ -1118,8 +1338,18 @@ begin
   finally
     ScreenshotListView.Items.EndUpdate;
   end;
-  ScreenshotsInfoPanel.Visible:=(ScreenshotListView.Items.Count=0) and (ListView.Selected<>nil) and (not ScummVMMode(TGame(ListView.Selected.Data)));
 
+  ScreenshotsInfoPanel.Visible:=(ScreenshotListView.Items.Count=0) and (ListView.Selected<>nil);
+  ScreenshotsInfoPanel.Height:=IfThen(ScreenshotsInfoPanel.Visible,17,0);
+  If ScreenshotsInfoPanel.Visible then begin
+    If ScummVMMode(TGame(ListView.Selected.Data)) then begin
+      ScreenshotsInfoPanel.Caption:=LanguageSetup.CaptureScreenshotsInfoScumm;
+    end else begin
+      If WindowsExeMode(TGame(ListView.Selected.Data))
+        then ScreenshotsInfoPanel.Caption:=''
+        else ScreenshotsInfoPanel.Caption:=LanguageSetup.CaptureScreenshotsInfo;
+    end
+  end;
   ScreenshotListViewSelectItem(self,ScreenshotListView.Selected,True);
 
   SoundListView.Items.BeginUpdate;
@@ -1133,9 +1363,24 @@ begin
   finally
     SoundListView.Items.EndUpdate;
   end;
-  SoundInfoPanel.Visible:=(SoundListView.Items.Count=0) and (ListView.Selected<>nil) and (not ScummVMMode(TGame(ListView.Selected.Data)));
-
+  SoundInfoPanel.Visible:=(SoundListView.Items.Count=0) and (ListView.Selected<>nil) and (not ScummVMMode(TGame(ListView.Selected.Data))) and (not WindowsExeMode(TGame(ListView.Selected.Data)));
+  SoundInfoPanel.Height:=IfThen(SoundInfoPanel.Visible,17,0);
   SoundListViewSelectItem(self,SoundListView.Selected,True);
+
+  VideoListView.Items.BeginUpdate;
+  try
+    VideoListView.Items.Clear;
+    If (ListView.Selected<>nil) and (ListView.Selected.Data<>nil) then begin
+      S:=Trim(TGame(ListView.Selected.Data).CaptureFolder);
+      If S<>'' then S:=MakeAbsPath(S,PrgSetup.BaseDir);
+      If S<>'' then AddVideosToList(VideoListView,S,38);
+    end;
+  finally
+    VideoListView.Items.EndUpdate;
+  end;
+  VideoInfoPanel.Visible:=(VideoListView.Items.Count=0) and (ListView.Selected<>nil) and (not ScummVMMode(TGame(ListView.Selected.Data))) and (not WindowsExeMode(TGame(ListView.Selected.Data)));
+  VideoInfoPanel.Height:=IfThen(VideoInfoPanel.Visible,17,0);
+  VideoListViewSelectItem(self,VideoListView.Selected,True);
 end;
 
 Procedure TDFendReloadedMainForm.UpdateOpenFileInDataFolderMenu;
@@ -1333,19 +1578,27 @@ end;
 
 Procedure TDFendReloadedMainForm.LoadGUISetup(const PrgStart : Boolean);
 begin
-  ListView.Items.BeginUpdate;
-  try
-    ListView.Items.Clear;
-    InitListViewForGamesList(ListView,PrgSetup.ShowExtraInfo);
-    InitTreeViewForGamesList(TreeView,GameDB);
-    if not PrgStart then TreeViewChange(self,TreeView.Selected);
-  finally
-    ListView.Items.EndUpdate;
+  ListviewScreenshotImageList.Width:=PrgSetup.ScreenshotListViewWidth;
+  ListviewScreenshotImageList.Height:=PrgSetup.ScreenshotListViewHeight;
+
+  ListView.GridLines:=PrgSetup.GridLinesInGamesList;
+
+  If not PrgStart then begin
+    ListView.Items.BeginUpdate;
+    try
+      ListView.Items.Clear;
+      InitListViewForGamesList(ListView,PrgSetup.ShowExtraInfo);
+      InitTreeViewForGamesList(TreeView,GameDB);
+      if not PrgStart then TreeViewChange(self,TreeView.Selected);
+    finally
+      ListView.Items.EndUpdate;
+    end;
   end;
 
   LoadListViewGUISetup(ListView,PrgSetup.GamesListViewBackground,PrgSetup.GamesListViewFontColor,PrgSetup.GamesListViewFontSize);
   LoadListViewGUISetup(ScreenshotListView,PrgSetup.ScreenshotsListViewBackground,PrgSetup.ScreenshotsListViewFontColor,PrgSetup.ScreenshotsListViewFontSize);
   LoadListViewGUISetup(SoundListView,PrgSetup.ScreenshotsListViewBackground,PrgSetup.ScreenshotsListViewFontColor,PrgSetup.ScreenshotsListViewFontSize);
+  LoadListViewGUISetup(VideoListView,PrgSetup.ScreenshotsListViewBackground,PrgSetup.ScreenshotsListViewFontColor,PrgSetup.ScreenshotsListViewFontSize);
   LoadTreeViewGUISetup(TreeView,PrgSetup.GamesTreeViewBackground,PrgSetup.GamesTreeViewFontColor,PrgSetup.GamesTreeViewFontSize);
   LoadCoolBarGUISetup(CoolBar,PrgSetup.ToolbarBackground,PrgSetup.ToolbarFontSize);
 
@@ -1380,7 +1633,11 @@ Var G : TGame;
     B : Boolean;
 begin
    G:=nil;
-   if not ShowWizardDialog(self,GameDB,ExeFile,G,B) then exit;
+   try
+     if not ShowWizardDialog(self,GameDB,ExeFile,G,B,SearchLinkFile) then exit;
+   finally
+     LoadSearchLinks;
+   end;
    InitTreeViewForGamesList(TreeView,GameDB);
    TreeViewChange(self,TreeView.Selected);
    SelectGame(G);
@@ -1394,22 +1651,30 @@ Var G,DefaultGame : TGame;
     I : Integer;
     P : TPoint;
     St : TStringList;
-    B : Boolean;
+    B,C : Boolean;
 begin
   StopCaptureChangeNotify;
   try
     Case (Sender as TComponent).Tag of
       {File}
       1001 : begin
-               OpenDialog.DefaultExt:='conf';
-               OpenDialog.Title:=LanguageSetup.MenuFileImportConfTitle;
-               OpenDialog.Filter:=LanguageSetup.MenuFileImportConfFilter;
-               If not OpenDialog.Execute then exit;
-               G:=ImportConfFile(GameDB,OpenDialog.FileName);
-               If G=nil then exit;
-               InitTreeViewForGamesList(TreeView,GameDB);
-               TreeViewChange(Sender,TreeView.Selected);
-               SelectGame(G);
+               OpenDialog.Options:=OpenDialog.Options+[ofAllowMultiSelect];
+               try
+                 OpenDialog.DefaultExt:='conf';
+                 OpenDialog.Title:=LanguageSetup.MenuFileImportConfTitle;
+                 OpenDialog.Filter:=LanguageSetup.MenuFileImportConfFilter;
+                 If not OpenDialog.Execute then exit;
+                 For I:=0 to OpenDialog.Files.Count-1 do begin
+                   G:=ImportConfFile(GameDB,OpenDialog.Files[I]);
+                   If G<>nil then begin
+                     InitTreeViewForGamesList(TreeView,GameDB);
+                     TreeViewChange(Sender,TreeView.Selected);
+                     SelectGame(G);
+                   end;
+                 end;
+               finally
+                 OpenDialog.Options:=OpenDialog.Options-[ofAllowMultiSelect];
+               end;
              end;
       1002 : begin
                SaveDialog.DefaultExt:='txt';
@@ -1433,26 +1698,33 @@ begin
              end;
       1007 : Close;
       1008 : begin
-               OpenDialog.DefaultExt:='prof';
-               OpenDialog.Title:=LanguageSetup.MenuFileImportProfTitle;
-               OpenDialog.Filter:=LanguageSetup.MenuFileImportProfFilter;
-               If not OpenDialog.Execute then exit;
-               S:=GameDB.ProfFileName(ExtractFileName(OpenDialog.FileName));
-               if not CopyFile(PChar(OpenDialog.FileName),PChar(S),True) then begin
-                 MessageDlg(Format(LanguageSetup.MessageCouldNotCopyFile,[OpenDialog.FileName,S]),mtError,[mbOK],0);
-                 exit;
+               OpenDialog.Options:=OpenDialog.Options+[ofAllowMultiSelect];
+               try
+                 OpenDialog.DefaultExt:='prof';
+                 OpenDialog.Title:=LanguageSetup.MenuFileImportProfTitle;
+                 OpenDialog.Filter:=LanguageSetup.MenuFileImportProfFilter;
+                 If not OpenDialog.Execute then exit;
+                 For I:=0 to OpenDialog.Files.Count-1 do begin
+                   S:=GameDB.ProfFileName(ExtractFileName(OpenDialog.Files[I]));
+                   if not CopyFile(PChar(OpenDialog.Files[I]),PChar(S),True) then begin
+                     MessageDlg(Format(LanguageSetup.MessageCouldNotCopyFile,[OpenDialog.Files[I],S]),mtError,[mbOK],0);
+                     continue;
+                   end;
+                   G:=TGame.Create(S);
+                   GameDB.Add(G);
+                   InitTreeViewForGamesList(TreeView,GameDB);
+                   TreeViewChange(Sender,TreeView.Selected);
+                   SelectGame(G);
+                 end;
+               finally
+                 OpenDialog.Options:=OpenDialog.Options-[ofAllowMultiSelect];
                end;
-               G:=TGame.Create(S);
-               GameDB.Add(G);
-               InitTreeViewForGamesList(TreeView,GameDB);
-               TreeViewChange(Sender,TreeView.Selected);
-               SelectGame(G);
              end;
       1009 : begin
                OpenDialog.DefaultExt:='xml';
-               //OpenDialog.Title:=LanguageSetup.MenuFileImportXMLTitle;
+               {OpenDialog.Title:=LanguageSetup.MenuFileImportXMLTitle;}
                OpenDialog.Title:='XML import';
-               //OpenDialog.Filter:=LanguageSetup.MenuFileImportXMLFilter;
+               {OpenDialog.Filter:=LanguageSetup.MenuFileImportXMLFilter;}
                OpenDialog.Filter:='XML files (*.xml)|*xml|All files|*.*';
                If not OpenDialog.Execute then exit;
                If ListView.Selected<>nil then G:=TGame(ListView.Selected.Data) else G:=nil;
@@ -1461,6 +1733,25 @@ begin
                InitTreeViewForGamesList(TreeView,GameDB);
                TreeViewChange(Sender,TreeView.Selected);
                SelectGame(G);
+             end;
+      1010 : begin
+               OpenDialog.Options:=OpenDialog.Options+[ofAllowMultiSelect];
+               try
+                 OpenDialog.DefaultExt:='zip';
+                 OpenDialog.Title:=LanguageSetup.ProfileMountingZipFileGeneral;
+                 OpenDialog.Filter:=LanguageSetup.ProfileMountingZipFileFilter2;
+                 If not OpenDialog.Execute then exit;
+                 For I:=0 to OpenDialog.Files.Count-1 do begin
+                   G:=ImportZipPackage(self,OpenDialog.Files[I],GameDB);
+                   If G<>nil then begin
+                     InitTreeViewForGamesList(TreeView,GameDB);
+                     TreeViewChange(Sender,TreeView.Selected);
+                     SelectGame(G);
+                   end;
+                 end;
+               finally
+                 OpenDialog.Options:=OpenDialog.Options-[ofAllowMultiSelect];
+               end;
              end;
       {View}
       2001 : begin
@@ -1482,14 +1773,13 @@ begin
                PrgSetup.ShowSearchBox:=not PrgSetup.ShowSearchBox;
                SearchEdit.Visible:=PrgSetup.ShowSearchBox;
                MenuViewsShowSearchBox.Checked:=PrgSetup.ShowSearchBox;
-               if not SearchEdit.Visible then begin
+
+               If SearchEdit.Font.Color=clGray then begin
                  SearchEdit.OnChange:=nil;
                  SearchEdit.Text:=LanguageSetup.Search;
-                 SearchEdit.Font.Color:=clGray;
                  SearchEdit.OnChange:=SearchEditChange;
-                 InitListViewForGamesList(ListView,PrgSetup.ShowExtraInfo);
-                 ListViewSelectItem(Sender,ListView.Selected,True);
                end;
+               LoadGUISetup(False);
              end;
       2004 : begin
                PrgSetup.ShowExtraInfo:=not PrgSetup.ShowExtraInfo;
@@ -1508,27 +1798,34 @@ begin
       2009 : begin PrgSetup.ListViewStyle:='List'; InitViewStyle; end;
       2010 : begin PrgSetup.ListViewStyle:='SmallIcons'; InitViewStyle; end;
       2011 : begin PrgSetup.ListViewStyle:='Icons'; InitViewStyle; end;
+      2012 : begin PrgSetup.ListViewStyle:='Screenshots'; InitViewStyle; end;
       {Run}
       3001 : begin
                If (ListView.Selected=nil) or (ListView.Selected.Data=nil) then begin
                  MessageDlg(LanguageSetup.MessageNoGameSelected,mtError,[mbOK],0); exit;
                end;
                G:=TGame(ListView.Selected.Data);
-               If ScummVMMode(G) then RunScummVMGame(G) else RunGame(G);
+               If ScummVMMode(G) then begin
+                 RunScummVMGame(G)
+               end else begin
+                 If WindowsExeMode(G)
+                   then RunWindowsGame(G)
+                   else RunGame(G);
+               end;
              end;
       3002 : begin
                If (ListView.Selected=nil) or (ListView.Selected.Data=nil) then begin
                  MessageDlg(LanguageSetup.MessageNoGameSelected,mtError,[mbOK],0); exit;
                end;
                G:=TGame(ListView.Selected.Data);
-               RunGame(G,True);
+               If WindowsExeMode(G) then RunWindowsGame(G,True) else RunGame(G,True);
              end;
-      3003 : If FileExists(IncludeTrailingPathDelimiter(PrgSetup.DosBoxDir)+DosBoxFileName)
-               then ShellExecute(Handle,'open',PChar(IncludeTrailingPathDelimiter(PrgSetup.DosBoxDir)+DosBoxFileName),nil,PChar(IncludeTrailingPathDelimiter(PrgSetup.DosBoxDir)),SW_SHOW)
-               else MessageDlg(Format(LanguageSetup.MessageCouldNotFindFile,[IncludeTrailingPathDelimiter(PrgSetup.DosBoxDir)+DosBoxFileName]),mtError,[mbOK],0);
+      3003 : If FileExists(IncludeTrailingPathDelimiter(PrgSetup.DOSBoxSettings[0].DosBoxDir)+DosBoxFileName)
+               then ShellExecute(Handle,'open',PChar(IncludeTrailingPathDelimiter(PrgSetup.DOSBoxSettings[0].DosBoxDir)+DosBoxFileName),nil,PChar(IncludeTrailingPathDelimiter(PrgSetup.DOSBoxSettings[0].DosBoxDir)),SW_SHOW)
+               else MessageDlg(Format(LanguageSetup.MessageCouldNotFindFile,[IncludeTrailingPathDelimiter(PrgSetup.DOSBoxSettings[0].DosBoxDir)+DosBoxFileName]),mtError,[mbOK],0);
       3004 : begin
-               If not FileExists(IncludeTrailingPathDelimiter(PrgSetup.DosBoxDir)+DosBoxFileName) then begin
-                 MessageDlg(Format(LanguageSetup.MessageCouldNotFindFile,[IncludeTrailingPathDelimiter(PrgSetup.DosBoxDir)+DosBoxFileName]),mtError,[mbOK],0);
+               If not FileExists(IncludeTrailingPathDelimiter(PrgSetup.DOSBoxSettings[0].DosBoxDir)+DosBoxFileName) then begin
+                 MessageDlg(Format(LanguageSetup.MessageCouldNotFindFile,[IncludeTrailingPathDelimiter(PrgSetup.DOSBoxSettings[0].DosBoxDir)+DosBoxFileName]),mtError,[mbOK],0);
                  exit;
                end;
                DefaultGame:=TGame.Create(PrgSetup);
@@ -1545,18 +1842,25 @@ begin
                end;
                DeleteFile(TempDir+'TempGameRec.prof');
              end;
-      3005 : If FileExists(IncludeTrailingPathDelimiter(PrgSetup.DosBoxDir)+DosBoxConfFileName)
-               then ShellExecute(Handle,'open','notepad.exe',PChar(IncludeTrailingPathDelimiter(PrgSetup.DosBoxDir)+DosBoxConfFileName),PChar(IncludeTrailingPathDelimiter(PrgSetup.DosBoxDir)),SW_SHOW)
-               else MessageDlg(Format(LanguageSetup.MessageCouldNotFindFile,[IncludeTrailingPathDelimiter(PrgSetup.DosBoxDir)+DosBoxConfFileName]),mtError,[mbOK],0);
+      3005 : If FileExists(IncludeTrailingPathDelimiter(PrgSetup.DOSBoxSettings[0].DosBoxDir)+DosBoxConfFileName)
+               then ShellExecute(Handle,'open',PChar(GetDefaultEditor),PChar(IncludeTrailingPathDelimiter(PrgSetup.DOSBoxSettings[0].DosBoxDir)+DosBoxConfFileName),PChar(IncludeTrailingPathDelimiter(PrgSetup.DOSBoxSettings[0].DosBoxDir)),SW_SHOW)
+               else MessageDlg(Format(LanguageSetup.MessageCouldNotFindFile,[IncludeTrailingPathDelimiter(PrgSetup.DOSBoxSettings[0].DosBoxDir)+DosBoxConfFileName]),mtError,[mbOK],0);
       3006 : If FileExists(IncludeTrailingPathDelimiter(PrgSetup.ScummVMPath)+ScummPrgFile)
                then ShellExecute(Handle,'open',PChar(IncludeTrailingPathDelimiter(PrgSetup.ScummVMPath)+ScummPrgFile),nil,PChar(IncludeTrailingPathDelimiter(PrgSetup.ScummVMPath)),SW_SHOW)
                else MessageDlg(Format(LanguageSetup.MessageCouldNotFindFile,[IncludeTrailingPathDelimiter(PrgSetup.ScummVMPath)+ScummPrgFile]),mtError,[mbOK],0);
       3007 : begin
                S:=IncludeTrailingPathDelimiter(GetSpecialFolder(Handle,CSIDL_APPDATA))+'ScummVM\';
               If FileExists(S+ScummVMConfFileName)
-                 then ShellExecute(Handle,'open','notepad.exe',PChar(S+ScummVMConfFileName),PChar(S),SW_SHOW)
+                 then ShellExecute(Handle,'open',PChar(GetDefaultEditor),PChar(S+ScummVMConfFileName),PChar(S),SW_SHOW)
                  else MessageDlg(Format(LanguageSetup.MessageCouldNotFindFile,[S+ScummVMConfFileName]),mtError,[mbOK],0);
              end;
+      3010..3019 : If (ListView.Selected<>nil) and (ListView.Selected.Data<>nil) then begin
+                     G:=TGame(ListView.Selected.Data);
+                     If ScummVMMode(G) then exit;
+                     If WindowsExeMode(G)
+                       then RunWindowssExtraFile(G,(Sender as TComponent).Tag-3010)
+                       else RunExtraFile(G,(Sender as TComponent).Tag-3010);
+                   end;
       {Profile}
       4000 : Case PrgSetup.AddButtonFunction of
                0 : MenuWork(MenuProfileAdd);
@@ -1571,11 +1875,12 @@ begin
                DefaultGame:=TGame.Create(PrgSetup);
                try
                  If PrgSetup.DFendStyleProfileEditor then begin
-                   if not EditGameProfil(self,GameDB,G,DefaultGame) then exit;
+                   if not EditGameProfil(self,GameDB,G,DefaultGame,SearchLinkFile,DeleteOnExit) then exit;
                  end else begin
-                   if not ModernEditGameProfil(self,GameDB,G,DefaultGame) then exit;
+                   if not ModernEditGameProfil(self,GameDB,G,DefaultGame,SearchLinkFile,DeleteOnExit) then exit;
                  end;
                finally
+                 LoadSearchLinks;
                  DefaultGame.Free;
                end;
                InitTreeViewForGamesList(TreeView,GameDB);
@@ -1592,14 +1897,15 @@ begin
                  For I:=0 to ListView.Items.Count-1 do L.Add(ListView.Items[I].Data);
                  G:=TGame(ListView.Selected.Data);
                  If PrgSetup.DFendStyleProfileEditor then begin
-                   if not EditGameProfil(self,GameDB,G,nil,L) then exit;
+                   if not EditGameProfil(self,GameDB,G,nil,SearchLinkFile,DeleteOnExit,L) then exit;
                  end else begin
-                   if not ModernEditGameProfil(self,GameDB,G,nil,L) then exit;
+                   if not ModernEditGameProfil(self,GameDB,G,nil,SearchLinkFile,DeleteOnExit,L) then exit;
                  end;
                  InitTreeViewForGamesList(TreeView,GameDB);
                  TreeViewChange(Sender,TreeView.Selected);
                  SelectGame(G);
                finally
+                 LoadSearchLinks;
                  L.Free;
                end;
              end;
@@ -1608,10 +1914,12 @@ begin
                  MessageDlg(LanguageSetup.MessageNoGameSelected,mtError,[mbOK],0); exit;
                end;
                S:=TGame(ListView.Selected.Data).Name;
-               If not InputQuery(LanguageSetup.MenuProfileCopyTitle,LanguageSetup.MenuProfileCopyPrompt,S) then exit;
+               If not ShowCopyProfileDialog(self,Trim(TGame(ListView.Selected.Data).DataDir)<>'',S,B,C) then exit;
                G:=GameDB[GameDB.Add(S)];
                G.AssignFrom(TGame(ListView.Selected.Data));
                G.Name:=S;
+               If B then G.CaptureFolder:='.\'+CaptureSubDir+'\'+MakeFileSysOKFolderName(S)+'\';
+               If C then G.DataDir:='';
                G.LoadCache;
                InitTreeViewForGamesList(TreeView,GameDB);
                TreeViewChange(Sender,TreeView.Selected);
@@ -1666,7 +1974,10 @@ begin
                If WineSupportEnabled and PrgSetup.LinuxLinkMode then begin
                  CreateLinuxShortCut(self,TGame(ListView.Selected.Data));
                end else begin
-                 ShowCreateShortcutDialog(self,TGame(ListView.Selected.Data).Name,TGame(ListView.Selected.Data).SetupFile,TGame(ListView.Selected.Data).Icon,ScummVMMode(TGame(ListView.Selected.Data)));
+                 G:=TGame(ListView.Selected.Data);
+                 If WindowsExeMode(G)
+                   then ShowCreateShortcutDialog(self,G.Name,G.SetupFile,G.Icon,G.GameExe,G.GameParameters,False,True)
+                   else ShowCreateShortcutDialog(self,G.Name,G.SetupFile,G.Icon,'','',ScummVMMode(G),False);
                end;
              end;
       4012 : begin
@@ -1680,42 +1991,54 @@ begin
                  MessageDlg(LanguageSetup.MessageNoGameSelected,mtError,[mbOK],0); exit;
                end;
                G:=TGame(ListView.Selected.Data);
-               If ScummVMMode(G) then begin
-                 S:=TempDir+ChangeFileExt(ExtractFileName(G.SetupFile),'.ini');
-                 T:='ScummVM';
-                 St:=BuildScummVMIniFile(G);
-               end else begin
-                 S:=TempDir+ChangeFileExt(ExtractFileName(G.SetupFile),'.conf');
-                 T:='DOSBox';
-                 St:=BuildConfFile(G,False,False);
-               end;
-                 try
-                   St.Insert(0,'# This '+T+' configuration file was automatically created by D-Fend Reloaded.');
-                   St.Insert(1,'# Changes made to this file will NOT be transfered to D-Rend Reloaded profiles list.');
-                   St.Insert(2,'# D-Fend Reloaded will delete this file from temp directory on program close.');
-                   St.Insert(3,'');
-                   St.Insert(4,'# Config file for profile "'+G.Name+'"');
-                   St.Insert(5,'');
-                   St.SaveToFile(S);
-                 finally
-                   St.Free;
-                 end;
-               ShellExecute(Handle,'open','notepad.exe',PChar(S),nil,SW_SHOW);
-               If DeleteOnExit.IndexOf(S)<0 then DeleteOnExit.Add(S);
+               OpenConfigurationFile(G,DeleteOnExit);
              end;
       4014 : begin
                G:=nil;
                DefaultGame:=TGame.Create(PrgSetup);
                try
                  DefaultGame.ProfileMode:='ScummVM';
-                 if not ModernEditGameProfil(self,GameDB,G,DefaultGame) then exit;
+                 if not ModernEditGameProfil(self,GameDB,G,DefaultGame,SearchLinkFile,DeleteOnExit) then exit;
                finally
+                 LoadSearchLinks;
                  DefaultGame.ProfileMode:='DOSBox';
                  DefaultGame.Free;
                end;
                InitTreeViewForGamesList(TreeView,GameDB);
                TreeViewChange(Sender,TreeView.Selected);
                SelectGame(G);
+             end;
+      4015 : OpenLink((Sender as TMenuItem).Hint,'<GAMENAME>',TGame(ListView.Selected.Data).Name);
+      4016 : If SearchLinkFile.EditFile(False) then LoadSearchLinks;
+      4017 : begin
+               If (ListView.Selected=nil) or (ListView.Selected.Data=nil) then begin
+                 MessageDlg(LanguageSetup.MessageNoGameSelected,mtError,[mbOK],0); exit;
+               end;
+               SaveDialog.DefaultExt:='zip';
+               SaveDialog.Title:=LanguageSetup.ProfileMountingZipFileGeneral;
+               SaveDialog.Filter:=LanguageSetup.ProfileMountingZipFileFilter2;
+               If not SaveDialog.Execute then exit;
+               BuildZipPackage(self,TGame(ListView.Selected.Data),SaveDialog.Filename);
+             end;
+      4018 : begin
+               G:=nil;
+               DefaultGame:=TGame.Create(PrgSetup);
+               try
+                 DefaultGame.ProfileMode:='Windows';
+                 if not ModernEditGameProfil(self,GameDB,G,DefaultGame,SearchLinkFile,DeleteOnExit) then exit;
+               finally
+                 LoadSearchLinks;
+                 DefaultGame.ProfileMode:='DOSBox';
+                 DefaultGame.Free;
+               end;
+               InitTreeViewForGamesList(TreeView,GameDB);
+               TreeViewChange(Sender,TreeView.Selected);
+               SelectGame(G);
+             end;
+      4019 : If (ListView.Selected<>nil) and (ListView.Selected.Data<>nil) then begin
+               G:=TGame(ListView.Selected.Data); If Trim(G.CaptureFolder)='' then exit;
+               S:=MakeAbsPath(G.CaptureFolder,PrgSetup.BaseDir);
+               If DirectoryExists(S) then ShellExecute(Handle,'explore',PChar(S),nil,PChar(S),SW_SHOW)
              end;
       {Extras}
       5001 : begin S:=''; ShowIconManager(self,S,PrgSetup.GameDir,True); end;
@@ -1725,7 +2048,8 @@ begin
                ShellExecute(Handle,'explore',PChar(S),nil,PChar(S),SW_SHOW);
              end;
       5005 : begin
-               G:=ShowTemplateDialog(self,GameDB);
+               G:=ShowTemplateDialog(self,GameDB,SearchLinkFile,DeleteOnExit);
+               LoadSearchLinks;
                UpdateAddFromTemplateMenu;
                if G=nil then exit;
                ListView.Items.Clear;
@@ -1759,18 +2083,19 @@ begin
                St:=CheckGameDB(GameDB);
                try
                  If St.Count=0 then begin
-                   MessageDlg('There are no missing files. All files and directories for all profiles are available.',mtInformation,[mbOK],0);
+                   MessageDlg(LanguageSetup.MissingFilesOK,mtInformation,[mbOK],0);
                  end else begin
-                   ShowInfoTextDialog(self,'Missing files',St);
+                   ShowInfoTextDialog(self,LanguageSetup.MissingFilesCaption,St);
                  end;
                finally
                  St.Free;
                end;
              end;
+      5017 : ShowBuildZipPackagesDialog(self,GameDB);
       {Help}
       6001 : ShellExecute(Handle,'open',PChar('http:/'+'/www.dosbox.com/wiki/'),nil,nil,SW_SHOW);
       6002 : ShellExecute(Handle,'open',PChar('http:/'+'/www.dosbox.com/wiki/Special_Keys'),nil,nil,SW_SHOW);
-      6003 : If FileExists(IncludeTrailingPathDelimiter(PrgSetup.DosBoxDir)+DosBoxFileName) then begin
+      6003 : If FileExists(IncludeTrailingPathDelimiter(PrgSetup.DOSBoxSettings[0].DosBoxDir)+DosBoxFileName) then begin
                DefaultGame:=TGame.Create(PrgSetup);
                try
                  RunCommand(DefaultGame,'intro special',True);
@@ -1778,12 +2103,12 @@ begin
                  DefaultGame.Free;
                end;
              end else begin
-               MessageDlg(Format(LanguageSetup.MessageCouldNotFindFile,[IncludeTrailingPathDelimiter(PrgSetup.DosBoxDir)+DosBoxFileName]),mtError,[mbOK],0);
+               MessageDlg(Format(LanguageSetup.MessageCouldNotFindFile,[IncludeTrailingPathDelimiter(PrgSetup.DOSBoxSettings[0].DosBoxDir)+DosBoxFileName]),mtError,[mbOK],0);
              end;
       6004 : ShellExecute(Handle,'open',PChar('http:/'+'/www.dosbox.com/comp_list.php?letter=a'),nil,nil,SW_SHOW);
       6005 : ShellExecute(Handle,'open',PChar('http:/'+'/pain.scene.org/service_dosbox.php'),nil,nil,SW_SHOW);
       6006 : ShellExecute(Handle,'open',PChar('http:/'+'/dosbox.sourceforge.net/oldwiki/index.php?page=CommandLine'),nil,nil,SW_SHOW);
-      6007 : If FileExists(IncludeTrailingPathDelimiter(PrgSetup.DosBoxDir)+DosBoxFileName) then begin
+      6007 : If FileExists(IncludeTrailingPathDelimiter(PrgSetup.DOSBoxSettings[0].DosBoxDir)+DosBoxFileName) then begin
                DefaultGame:=TGame.Create(PrgSetup);
                try
                  RunCommand(DefaultGame,'intro',True);
@@ -1791,16 +2116,15 @@ begin
                  DefaultGame.Free;
                end;
              end else begin
-               MessageDlg(Format(LanguageSetup.MessageCouldNotFindFile,[IncludeTrailingPathDelimiter(PrgSetup.DosBoxDir)+DosBoxFileName]),mtError,[mbOK],0);
+               MessageDlg(Format(LanguageSetup.MessageCouldNotFindFile,[IncludeTrailingPathDelimiter(PrgSetup.DOSBoxSettings[0].DosBoxDir)+DosBoxFileName]),mtError,[mbOK],0);
              end;
       6008 : ShellExecute(Handle,'open',PChar(LanguageSetup.MenuHelpHomepageURL),nil,nil,SW_SHOW);
-      6009 : ShellExecute(Handle,'open',PChar('http:/'+'/vogons.zetafleet.com/viewtopic.php?t=17415'),nil,nil,SW_SHOW);
+      6009 : {ShellExecute(Handle,'open',PChar('http:/'+'/vogons.zetafleet.com/viewtopic.php?t=17415'),nil,nil,SW_SHOW);}
+             Application.HelpCommand(HELP_CONTEXT,ID_HelpForum);
       6010 : If FileExists(PrgDir+'UpdateCheck.exe')
                then RunUpdateCheck(False)
                else ShellExecute(Handle,'open',PChar(LanguageSetup.MenuHelpUpdatesURL),nil,nil,SW_SHOW);
-      6011 : If FileExists(PrgDir+'FAQs.txt')
-               then ShellExecute(Handle,'open',PChar(PrgDir+'FAQs.txt'),nil,nil,SW_SHOW)
-               else MessageDlg(Format(LanguageSetup.MessageCouldNotFindFile,[PrgDir+'FAQs.txt']),mtError,[mbOK],0);
+      6011 : Application.HelpCommand(HELP_CONTEXT,ID_FAQs);
       6012 : If FileExists(PrgDataDir+'Icons.ini')
                then ShellExecute(Handle,'open',PChar(PrgDataDir+'Icons.ini'),nil,nil,SW_SHOW)
                else MessageDlg(Format(LanguageSetup.MessageCouldNotFindFile,[PrgDataDir+'Icons.ini']),mtError,[mbOK],0);
@@ -1830,7 +2154,12 @@ begin
       6020 : ShellExecute(Handle,'open',PChar('http:/'+'/www.scummvm.org/compatibility.php'),nil,nil,SW_SHOW);
       6021 : ShowListScummVMGamesDialog(self);
       6022 : ShowOperationModeInfoDialog(self);
-      6101 : ShellExecute(Handle,'open',PChar(PrgSetup.DosBoxDir+RemoveUnderline((Sender as TMenuItem).Caption)),nil,nil,SW_SHOW);
+      6023 : MessageDlg(LanguageSetup.MenuHelpMakeAutoSetupTemplatesInfo,mtInformation,[mbOK],0);
+      6024 : Application.HelpCommand(HELP_CONTEXT,ID_Index);
+      6025 : Application.HelpCommand(HELP_CONTEXT,ID_Index);
+      6026 : Application.HelpCommand(HELP_CONTEXT,ID_Introduction);
+      6027 : Application.HelpCommand(HELP_CONTEXT,ID_Introduction2);
+      6101 : ShellExecute(Handle,'open',PChar(PrgSetup.DOSBoxSettings[0].DosBoxDir+RemoveUnderline((Sender as TMenuItem).Caption)),nil,nil,SW_SHOW);
       6102 : begin
                If not OldGamesMenuUsed then begin
                  MessageDlg(LanguageSetup.MenuHelpAbandonwareInfo,mtInformation,[mbOK],0);
@@ -1838,6 +2167,7 @@ begin
                end;
                ShellExecute(Handle,'open',PChar((Sender as TMenuItem).Hint),nil,nil,SW_SHOW);
              end;
+      6103 : If HelpMenuLinkFile.EditFile(True) then LoadAbandonLinks;
     end;
   finally
     StartCaptureChangeNotify;
@@ -1853,6 +2183,7 @@ begin
     3 : begin TrayIconDblClick(Sender); MenuWork(MenuProfileAddWithWizard); end;
     4 : Close;
     5 : ShowMiniRunDialog(self,GameDB);
+    6 : begin TrayIconDblClick(Sender); MenuWork(MenuProfileAddWindows); end;
   end;
 end;
 
@@ -1910,14 +2241,15 @@ begin
   try
     G:=nil;
     If PrgSetup.DFendStyleProfileEditor then begin
-      if not EditGameProfil(self,GameDB,G,TemplateDB[(Sender as TComponent).Tag]) then exit;
+      if not EditGameProfil(self,GameDB,G,TemplateDB[(Sender as TComponent).Tag],SearchLinkFile,DeleteOnExit) then exit;
     end else begin
-      if not ModernEditGameProfil(self,GameDB,G,TemplateDB[(Sender as TComponent).Tag]) then exit;
+      if not ModernEditGameProfil(self,GameDB,G,TemplateDB[(Sender as TComponent).Tag],SearchLinkFile,DeleteOnExit) then exit;
     end;
     InitTreeViewForGamesList(TreeView,GameDB);
     TreeViewChange(Sender,TreeView.Selected);
     SelectGame(G);
   finally
+    LoadSearchLinks;
     TemplateDB.Free;
   end;
 end;
@@ -1934,6 +2266,10 @@ begin
   ScreenshotPopupDelete.Enabled:=B;
   ScreenshotPopupDeleteAll.Enabled:=B;
   ScreenshotPopupUseAsBackground.Enabled:=B;
+  ScreenshotPopupUseInScreenshotList.Enabled:=B;
+  If not ScreenshotPopupUseInScreenshotList.Enabled then ScreenshotPopupUseInScreenshotList.Checked:=False else begin
+    ScreenshotPopupUseInScreenshotList.Checked:=(ScreenshotListView.Selected<>nil) and (ListView.Selected<>nil) and ((Trim(ExtUpperCase(ScreenshotListView.Selected.Caption))=Trim(ExtUpperCase(TGame(ListView.Selected.Data).ScreenshotListScreenshot))));
+  end;
 end;
 
 procedure TDFendReloadedMainForm.SoundListViewSelectItem(Sender: TObject; Item: TListItem; Selected: Boolean);
@@ -1946,9 +2282,11 @@ begin
   If B then S:=ExtUpperCase(ExtractFileExt(Item.Caption)) else S:='';
 
   SoundPopupOpen.Enabled:=B;
+  SoundPopupOpenExternal.Enabled:=B;
   SoundPopupSave.Enabled:=B;
   SoundPopupSaveMp3.Enabled:=B and (S='.WAV') and FileExists(PrgSetup.WaveEncMp3);
   SoundPopupSaveOgg.Enabled:=B and (S='.WAV') and FileExists(PrgSetup.WaveEncOgg);
+  SoundPopupRename.Enabled:=B;
   SoundPopupDelete.Enabled:=B;
   SoundPopupDeleteAll.Enabled:=B;
 
@@ -1956,6 +2294,19 @@ begin
   For I:=0 to SoundListView.Items.Count-1 do If ExtUpperCase(ExtractFileExt(SoundListView.Items[I].Caption))='.WAV' then begin B:=True; break; end;
   SoundPopupSaveMp3All.Enabled:=B and FileExists(PrgSetup.WaveEncMp3);
   SoundPopupSaveOggAll.Enabled:=B and FileExists(PrgSetup.WaveEncOgg);
+end;
+
+procedure TDFendReloadedMainForm.VideoListViewSelectItem(Sender: TObject; Item: TListItem; Selected: Boolean);
+Var B : Boolean;
+begin
+  B:=(Item<>nil);
+
+  VideoPopupOpen.Enabled:=B;
+  VideoPopupOpenExternal.Enabled:=B;
+  VideoPopupSave.Enabled:=B;
+  VideoPopupRename.Enabled:=B;
+  VideoPopupDelete.Enabled:=B;
+  VideoPopupDeleteAll.Enabled:=B;
 end;
 
 procedure TDFendReloadedMainForm.ScreenshotListViewDblClick(Sender: TObject);
@@ -1966,6 +2317,11 @@ end;
 procedure TDFendReloadedMainForm.SoundListViewDblClick(Sender: TObject);
 begin
   SoundMenuWork(SoundPopupOpen);
+end;
+
+procedure TDFendReloadedMainForm.VideoListViewDblClick(Sender: TObject);
+begin
+  VideoMenuWork(VideoPopupOpen);
 end;
 
 procedure TDFendReloadedMainForm.ScreenshotListViewKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -1984,12 +2340,26 @@ end;
 procedure TDFendReloadedMainForm.SoundListViewKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
   If (Shift=[ssShift]) and (Key=VK_DELETE) then begin SoundMenuWork(SoundPopupDeleteAll); exit; end;
+  If (Shift=[ssShift]) and (Key=VK_RETURN) then begin SoundMenuWork(SoundPopupOpenExternal); exit; end;
   If Shift<>[] then exit;
   Case Key of
     VK_RETURN : SoundMenuWork(SoundPopupOpen);
     VK_INSERT : SoundMenuWork(SoundPopupImport);
     VK_F5 : SoundMenuWork(SoundPopupRefresh);
     VK_DELETE : SoundMenuWork(SoundPopupDelete);
+  end;
+end;
+
+procedure TDFendReloadedMainForm.VideoListViewKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+begin
+  If (Shift=[ssShift]) and (Key=VK_DELETE) then begin VideoMenuWork(VideoPopupDeleteAll); exit; end;
+  If (Shift=[ssShift]) and (Key=VK_RETURN) then begin VideoMenuWork(VideoPopupOpenExternal); exit; end;
+  If Shift<>[] then exit;
+  Case Key of
+    VK_RETURN : VideoMenuWork(VideoPopupOpen);
+    VK_INSERT : VideoMenuWork(VideoPopupImport);
+    VK_F5 : VideoMenuWork(VideoPopupRefresh);
+    VK_DELETE : VideoMenuWork(VideoPopupDelete);
   end;
 end;
 
@@ -2102,6 +2472,13 @@ begin
             MessageDlg(Format(LanguageSetup.MessageCouldNotRenameFile,[S+SoundListView.Selected.Caption,S+T]),mtError,[mbOK],0);
           ListViewSelectItem(Sender,ListView.Selected,True);
         end;
+    9 : If (ScreenshotListView.Selected<>nil) and (ListView.Selected<>nil) then begin
+          S:=ScreenshotListView.Selected.Caption;
+          If Trim(ExtUpperCase(S))=Trim(ExtUpperCase(TGame(ListView.Selected.Data).ScreenshotListScreenshot))
+          then TGame(ListView.Selected.Data).ScreenshotListScreenshot:=''
+          else TGame(ListView.Selected.Data).ScreenshotListScreenshot:=S;
+          TreeViewChange(Sender,TreeView.Selected);
+        end;
   end;
 end;
 
@@ -2110,16 +2487,34 @@ Var S,T : String;
     G : TGame;
     I : Integer;
     SaveDialog : TSaveDialog;
+    St1,St2 : TStringList;
 begin
   Case (Sender as TComponent).Tag of
     0 : If SoundListView.Selected<>nil then begin
           S:=Trim(TGame(ListView.Selected.Data).CaptureFolder);
           If S<>'' then S:=MakeAbsPath(S,PrgSetup.BaseDir);
           If S='' then exit;
-          PlaySoundDialog(self,IncludeTrailingPathDelimiter(S)+SoundListView.Selected.Caption);
+          St1:=TStringList.Create;
+          St2:=TStringList.Create;
+          try
+            For I:=0 to SoundListView.Items.Count-1 do begin
+              If (I<SoundListView.Selected.Index) and (ExtUpperCase(ExtractFileExt(SoundListView.Items[I].Caption))<>'.OGG') then St1.Add(IncludeTrailingPathDelimiter(S)+SoundListView.Items[I].Caption);
+              If (I>SoundListView.Selected.Index) and (ExtUpperCase(ExtractFileExt(SoundListView.Items[I].Caption))<>'.OGG') then St2.Add(IncludeTrailingPathDelimiter(S)+SoundListView.Items[I].Caption);
+            end;
+            PlaySoundDialog(self,IncludeTrailingPathDelimiter(S)+SoundListView.Selected.Caption,St1,St2);
+          finally
+            St1.Free;
+            St2.Free;
+          end;
           ListViewSelectItem(Sender,ListView.Selected,True);
         end;
     1 : ListViewSelectItem(Sender,ListView.Selected,True);
+    2 : If SoundListView.Selected<>nil then begin
+          S:=Trim(TGame(ListView.Selected.Data).CaptureFolder);
+          If S<>'' then S:=MakeAbsPath(S,PrgSetup.BaseDir);
+          If S='' then exit;
+          ShellExecute(Handle,'open',PChar(IncludeTrailingPathDelimiter(S)+SoundListView.Selected.Caption),nil,nil,SW_SHOW);
+        end;
     3 : If SoundListView.Selected<>nil then begin
           S:=Trim(TGame(ListView.Selected.Data).CaptureFolder);
           If S<>'' then S:=MakeAbsPath(S,PrgSetup.BaseDir);
@@ -2245,6 +2640,109 @@ begin
   end;
 end;
 
+procedure TDFendReloadedMainForm.VideoMenuWork(Sender: TObject);
+Var S,T : String;
+    G : TGame;
+    I : Integer;
+    SaveDialog : TSaveDialog;
+    St1,St2 : TStringList;
+begin
+  Case (Sender as TComponent).Tag of
+    0 : If VideoListView.Selected<>nil then begin
+          S:=Trim(TGame(ListView.Selected.Data).CaptureFolder);
+          If S<>'' then S:=MakeAbsPath(S,PrgSetup.BaseDir);
+          If S='' then exit;
+          St1:=TStringList.Create;
+          St2:=TStringList.Create;
+          try
+            For I:=0 to VideoListView.Items.Count-1 do begin
+              If I<VideoListView.Selected.Index then St1.Add(IncludeTrailingPathDelimiter(S)+VideoListView.Items[I].Caption);
+              If I>VideoListView.Selected.Index then St2.Add(IncludeTrailingPathDelimiter(S)+VideoListView.Items[I].Caption);
+            end;
+            PlayVideoDialog(self,IncludeTrailingPathDelimiter(S)+VideoListView.Selected.Caption,St1,St2);
+          finally
+            St1.Free;
+            St2.Free;
+          end;
+          ListViewSelectItem(Sender,ListView.Selected,True);
+        end;
+    1 : ListViewSelectItem(Sender,ListView.Selected,True);
+    2 : If VideoListView.Selected<>nil then begin
+          S:=Trim(TGame(ListView.Selected.Data).CaptureFolder);
+          If S<>'' then S:=MakeAbsPath(S,PrgSetup.BaseDir);
+          If S='' then exit;
+          ShellExecute(Handle,'open',PChar(IncludeTrailingPathDelimiter(S)+VideoListView.Selected.Caption),nil,nil,SW_SHOW);
+        end;
+    3 : If VideoListView.Selected<>nil then begin
+          S:=Trim(TGame(ListView.Selected.Data).CaptureFolder);
+          If S<>'' then S:=MakeAbsPath(S,PrgSetup.BaseDir);
+          If S='' then exit;
+          S:=IncludeTrailingPathDelimiter(S)+VideoListView.Selected.Caption;
+          SaveDialog:=TSaveDialog.Create(self);
+          try
+            T:=ExtractFileExt(S);
+            If (T<>'') and (T[1]='.') then T:=Copy(T,2,MaxInt);
+            SaveDialog.DefaultExt:=T;
+            SaveDialog.Title:=LanguageSetup.VideoCaptureSaveTitle;
+            SaveDialog.Filter:=LanguageSetup.VideoCaptureSaveFilter;
+            If not SaveDialog.Execute then exit;
+            T:=SaveDialog.FileName;
+            If not CopyFile(PChar(S),PChar(T),True) then MessageDlg(Format(LanguageSetup.MessageCouldNotCopyFile,[S,T]),mtError,[mbOK],0);
+          finally
+            SaveDialog.Free;
+          end;
+        end;
+    6 : If VideoListView.Selected<>nil then begin
+          S:=Trim(TGame(ListView.Selected.Data).CaptureFolder);
+          If S<>'' then S:=MakeAbsPath(S,PrgSetup.BaseDir);
+          If S='' then exit;
+          if not DeleteFile(IncludeTrailingPathDelimiter(S)+VideoListView.Selected.Caption) then
+            Messagedlg(Format(LanguageSetup.MessageCouldNotDeleteDir,[IncludeTrailingPathDelimiter(S)+VideoListView.Selected.Caption]),mtError,[mbOK],0);
+          ListViewSelectItem(Sender,ListView.Selected,True);
+        end;
+    7 : If VideoListView.Selected<>nil then begin
+          S:=Trim(TGame(ListView.Selected.Data).CaptureFolder);
+          If S<>'' then S:=MakeAbsPath(S,PrgSetup.BaseDir);
+          If S='' then exit;
+          For I:=0 to VideoListView.Items.Count-1 do if not DeleteFile(IncludeTrailingPathDelimiter(S)+VideoListView.Items[I].Caption) then begin
+            MessageDlg(Format(LanguageSetup.MessageCouldNotDeleteDir,[IncludeTrailingPathDelimiter(S)+VideoListView.Items[I].Caption]),mtError,[mbOK],0);
+            break;
+          end;
+          ListViewSelectItem(Sender,ListView.Selected,True);
+        end;
+    8 : begin
+          If (ListView.Selected=nil) or (ListView.Selected.Data=nil) then begin
+            MessageDlg(LanguageSetup.MessageNoGameSelected,mtError,[mbOK],0); exit;
+          end;
+          G:=TGame(ListView.Selected.Data);
+          S:=Trim(TGame(ListView.Selected.Data).CaptureFolder);
+          If S<>'' then S:=MakeAbsPath(S,PrgSetup.BaseDir);
+          If S='' then exit;
+          OpenDialog.Title:=LanguageSetup.VideoCaptureImportTitle;
+          OpenDialog.Filter:=LanguageSetup.VideoCaptureImportFilter;
+          If not OpenDialog.Execute then exit;
+          S:=IncludeTrailingPathDelimiter(S)+ExtractFileName(OpenDialog.FileName);
+          if not CopyFile(PChar(OpenDialog.FileName),PChar(S),True) then begin
+            MessageDlg(Format(LanguageSetup.MessageCouldNotCopyFile,[OpenDialog.FileName,S]),mtError,[mbOK],0);
+            exit;
+          end;
+          ListViewSelectItem(Sender,ListView.Selected,True);
+        end;
+   11 : If VideoListView.Selected<>nil then begin
+          S:=Trim(TGame(ListView.Selected.Data).CaptureFolder);
+          If S<>'' then S:=MakeAbsPath(S,PrgSetup.BaseDir);
+          If S='' then exit;
+          S:=IncludeTrailingPathDelimiter(S);
+          T:=ChangeFileExt(VideoListView.Selected.Caption,'');
+          If not InputQuery(LanguageSetup.ScreenshotPopupRenameCaption,LanguageSetup.ScreenshotPopupRenameLabel,T) then exit;
+          T:=T+ExtractFileExt(VideoListView.Selected.Caption);
+          If not RenameFile(S+VideoListView.Selected.Caption,S+T) then
+            MessageDlg(Format(LanguageSetup.MessageCouldNotRenameFile,[S+VideoListView.Selected.Caption,S+T]),mtError,[mbOK],0);
+          ListViewSelectItem(Sender,ListView.Selected,True);
+        end;
+  end;
+end;
+
 procedure TDFendReloadedMainForm.TreeViewPopupEditUserFiltersClick(Sender: TObject);
 begin
   if ShowTreeListSetupDialog(self,GameDB) then begin
@@ -2285,11 +2783,11 @@ end;
 
 procedure TDFendReloadedMainForm.ApplicationEventsIdle(Sender: TObject; var Done: Boolean);
 begin
-  If PrgSetup.MinimizeOnDosBoxStart and PrgSetup.RestoreWhenDOSBoxCloses and (WindowState=wsMinimized) and MinimizedAtDOSBoxStaert then begin
+  If PrgSetup.MinimizeOnDosBoxStart and PrgSetup.RestoreWhenDOSBoxCloses and (WindowState=wsMinimized) and MinimizedAtDOSBoxStart then begin
     DOSBoxRunning:=False;
     EnumWindows(@EnumWindowsFunc,0);
     if DOSBoxRunning then exit;
-    MinimizedAtDOSBoxStaert:=False;
+    MinimizedAtDOSBoxStart:=False;
     If PrgSetup.MinimizeToTray then begin
       TrayIconDblClick(Sender);
       Application.ProcessMessages;
@@ -2305,6 +2803,7 @@ begin
   try
     If (hScreenshotsChangeNotification<>INVALID_HANDLE_VALUE) and (WaitForSingleObject(hScreenshotsChangeNotification,0)=WAIT_OBJECT_0) then begin
       UpdateScreenshotList;
+      PictureCache.Clear;
       FindNextChangeNotification(hScreenshotsChangeNotification);
     end;
 
@@ -2448,35 +2947,55 @@ begin
   end;
 
   If (FileExt='.JPG') or (FileExt='.JPEG') or (FileExt='.PNG') or (FileExt='.GIF') or (FileExt='.BMP') then begin
-    If (G<>nil) and (not ScummVMMode(G)) then begin
-      S:=Trim(TGame(ListView.Selected.Data).CaptureFolder);
+    If G<>nil then begin
+      S:=Trim(G.CaptureFolder);
       If S<>'' then S:=MakeAbsPath(S,PrgSetup.BaseDir);
       If S='' then exit;
       S:=IncludeTrailingPathDelimiter(S)+ExtractFileName(FileName);
       if not CopyFile(PChar(FileName),PChar(S),True) then
         ErrorCode:=Format(LanguageSetup.MessageCouldNotCopyFile,[FileName,S]);
+      exit;
     end else begin
       ErrorCode:=Format(LanguageSetup.DragDropErrorNoProfileSelectedForScreenshots,[ExtractFileName(FileName)]);
+      exit;
     end;
-    exit;
   end;
 
   If (FileExt='.WAV') or (FileExt='.MP3') or (FileExt='.OGG') then begin
-    If (G<>nil) and (not ScummVMMode(G)) then begin
-      S:=Trim(TGame(ListView.Selected.Data).CaptureFolder);
+    If G<>nil then begin
+      S:=Trim(G.CaptureFolder);
       If S<>'' then S:=MakeAbsPath(S,PrgSetup.BaseDir);
       If S='' then exit;
       S:=IncludeTrailingPathDelimiter(S)+ExtractFileName(FileName);
       if not CopyFile(PChar(FileName),PChar(S),True) then ErrorCode:=Format(LanguageSetup.MessageCouldNotCopyFile,[FileName,S]);
+      exit;
     end else begin
       ErrorCode:=Format(LanguageSetup.DragDropErrorNoProfileSelectedForSoundFiles,[ExtractFileName(FileName)]);
+      exit;
     end;
-    exit;
   end;
 
   If (FileExt='.EXE') or (FileExt='.COM') or (FileExt='.BAT') or (FileExt='.BAS') then begin
     StartWizard(FileName);
     exit;
+  end;
+
+  If (FileExt='.ZIP') or (FileExt='.7Z') then begin
+    G:=ImportZipPackage(self,FileName,GameDB);
+    If G=nil then exit;
+    InitTreeViewForGamesList(TreeView,GameDB);
+    TreeViewChange(self,TreeView.Selected);
+    SelectGame(G);
+    exit;
+  end;
+
+  If G<>nil then begin
+    If (Trim(G.DataDir)<>'') and DirectoryExists(MakeAbsPath(G.DataDir,PrgSetup.BaseDir)) then begin
+      S:=IncludeTrailingPathDelimiter(MakeAbsPath(G.DataDir,PrgSetup.BaseDir))+ExtractFileName(FileName);
+      if not CopyFile(PChar(FileName),PChar(S),True) then
+        ErrorCode:=Format(LanguageSetup.MessageCouldNotCopyFile,[FileName,S]);
+      exit;
+    end;
   end;
 
   ErrorCode:=Format(LanguageSetup.DragDropErrorUnknownExtension,[ExtractFileName(FileName)]);
@@ -2504,6 +3023,23 @@ begin
  finally
    Errors.Free;
  end;
+end;
+
+procedure TDFendReloadedMainForm.ZipInfoNotify(Sender: TObject);
+begin
+  ZipInfoPanel.Visible:=(ZipManager.Count>0);
+end;
+
+procedure TDFendReloadedMainForm.ZipInfoPanelDblClick(Sender: TObject);
+begin
+  ShowZipWaitInfoDialog(self);
+end;
+
+procedure TDFendReloadedMainForm.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+begin
+  If ZipManager.Count>0 then begin
+    If MessageDlg(LanguageSetup.ZipFormCloseWarning,mtConfirmation,[mbYes,mbNo],0)<>mrYes then CanClose:=False;
+  end;
 end;
 
 end.

@@ -16,7 +16,7 @@ type
     { Private-Deklarationen }
   public
     { Public-Deklarationen }
-    Procedure InitGUI(const OnProfileNameChange : TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup, CurrentScummVMGameName : PString);
+    Procedure InitGUI(const InitData : TModernProfileEditorInitData);
     Procedure SetGame(const Game : TGame; const LoadFromTemplate : Boolean);
     Function CheckValue : Boolean;
     Procedure GetGame(const Game : TGame);
@@ -25,13 +25,13 @@ type
 
 implementation
 
-uses VistaToolsUnit, LanguageSetupUnit, CommonTools;
+uses VistaToolsUnit, LanguageSetupUnit, CommonTools, HelpConsts;
 
 {$R *.dfm}
 
 { TModernProfileEditorScummVMGraphicsFrame }
 
-procedure TModernProfileEditorScummVMGraphicsFrame.InitGUI(const OnProfileNameChange: TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup, CurrentScummVMGameName : PString);
+procedure TModernProfileEditorScummVMGraphicsFrame.InitGUI(const InitData : TModernProfileEditorInitData);
 Var St : TStringList;
 begin
   NoFlicker(FilterComboBox);
@@ -39,9 +39,11 @@ begin
   NoFlicker(KeepAspectRatioCheckBox);
 
   FilterLabel.Caption:=LanguageSetup.ProfileEditorScummVMFilter;
-  St:=ValueToList(GameDB.ConfOpt.ScummVMFilter,';,'); try FilterComboBox.Items.AddStrings(St); finally St.Free; end;
+  St:=ValueToList(InitData.GameDB.ConfOpt.ScummVMFilter,';,'); try FilterComboBox.Items.AddStrings(St); finally St.Free; end;
   StartFullscreenCheckBox.Caption:=LanguageSetup.GameStartFullscreen;
   KeepAspectRatioCheckBox.Caption:=LanguageSetup.GameAspectCorrection;
+
+  HelpContext:=ID_ProfileEditGraphics;
 end;
 
 procedure TModernProfileEditorScummVMGraphicsFrame.SetGame(const Game: TGame; const LoadFromTemplate: Boolean);
@@ -75,9 +77,9 @@ procedure TModernProfileEditorScummVMGraphicsFrame.GetGame(const Game: TGame);
 Var S : String;
 begin
   S:=FilterComboBox.Text;
-  If Pos('(',S)=0 then Game.Scale:='' else begin
+  If Pos('(',S)=0 then Game.ScummVMFilter:='' else begin
     S:=Copy(S,Pos('(',S)+1,MaxInt);
-    If Pos(')',S)=0 then Game.Scale:=''  else Game.Scale:=Copy(S,1,Pos(')',S)-1);
+    If Pos(')',S)=0 then Game.ScummVMFilter:=''  else Game.ScummVMFilter:=Copy(S,1,Pos(')',S)-1);
   end;
   Game.StartFullscreen:=StartFullscreenCheckBox.Checked;
   Game.AspectCorrection:=KeepAspectRatioCheckBox.Checked;

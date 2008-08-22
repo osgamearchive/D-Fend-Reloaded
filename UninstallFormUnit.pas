@@ -16,11 +16,14 @@ type
     CancelButton: TBitBtn;
     SelectAllButton: TBitBtn;
     SelectNoneButton: TBitBtn;
+    HelpButton: TBitBtn;
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure OKButtonClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure SelectButtonClick(Sender: TObject);
+    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure HelpButtonClick(Sender: TObject);
   private
     { Private-Deklarationen }
     DirList : TStringList;
@@ -41,10 +44,13 @@ Function UsedByOtherGame(const GameDB : TGameDB; const Game : TGame; Dir: String
 Function IconUsedByOtherGame(const GameDB : TGameDB; const Game : TGame; Icon: String): Boolean;
 Function ExtraFileUsedByOtherGame(const GameDB : TGameDB; const Game : TGame; ExtraFile: String): Boolean;
 
+Procedure FileAndFoldersFromDrives(const Game : TGame; var Files, Folders : TStringList);
+Procedure UnusedFileAndFoldersFromDrives(const GameDB : TGameDB; const Game : TGame; var Files, Folders : TStringList);
+
 implementation
 
 uses VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgSetupUnit, PrgConsts,
-     GameDBToolsUnit;
+     GameDBToolsUnit, HelpConsts;
 
 {$R *.dfm}
 
@@ -57,6 +63,7 @@ begin
   InfoLabel.Caption:=LanguageSetup.UninstallFormLabel;
   OKButton.Caption:=LanguageSetup.OK;
   CancelButton.Caption:=LanguageSetup.Cancel;
+  HelpButton.Caption:=LanguageSetup.Help;
   SelectAllButton.Caption:=LanguageSetup.All;
   SelectNoneButton.Caption:=LanguageSetup.None;
 
@@ -65,7 +72,7 @@ end;
 
 procedure TUninstallForm.FormShow(Sender: TObject);
 Var S : String;
-    St : TStringList;
+    St, Files, Folders : TStringList;
     I : Integer;
     B : Boolean;
 begin
@@ -81,6 +88,12 @@ begin
       ListBox.Items.Add(LanguageSetup.UninstallFormProgramDir+': '+S);
       DirList.Add(S);
     end;
+    S:=Trim(Game.ScummVMSavePath);
+    If (S<>'') and (not UsedByOtherGame(GameDB,Game,IncludeTrailingPathDelimiter(S))) then begin
+      S:=ExtractFilePath(MakeAbsPath(IncludeTrailingPathDelimiter(S),PrgSetup.BaseDir));
+      //ListBox.Items.Add(LanguageSetup.UninstallFormSaveDir+': '+S);
+      DirList.Add(S);
+    end;
   end else begin
     S:=Trim(Game.GameExe);
     If ExtUpperCase(Copy(S,1,7))='DOSBOX:' then S:='';
@@ -91,19 +104,19 @@ begin
       ListBox.Items.Add(LanguageSetup.UninstallFormProgramDir+': '+S);
       DirList.Add(S);
     end;
+  end;
 
-    S:=Trim(Game.CaptureFolder);
-    If (S<>'') and (not UsedByOtherGame(GameDB,Game,IncludeTrailingPathDelimiter(S))) then begin
-      S:=ExtractFilePath(MakeAbsPath(IncludeTrailingPathDelimiter(S),PrgSetup.BaseDir));
-      ListBox.Items.Add(LanguageSetup.UninstallFormCaptureFolder+': '+S);
-      DirList.Add(S);
-    end;
+  S:=Trim(Game.CaptureFolder);
+  If (S<>'') and (not UsedByOtherGame(GameDB,Game,IncludeTrailingPathDelimiter(S))) then begin
+    S:=ExtractFilePath(MakeAbsPath(IncludeTrailingPathDelimiter(S),PrgSetup.BaseDir));
+    ListBox.Items.Add(LanguageSetup.UninstallFormCaptureFolder+': '+S);
+    DirList.Add(S);
   end;
 
   S:=MakeAbsIconName(Game.Icon);
   If (S<>'') and FileExists(S) and (not IconUsedByOtherGame(GameDB,Game,S)) then begin
     ListBox.Items.Add(LanguageSetup.UninstallFormIcon+': '+S);
-    DirList.AddObject(S,TObject(1));
+    DirList.AddObject(S,TObject(1)); {TObject(1) = is file not folder}
   end;
 
   S:=Trim(Game.DataDir);
@@ -120,7 +133,7 @@ begin
       For I:=0 to St.Count-1 do If (Trim(St[I])<>'') and (not ExtraFileUsedByOtherGame(GameDB,Game,St[I])) then begin
         S:=MakeAbsPath(St[I],PrgSetup.BaseDir);
         ListBox.Items.Add(LanguageSetup.UninstallFormExtraFile+': '+S);
-        DirList.AddObject(S,TObject(1));
+        DirList.AddObject(S,TObject(1)); {TObject(1) = is file not folder}
       end;
     finally
       St.Free;
@@ -141,6 +154,23 @@ begin
     end;
   end;
 
+  UnusedFileAndFoldersFromDrives(GameDB,Game,Files,Folders);
+  try
+    For I:=0 to Files.Count-1 do begin
+      S:=Files[I];
+      ListBox.Items.Add(LanguageSetup.UninstallFormExtraFile+': '+S);
+      DirList.AddObject(S,TObject(1)); {TObject(1) = is file not folder}
+    end;
+    For I:=0 to Folders.Count-1 do begin
+      S:=Folders[I];
+      ListBox.Items.Add(LanguageSetup.UninstallFormExtraDir+': '+S);
+      DirList.Add(S);
+    end;
+  finally
+    Files.Free;
+    Folders.Free;
+  end;
+
   For I:=0 to ListBox.Items.Count-1 do ListBox.Checked[I]:=True; 
 end;
 
@@ -153,7 +183,6 @@ begin
   For I:=1 to ListBox.Count-1 do If ListBox.Checked[I] then begin
     If Integer(DirList.Objects[I])<>0 then begin
       If (not DeleteSingleFile(DirList[I],ContinueNext)) and (not ContinueNext) then exit;
-
     end else begin
       If (not DeleteDir(DirList[I],ContinueNext)) and (not ContinueNext) then exit;
     end;
@@ -173,10 +202,22 @@ begin
   DirList.Free;
 end;
 
+procedure TUninstallForm.HelpButtonClick(Sender: TObject);
+begin
+  Application.HelpCommand(HELP_CONTEXT,ID_ProfileUninstall);
+end;
+
+procedure TUninstallForm.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+begin
+  If (Key=VK_F1) and (Shift=[]) then HelpButtonClick(Sender);
+end;
+
 { global }
 
 Function UninstallGame(const AOwner : TComponent; const AGameDB : TGameDB; const AGame : TGame) : Boolean;
 begin
+  If WindowsExeMode(AGame) then begin result:=False; exit; end;
+
   UninstallForm:=TUninstallForm.Create(AOwner);
   try
     UninstallForm.GameDB:=AGameDB;
@@ -203,7 +244,6 @@ begin
   until False;
   result:=True;
 end;
-
 
 Function DeleteDir(const Dir: String; var ContinueNext : Boolean) : Boolean;
 Var Rec : TSearchRec;
@@ -265,7 +305,7 @@ begin
   result:=(Copy(S,1,length(Dir))=Dir);
 end;
 Var I,J : Integer;
-    St : TStringList;
+    St,Files,Folders : TStringList;
 begin
   Dir:=Trim(ExtUpperCase(ExtractFilePath(MakeAbsPath(IncludeTrailingPathDelimiter(Dir),PrgSetup.BaseDir))));
 
@@ -276,10 +316,19 @@ begin
 
     If ScummVMMode(GameDB[I]) then begin
       If SameDir(GameDB[I].ScummVMPath) then exit;
+      If SameDir(GameDB[I].CaptureFolder) then exit;
     end else begin
       If SameDir(GameDB[I].GameExe) then exit;
       If SameDir(GameDB[I].SetupExe) then exit;
       If SameDir(GameDB[I].CaptureFolder) then exit;
+
+      FileAndFoldersFromDrives(GameDB[I],Files,Folders);
+      try
+        For J:=0 to Folders.Count-1 do If SameDir(Folders[J]) then exit;
+      finally
+        Files.Free;
+        Folders.Free;
+      end;
     end;
     If SameDir(GameDB[I].DataDir) then exit;
 
@@ -310,7 +359,8 @@ begin
   result:=(Trim(S)<>'') and (Trim(ExtUpperCase(MakeAbsPath(S,PrgSetup.BaseDir)))=ExtraFile);
 end;
 Var I,J : Integer;
-    St : TStringList;
+    St, Files, Folders : TStringList;
+    S : String;
 begin
   result:=True;
 
@@ -324,9 +374,99 @@ begin
     finally
       St.Free;
     end;
+
+    If (not ScummVMMode(GameDB[I])) and (not WindowsExeMode(GameDB[I])) then begin
+      FileAndFoldersFromDrives(GameDB[I],Files,Folders);
+      try
+        For J:=0 to Files.Count-1 do If SameFile(Files[J]) then exit;
+      finally
+        Files.Free;
+        Folders.Free;
+      end;
+    end;
   end;
 
   result:=False;
+end;
+
+Procedure FileAndFoldersFromDrives(const Game : TGame; var Files, Folders : TStringList);
+Var I,J : Integer;
+    S,T : String;
+    St,St2 : TStringList;
+begin
+  Files:=TStringList.Create;
+  Folders:=TStringList.Create;
+
+  For I:=0 to 9 do begin
+    Case I of
+      0 : S:=Game.Mount0;
+      1 : S:=Game.Mount1;
+      2 : S:=Game.Mount2;
+      3 : S:=Game.Mount3;
+      4 : S:=Game.Mount4;
+      5 : S:=Game.Mount5;
+      6 : S:=Game.Mount6;
+      7 : S:=Game.Mount7;
+      8 : S:=Game.Mount8;
+      9 : S:=Game.Mount9;
+    end;
+    If S='' then continue;
+
+    St:=ValueToList(S);
+    St2:=TStringList.Create;
+    try
+      If St.Count<2 then continue;
+
+      S:=Trim(St[0]); J:=Pos('$',S);
+      While J>0 do begin St2.Add(Trim(Copy(S,1,J-1))); S:=Trim(Copy(S,J+1,MaxInt)); J:=Pos('$',S); end;
+      St2.Add(S);
+
+      S:=Trim(ExtUpperCase(St[1]));
+
+      If (S='CDROMIMAGE') or (S='FLOPPYIMAGE') or (S='IMAGE') then begin
+        {Image files}
+        For J:=0 to St2.Count-1 do begin
+          T:=MakeAbsPath(St2[J],PrgSetup.BaseDir);
+          If FileExists(T) then Files.Add(T);
+        end;
+      end;
+
+      If (S='PHYSFS') and (St2.Count=2) then begin
+        {RealFolder$ZipFile in St2}
+        T:=MakeAbsPath(IncludeTrailingPathDelimiter(St2[0]),PrgSetup.BaseDir);
+        If DirectoryExists(T) then Folders.Add(T);
+        T:=MakeAbsPath(St2[1],PrgSetup.BaseDir);
+        If FileExists(T) then Files.Add(T);
+      end;
+
+      If (S='ZIP') and (St2.Count=2) then begin
+        {RealFolder$ZipFile in St2, only add ZipFile}
+        T:=MakeAbsPath(St2[1],PrgSetup.BaseDir);
+        If FileExists(T) then Files.Add(T);
+      end;
+    finally
+      St.Free;
+      St2.Free;
+    end;
+  end;
+end;
+
+Procedure UnusedFileAndFoldersFromDrives(const GameDB : TGameDB; const Game : TGame; var Files, Folders : TStringList);
+Var I : Integer;
+begin
+  FileAndFoldersFromDrives(Game,Files,Folders);
+
+  I:=0;
+  While I<Files.Count do begin
+    If ExtraFileUsedByOtherGame(GameDB,Game,Files[I]) then begin Files.Delete(I); continue; end;
+    inc(I);
+  end;
+
+  I:=0;
+  While I<Folders.Count do begin
+    If UsedByOtherGame(GameDB,Game,Folders[I]) then begin Folders.Delete(I); continue; end;
+    inc(I);
+  end;
 end;
 
 end.

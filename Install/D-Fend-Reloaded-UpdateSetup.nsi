@@ -15,8 +15,8 @@
 ; ============================================================
 
 !define VER_MAYOR 0
-!define VER_MINOR1 4
-!define VER_MINOR2 1
+!define VER_MINOR1 5
+!define VER_MINOR2 0
 
 !define PrgName "D-Fend Reloaded ${VER_MAYOR}.${VER_MINOR1}.${VER_MINOR2}"
 OutFile "D-Fend-Reloaded-${VER_MAYOR}.${VER_MINOR1}.${VER_MINOR2}-UpdateSetup.exe"
@@ -94,18 +94,30 @@ Var InstallDataType
 ; ============================================================
 
 !insertmacro MUI_LANGUAGE "English"
+
+!insertmacro MUI_LANGUAGE "Danish"
 !insertmacro MUI_LANGUAGE "French"
 !insertmacro MUI_LANGUAGE "German"
 !insertmacro MUI_LANGUAGE "Russian"
 !insertmacro MUI_LANGUAGE "SimpChinese"
 !insertmacro MUI_LANGUAGE "Spanish"
+!insertmacro MUI_LANGUAGE "TradChinese"
 
+!include "D-Fend-Reloaded-Setup-Lang-Danish.nsi"
 !include "D-Fend-Reloaded-Setup-Lang-English.nsi"
 !include "D-Fend-Reloaded-Setup-Lang-French.nsi"
 !include "D-Fend-Reloaded-Setup-Lang-German.nsi"
 !include "D-Fend-Reloaded-Setup-Lang-Russian.nsi"
 !include "D-Fend-Reloaded-Setup-Lang-Simplified_Chinese.nsi"
 !include "D-Fend-Reloaded-Setup-Lang-Spanish.nsi"
+!include "D-Fend-Reloaded-Setup-Lang-Traditional_Chinese.nsi"
+
+
+
+; Pack program file
+; ============================================================
+
+!system '"upx.exe" "..\DFend.exe"'
 
 
 
@@ -157,23 +169,32 @@ Section "$(LANGNAME_DFendReloaded)" ID_DFend
   File "..\oggenc2.exe"
   File "..\LicenseComponents.txt"
   File "..\Links.txt"
+  File "..\SearchLinks.txt"
   File "..\ChangeLog.txt"
-  File "..\FAQs.txt"
   File "..\D-Fend Reloaded DataInstaller.nsi"
   File "..\UpdateCheck\UpdateCheck.exe"
   File "..\SetInstLang\SetInstallerLanguage.exe"
-  
+  File "..\7za.dll"
+  File "..\DelZip179.dll"
+  File "..\mediaplr.dll"
+  File "..\InstallVideoCodec.exe"
+
   SetOutPath "$DataInstDir"
   File "..\D-Fend Reloaded DataInstaller.nsi"
   File "..\Icons.ini"
   
   SetOutPath "$INSTDIR\Lang"
-  File "..\Lang\*.ini"  
+  File "..\Lang\*.ini"
+  File "..\Lang\*.chm"
   
   ; Update config file
   
   WriteINIStr $DataInstDir\ConfOpt.dat resolution value original,320x200,640x432,640x480,720x480,800x600,1024x768,1152x864,1280x720,1280x768,1280x960,1280x1024,1600x1200,1920x1080,1920x1200
   WriteINIStr $DataInstDir\ConfOpt.dat joysticks value none,auto,2axis,4axis,fcs,ch
+  WriteINIStr $DataInstDir\ConfOpt.dat GUSRate value 8000,11025,22050,32000,44100,48000,50000
+  WriteINIStr $DataInstDir\ConfOpt.dat OPLRate value 8000,11025,22050,32000,44100,48000,50000
+  WriteINIStr $DataInstDir\ConfOpt.dat PCRate value 8000,11025,22050,32000,44100,48000,50000
+  WriteINIStr $DataInstDir\ConfOpt.dat Rate value 8000,11025,22050,32000,44100,48000,50000
   
   ; Update templates
   

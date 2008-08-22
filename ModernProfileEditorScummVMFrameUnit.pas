@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, 
-  Dialogs, StdCtrls, Spin, GameDBUnit, ModernProfileEditorFormUnit;
+  Dialogs, StdCtrls, Spin, GameDBUnit, ModernProfileEditorFormUnit, Buttons;
 
 type
   TModernProfileEditorScummVMFrame = class(TFrame, IModernProfileEditorFrame)
@@ -15,13 +15,20 @@ type
     AutosaveEdit: TSpinEdit;
     TalkSpeedEdit: TSpinEdit;
     TalkSpeedLabel: TLabel;
+    SavePathGroupBox: TGroupBox;
+    SavePathDefaultRadioButton: TRadioButton;
+    SavePathCustomRadioButton: TRadioButton;
+    SavePathEditButton: TSpeedButton;
+    SavePathEdit: TEdit;
+    procedure SavePathEditButtonClick(Sender: TObject);
+    procedure SavePathEditChange(Sender: TObject);
   private
     { Private-Deklarationen }
-    LastGameName : String;
-    CurrentGameName : PString;
+    LastGameName, SaveLang : String;
+    CurrentGameName, CurrentScummVMPath : PString;
   public
     { Public-Deklarationen }
-    Procedure InitGUI(const OnProfileNameChange : TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup, CurrentScummVMGameName : PString);
+    Procedure InitGUI(const InitData : TModernProfileEditorInitData);
     Procedure SetGame(const Game : TGame; const LoadFromTemplate : Boolean);
     Function CheckValue : Boolean;
     Procedure GetGame(const Game : TGame);
@@ -30,13 +37,13 @@ type
 
 implementation
 
-uses Math, VistaToolsUnit, LanguageSetupUnit, CommonTools;
+uses Math, VistaToolsUnit, LanguageSetupUnit, CommonTools, HelpConsts, PrgSetupUnit;
 
 {$R *.dfm}
 
 { TModernProfileEditorScummVMFrame }
 
-procedure TModernProfileEditorScummVMFrame.InitGUI(const OnProfileNameChange: TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup, CurrentScummVMGameName : PString);
+procedure TModernProfileEditorScummVMFrame.InitGUI(const InitData : TModernProfileEditorInitData);
 begin
   LastGameName:='';
 
@@ -44,13 +51,24 @@ begin
   NoFlicker(AutosaveEdit);
   NoFlicker(TalkSpeedEdit);
   NoFlicker(SubtitlesCheckBox);
+  NoFlicker(SavePathGroupBox);
+  NoFlicker(SavePathDefaultRadioButton);
+  NoFlicker(SavePathCustomRadioButton);
+  NoFlicker(SavePathEdit);
 
   LanguageLabel.Caption:=LanguageSetup.ProfileEditorScummVMLanguage;
   AutosaveLabel.Caption:=LanguageSetup.ProfileEditorScummVMAutosave;
   TalkSpeedLabel.Caption:=LanguageSetup.ProfileEditorScummVMTextSpeed;
   SubtitlesCheckBox.Caption:=LanguageSetup.ProfileEditorScummVMSubtitles;
+  //SavePathGroupBox.Caption:=LanguageSetup.ScummVMSavePath;
+  //SavePathDefaultRadioButton.Caption:=LanguageSetup.ScummVMSavePathGameDir+' ('+LanguageSetup.Default+')';
+  //SavePathCustomRadioButton.Caption:=LanguageSetup.ScummVMSavePathCustom;
+  SavePathEditButton.Caption:=LanguageSetup.ChooseFolder;
 
-  CurrentGameName:=CurrentScummVMGameName;
+  CurrentGameName:=InitData.CurrentScummVMGameName;
+  CurrentScummVMPath:=InitData.CurrentScummVMPath;
+
+  HelpContext:=ID_ProfileEditScummVM;
 end;
 
 Type TLangRec=record
@@ -73,6 +91,10 @@ begin
   AutosaveEdit.Value:=Min(86400,Max(1,Game.ScummVMAutosave));
   TalkSpeedEdit.Value:=Min(1000,Max(1,Game.ScummVMTalkSpeed));
   SubtitlesCheckBox.Checked:=Game.ScummVMSubtitles;
+
+  SavePathEdit.Text:=Game.ScummVMSavePath;
+  SavePathEditChange(self);
+  SaveLang:=Game.ScummVMLanguage;
 end;
 
 procedure TModernProfileEditorScummVMFrame.ShowFrame;
@@ -83,7 +105,7 @@ begin
   If LastGameName=CurrentGameName^ then exit;
   LastGameName:=CurrentGameName^;
 
-  If LanguageComboBox.ItemIndex>=0 then S:=LanguageComboBox.Text else S:='';
+  If LanguageComboBox.ItemIndex>=0 then S:=LanguageComboBox.Text else S:=SaveLang;
   LanguageComboBox.Items.BeginUpdate;
   try
     LanguageComboBox.Items.Clear;
@@ -117,6 +139,25 @@ begin
   Game.ScummVMAutosave:=AutosaveEdit.Value;
   Game.ScummVMTalkSpeed:=TalkSpeedEdit.Value;
   Game.ScummVMSubtitles:=SubtitlesCheckBox.Checked;
+  If SavePathDefaultRadioButton.Checked then Game.ScummVMSavePath:='' else Game.ScummVMSavePath:=Trim(SavePathEdit.Text);
+end;
+
+procedure TModernProfileEditorScummVMFrame.SavePathEditChange(Sender: TObject);
+begin
+  SavePathDefaultRadioButton.Checked:=(Trim(SavePathEdit.Text)='');
+  SavePathCustomRadioButton.Checked:=(Trim(SavePathEdit.Text)<>'');
+end;
+
+procedure TModernProfileEditorScummVMFrame.SavePathEditButtonClick(Sender: TObject);
+Var S : String;
+begin
+  S:=Trim(SavePathEdit.Text);
+  If S='' then S:=Trim(CurrentScummVMPath^);
+  If S='' then S:=PrgSetup.GameDir;
+  S:=MakeAbsPath(S,PrgSetup.BaseDir);
+  if not SelectDirectory(Handle,LanguageSetup.ChooseFolder,S) then exit;
+  SavePathEdit.Text:=S;
+  SavePathEditChange(Sender);
 end;
 
 end.

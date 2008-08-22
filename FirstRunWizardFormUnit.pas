@@ -35,6 +35,8 @@ type
     GameDirEdit: TLabeledEdit;
     GameDirButton: TSpeedButton;
     GameDirInfoLabel: TLabel;
+    AcceptAllSettingsButton: TBitBtn;
+    HelpButton: TBitBtn;
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure LanguageComboBoxChange(Sender: TObject);
@@ -44,6 +46,8 @@ type
     procedure OKButtonClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure GameDirButtonClick(Sender: TObject);
+    procedure HelpButtonClick(Sender: TObject);
+    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
   private
     { Private-Deklarationen }
     DosBoxLang : TStringList;
@@ -62,7 +66,7 @@ Function ShowFirstRunWizardDialog(const AOwner : TComponent) : Boolean;
 implementation
 
 uses IniFiles, Registry, VistaToolsUnit, LanguageSetupUnit, PrgSetupUnit,
-     CommonTools, PrgConsts;
+     CommonTools, PrgConsts, HelpConsts;
 
 {$R *.dfm}
 
@@ -88,6 +92,8 @@ begin
   BackButton.Caption:=LanguageSetup.WizardFormButtonPrevious;
   NextButton.Caption:=LanguageSetup.WizardFormButtonNext;
   OKButton.Caption:=LanguageSetup.OK;
+  HelpButton.Caption:=LanguageSetup.Help;
+  AcceptAllSettingsButton.Caption:=LanguageSetup.FirstRunWizardAcceptAllSettings;
 
   LanguageTopInfoLabel.Caption:=LanguageSetup.FirstRunWizardInfoLanguage;
   LanguageLabel.Caption:=LanguageSetup.SetupFormLanguage;
@@ -96,6 +102,9 @@ begin
   DosBoxDirEdit.EditLabel.Caption:=LanguageSetup.SetupFormDosBoxDir;
   DosBoxButton.Hint:=LanguageSetup.ChooseFolder;
   DOSBoxInfoLabel.Caption:=LanguageSetup.FirstRunWizardInfoDOSBox2;
+  If OperationMode=omPortable then begin
+    DOSBoxInfoLabel.Caption:=DOSBoxInfoLabel.Caption+#13+#13+LanguageSetup.FirstRunWizardInfoDOSBox3;
+  end;
 
   DOSBoxLanguageTopInfoLabel.Caption:=LanguageSetup.FirstRunWizardInfoDOSBoxLanguage;
   DosBoxLangLabel.Caption:=LanguageSetup.SetupFormDosBoxLang;
@@ -118,7 +127,7 @@ end;
 procedure TFirstRunWizardForm.FormShow(Sender: TObject);
 begin
   LoadAndSetupLanguageList;
-  DosBoxDirEdit.Text:=PrgSetup.DosBoxDir;
+  DosBoxDirEdit.Text:=PrgSetup.DOSBoxSettings[0].DosBoxDir;
   case PrgSetup.CheckForUpdates of
     0 : Update0RadioButton.Checked:=True;
     1 : Update1RadioButton.Checked:=True;
@@ -257,6 +266,7 @@ begin
           Notebook.PageIndex:=3;
           NextButton.Visible:=True;
           OKButton.Visible:=False;
+          AcceptAllSettingsButton.Visible:=True;
         end;
   end;
 end;
@@ -279,15 +289,18 @@ begin
           Notebook.PageIndex:=4;
           NextButton.Visible:=False;
           OKButton.Visible:=True;
+          AcceptAllSettingsButton.Visible:=False;
         end;
   end;
 end;
 
 procedure TFirstRunWizardForm.OKButtonClick(Sender: TObject);
 begin
+  If Notebook.PageIndex<1 then LoadAndSetupDOSBoxLanguages;
+
   PrgSetup.Language:=ShortLanguageName(LanguageComboBox.Text)+'.ini';
-  PrgSetup.DosBoxDir:=IncludeTrailingPathDelimiter(DosBoxDirEdit.Text);
-  PrgSetup.DosBoxLanguage:=DosBoxLang[DosBoxLangEditComboBox.ItemIndex];
+  PrgSetup.DOSBoxSettings[0].DosBoxDir:=IncludeTrailingPathDelimiter(DosBoxDirEdit.Text);
+  PrgSetup.DOSBoxSettings[0].DosBoxLanguage:=DosBoxLang[DosBoxLangEditComboBox.ItemIndex];
   PrgSetup.GameDir:=GameDirEdit.Text;
   If Update0RadioButton.Checked then PrgSetup.CheckForUpdates:=0;
   If Update1RadioButton.Checked then PrgSetup.CheckForUpdates:=1;
@@ -308,6 +321,16 @@ Var S : String;
 begin
   S:=GameDirEdit.Text; If S='' then S:=PrgSetup.BaseDir;
   if SelectDirectory(Handle,LanguageSetup.SetupFormGameDir,S) then GameDirEdit.Text:=IncludeTrailingPathDelimiter(S);
+end;
+
+procedure TFirstRunWizardForm.HelpButtonClick(Sender: TObject);
+begin
+  Application.HelpCommand(HELP_CONTEXT,ID_FirstRunWizard);
+end;
+
+procedure TFirstRunWizardForm.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+begin
+  If (Key=VK_F1) and (Shift=[]) then HelpButtonClick(Sender);
 end;
 
 { global }

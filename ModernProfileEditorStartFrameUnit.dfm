@@ -280,6 +280,10 @@ object ModernProfileEditorStartFrame: TModernProfileEditorStartFrame
     object AutoexecSheet2: TTabSheet
       Caption = 'Abschluss'
       ImageIndex = 1
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object Panel12: TPanel
         Left = 0
         Top = 192

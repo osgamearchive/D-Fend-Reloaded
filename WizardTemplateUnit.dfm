@@ -308,7 +308,7 @@ object WizardTemplateFrame: TWizardTemplateFrame
     object PanelInfoLabel: TLabel
       Left = 16
       Top = 16
-      Width = 231
+      Width = 71
       Height = 13
       Anchors = [akLeft, akTop, akRight, akBottom]
       Caption = 'PanelInfoLabel'
@@ -316,7 +316,6 @@ object WizardTemplateFrame: TWizardTemplateFrame
       ParentColor = False
       Transparent = True
       WordWrap = True
-      ExplicitWidth = 71
     end
     object OKButton: TBitBtn
       Left = 16
@@ -347,16 +346,15 @@ object WizardTemplateFrame: TWizardTemplateFrame
         0000}
       NumGlyphs = 2
     end
-    object BitBtn1: TBitBtn
+    object OperationModeInfoButton: TBitBtn
       Left = 128
       Top = 48
-      Width = 161
+      Width = 177
       Height = 25
       Anchors = [akLeft, akBottom]
       Caption = 'Operation mode info'
       TabOrder = 1
-      Visible = False
-      OnClick = BitBtn1Click
+      OnClick = OperationModeInfoButtonClick
     end
   end
 end

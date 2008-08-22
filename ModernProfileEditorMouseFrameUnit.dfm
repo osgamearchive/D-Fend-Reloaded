@@ -54,7 +54,6 @@ object ModernProfileEditorMouseFrame: TModernProfileEditorMouseFrame
     Anchors = [akLeft, akTop, akRight]
     Caption = 'LockMouseCheckBox'
     TabOrder = 0
-    ExplicitWidth = 729
   end
   object MouseSensitivityEdit: TSpinEdit
     Left = 16
@@ -74,7 +73,6 @@ object ModernProfileEditorMouseFrame: TModernProfileEditorMouseFrame
     Anchors = [akLeft, akTop, akRight]
     Caption = 'Force2ButtonsCheckBox'
     TabOrder = 2
-    ExplicitWidth = 740
   end
   object SwapButtonsCheckBox: TCheckBox
     Left = 16

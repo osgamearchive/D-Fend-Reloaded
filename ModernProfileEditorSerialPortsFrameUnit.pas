@@ -13,7 +13,7 @@ type
     { Private-Deklarationen }
   public
     { Public-Deklarationen }
-    Procedure InitGUI(const OnProfileNameChange : TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup, CurrentScummVMGameName : PString);
+    Procedure InitGUI(const InitData : TModernProfileEditorInitData);
     Procedure SetGame(const Game : TGame; const LoadFromTemplate : Boolean);
     Function CheckValue : Boolean;
     Procedure GetGame(const Game : TGame);
@@ -22,15 +22,17 @@ type
 
 implementation
 
-uses LanguageSetupUnit;
+uses LanguageSetupUnit, HelpConsts;
 
 {$R *.dfm}
 
 { TModernProfileEditorSerialPortsFrame }
 
-procedure TModernProfileEditorSerialPortsFrame.InitGUI(const OnProfileNameChange: TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup, CurrentScummVMGameName : PString);
+procedure TModernProfileEditorSerialPortsFrame.InitGUI(const InitData : TModernProfileEditorInitData);
 begin
   InfoLabel.Caption:=LanguageSetup.ProfileEditorSerialPortsInfo;
+
+  HelpContext:=ID_ProfileEditSerialPorts;
 end;
 
 procedure TModernProfileEditorSerialPortsFrame.SetGame(const Game: TGame; const LoadFromTemplate: Boolean);

@@ -11,9 +11,11 @@ object StatisticsForm: TStatisticsForm
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
+  KeyPreview = True
   OldCreateOrder = False
   Position = poOwnerFormCenter
   OnCreate = FormCreate
+  OnKeyDown = FormKeyDown
   PixelsPerInch = 96
   TextHeight = 13
   object Panel1: TPanel
@@ -26,10 +28,19 @@ object StatisticsForm: TStatisticsForm
     object OKButton: TBitBtn
       Left = 8
       Top = 6
-      Width = 75
+      Width = 97
       Height = 25
       TabOrder = 0
       Kind = bkOK
+    end
+    object HelpButton: TBitBtn
+      Left = 120
+      Top = 6
+      Width = 97
+      Height = 25
+      TabOrder = 1
+      OnClick = HelpButtonClick
+      Kind = bkHelp
     end
   end
   object Memo: TRichEdit

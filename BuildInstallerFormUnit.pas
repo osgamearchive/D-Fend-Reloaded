@@ -49,6 +49,9 @@ type
     OKButton3: TBitBtn;
     CancelButton3: TBitBtn;
     DestFileEdit3: TLabeledEdit;
+    HelpButton3: TBitBtn;
+    HelpButton: TBitBtn;
+    HelpButton2: TBitBtn;
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure SelectButtonClick(Sender: TObject);
@@ -61,6 +64,8 @@ type
     procedure SelectButtonClick3(Sender: TObject);
     procedure DestFileButton3Click(Sender: TObject);
     procedure OKButtonClick(Sender: TObject);
+    procedure HelpButtonClick(Sender: TObject);
+    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
   private
     { Private-Deklarationen }
     TemplateDB, AutoSetupDB : TGameDB;
@@ -87,7 +92,7 @@ function BuildEXEInstaller(const Handle : THandle; const FileName : String) : Bo
 implementation
 
 uses Registry, ShellAPI, VistaToolsUnit, LanguageSetupUnit, PrgSetupUnit,
-     CommonTools, PrgConsts, GameDBToolsUnit;
+     CommonTools, PrgConsts, GameDBToolsUnit, UninstallFormUnit, HelpConsts;
 
 {$R *.dfm}
 
@@ -106,6 +111,7 @@ begin
   DestFileButton.Hint:=LanguageSetup.ChooseFile;
   OKButton.Caption:=LanguageSetup.OK;
   CancelButton.Caption:=LanguageSetup.Cancel;
+  HelpButton.Caption:=LanguageSetup.Help;
   SelectAllButton.Caption:=LanguageSetup.All;
   SelectNoneButton.Caption:=LanguageSetup.None;
   SelectGenreButton.Caption:=LanguageSetup.GameBy;
@@ -122,6 +128,7 @@ begin
   DestFileButton2.Hint:=LanguageSetup.ChooseFile;
   OKButton2.Caption:=LanguageSetup.OK;
   CancelButton2.Caption:=LanguageSetup.Cancel;
+  HelpButton2.Caption:=LanguageSetup.Help;
   SelectAllButton2.Caption:=LanguageSetup.All;
   SelectNoneButton2.Caption:=LanguageSetup.None;
   SelectGenreButton2.Caption:=LanguageSetup.GameBy;
@@ -138,6 +145,7 @@ begin
   DestFileButton3.Hint:=LanguageSetup.ChooseFile;
   OKButton3.Caption:=LanguageSetup.OK;
   CancelButton3.Caption:=LanguageSetup.Cancel;
+  HelpButton3.Caption:=LanguageSetup.Help;
   SelectAllButton3.Caption:=LanguageSetup.All;
   SelectNoneButton3.Caption:=LanguageSetup.None;
   SelectGenreButton3.Caption:=LanguageSetup.GameBy;
@@ -163,9 +171,9 @@ end;
 
 procedure TBuildInstallerForm.FormShow(Sender: TObject);
 begin
-  BuildCheckList(ListBox,GameDB,False,False);
-  BuildCheckList(ListBox3,TemplateDB,False,False);
-  BuildCheckList(ListBox2,AutoSetupDB,False,False);
+  BuildCheckList(ListBox,GameDB,False,False,True);
+  BuildCheckList(ListBox3,TemplateDB,False,False,True);
+  BuildCheckList(ListBox2,AutoSetupDB,False,False,True);
   BuildSelectPopupMenu(PopupMenu,GameDB,SelectButtonClick,False);
   BuildSelectPopupMenu(PopupMenu3,TemplateDB,SelectButtonClick3,False);
   BuildSelectPopupMenu(PopupMenu2,AutoSetupDB,SelectButtonClick2,False);
@@ -469,6 +477,16 @@ begin
   end;
 end;
 
+procedure TBuildInstallerForm.HelpButtonClick(Sender: TObject);
+begin
+  Application.HelpCommand(HELP_CONTEXT,ID_ExtrasBuildInstallers);
+end;
+
+procedure TBuildInstallerForm.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+begin
+  If (Key=VK_F1) and (Shift=[]) then HelpButtonClick(Sender);
+end;
+
 { global }
 
 Function BuildInstaller(const AOwner : TComponent; const AGameDB : TGameDB) : Boolean;
@@ -529,7 +547,7 @@ begin
 end;
 Var S,T : String;
     I : Integer;
-    St : TStringList;
+    St, Files, Folders : TStringList;
 begin
   Game.StoreAllValues;
 
@@ -540,6 +558,15 @@ begin
 
   If ScummVMMode(Game) then begin
     S:=Trim(Game.ScummVMPath);
+    If S<>'' then begin
+      S:=IncludeTrailingPathDelimiter(MakeRelPath(S,PrgSetup.BaseDir));
+      If Copy(S,2,2)=':\' then begin
+        MessageDlg(Format(LanguageSetup.MessagePathNotRelative,[S,Game.Name,PrgSetup.BaseDir]),mtError,[mbOK],0);
+        result:=False; exit;
+      end;
+      AddFiles(S);
+    end;
+    S:=Trim(Game.ScummVMSavePath);
     If S<>'' then begin
       S:=IncludeTrailingPathDelimiter(MakeRelPath(S,PrgSetup.BaseDir));
       If Copy(S,2,2)=':\' then begin
@@ -561,16 +588,16 @@ begin
       end;
       AddFiles(S);
     end;
+  end;
 
-    S:=Trim(Game.CaptureFolder);
-    If S<>'' then begin
-      S:=IncludeTrailingPathDelimiter(MakeRelPath(S,PrgSetup.BaseDir));
-      If Copy(S,2,2)=':\' then begin
-        MessageDlg(Format(LanguageSetup.MessagePathNotRelative,[S,Game.Name,PrgSetup.BaseDir]),mtError,[mbOK],0);
-        result:=False; exit;
-      end;
-      AddFiles(S);
+  S:=Trim(Game.CaptureFolder);
+  If S<>'' then begin
+    S:=IncludeTrailingPathDelimiter(MakeRelPath(S,PrgSetup.BaseDir));
+    If Copy(S,2,2)=':\' then begin
+      MessageDlg(Format(LanguageSetup.MessagePathNotRelative,[S,Game.Name,PrgSetup.BaseDir]),mtError,[mbOK],0);
+      result:=False; exit;
     end;
+    AddFiles(S);
   end;
 
   S:=MakeAbsIconName(Game.Icon);
@@ -640,6 +667,34 @@ begin
     finally
       St.Free;
     end;
+  end;
+
+  FileAndFoldersFromDrives(Game,Files,Folders);
+  try
+    For I:=0 to Files.Count-1 do begin
+      S:=MakeRelPath(Files[I],PrgSetup.BaseDir);
+      If Copy(S,2,2)=':\' then begin
+        MessageDlg(Format(LanguageSetup.MessagePathNotRelative,[S,Game.Name,PrgSetup.BaseDir]),mtError,[mbOK],0);
+        result:=False; exit;
+      end;
+      T:=ExtractFilePath(S);
+      If (T<>'') and (T[1]='.') then Delete(T,1,1);
+      If (T<>'') and (T[1]='\') then Delete(T,1,1);
+      If (T<>'') and (T[length(T)]='\') then Delete(T,length(T),1);
+      NSI.Add('  SetOutPath "$DataInstDir\'+T+'"');
+      NSI.Add('  File /nonfatal "'+S+'"');
+    end;
+    For I:=0 to Folders.Count-1 do begin
+      S:=IncludeTrailingPathDelimiter(MakeRelPath(IncludeTrailingPathDelimiter(Folders[I]),PrgSetup.BaseDir));
+      If Copy(S,2,2)=':\' then begin
+        MessageDlg(Format(LanguageSetup.MessagePathNotRelative,[S,Game.Name,PrgSetup.BaseDir]),mtError,[mbOK],0);
+        result:=False; exit;
+      end;
+      AddFiles(S);
+    end;
+  finally
+    Files.Free;
+    Folders.Free;
   end;
 
   NSI.Add('SectionEnd');

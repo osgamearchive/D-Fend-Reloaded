@@ -43,7 +43,7 @@ type
 
 implementation
 
-uses LanguageSetupUnit, VistaToolsUnit, PrgSetupUnit, CommonTools;
+uses LanguageSetupUnit, VistaToolsUnit, PrgSetupUnit, CommonTools, HelpConsts;
 
 {$R *.dfm}
 
@@ -135,6 +135,8 @@ begin
   MIDICheckBox.Caption:=LanguageSetup.SetupFormDosBoxCVSMidiModes;
   PrinterGroupBox.Caption:=LanguageSetup.SetupFormDosBoxCVSPrinterGroup;
   PrinterCheckBox.Caption:=LanguageSetup.SetupFormDosBoxCVSPrinter;
+
+  HelpContext:=ID_FileOptionsDOSBoxCVSFeatures;
 end;
 
 procedure TSetupFrameDOSBoxExt.DOSBoxDirChanged;

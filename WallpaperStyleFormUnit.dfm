@@ -4,16 +4,18 @@ object WallpaperStyleForm: TWallpaperStyleForm
   BorderStyle = bsDialog
   Caption = 'WallpaperStyleForm'
   ClientHeight = 143
-  ClientWidth = 306
+  ClientWidth = 308
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
+  KeyPreview = True
   OldCreateOrder = False
   Position = poOwnerFormCenter
   OnCreate = FormCreate
+  OnKeyDown = FormKeyDown
   PixelsPerInch = 96
   TextHeight = 13
   object TileRadioButton: TRadioButton

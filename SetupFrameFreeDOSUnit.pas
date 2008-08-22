@@ -31,7 +31,7 @@ type
 
 implementation
 
-uses ShellAPI, LanguageSetupUnit, VistaToolsUnit, PrgSetupUnit, CommonTools;
+uses ShellAPI, LanguageSetupUnit, VistaToolsUnit, PrgSetupUnit, CommonTools, HelpConsts;
 
 {$R *.dfm}
 
@@ -60,6 +60,8 @@ begin
   FreeDOSDownloadURL.Caption:='http:/'+'/www.freedos.org/';
   with FreeDOSDownloadURL.Font do begin Color:=clBlue; Style:=[fsUnderline]; end;
   FreeDOSDownloadURL.Cursor:=crHandPoint;
+
+  HelpContext:=ID_FileOptionsFreeDOS;
 end;
 
 procedure TSetupFrameFreeDOS.DOSBoxDirChanged;

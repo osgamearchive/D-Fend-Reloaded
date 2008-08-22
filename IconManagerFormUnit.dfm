@@ -1,31 +1,35 @@
 object IconManagerForm: TIconManagerForm
   Left = 0
   Top = 0
-  BorderStyle = bsDialog
+  BorderIcons = [biSystemMenu, biMaximize]
   Caption = 'Icon Manager'
-  ClientHeight = 357
-  ClientWidth = 564
+  ClientHeight = 347
+  ClientWidth = 551
   Color = clBtnFace
+  Constraints.MinHeight = 250
+  Constraints.MinWidth = 550
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
+  KeyPreview = True
   OldCreateOrder = False
   Position = poOwnerFormCenter
   OnCreate = FormCreate
+  OnKeyDown = FormKeyDown
   OnShow = FormShow
   DesignSize = (
-    564
-    357)
+    551
+    347)
   PixelsPerInch = 96
   TextHeight = 13
   object CustomIconButton: TSpeedButton
-    Left = 533
-    Top = 277
+    Left = 520
+    Top = 268
     Width = 23
     Height = 22
-    Anchors = [akTop, akRight]
+    Anchors = [akRight, akBottom]
     Glyph.Data = {
       76010000424D7601000000000000760000002800000020000000100000000100
       04000000000000010000120B0000120B00001000000000000000000000000000
@@ -45,45 +49,50 @@ object IconManagerForm: TIconManagerForm
   object ListView: TListView
     Left = 0
     Top = 0
-    Width = 564
-    Height = 249
+    Width = 551
+    Height = 239
     Align = alTop
     Anchors = [akLeft, akTop, akRight, akBottom]
     Columns = <>
+    HideSelection = False
     IconOptions.Arrangement = iaLeft
-    IconOptions.WrapText = False
+    IconOptions.AutoArrange = True
     LargeImages = ImageList
     ReadOnly = True
     SmallImages = ImageList
     SortType = stText
     TabOrder = 0
-    ViewStyle = vsSmallIcon
     OnChange = ListViewChange
     OnClick = ListViewClick
     OnDblClick = ListViewDblClick
     OnKeyDown = ListViewKeyDown
+    ExplicitWidth = 564
+    ExplicitHeight = 249
   end
   object OKButton: TBitBtn
     Left = 8
-    Top = 324
+    Top = 314
     Width = 97
     Height = 25
+    Anchors = [akLeft, akBottom]
     TabOrder = 4
     OnClick = OKButtonClick
     Kind = bkOK
+    ExplicitTop = 324
   end
   object CancelButton: TBitBtn
-    Left = 120
-    Top = 324
+    Left = 111
+    Top = 314
     Width = 97
     Height = 25
     Anchors = [akLeft, akBottom]
     TabOrder = 5
     Kind = bkCancel
+    ExplicitTop = 324
   end
   object AddButton: TBitBtn
-    Left = 232
-    Top = 324
+    Left = 214
+    Top = 314
     Width = 97
     Height = 25
     Anchors = [akLeft, akBottom]
@@ -104,10 +113,11 @@ object IconManagerForm: TIconManagerForm
       333333333337733333FF3333333C333330003333333733333777333333333333
       3000333333333333377733333333333333333333333333333333}
     NumGlyphs = 2
+    ExplicitTop = 324
   end
   object DelButton: TBitBtn
-    Left = 344
-    Top = 324
+    Left = 317
+    Top = 314
     Width = 97
     Height = 25
     Anchors = [akLeft, akBottom]
@@ -128,45 +138,62 @@ object IconManagerForm: TIconManagerForm
       333333377F33333333FF3333C333333330003333733333333777333333333333
       3000333333333333377733333333333333333333333333333333}
     NumGlyphs = 2
+    ExplicitTop = 324
   end
   object LibraryIconRadioButton: TRadioButton
     Left = 8
-    Top = 255
-    Width = 548
+    Top = 245
+    Width = 535
     Height = 17
     Anchors = [akLeft, akRight, akBottom]
     Caption = 'Use icon from list above'
     Checked = True
     TabOrder = 1
     TabStop = True
+    ExplicitTop = 255
+    ExplicitWidth = 548
   end
   object CustomIconRadioButton: TRadioButton
     Left = 8
-    Top = 280
+    Top = 270
     Width = 217
     Height = 17
-    Anchors = [akLeft, akRight, akBottom]
+    Anchors = [akLeft, akBottom]
     Caption = 'Use custom icon'
     TabOrder = 2
+    ExplicitTop = 280
   end
   object CustomIconEdit: TEdit
     Left = 224
-    Top = 278
-    Width = 298
+    Top = 268
+    Width = 285
     Height = 21
-    Anchors = [akLeft, akTop, akRight]
+    Anchors = [akLeft, akRight, akBottom]
     TabOrder = 3
     OnChange = CustomIconEditChange
+    ExplicitTop = 278
+    ExplicitWidth = 298
+  end
+  object HelpButton: TBitBtn
+    Left = 420
+    Top = 314
+    Width = 97
+    Height = 25
+    Anchors = [akLeft, akBottom]
+    TabOrder = 8
+    OnClick = HelpButtonClick
+    Kind = bkHelp
+    ExplicitTop = 324
   end
   object ImageList: TImageList
     Height = 32
     Width = 32
     Left = 456
-    Top = 325
+    Top = 277
   end
   object OpenDialog: TOpenDialog
     DefaultExt = 'ico'
-    Left = 496
-    Top = 325
+    Left = 488
+    Top = 277
   end
 end

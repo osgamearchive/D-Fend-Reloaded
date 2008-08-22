@@ -17,10 +17,13 @@ type
     SelectNoneButton: TBitBtn;
     SelectGenreButton: TBitBtn;
     PopupMenu: TPopupMenu;
+    HelpButton: TBitBtn;
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure OKButtonClick(Sender: TObject);
     procedure SelectButtonClick(Sender: TObject);
+    procedure HelpButtonClick(Sender: TObject);
+    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
   private
     { Private-Deklarationen }
   public
@@ -36,7 +39,7 @@ Function UninstallMultipleGames(const AOwner : TComponent; const AGameDB : TGame
 implementation
 
 uses VistaToolsUnit, LanguageSetupUnit, UninstallFormUnit, CommonTools,
-     PrgSetupUnit, PrgConsts, ProgressFormUnit, GameDBToolsUnit;
+     PrgSetupUnit, PrgConsts, ProgressFormUnit, GameDBToolsUnit, HelpConsts;
 
 {$R *.dfm}
 
@@ -54,6 +57,7 @@ begin
   ActionsRadioGroup.Items[3]:=LanguageSetup.UninstallSelectFormActionAsk;
   OKButton.Caption:=LanguageSetup.OK;
   CancelButton.Caption:=LanguageSetup.Cancel;
+  HelpButton.Caption:=LanguageSetup.Help;
   SelectAllButton.Caption:=LanguageSetup.All;
   SelectNoneButton.Caption:=LanguageSetup.None;
   SelectGenreButton.Caption:=LanguageSetup.GameBy;
@@ -61,7 +65,7 @@ end;
 
 procedure TUninstallSelectForm.FormShow(Sender: TObject);
 begin
-  BuildCheckList(ListBox,GameDB,False,False);
+  BuildCheckList(ListBox,GameDB,False,False,True);
   BuildSelectPopupMenu(PopupMenu,GameDB,SelectButtonClick,False);
 end;
 
@@ -87,7 +91,7 @@ procedure TUninstallSelectForm.OKButtonClick(Sender: TObject);
 Var I,J : Integer;
     S : String;
     G : TGame;
-    St : TStringList;
+    St, Files, Folders : TStringList;
     ContinueNext : Boolean;
 begin
   SetCurrentDir(PrgDataDir);
@@ -112,6 +116,11 @@ begin
             S:=ExtractFilePath(MakeAbsPath(IncludeTrailingPathDelimiter(S),PrgSetup.BaseDir));
             if (not DeleteDir(S,ContinueNext)) and (not ContinueNext) then exit;
           end;
+          S:=Trim(G.ScummVMSavePath);
+          If (S<>'') and (not UsedByOtherGame(GameDB,G,IncludeTrailingPathDelimiter(S))) then begin
+            S:=ExtractFilePath(MakeAbsPath(IncludeTrailingPathDelimiter(S),PrgSetup.BaseDir));
+            if (not DeleteDir(S,ContinueNext)) and (not ContinueNext) then exit;
+          end;
         end else begin
           S:=Trim(G.GameExe);
           If ExtUpperCase(Copy(S,1,7))='DOSBOX:' then S:='';
@@ -126,12 +135,10 @@ begin
       end;
 
       If ActionsRadioGroup.ItemIndex>1 then begin
-        If not ScummVMMode(G) then begin
-          S:=Trim(G.CaptureFolder);
-          If (S<>'') and (not UsedByOtherGame(GameDB,G,IncludeTrailingPathDelimiter(S))) then begin
-            S:=ExtractFilePath(MakeAbsPath(IncludeTrailingPathDelimiter(S),PrgSetup.BaseDir));
-            if (not DeleteDir(S,ContinueNext)) and (not ContinueNext) then exit;
-          end;
+        S:=Trim(G.CaptureFolder);
+        If (S<>'') and (not UsedByOtherGame(GameDB,G,IncludeTrailingPathDelimiter(S))) then begin
+          S:=ExtractFilePath(MakeAbsPath(IncludeTrailingPathDelimiter(S),PrgSetup.BaseDir));
+          if (not DeleteDir(S,ContinueNext)) and (not ContinueNext) then exit;
         end;
 
         S:=MakeAbsIconName(G.Icon);
@@ -170,6 +177,23 @@ begin
             St.Free;
           end;
         end;
+
+        UnusedFileAndFoldersFromDrives(GameDB,G,Files,Folders);
+        try
+          For J:=0 to Files.Count-1 do begin
+            S:=Files[J];
+            ListBox.Items.Add(LanguageSetup.UninstallFormExtraFile+': '+S);
+            If not DeleteSingleFile(S,ContinueNext) and (not ContinueNext) then exit;
+          end;
+          For J:=0 to Folders.Count-1 do begin
+            S:=Files[J];
+            if (not DeleteDir(S,ContinueNext)) and (not ContinueNext) then exit;
+          end;
+        finally
+          Files.Free;
+          Folders.Free;
+        end;
+
       end;
 
       GameDB.Delete(G);
@@ -177,6 +201,16 @@ begin
   finally
     DoneProgressWindow;
   end;
+end;
+
+procedure TUninstallSelectForm.HelpButtonClick(Sender: TObject);
+begin
+  Application.HelpCommand(HELP_CONTEXT,ID_ExtrasUninstallMultipleGames);
+end;
+
+procedure TUninstallSelectForm.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+begin
+  If (Key=VK_F1) and (Shift=[]) then HelpButtonClick(Sender);
 end;
 
 { global }

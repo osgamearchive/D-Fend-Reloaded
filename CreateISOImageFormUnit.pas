@@ -15,10 +15,14 @@ type
     OKButton: TBitBtn;
     CancelButton: TBitBtn;
     SaveDialog: TSaveDialog;
+    InfoLabel: TLabel;
+    HelpButton: TBitBtn;
     procedure FormCreate(Sender: TObject);
     procedure FileNameButtonClick(Sender: TObject);
     procedure OKButtonClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
+    procedure HelpButtonClick(Sender: TObject);
+    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
   private
     { Private-Deklarationen }
   public
@@ -38,7 +42,7 @@ Function ShowWriteIMGImageDialog(const AOwner : TComponent; const ImageFileName 
 implementation
 
 uses ShellAPI, VistaToolsUnit, LanguageSetupUnit, PrgSetupUnit, CommonTools,
-     DriveReadFormUnit, ReadDriveUnit;
+     DriveReadFormUnit, ReadDriveUnit, HelpConsts;
 
 {$R *.dfm}
 
@@ -49,8 +53,10 @@ begin
 
   OKButton.Caption:=LanguageSetup.OK;
   CancelButton.Caption:=LanguageSetup.Cancel;
+  HelpButton.Caption:=LanguageSetup.Help;
   FileNameEdit.EditLabel.Caption:=LanguageSetup.ReadImageFileName;
   FileNameButton.Hint:=LanguageSetup.ChooseFile;
+  InfoLabel.Caption:=LanguageSetup.ReadImageInfo;
 
   FloppyMode:=False;
   WriteMode:=False;
@@ -71,6 +77,12 @@ begin
     DriveLabel.Caption:=LanguageSetup.ReadImageDriveLabelFloppy;
     SaveDialog.Filter:=LanguageSetup.ReadImageFileNameFilterIMG;
     SaveDialog.DefaultExt:='img';
+
+    InfoLabel.Visible:=False;
+    OKButton.Top:=InfoLabel.Top+8;
+    CancelButton.Top:=InfoLabel.Top+8;
+    HelpButton.Top:=InfoLabel.Top+8;
+    Height:=(Height-ClientHeight)+OKButton.Top+OKButton.Height+8;
   end else begin
     Caption:=LanguageSetup.ReadImageCaptionISO;
     DriveLabel.Caption:=LanguageSetup.ReadImageDriveLabelCD;
@@ -119,6 +131,22 @@ begin
   FileName:=MakeAbsPath(FileNameEdit.Text,PrgSetup.BaseDir);
   S:=DriveComboBox.Items[DriveComboBox.ItemIndex];
   Drive:=S[1];
+end;
+
+procedure TCreateISOImageForm.HelpButtonClick(Sender: TObject);
+begin
+  If FloppyMode then begin
+    If WriteMode
+      then Application.HelpCommand(HELP_CONTEXT,ID_ExtrasImagesWriteImageToFloppy)
+      else Application.HelpCommand(HELP_CONTEXT,ID_ExtrasImagesCreateImageFromFloppy);
+  end else begin
+    Application.HelpCommand(HELP_CONTEXT,ID_ExtrasImagesCreateImageFromCD);
+  end;
+end;
+
+procedure TCreateISOImageForm.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+begin
+  If (Key=VK_F1) and (Shift=[]) then HelpButtonClick(Sender);
 end;
 
 { global }

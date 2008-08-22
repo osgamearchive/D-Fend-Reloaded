@@ -30,7 +30,7 @@ type
 
 implementation
 
-uses LanguageSetupUnit, VistaToolsUnit, GameDBToolsUnit, PrgConsts;
+uses LanguageSetupUnit, VistaToolsUnit, GameDBToolsUnit, PrgConsts, HelpConsts;
 
 {$R *.dfm}
 
@@ -57,6 +57,9 @@ begin
   Service2Button.Caption:=LanguageSetup.SetupFormService2;
   Service3Button.Caption:=LanguageSetup.SetupFormService3;
   Service4Button.Caption:=LanguageSetup.SetupFormService4;
+  Service5Button.Caption:=LanguageSetup.SetupFormService5;
+
+  HelpContext:=ID_FileOptionsService;
 end;
 
 procedure TSetupFrameService.DOSBoxDirChanged;
@@ -67,6 +70,7 @@ procedure TSetupFrameService.ShowFrame(const AdvencedMode: Boolean);
 begin
   Service1Button.Visible:=AdvencedMode;
   Service2Button.Visible:=AdvencedMode;
+  Service5Button.Visible:=AdvencedMode;
 end;
 
 procedure TSetupFrameService.RestoreDefaults;

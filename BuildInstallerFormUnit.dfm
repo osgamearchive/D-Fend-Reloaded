@@ -11,10 +11,12 @@ object BuildInstallerForm: TBuildInstallerForm
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
+  KeyPreview = True
   OldCreateOrder = False
   Position = poOwnerFormCenter
   OnCreate = FormCreate
   OnDestroy = FormDestroy
+  OnKeyDown = FormKeyDown
   OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
@@ -141,6 +143,15 @@ object BuildInstallerForm: TBuildInstallerForm
         TabOrder = 8
         OnClick = SelectButtonClick
       end
+      object HelpButton: TBitBtn
+        Left = 234
+        Top = 516
+        Width = 97
+        Height = 25
+        TabOrder = 9
+        OnClick = HelpButtonClick
+        Kind = bkHelp
+      end
     end
     object TemplatesSheet: TTabSheet
       Caption = 'TemplatesSheet'
@@ -262,6 +273,15 @@ object BuildInstallerForm: TBuildInstallerForm
         Height = 25
         TabOrder = 8
         Kind = bkCancel
+      end
+      object HelpButton3: TBitBtn
+        Left = 234
+        Top = 516
+        Width = 97
+        Height = 25
+        TabOrder = 9
+        OnClick = HelpButtonClick
+        Kind = bkHelp
       end
     end
     object AutoSetupSheet: TTabSheet
@@ -385,23 +405,32 @@ object BuildInstallerForm: TBuildInstallerForm
         EditLabel.Caption = 'Dateiname des Paketes'
         TabOrder = 8
       end
+      object HelpButton2: TBitBtn
+        Left = 234
+        Top = 516
+        Width = 97
+        Height = 25
+        TabOrder = 9
+        OnClick = HelpButtonClick
+        Kind = bkHelp
+      end
     end
   end
   object SaveDialog: TSaveDialog
     DefaultExt = 'exe'
     Left = 256
-    Top = 536
+    Top = 504
   end
   object PopupMenu: TPopupMenu
     Left = 224
-    Top = 536
+    Top = 504
   end
   object PopupMenu2: TPopupMenu
     Left = 296
-    Top = 536
+    Top = 504
   end
   object PopupMenu3: TPopupMenu
     Left = 336
-    Top = 536
+    Top = 504
   end
 end

@@ -27,7 +27,7 @@ type
 
 implementation
 
-uses LanguageSetupUnit, VistaToolsUnit, PrgSetupUnit;
+uses LanguageSetupUnit, VistaToolsUnit, PrgSetupUnit, HelpConsts;
 
 {$R *.dfm}
 
@@ -59,6 +59,8 @@ begin
   AutoSetScreenshotFolderRadioGroup.Caption:=LanguageSetup.SetupFormProfileEditorAutoSetScreenshotFolder;
   AutoSetScreenshotFolderRadioGroup.Items[0]:=LanguageSetup.SetupFormProfileEditorAutoSetScreenshotFolderOnlyWizard;
   AutoSetScreenshotFolderRadioGroup.Items[1]:=LanguageSetup.SetupFormProfileEditorAutoSetScreenshotFolderAlways;
+
+  HelpContext:=ID_FileOptionsProfileEditor;
 end;
 
 procedure TSetupFrameProfileEditor.DOSBoxDirChanged;

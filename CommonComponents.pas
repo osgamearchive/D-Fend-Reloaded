@@ -1,6 +1,8 @@
 unit CommonComponents;
 interface
 
+{DEFINE DoubleNumberCheck}
+
 uses Windows, Classes, IniFiles, Math, Variants;
 
 Type ConfigRec=record
@@ -63,11 +65,12 @@ Type TBasePrgSetup=class
     property StoreConfigOnExit : Boolean read FStoreConfigOnExit write FStoreConfigOnExit;
     property OnChanged : TNotifyEvent read FOnChanged write FOnChanged;
     property OwnINI : Boolean read FOwnINI;
+    property MemIni : TMemIniFile read Ini;
 end;
 
 implementation
 
-uses SysUtils, CommonTools;
+uses SysUtils, CommonTools {$IFDEF DoubleNumberCheck}, Dialogs {$ENDIF};
 
 { TBasePrgSetup }
 
@@ -277,7 +280,12 @@ begin
 
   J:=length(List)-1;
   For I:=0 to length(List)-2 do begin
+    {$IFDEF DoubleNumberCheck}
+    If (J=length(List)-1) and (Nr<List[I].Nr) then J:=I;
+    If Nr=List[I].Nr then ShowMessage('Double use of nr '+IntToStr(Nr)); 
+    {$ELSE}
     If Nr<List[I].Nr then begin J:=I; break; end;
+    {$ENDIF}
   end;
 
   For I:=length(List)-2 downto J do List[I+1]:=List[I];

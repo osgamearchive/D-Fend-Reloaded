@@ -24,6 +24,11 @@ type
     NotSetRadioButton3: TRadioButton;
     NotSetEdit: TEdit;
     ImageOpenDialog: TOpenDialog;
+    FavoriteGroupBox: TGroupBox;
+    CheckBoxBold: TCheckBox;
+    CheckBoxItalic: TCheckBox;
+    CheckBoxUnderline: TCheckBox;
+    GridLinesCheckBox: TCheckBox;
     procedure GamesListBackgroundColorBoxChange(Sender: TObject);
     procedure GamesListBackgroundEditChange(Sender: TObject);
     procedure GamesListBackgroundButtonClick(Sender: TObject);
@@ -44,7 +49,7 @@ type
 
 implementation
 
-uses LanguageSetupUnit, VistaToolsUnit, PrgSetupUnit, CommonTools;
+uses LanguageSetupUnit, VistaToolsUnit, PrgSetupUnit, CommonTools, HelpConsts;
 
 {$R *.dfm}
 
@@ -73,6 +78,11 @@ begin
   NoFlicker(NotSetRadioButton2);
   NoFlicker(NotSetRadioButton3);
   NoFlicker(NotSetEdit);
+  NoFlicker(FavoriteGroupBox);
+  NoFlicker(CheckBoxBold);
+  NoFlicker(CheckBoxItalic);
+  NoFlicker(CheckBoxUnderline);
+  NoFlicker(GridLinesCheckBox);
 
   S:=Trim(PrgSetup.GamesListViewBackground);
   If S='' then GamesListBackgroundRadioButton1.Checked:=True else begin
@@ -92,6 +102,15 @@ begin
   NotSetRadioButton2.Checked:=(S='-');
   NotSetRadioButton3.Checked:=(S<>'') and (S<>'-');
   If NotSetRadioButton3.Checked then NotSetEdit.Text:=S;
+
+  CheckBoxBold.Font.Style:=[fsBold];
+  CheckBoxItalic.Font.Style:=[fsItalic];
+  CheckBoxUnderline.Font.Style:=[fsUnderline];
+  CheckBoxBold.Checked:=PrgSetup.FavoritesBold;
+  CheckBoxItalic.Checked:=PrgSetup.FavoritesItalic;
+  CheckBoxUnderline.Checked:=PrgSetup.FavoritesUnderline;
+
+  GridLinesCheckBox.Checked:=PrgSetup.GridLinesInGamesList;
 end;
 
 procedure TSetupFrameGamesListAppearance.LoadLanguage;
@@ -113,6 +132,15 @@ begin
     else GamesListFontColorBox.Style:=GamesListFontColorBox.Style-[cbPrettyNames];
   NotSetGroupBox.Caption:=LanguageSetup.ValueForNotSet+' "'+LanguageSetup.NotSet+'"';
   NotSetRadioButton1.Caption:='"'+LanguageSetup.NotSet+'"';
+
+  FavoriteGroupBox.Caption:=LanguageSetup.FontStyleForFavorites;
+  CheckBoxBold.Caption:=LanguageSetup.FontStyleForFavoritesBold;
+  CheckBoxItalic.Caption:=LanguageSetup.FontStyleForFavoritesItalic;
+  CheckBoxUnderline.Caption:=LanguageSetup.FontStyleForFavoritesUnderline;
+
+  //GridLinesCheckBox.Caption:=LanguageSetup.
+
+  HelpContext:=ID_FileOptionsAppearanceList;
 end;
 
 procedure TSetupFrameGamesListAppearance.DOSBoxDirChanged;
@@ -134,6 +162,12 @@ begin
 
   NotSetEdit.Text:='';
   NotSetRadioButton1.Checked:=True;
+
+  CheckBoxBold.Checked:=True;
+  CheckBoxItalic.Checked:=False;
+  CheckBoxUnderline.Checked:=False;
+
+  GridLinesCheckBox.Checked:=False;
 end;
 
 procedure TSetupFrameGamesListAppearance.SaveSetup;
@@ -146,6 +180,10 @@ begin
   If NotSetRadioButton1.Checked then PrgSetup.ValueForNotSet:='';
   If NotSetRadioButton2.Checked then PrgSetup.ValueForNotSet:='-';
   If NotSetRadioButton3.Checked then PrgSetup.ValueForNotSet:=NotSetEdit.Text;
+  PrgSetup.FavoritesBold:=CheckBoxBold.Checked;
+  PrgSetup.FavoritesItalic:=CheckBoxItalic.Checked;
+  PrgSetup.FavoritesUnderline:=CheckBoxUnderline.Checked;
+  PrgSetup.GridLinesInGamesList:=GridLinesCheckBox.Checked;
 end;
 
 procedure TSetupFrameGamesListAppearance.GamesListBackgroundColorBoxChange(Sender: TObject);

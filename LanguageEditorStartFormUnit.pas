@@ -13,8 +13,11 @@ type
     LanguageNameEdit: TEdit;
     OKButton: TBitBtn;
     CancelButton: TBitBtn;
+    HelpButton: TBitBtn;
     procedure FormCreate(Sender: TObject);
     procedure LanguageNameEditChange(Sender: TObject);
+    procedure HelpButtonClick(Sender: TObject);
+    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
   private
     { Private-Deklarationen }
   public
@@ -28,7 +31,8 @@ Function ShowLanguageEditorStartDialog(const AOwner : TComponent; var LanguageFi
 
 implementation
 
-uses VistaToolsUnit, LanguageSetupUnit, PrgSetupUnit, PrgConsts, CommonTools;
+uses VistaToolsUnit, LanguageSetupUnit, PrgSetupUnit, PrgConsts, CommonTools,
+     HelpConsts;
 
 {$R *.dfm}
 
@@ -40,6 +44,7 @@ begin
   Caption:=LanguageSetup.ProfileEditor;
   OKButton.Caption:=LanguageSetup.OK;
   CancelButton.Caption:=LanguageSetup.Cancel;
+  HelpButton.Caption:=LanguageSetup.Help;
 
   Caption:=LanguageSetup.LanguageEditorCaption;
   EditThisRadioButton.Caption:=LanguageSetup.LanguageEditorEditThisLanguage;
@@ -49,6 +54,16 @@ end;
 procedure TLanguageEditorStartForm.LanguageNameEditChange(Sender: TObject);
 begin
   EditNewRadioButton.Checked:=True;
+end;
+
+procedure TLanguageEditorStartForm.HelpButtonClick(Sender: TObject);
+begin
+  Application.HelpCommand(HELP_CONTEXT,ID_HelpLanguageEditor);
+end;
+
+procedure TLanguageEditorStartForm.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+begin
+  If (Key=VK_F1) and (Shift=[]) then HelpButtonClick(Sender);
 end;
 
 { global }

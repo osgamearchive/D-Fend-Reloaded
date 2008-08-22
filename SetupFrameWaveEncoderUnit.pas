@@ -34,7 +34,7 @@ type
 implementation
 
 uses LanguageSetupUnit, VistaToolsUnit, PrgSetupUnit, CommonTools,
-     SetupDosBoxFormUnit;
+     SetupDosBoxFormUnit, HelpConsts;
 
 {$R *.dfm}
 
@@ -66,6 +66,8 @@ begin
   WaveEncOggButton1.Hint:=LanguageSetup.ChooseFile;
   WaveEncOggButton2.Hint:=LanguageSetup.SetupFormSearchOggEnc;
   WaveEncOggParameterEdit.EditLabel.Caption:=LanguageSetup.SetupFormWaveEncOggParameters;
+
+  HelpContext:=ID_FileOptionsWaveEncoder;
 end;
 
 procedure TSetupFrameWaveEncoder.DOSBoxDirChanged;

@@ -3,7 +3,7 @@ object CreateISOImageForm: TCreateISOImageForm
   Top = 0
   BorderStyle = bsDialog
   Caption = 'ISO-Image von CD erstellen'
-  ClientHeight = 171
+  ClientHeight = 206
   ClientWidth = 502
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -11,15 +11,20 @@ object CreateISOImageForm: TCreateISOImageForm
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
+  KeyPreview = True
   OldCreateOrder = False
   Position = poOwnerFormCenter
   OnCreate = FormCreate
+  OnKeyDown = FormKeyDown
   OnShow = FormShow
+  DesignSize = (
+    502
+    206)
   PixelsPerInch = 96
   TextHeight = 13
   object DriveLabel: TLabel
-    Left = 16
-    Top = 19
+    Left = 8
+    Top = 22
     Width = 61
     Height = 13
     Caption = 'CD Laufwerk'
@@ -47,19 +52,29 @@ object CreateISOImageForm: TCreateISOImageForm
     ShowHint = True
     OnClick = FileNameButtonClick
   end
+  object InfoLabel: TLabel
+    Left = 8
+    Top = 120
+    Width = 486
+    Height = 47
+    Anchors = [akLeft, akTop, akRight]
+    AutoSize = False
+    Caption = 'InfoLabel'
+    WordWrap = True
+  end
   object DriveComboBox: TComboBox
-    Left = 16
+    Left = 8
     Top = 38
-    Width = 69
+    Width = 77
     Height = 21
     Style = csDropDownList
     ItemHeight = 13
     TabOrder = 3
   end
   object FileNameEdit: TLabeledEdit
-    Left = 16
+    Left = 8
     Top = 88
-    Width = 449
+    Width = 457
     Height = 21
     EditLabel.Width = 47
     EditLabel.Height = 13
@@ -67,8 +82,8 @@ object CreateISOImageForm: TCreateISOImageForm
     TabOrder = 0
   end
   object OKButton: TBitBtn
-    Left = 16
-    Top = 132
+    Left = 8
+    Top = 173
     Width = 97
     Height = 25
     TabOrder = 1
@@ -76,17 +91,26 @@ object CreateISOImageForm: TCreateISOImageForm
     Kind = bkOK
   end
   object CancelButton: TBitBtn
-    Left = 128
-    Top = 132
+    Left = 120
+    Top = 173
     Width = 97
     Height = 25
     TabOrder = 2
     Kind = bkCancel
   end
+  object HelpButton: TBitBtn
+    Left = 232
+    Top = 173
+    Width = 97
+    Height = 25
+    TabOrder = 4
+    OnClick = HelpButtonClick
+    Kind = bkHelp
+  end
   object SaveDialog: TSaveDialog
     DefaultExt = 'iso'
     Title = 'ISO-Image speichern'
-    Left = 232
-    Top = 128
+    Left = 240
+    Top = 137
   end
 end

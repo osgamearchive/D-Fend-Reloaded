@@ -64,6 +64,9 @@ const NR_Name=1;
       NR_ExtraDirs=111;
       NR_ExtraFiles=112;
       NR_LastModification=113;
+      NR_ScreenshotListScreenshot=114;
+
+      NR_ExtraPrgFile=120; {120-130}
 
       NR_Genre=201;
       NR_Developer=202;
@@ -93,6 +96,7 @@ const NR_Name=1;
       NR_Priority=315;
       NR_CustomDOSBoxDir=316;
       NR_CustomKeyMappingFile=317;
+      NR_CustomDOSBoxLanguage=318;
 
       NR_Memory=401;
       NR_XMS=402;
@@ -221,12 +225,15 @@ const NR_Name=1;
       NR_ScummVMTalkSpeed=1415;
       NR_ScummVMSpeechMute=1416;
       NR_ScummVMSubtitles=1417;
+      NR_ScummVMSavePath=1418;
 
 Type TGame=class(TBasePrgSetup)
   private
     Procedure InitData;
+    Function GetExtraPrgFile(I : Integer) : String;
+    Procedure SetExtraPrgFile(I : Integer; S : String);
   protected
-    Procedure UpdatingFile; override;  
+    Procedure UpdatingFile; override;
   public
     CacheName, CacheNameUpper : String;
     CacheGenre, CacheGenreUpper : String;
@@ -258,6 +265,9 @@ Type TGame=class(TBasePrgSetup)
     property ExtraDirs : String index NR_ExtraDirs read GetString write SetString;
     property ExtraFiles : String index NR_ExtraFiles read GetString write SetString;
     property LastModification : String index NR_LastModification read GetString write SetString;
+    property ScreenshotListScreenshot : String index NR_ScreenshotListScreenshot read GetString write SetString;
+
+    property ExtraPrgFile[I : Integer] : String read GetExtraPrgFile write SetExtraPrgFile;
 
     property Genre : String index NR_Genre read GetString write SetString;
     property Developer : String index NR_Developer read GetString write SetString;
@@ -287,6 +297,7 @@ Type TGame=class(TBasePrgSetup)
     property Priority : String index NR_Priority read GetString write SetString;
     property CustomDOSBoxDir : String index NR_CustomDOSBoxDir read GetString write SetString;
     property CustomKeyMappingFile : String index NR_CustomKeyMappingFile read GetString write SetString;
+    property CustomDOSBoxLanguage : String index NR_CustomDOSBoxLanguage read GetString write SetString;
 
     property Memory : Integer index NR_Memory read Getinteger write SetInteger;
     property XMS : Boolean index NR_XMS read GetBoolean write SetBoolean;
@@ -415,6 +426,7 @@ Type TGame=class(TBasePrgSetup)
     property ScummVMTalkSpeed : Integer index NR_ScummVMTalkSpeed read GetInteger write SetInteger;
     property ScummVMSpeechMute : Boolean index NR_ScummVMSpeechMute read GetBoolean write SetBoolean;
     property ScummVMSubtitles : Boolean index NR_ScummVMSubtitles read GetBoolean write SetBoolean;
+    property ScummVMSavePath : String index NR_ScummVMSavePath read GetString write SetString;
 end;
 
 Type TGameDB=class
@@ -493,15 +505,15 @@ Const DefaultValuesResolution='original,320x200,640x432,640x480,720x480,800x600,
       DefaultValuesDMA1='0,1,3';
       DefaultValuesDMA2='0,1,3';
       DefaultValuesGUSBase='210,220,240,260,280';
-      DefaultValuesGUSRate='8000,11025,22050,32000,44100';
+      DefaultValuesGUSRate='8000,11025,22050,32000,44100,48000,50000';
       DefaultValuesHDMA='5,6,7';
       DefaultValuesIRQ='3,5,7,10,11';
       DefaultValuesIRQ1='3,5,7,10,11';
       DefaultValuesIRQ2='3,5,7,10,11';
       DefaultValuesMPU401='none,intelligent,uart';
-      DefaultValuesOPLRate='8000,11025,22050,32000,44100';
-      DefaultValuesPCRate='8000,11025,22050,32000,44100';
-      DefaultValuesRate='8000,11025,22050,32000,44100';
+      DefaultValuesOPLRate='8000,11025,22050,32000,44100,48000,50000';
+      DefaultValuesPCRate='8000,11025,22050,32000,44100,48000,50000';
+      DefaultValuesRate='8000,11025,22050,32000,44100,48000,50000';
       DefaultValuesSBBase='210,220,240,260,280';
       DefaultValuesMouseSensitivity='10,20,30,40,50,60,70,80,90,100,125,150,175,200,250,300,350,400,450,500,550,600,700,800,900,1000';
       DefaultValuesTandyRate='8000,11025,22050,32000,44100';
@@ -561,6 +573,7 @@ begin
   AddStringRec(35,'ScummVMMusicDriver','value',DefaultValuesScummVMMusicDriver);
   AddStringRec(36,'VGAChipsets','value',DefaultValuesVGAChipsets);
   AddStringRec(37,'VGAVideoRAM','value',DefaultValuesVGAVideoRAM);
+
 end;
 
 destructor TConfOpt.Destroy;
@@ -593,6 +606,7 @@ end;
 
 procedure TGame.InitData;
 Var S : String;
+    I : Integer;
 begin
   S:=ExtractFileName(SetupFile);
   while (S<>'') and (S[length(S)]<>'.') do Delete(S,length(S),1);
@@ -613,6 +627,11 @@ begin
   AddStringRec(NR_ExtraDirs,'Extra','ExtraDirs','');
   AddStringRec(NR_ExtraFiles,'Extra','ExtraFiles','');
   AddStringRec(NR_LastModification,'Extra','LastModification','');
+  AddStringRec(NR_ScreenshotListScreenshot,'Extra','ScreenshotListScreenshot','');
+
+  For I:=0 to 9 do begin
+    AddStringRec(NR_ExtraPrgFile+I,'Extra','ExtraExe'+IntToStr(I),'');
+  end;
 
   AddStringRec(NR_Genre,'ExtraInfo','Genre','');
   AddStringRec(NR_Developer,'ExtraInfo','Developer','');
@@ -627,14 +646,14 @@ begin
 
   AddBooleanRec(NR_CloseDosBoxAfterGameExit,'Extra','CloseOnExit',True);
   AddBooleanRec(NR_StartFullscreen,'sdl','fullscreen',True);
-  AddBooleanRec(NR_AutoLockMouse,'sdl','autolock',False);
+  AddBooleanRec(NR_AutoLockMouse,'sdl','autolock',True);
   AddBooleanRec(NR_Force2ButtonMouseMode,'dos','Force2ButtonMouseMode',False);
   AddBooleanRec(NR_SwapMouseButtons,'dos','SwapMouseButtons',False);
-  AddBooleanRec(NR_UseDoublebuffering,'sdl','fulldouble',True);
+  AddBooleanRec(NR_UseDoublebuffering,'sdl','fulldouble',False);
   AddBooleanRec(NR_AspectCorrection,'render','aspect',False);
   AddBooleanRec(NR_UseScanCodes,'sdl','usecancodes',True);
   AddIntegerRec(NR_MouseSensitivity,'sdl','sensitivity',100);
-  AddStringRec(NR_Render,'sdl','output','overlay');
+  AddStringRec(NR_Render,'sdl','output','surface');
   AddStringRec(NR_WindowResolution,'sdl','windowresolution','original');
   AddStringRec(NR_FullscreenResolution,'sdl','fullresolution','original');
   AddStringRec(NR_Scale,'render','scaler','normal2x');
@@ -642,13 +661,14 @@ begin
   AddStringRec(NR_Priority,'sdl','priority','higher,normal');
   AddStringRec(NR_CustomDOSBoxDir,'dosbox','DOSBoxDirectory','default');
   AddStringRec(NR_CustomKeyMappingFile,'sdl','mapperfile','default');
+  AddStringRec(NR_CustomDOSBoxLanguage,'sdl','DOSBoxlanguage','default');
 
-  AddIntegerRec(NR_Memory,'dosbox','memsize',32);
+  AddIntegerRec(NR_Memory,'dosbox','memsize',16);
   AddBooleanRec(NR_XMS,'dos','xms',True);
   AddBooleanRec(NR_EMS,'dos','ems',True);
   AddBooleanRec(NR_UMB,'dos','umb',True);
   AddStringRec(NR_Core,'cpu','core','auto');
-  AddStringRec(NR_Cycles,'cpu','cycles','3000');
+  AddStringRec(NR_Cycles,'cpu','cycles','auto');
   AddIntegerRec(NR_CyclesUp,'cpu','cyclesup',500);
   AddIntegerRec(NR_CyclesDown,'cpu','cyclesdown',20);
   AddIntegerRec(NR_FrameSkip,'render','frameskip',0);
@@ -769,7 +789,20 @@ begin
   AddIntegerRec(NR_ScummVMTalkSpeed,'ScummVM','TalkSpeed',60);
   AddBooleanRec(NR_ScummVMSpeechMute,'ScummVM','SpeechMute',False);
   AddBooleanRec(NR_ScummVMSubtitles,'ScummVM','Subtitles',True);
+  AddStringRec(NR_ScummVMSavePath,'ScummVM','Savepath','');
+end;
 
+Function TGame.GetExtraPrgFile(I : Integer) : String;
+begin
+  result:='';
+  If (I<0) or (I>9) then exit;
+  result:=GetString(NR_ExtraPrgFile+I);
+end;
+
+Procedure TGame.SetExtraPrgFile(I : Integer; S : String);
+begin
+  If (I<0) or (I>9) then exit;
+  SetString(NR_ExtraPrgFile+I,S);
 end;
 
 procedure TGame.LoadCache;

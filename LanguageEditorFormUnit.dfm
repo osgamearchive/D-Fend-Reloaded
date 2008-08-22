@@ -3,17 +3,19 @@ object LanguageEditorForm: TLanguageEditorForm
   Top = 0
   Caption = 'Language editor'
   ClientHeight = 549
-  ClientWidth = 675
+  ClientWidth = 724
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
+  KeyPreview = True
   OldCreateOrder = False
   Position = poOwnerFormCenter
   OnClose = FormClose
   OnCreate = FormCreate
+  OnKeyDown = FormKeyDown
   OnResize = FormResize
   OnShow = FormShow
   PixelsPerInch = 96
@@ -21,13 +23,13 @@ object LanguageEditorForm: TLanguageEditorForm
   object Panel1: TPanel
     Left = 0
     Top = 0
-    Width = 675
+    Width = 724
     Height = 41
     Align = alTop
     BevelOuter = bvNone
     TabOrder = 0
     DesignSize = (
-      675
+      724
       41)
     object InfoLabel: TLabel
       Left = 168
@@ -37,7 +39,7 @@ object LanguageEditorForm: TLanguageEditorForm
       Caption = 'InfoLabel'
     end
     object CloseButton: TBitBtn
-      Left = 582
+      Left = 631
       Top = 9
       Width = 83
       Height = 25
@@ -59,7 +61,7 @@ object LanguageEditorForm: TLanguageEditorForm
   object Tab: TStringGrid
     Left = 0
     Top = 41
-    Width = 675
+    Width = 724
     Height = 508
     Align = alClient
     ColCount = 3

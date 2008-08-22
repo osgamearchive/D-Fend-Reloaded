@@ -25,7 +25,7 @@ type
 
 implementation
 
-uses Math, LanguageSetupUnit, VistaToolsUnit, PrgSetupUnit;
+uses Math, LanguageSetupUnit, VistaToolsUnit, PrgSetupUnit, HelpConsts;
 
 {$R *.dfm}
 
@@ -53,6 +53,8 @@ begin
   StartSizeComboBox.Items[2]:=LanguageSetup.SetupFormStartSizeMinimized;
   StartSizeComboBox.Items[3]:=LanguageSetup.SetupFormStartSizeMaximized;
   StartSizeComboBox.ItemIndex:=I;
+
+  HelpContext:=ID_FileOptionsUserInterface;
 end;
 
 procedure TSetupFrameSurface.DOSBoxDirChanged;

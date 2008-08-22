@@ -36,7 +36,7 @@ begin
     St.Add('    <Type>DOSBox</Type>');
     St.Add('    <Version>0.72</Version>');
     If G.CustomDOSBoxDir='' then begin
-      St.Add('    <Path>'+IncludeTrailingPathDelimiter(MakeAbsPath(PrgSetup.DosBoxDir,PrgSetup.BaseDir))+'DOSBox.exe</Path>');
+      St.Add('    <Path>'+IncludeTrailingPathDelimiter(MakeAbsPath(PrgSetup.DOSBoxSettings[0].DosBoxDir,PrgSetup.BaseDir))+'DOSBox.exe</Path>');
       St.Add('    <Name>DOSBox 0.72</Name>');
     end else begin
       St.Add('    <Path>'+IncludeTrailingPathDelimiter(MakeAbsPath(G.CustomDOSBoxDir,PrgSetup.BaseDir))+'DOSBox.exe</Path>');
@@ -580,7 +580,7 @@ begin
     XMLDoc.FileName:=FileName;
 
     If not XMLDoc.Active then begin
-      //result:=LanguageSetup.MessageCouldNotActivateXMLDocument;
+      {result:=LanguageSetup.MessageCouldNotActivateXMLDocument;}
       result:='Could not activte the XML document.';
       exit;
     end;
@@ -588,7 +588,7 @@ begin
     S:=Trim(ExtUpperCase(XMLDoc.DocumentElement.NodeName));
     If S='DOCUMENT' then begin result:=ImportXMLFileIntern(GameDB,XMLDoc.DocumentElement,xtDOG); exit; end;
     If S='PROFILES' then begin result:=ImportXMLFileIntern(GameDB,XMLDoc.DocumentElement,xtDBGL); exit; end;
-    //result:=Format(LanguageSetup.MessageUnknownXMLType,[XMLDoc.DocumentElement.NodeName]);
+    {result:=Format(LanguageSetup.MessageUnknownXMLType,[XMLDoc.DocumentElement.NodeName]);}
     result:=Format('Unknown document type "%s".',[XMLDoc.DocumentElement.NodeName]);
   finally
     XMLDoc.Free;

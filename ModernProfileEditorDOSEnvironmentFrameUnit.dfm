@@ -35,7 +35,7 @@ object ModernProfileEditorDOSEnvironmentFrame: TModernProfileEditorDOSEnvironmen
     Top = 43
     Width = 97
     Height = 21
-    ItemHeight = 0
+    ItemHeight = 13
     TabOrder = 0
   end
   object Use4DOSCheckBox: TCheckBox

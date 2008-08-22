@@ -18,6 +18,7 @@ type
     procedure SectionComboBoxChange(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormResize(Sender: TObject);
+    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
   private
     { Private-Deklarationen }
     DefaultLanguageFile : String;
@@ -37,7 +38,7 @@ Procedure ShowLanguageEditorDialog(const AOwner : TComponent; const ALanguageFil
 implementation
 
 uses Math, IniFiles, VistaToolsUnit, LanguageSetupUnit, PrgSetupUnit, PrgConsts,
-     CommonTools;
+     CommonTools, HelpConsts;
 
 {$R *.dfm}
 
@@ -55,6 +56,11 @@ begin
 
   DefaultLanguageFile:=PrgDir+LanguageSubDir+'\English.ini';
   LastSection:=-1;
+end;
+
+procedure TLanguageEditorForm.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+begin
+  If (Key=VK_F1) and (Shift=[]) then Application.HelpCommand(HELP_CONTEXT,ID_HelpLanguageEditor);
 end;
 
 procedure TLanguageEditorForm.FormShow(Sender: TObject);

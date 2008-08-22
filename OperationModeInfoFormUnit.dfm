@@ -11,9 +11,11 @@ object OperationModeInfoForm: TOperationModeInfoForm
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
+  KeyPreview = True
   OldCreateOrder = False
   Position = poOwnerFormCenter
   OnCreate = FormCreate
+  OnKeyDown = FormKeyDown
   DesignSize = (
     621
     322)
@@ -36,12 +38,11 @@ object OperationModeInfoForm: TOperationModeInfoForm
   object OKButton: TBitBtn
     Left = 16
     Top = 289
-    Width = 75
+    Width = 97
     Height = 25
     Anchors = [akLeft, akBottom]
     TabOrder = 0
     Kind = bkOK
-    ExplicitTop = 316
   end
   object PrgDirEdit: TLabeledEdit
     Left = 16
@@ -54,7 +55,6 @@ object OperationModeInfoForm: TOperationModeInfoForm
     EditLabel.Caption = 'PrgDirEdit'
     ReadOnly = True
     TabOrder = 1
-    ExplicitTop = 234
   end
   object PrgDataDirEdit: TLabeledEdit
     Left = 16
@@ -67,7 +67,6 @@ object OperationModeInfoForm: TOperationModeInfoForm
     EditLabel.Caption = 'PrgDataDirEdit'
     ReadOnly = True
     TabOrder = 2
-    ExplicitTop = 282
   end
   object CheckBox1: TCheckBox
     Left = 16
@@ -78,7 +77,6 @@ object OperationModeInfoForm: TOperationModeInfoForm
     Caption = 'Program settings are stored in program folder'
     Enabled = False
     TabOrder = 3
-    ExplicitWidth = 494
   end
   object CheckBox3: TCheckBox
     Left = 16
@@ -121,5 +119,15 @@ object OperationModeInfoForm: TOperationModeInfoForm
     Caption = 'Program settings are stored in the user profile folder'
     Enabled = False
     TabOrder = 7
+  end
+  object HelpButton: TBitBtn
+    Left = 124
+    Top = 289
+    Width = 97
+    Height = 25
+    Anchors = [akLeft, akBottom]
+    TabOrder = 8
+    OnClick = HelpButtonClick
+    Kind = bkHelp
   end
 end

@@ -18,11 +18,14 @@ type
     CancelButton: TBitBtn;
     SelectGenreButton: TBitBtn;
     PopupMenu: TPopupMenu;
+    HelpButton: TBitBtn;
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure SelectButtonClick(Sender: TObject);
     procedure OKButtonClick(Sender: TObject);
     procedure SelectFolderButtonClick(Sender: TObject);
+    procedure HelpButtonClick(Sender: TObject);
+    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
   private
     { Private-Deklarationen }
   public
@@ -40,7 +43,7 @@ Function ExportProfFiles(const AOwner : TComponent; const AGameDB : TGameDB) : B
 implementation
 
 uses ShlObj, VistaToolsUnit, LanguageSetupUnit, DosBoxUnit, CommonTools,
-     PrgSetupUnit, GameDBToolsUnit, ScummVMUnit;
+     PrgSetupUnit, GameDBToolsUnit, ScummVMUnit, HelpConsts;
 
 {$R *.dfm}
 
@@ -55,6 +58,7 @@ begin
   SelectFolderButton.Hint:=LanguageSetup.ChooseFolder;
   OKButton.Caption:=LanguageSetup.OK;
   CancelButton.Caption:=LanguageSetup.Cancel;
+  HelpButton.Caption:=LanguageSetup.Help;
   SelectAllButton.Caption:=LanguageSetup.All;
   SelectNoneButton.Caption:=LanguageSetup.None;
   SelectGenreButton.Caption:=LanguageSetup.GameBy;
@@ -66,7 +70,7 @@ procedure TCreateConfForm.FormShow(Sender: TObject);
 begin
   If ProfFileMode then Caption:=LanguageSetup.CreateConfFormProfMode;
 
-  BuildCheckList(ListBox,GameDB,True,false);
+  BuildCheckList(ListBox,GameDB,True,False,True);
   BuildSelectPopupMenu(PopupMenu,GameDB,SelectButtonClick,True);
 
   FolderEdit.Text:=GetSpecialFolder(Handle,CSIDL_DESKTOPDIRECTORY);
@@ -139,6 +143,18 @@ begin
       end;
     end;
   end;
+end;
+
+procedure TCreateConfForm.HelpButtonClick(Sender: TObject);
+begin
+  If ProfFileMode
+    then Application.HelpCommand(HELP_CONTEXT,ID_FileExportProf)
+    else Application.HelpCommand(HELP_CONTEXT,ID_FileExportConf);
+end;
+
+procedure TCreateConfForm.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+begin
+  If (Key=VK_F1) and (Shift=[]) then HelpButtonClick(Sender);
 end;
 
 { global }

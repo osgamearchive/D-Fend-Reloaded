@@ -11,10 +11,10 @@ WWW=
 Language=
 
 [sdl]
-output=overlay
+output=surface
 fullscreen=1
 autolock=0
-fulldouble=1
+fulldouble=0
 usecancodes=1
 sensitivity=100
 windowresolution=original

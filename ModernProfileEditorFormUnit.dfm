@@ -11,9 +11,11 @@ object ModernProfileEditorForm: TModernProfileEditorForm
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
+  KeyPreview = True
   OldCreateOrder = False
   Position = poOwnerFormCenter
   OnCreate = FormCreate
+  OnKeyDown = FormKeyDown
   OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
@@ -35,13 +37,13 @@ object ModernProfileEditorForm: TModernProfileEditorForm
     end
     object PreviousButton: TBitBtn
       Tag = 1
-      Left = 215
+      Left = 318
       Top = 6
       Width = 130
       Height = 25
       Caption = 'Vorheriges'
       ModalResult = 1
-      TabOrder = 2
+      TabOrder = 3
       Visible = False
       OnClick = OKButtonClick
       Glyph.Data = {
@@ -61,13 +63,13 @@ object ModernProfileEditorForm: TModernProfileEditorForm
     end
     object NextButton: TBitBtn
       Tag = 2
-      Left = 351
+      Left = 454
       Top = 6
       Width = 130
       Height = 25
       Caption = 'N'#228'chstes'
       ModalResult = 1
-      TabOrder = 3
+      TabOrder = 4
       Visible = False
       OnClick = OKButtonClick
       Glyph.Data = {
@@ -94,6 +96,38 @@ object ModernProfileEditorForm: TModernProfileEditorForm
       TabOrder = 0
       OnClick = OKButtonClick
       Kind = bkOK
+    end
+    object HelpButton: TBitBtn
+      Left = 215
+      Top = 6
+      Width = 97
+      Height = 25
+      TabOrder = 2
+      OnClick = HelpButtonClick
+      Kind = bkHelp
+    end
+    object ShowConfButton: TBitBtn
+      Left = 590
+      Top = 6
+      Width = 179
+      Height = 25
+      Caption = 'Conf file anzeigen'
+      TabOrder = 5
+      OnClick = ShowConfButtonClick
+      Glyph.Data = {
+        76010000424D7601000000000000760000002800000020000000100000000100
+        04000000000000010000130B0000130B00001000000000000000000000000000
+        800000800000008080008000000080008000808000007F7F7F00BFBFBF000000
+        FF0000FF000000FFFF00FF000000FF00FF00FFFF0000FFFFFF0033333333B333
+        333B33FF33337F3333F73BB3777BB7777BB3377FFFF77FFFF77333B000000000
+        0B3333777777777777333330FFFFFFFF07333337F33333337F333330FFFFFFFF
+        07333337F3FF3FFF7F333330F00F000F07333337F77377737F333330FFFFFFFF
+        07333FF7F3FFFF3F7FFFBBB0F0000F0F0BB37777F7777373777F3BB0FFFFFFFF
+        0BBB3777F3FF3FFF77773330F00F000003333337F773777773333330FFFF0FF0
+        33333337F3FF7F37F3333330F08F0F0B33333337F7737F77FF333330FFFF003B
+        B3333337FFFF77377FF333B000000333BB33337777777F3377FF3BB3333BB333
+        3BB33773333773333773B333333B3333333B7333333733333337}
+      NumGlyphs = 2
     end
   end
   object MainPanel: TPanel
@@ -160,7 +194,7 @@ object ModernProfileEditorForm: TModernProfileEditorForm
     Left = 632
     Top = 517
     Bitmap = {
-      494C010118001C00040010001000FFFFFFFFFF00FFFFFFFFFFFFFFFF424D3600
+      494C010118001C00040010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000007000000001002000000000000070
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -1088,6 +1122,7 @@ object ModernProfileEditorForm: TModernProfileEditorForm
       0000E00F0000C0070000C0070000000100008003000000010000800300000001
       00000001000000010000000100008003000000010000E00F000000010000E00F
       000000010000E00F000080030000E00F000080030000E00F0000C0070000E00F
-      FFFFE00F0000E00FFFFFF83F0000E00F}
+      FFFFE00F0000E00FFFFFF83F0000E00F00000000000000000000000000000000
+      000000000000}
   end
 end

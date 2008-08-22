@@ -57,7 +57,7 @@ type
     JustChanging : Boolean;
   public
     { Public-Deklarationen }
-    Procedure InitGUI(const OnProfileNameChange : TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup, CurrentScummVMGameName : PString);
+    Procedure InitGUI(const InitData : TModernProfileEditorInitData);
     Procedure SetGame(const Game : TGame; const LoadFromTemplate : Boolean);
     Function CheckValue : Boolean;
     Procedure GetGame(const Game : TGame);
@@ -66,13 +66,13 @@ type
 
 implementation
 
-uses VistaToolsUnit, LanguageSetupUnit;
+uses VistaToolsUnit, LanguageSetupUnit, HelpConsts;
 
 {$R *.dfm}
 
 { TModernProfileEditorVolumeFrame }
 
-procedure TModernProfileEditorVolumeFrame.InitGUI(const OnProfileNameChange: TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup, CurrentScummVMGameName : PString);
+procedure TModernProfileEditorVolumeFrame.InitGUI(const InitData : TModernProfileEditorInitData);
 begin
   NoFlicker(SoundVolumeMasterLeftEdit);
   NoFlicker(SoundVolumeMasterRightEdit);
@@ -107,6 +107,8 @@ begin
   SoundVolumeFMLabel.Caption:=LanguageSetup.ProfileEditorSoundFM;
 
   JustChanging:=False;
+
+  HelpContext:=ID_ProfileEditSoundVolume;
 end;
 
 procedure TModernProfileEditorVolumeFrame.SetGame(const Game: TGame; const LoadFromTemplate: Boolean);

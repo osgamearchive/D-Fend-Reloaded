@@ -4,8 +4,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, 
-  Dialogs, Grids, ValEdit, StdCtrls, ComCtrls, Buttons, GameDBUnit,
-  ModernProfileEditorFormUnit;
+  Dialogs, Grids, ValEdit, StdCtrls, ComCtrls, Buttons, ImgList, ToolWin,
+  ExtCtrls, Menus, GameDBUnit, ModernProfileEditorFormUnit, LinkFileUnit;
 
 type
   TModernProfileEditorGameInfoFrame = class(TFrame, IModernProfileEditorFrame)
@@ -17,14 +17,23 @@ type
     UserDefinedDataLabel: TLabel;
     DelButton: TSpeedButton;
     AddButton: TSpeedButton;
+    Panel1: TPanel;
+    ToolBar: TToolBar;
+    SearchGameButton: TToolButton;
+    ImageList: TImageList;
+    SearchPopupMenu: TPopupMenu;
     procedure FrameResize(Sender: TObject);
     procedure AddButtonClick(Sender: TObject);
     procedure DelButtonClick(Sender: TObject);
+    Procedure SearchClick(Sender : TObject);
   private
     { Private-Deklarationen }
+    LinkFile : TLinkFile;
+    PProfileName : PString;
+    Procedure LoadLinks;
   public
     { Public-Deklarationen }
-    Procedure InitGUI(const OnProfileNameChange : TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup, CurrentScummVMGameName : PString);
+    Procedure InitGUI(const InitData : TModernProfileEditorInitData);
     Procedure SetGame(const Game : TGame; const LoadFromTemplate : Boolean);
     Function CheckValue : Boolean;
     Procedure GetGame(const Game : TGame);
@@ -33,13 +42,13 @@ type
 
 implementation
 
-uses LanguageSetupUnit, VistaToolsUnit, CommonTools;
+uses LanguageSetupUnit, VistaToolsUnit, CommonTools, HelpConsts;
 
 {$R *.dfm}
 
 { TModernProfileEditorGameInfoFrame }
 
-procedure TModernProfileEditorGameInfoFrame.InitGUI(const OnProfileNameChange: TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup, CurrentScummVMGameName : PString);
+procedure TModernProfileEditorGameInfoFrame.InitGUI(const InitData : TModernProfileEditorInitData);
 Var St : TStringList;
 begin
   NoFlicker(GameInfoValueListEditor);
@@ -54,19 +63,19 @@ begin
     Strings.Delete(0);
     Strings.Add(LanguageSetup.GameGenre+'=');
     ItemProps[Strings.Count-1].EditStyle:=esPickList;
-    St:=GameDB.GetGenreList; try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
+    St:=InitData.GameDB.GetGenreList; try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
     Strings.Add(LanguageSetup.GameDeveloper+'=');
     ItemProps[Strings.Count-1].EditStyle:=esPickList;
-    St:=GameDB.GetDeveloperList; try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
+    St:=InitData.GameDB.GetDeveloperList; try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
     Strings.Add(LanguageSetup.GamePublisher+'=');
     ItemProps[Strings.Count-1].EditStyle:=esPickList;
-    St:=GameDB.GetPublisherList; try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
+    St:=InitData.GameDB.GetPublisherList; try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
     Strings.Add(LanguageSetup.GameYear+'=');
     ItemProps[Strings.Count-1].EditStyle:=esPickList;
-    St:=GameDB.GetYearList; try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
+    St:=InitData.GameDB.GetYearList; try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
     Strings.Add(LanguageSetup.GameLanguage+'=');
     ItemProps[Strings.Count-1].EditStyle:=esPickList;
-    St:=GameDB.GetLanguageList; try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
+    St:=InitData.GameDB.GetLanguageList; try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
     Strings.Add(LanguageSetup.GameWWW+'=');
   end;
   FavouriteCheckBox.Caption:=LanguageSetup.GameFavorite;
@@ -80,6 +89,32 @@ begin
   DelButton.Hint:=RemoveUnderline(LanguageSetup.Del);
 
   NotesLabel.Caption:=LanguageSetup.GameNotes+':';
+
+  PProfileName:=InitData.CurrentProfileName;
+  LinkFile:=InitData.SearchLinkFile;
+
+  LoadLinks;
+
+  HelpContext:=ID_ProfileEditProgramInformation;
+end;
+
+procedure TModernProfileEditorGameInfoFrame.LoadLinks;
+begin
+  LinkFile.AddLinksToMenu(SearchPopupMenu,0,1,SearchClick,1);
+  SearchGameButton.Caption:=LanguageSetup.ProfileEditorLookUpGame+' '+LinkFile.Name[0];
+  SearchGameButton.Hint:=LinkFile.Link[0];
+end;
+
+procedure TModernProfileEditorGameInfoFrame.SearchClick(Sender: TObject);
+begin
+  Case (Sender as TComponent).Tag of
+    0 : begin
+          LinkFile.MoveToTop((Sender as TMenuItem).Caption);
+          LoadLinks;
+        end;
+    1 : If LinkFile.EditFile(False) then LoadLinks;
+    2 : OpenLink(LinkFile.Link[0],'<GAMENAME>',PProfileName^);
+  end;
 end;
 
 procedure TModernProfileEditorGameInfoFrame.SetGame(const Game: TGame; const LoadFromTemplate: Boolean);

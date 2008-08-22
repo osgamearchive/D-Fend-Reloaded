@@ -12,6 +12,14 @@ SDeanComponents v2.60.00
 written by Sarah Dean (sdean12@sdean12.org)
 http://www.SDean12.org/
 
+TZipMaster 1.79
+written by Chris Vleghert and Eric W. Engler
+(http://www.delphizip.org)
+
+TSevenZip 0.7.4a
+written by Ivo Andonov and Rainer Geigenberger (SevenZipVCL@rg-software.de)
+(http://www.rg-software.de)
+
 Used as binary program by D-Fend Reloaded:
 
 MTOOLs for Bochs and Win32 and/or DOS
@@ -29,3 +37,7 @@ OggEnc v2.84 (libvorbis 1.2.0)
 Doszip Commander 1.28
 (c) 1996-2007 Hjort Nidudsson
 (http://sourceforge.net/projects/doszip)
+
+Dr.SAGURA Media Player
+(c) 2007 Dr. Andrei Sagura
+(http://www.sagura.com)

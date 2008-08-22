@@ -11,9 +11,11 @@ object CreateConfForm: TCreateConfForm
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
+  KeyPreview = True
   OldCreateOrder = False
   Position = poOwnerFormCenter
   OnCreate = FormCreate
+  OnKeyDown = FormKeyDown
   OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
@@ -111,8 +113,17 @@ object CreateConfForm: TCreateConfForm
     TabOrder = 3
     OnClick = SelectButtonClick
   end
+  object HelpButton: TBitBtn
+    Left = 222
+    Top = 401
+    Width = 97
+    Height = 25
+    TabOrder = 7
+    OnClick = HelpButtonClick
+    Kind = bkHelp
+  end
   object PopupMenu: TPopupMenu
-    Left = 232
+    Left = 368
     Top = 400
   end
 end

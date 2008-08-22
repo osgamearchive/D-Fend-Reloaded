@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, 
-  Dialogs, ExtCtrls, StdCtrls, GameDBUnit;
+  Dialogs, ExtCtrls, StdCtrls, GameDBUnit, Buttons;
 
 type
   TWizardScummVMSettingsFrame = class(TFrame)
@@ -14,19 +14,27 @@ type
     InfoLabel: TLabel;
     Bevel: TBevel;
     LanguageInfoLabel: TLabel;
+    SavePathGroupBox: TGroupBox;
+    SavePathEditButton: TSpeedButton;
+    SavePathDefaultRadioButton: TRadioButton;
+    SavePathCustomRadioButton: TRadioButton;
+    SavePathEdit: TEdit;
+    procedure SavePathEditChange(Sender: TObject);
+    procedure SavePathEditButtonClick(Sender: TObject);
   private
     { Private-Deklarationen }
     FGameDB : TGameDB;
+    ScummVMPath : String;
   public
     { Public-Deklarationen }
     Procedure Init(const GameDB : TGameDB);
-    Procedure SetScummVMGameName(const Name : String);
+    Procedure SetScummVMGameName(const Name, Path : String);
     Function CreateGame(const GameName : String) : TGame;
   end;
 
 implementation
 
-uses VistaToolsUnit, LanguageSetupUnit, CommonTools;
+uses VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgSetupUnit;
 
 {$R *.dfm}
 
@@ -41,6 +49,9 @@ begin
   InfoLabel.Caption:=LanguageSetup.WizardFormPage6Info;
   LanguageLabel.Caption:=LanguageSetup.ProfileEditorScummVMLanguage;
   StartFullscreenCheckBox.Caption:=LanguageSetup.GameStartFullscreen;
+  //SavePathGroupBox.Caption:=LanguageSetup.ScummVMSavePath;
+  //SavePathDefaultRadioButton.Caption:=LanguageSetup.ScummVMSavePathGameDir+' ('+LanguageSetup.Default+')';
+  //SavePathCustomRadioButton.Caption:=LanguageSetup.ScummVMSavePathCustom;
   LanguageInfoLabel.Caption:=LanguageSetup.WizardFormScummVMLanguageInfo;
 end;
 
@@ -59,7 +70,7 @@ const LangData : Array[0..7] of TLangRec=(
   (Game: 'simon2'; Lang: 'en,de,fr,it,es,hb,pl,ru')
 );
 
-procedure TWizardScummVMSettingsFrame.SetScummVMGameName(const Name: String);
+procedure TWizardScummVMSettingsFrame.SetScummVMGameName(const Name, Path : String);
 Var S : String;
     I : Integer;
     St : TStringList;
@@ -86,6 +97,8 @@ begin
       If I>=0 then LanguageComboBox.ItemIndex:=I;
     end;
   end;
+
+  ScummVMPath:=Path;
 end;
 
 function TWizardScummVMSettingsFrame.CreateGame(const GameName: String): TGame;
@@ -96,6 +109,26 @@ begin
 
   If LanguageComboBox.ItemIndex>=0 then result.ScummVMLanguage:=LanguageComboBox.Text else result.ScummVMLanguage:='';
   result.StartFullscreen:=StartFullscreenCheckBox.Checked;
+
+  If SavePathDefaultRadioButton.Checked then result.ScummVMSavePath:='' else result.ScummVMSavePath:=Trim(SavePathEdit.Text);
+end;
+
+procedure TWizardScummVMSettingsFrame.SavePathEditChange(Sender: TObject);
+begin
+  SavePathDefaultRadioButton.Checked:=(Trim(SavePathEdit.Text)='');
+  SavePathCustomRadioButton.Checked:=(Trim(SavePathEdit.Text)<>'');
+end;
+
+procedure TWizardScummVMSettingsFrame.SavePathEditButtonClick(Sender: TObject);
+Var S : String;
+begin
+  S:=Trim(SavePathEdit.Text);
+  If S='' then S:=Trim(ScummVMPath);
+  If S='' then S:=PrgSetup.GameDir;
+  S:=MakeAbsPath(S,PrgSetup.BaseDir);
+  if not SelectDirectory(Handle,LanguageSetup.ChooseFolder,S) then exit;
+  SavePathEdit.Text:=S;
+  SavePathEditChange(Sender);
 end;
 
 end.

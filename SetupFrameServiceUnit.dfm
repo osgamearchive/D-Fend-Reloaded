@@ -119,7 +119,6 @@ object SetupFrameService: TSetupFrameService
     Anchors = [akLeft, akTop, akRight]
     Caption = 'Pr'#252'fsummen f'#252'r alle Profile berechnen'
     TabOrder = 4
-    Visible = False
     WordWrap = True
     OnClick = ButtonWork
     Glyph.Data = {

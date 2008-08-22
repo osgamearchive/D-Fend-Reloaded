@@ -38,7 +38,7 @@ type
 
 implementation
 
-uses Math, LanguageSetupUnit, VistaToolsUnit, PrgSetupUnit, CommonTools;
+uses Math, LanguageSetupUnit, VistaToolsUnit, PrgSetupUnit, CommonTools, HelpConsts;
 
 {$R *.dfm}
 
@@ -127,6 +127,8 @@ begin
 
   DefaultValueComboBox.ItemIndex:=Max(0,I);
   DefaultValueComboBoxChange(self);
+
+  HelpContext:=ID_FileOptionsDefaultValues;
 end;
 
 procedure TSetupFrameDefaultValues.DOSBoxDirChanged;

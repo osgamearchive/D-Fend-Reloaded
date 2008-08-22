@@ -25,17 +25,19 @@ LangString LANGNAME_NoInstallationFound ${LANG_ENGLISH} "There is no D-Fend Relo
 
 LangString LANGNAME_ProgramFiles ${LANG_ENGLISH} "Program files"
 LangString LANGNAME_LanguageFiles ${LANG_ENGLISH} "Language files"
+LangString LANGNAME_VideoCodec ${LANG_ENGLISH} "DOSBox video codec"
 LangString LANGNAME_DOSBox ${LANG_ENGLISH} "DOSBox"
-LangString LANGNAME_Tools ${LANG_ENGLISH} "Tools"   # NEW !!!
+LangString LANGNAME_Tools ${LANG_ENGLISH} "Tools"
 LangString LANGNAME_FreeDosTools ${LANG_ENGLISH} "FreeDOS Tools for use in DosBox"
-LangString LANGNAME_Doszip ${LANG_ENGLISH} "Doszip Commander"   # NEW !!!
+LangString LANGNAME_Doszip ${LANG_ENGLISH} "Doszip Commander"
 LangString LANGNAME_DesktopShortcut ${LANG_ENGLISH} "Desktop Shortcut"
 
 LangString DESC_DFend ${LANG_ENGLISH} "D-Fend Reloaded is the graphical user interface for administrating DOS games."
 LangString DESC_DosBox ${LANG_ENGLISH} "DOSBox is the DOS emulator used by D-Fend Reloaded."
 LangString DESC_DosBoxProgramFiles ${LANG_ENGLISH} "Program files of the DOS emulator."
 LangString DESC_DosBoxLanguageFiles ${LANG_ENGLISH} "Language files for different languages for DOSBox."
-LangString DESC_Tools ${LANG_ENGLISH} "Tools for use in DOSBox."      # NEW !!!
+LangString DESC_VideoCodec ${LANG_ENGLISH} "Codec for viewing videos captured with DOSBox."
+LangString DESC_Tools ${LANG_ENGLISH} "Tools for use in DOSBox."
 LangString DESC_FreeDosTools ${LANG_ENGLISH} "Commandline tools form the FreeDOS collection for use in DOSBox."
-LangString DESC_Doszip ${LANG_ENGLISH} "Doszip Commander is a Norton Commander clone to be used in DOSBox."      # NEW !!!
+LangString DESC_Doszip ${LANG_ENGLISH} "Doszip Commander is a Norton Commander clone to be used in DOSBox."
 LangString DESC_DesktopShortcut ${LANG_ENGLISH} "Creates a desktop shortcut for D-Fend Reloaded."

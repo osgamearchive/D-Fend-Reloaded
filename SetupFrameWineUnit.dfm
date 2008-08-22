@@ -15,8 +15,8 @@ object SetupFrameWine: TSetupFrameWine
     Anchors = [akLeft, akTop, akRight]
     AutoSize = False
     Caption = 
-      'You can overwrite this setting by using on of the following comm' +
-      'and line parameters: "WindowsMode" or "NoWineSupport".'
+      'You can overwrite this setting by using one of the following com' +
+      'mand line parameters: "WindowsMode" or "NoWineSupport".'
     WordWrap = True
   end
   object ListInfoLabel: TLabel

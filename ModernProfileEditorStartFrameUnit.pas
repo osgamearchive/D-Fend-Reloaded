@@ -41,7 +41,7 @@ type
     { Private-Deklarationen }
   public
     { Public-Deklarationen }
-    Procedure InitGUI(const OnProfileNameChange : TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup, CurrentScummVMGameName : PString);
+    Procedure InitGUI(const InitData : TModernProfileEditorInitData);
     Procedure SetGame(const Game : TGame; const LoadFromTemplate : Boolean);
     Function CheckValue : Boolean;
     Procedure GetGame(const Game : TGame);
@@ -50,13 +50,13 @@ type
 
 implementation
 
-uses VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgSetupUnit;
+uses VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgSetupUnit, HelpConsts;
 
 {$R *.dfm}
 
 { TModernProfileEditorStartFrame }
 
-procedure TModernProfileEditorStartFrame.InitGUI(const OnProfileNameChange: TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup, CurrentScummVMGameName : PString);
+procedure TModernProfileEditorStartFrame.InitGUI(const InitData : TModernProfileEditorInitData);
 Var S : String;
 begin
   NoFlicker(AutoexecOverrideGameStartCheckBox);
@@ -95,6 +95,8 @@ begin
   AutoexecBootFloppyImageDelButton.Hint:=LanguageSetup.ProfileMountingDelImage;
 
   AutoexecBootFloppyImageTab.ColWidths[0]:=AutoexecBootFloppyImageTab.ClientWidth-25;
+
+  HelpContext:=ID_ProfileEditStarting;
 end;
 
 procedure TModernProfileEditorStartFrame.SetGame(const Game: TGame; const LoadFromTemplate: Boolean);

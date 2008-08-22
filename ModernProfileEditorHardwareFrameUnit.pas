@@ -13,7 +13,7 @@ type
     { Private-Deklarationen }
   public
     { Public-Deklarationen }
-    Procedure InitGUI(const OnProfileNameChange : TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup, CurrentScummVMGameName : PString);
+    Procedure InitGUI(const InitData : TModernProfileEditorInitData);
     Procedure SetGame(const Game : TGame; const LoadFromTemplate : Boolean);
     Function CheckValue : Boolean;
     Procedure GetGame(const Game : TGame);
@@ -28,7 +28,7 @@ uses LanguageSetupUnit;
 
 { TModernProfileEditorHardwareFrame }
 
-procedure TModernProfileEditorHardwareFrame.InitGUI(const OnProfileNameChange: TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup, CurrentScummVMGameName : PString);
+procedure TModernProfileEditorHardwareFrame.InitGUI(const InitData : TModernProfileEditorInitData);
 begin
   InfoLabel.Caption:=LanguageSetup.ProfileEditorHardwareInfo;
 end;

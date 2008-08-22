@@ -14,10 +14,13 @@ type
     OKButton: TBitBtn;
     CancelButton: TBitBtn;
     SaveDialog: TSaveDialog;
+    HelpButton: TBitBtn;
     procedure FormCreate(Sender: TObject);
     procedure DestFileButtonClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure OKButtonClick(Sender: TObject);
+    procedure HelpButtonClick(Sender: TObject);
+    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
   private
     { Private-Deklarationen }
     function BuildNSIScript: Boolean;
@@ -34,7 +37,7 @@ Function BuildInstallerForSingleGame(const AOwner : TComponent; const AGame : TG
 implementation
 
 uses Registry, ShellAPI, VistaToolsUnit, LanguageSetupUnit, PrgSetupUnit,
-     CommonTools, PrgConsts, BuildInstallerFormUnit;
+     CommonTools, PrgConsts, BuildInstallerFormUnit, HelpConsts;
 
 {$R *.dfm}
 
@@ -48,6 +51,7 @@ begin
   DestFileButton.Hint:=LanguageSetup.ChooseFile;
   OKButton.Caption:=LanguageSetup.OK;
   CancelButton.Caption:=LanguageSetup.Cancel;
+  HelpButton.Caption:=LanguageSetup.Help;
   InstTypeRadioGroup.Caption:=LanguageSetup.BuildInstallerInstType;
   InstTypeRadioGroup.Items[0]:=LanguageSetup.BuildInstallerInstTypeScriptOnly;
   InstTypeRadioGroup.Items[1]:=LanguageSetup.BuildInstallerInstTypeFullInstaller;
@@ -119,6 +123,16 @@ begin
   If InstTypeRadioGroup.ItemIndex=1 then begin
     If not BuildEXEInstaller(Handle,DestFileEdit.Text) then begin ModalResult:=mrNone; exit; end;
   end;
+end;
+
+procedure TBuildInstallerForSingleGameForm.HelpButtonClick(Sender: TObject);
+begin
+  Application.HelpCommand(HELP_CONTEXT,ID_ProfileMakeInstallerPackage);
+end;
+
+procedure TBuildInstallerForSingleGameForm.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+begin
+  If (Key=VK_F1) and (Shift=[]) then HelpButtonClick(Sender);
 end;
 
 { global }

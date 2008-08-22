@@ -24,12 +24,13 @@ type
   public
     { Public-Deklarationen }
     SearchType : TSearchType;
+    DOSBoxDir : String; {if SearchType=stDOSBox}
   end;
 
 var
   SetupDosBoxForm: TSetupDosBoxForm;
 
-Function SearchDosBox(const AOwner : TComponent) : Boolean;
+Function SearchDosBox(const AOwner : TComponent; var ADOSBoxDir : String) : Boolean;
 Function SearchOggEnc(const AOwner : TComponent) : Boolean;
 Function SearchLame(const AOwner : TComponent) : Boolean;
 Function SearchScummVM(const AOwner : TComponent) : Boolean;
@@ -95,7 +96,7 @@ begin
   result:=False;
 
   Case SearchType of
-    stDOSBox  : begin result:=FileExists(Dir+DosBoxFileName); if result then begin PrgSetup.DosBoxDir:=Dir; exit; end; end;
+    stDOSBox  : begin result:=FileExists(Dir+DosBoxFileName); if result then begin DOSBoxDir:=Dir; exit; end; end;
     stOggEnc  : begin result:=FileExists(Dir+OggEncPrgFile); if result then begin PrgSetup.WaveEncOgg:=Dir+OggEncPrgFile; exit; end; end;
     stLame    : begin result:=FileExists(Dir+LamePrgFile); if result then begin PrgSetup.WaveEncMp3:=Dir+LamePrgFile; exit; end; end;
     stScummVM : begin result:=FileExists(Dir+ScummPrgFile); if result then begin PrgSetup.ScummVMPath:=Dir; exit; end; end;
@@ -134,25 +135,26 @@ end;
 
 { global }
 
-Function SearchDosBox(const AOwner : TComponent) : Boolean;
+Function SearchDosBox(const AOwner : TComponent; var ADOSBoxDir : String) : Boolean;
 Var S : String;
 begin
-  If FileExists(IncludeTrailingPathDelimiter(PrgSetup.DosBoxDir)+DosBoxFileName) then begin
+  If FileExists(IncludeTrailingPathDelimiter(ADOSBoxDir)+DosBoxFileName) then begin
     result:=True;
     exit;
   end;
 
   S:=IncludeTrailingPathDelimiter(GetSpecialFolder(Application.Handle,CSIDL_PROGRAM_FILES))+'DOSBox\';
-  If FileExists(S+DosBoxFileName) then begin PrgSetup.DosBoxDir:=S; result:=True; exit; end;
+  If FileExists(S+DosBoxFileName) then begin ADOSBoxDir:=S; result:=True; exit; end;
 
   SetupDosBoxForm:=TSetupDosBoxForm.Create(AOwner);
   try
-
-    If SetupDosBoxForm.SearchDir(PrgDir) then begin result:=True; exit; end;
+    SetupDosBoxForm.SearchType:=stDOSBox;
+    If SetupDosBoxForm.SearchDir(PrgDir) then begin result:=True; ADOSBoxDir:=SetupDosBoxForm.DOSBoxDir; exit; end;
     If PrgDataDir<>PrgDir then begin
-      If SetupDosBoxForm.SearchDir(PrgDataDir) then begin result:=True; exit; end;
+      If SetupDosBoxForm.SearchDir(PrgDataDir) then begin result:=True; ADOSBoxDir:=SetupDosBoxForm.DOSBoxDir; exit; end;
     end;
     result:=(SetupDosBoxForm.ShowModal<>mrAbort);
+    If result then ADOSBoxDir:=SetupDosBoxForm.DOSBoxDir;
   finally
     SetupDosBoxForm.Free;
   end;

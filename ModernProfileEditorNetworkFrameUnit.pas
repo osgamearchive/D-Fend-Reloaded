@@ -18,7 +18,7 @@ type
     { Private-Deklarationen }
   public
     { Public-Deklarationen }
-    Procedure InitGUI(const OnProfileNameChange : TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup, CurrentScummVMGameName : PString);
+    Procedure InitGUI(const InitData : TModernProfileEditorInitData);
     Procedure SetGame(const Game : TGame; const LoadFromTemplate : Boolean);
     Function CheckValue : Boolean;
     Procedure GetGame(const Game : TGame);
@@ -27,13 +27,13 @@ type
 
 implementation
 
-uses VistaToolsUnit, LanguageSetupUnit, CommonTools;
+uses VistaToolsUnit, LanguageSetupUnit, CommonTools, HelpConsts;
 
 {$R *.dfm}
 
 { TModernProfileEditorNetworkFrame }
 
-procedure TModernProfileEditorNetworkFrame.InitGUI(const OnProfileNameChange: TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup, CurrentScummVMGameName : PString);
+procedure TModernProfileEditorNetworkFrame.InitGUI(const InitData : TModernProfileEditorInitData);
 begin
   NoFlicker(ActivateCheckBox);
   NoFlicker(ConnectionsRadioGroup);
@@ -47,6 +47,8 @@ begin
   ConnectionsRadioGroup.Items[2]:=LanguageSetup.GameIPXEstablishConnectionServer;
   ServerAddressEdit.EditLabel.Caption:=LanguageSetup.GameIPXAddress;
   PortLabel.Caption:=LanguageSetup.GameIPXPort;
+
+  HelpContext:=ID_ProfileEditNetwork;
 end;
 
 procedure TModernProfileEditorNetworkFrame.SetGame(const Game: TGame; const LoadFromTemplate: Boolean);

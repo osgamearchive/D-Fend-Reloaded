@@ -47,6 +47,7 @@ type
   private
     { Private-Deklarationen }
     Procedure CenterWindow;
+    Procedure LoadImage(const MoveWindow : Boolean);
   public
     { Public-Deklarationen }
     ImageFile : String;
@@ -70,8 +71,8 @@ Var P : TForm;
 begin
   P:=(Owner as TForm);
 
-  Left:=(P.Left+P.Width div 2)-Width div 2;
-  Top:=(P.Top+P.Height div 2)-Height div 2;
+  Left:=Max(0,(P.Left+P.Width div 2)-Width div 2);
+  Top:=Max(0,(P.Top+P.Height div 2)-Height div 2);
 end;
 
 procedure TViewImageForm.FormCreate(Sender: TObject);
@@ -86,7 +87,7 @@ begin
   CopyButton.Caption:=LanguageSetup.Copy;
   SaveButton.Caption:=LanguageSetup.Save;
   ClearButton.Caption:=LanguageSetup.Clear;
-  {ZoomButton.Caption:=LanguageSetup.ViewImageFormZoomButton;}
+  ZoomButton.Caption:=LanguageSetup.ViewImageFormZoomButton;
   BackgroundButton.Caption:=LanguageSetup.ViewImageFormBackgroundButton;
 
   PrevImages:=TStringList.Create;
@@ -94,19 +95,27 @@ begin
 end;
 
 procedure TViewImageForm.FormShow(Sender: TObject);
+begin
+  LoadImage(True);
+end;
+
+procedure TViewImageForm.LoadImage(const MoveWindow: Boolean);
 Var P : TPicture;
+    W,H : Integer;
 begin
   PreviousButton.Enabled:=(PrevImages.Count>0);
   NextButton.Enabled:=(NextImages.Count>0);
 
   P:=LoadImageFromFile(ImageFile);
   try Image.Picture.Assign(P); finally P.Free; end;
-
   Caption:=LanguageSetup.ViewImageForm+' ['+MakeRelPath(ImageFile,PrgSetup.BaseDir)+']';
 
-  ClientHeight:=Min(Max(100,Image.Picture.Height+(ClientHeight-Image.Height)),Screen.WorkAreaHeight-10);
-  ClientWidth:=Min(Max(850,Image.Picture.Width),Screen.WorkAreaWidth-10);
-  CenterWindow;
+  W:=Image.Picture.Width; H:=Image.Picture.Height;
+  If (H<Screen.Height div 3) and (W<Screen.Width div 3) then begin W:=W*2; H:=H*2; end;
+  ClientHeight:=Min(Max(100,H+(ClientHeight-Image.Height)),Screen.WorkAreaHeight-10-(Height-Image.ClientHeight));
+  ClientWidth:=Min(Max(850,W),Screen.WorkAreaWidth-10-(Width-Image.ClientWidth));
+
+  If MoveWindow or (Left+Width>=Screen.WorkAreaWidth-10) or (Top+Height>=Screen.WorkAreaHeight-10) then CenterWindow;
 end;
 
 procedure TViewImageForm.ButtonWork(Sender: TObject);
@@ -137,13 +146,13 @@ begin
           NextImages.Insert(0,ImageFile);
           ImageFile:=PrevImages[PrevImages.Count-1];
           PrevImages.Delete(PrevImages.Count-1);
-          FormShow(Sender);
+          LoadImage(False);
         end;
     6 : if NextImages.Count>0 then begin
           PrevImages.Add(ImageFile);
           ImageFile:=NextImages[0];
           NextImages.Delete(0);
-          FormShow(Sender);
+          LoadImage(False);
         end;
     7 : begin
           If WindowState=wsMaximized then WindowState:=wsNormal;

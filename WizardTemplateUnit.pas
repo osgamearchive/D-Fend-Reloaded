@@ -32,11 +32,11 @@ type
     SpeedButton2: TSpeedButton;
     SpeedButton3: TSpeedButton;
     SpeedButton4: TSpeedButton;
-    BitBtn1: TBitBtn;
+    OperationModeInfoButton: TBitBtn;
     procedure IndirectTypeChange(Sender: TObject);
     procedure HelpButtonClick(Sender: TObject);
     procedure OKButtonClick(Sender: TObject);
-    procedure BitBtn1Click(Sender: TObject);
+    procedure OperationModeInfoButtonClick(Sender: TObject);
   private
     { Private-Deklarationen }
     FGameDB, TemplateDB, AutoSetupDB : TGameDB;
@@ -114,8 +114,9 @@ begin
   TemplateType4List.Items.AddObject(LanguageSetup.TemplateFormDefault,nil);
   For I:=0 to TemplateDB.Count-1 do TemplateType4List.Items.AddObject(TemplateDB[I].CacheName,TemplateDB[I]);
   TemplateType4List.ItemIndex:=0;
-  
+
   OKButton.Caption:=LanguageSetup.OK;
+  OperationModeInfoButton.Caption:=LanguageSetup.WizardFormOperationModeInfo;
 end;
 
 procedure TWizardTemplateFrame.Done;
@@ -242,7 +243,7 @@ begin
   result.Name:=GameName;
 end;
 
-procedure TWizardTemplateFrame.BitBtn1Click(Sender: TObject);
+procedure TWizardTemplateFrame.OperationModeInfoButtonClick(Sender: TObject);
 begin
   ShowOperationModeInfoDialog(self);
 end;

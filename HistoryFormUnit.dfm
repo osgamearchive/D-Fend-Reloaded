@@ -11,8 +11,10 @@ object HistoryForm: THistoryForm
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
+  KeyPreview = True
   OldCreateOrder = False
   Position = poOwnerFormCenter
+  OnKeyDown = FormKeyDown
   OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
@@ -76,5 +78,14 @@ object HistoryForm: THistoryForm
       BBB35555F55555575F555550555555550BBB55575555555575F5555555555555
       50BB555555555555575F555555555555550B5555555555555575}
     NumGlyphs = 2
+  end
+  object HelpButton: TBitBtn
+    Left = 214
+    Top = 383
+    Width = 97
+    Height = 25
+    TabOrder = 3
+    OnClick = HelpButtonClick
+    Kind = bkHelp
   end
 end

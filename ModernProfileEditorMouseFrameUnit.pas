@@ -20,7 +20,7 @@ type
     { Private-Deklarationen }
   public
     { Public-Deklarationen }
-    Procedure InitGUI(const OnProfileNameChange : TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup, CurrentScummVMGameName : PString);
+    Procedure InitGUI(const InitData : TModernProfileEditorInitData);
     Procedure SetGame(const Game : TGame; const LoadFromTemplate : Boolean);
     Function CheckValue : Boolean;
     Procedure GetGame(const Game : TGame);
@@ -29,13 +29,13 @@ type
 
 implementation
 
-uses VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgSetupUnit;
+uses VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgSetupUnit, HelpConsts;
 
 {$R *.dfm}
 
 { TModernProfileEditorMouseFrame }
 
-procedure TModernProfileEditorMouseFrame.InitGUI(const OnProfileNameChange: TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup, CurrentScummVMGameName : PString);
+procedure TModernProfileEditorMouseFrame.InitGUI(const InitData : TModernProfileEditorInitData);
 begin
   NoFlicker(LockMouseCheckBox);
   NoFlicker(MouseSensitivityEdit);
@@ -59,6 +59,8 @@ begin
   end else begin
     SwapButtonsInfoLabel.Font.Color:=clRed;
   end;
+
+  HelpContext:=ID_ProfileEditMouse;
 end;
 
 procedure TModernProfileEditorMouseFrame.SetGame(const Game: TGame; const LoadFromTemplate: Boolean);

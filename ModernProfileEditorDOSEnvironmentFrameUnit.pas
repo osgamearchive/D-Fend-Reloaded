@@ -21,7 +21,7 @@ type
     { Private-Deklarationen }
   public
     { Public-Deklarationen }
-    Procedure InitGUI(const OnProfileNameChange : TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup, CurrentScummVMGameName : PString);
+    Procedure InitGUI(const InitData : TModernProfileEditorInitData);
     Procedure SetGame(const Game : TGame; const LoadFromTemplate : Boolean);
     Function CheckValue : Boolean;
     Procedure GetGame(const Game : TGame);
@@ -30,13 +30,13 @@ type
 
 implementation
 
-uses VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgSetupUnit;
+uses VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgSetupUnit, HelpConsts;
 
 {$R *.dfm}
 
 { TModernProfileEditorDOSEnvironmentFrame }
 
-procedure TModernProfileEditorDOSEnvironmentFrame.InitGUI(const OnProfileNameChange: TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup, CurrentScummVMGameName : PString);
+procedure TModernProfileEditorDOSEnvironmentFrame.InitGUI(const InitData : TModernProfileEditorInitData);
 Var St : TStringList;
 begin
   NoFlicker(ReportedDOSVersionComboBox);
@@ -46,7 +46,7 @@ begin
   NoFlicker(CustomSetsEnvDel);
 
   ReportedDOSVersionLabel.Caption:=LanguageSetup.GameReportedDOSVersion;
-  St:=ValueToList(GameDB.ConfOpt.ReportedDOSVersion,';,'); try ReportedDOSVersionComboBox.Items.AddStrings(St); finally St.Free; end;
+  St:=ValueToList(InitData.GameDB.ConfOpt.ReportedDOSVersion,';,'); try ReportedDOSVersionComboBox.Items.AddStrings(St); finally St.Free; end;
   Use4DOSCheckBox.Caption:=LanguageSetup.ProfileEditorAutoexecUse4DOS;
   Use4DOSInfoLabel.Caption:=LanguageSetup.ProfileEditorNeedFreeDOS;
   If DirectoryExists(IncludeTrailingPathDelimiter(MakeAbsPath(PrgSetup.PathToFREEDOS,PrgSetup.BaseDir))) then begin
@@ -60,6 +60,8 @@ begin
   CustomSetsValueListEditor.TitleCaptions.Add(LanguageSetup.Value);
   CustomSetsEnvAdd.Caption:=LanguageSetup.Add;
   CustomSetsEnvDel.Caption:=LanguageSetup.Del;
+
+  HelpContext:=ID_ProfileEditDOSEnvironment;
 end;
 
 procedure TModernProfileEditorDOSEnvironmentFrame.SetGame(const Game: TGame; const LoadFromTemplate: Boolean);

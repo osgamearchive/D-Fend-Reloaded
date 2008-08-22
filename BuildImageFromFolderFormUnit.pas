@@ -19,10 +19,13 @@ type
     SaveDialog: TSaveDialog;
     WriteToFloppyCheckBox: TCheckBox;
     MakeBootableWithMouseDriverCheckBox: TCheckBox;
+    HelpButton: TBitBtn;
     procedure FormCreate(Sender: TObject);
     procedure ButtonWork(Sender: TObject);
     procedure OKButtonClick(Sender: TObject);
     procedure MakeBootableCheckBoxClick(Sender: TObject);
+    procedure HelpButtonClick(Sender: TObject);
+    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
   private
     { Private-Deklarationen }
   public
@@ -37,7 +40,8 @@ Function ShowBuildImageFromFolderDialog(const AOwner : TComponent) : Boolean;
 implementation
 
 Uses VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgSetupUnit,
-     CreateISOImageFormUnit, GameDBUnit, DOSBoxUnit, PrgConsts, CreateImageUnit;
+     CreateISOImageFormUnit, GameDBUnit, DOSBoxUnit, PrgConsts, CreateImageUnit,
+     HelpConsts;
 
 {$R *.dfm}
 
@@ -56,9 +60,9 @@ begin
   WriteToFloppyCheckBox.Caption:=LanguageSetup.ImageFromFolderWriteToFloppy;
   OKButton.Caption:=LanguageSetup.OK;
   CancelButton.Caption:=LanguageSetup.Cancel;
+  HelpButton.Caption:=LanguageSetup.Help;
   SaveDialog.Title:=LanguageSetup.ImageFromFolderSaveDialogTitle;
   SaveDialog.Filter:=LanguageSetup.ImageFromFolderSaveDialogFilter;
-
 end;
 
 procedure TBuildImageFromFolderForm.ButtonWork(Sender: TObject);
@@ -122,6 +126,16 @@ begin
     ModalResult:=mrNone;
     exit;
   end;
+end;
+
+procedure TBuildImageFromFolderForm.HelpButtonClick(Sender: TObject);
+begin
+  Application.HelpCommand(HELP_CONTEXT,ID_ExtrasImagesCreateFromFolder);
+end;
+
+procedure TBuildImageFromFolderForm.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+begin
+  If (Key=VK_F1) and (Shift=[]) then HelpButtonClick(Sender);
 end;
 
 { global }

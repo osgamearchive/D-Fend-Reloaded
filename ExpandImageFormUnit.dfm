@@ -11,9 +11,11 @@ object ExpandImageForm: TExpandImageForm
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
+  KeyPreview = True
   OldCreateOrder = False
   Position = poOwnerFormCenter
   OnCreate = FormCreate
+  OnKeyDown = FormKeyDown
   PixelsPerInch = 96
   TextHeight = 13
   object FileNameButton: TSpeedButton
@@ -120,9 +122,18 @@ object ExpandImageForm: TExpandImageForm
       'ISO-Image')
     TabOrder = 2
   end
+  object HelpButton: TBitBtn
+    Left = 231
+    Top = 273
+    Width = 97
+    Height = 25
+    TabOrder = 6
+    OnClick = HelpButtonClick
+    Kind = bkHelp
+  end
   object OpenDialog: TOpenDialog
     DefaultExt = 'img'
-    Left = 232
-    Top = 276
+    Left = 256
+    Top = 236
   end
 end

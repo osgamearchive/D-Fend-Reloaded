@@ -24,7 +24,7 @@ type
     SaveCycles : String;
   public
     { Public-Deklarationen }
-    Procedure InitGUI(const OnProfileNameChange : TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup, CurrentScummVMGameName : PString);
+    Procedure InitGUI(const InitData : TModernProfileEditorInitData);
     Procedure SetGame(const Game : TGame; const LoadFromTemplate : Boolean);
     Function CheckValue : Boolean;
     Procedure GetGame(const Game : TGame);
@@ -33,13 +33,13 @@ type
 
 implementation
 
-uses CommonTools, LanguageSetupUnit, VistaToolsUnit;
+uses CommonTools, LanguageSetupUnit, VistaToolsUnit, HelpConsts;
 
 {$R *.dfm}
 
 { TModernProfileEditorCPUFrame }
 
-procedure TModernProfileEditorCPUFrame.InitGUI(const OnProfileNameChange: TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup, CurrentScummVMGameName : PString);
+procedure TModernProfileEditorCPUFrame.InitGUI(const InitData : TModernProfileEditorInitData);
 Var St : TStringList;
     I : Integer;
     S : String;
@@ -56,10 +56,10 @@ begin
   CPUCyclesGroupBox.Caption:=LanguageSetup.GameCycles;
   CyclesValueRadioButton.Caption:=LanguageSetup.Value;
 
-  St:=ValueToList(GameDB.ConfOpt.Core,';,'); try CPUCoreRadioGroup.Items.AddStrings(St); finally St.Free; end;
+  St:=ValueToList(InitData.GameDB.ConfOpt.Core,';,'); try CPUCoreRadioGroup.Items.AddStrings(St); finally St.Free; end;
   CPUCoreRadioGroup.ItemIndex:=0;
 
-  St:=ValueToList(GameDB.ConfOpt.Cycles,';,');
+  St:=ValueToList(InitData.GameDB.ConfOpt.Cycles,';,');
   try
     For I:=0 to St.Count-1 do begin
       S:=Trim(ExtUpperCase(St[I]));
@@ -74,6 +74,8 @@ begin
   CyclesUpLabel.Caption:=LanguageSetup.GameCyclesUp;
   CyclesDownLabel.Caption:=LanguageSetup.GameCyclesDown;
   CyclesInfoLabel.Caption:=LanguageSetup.GameCyclesInfo;
+
+  HelpContext:=ID_ProfileEditCPU;
 end;
 
 procedure TModernProfileEditorCPUFrame.SetGame(const Game: TGame; const LoadFromTemplate: Boolean);

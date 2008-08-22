@@ -11,9 +11,9 @@ Type TSimpleEvent=Procedure of object;
 
 Type TInitData=record
   LanguageChangeNotify, DosBoxDirChangeNotify : TSimpleEvent;
-  PDosBoxDir, PBaseDir : PString;
+  PDosBoxDir, PBaseDir, PDOSBoxLang : PString;
   GameDB : TGameDB;
-  OpenLanguageEditorEvent : TOpenLanguageEditorEvent
+  OpenLanguageEditorEvent : TOpenLanguageEditorEvent;
 end;
 
 Type ISetupFrame=interface
@@ -52,19 +52,22 @@ type
     ImageList: TImageList;
     RestoreDefaultValuesButton: TBitBtn;
     PopupMenu: TPopupMenu;
+    HelpButton: TBitBtn;
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure ModeComboBoxChange(Sender: TObject);
     procedure TreeChange(Sender: TObject; Node: TTreeNode);
     procedure OKButtonClick(Sender: TObject);
     procedure RestoreDefaultValuesButtonClick(Sender: TObject);
+    procedure HelpButtonClick(Sender: TObject);
+    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
   private
     { Private-Deklarationen }
     Frames : Array of TFrameRecord;
     VisibleFrame : Integer;
     SetAdvanced : Boolean;
     LanguageFrame, TreeListFrame : TFrame;
-    InternalDOSBoxDir, InternalBaseDir : String;
+    InternalDOSBoxDir, InternalDOSBoxLang, InternalBaseDir : String;
     Procedure InitFramesList;
     Procedure AddTreeNode(const ParentFrame, NewFrame : TFrame; NewFrameInterface : ISetupFrame; const AdvencedModeOnly : Boolean; const ImageIndex : Integer; const IsEmpty : Boolean = False);
     Procedure LoadLanguage;
@@ -96,7 +99,9 @@ uses VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgSetupUnit,
      SetupFrameDefaultValuesUnit, SetupFrameProgramsUnit, SetupFrameDOSBoxUnit,
      SetupFrameDOSBoxExtUnit, SetupFrameFreeDOSUnit, SetupFrameScummVMUnit,
      SetupFrameQBasicUnit, SetupFrameWaveEncoderUnit, SetupFrameSecurityUnit,
-     SetupFrameServiceUnit, SetupFrameUpdateUnit, SetupFrameWineUnit;
+     SetupFrameServiceUnit, SetupFrameUpdateUnit, SetupFrameWineUnit,
+     SetupFrameCompressionUnit, SetupFrameGamesListScreenshotModeAppearanceUnit,
+     HelpConsts;
 
 {$R *.dfm}
 
@@ -128,7 +133,8 @@ begin
     If PrgSetup.EasySetupMode and (not SetAdvanced) then ModeComboBox.ItemIndex:=0 else ModeComboBox.ItemIndex:=1;
   end;
 
-  InternalDOSBoxDir:=PrgSetup.DosBoxDir;
+  InternalDOSBoxDir:=PrgSetup.DOSBoxSettings[0].DosBoxDir;
+  InternalDOSBoxLang:=PrgSetup.DOSBoxSettings[0].DosBoxLanguage;
   InternalBaseDir:=PrgSetup.BaseDir;
 
   LoadUserIcons(ImageList,'SetupForm');
@@ -151,6 +157,7 @@ begin
   InitData.DosBoxDirChangeNotify:=DOSBoxDirChanged;
   InitData.OpenLanguageEditorEvent:=OpenLanguageEditor;
   InitData.PDosBoxDir:=@InternalDOSBoxDir;
+  InitData.PDOSBoxLang:=@InternalDOSBoxLang;
   InitData.PBaseDir:=@InternalBaseDir;
   InitData.GameDB:=GameDB;
 
@@ -175,13 +182,15 @@ begin
   F:=TSetupFrameBase.Create(self); AddTreeNode(nil,F,TSetupFrameBase(F),False,0); Root:=F;
   F:=TSetupFrameDirectories.Create(self); AddTreeNode(Root,F,TSetupFrameDirectories(F),False,1);
   F:=TSetupFrameSecurity.Create(self); AddTreeNode(Root,F,TSetupFrameSecurity(F),True,5);
-  {F:=TSetupFrameWine.Create(self); AddTreeNode(Root,F,TSetupFrameWine(F),True,0);}
+  F:=TSetupFrameCompression.Create(self); AddTreeNode(Root,F,TSetupFrameCompression(F),True,16);
+  F:=TSetupFrameWine.Create(self); AddTreeNode(Root,F,TSetupFrameWine(F),True,0);
 
   F:=TSetupFrameSurface.Create(self); AddTreeNode(nil,F,TSetupFrameSurface(F),False,12); Root:=F;
   F:=TSetupFrameLanguage.Create(self); AddTreeNode(Root,F,TSetupFrameLanguage(F),False,2,True); LanguageFrame:=F;
   F:=TSetupFrameToolbar.Create(self); AddTreeNode(Root,F,TSetupFrameToolbar(F),True,13);
   F:=TSetupFrameGamesListColumns.Create(self); AddTreeNode(Root,F,TSetupFrameGamesListColumns(F),True,3);
-  F:=TSetupFrameGamesListAppearance.Create(self); AddTreeNode(Root,F,TSetupFrameGamesListAppearance(F),True,3);
+  F:=TSetupFrameGamesListAppearance.Create(self); AddTreeNode(Root,F,TSetupFrameGamesListAppearance(F),True,3); Root2:=F;
+  F:=TSetupFrameGamesListScreenshotModeAppearance.Create(self); AddTreeNode(Root2,F,TSetupFrameGamesListScreenshotModeAppearance(F),True,3);
   F:=TSetupFrameGamesListTreeAppearance.Create(self); AddTreeNode(Root,F,TSetupFrameGamesListTreeAppearance(F),True,3); TreeListFrame:=F;
   F:=TSetupFrameGamesListScreenshotAppearance.Create(self); AddTreeNode(Root,F,TSetupFrameGamesListScreenshotAppearance(F),True,3);
 
@@ -206,6 +215,7 @@ begin
   Caption:=LanguageSetup.SetupForm;
   OKButton.Caption:=LanguageSetup.OK;
   CancelButton.Caption:=LanguageSetup.Cancel;
+  HelpButton.Caption:=LanguageSetup.Help;
   RestoreDefaultValuesButton.Caption:=LanguageSetup.SetupFormDefaultValueReset;
   ModeLabel.Caption:=LanguageSetup.SetupFormMode;
   I:=ModeComboBox.ItemIndex;
@@ -356,6 +366,20 @@ Var I : Integer;
 begin
   If not SetAdvanced then PrgSetup.EasySetupMode:=(ModeComboBox.ItemIndex=0);
   For I:=0 to length(Frames)-1 do Frames[I].IFrame.SaveSetup;
+end;
+
+procedure TSetupForm.HelpButtonClick(Sender: TObject);
+Var I : Integer;
+begin
+  I:=0;
+  If VisibleFrame>=0 then I:=Frames[VisibleFrame].Frame.HelpContext;
+  If I=0 then I:=ID_FileOptions;
+  Application.HelpCommand(HELP_CONTEXT,I);
+end;
+
+procedure TSetupForm.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+begin
+  If (Key=VK_F1) and (Shift=[]) then HelpButtonClick(Sender);
 end;
 
 { global }

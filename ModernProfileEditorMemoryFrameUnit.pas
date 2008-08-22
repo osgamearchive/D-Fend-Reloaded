@@ -30,7 +30,7 @@ type
     ProfileExe : PString;
   public
     { Public-Deklarationen }
-    Procedure InitGUI(const OnProfileNameChange : TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup, CurrentScummVMGameName : PString);
+    Procedure InitGUI(const InitData : TModernProfileEditorInitData);
     Procedure SetGame(const Game : TGame; const LoadFromTemplate : Boolean);
     Function CheckValue : Boolean;
     Procedure GetGame(const Game : TGame);
@@ -39,13 +39,13 @@ type
 
 implementation
 
-uses LanguageSetupUnit, VistaToolsUnit, CommonTools, PrgSetupUnit;
+uses LanguageSetupUnit, VistaToolsUnit, CommonTools, PrgSetupUnit, HelpConsts;
 
 {$R *.dfm}
 
 { TModernProfileEditorMemoryFrame }
 
-procedure TModernProfileEditorMemoryFrame.InitGUI(const OnProfileNameChange: TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup, CurrentScummVMGameName : PString);
+procedure TModernProfileEditorMemoryFrame.InitGUI(const InitData : TModernProfileEditorInitData);
 begin
   NoFlicker(MemoryEdit);
 
@@ -63,7 +63,9 @@ begin
     DOS32AInfoLabel.Font.Color:=clRed;
   end;
   LastProfileExe:='-';
-  ProfileExe:=CurrentProfileExe;
+  ProfileExe:=InitData.CurrentProfileExe;
+
+  HelpContext:=ID_ProfileEditMemory;
 end;
 
 procedure TModernProfileEditorMemoryFrame.SetGame(const Game: TGame; const LoadFromTemplate: Boolean);

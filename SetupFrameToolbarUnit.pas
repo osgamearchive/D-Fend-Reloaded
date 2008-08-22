@@ -38,7 +38,7 @@ type
 
 implementation
 
-uses Math, LanguageSetupUnit, VistaToolsUnit, PrgSetupUnit, CommonTools;
+uses Math, LanguageSetupUnit, VistaToolsUnit, PrgSetupUnit, CommonTools, HelpConsts;
 
 {$R *.dfm}
 
@@ -102,6 +102,8 @@ begin
   ToolbarImageCheckBox.Caption:=LanguageSetup.SetupFormBackgroundColorFile;
   ToolbarImageButton.Hint:=LanguageSetup.ChooseFile;
   ToolbarFontSizeLabel.Caption:=LanguageSetup.SetupFormFontSize;
+
+  HelpContext:=ID_FileOptionsToolbar;
 end;
 
 procedure TSetupFrameToolbar.DOSBoxDirChanged;

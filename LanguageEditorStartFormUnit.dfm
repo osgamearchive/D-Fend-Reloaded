@@ -11,9 +11,11 @@ object LanguageEditorStartForm: TLanguageEditorStartForm
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
+  KeyPreview = True
   OldCreateOrder = False
   Position = poOwnerFormCenter
   OnCreate = FormCreate
+  OnKeyDown = FormKeyDown
   PixelsPerInch = 96
   TextHeight = 13
   object EditThisRadioButton: TRadioButton
@@ -57,5 +59,14 @@ object LanguageEditorStartForm: TLanguageEditorStartForm
     Height = 25
     TabOrder = 4
     Kind = bkCancel
+  end
+  object HelpButton: TBitBtn
+    Left = 232
+    Top = 98
+    Width = 97
+    Height = 25
+    TabOrder = 5
+    OnClick = HelpButtonClick
+    Kind = bkHelp
   end
 end

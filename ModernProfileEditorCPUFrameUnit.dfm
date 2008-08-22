@@ -75,7 +75,7 @@ object ModernProfileEditorCPUFrame: TModernProfileEditorCPUFrame
       Top = 76
       Width = 104
       Height = 21
-      ItemHeight = 0
+      ItemHeight = 13
       TabOrder = 3
     end
   end

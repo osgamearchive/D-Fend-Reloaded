@@ -40,7 +40,7 @@ type
 
 implementation
 
-uses Math, LanguageSetupUnit, VistaToolsUnit, PrgSetupUnit, CommonTools;
+uses Math, LanguageSetupUnit, VistaToolsUnit, PrgSetupUnit, CommonTools, HelpConsts;
 
 {$R *.dfm}
 
@@ -100,6 +100,8 @@ begin
     then ScreenshotsListFontColorBox.Style:=ScreenshotsListFontColorBox.Style+[cbPrettyNames]
     else ScreenshotsListFontColorBox.Style:=ScreenshotsListFontColorBox.Style-[cbPrettyNames];
   ScreenshotPreviewLabel.Caption:=LanguageSetup.SetupFormScreenshotPreviewSize;
+
+  HelpContext:=ID_FileOptionsAppearanceScreenshots;
 end;
 
 procedure TSetupFrameGamesListScreenshotAppearance.DOSBoxDirChanged;

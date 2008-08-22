@@ -17,9 +17,12 @@ type
     OpenFolderCheckBox: TCheckBox;
     OpenDialog: TOpenDialog;
     ImageTypeRadioGroup: TRadioGroup;
+    HelpButton: TBitBtn;
     procedure FormCreate(Sender: TObject);
     procedure ButtonWork(Sender: TObject);
     procedure OKButtonClick(Sender: TObject);
+    procedure HelpButtonClick(Sender: TObject);
+    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
   private
     { Private-Deklarationen }
     Function ExpandImage(const FileName, Dir : String; const ImageType : Integer) : Boolean;
@@ -35,7 +38,7 @@ Function ShowExpandImageDialog(const AOwner : TComponent) : Boolean;
 implementation
 
 uses ShellAPI, VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgSetupUnit,
-     GameDBUnit, DOSBoxUnit, ImageTools;
+     GameDBUnit, DOSBoxUnit, ImageTools, HelpConsts;
 
 {$R *.dfm}
 
@@ -58,6 +61,7 @@ begin
   ImageTypeRadioGroup.ItemIndex:=0;
   OKButton.Caption:=LanguageSetup.OK;
   CancelButton.Caption:=LanguageSetup.Cancel;
+  HelpButton.Caption:=LanguageSetup.Help;
   OpenDialog.Title:=LanguageSetup.ExtractImageOpenFileTitle;
   OpenDialog.Filter:=LanguageSetup.ExtractImageOpenFileFilter;
 end;
@@ -166,6 +170,16 @@ begin
   end;
 
   result:=True;
+end;
+
+procedure TExpandImageForm.HelpButtonClick(Sender: TObject);
+begin
+  Application.HelpCommand(HELP_CONTEXT,ID_ExtrasImagesExtractToFolder);
+end;
+
+procedure TExpandImageForm.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+begin
+  If (Key=VK_F1) and (Shift=[]) then HelpButtonClick(Sender);
 end;
 
 { global }

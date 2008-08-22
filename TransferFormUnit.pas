@@ -20,11 +20,14 @@ type
     SelectGenreButton: TBitBtn;
     PopupMenu: TPopupMenu;
     CopyDFRCheckBox: TCheckBox;
+    HelpButton: TBitBtn;
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure SelectButtonClick(Sender: TObject);
     procedure OKButtonClick(Sender: TObject);
     procedure DestPrgDirButtonClick(Sender: TObject);
+    procedure HelpButtonClick(Sender: TObject);
+    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
   private
     { Private-Deklarationen }
     Function CopyInstallation(const DestPrgDir : String) : Boolean;
@@ -46,7 +49,8 @@ Function TransferGames(const AOwner : TComponent; const AGameDB : TGameDB) : Boo
 implementation
 
 uses ShlObj, VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgConsts,
-     ProgressFormUnit, GameDBToolsUnit, SmallWaitFormUnit;
+     ProgressFormUnit, GameDBToolsUnit, SmallWaitFormUnit, UninstallFormUnit,
+     HelpConsts;
 
 {$R *.dfm}
 
@@ -60,6 +64,7 @@ begin
   DestPrgDirEdit.EditLabel.Caption:=LanguageSetup.TransferFormDestPrgDir;
   DestPrgDirButton.Hint:=LanguageSetup.ChooseFolder;
   OKButton.Caption:=LanguageSetup.OK;
+  HelpButton.Caption:=LanguageSetup.Help;
   CancelButton.Caption:=LanguageSetup.Cancel;
   SelectAllButton.Caption:=LanguageSetup.All;
   SelectNoneButton.Caption:=LanguageSetup.None;
@@ -69,7 +74,7 @@ end;
 
 procedure TTransferForm.FormShow(Sender: TObject);
 begin
-  BuildCheckList(ListBox,GameDB,False,False);
+  BuildCheckList(ListBox,GameDB,False,False,True);
   BuildSelectPopupMenu(PopupMenu,GameDB,SelectButtonClick,False);
 end;
 
@@ -134,6 +139,8 @@ begin
       St.Add('D-Fend Reloaded DataInstaller.nsi');
       St.Add('UpdateCheck.exe');
       St.Add('SetInstallerLanguage.exe');
+      St.Add('7za.dll');
+      St.Add('DelZip179.dll');
       For I:=0 to St.Count-1 do CopyFile(PChar(PrgDir+St[I]),PChar(DestPrgDir+St[I]),False);
     finally
       St.Free;
@@ -208,9 +215,9 @@ begin
 
     {Transfer DOSBox}
 
-    If not CopyDir(IncludeTrailingPathDelimiter(PrgSetup.DosBoxDir),IncludeTrailingPathDelimiter(DestPrgDir+'DOSBox')) then exit;
-    If Trim(PrgSetup.DosBoxMapperFile)<>'' then
-      CopyFile(PChar(MakeAbsPath(PrgSetup.DosBoxMapperFile,PrgSetup.BaseDir)),PChar(IncludeTrailingPathDelimiter(DestPrgDir+'DOSBox')+ExtractFileName(PrgSetup.DosBoxMapperFile)),False);
+    If not CopyDir(IncludeTrailingPathDelimiter(PrgSetup.DOSBoxSettings[0].DosBoxDir),IncludeTrailingPathDelimiter(DestPrgDir+'DOSBox')) then exit;
+    If Trim(PrgSetup.DOSBoxSettings[0].DosBoxMapperFile)<>'' then
+      CopyFile(PChar(MakeAbsPath(PrgSetup.DOSBoxSettings[0].DosBoxMapperFile,PrgSetup.BaseDir)),PChar(IncludeTrailingPathDelimiter(DestPrgDir+'DOSBox')+ExtractFileName(PrgSetup.DOSBoxSettings[0].DosBoxMapperFile)),False);
 
     {Change DFend.ini}
 
@@ -221,11 +228,11 @@ begin
         NewSetup.BaseDir:=DestPrgDir;
         NewSetup.GameDir:=DestPrgDir+'VirtualHD';
         NewSetup.DataDir:=DestPrgDir+'GameData';
-        NewSetup.DosBoxDir:=DestPrgDir+'DOSBox';
-        If Trim(PrgSetup.DosBoxLanguage)=''
-          then NewSetup.DosBoxLanguage:=''
-          else NewSetup.DosBoxLanguage:=DestPrgDir+'DOSBox\'+ExtractFileName(PrgSetup.DosBoxLanguage);
-        NewSetup.DosBoxMapperFile:='./'+ExtractFileName(PrgSetup.DosBoxMapperFile);
+        NewSetup.DOSBoxSettings[0].DosBoxDir:=DestPrgDir+'DOSBox';
+        If Trim(PrgSetup.DOSBoxSettings[0].DosBoxLanguage)=''
+          then NewSetup.DOSBoxSettings[0].DosBoxLanguage:=''
+          else NewSetup.DOSBoxSettings[0].DosBoxLanguage:=DestPrgDir+'DOSBox\'+ExtractFileName(PrgSetup.DOSBoxSettings[0].DosBoxLanguage);
+        NewSetup.DOSBoxSettings[0].DosBoxMapperFile:='./'+ExtractFileName(PrgSetup.DOSBoxSettings[0].DosBoxMapperFile);
         NewSetup.PathToFREEDOS:='.\VirtualHD\FREEDOS\';
         If FileExists(DestPrgDir+OggEncPrgFile) then NewSetup.WaveEncOgg:='.\'+OggEncPrgFile;
 
@@ -387,7 +394,7 @@ end;
 function TTransferForm.TransferGame(const Game: TGame; const DestDataDir: String): Boolean;
 Var S,T : String;
     I : Integer;
-    St : TStringList;
+    St, Files, Folders : TStringList;
 begin
   result:=False;
   Game.StoreAllValues;
@@ -408,6 +415,11 @@ begin
       S:=IncludeTrailingPathDelimiter(S);
       if not CopyFiles(S,PrgDataDir,DestDataDir,Game.Name) then exit;
     end;
+    S:=Trim(Game.ScummVMSavePath);
+    If S<>'' then begin
+      S:=IncludeTrailingPathDelimiter(S);
+      if not CopyFiles(S,PrgDataDir,DestDataDir,Game.Name) then exit;
+    end;
   end else begin
     S:=Trim(Game.GameExe);
     If ExtUpperCase(Copy(S,1,7))='DOSBOX:' then S:='';
@@ -417,12 +429,12 @@ begin
       S:=IncludeTrailingPathDelimiter(ExtractFilePath(S));
       if not CopyFiles(S,PrgDataDir,DestDataDir,Game.Name) then exit;
     end;
+  end;
 
-    S:=Trim(Game.CaptureFolder);
-    If S<>'' then begin
-      S:=IncludeTrailingPathDelimiter(S);
-      if not CopyFiles(S,PrgDataDir,DestDataDir,Game.Name) then exit;
-    end;
+  S:=Trim(Game.CaptureFolder);
+  If S<>'' then begin
+    S:=IncludeTrailingPathDelimiter(S);
+    if not CopyFiles(S,PrgDataDir,DestDataDir,Game.Name) then exit;
   end;
 
   S:=MakeAbsIconName(Game.Icon);
@@ -488,6 +500,28 @@ begin
     end;
   end;
 
+  FileAndFoldersFromDrives(Game,Files,Folders);
+  try
+    For I:=0 to Files.Count-1 do begin
+      S:=MakeRelPath(Files[I],PrgSetup.BaseDir);
+      If not ForceDirectories(ExtractFilePath(MakeAbsPath(S,DestDataDir))) then begin
+        MessageDlg(Format(LanguageSetup.MessageCouldNotCreateDir,[ExtractFilePath(MakeAbsPath(S,DestDataDir))]),mtError,[mbOK],0); exit;
+        exit;
+      end;
+      if not CopyFile(PChar(MakeAbsPath(S,PrgDataDir)),PChar(MakeAbsPath(S,DestDataDir)),False) then begin
+        MessageDlg(Format(LanguageSetup.MessageCouldNotCopyFile,[MakeAbsPath(S,PrgDataDir),MakeAbsPath(S,DestDataDir)]),mtError,[mbOK],0); exit;
+        exit;
+      end;
+    end;
+    For I:=0 to Folders.Count-1 do begin
+      S:=Folders[I];
+      if not CopyFiles(S,PrgDataDir,DestDataDir,Game.Name) then exit;
+    end;
+  finally
+    Files.Free;
+    Folders.Free;
+  end;
+
   result:=True;
 end;
 
@@ -513,6 +547,16 @@ begin
   finally
     DoneProgressWindow;
   end;
+end;
+
+procedure TTransferForm.HelpButtonClick(Sender: TObject);
+begin
+  Application.HelpCommand(HELP_CONTEXT,ID_ExtrasTransferProfiles);
+end;
+
+procedure TTransferForm.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+begin
+  If (Key=VK_F1) and (Shift=[]) then HelpButtonClick(Sender);
 end;
 
 { global }

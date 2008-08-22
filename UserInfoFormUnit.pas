@@ -14,12 +14,15 @@ type
     Tab: TStringGrid;
     DelButton: TSpeedButton;
     AddButton: TSpeedButton;
+    HelpButton: TBitBtn;
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure OKButtonClick(Sender: TObject);
     procedure FormResize(Sender: TObject);
     procedure AddButtonClick(Sender: TObject);
     procedure DelButtonClick(Sender: TObject);
+    procedure HelpButtonClick(Sender: TObject);
+    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
   private
     { Private-Deklarationen }
   public
@@ -34,7 +37,7 @@ Function ShowUserInfoDialog(const AOwner : TComponent; const AGame : TGame) : Bo
 
 implementation
 
-uses VistaToolsUnit, LanguageSetupUnit, CommonTools;
+uses VistaToolsUnit, LanguageSetupUnit, CommonTools, HelpConsts;
 
 {$R *.dfm}
 
@@ -48,6 +51,7 @@ begin
   Tab.Cells[1,0]:=LanguageSetup.Value;
   OKButton.Caption:=LanguageSetup.OK;
   CancelButton.Caption:=LanguageSetup.Cancel;
+  HelpButton.Caption:=LanguageSetup.Help;
   AddButton.Hint:=RemoveUnderline(LanguageSetup.Add);
   DelButton.Hint:=RemoveUnderline(LanguageSetup.Del);
 end;
@@ -123,6 +127,16 @@ begin
   finally
     St.Free;
   end;
+end;
+
+procedure TUserInfoForm.HelpButtonClick(Sender: TObject);
+begin
+  Application.HelpCommand(HELP_CONTEXT,ID_ProfileEditProgramInformation);
+end;
+
+procedure TUserInfoForm.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+begin
+  If (Key=VK_F1) and (Shift=[]) then HelpButtonClick(Sender);
 end;
 
 { global }

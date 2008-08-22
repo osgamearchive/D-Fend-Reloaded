@@ -24,6 +24,7 @@ type
     Bevel: TBevel;
     FolderInfoButton: TSpeedButton;
     DataFolderShowButton: TBitBtn;
+    FolderInfoButton2: TSpeedButton;
     procedure ButtonWork(Sender: TObject);
     procedure FolderInfoButtonClick(Sender: TObject);
     procedure DataFolderShowButtonClick(Sender: TObject);
@@ -145,7 +146,10 @@ end;
 
 procedure TWizardPrgFileFrame.FolderInfoButtonClick(Sender: TObject);
 begin
-  MessageDlg(Format(LanguageSetup.WizardFormGamesFolderInfo,[PrgSetup.BaseDir]),mtInformation,[mbOK],0);
+  Case (Sender as TComponent).Tag of
+    0 : MessageDlg(Format(LanguageSetup.WizardFormGamesFolderInfo,[PrgSetup.BaseDir]),mtInformation,[mbOK],0);
+    1 : MessageDlg(Format(LanguageSetup.WizardFormBaseDataFolderInfo,[PrgSetup.BaseDir]),mtInformation,[mbOK],0);
+  end;
 end;
 
 procedure TWizardPrgFileFrame.DataFolderShowButtonClick(Sender: TObject);
@@ -157,6 +161,7 @@ begin
   BaseDataFolderButton.Visible:=True;
   DataFolderEdit.Visible:=True;
   DataFolderButton.Visible:=True;
+  FolderInfoButton2.Visible:=True;
 end;
 
 

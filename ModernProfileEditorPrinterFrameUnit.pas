@@ -25,7 +25,7 @@ type
     { Private-Deklarationen }
   public
     { Public-Deklarationen }
-    Procedure InitGUI(const OnProfileNameChange : TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup, CurrentScummVMGameName : PString);
+    Procedure InitGUI(const InitData : TModernProfileEditorInitData);
     Procedure SetGame(const Game : TGame; const LoadFromTemplate : Boolean);
     Function CheckValue : Boolean;
     Procedure GetGame(const Game : TGame);
@@ -34,13 +34,13 @@ type
 
 implementation
 
-uses VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgSetupUnit;
+uses VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgSetupUnit, HelpConsts;
 
 {$R *.dfm}
 
 { TFrame1 }
 
-procedure TModernProfileEditorPrinterFrame.InitGUI(const OnProfileNameChange: TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup, CurrentScummVMGameName: PString);
+procedure TModernProfileEditorPrinterFrame.InitGUI(const InitData : TModernProfileEditorInitData);
 begin
   NoFlicker(EnablePrinterEmulationCheckBox);
   NoFlicker(ResolutionEdit);
@@ -59,6 +59,8 @@ begin
   with OutputFormatComboBox.Items do begin Add('png'); Add('ps'); Add('bmp'); Add('printer'); end;
   MultiPageCheckBox.Caption:=LanguageSetup.GamePrinterMultiPage;
   MultiPageInfoLabel.Caption:=LanguageSetup.GamePrinterMultiPageInfo;
+
+  HelpContext:=ID_ProfileEditPrinter;
 end;
 
 procedure TModernProfileEditorPrinterFrame.SetGame(const Game: TGame; const LoadFromTemplate: Boolean);

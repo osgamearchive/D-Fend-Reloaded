@@ -33,7 +33,7 @@ type
 
 implementation
 
-uses LanguageSetupUnit, VistaToolsUnit, PrgSetupUnit, CommonTools;
+uses LanguageSetupUnit, VistaToolsUnit, PrgSetupUnit, CommonTools, HelpConsts;
 
 {$R *.dfm}
 
@@ -55,6 +55,8 @@ begin
   BaseDirEdit.Text:=PrgSetup.BaseDir;
   GameDirEdit.Text:=PrgSetup.GameDir;
   DataDirEdit.Text:=PrgSetup.DataDir;
+
+  HelpContext:=ID_FileOptionsGeneral;
 end;
 
 procedure TSetupFrameDirectories.LoadLanguage;

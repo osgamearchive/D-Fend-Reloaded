@@ -16,28 +16,31 @@ type
     UseProfileIconCheckBox: TCheckBox;
     LinkNameEdit: TLabeledEdit;
     LinkCommentEdit: TLabeledEdit;
+    HelpButton: TBitBtn;
     procedure FormCreate(Sender: TObject);
     procedure StartmenuEditChange(Sender: TObject);
     procedure OKButtonClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
+    procedure HelpButtonClick(Sender: TObject);
+    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
   private
     { Private-Deklarationen }
   public
     { Public-Deklarationen }
-    GameName, GameFile, GameIcon : String;
-    GameScummVM : Boolean;
+    GameName, GameFile, GameExeFile, GameIcon, WinGameParameters : String;
+    GameScummVM, GameWindowsExe : Boolean;
   end;
 
 var
   CreateShortcutForm: TCreateShortcutForm;
 
-Function ShowCreateShortcutDialog(const AOwner : TComponent; const AGameName, AGameFileName, AGameIconFile : String; const AGameScummVM : Boolean) : Boolean;
+Function ShowCreateShortcutDialog(const AOwner : TComponent; const AGameName, AGameFileName, AGameIconFile, AGammExeName, AWinGameParameters : String; const AGameScummVM, AGameWindowsExe : Boolean) : Boolean;
 Function CreateLinuxShortCut(const AOwner : TComponent; const Game : TGame) : Boolean;
 
 implementation
 
 uses ShlObj, VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgSetupUnit,
-     PrgConsts, GameDBToolsUnit, DosBoxUnit;
+     PrgConsts, GameDBToolsUnit, DosBoxUnit, HelpConsts;
 
 {$R *.dfm}
 
@@ -48,11 +51,14 @@ begin
   Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName);
 
   Caption:=LanguageSetup.CreateShortcutForm;
+  LinkNameEdit.EditLabel.Caption:=LanguageSetup.CreateShortcutFormLinkName;
+  LinkCommentEdit.EditLabel.Caption:=LanguageSetup.CreateShortcutFormLinkComment;
   DesktopRadioButton.Caption:=LanguageSetup.CreateShortcutFormDesktop;
   StartmenuRadioButton.Caption:=LanguageSetup.CreateShortcutFormStartmenu;
   UseProfileIconCheckBox.Caption:=LanguageSetup.CreateShortcutFormUseProfileIcon;
   OKButton.Caption:=LanguageSetup.OK;
   CancelButton.Caption:=LanguageSetup.Cancel;
+  HelpButton.Caption:=LanguageSetup.Help;
 end;
 
 procedure TCreateShortcutForm.FormShow(Sender: TObject);
@@ -61,7 +67,13 @@ begin
   UseProfileIconCheckBox.Checked:=UseProfileIconCheckBox.Enabled;
 
   LinkNameEdit.Text:=GameName;
-  LinkCommentEdit.Text:=Format('Run %s in DOSBox',[GameName]); {or "ScummVM", see GameScummVM field}
+  If GameScummVM then begin
+    LinkCommentEdit.Text:=Format(LanguageSetup.CreateShortcutFormRunGameInScummVM,[GameName]);
+  end else begin
+    If GameWindowsExe
+      then LinkCommentEdit.Text:=Format(LanguageSetup.CreateShortcutFormRunGame,[GameName])
+      else LinkCommentEdit.Text:=Format(LanguageSetup.CreateShortcutFormRunGameInDOSBox,[GameName]);
+  end;
 end;
 
 procedure TCreateShortcutForm.OKButtonClick(Sender: TObject);
@@ -71,16 +83,20 @@ begin
 
   If DesktopRadioButton.Checked then begin
     Dir:=IncludeTrailingPathDelimiter(GetSpecialFolder(Handle,CSIDL_DESKTOPDIRECTORY));
-    FileName:=Dir+MakeFileSysOKFolderName(GameFile)+'.lnk';
-    CreateLink(ExpandFileName(Application.ExeName),GameName,FileName,Icon,LinkCommentEdit.Text);
   end else begin
     Dir:=IncludeTrailingPathDelimiter(GetSpecialFolder(Handle,CSIDL_PROGRAMS));
     Dir:=Dir+StartmenuEdit.Text+'\';
-    FileName:=Dir+MakeFileSysOKFolderName(GameFile)+'.lnk';
     if not ForceDirectories(Dir) then begin
       MessageDlg(Format(LanguageSetup.MessageCouldNotCreateDir,[Dir]),mtError,[mbOK],0);
       exit;
     end;
+  end;
+
+  FileName:=Dir+MakeFileSysOKFolderName(GameFile)+'.lnk';
+
+  If GameWindowsExe then begin
+    CreateLink(GameExeFile,WinGameParameters,FileName,Icon,LinkCommentEdit.Text);
+  end else begin
     CreateLink(ExpandFileName(Application.ExeName),GameName,FileName,Icon,LinkCommentEdit.Text);
   end;
 end;
@@ -90,16 +106,29 @@ begin
   StartmenuRadioButton.Checked:=True;
 end;
 
+procedure TCreateShortcutForm.HelpButtonClick(Sender: TObject);
+begin
+  Application.HelpCommand(HELP_CONTEXT,ID_ProfileCreateShortCut);
+end;
+
+procedure TCreateShortcutForm.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+begin
+  If (Key=VK_F1) and (Shift=[]) then HelpButtonClick(Sender);
+end;
+
 { global }
 
-Function ShowCreateShortcutDialog(const AOwner : TComponent; const AGameName, AGameFileName, AGameIconFile : String; const AGameScummVM : Boolean) : Boolean;
+Function ShowCreateShortcutDialog(const AOwner : TComponent; const AGameName, AGameFileName, AGameIconFile, AGammExeName, AWinGameParameters : String; const AGameScummVM, AGameWindowsExe : Boolean) : Boolean;
 begin
   CreateShortcutForm:=TCreateShortcutForm.Create(AOwner);
   try
     CreateShortcutForm.GameName:=AGameName;
     CreateShortcutForm.GameFile:=ChangeFileExt(ExtractFileName(AGameFileName),'');
+    If AGameWindowsExe then CreateShortcutForm.GameExeFile:=MakeAbsPath(AGammExeName,PrgSetup.BaseDir);
     CreateShortcutForm.GameIcon:=AGameIconFile;
     CreateShortcutForm.GameScummVM:=AGameScummVM;
+    CreateShortcutForm.GameWindowsExe:=AGameWindowsExe;
+    CreateShortcutForm.WinGameParameters:=AWinGameParameters;
     result:=(CreateShortcutForm.ShowModal=mrOK);
   finally
     CreateShortcutForm.Free;
@@ -110,10 +139,11 @@ Function CreateLinuxShortCut(const AOwner : TComponent; const Game : TGame) : Bo
 Var SaveDialog : TSaveDialog;
     St,St2 : TStringList;
     ConfFile,S : String;
+    DOSBoxNr : Integer;
 begin
   result:=False;
 
-  If ScummVMMode(Game) then begin
+  If ScummVMMode(Game) or WindowsExeMode(Game) then begin
     MessageDlg(LanguageSetup.CreateShortcutFormNoLinuxScummVMLinks,mtError,[mbOK],0);
     exit;
   end;
@@ -123,6 +153,7 @@ begin
     SaveDialog.Filter:=LanguageSetup.CreateShortcutFormFilter;
     SaveDialog.Title:=LanguageSetup.CreateShortcutForm;
     If not SaveDialog.Execute then exit;
+
     ConfFile:=IncludeTrailingPathDelimiter(ExtractFilePath(SaveDialog.FileName))+ExtractFileName(MakeAbsPath(ChangeFileExt(Game.SetupFile,'.conf'),PrgSetup.BaseDir));
     St:=TStringList.Create;
     try
@@ -137,8 +168,10 @@ begin
         St2.Free;
       end;
       If Trim(PrgSetup.LinuxShellScriptPreamble)<>'' then St.Add(PrgSetup.LinuxShellScriptPreamble);
-      If (Trim(Game.CustomDOSBoxDir)<>'') and (Trim(ExtUpperCase(Game.CustomDOSBoxDir))<>'DEFAULT') then S:=Game.CustomDOSBoxDir else S:=PrgSetup.DosBoxDir;
-      St.Add({UnmapDrive(IncludeTrailingPathDelimiter(S)+DosBoxFileName,ptDOSBox)+}'dosbox -conf '+UnmapDrive(ConfFile,ptDOSBox));
+
+      DOSBoxNr:=GetDOSBoxNr(Game);
+      If DOSBoxNr>=0 then S:=MakeAbsPath(PrgSetup.DOSBoxSettings[DOSBoxNr].DosBoxDir,PrgSetup.BaseDir) else S:=Trim(Game.CustomDOSBoxDir);
+      St.Add(UnmapDrive(IncludeTrailingPathDelimiter(S)+DosBoxFileName,ptDOSBox)+' -conf '+UnmapDrive(ConfFile,ptDOSBox));
       try
         St.SaveToFile(SaveDialog.FileName);
       except

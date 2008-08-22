@@ -4,33 +4,41 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, 
-  Dialogs, StdCtrls, ExtCtrls, Buttons, SetupFormUnit;
+  Dialogs, StdCtrls, ExtCtrls, Buttons, SetupFormUnit, PrgSetupUnit;
 
 type
   TSetupFrameDOSBox = class(TFrame, ISetupFrame)
     DosBoxButton: TSpeedButton;
     FindDosBoxButton: TSpeedButton;
-    DosBoxMapperButton: TSpeedButton;
-    SDLVideodriverLabel: TLabel;
-    SDLVideodriverInfoLabel: TLabel;
     DosBoxDirEdit: TLabeledEdit;
-    HideDosBoxConsoleCheckBox: TCheckBox;
-    MinimizeDFendCheckBox: TCheckBox;
-    DosBoxMapperEdit: TLabeledEdit;
-    SDLVideoDriverComboBox: TComboBox;
-    CenterDOSBoxCheckBox: TCheckBox;
     DosBoxTxtOpenDialog: TOpenDialog;
     DOSBoxDownloadURLInfo: TLabel;
     DOSBoxDownloadURL: TLabel;
-    UseShortPathNamesCheckBox: TCheckBox;
+    DOSBoxInstallationLabel: TLabel;
+    DOSBoxInstallationComboBox: TComboBox;
+    DOSBoxAddButton: TSpeedButton;
+    DOSBoxDeleteButton: TSpeedButton;
+    DOSBoxDownButton: TSpeedButton;
+    DOSBoxUpButton: TSpeedButton;
+    GlobalGroupBox: TGroupBox;
+    MinimizeDFendCheckBox: TCheckBox;
     RestoreWindowCheckBox: TCheckBox;
+    UseShortPathNamesCheckBox: TCheckBox;
+    MoreSettingsButton: TBitBtn;
+    DOSBoxEditButton: TSpeedButton;
+    PortableModeInfoButton: TBitBtn;
     procedure DosBoxDirEditChange(Sender: TObject);
     procedure ButtonWork(Sender: TObject);
     procedure DOSBoxDownloadURLClick(Sender: TObject);
+    procedure MinimizeDFendCheckBoxClick(Sender: TObject);
+    procedure DOSBoxInstallationComboBoxChange(Sender: TObject);
+    procedure PortableModeInfoButtonClick(Sender: TObject);
   private
     { Private-Deklarationen }
-    PDosBoxDir : PString;
+    DOSBoxData : Array of TDOSBoxData;
+    PDosBoxDir, PDOSBoxLang : PString;
     DosBoxDirChange : TSimpleEvent;
+    LastIndex : Integer;
   public
     { Public-Deklarationen }
     Function GetName : String;
@@ -44,8 +52,8 @@ type
 
 implementation
 
-uses ShellAPI, LanguageSetupUnit, VistaToolsUnit, PrgSetupUnit, CommonTools,
-     SetupDosBoxFormUnit;
+uses ShellAPI, LanguageSetupUnit, VistaToolsUnit, CommonTools,
+     SetupDosBoxFormUnit, SetupFrameDOSBoxFormUnit, HelpConsts;
 
 {$R *.dfm}
 
@@ -57,47 +65,74 @@ begin
 end;
 
 procedure TSetupFrameDOSBox.InitGUIAndLoadSetup(InitData: TInitData);
+Var I : Integer;
 begin
   PDosBoxDir:=InitData.PDosBoxDir;
+  PDOSBoxLang:=InitData.PDOSBoxLang;
   DosBoxDirChange:=InitData.DosBoxDirChangeNotify;
 
+  NoFlicker(DOSBoxInstallationComboBox);
   NoFlicker(DosBoxDirEdit);
-  NoFlicker(DosBoxMapperEdit);
-  NoFlicker(HideDosBoxConsoleCheckBox);
+  NoFlicker(MoreSettingsButton);
+  NoFlicker(GlobalGroupBox);
   NoFlicker(MinimizeDFendCheckBox);
-  NoFlicker(CenterDOSBoxCheckBox);
-  NoFlicker(SDLVideoDriverComboBox);
-  NoFlicker(UseShortPathNamesCheckBox);
   NoFlicker(RestoreWindowCheckBox);
+  NoFlicker(UseShortPathNamesCheckBox);
 
-  DosBoxDirEdit.Text:=PrgSetup.DosBoxDir;
-  DosBoxDirEditChange(self);
-  DosBoxMapperEdit.Text:=PrgSetup.DosBoxMapperFile;
-  HideDosBoxConsoleCheckBox.Checked:=PrgSetup.HideDosBoxConsole;
+  SetLength(DOSBoxData,PrgSetup.DOSBoxSettingsCount);
+  For I:=0 to length(DOSBoxData)-1 do begin
+    DOSBoxSettingToDOSBoxData(PrgSetup.DOSBoxSettings[I],DOSBoxData[I]);
+    If I=0
+      then DOSBoxInstallationComboBox.Items.Add(LanguageSetup.Default)
+      else DOSBoxInstallationComboBox.Items.Add(DOSBoxData[I].Name);
+  end;
+
+  LastIndex:=-1;
+  DOSBoxInstallationComboBox.ItemIndex:=0;
+  DOSBoxInstallationComboBoxChange(self);
+
   MinimizeDFendCheckBox.Checked:=PrgSetup.MinimizeOnDosBoxStart;
   RestoreWindowCheckBox.Checked:=PrgSetup.RestoreWhenDOSBoxCloses;
-  CenterDOSBoxCheckBox.Checked:=PrgSetup.CenterDOSBoxWindow;
   UseShortPathNamesCheckBox.Checked:=PrgSetup.UseShortFolderNames;
-  If Trim(ExtUpperCase(PrgSetup.SDLVideodriver))='WINDIB' then SDLVideoDriverComboBox.ItemIndex:=1 else SDLVideoDriverComboBox.ItemIndex:=0;
+  MinimizeDFendCheckBoxClick(self);
+
+  HelpContext:=ID_FileOptionsDOSBox;
 end;
 
 procedure TSetupFrameDOSBox.LoadLanguage;
 begin
+  DOSBoxInstallationLabel.Caption:=LanguageSetup.SetupFormDOSBoxInstallation;
+  DOSBoxEditButton.Hint:=LanguageSetup.SetupFormDOSBoxInstallationEdit;
+  DOSBoxAddButton.Hint:=LanguageSetup.SetupFormDOSBoxInstallationAdd;
+  DOSBoxDeleteButton.Hint:=LanguageSetup.SetupFormDOSBoxInstallationDelete;
+  DOSBoxUpButton.Hint:=LanguageSetup.SetupFormDOSBoxInstallationUp;
+  DOSBoxDownButton.Hint:=LanguageSetup.SetupFormDOSBoxInstallationDown;
   DosBoxDirEdit.EditLabel.Caption:=LanguageSetup.SetupFormDosBoxDir;
   DosBoxButton.Hint:=LanguageSetup.ChooseFolder;
   FindDosBoxButton.Hint:=LanguageSetup.SetupFormSearchDosBox;
-  DosBoxMapperEdit.EditLabel.Caption:=LanguageSetup.SetupFormDosBoxMapperFile;
-  DosBoxMapperButton.Hint:=LanguageSetup.ChooseFile;
+  MoreSettingsButton.Caption:=LanguageSetup.SetupFormDOSBoxInstallationMoreSettings;
+  PortableModeInfoButton.Caption:=LanguageSetup.SetupFormDOSBoxPortableModeInfo;
+  PortableModeInfoButton.Visible:=(OperationMode=omPortable);
+  GlobalGroupBox.Caption:=LanguageSetup.SetupFormDOSBoxInstallationGlobal;
+
+  MinimizeDFendCheckBox.Caption:=LanguageSetup.SetupFormMinimizeDFend;
+  RestoreWindowCheckBox.Caption:=LanguageSetup.SetupFormRestoreWindow;
+  UseShortPathNamesCheckBox.Caption:=LanguageSetup.SetupFormUseShortPathNames;
+
   DOSBoxDownloadURLInfo.Caption:=LanguageSetup.SetupFormDOSBoxDownloadURL;
   DOSBoxDownloadURL.Caption:='http:/'+'/www.dosbox.com/download.php?main=1';
   with DOSBoxDownloadURL.Font do begin Color:=clBlue; Style:=[fsUnderline]; end;
   DOSBoxDownloadURL.Cursor:=crHandPoint;
+end;
 
-  HideDosBoxConsoleCheckBox.Caption:=LanguageSetup.SetupFormHideDosBoxConsole;
-  MinimizeDFendCheckBox.Caption:=LanguageSetup.SetupFormMinimizeDFend;
-  CenterDOSBoxCheckBox.Caption:=LanguageSetup.SetupFormCenterDOSBoxWindow;
-  SDLVideodriverLabel.Caption:=LanguageSetup.SetupFormDosBoxSDLVideodriver;
-  SDLVideodriverInfoLabel.Caption:=LanguageSetup.SetupFormDosBoxSDLVideodriverInfo;
+procedure TSetupFrameDOSBox.MinimizeDFendCheckBoxClick(Sender: TObject);
+begin
+  RestoreWindowCheckBox.Enabled:=MinimizeDFendCheckBox.Checked;
+end;
+
+procedure TSetupFrameDOSBox.PortableModeInfoButtonClick(Sender: TObject);
+begin
+  MessageDlg(LanguageSetup.FirstRunWizardInfoDOSBox3,mtInformation,[mbOK],0);
 end;
 
 procedure TSetupFrameDOSBox.DOSBoxDirChanged;
@@ -106,74 +141,140 @@ end;
 
 procedure TSetupFrameDOSBox.ShowFrame(const AdvencedMode: Boolean);
 begin
-  DosBoxMapperEdit.Visible:=AdvencedMode;
-  DosBoxMapperButton.Visible:=AdvencedMode;
-  HideDosBoxConsoleCheckBox.Visible:=AdvencedMode;
-  MinimizeDFendCheckBox.Visible:=AdvencedMode;
-  {RestoreWindowCheckBox.Visible:=AdvencedMode;}
-  CenterDOSBoxCheckBox.Visible:=AdvencedMode;
-  SDLVideodriverLabel.Visible:=AdvencedMode;
-  SDLVideoDriverComboBox.Visible:=AdvencedMode;
-  SDLVideodriverInfoLabel.Visible:=AdvencedMode;
-  {UseShortPathNamesCheckBox.Visible:=AdvencedMode;}
+  MoreSettingsButton.Visible:=AdvencedMode;
+  GlobalGroupBox.Visible:=AdvencedMode;
 
-  If AdvencedMode then DOSBoxDownloadURLInfo.Top:=SDLVideodriverInfoLabel.Top+SDLVideodriverInfoLabel.Height+10 else DOSBoxDownloadURLInfo.Top:=DosBoxMapperEdit.Top-10;
+  If AdvencedMode then begin
+    DOSBoxDownloadURLInfo.Top:=GlobalGroupBox.Top+GlobalGroupBox.Height+10;
+    PortableModeInfoButton.Left:=MoreSettingsButton.Left+MoreSettingsButton.Width+10;
+  end else begin
+    DOSBoxDownloadURLInfo.Top:=GlobalGroupBox.Top;
+    PortableModeInfoButton.Left:=MoreSettingsButton.Left;
+  end;
   DOSBoxDownloadURL.Top:=DOSBoxDownloadURLInfo.Top+19;
 end;
 
 procedure TSetupFrameDOSBox.RestoreDefaults;
 begin
-  DosBoxMapperEdit.Text:='.\mapper.txt';
-  HideDosBoxConsoleCheckBox.Checked:=True;
   MinimizeDFendCheckBox.Checked:=False;
   RestoreWindowCheckBox.Checked:=False;
-  CenterDOSBoxCheckBox.Checked:=False;
   UseShortPathNamesCheckBox.Checked:=True;
-  If IsWindowsVista then SDLVideoDriverComboBox.ItemIndex:=1 else SDLVideoDriverComboBox.ItemIndex:=0;
 end;
 
 procedure TSetupFrameDOSBox.SaveSetup;
+Var I : Integer;
 begin
-  PrgSetup.DosBoxDir:=IncludeTrailingPathDelimiter(DosBoxDirEdit.Text);
-  PrgSetup.DosBoxMapperFile:=DosBoxMapperEdit.Text;
-  PrgSetup.HideDosBoxConsole:=HideDosBoxConsoleCheckBox.Checked;
+  DOSBoxInstallationComboBox.ItemIndex:=-1;
+  DOSBoxInstallationComboBoxChange(self);
+  While PrgSetup.DOSBoxSettingsCount>length(DOSBoxData) do PrgSetup.DeleteDOSBoxSettings(PrgSetup.DOSBoxSettingsCount-1);
+  While PrgSetup.DOSBoxSettingsCount<length(DOSBoxData) do PrgSetup.AddDOSBoxSettings('');
+  DOSBoxData[0].DosBoxLanguage:=PDOSBoxLang^;
+  For I:=0 to length(DOSBoxData)-1 do DOSBoxDataToDOSBoxSetting(DOSBoxData[I],PrgSetup.DOSBoxSettings[I]);
+  For I:=0 to PrgSetup.DOSBoxSettingsCount-1 do PrgSetup.DOSBoxSettings[I].Nr:=I;
+
   PrgSetup.MinimizeOnDosBoxStart:=MinimizeDFendCheckBox.Checked;
   PrgSetup.RestoreWhenDOSBoxCloses:=RestoreWindowCheckBox.Checked;
-  PrgSetup.CenterDOSBoxWindow:=CenterDOSBoxCheckBox.Checked;
   PrgSetup.UseShortFolderNames:=UseShortPathNamesCheckBox.Checked;
-  If SDLVideoDriverComboBox.ItemIndex=1 then PrgSetup.SDLVideodriver:='WinDIB' else PrgSetup.SDLVideodriver:='DirectX';
+end;
+
+procedure TSetupFrameDOSBox.DOSBoxInstallationComboBoxChange(Sender: TObject);
+begin
+  If LastIndex>=0 then begin
+    DOSBoxData[LastIndex].DosBoxDir:=IncludeTrailingPathDelimiter(DosBoxDirEdit.Text);
+  end;
+
+  LastIndex:=DOSBoxInstallationComboBox.ItemIndex;
+
+  If LastIndex>=0 then begin
+    DosBoxDirEdit.Text:=DOSBoxData[LastIndex].DosBoxDir;
+  end else begin
+    DosBoxDirEdit.Text:='';
+  end;
+  DosBoxDirEditChange(self);
+
+  DOSBoxEditButton.Enabled:=(LastIndex>=1);
+  DOSBoxDeleteButton.Enabled:=(LastIndex>=1);
+  DOSBoxUpButton.Enabled:=(LastIndex>=2);
+  DOSBoxDownButton.Enabled:=(LastIndex>=1) and (LastIndex<length(DOSBoxData)-1);
 end;
 
 procedure TSetupFrameDOSBox.DosBoxDirEditChange(Sender: TObject);
 begin
-  If PDosBoxDir^=DosBoxDirEdit.Text then exit;
+  If (PDosBoxDir^=DosBoxDirEdit.Text) or (DOSBoxInstallationComboBox.ItemIndex<>0) then exit;
   PDosBoxDir^:=DosBoxDirEdit.Text;
   DosBoxDirChange;
 end;
 
 procedure TSetupFrameDOSBox.ButtonWork(Sender: TObject);
 Var S : String;
+    I,J : Integer;
+    D : TDOSBoxData;
 begin
   Case (Sender as TComponent).Tag of
-    3 : begin
+    0 : If DOSBoxInstallationComboBox.ItemIndex>=1 then begin
+          S:=DOSBoxData[DOSBoxInstallationComboBox.ItemIndex].Name;
+          If not InputQuery(LanguageSetup.SetupFormDOSBoxInstallationEditCaption,LanguageSetup.SetupFormDOSBoxInstallationEditInfo,S) then exit;
+          I:=DOSBoxInstallationComboBox.ItemIndex;
+          DOSBoxData[DOSBoxInstallationComboBox.ItemIndex].Name:=S;
+          DOSBoxInstallationComboBox.Items[DOSBoxInstallationComboBox.ItemIndex]:=S;
+          DOSBoxInstallationComboBox.ItemIndex:=I;
+        end;
+    1 : begin
+          S:='';
+          If not InputQuery(LanguageSetup.SetupFormDOSBoxInstallationAddCaption,LanguageSetup.SetupFormDOSBoxInstallationEditInfo,S) then exit;
+          I:=length(DOSBoxData);
+          SetLength(DOSBoxData,I+1);
+          InitDOSBoxData(DOSBoxData[I]);
+          DOSBoxData[I].Name:=S;
+          DOSBoxInstallationComboBox.Items.Add(S);
+          DOSBoxInstallationComboBox.ItemIndex:=I;
+          DOSBoxInstallationComboBoxChange(self);
+        end;
+    2 : If DOSBoxInstallationComboBox.ItemIndex>=1 then begin
+          I:=DOSBoxInstallationComboBox.ItemIndex;
+          If MessageDlg(Format(LanguageSetup.SetupFormDOSBoxInstallationDeleteConfirm,[DOSBoxData[I].Name]),mtConfirmation,[mbYes,mbNo],0)<>mrYes then exit;
+          DOSBoxInstallationComboBox.ItemIndex:=I-1;
+          DOSBoxInstallationComboBoxChange(Sender);
+          DOSBoxInstallationComboBox.Items.Delete(I);
+          For J:=I+1 to length(DOSBoxData)-1 do DOSBoxData[J-1]:=DOSBoxData[J];
+          SetLength(DOSBoxData,length(DOSBoxData)-1);
+          DOSBoxInstallationComboBoxChange(Sender);
+        end;
+    3 : If DOSBoxInstallationComboBox.ItemIndex>=2 then begin
+          I:=DOSBoxInstallationComboBox.ItemIndex;
+          DOSBoxInstallationComboBox.Items.Exchange(I,I-1);
+          D:=DOSBoxData[I]; DOSBoxData[I]:=DOSBoxData[I-1]; DOSBoxData[I-1]:=D;
+          LastIndex:=I-1;
+          DOSBoxInstallationComboBox.ItemIndex:=I-1;
+          DOSBoxInstallationComboBoxChange(Sender);
+        end;
+    4 : If (DOSBoxInstallationComboBox.ItemIndex>=0) and (DOSBoxInstallationComboBox.ItemIndex<length(DOSBoxData)-1) then begin
+          I:=DOSBoxInstallationComboBox.ItemIndex;
+          DOSBoxInstallationComboBox.Items.Exchange(I,I+1);
+          D:=DOSBoxData[I]; DOSBoxData[I]:=DOSBoxData[I+1]; DOSBoxData[I+1]:=D;
+          LastIndex:=I+1;
+          DOSBoxInstallationComboBox.ItemIndex:=I+1;
+          DOSBoxInstallationComboBoxChange(Sender);
+        end;
+    5 : If DOSBoxInstallationComboBox.ItemIndex>=0 then begin
           S:=DosBoxDirEdit.Text;
           if SelectDirectory(Handle,LanguageSetup.SetupFormDosBoxDir,S) then begin
             DosBoxDirEdit.Text:=S;
             DosBoxDirEditChange(Sender);
           end;
         end;
-    4 : if SearchDosBox(self) then begin
-          DosBoxDirEdit.Text:=PrgSetup.DosBoxDir;
-          DosBoxDirEditChange(Sender);
+    6 : If DOSBoxInstallationComboBox.ItemIndex>=0 then begin
+          if SearchDosBox(self,S) then begin
+            DosBoxDirEdit.Text:=S;
+            DosBoxDirEditChange(Sender);
+          end;
         end;
-    5 : begin
-          DosBoxTxtOpenDialog.Title:=LanguageSetup.SetupFormDosBoxMapperFileTitle;
-          DosBoxTxtOpenDialog.Filter:=LanguageSetup.SetupFormDosBoxMapperFileFilter;
-          If Trim(DosBoxMapperEdit.Text)=''
-            then DosBoxTxtOpenDialog.InitialDir:=PrgDataDir
-            else DosBoxTxtOpenDialog.InitialDir:=ExtractFilePath(MakeAbsPath(DosBoxMapperEdit.Text,PrgDataDir));
-          if not DosBoxTxtOpenDialog.Execute then exit;
-          DosBoxMapperEdit.Text:=MakeRelPath(DosBoxTxtOpenDialog.FileName,PrgDataDir);
+    7 : If DOSBoxInstallationComboBox.ItemIndex>=0 then begin
+          If DOSBoxInstallationComboBox.ItemIndex=0 then DOSBoxData[0].DosBoxLanguage:=PDOSBoxLang^;
+          DOSBoxData[DOSBoxInstallationComboBox.ItemIndex].DosBoxDir:=IncludeTrailingPathDelimiter(DosBoxDirEdit.Text);
+          ShowSetupFrameDOSBoxDialog(self,DOSBoxData[DOSBoxInstallationComboBox.ItemIndex],DOSBoxInstallationComboBox.ItemIndex=0);
+          DosBoxDirEdit.Text:=DOSBoxData[DOSBoxInstallationComboBox.ItemIndex].DosBoxDir;
+          If DOSBoxInstallationComboBox.ItemIndex=0 then PDOSBoxLang^:=DOSBoxData[0].DosBoxLanguage;
         end;
   end;
 end;

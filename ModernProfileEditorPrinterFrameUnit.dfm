@@ -89,7 +89,7 @@ object ModernProfileEditorPrinterFrame: TModernProfileEditorPrinterFrame
     MaxValue = 250
     MinValue = 1
     TabOrder = 2
-    Value = 0
+    Value = 1
   end
   object PaperHeightEdit: TSpinEdit
     Left = 128
@@ -99,7 +99,7 @@ object ModernProfileEditorPrinterFrame: TModernProfileEditorPrinterFrame
     MaxValue = 250
     MinValue = 1
     TabOrder = 3
-    Value = 0
+    Value = 1
   end
   object OutputFormatComboBox: TComboBox
     Left = 16

@@ -11,9 +11,11 @@ object CreateImageForm: TCreateImageForm
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
+  KeyPreview = True
   OldCreateOrder = False
   Position = poOwnerFormCenter
   OnCreate = FormCreate
+  OnKeyDown = FormKeyDown
   PixelsPerInch = 96
   TextHeight = 13
   object PageControl: TPageControl
@@ -262,7 +264,7 @@ object CreateImageForm: TCreateImageForm
         Left = 16
         Top = 152
         Width = 500
-        Height = 89
+        Height = 73
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Image type'
         ItemIndex = 1
@@ -272,7 +274,6 @@ object CreateImageForm: TCreateImageForm
             'using fdisk)'
           'Create a preformated image')
         TabOrder = 4
-        Visible = False
       end
     end
   end
@@ -293,9 +294,18 @@ object CreateImageForm: TCreateImageForm
     TabOrder = 2
     Kind = bkCancel
   end
+  object HelpButton: TBitBtn
+    Left = 232
+    Top = 352
+    Width = 97
+    Height = 25
+    TabOrder = 3
+    OnClick = HelpButtonClick
+    Kind = bkHelp
+  end
   object ImageList: TImageList
-    Left = 240
-    Top = 345
+    Left = 248
+    Top = 329
     Bitmap = {
       494C010102000400040010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000001000000001002000000000000010
@@ -438,7 +448,7 @@ object CreateImageForm: TCreateImageForm
   end
   object OpenDialog: TOpenDialog
     DefaultExt = 'img'
-    Left = 272
-    Top = 345
+    Left = 280
+    Top = 329
   end
 end

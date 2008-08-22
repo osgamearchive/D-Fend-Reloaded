@@ -18,7 +18,10 @@ type
     CheckBox4: TCheckBox;
     CheckBox5: TCheckBox;
     CheckBox2: TCheckBox;
+    HelpButton: TBitBtn;
     procedure FormCreate(Sender: TObject);
+    procedure HelpButtonClick(Sender: TObject);
+    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
   private
     { Private-Deklarationen }
   public
@@ -32,7 +35,7 @@ Procedure ShowOperationModeInfoDialog(const AOwner : TComponent);
 
 implementation
 
-uses VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgSetupUnit;
+uses VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgSetupUnit, HelpConsts;
 
 {$R *.dfm}
 
@@ -42,12 +45,19 @@ begin
   Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName);
   OpModeLabel.Font.Style:=[fsBold];
 
-  Caption:='D-Fend Reloaded operation mode';
+  Caption:=LanguageSetup.OperationModeCaption;
+  TopLabel.Caption:=LanguageSetup.OperationModeTopLabel;
+  CheckBox1.Caption:=LanguageSetup.OperationModeInfoPrgSettingsPrgDir;
+  CheckBox2.Caption:=LanguageSetup.OperationModeInfoPrgSettingsUserDir;
+  CheckBox3.Caption:=LanguageSetup.OperationModeInfoUsersShareSettings;
+  CheckBox4.Caption:=LanguageSetup.OperationModeInfoVistaCompatible;
+  CheckBox5.Caption:=LanguageSetup.OperationModeInfoDOSBoxRelative;
   OKButton.Caption:=LanguageSetup.OK;
+  HelpButton.Caption:=LanguageSetup.Help;
 
   Case OperationMode of
     omPrgDir   : begin
-                   OpModeLabel.Caption:='Program directroy mode';
+                   OpModeLabel.Caption:=LanguageSetup.OperationModeOpModePrgDir;
                    CheckBox1.Checked:=True;
                    CheckBox2.Checked:=False;
                    CheckBox3.Checked:=True;
@@ -55,7 +65,7 @@ begin
                    CheckBox5.Checked:=False;
                  end;
     omUserDir  : begin
-                   OpModeLabel.Caption:='User directroy mode';
+                   OpModeLabel.Caption:=LanguageSetup.OperationModeOpModeUserDir;
                    CheckBox1.Checked:=False;
                    CheckBox2.Checked:=True;
                    CheckBox3.Checked:=False;
@@ -63,7 +73,7 @@ begin
                    CheckBox5.Checked:=False;
                  end;
     omPortable : begin
-                   OpModeLabel.Caption:='Portable mode';
+                   OpModeLabel.Caption:=LanguageSetup.OperationModeOpModePortable;
                    CheckBox1.Checked:=True;
                    CheckBox2.Checked:=False;
                    CheckBox3.Checked:=True;
@@ -72,11 +82,21 @@ begin
                  end;
   end;
 
-  PrgDirEdit.EditLabel.Caption:='Directory for D-Fend Reloaded program files';
+  PrgDirEdit.EditLabel.Caption:=LanguageSetup.OperationModePrgDir;
   PrgDirEdit.Text:=PrgDir;
 
-  PrgDataDirEdit.EditLabel.Caption:='Directory for data files (games, profiles, settings, etc.)';
+  PrgDataDirEdit.EditLabel.Caption:=LanguageSetup.OperationModeDataDir;
   PrgDataDirEdit.Text:=PrgDataDir;
+end;
+
+procedure TOperationModeInfoForm.HelpButtonClick(Sender: TObject);
+begin
+  Application.HelpCommand(HELP_CONTEXT,ID_HelpOperationMode);
+end;
+
+procedure TOperationModeInfoForm.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+begin
+  If (Key=VK_F1) and (Shift=[]) then HelpButtonClick(Sender);
 end;
 
 { global }

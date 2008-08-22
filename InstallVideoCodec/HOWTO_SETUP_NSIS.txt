@@ -1,0 +1,2 @@
+Copy the inetc.dll form Save\Inetc.zip to the NSIS plusins folder and
+copy the messagebox.dll from Save\messagebox v0.98 beta 3.zip to the NSIS plusins folder !

@@ -28,7 +28,7 @@ type
     { Private-Deklarationen }
   public
     { Public-Deklarationen }
-    Procedure InitGUI(const OnProfileNameChange : TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup, CurrentScummVMGameName : PString);
+    Procedure InitGUI(const InitData : TModernProfileEditorInitData);
     Procedure SetGame(const Game : TGame; const LoadFromTemplate : Boolean);
     Function CheckValue : Boolean;
     Procedure GetGame(const Game : TGame);
@@ -37,13 +37,13 @@ type
 
 implementation
 
-uses Math, VistaToolsUnit, LanguageSetupUnit, CommonTools;
+uses Math, VistaToolsUnit, LanguageSetupUnit, CommonTools, HelpConsts;
 
 {$R *.dfm}
 
 { TModernProfileEditorScummVMSoundFrame }
 
-procedure TModernProfileEditorScummVMSoundFrame.InitGUI(const OnProfileNameChange: TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup, CurrentScummVMGameName: PString);
+procedure TModernProfileEditorScummVMSoundFrame.InitGUI(const InitData : TModernProfileEditorInitData);
 Var St : TStringList;
 begin
   NoFlicker(MusicVolumeEdit);
@@ -69,7 +69,9 @@ begin
   SpeechMuteCheckBox.Caption:=LanguageSetup.ProfileEditorScummVMSpeechMute;
 
   with OutputRateComboBox.Items do begin Add('11025'); Add('22050'); Add('44100'); end;
-  St:=ValueToList(GameDB.ConfOpt.ScummVMMusicDriver,';,'); try MusicDriverComboBox.Items.AddStrings(St); finally St.Free; end;
+  St:=ValueToList(InitData.GameDB.ConfOpt.ScummVMMusicDriver,';,'); try MusicDriverComboBox.Items.AddStrings(St); finally St.Free; end;
+
+  HelpContext:=ID_ProfileEditSound;
 end;
 
 procedure TModernProfileEditorScummVMSoundFrame.SetGame(const Game: TGame; const LoadFromTemplate: Boolean);

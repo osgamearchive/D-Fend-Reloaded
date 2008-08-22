@@ -16,8 +16,8 @@
 ; ============================================================
 
 !define VER_MAYOR 0
-!define VER_MINOR1 4
-!define VER_MINOR2 1
+!define VER_MINOR1 5
+!define VER_MINOR2 0
 
 !define PrgName "D-Fend Reloaded ${VER_MAYOR}.${VER_MINOR1}.${VER_MINOR2}"
 OutFile "D-Fend-Reloaded-${VER_MAYOR}.${VER_MINOR1}.${VER_MINOR2}-Setup.exe"
@@ -55,12 +55,14 @@ SetCompressor /solid lzma
 ; Register custom page definitions and license for different languages here
 ; ============================================================
 
+ReserveFile "ioFileDanish.ini"
 ReserveFile "ioFileEnglish.ini"
 ReserveFile "ioFileFrench.ini"
 ReserveFile "ioFileGerman.ini"
 ReserveFile "ioFileRussian.ini"
 ReserveFile "ioFileSimplified_Chinese.ini"
 ReserveFile "ioFileSpanish.ini"
+ReserveFile "ioFileTraditional_Chinese.ini"
 
 
 
@@ -129,18 +131,30 @@ Var AdminOK
 ; ============================================================
 
 !insertmacro MUI_LANGUAGE "English"
+
+!insertmacro MUI_LANGUAGE "Danish"
 !insertmacro MUI_LANGUAGE "French"
 !insertmacro MUI_LANGUAGE "German"
 !insertmacro MUI_LANGUAGE "Russian"
 !insertmacro MUI_LANGUAGE "SimpChinese"
 !insertmacro MUI_LANGUAGE "Spanish"
+!insertmacro MUI_LANGUAGE "TradChinese"
 
+!include "D-Fend-Reloaded-Setup-Lang-Danish.nsi"
 !include "D-Fend-Reloaded-Setup-Lang-English.nsi"
 !include "D-Fend-Reloaded-Setup-Lang-French.nsi"
 !include "D-Fend-Reloaded-Setup-Lang-German.nsi"
 !include "D-Fend-Reloaded-Setup-Lang-Russian.nsi"
 !include "D-Fend-Reloaded-Setup-Lang-Simplified_Chinese.nsi"
 !include "D-Fend-Reloaded-Setup-Lang-Spanish.nsi"
+!include "D-Fend-Reloaded-Setup-Lang-Traditional_Chinese.nsi"
+
+
+
+; Pack program file
+; ============================================================
+
+!system '"upx.exe" "..\DFend.exe"'
 
 
 
@@ -181,12 +195,16 @@ Section "$(LANGNAME_DFendReloaded)" ID_DFend
   File "..\License.txt"
   File "..\LicenseComponents.txt"
   File "..\Links.txt"
+  File "..\SearchLinks.txt"
   File "..\ChangeLog.txt"
-  File "..\FAQs.txt"
   File "..\Readme_OperationMode.txt"
   File "..\D-Fend Reloaded DataInstaller.nsi"
   File "..\UpdateCheck\UpdateCheck.exe"
   File "..\SetInstLang\SetInstallerLanguage.exe"  
+  File "..\7za.dll"
+  File "..\DelZip179.dll"
+  File "..\mediaplr.dll"
+  File "..\InstallVideoCodec.exe"
   
   SetOutPath "$DataInstDir"
   File "..\D-Fend Reloaded DataInstaller.nsi"
@@ -198,6 +216,7 @@ Section "$(LANGNAME_DFendReloaded)" ID_DFend
 
   SetOutPath "$INSTDIR\Lang"
   File "..\Lang\*.ini"
+  File "..\Lang\*.chm"
   
   IntCmp $InstallDataType 1 WriteNewUserDir
   
@@ -275,50 +294,62 @@ SectionEnd
 SectionGroup "$(LANGNAME_DOSBox)" ID_DosBox
   
 Section "$(LANGNAME_ProgramFiles)" ID_DosBoxProgramFiles
-  SetOutPath "$INSTDIR\DosBox"
-  File "..\DosBox\README.txt"
-  File "..\DosBox\COPYING.txt"
-  File "..\DosBox\THANKS.txt"
-  File "..\DosBox\NEWS.txt"
-  File "..\DosBox\AUTHORS.txt"
-  File "..\DosBox\INSTALL.txt"
-  File "..\DosBox\DOSBox.exe"
-  File "..\DosBox\dosbox.conf"
-  File "..\DosBox\SDL.dll"
-  File "..\DosBox\SDL_net.dll"
+  SetOutPath "$INSTDIR\DOSBox"
+  File "..\DOSBox\README.txt"
+  File "..\DOSBox\COPYING.txt"
+  File "..\DOSBox\THANKS.txt"
+  File "..\DOSBox\NEWS.txt"
+  File "..\DOSBox\AUTHORS.txt"
+  File "..\DOSBox\INSTALL.txt"
+  File "..\DOSBox\DOSBox.exe"
+  File "..\DOSBox\dosbox.conf"
+  File "..\DOSBox\SDL.dll"
+  File "..\DOSBox\SDL_net.dll"
   
-  SetOutPath "$INSTDIR\DosBox\zmbv"
-  File "..\DosBox\zmbv\zmbv.dll"
-  File "..\DosBox\zmbv\zmbv.inf"
-  File "..\DosBox\zmbv\README.txt"
+  SetOutPath "$INSTDIR\DOSBox\zmbv"
+  File "..\DOSBox\zmbv\zmbv.dll"
+  File "..\DOSBox\zmbv\zmbv.inf"
+  File "..\DOSBox\zmbv\README.txt"
 
-  CreateDirectory "$INSTDIR\DosBox\capture"
+  CreateDirectory "$INSTDIR\DOSBox\capture"
   
   IntCmp $InstallDataType 2 NoDosBoxStartMenuLinks
   CreateDirectory "$SMPROGRAMS\D-Fend Reloaded\DOSBox"
   CreateDirectory "$SMPROGRAMS\D-Fend Reloaded\DOSBox\Video"
-  CreateShortCut "$SMPROGRAMS\D-Fend Reloaded\DOSBox\DOSBox.lnk" "$INSTDIR\DosBox\DOSBox.exe" "-conf $\"$INSTDIR\DosBox\dosbox.conf$\"" "$INSTDIR\DosBox\DOSBox.exe" 0
-  CreateShortCut "$SMPROGRAMS\D-Fend Reloaded\DOSBox\DOSBox (noconsole).lnk" "$INSTDIR\DosBox\DOSBox.exe" "-noconsole -conf $\"$INSTDIR\DosBox\dosbox.conf$\"" "$INSTDIR\DosBox\DOSBox.exe" 0
-  CreateShortCut "$SMPROGRAMS\D-Fend Reloaded\DOSBox\README.lnk" "$INSTDIR\DosBox\README.txt"
-  CreateShortCut "$SMPROGRAMS\D-Fend Reloaded\DOSBox\DOSBox.conf.lnk" "notepad.exe" "$INSTDIR\DosBox\dosbox.conf"
-  CreateShortCut "$SMPROGRAMS\D-Fend Reloaded\DOSBox\Capture folder.lnk" "$INSTDIR\DosBox\capture"
-  CreateShortCut "$SMPROGRAMS\D-Fend Reloaded\DOSBox\Video\Video instructions.lnk" "$INSTDIR\DosBox\zmbv\README.txt"
+  CreateShortCut "$SMPROGRAMS\D-Fend Reloaded\DOSBox\DOSBox.lnk" "$INSTDIR\DOSBox\DOSBox.exe" "-conf $\"$INSTDIR\DosBox\dosbox.conf$\"" "$INSTDIR\DosBox\DOSBox.exe" 0
+  CreateShortCut "$SMPROGRAMS\D-Fend Reloaded\DOSBox\DOSBox (noconsole).lnk" "$INSTDIR\DOSBox\DOSBox.exe" "-noconsole -conf $\"$INSTDIR\DosBox\dosbox.conf$\"" "$INSTDIR\DosBox\DOSBox.exe" 0
+  CreateShortCut "$SMPROGRAMS\D-Fend Reloaded\DOSBox\README.lnk" "$INSTDIR\DOSBox\README.txt"
+  CreateShortCut "$SMPROGRAMS\D-Fend Reloaded\DOSBox\DOSBox.conf.lnk" "notepad.exe" "$INSTDIR\DOSBox\dosbox.conf"
+  CreateShortCut "$SMPROGRAMS\D-Fend Reloaded\DOSBox\Capture folder.lnk" "$INSTDIR\DOSBox\capture"
+  CreateShortCut "$SMPROGRAMS\D-Fend Reloaded\DOSBox\Video\Video instructions.lnk" "$INSTDIR\DOSBox\zmbv\README.txt"
   
   ClearErrors
   ReadRegStr $R0 HKLM "SOFTWARE\Microsoft\Windows NT\CurrentVersion" CurrentVersion
   IfErrors we_9x we_nt
   we_nt:  
-  CreateShortCut "$SMPROGRAMS\D-Fend Reloaded\DosBox\Video\Install movie codec.lnk" "rundll32" "setupapi,InstallHinfSection DefaultInstall 128 $INSTDIR\DosBox\zmbv\zmbv.inf"
+  CreateShortCut "$SMPROGRAMS\D-Fend Reloaded\DosBox\Video\Install movie codec.lnk" "rundll32" "setupapi,InstallHinfSection DefaultInstall 128 $INSTDIR\DOSBox\zmbv\zmbv.inf"
   goto end
   we_9x:
-  CreateShortCut "$SMPROGRAMS\D-Fend Reloaded\DosBox\Video\Install movie codec.lnk" "rundll" "setupx.dll,InstallHinfSection DefaultInstall 128 $INSTDIR\DosBox\zmbv\zmbv.inf"
+  CreateShortCut "$SMPROGRAMS\D-Fend Reloaded\DosBox\Video\Install movie codec.lnk" "rundll" "setupx.dll,InstallHinfSection DefaultInstall 128 $INSTDIR\DOSBox\zmbv\zmbv.inf"
   end:
   NoDosBoxStartMenuLinks:
 SectionEnd
 
 Section "$(LANGNAME_LanguageFiles)" ID_DosBoxLanguageFiles
-  SetOutPath "$INSTDIR\DosBox"
+  SetOutPath "$INSTDIR\DOSBox"
   File "..\DosBoxLang\*.*"
+SectionEnd
+
+Section "$(LANGNAME_VideoCodec)" ID_DosBoxVideoCodec
+  ClearErrors
+  ReadRegStr $R0 HKLM "SOFTWARE\Microsoft\Windows NT\CurrentVersion" CurrentVersion
+  IfErrors we_9x2 we_nt2
+  we_nt2:
+  Exec '"rundll32" setupapi,InstallHinfSection DefaultInstall 128 $INSTDIR\DOSBox\zmbv\zmbv.inf'
+  goto end2
+  we_9x2:
+  Exec '"rundll32" setupx.dll,InstallHinfSection DefaultInstall 128 $INSTDIR\DOSBox\zmbv\zmbv.inf'
+  end2:
 SectionEnd
  
 SectionGroupEnd
@@ -410,16 +441,20 @@ Function .onInit
   SelLang:
   !define MUI_LANGDLL_ALLLANGUAGES
   !insertmacro MUI_LANGDLL_DISPLAY
+  !insertmacro MUI_INSTALLOPTIONS_EXTRACT "ioFileDanish.ini"
   !insertmacro MUI_INSTALLOPTIONS_EXTRACT "ioFileEnglish.ini"
   !insertmacro MUI_INSTALLOPTIONS_EXTRACT "ioFileFrench.ini"
   !insertmacro MUI_INSTALLOPTIONS_EXTRACT "ioFileGerman.ini"
   !insertmacro MUI_INSTALLOPTIONS_EXTRACT "ioFileRussian.ini"
+  !insertmacro MUI_INSTALLOPTIONS_EXTRACT "ioFileSimplified_Chinese.ini"
   !insertmacro MUI_INSTALLOPTIONS_EXTRACT "ioFileSpanish.ini"
-  
+  !insertmacro MUI_INSTALLOPTIONS_EXTRACT "ioFileTraditional_Chinese.ini"
+
   IntCmp $AdminOK 1 InitReturn
   MessageBox MB_YESNO "$(LANGNAME_NeedAdminRights)" IDYES UAC_Elevate IDNO InitReturn
 
   InitReturn:
+  ;MessageBox MB_OK "This is not D-Fend Reloaded 0.5.0 ! This is the release candiate 3 of version 0.5.0 ! This means this version is very close to the final release 0.5.0 but there might be some unfixed bugs etc. Please do not use this version unless you want to do beta testing. The final release of 0.5.0 will be released very soon."
 FunctionEnd  
 
 Function un.onInit  
@@ -484,16 +519,27 @@ Function InstallType
   IntOp $R0 $R0 & 0xFFFFFFFE
   SectionSetFlags ${ID_DesktopShortcut} $R0    
   
+  SectionGetFlags ${ID_DosBoxVideoCodec} $R0
+  IntOp $R0 $R0 & 0xFFFFFFFE
+  SectionSetFlags ${ID_DosBoxVideoCodec} $R0      
+  
   EndSel:
 FunctionEnd
 
 Function .onSelChange
   IntCmp $InstallDataType 2 NoDesktopShortcut
   Goto NextSelChangeCheck
+  
   NoDesktopShortcut:  
+  
   SectionGetFlags ${ID_DesktopShortcut} $R0
   IntOp $R0 $R0 & 0xFFFFFFFE
-  SectionSetFlags ${ID_DesktopShortcut} $R0  
+  SectionSetFlags ${ID_DesktopShortcut} $R0
+  
+  SectionGetFlags ${ID_DosBoxVideoCodec} $R0
+  IntOp $R0 $R0 & 0xFFFFFFFE
+  SectionSetFlags ${ID_DosBoxVideoCodec} $R0  
+  
   NextSelChangeCheck:
 
   SectionGetFlags ${ID_DosBoxProgramFiles} $R0
@@ -504,6 +550,10 @@ Function .onSelChange
   IntOp $R0 $R0 & 0xFFFFFFFE
   SectionSetFlags ${ID_DosBoxLanguageFiles} $R0
     
+  SectionGetFlags ${ID_DosBoxVideoCodec} $R0
+  IntOp $R0 $R0 & 0xFFFFFFFE
+  SectionSetFlags ${ID_DosBoxVideoCodec} $R0
+	
   End:
 FunctionEnd
 
@@ -517,6 +567,7 @@ FunctionEnd
   !insertmacro MUI_DESCRIPTION_TEXT ${ID_DosBox} $(DESC_DosBox)
   !insertmacro MUI_DESCRIPTION_TEXT ${ID_DosBoxProgramFiles} $(DESC_DosBoxProgramFiles)
   !insertmacro MUI_DESCRIPTION_TEXT ${ID_DosBoxLanguageFiles} $(DESC_DosBoxLanguageFiles)
+  !insertmacro MUI_DESCRIPTION_TEXT ${ID_DosBoxVideoCodec} $(DESC_VideoCodec)
   !insertmacro MUI_DESCRIPTION_TEXT ${ID_Tools} $(DESC_Tools)
   !insertmacro MUI_DESCRIPTION_TEXT ${ID_FreeDosTools} $(DESC_FreeDosTools)
   !insertmacro MUI_DESCRIPTION_TEXT ${ID_Doszip} $(DESC_Doszip)

@@ -31,11 +31,12 @@ type
     VideoRamLabel: TLabel;
     VideoRamComboBox: TComboBox;
     VGASettingsLabel: TLabel;
+    FullscreenInfoLabel: TLabel;
   private
     { Private-Deklarationen }
   public
     { Public-Deklarationen }
-    Procedure InitGUI(const OnProfileNameChange : TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup, CurrentScummVMGameName : PString);
+    Procedure InitGUI(const InitData : TModernProfileEditorInitData);
     Procedure SetGame(const Game : TGame; const LoadFromTemplate : Boolean);
     Function CheckValue : Boolean;
     Procedure GetGame(const Game : TGame);
@@ -44,13 +45,13 @@ type
 
 implementation
 
-uses VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgSetupUnit;
+uses VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgSetupUnit, HelpConsts;
 
 {$R *.dfm}
 
 { TModernProfileEditorGraphicsFrame }
 
-procedure TModernProfileEditorGraphicsFrame.InitGUI(const OnProfileNameChange: TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup, CurrentScummVMGameName : PString);
+procedure TModernProfileEditorGraphicsFrame.InitGUI(const InitData : TModernProfileEditorInitData);
 Var St : TStringList;
 begin
   NoFlicker(WindowResolutionComboBox);
@@ -69,28 +70,31 @@ begin
   NoFlicker(TextModeLinesRadioGroup);
 
   WindowResolutionLabel.Caption:=LanguageSetup.GameWindowResolution;
-  St:=ValueToList(GameDB.ConfOpt.Resolution,';,'); try WindowResolutionComboBox.Items.AddStrings(St); finally St.Free; end;
+  St:=ValueToList(InitData.GameDB.ConfOpt.Resolution,';,'); try WindowResolutionComboBox.Items.AddStrings(St); finally St.Free; end;
   FullscreenResolutionLabel.Caption:=LanguageSetup.GameFullscreenResolution;
-  St:=ValueToList(GameDB.ConfOpt.Resolution,';,'); try FullscreenResolutionComboBox.Items.AddStrings(St); finally St.Free; end;
+  St:=ValueToList(InitData.GameDB.ConfOpt.Resolution,';,'); try FullscreenResolutionComboBox.Items.AddStrings(St); finally St.Free; end;
   StartFullscreenCheckBox.Caption:=LanguageSetup.GameStartFullscreen;
+  FullscreenInfoLabel.Caption:='('+LanguageSetup.GameStartFullscreenInfo+')';
   DoublebufferingCheckBox.Caption:=LanguageSetup.GameUseDoublebuffering;
   KeepAspectRatioCheckBox.Caption:=LanguageSetup.GameAspectCorrection;
   GlideEmulationCheckBox.Caption:=LanguageSetup.GameGlideEmulation;
   RenderLabel.Caption:=LanguageSetup.GameRender;
-  St:=ValueToList(GameDB.ConfOpt.Render,';,'); try RenderComboBox.Items.AddStrings(St); finally St.Free; end;
+  St:=ValueToList(InitData.GameDB.ConfOpt.Render,';,'); try RenderComboBox.Items.AddStrings(St); finally St.Free; end;
   VideoCardLabel.Caption:=LanguageSetup.GameVideoCard;
-  St:=ValueToList(GameDB.ConfOpt.Video,';,'); try VideoCardComboBox.Items.AddStrings(St); finally St.Free; end;
+  St:=ValueToList(InitData.GameDB.ConfOpt.Video,';,'); try VideoCardComboBox.Items.AddStrings(St); finally St.Free; end;
   VGASettingsGroupBox.Caption:=LanguageSetup.GameVGASettings;
   VGAChipsetLabel.Caption:=LanguageSetup.GameVGAChipset;
-  St:=ValueToList(GameDB.ConfOpt.VGAChipsets,';,'); try VGAChipsetComboBox.Items.AddStrings(St); finally St.Free; end;
+  St:=ValueToList(InitData.GameDB.ConfOpt.VGAChipsets,';,'); try VGAChipsetComboBox.Items.AddStrings(St); finally St.Free; end;
   VideoRamLabel.Caption:=LanguageSetup.GameVideoRam;
-  St:=ValueToList(GameDB.ConfOpt.VGAVideoRAM,';,'); try VideoRamComboBox.Items.AddStrings(St); finally St.Free; end;
+  St:=ValueToList(InitData.GameDB.ConfOpt.VGAVideoRAM,';,'); try VideoRamComboBox.Items.AddStrings(St); finally St.Free; end;
   VGASettingsLabel.Caption:=LanguageSetup.GameVGASettingsInfo;
   ScaleLabel.Caption:=LanguageSetup.GameScale;
-  St:=ValueToList(GameDB.ConfOpt.Scale,';,'); try ScaleComboBox.Items.AddStrings(St); finally St.Free; end;
+  St:=ValueToList(InitData.GameDB.ConfOpt.Scale,';,'); try ScaleComboBox.Items.AddStrings(St); finally St.Free; end;
   FrameSkipLabel.Caption:=LanguageSetup.GameFrameskip;
 
   TextModeLinesRadioGroup.Caption:=LanguageSetup.GameTextModeLines;
+
+  HelpContext:=ID_ProfileEditGraphics;
 end;
 
 procedure TModernProfileEditorGraphicsFrame.SetGame(const Game: TGame; const LoadFromTemplate: Boolean);

@@ -11,7 +11,10 @@ type
     Panel1: TPanel;
     Memo: TRichEdit;
     OKButton: TBitBtn;
+    HelpButton: TBitBtn;
     procedure FormCreate(Sender: TObject);
+    procedure HelpButtonClick(Sender: TObject);
+    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
   private
     { Private-Deklarationen }
   public
@@ -26,7 +29,8 @@ Procedure ShowStatisticsDialog(const AOwner : TComponent; const AGameDB : TGameD
 
 implementation
 
-uses VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgSetupUnit, PrgConsts;
+uses VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgSetupUnit, PrgConsts,
+     HelpConsts;
 
 {$R *.dfm}
 
@@ -36,6 +40,18 @@ begin
   Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName);
 
   OKButton.Caption:=LanguageSetup.OK;
+  HelpButton.Caption:=LanguageSetup.Help;
+end;
+
+procedure TStatisticsForm.HelpButtonClick(Sender: TObject);
+begin
+  if not StatisticsForm.HelpButton.Visible then exit;
+  Application.HelpCommand(HELP_CONTEXT,ID_HelpStatistics);
+end;
+
+procedure TStatisticsForm.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+begin
+  If (Key=VK_F1) and (Shift=[]) then HelpButtonClick(Sender);
 end;
 
 { global }
@@ -119,6 +135,7 @@ begin
   try
     StatisticsForm.Caption:=ACaption;
     StatisticsForm.Memo.Lines.AddStrings(AText);
+    StatisticsForm.HelpButton.Visible:=False;
     StatisticsForm.ShowModal;
   finally
     StatisticsForm.Free;

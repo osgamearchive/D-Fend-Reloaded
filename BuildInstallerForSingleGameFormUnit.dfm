@@ -11,9 +11,11 @@ object BuildInstallerForSingleGameForm: TBuildInstallerForSingleGameForm
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
+  KeyPreview = True
   OldCreateOrder = False
   Position = poOwnerFormCenter
   OnCreate = FormCreate
+  OnKeyDown = FormKeyDown
   OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
@@ -77,9 +79,18 @@ object BuildInstallerForSingleGameForm: TBuildInstallerForSingleGameForm
     TabOrder = 3
     Kind = bkCancel
   end
+  object HelpButton: TBitBtn
+    Left = 232
+    Top = 148
+    Width = 97
+    Height = 25
+    TabOrder = 4
+    OnClick = HelpButtonClick
+    Kind = bkHelp
+  end
   object SaveDialog: TSaveDialog
     DefaultExt = 'exe'
-    Left = 224
-    Top = 144
+    Left = 240
+    Top = 120
   end
 end

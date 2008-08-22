@@ -18,17 +18,16 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <Version>7.0</Version>
     <DCC_Define>DEBUG</DCC_Define>
-    <DCC_UnitSearchPath>.\pngimage</DCC_UnitSearchPath>
-    <DCC_ResourcePath>.\pngimage</DCC_ResourcePath>
-    <DCC_ObjPath>.\pngimage</DCC_ObjPath>
-    <DCC_IncludePath>.\pngimage</DCC_IncludePath>
+    <DCC_UnitSearchPath>.\pngimage;.\SevenZip;.\ZipMaster</DCC_UnitSearchPath>
+    <DCC_ResourcePath>.\pngimage;.\SevenZip;.\ZipMaster</DCC_ResourcePath>
+    <DCC_ObjPath>.\pngimage;.\SevenZip;.\ZipMaster</DCC_ObjPath>
+    <DCC_IncludePath>.\pngimage;.\SevenZip;.\ZipMaster</DCC_IncludePath>
   </PropertyGroup>
   <ProjectExtensions>
     <Borland.Personality>Delphi.Personality</Borland.Personality>
     <Borland.ProjectType />
     <BorlandProject>
-<BorlandProject><Delphi.Personality><Parameters><Parameters Name="UseLauncher">False</Parameters><Parameters Name="LoadAllSymbols">True</Parameters><Parameters Name="LoadUnspecifiedSymbols">False</Parameters>  
-    </Parameters><VersionInfo><VersionInfo Name="IncludeVerInfo">True</VersionInfo><VersionInfo Name="AutoIncBuild">False</VersionInfo><VersionInfo Name="MajorVer">0</VersionInfo><VersionInfo Name="MinorVer">4</VersionInfo><VersionInfo Name="Release">1</VersionInfo><VersionInfo Name="Build">11</VersionInfo><VersionInfo Name="Debug">False</VersionInfo><VersionInfo Name="PreRelease">False</VersionInfo><VersionInfo Name="Special">False</VersionInfo><VersionInfo Name="Private">False</VersionInfo><VersionInfo Name="DLL">False</VersionInfo><VersionInfo Name="Locale">1031</VersionInfo><VersionInfo Name="CodePage">1252</VersionInfo></VersionInfo><VersionInfoKeys><VersionInfoKeys Name="CompanyName"></VersionInfoKeys><VersionInfoKeys Name="FileDescription">D-Fend Reloaded</VersionInfoKeys><VersionInfoKeys Name="FileVersion">0.4.1.11</VersionInfoKeys><VersionInfoKeys Name="InternalName">D-Fend Reloaded</VersionInfoKeys><VersionInfoKeys Name="LegalCopyright">Alexander Herzog</VersionInfoKeys><VersionInfoKeys Name="LegalTrademarks"></VersionInfoKeys><VersionInfoKeys Name="OriginalFilename">DFend.exe</VersionInfoKeys><VersionInfoKeys Name="ProductName">D-Fend Reloaded</VersionInfoKeys><VersionInfoKeys Name="ProductVersion">1.0.0.0</VersionInfoKeys><VersionInfoKeys Name="Comments">GPL v3</VersionInfoKeys></VersionInfoKeys><Source><Source Name="MainSource">DFend.dpr</Source></Source></Delphi.Personality><ModelSupport>False</ModelSupport></BorlandProject></BorlandProject>
+<BorlandProject><Delphi.Personality><Parameters><Parameters Name="UseLauncher">False</Parameters><Parameters Name="LoadAllSymbols">True</Parameters><Parameters Name="LoadUnspecifiedSymbols">False</Parameters></Parameters><VersionInfo><VersionInfo Name="IncludeVerInfo">True</VersionInfo><VersionInfo Name="AutoIncBuild">False</VersionInfo><VersionInfo Name="MajorVer">0</VersionInfo><VersionInfo Name="MinorVer">5</VersionInfo><VersionInfo Name="Release">0</VersionInfo><VersionInfo Name="Build">14</VersionInfo><VersionInfo Name="Debug">False</VersionInfo><VersionInfo Name="PreRelease">False</VersionInfo><VersionInfo Name="Special">False</VersionInfo><VersionInfo Name="Private">False</VersionInfo><VersionInfo Name="DLL">False</VersionInfo><VersionInfo Name="Locale">1031</VersionInfo><VersionInfo Name="CodePage">1252</VersionInfo></VersionInfo><VersionInfoKeys><VersionInfoKeys Name="CompanyName"></VersionInfoKeys><VersionInfoKeys Name="FileDescription">D-Fend Reloaded</VersionInfoKeys><VersionInfoKeys Name="FileVersion">0.5.0.14</VersionInfoKeys><VersionInfoKeys Name="InternalName">D-Fend Reloaded</VersionInfoKeys><VersionInfoKeys Name="LegalCopyright">Alexander Herzog</VersionInfoKeys><VersionInfoKeys Name="LegalTrademarks"></VersionInfoKeys><VersionInfoKeys Name="OriginalFilename">DFend.exe</VersionInfoKeys><VersionInfoKeys Name="ProductName">D-Fend Reloaded</VersionInfoKeys><VersionInfoKeys Name="ProductVersion">1.0.0.0</VersionInfoKeys><VersionInfoKeys Name="Comments">GPL v3</VersionInfoKeys></VersionInfoKeys><Source><Source Name="MainSource">DFend.dpr</Source></Source></Delphi.Personality><ModelSupport>False</ModelSupport></BorlandProject></BorlandProject>
   </ProjectExtensions>
   <Import Project="$(MSBuildBinPath)\Borland.Delphi.Targets" />
   <ItemGroup>
@@ -44,6 +43,9 @@
     <DCCReference Include="BuildInstallerForSingleGameFormUnit.pas">
       <Form>BuildInstallerForSingleGameForm</Form>
     </DCCReference>
+    <DCCReference Include="BuildZipPackagesFormUnit.pas">
+      <Form>BuildZipPackagesForm</Form>
+    </DCCReference>
     <DCCReference Include="CacheChooseFormUnit.pas">
       <Form>CacheChooseForm</Form>
     </DCCReference>
@@ -55,6 +57,9 @@
     </DCCReference>
     <DCCReference Include="CommonComponents.pas" />
     <DCCReference Include="CommonTools.pas" />
+    <DCCReference Include="CopyProfileFormUnit.pas">
+      <Form>CopyProfileForm</Form>
+    </DCCReference>
     <DCCReference Include="CreateConfFormUnit.pas">
       <Form>CreateConfForm</Form>
     </DCCReference>
@@ -81,13 +86,21 @@
     <DCCReference Include="ExpandImageFormUnit.pas">
       <Form>ExpandImageForm</Form>
     </DCCReference>
+    <DCCReference Include="ExtraExeEditFormUnit.pas">
+      <Form>ExtraExeEditForm</Form>
+    </DCCReference>
     <DCCReference Include="FastMM4.pas" />
     <DCCReference Include="FirstRunWizardFormUnit.pas">
       <Form>FirstRunWizardForm</Form>
     </DCCReference>
+    <DCCReference Include="FullscreenInfoFormUnit.pas">
+      <Form>FullscreenInfoForm</Form>
+    </DCCReference>
     <DCCReference Include="GameDBToolsUnit.pas" />
     <DCCReference Include="GameDBUnit.pas" />
     <DCCReference Include="HashCalc.pas" />
+    <DCCReference Include="HelpConsts.pas" />
+    <DCCReference Include="HelpTools.pas" />
     <DCCReference Include="HistoryFormUnit.pas">
       <Form>HistoryForm</Form>
     </DCCReference>
@@ -95,6 +108,7 @@
     <DCCReference Include="IconManagerFormUnit.pas">
       <Form>IconManagerForm</Form>
     </DCCReference>
+    <DCCReference Include="ImageCacheUnit.pas" />
     <DCCReference Include="ImageTools.pas" />
     <DCCReference Include="InfoFormUnit.pas">
       <Form>InfoForm</Form>
@@ -106,6 +120,10 @@
       <Form>LanguageEditorStartForm</Form>
     </DCCReference>
     <DCCReference Include="LanguageSetupUnit.pas" />
+    <DCCReference Include="LinkFileEditFormUnit.pas">
+      <Form>LinkFileEditForm</Form>
+    </DCCReference>
+    <DCCReference Include="LinkFileUnit.pas" />
     <DCCReference Include="ListScummVMGamesFormUnit.pas">
       <Form>ListScummVMGamesForm</Form>
     </DCCReference>
@@ -203,20 +221,51 @@
     <DCCReference Include="PlaySoundFormUnit.pas">
       <Form>PlaySoundForm</Form>
     </DCCReference>
+    <DCCReference Include="PlayVideoFormUnit.pas">
+      <Form>PlayVideoForm</Form>
+    </DCCReference>
     <DCCReference Include="pngimage\pngimage.pas" />
     <DCCReference Include="PrgConsts.pas" />
     <DCCReference Include="PrgSetupUnit.pas" />
     <DCCReference Include="ProfileEditorFormUnit.pas">
       <Form>ProfileEditorForm</Form>
     </DCCReference>
+    <DCCReference Include="ProfileMountEditorCDDriveFrameUnit.pas">
+      <Form>ProfileMountEditorCDDriveFrame</Form>
+    </DCCReference>
+    <DCCReference Include="ProfileMountEditorCDImageFrameUnit.pas">
+      <Form>ProfileMountEditorCDImageFrame</Form>
+    </DCCReference>
+    <DCCReference Include="ProfileMountEditorDriveFrameUnit.pas">
+      <Form>ProfileMountEditorDriveFrame</Form>
+    </DCCReference>
+    <DCCReference Include="ProfileMountEditorFloppyDriveFrameUnit.pas">
+      <Form>ProfileMountEditorFloppyDriveFrame</Form>
+    </DCCReference>
+    <DCCReference Include="ProfileMountEditorFloppyImage1FrameUnit.pas">
+      <Form>ProfileMountEditorFloppyImage1Frame</Form>
+    </DCCReference>
+    <DCCReference Include="ProfileMountEditorFloppyImage2FrameUnit.pas">
+      <Form>ProfileMountEditorFloppyImage2Frame</Form>
+    </DCCReference>
     <DCCReference Include="ProfileMountEditorFormUnit.pas">
       <Form>ProfileMountEditorForm</Form>
+    </DCCReference>
+    <DCCReference Include="ProfileMountEditorHDImageFrameUnit.pas">
+      <Form>ProfileMountEditorHDImageFrame</Form>
+    </DCCReference>
+    <DCCReference Include="ProfileMountEditorPhysFSFrameUnit.pas">
+      <Form>ProfileMountEditorPhysFSFrame</Form>
+    </DCCReference>
+    <DCCReference Include="ProfileMountEditorZipFrameUnit.pas">
+      <Form>ProfileMountEditorZipFrame</Form>
     </DCCReference>
     <DCCReference Include="ProgressFormUnit.pas">
       <Form>ProgressForm</Form>
     </DCCReference>
     <DCCReference Include="ReadDriveUnit.pas" />
     <DCCReference Include="ResHookUnit.pas" />
+    <DCCReference Include="ScreensaverControlUnit.pas" />
     <DCCReference Include="ScummVMToolsUnit.pas" />
     <DCCReference Include="ScummVMUnit.pas" />
     <DCCReference Include="SelectProfilesFormUnit.pas">
@@ -234,6 +283,9 @@
     <DCCReference Include="SetupFrameBaseUnit.pas">
       <Form>SetupFrameBase</Form>
     </DCCReference>
+    <DCCReference Include="SetupFrameCompressionUnit.pas">
+      <Form>SetupFrameCompression</Form>
+    </DCCReference>
     <DCCReference Include="SetupFrameDefaultValuesUnit.pas">
       <Form>SetupFrameDefaultValues</Form>
     </DCCReference>
@@ -242,6 +294,9 @@
     </DCCReference>
     <DCCReference Include="SetupFrameDOSBoxExtUnit.pas">
       <Form>SetupFrameDOSBoxExt</Form>
+    </DCCReference>
+    <DCCReference Include="SetupFrameDOSBoxFormUnit.pas">
+      <Form>SetupFrameDOSBoxForm</Form>
     </DCCReference>
     <DCCReference Include="SetupFrameDOSBoxUnit.pas">
       <Form>SetupFrameDOSBox</Form>
@@ -257,6 +312,9 @@
     </DCCReference>
     <DCCReference Include="SetupFrameGamesListScreenshotAppearanceUnit.pas">
       <Form>SetupFrameGamesListScreenshotAppearance</Form>
+    </DCCReference>
+    <DCCReference Include="SetupFrameGamesListScreenshotModeAppearanceUnit.pas">
+      <Form>SetupFrameGamesListScreenshotModeAppearance</Form>
     </DCCReference>
     <DCCReference Include="SetupFrameGamesListTreeAppearanceUnit.pas">
       <Form>SetupFrameGamesListTreeAppearance</Form>
@@ -325,6 +383,9 @@
     <DCCReference Include="UserInfoFormUnit.pas">
       <Form>UserInfoForm</Form>
     </DCCReference>
+    <DCCReference Include="ViewFilesFrameUnit.pas">
+      <Form>ViewFilesFrame</Form>
+    </DCCReference>
     <DCCReference Include="ViewImageFormUnit.pas">
       <Form>ViewImageForm</Form>
     </DCCReference>
@@ -332,6 +393,7 @@
     <DCCReference Include="WallpaperStyleFormUnit.pas">
       <Form>WallpaperStyleForm</Form>
     </DCCReference>
+    <DCCReference Include="WindowsProfileUnit.pas" />
     <DCCReference Include="WizardBaseUnit.pas">
       <Form>WizardBaseFrame</Form>
     </DCCReference>
@@ -355,6 +417,14 @@
     </DCCReference>
     <DCCReference Include="WizardTemplateUnit.pas">
       <Form>WizardTemplateFrame</Form>
+    </DCCReference>
+    <DCCReference Include="ZipInfoFormUnit.pas">
+      <Form>ZipInfoForm</Form>
+    </DCCReference>
+    <DCCReference Include="ZipManagerUnit.pas" />
+    <DCCReference Include="ZipPackageUnit.pas" />
+    <DCCReference Include="ZipWaitInfoFormUnit.pas">
+      <Form>ZipWaitInfoForm</Form>
     </DCCReference>
   </ItemGroup>
 </Project>

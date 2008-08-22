@@ -11,9 +11,11 @@ object UserInfoForm: TUserInfoForm
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
+  KeyPreview = True
   OldCreateOrder = False
   Position = poOwnerFormCenter
   OnCreate = FormCreate
+  OnKeyDown = FormKeyDown
   OnResize = FormResize
   OnShow = FormShow
   PixelsPerInch = 96
@@ -95,6 +97,15 @@ object UserInfoForm: TUserInfoForm
       Height = 25
       TabOrder = 1
       Kind = bkCancel
+    end
+    object HelpButton: TBitBtn
+      Left = 232
+      Top = 6
+      Width = 97
+      Height = 25
+      TabOrder = 2
+      OnClick = HelpButtonClick
+      Kind = bkHelp
     end
   end
   object Tab: TStringGrid

@@ -26,7 +26,7 @@ type
     { Private-Deklarationen }
   public
     { Public-Deklarationen }
-    Procedure InitGUI(const OnProfileNameChange : TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup, CurrentScummVMGameName : PString);
+    Procedure InitGUI(const InitData : TModernProfileEditorInitData);
     Procedure SetGame(const Game : TGame; const LoadFromTemplate : Boolean);
     Function CheckValue : Boolean;
     Procedure GetGame(const Game : TGame);
@@ -35,13 +35,13 @@ type
 
 implementation
 
-uses VistaToolsUnit, LanguageSetupUnit, CommonTools;
+uses VistaToolsUnit, LanguageSetupUnit, CommonTools, HelpConsts;
 
 {$R *.dfm}
 
 { TFrame1 }
 
-procedure TModernProfileEditorGUSFrame.InitGUI(const OnProfileNameChange: TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup, CurrentScummVMGameName : PString);
+procedure TModernProfileEditorGUSFrame.InitGUI(const InitData : TModernProfileEditorInitData);
 Var St : TStringList;
 begin
   NoFlicker(ActivateGUSCheckBox);
@@ -55,18 +55,20 @@ begin
 
   ActivateGUSCheckBox.Caption:=LanguageSetup.ProfileEditorSoundGUSEnabled;
   AddressLabel.Caption:=LanguageSetup.ProfileEditorSoundGUSAddress;
-  St:=ValueToList(GameDB.ConfOpt.GUSBase,';,'); try AddressComboBox.Items.AddStrings(St); finally St.Free; end;
+  St:=ValueToList(InitData.GameDB.ConfOpt.GUSBase,';,'); try AddressComboBox.Items.AddStrings(St); finally St.Free; end;
   SampleRateLabel.Caption:=LanguageSetup.ProfileEditorSoundGUSRate;
-  St:=ValueToList(GameDB.ConfOpt.GUSRate,';,'); try SampleRateComboBox.Items.AddStrings(St); finally St.Free; end;
+  St:=ValueToList(InitData.GameDB.ConfOpt.GUSRate,';,'); try SampleRateComboBox.Items.AddStrings(St); finally St.Free; end;
   Interrupt1Label.Caption:=LanguageSetup.ProfileEditorSoundGUSIRQ1;
-  St:=ValueToList(GameDB.ConfOpt.IRQ1,';,'); try Interrupt1ComboBox.Items.AddStrings(St); finally St.Free; end;
+  St:=ValueToList(InitData.GameDB.ConfOpt.IRQ1,';,'); try Interrupt1ComboBox.Items.AddStrings(St); finally St.Free; end;
   Interrupt2Label.Caption:=LanguageSetup.ProfileEditorSoundGUSIRQ2;
-  St:=ValueToList(GameDB.ConfOpt.IRQ2,';,'); try Interrupt2ComboBox.Items.AddStrings(St); finally St.Free; end;
+  St:=ValueToList(InitData.GameDB.ConfOpt.IRQ2,';,'); try Interrupt2ComboBox.Items.AddStrings(St); finally St.Free; end;
   DMA1Label.Caption:=LanguageSetup.ProfileEditorSoundGUSDMA1;
-  St:=ValueToList(GameDB.ConfOpt.Dma1,';,'); try DMA1ComboBox.Items.AddStrings(St); finally St.Free; end;
+  St:=ValueToList(InitData.GameDB.ConfOpt.Dma1,';,'); try DMA1ComboBox.Items.AddStrings(St); finally St.Free; end;
   DMA2Label.Caption:=LanguageSetup.ProfileEditorSoundGUSDMA2;
-  St:=ValueToList(GameDB.ConfOpt.Dma2,';,'); try DMA2ComboBox.Items.AddStrings(St); finally St.Free; end;
+  St:=ValueToList(InitData.GameDB.ConfOpt.Dma2,';,'); try DMA2ComboBox.Items.AddStrings(St); finally St.Free; end;
   PathEdit.EditLabel.Caption:=LanguageSetup.ProfileEditorSoundGUSPath;
+
+  HelpContext:=ID_ProfileEditSoundGUS;
 end;
 
 Procedure SetComboBox(const ComboBox : TComboBox; const Value : String; const Default : Integer); overload;

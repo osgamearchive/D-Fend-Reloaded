@@ -27,7 +27,7 @@ type
     { Private-Deklarationen }
   public
     { Public-Deklarationen }
-    Procedure InitGUI(const OnProfileNameChange : TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup, CurrentScummVMGameName : PString);
+    Procedure InitGUI(const InitData : TModernProfileEditorInitData);
     Procedure SetGame(const Game : TGame; const LoadFromTemplate : Boolean);
     Function CheckValue : Boolean;
     Procedure GetGame(const Game : TGame);
@@ -36,13 +36,13 @@ type
 
 implementation
 
-uses VistaToolsUnit, LanguageSetupUnit, CommonTools;
+uses VistaToolsUnit, LanguageSetupUnit, CommonTools, HelpConsts;
 
 {$R *.dfm}
 
 { TModernProfileEditorSoundBlasterFrame }
 
-procedure TModernProfileEditorSoundBlasterFrame.InitGUI(const OnProfileNameChange: TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup, CurrentScummVMGameName : PString);
+procedure TModernProfileEditorSoundBlasterFrame.InitGUI(const InitData : TModernProfileEditorInitData);
 Var St : TStringList;
 begin
   NoFlicker(TypeComboBox);
@@ -55,20 +55,22 @@ begin
   NoFlicker(UseMixerCheckBox);
 
   TypeLabel.Caption:=LanguageSetup.ProfileEditorSoundSBType;
-  St:=ValueToList(GameDB.ConfOpt.Sblaster,';,'); try TypeComboBox.Items.AddStrings(St); finally St.Free; end;
+  St:=ValueToList(InitData.GameDB.ConfOpt.Sblaster,';,'); try TypeComboBox.Items.AddStrings(St); finally St.Free; end;
   AddressLabel.Caption:=LanguageSetup.ProfileEditorSoundSBAddress;
-  St:=ValueToList(GameDB.ConfOpt.SBBase,';,'); try AddressComboBox.Items.AddStrings(St); finally St.Free; end;
+  St:=ValueToList(InitData.GameDB.ConfOpt.SBBase,';,'); try AddressComboBox.Items.AddStrings(St); finally St.Free; end;
   InterruptLabel.Caption:=LanguageSetup.ProfileEditorSoundSBIRQ;
-  St:=ValueToList(GameDB.ConfOpt.IRQ,';,'); try InterruptComboBox.Items.AddStrings(St); finally St.Free; end;
+  St:=ValueToList(InitData.GameDB.ConfOpt.IRQ,';,'); try InterruptComboBox.Items.AddStrings(St); finally St.Free; end;
   DMALabel.Caption:=LanguageSetup.ProfileEditorSoundSBDMA;
-  St:=ValueToList(GameDB.ConfOpt.DMA,';,'); try DMAComboBox.Items.AddStrings(St); finally St.Free; end;
+  St:=ValueToList(InitData.GameDB.ConfOpt.DMA,';,'); try DMAComboBox.Items.AddStrings(St); finally St.Free; end;
   HDMALabel.Caption:=LanguageSetup.ProfileEditorSoundSBHDMA;
-  St:=ValueToList(GameDB.ConfOpt.HDMA,';,'); try HDMAComboBox.Items.AddStrings(St); finally St.Free; end;
+  St:=ValueToList(InitData.GameDB.ConfOpt.HDMA,';,'); try HDMAComboBox.Items.AddStrings(St); finally St.Free; end;
   OplModeLabel.Caption:=LanguageSetup.ProfileEditorSoundSBOplMode;
-  St:=ValueToList(GameDB.ConfOpt.Oplmode,';,'); try OplModeComboBox.Items.AddStrings(St); finally St.Free; end;
+  St:=ValueToList(InitData.GameDB.ConfOpt.Oplmode,';,'); try OplModeComboBox.Items.AddStrings(St); finally St.Free; end;
   OplSampleRateLabel.Caption:=LanguageSetup.ProfileEditorSoundSBOplRate;
-  St:=ValueToList(GameDB.ConfOpt.OPLRate,';,'); try OplSampleRateComboBox.Items.AddStrings(St); finally St.Free; end;
+  St:=ValueToList(InitData.GameDB.ConfOpt.OPLRate,';,'); try OplSampleRateComboBox.Items.AddStrings(St); finally St.Free; end;
   UseMixerCheckBox.Caption:=LanguageSetup.ProfileEditorSoundSBUseMixer;
+
+  HelpContext:=ID_ProfileEditSoundSoundBlaster;
 end;
 
 Procedure SetComboBox(const ComboBox : TComboBox; const Value : String; const Default : Integer); overload;

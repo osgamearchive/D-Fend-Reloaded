@@ -33,7 +33,7 @@ type
 implementation
 
 uses ShellAPI, LanguageSetupUnit, VistaToolsUnit, PrgSetupUnit, CommonTools,
-     SetupDosBoxFormUnit;
+     SetupDosBoxFormUnit, HelpConsts;
 
 {$R *.dfm}
 
@@ -63,6 +63,8 @@ begin
   QBasicDownloadURL.Caption:='http:/'+'/download.microsoft.com/download/win95upg/tool_s/1.0/w95/en-us/olddos.exe';
   with QBasicDownloadURL.Font do begin Color:=clBlue; Style:=[fsUnderline]; end;
   QBasicDownloadURL.Cursor:=crHandPoint;
+
+  HelpContext:=ID_FileOptionsQBasic;
 end;
 
 procedure TSetupFrameQBasic.DOSBoxDirChanged;

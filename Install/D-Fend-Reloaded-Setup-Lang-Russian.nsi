@@ -21,10 +21,11 @@ LangString LANGNAME_GameDataFolder ${LANG_RUSSIAN} "Папка данных и документов"
 LangString LANGNAME_Deinstall ${LANG_RUSSIAN} "только удаление"
 LangString LANGNAME_ConfirmDelUserData ${LANG_RUSSIAN} "Хотите ли вы также удалить папку данных и настроек $DataInstDir ?"
 
-LangString LANGNAME_NoInstallationFound ${LANG_RUSSIAN} "В указаной папке не обнаружено установленного D-Fend Reloaded , обновление невозможно."
+LangString LANGNAME_NoInstallationFound ${LANG_RUSSIAN} "В указанной папке не обнаружено установленного D-Fend Reloaded , обновление невозможно."
 
 LangString LANGNAME_ProgramFiles ${LANG_RUSSIAN} "Файлы программы"
 LangString LANGNAME_LanguageFiles ${LANG_RUSSIAN} "Языковые файлы"
+LangString LANGNAME_VideoCodec ${LANG_RUSSIAN} "Видеокодек DOSBox"
 LangString LANGNAME_DOSBox ${LANG_RUSSIAN} "DOSBox"
 LangString LANGNAME_Tools ${LANG_RUSSIAN} "Инструменты"
 LangString LANGNAME_FreeDosTools ${LANG_RUSSIAN} "Утилиты FreeDOS для использования в DosBox"
@@ -35,7 +36,8 @@ LangString DESC_DFend ${LANG_RUSSIAN} "D-Fend Reloaded - это пользовательский гр
 LangString DESC_DosBox ${LANG_RUSSIAN} "DOSBox - это эмулятор DOS, используемый D-Fend Reloaded."
 LangString DESC_DosBoxProgramFiles ${LANG_RUSSIAN} "Файлы программы эмулятора DOS."
 LangString DESC_DosBoxLanguageFiles ${LANG_RUSSIAN} "Файлы с настройками, описанием, и интерфейсом, переведённые на различные языки."
+LangString DESC_VideoCodec ${LANG_RUSSIAN} "Кодек для просмотра видео записанного в DOSBox."
 LangString DESC_Tools ${LANG_RUSSIAN} "Инструменты для DOSBox."
 LangString DESC_FreeDosTools ${LANG_RUSSIAN} "Утилиты командной строки из пакета FreeDOS для использования в DOSBox."
-LangString DESC_Doszip ${LANG_RUSSIAN} "Doszip Commander - это клон Norton Commander для использования в DOSBox."      # NEW !!!
+LangString DESC_Doszip ${LANG_RUSSIAN} "Doszip Commander - это клон Norton Commander для использования в DOSBox."
 LangString DESC_DesktopShortcut ${LANG_RUSSIAN} "Создаёт для D-Fend Reloaded ярлык на рабочем столе."

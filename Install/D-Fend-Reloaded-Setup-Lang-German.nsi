@@ -25,6 +25,7 @@ LangString LANGNAME_NoInstallationFound ${LANG_GERMAN} "An dem angegebenen Pfad 
 
 LangString LANGNAME_ProgramFiles ${LANG_GERMAN} "Programmdateien"
 LangString LANGNAME_LanguageFiles ${LANG_GERMAN} "Sprachdateien"
+LangString LANGNAME_VideoCodec ${LANG_GERMAN} "DOSBox Video-Codec"
 LangString LANGNAME_DOSBox ${LANG_GERMAN} "DOSBox"
 LangString LANGNAME_Tools ${LANG_GERMAN} "Tools"
 LangString LANGNAME_FreeDosTools ${LANG_GERMAN} "FreeDOS Kommandozeilen Programme"
@@ -35,6 +36,7 @@ LangString DESC_DFend ${LANG_GERMAN} "D-Fend Reloaded ist die zentrale Verwaltun
 LangString DESC_DosBox ${LANG_GERMAN} "DOSBox ist der von D-Fend Reloaded verwendete DOS-Emulator."
 LangString DESC_DosBoxProgramFiles ${LANG_GERMAN} "Programmdateien des DOS-Emulators."
 LangString DESC_DosBoxLanguageFiles ${LANG_GERMAN} "Sprachdateien für Deutsch und weitere Sprachen für DOSBox."
+LangString DESC_VideoCodec ${LANG_GERMAN} "Video-Codec um die mit DOSBox aufgezeichneten Videos anzeigen zu können."
 LangString DESC_Tools ${LANG_GERMAN} "Hilfsprogramme zur Verwendung in DOSBox."
 LangString DESC_FreeDosTools ${LANG_GERMAN} "Kommandozeilen Werkzeuge aus der FreeDOS-Sammlung zur Verwendung in DOSBox."
 LangString DESC_Doszip ${LANG_GERMAN} "Der Doszip Commander ist ein Norton Commander Clone, der innerhalb von DOSBox verwendet werden kann."

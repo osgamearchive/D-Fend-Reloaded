@@ -33,7 +33,7 @@ type
 
 implementation
 
-uses LanguageSetupUnit, VistaToolsUnit, PrgSetupUnit;
+uses LanguageSetupUnit, VistaToolsUnit, PrgSetupUnit, HelpConsts;
 
 {$R *.dfm}
 
@@ -41,7 +41,7 @@ uses LanguageSetupUnit, VistaToolsUnit, PrgSetupUnit;
 
 function TSetupFrameWine.GetName: String;
 begin
-  result:='Wine support';
+  result:=LanguageSetup.SetupFormWine;
 end;
 
 procedure TSetupFrameWine.InitGUIAndLoadSetup(InitData: TInitData);
@@ -68,8 +68,22 @@ end;
 
 procedure TSetupFrameWine.LoadLanguage;
 begin
-  List.TitleCaptions[0]:='Wine drive letter';
-  List.TitleCaptions[1]:='Linux path';
+  MainCheckBox.Caption:=LanguageSetup.SetupFormWineEnable;
+  MainInfoLabel.Caption:=LanguageSetup.SetupFormWineEnableInfo;
+
+  ListInfoLabel.Caption:=LanguageSetup.SetupFormWineRemap;
+  List.TitleCaptions[0]:=LanguageSetup.SetupFormWineRemapDriveLetter;
+  List.TitleCaptions[1]:=LanguageSetup.SetupFormWineRemapLinuxPath;
+
+  RemapMountsCheckBox.Caption:=LanguageSetup.SetupFormWineRemapMounts;
+  RemapScreenshotFolderCheckBox.Caption:=LanguageSetup.SetupFormWineRemapScreenshots;
+  RemapMapperFileCheckBox.Caption:=LanguageSetup.SetupFormWineRemapMapperFile;
+  RemapDOSBoxFolderCheckBox.Caption:=LanguageSetup.SetupFormWineRemapDOSBox;
+
+  LinuxLinkModeCheckBox.Caption:=LanguageSetup.SetupFormWineLinuxLinkMode;
+  ShellScriptPreambleEdit.EditLabel.Caption:=LanguageSetup.SetupFormWineShellPreamble;
+
+  HelpContext:=ID_FileOptionsWineSupport;
 end;
 
 procedure TSetupFrameWine.DOSBoxDirChanged;

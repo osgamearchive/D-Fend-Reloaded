@@ -33,7 +33,7 @@ Function ShowMiniRunDialog(const AOwner : TComponent; const AGameDB : TGameDB) :
 implementation
 
 uses VistaToolsUnit, LanguageSetupUnit, CommonTools, DosBoxUnit, ScummVMUnit,
-     GameDBToolsUnit;
+     GameDBToolsUnit, WindowsProfileUnit;
 
 {$R *.dfm}
 
@@ -111,7 +111,13 @@ begin
   end;
 
   G:=TGame(ListBox.Items.Objects[ListBox.ItemIndex]);
-  If ScummVMMode(G) then RunScummVMGame(G) else RunGame(G);
+  If ScummVMMode(G) then begin
+    RunScummVMGame(G);
+  end else begin
+    If WindowsExeMode(G)
+     then RunWindowsGame(G)
+     else RunGame(G);
+  end;
 end;
 
 { global }

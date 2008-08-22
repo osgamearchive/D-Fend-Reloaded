@@ -9,10 +9,12 @@ Function BuildScummVMIniFile(const Game : TGame) : TStringList;
 
 implementation
 
-uses Windows, Forms, Dialogs, SysUtils, PrgSetupUnit, CommonTools, PrgConsts,
-     GameDBToolsUnit, LanguageSetupUnit;
+uses Windows, Forms, Dialogs, SysUtils, IniFiles, PrgSetupUnit, CommonTools,
+     PrgConsts, GameDBToolsUnit, LanguageSetupUnit;
 
 Function BuildScummVMIniFile(const Game : TGame) : TStringList;
+Var Path,S : String;
+    Ini : TIniFile;
 begin
   result:=TStringList.Create;
   result.Add('[scummvm]');
@@ -36,9 +38,24 @@ begin
   result.Add('talkspeed='+IntToStr(Game.ScummVMTalkSpeed));
   If Game.ScummVMSpeechMute then result.Add('speech_mute=true') else result.Add('speech_mute=false');
   If Game.ScummVMSubtitles then result.Add('subtitles=true') else result.Add('subtitles=false');
+
+  Path:=IncludeTrailingPathDelimiter(PrgSetup.ScummVMPath);
+  If FileExists(Path+'summvm.ini') then begin
+    Ini:=TIniFile.Create(Path+'summvm.ini');
+    try
+      S:=Ini.ReadString('scummvm','themepath','');
+      If S='' then S:=Path;
+      result.Add('themepath='+S);
+      result.Add('gui_theme='+Ini.ReadString('scummvm','gui_theme',''));
+    finally
+      Ini.Free;
+    end;
+  end else begin
+    result.Add('themepath='+Path);
+  end;
 end;
 
-Procedure RunScummVM(const INIFile, GameName : String; const FullScreen : Boolean);
+Procedure RunScummVM(const INIFile, GameName, SavePath : String; const FullScreen : Boolean; const ScreenshotDir : String);
 Var PrgFile, Params : String;
     StartupInfo : TStartupInfo;
     ProcessInformation : TProcessInformation;
@@ -49,7 +66,11 @@ begin
     exit;
   end;
 
-  Params:='--config="'+INIFile+'" '+GameName;
+  If SavePath='' then begin
+    Params:='--config="'+INIFile+'" '+GameName;
+  end else begin
+    Params:='--config="'+INIFile+'" --savepath="'+SavePath+'" '+GameName;
+  end;
 
   with StartupInfo do begin
     cb:=SizeOf(TStartupInfo);
@@ -61,18 +82,33 @@ begin
     lpReserved2:=nil;
   end;
 
-  CreateProcess(
-    PChar(PrgFile),
-    PChar('"'+PrgFile+'" '+Params),
-    nil,
-    nil,
-    False,
-    0,
-    nil,
-    PChar(ExtractFilePath(PrgFile)),
-    StartupInfo,
-    ProcessInformation
-  );
+  If ScreenshotDir<>'' then begin
+    CreateProcess(
+      PChar(PrgFile),
+      PChar('"'+PrgFile+'" '+Params),
+      nil,
+      nil,
+      False,
+      0,
+      nil,
+      PChar(ScreenshotDir),
+      StartupInfo,
+      ProcessInformation
+    );
+  end else begin
+    CreateProcess(
+      PChar(PrgFile),
+      PChar('"'+PrgFile+'" '+Params),
+      nil,
+      nil,
+      False,
+      0,
+      nil,
+      PChar(ExtractFilePath(PrgFile)),
+      StartupInfo,
+      ProcessInformation
+    );
+  end;
 
   CloseHandle(ProcessInformation.hProcess);
   CloseHandle(ProcessInformation.hThread);
@@ -80,6 +116,7 @@ end;
 
 Procedure RunScummVMGame(const Game : TGame);
 Var St : TStringList;
+    S, SavePath : String;
 begin
   If PrgSetup.MinimizeOnScummVMStart then Application.Minimize;
 
@@ -93,7 +130,13 @@ begin
     end;
     AddToHistory(Game.Name);
 
-    RunScummVM(TempDir+ScummVMConfFileName,Game.ScummVMGame,Game.StartFullscreen);
+    S:='';
+    If Trim(Game.CaptureFolder)<>'' then begin
+      S:=MakeAbsPath(Game.CaptureFolder,PrgSetup.BaseDir);
+      If not ForceDirectories(S) then S:='';
+    end;
+    If Trim(Game.ScummVMSavePath)='' then SavePath:='' else SavePath:=MakeAbsPath(Game.ScummVMSavePath,PrgSetup.BaseDir);
+    RunScummVM(TempDir+ScummVMConfFileName,Game.ScummVMGame,SavePath,Game.StartFullscreen,S);
   finally
     St.Free;
   end;

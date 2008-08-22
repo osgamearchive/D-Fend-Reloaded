@@ -23,31 +23,41 @@ object ModernProfileEditorGraphicsFrame: TModernProfileEditorGraphicsFrame
   end
   object RenderLabel: TLabel
     Left = 24
-    Top = 200
+    Top = 224
     Width = 60
     Height = 13
     Caption = 'RenderLabel'
   end
   object VideoCardLabel: TLabel
     Left = 24
-    Top = 256
+    Top = 280
     Width = 74
     Height = 13
     Caption = 'VideoCardLabel'
   end
   object ScaleLabel: TLabel
     Left = 24
-    Top = 312
+    Top = 336
     Width = 50
     Height = 13
     Caption = 'ScaleLabel'
   end
   object FrameSkipLabel: TLabel
-    Left = 24
-    Top = 368
+    Left = 408
+    Top = 336
     Width = 74
     Height = 13
     Caption = 'FrameSkipLabel'
+  end
+  object FullscreenInfoLabel: TLabel
+    Left = 40
+    Top = 90
+    Width = 569
+    Height = 35
+    Anchors = [akLeft, akTop, akRight]
+    AutoSize = False
+    Caption = 'FullscreenInfoLabel'
+    WordWrap = True
   end
   object WindowResolutionComboBox: TComboBox
     Left = 24
@@ -78,7 +88,7 @@ object ModernProfileEditorGraphicsFrame: TModernProfileEditorGraphicsFrame
   end
   object DoublebufferingCheckBox: TCheckBox
     Left = 24
-    Top = 104
+    Top = 128
     Width = 577
     Height = 17
     Anchors = [akLeft, akTop, akRight]
@@ -87,7 +97,7 @@ object ModernProfileEditorGraphicsFrame: TModernProfileEditorGraphicsFrame
   end
   object KeepAspectRatioCheckBox: TCheckBox
     Left = 24
-    Top = 136
+    Top = 160
     Width = 577
     Height = 17
     Anchors = [akLeft, akTop, akRight]
@@ -96,7 +106,7 @@ object ModernProfileEditorGraphicsFrame: TModernProfileEditorGraphicsFrame
   end
   object RenderComboBox: TComboBox
     Left = 24
-    Top = 219
+    Top = 243
     Width = 145
     Height = 21
     Style = csDropDownList
@@ -105,7 +115,7 @@ object ModernProfileEditorGraphicsFrame: TModernProfileEditorGraphicsFrame
   end
   object VideoCardComboBox: TComboBox
     Left = 24
-    Top = 275
+    Top = 299
     Width = 145
     Height = 21
     Style = csDropDownList
@@ -114,7 +124,7 @@ object ModernProfileEditorGraphicsFrame: TModernProfileEditorGraphicsFrame
   end
   object ScaleComboBox: TComboBox
     Left = 24
-    Top = 331
+    Top = 355
     Width = 369
     Height = 21
     Style = csDropDownList
@@ -122,8 +132,8 @@ object ModernProfileEditorGraphicsFrame: TModernProfileEditorGraphicsFrame
     TabOrder = 8
   end
   object FrameSkipEdit: TSpinEdit
-    Left = 24
-    Top = 387
+    Left = 408
+    Top = 355
     Width = 60
     Height = 22
     MaxValue = 10
@@ -133,7 +143,7 @@ object ModernProfileEditorGraphicsFrame: TModernProfileEditorGraphicsFrame
   end
   object TextModeLinesRadioGroup: TRadioGroup
     Left = 24
-    Top = 429
+    Top = 389
     Width = 169
     Height = 76
     Caption = 'TextModeLinesRadioGroup'
@@ -147,7 +157,7 @@ object ModernProfileEditorGraphicsFrame: TModernProfileEditorGraphicsFrame
   end
   object GlideEmulationCheckBox: TCheckBox
     Left = 24
-    Top = 168
+    Top = 192
     Width = 577
     Height = 17
     Anchors = [akLeft, akTop, akRight]
@@ -157,7 +167,7 @@ object ModernProfileEditorGraphicsFrame: TModernProfileEditorGraphicsFrame
   end
   object VGASettingsGroupBox: TGroupBox
     Left = 208
-    Top = 208
+    Top = 232
     Width = 417
     Height = 105
     Anchors = [akLeft, akTop, akRight]

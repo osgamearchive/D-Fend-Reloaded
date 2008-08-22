@@ -23,11 +23,12 @@ type
     procedure ButtonWork(Sender: TObject);
     procedure TimerTimer(Sender: TObject);
     procedure InstallerLangEditComboBoxChange(Sender: TObject);
+    procedure DosBoxLangEditComboBoxChange(Sender: TObject);
   private
     { Private-Deklarationen }
     DosBoxLang : TStringList;
     JustLoading : Boolean;
-    PDosBoxDir : PString;
+    PDosBoxDir, PDOSBoxLang : PString;
     LanguageChangeNotify : TSimpleEvent;
     OpenLanguageEditor : TOpenLanguageEditorEvent;
     InstallerLang : Integer;
@@ -48,8 +49,8 @@ type
 
 implementation
 
-uses Registry, ShellAPI, LanguageSetupUnit, VistaToolsUnit, PrgSetupUnit,
-     CommonTools, PrgConsts;
+uses Registry, ShellAPI, Math, LanguageSetupUnit, VistaToolsUnit, PrgSetupUnit,
+     CommonTools, PrgConsts, HelpConsts;
 
 {$R *.dfm}
 
@@ -75,7 +76,8 @@ end;
 
 procedure TSetupFrameLanguage.InitGUIAndLoadSetup(InitData: TInitData);
 Var St : TStringList;
-    I : Integer;
+    I,J : Integer;
+    S : String;
 begin
   NoFlicker(LanguageComboBox);
   NoFlicker(LanguageOpenEditor);
@@ -84,6 +86,7 @@ begin
   NoFlicker(InstallerLangEditComboBox);
 
   PDosBoxDir:=InitData.PDosBoxDir;
+  PDOSBoxLang:=InitData.PDOSBoxLang;
   LanguageChangeNotify:=InitData.LanguageChangeNotify;
   OpenLanguageEditor:=InitData.OpenLanguageEditorEvent;
 
@@ -107,6 +110,10 @@ begin
     LanguageComboBoxChange(self); {to setup outdated warning}
 
     DOSBoxDirChanged;
+    I:=-1; S:=ExtractFileName(PrgSetup.DOSBoxSettings[0].DosBoxLanguage);
+    For J:=0 to DosBoxLang.Count-1 do if S=ExtractFileName(DosBoxLang[J]) then begin I:=J; break; end;
+    If I>=0 then DosBoxLangEditComboBox.ItemIndex:=I else DosBoxLangEditComboBox.ItemIndex:=0;
+
     ReadCurrentInstallerLanguage;
   finally
     JustLoading:=False;
@@ -132,8 +139,11 @@ begin
   LanguageOpenEditor.Caption:=LanguageSetup.SetupFormLanguageOpenEditor;
   LanguageNew.Caption:=LanguageSetup.SetupFormLanguageOpenEditorNew;
   DosBoxLangLabel.Caption:=LanguageSetup.SetupFormDosBoxLang;
+  DosBoxLangEditComboBox.Hint:=LanguageSetup.SetupFormDosBoxLangHint;
   InstallerLangLabel.Caption:=LanguageSetup.SetupFormInstallerLang;
   InstallerLangInfoLabel.Caption:=LanguageSetup.SetupFormInstallerLangInfo;
+
+  HelpContext:=ID_FileOptionsLanguage;
 end;
 
 Procedure FindAndAddLngFiles(const Dir : String; const St, St2 : TStrings);
@@ -154,7 +164,6 @@ end;
 
 procedure TSetupFrameLanguage.DOSBoxDirChanged;
 Var S : String;
-    I : Integer;
 begin
   S:=DosBoxLangEditComboBox.Text;
   DosBoxLangEditComboBox.Items.Clear;
@@ -165,15 +174,22 @@ begin
 
   FindAndAddLngFiles(IncludeTrailingPathDelimiter(PDosBoxDir^),DosBoxLangEditComboBox.Items,DosBoxLang);
   FindAndAddLngFiles(PrgDir+LanguageSubDir+'\',DosBoxLangEditComboBox.Items,DosBoxLang);
-  I:=DosBoxLangEditComboBox.Items.IndexOf(S);
-  If I>=0 then DosBoxLangEditComboBox.ItemIndex:=I else DosBoxLangEditComboBox.ItemIndex:=0;
+  DosBoxLangEditComboBox.ItemIndex:=Max(0,DosBoxLangEditComboBox.Items.IndexOf(S));
+end;
 
-  I:=DosBoxLang.IndexOf(PrgSetup.DosBoxLanguage);
-  If I>=0 then DosBoxLangEditComboBox.ItemIndex:=I else DosBoxLangEditComboBox.ItemIndex:=0;
+procedure TSetupFrameLanguage.DosBoxLangEditComboBoxChange(Sender: TObject);
+begin
+  PDOSBoxLang^:=DosBoxLang[DosBoxLangEditComboBox.ItemIndex];
 end;
 
 procedure TSetupFrameLanguage.ShowFrame(const AdvencedMode: Boolean);
+Var I,J : Integer;
+    S : String;
 begin
+  DOSBoxDirChanged;
+  I:=-1; S:=ExtractFileName(PDOSBoxLang^);
+  For J:=0 to DosBoxLang.Count-1 do if S=ExtractFileName(DosBoxLang[J]) then begin I:=J; break; end;
+  If I>=0 then DosBoxLangEditComboBox.ItemIndex:=I else DosBoxLangEditComboBox.ItemIndex:=0;
 end;
 
 procedure TSetupFrameLanguage.RestoreDefaults;
@@ -183,7 +199,7 @@ end;
 procedure TSetupFrameLanguage.SaveSetup;
 begin
   PrgSetup.Language:=ShortLanguageName(LanguageComboBox.Text)+'.ini';
-  PrgSetup.DosBoxLanguage:=DosBoxLang[DosBoxLangEditComboBox.ItemIndex];
+  PrgSetup.DOSBoxSettings[0].DosBoxLanguage:=PDOSBoxLang^;
 end;
 
 Function VersionStringToInt(S : String) : Integer;

@@ -29,7 +29,7 @@ type
 
 implementation
 
-uses LanguageSetupUnit, VistaToolsUnit, PrgSetupUnit;
+uses LanguageSetupUnit, VistaToolsUnit, PrgSetupUnit, HelpConsts;
 
 {$R *.dfm}
 
@@ -60,6 +60,8 @@ begin
   Update3RadioButton.Caption:=LanguageSetup.SetupFormUpdate3;
   UpdateCheckBox.Caption:=LanguageSetup.SetupFormUpdateVersionSpecific;
   UpdateLabel.Caption:=LanguageSetup.SetupFormUpdateInfo;
+
+  HelpContext:=ID_FileOptionsSearchForUpdates;
 end;
 
 procedure TSetupFrameUpdate.DOSBoxDirChanged;

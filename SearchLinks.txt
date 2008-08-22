@@ -1,0 +1,3 @@
+Moby games;http://www.mobygames.com/search/quick?game=<GAMENAME>&p=-1&search=Go
+Squakenet.com;http://www.squakenet.com/pc_games/step2.asp?game_title=<GAMENAME>
+Google;http://www.google.com/search?q=<GAMENAME>

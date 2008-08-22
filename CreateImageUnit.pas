@@ -37,6 +37,7 @@ type
     FloppyMakeBootableWithKeyboardDriverCheckBox: TCheckBox;
     FloppyMakeBootableWithMouseDriverCheckBox: TCheckBox;
     ImageTypeRadioGroup: TRadioGroup;
+    HelpButton: TBitBtn;
     procedure FormCreate(Sender: TObject);
     procedure FloppyFileButtonClick(Sender: TObject);
     procedure FloppyImageTypeComboBoxChange(Sender: TObject);
@@ -44,6 +45,8 @@ type
     procedure OKButtonClick(Sender: TObject);
     procedure HDSizeEditChange(Sender: TObject);
     procedure FloppyMakeBootableCheckBoxClick(Sender: TObject);
+    procedure HelpButtonClick(Sender: TObject);
+    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
   private
     { Private-Deklarationen }
     JustChanging : Boolean;
@@ -68,13 +71,16 @@ Function MakeHDBootable(const ImageFile : String; const WithKeyboardDriver, With
 implementation
 
 uses ShellAPI, VistaToolsUnit, LanguageSetupUnit, DiskImageToolsUnit,
-     PrgSetupUnit, CommonTools, PrgConsts, GameDBUnit, DOSBoxUnit, ImageTools;
+     PrgSetupUnit, CommonTools, PrgConsts, GameDBUnit, DOSBoxUnit, ImageTools,
+     HelpConsts;
 
 {$R *.dfm}
 
 var FloppyCylinders : Array[0..7] of Integer = (40, 40, 40, 40, 80, 80, 80, 80);
     FloppyHeads     : Array[0..7] of Integer = ( 1,  1,  2,  2,  2,  2,  2,  2);
     FloppySPT       : Array[0..7] of Integer = ( 8,  9,  8,  9,  9, 15, 18, 36);
+
+const FloppyDefault=6;
 
 procedure TCreateImageForm.FormCreate(Sender: TObject);
 Var I : Integer;
@@ -103,9 +109,13 @@ begin
   HDImageFileEdit.EditLabel.Caption:=LanguageSetup.CreateImageFormFilename;
   HDFileButton.Hint:=LanguageSetup.ChooseFile;
   HDCompressedCheckBox.Caption:=LanguageSetup.CreateImageFormCompression;
+  ImageTypeRadioGroup.Caption:=LanguageSetup.CreateImageFormHDImageType;
+  ImageTypeRadioGroup.Items[0]:=LanguageSetup.CreateImageFormHDImageTypePlain;
+  ImageTypeRadioGroup.Items[1]:=LanguageSetup.CreateImageFormHDImageTypeFAT;
 
   OKButton.Caption:=LanguageSetup.OK;
   CancelButton.Caption:=LanguageSetup.Cancel;
+  HelpButton.Caption:=LanguageSetup.Help;
 
   If DirectoryExists(IncludeTrailingPathDelimiter(MakeAbsPath(PrgSetup.PathToFREEDOS,PrgSetup.BaseDir))) then begin
     FloppyNeedFreeDOSLabel.Font.Color:=clGrayText;
@@ -126,15 +136,15 @@ begin
     For I:=1 to 40 do FloppySPTComboBox.Items.Add(IntToStr(I));
   end;
   For I:=1 to 2 do FloppyHeadsComboBox.Items.Add(IntToStr(I));
-  FloppyImageTypeComboBox.Items.Add('5,25" Single-Sided, Double Density (DD)');
-  FloppyImageTypeComboBox.Items.Add('5,25" Single-Sided, Double Density (DD)');
-  FloppyImageTypeComboBox.Items.Add('5,25" Double-Sided, Double Density (DD)');
-  FloppyImageTypeComboBox.Items.Add('5,25" Double-Sided, Double Density (DD)');
-  FloppyImageTypeComboBox.Items.Add('3,5" Double-Sided, Double Density (DD)');
-  FloppyImageTypeComboBox.Items.Add('5,25" Double-Sided, High-Density (HD)');
-  FloppyImageTypeComboBox.Items.Add('3,5" Double-Sided, High-Density (HD)');
-  FloppyImageTypeComboBox.Items.Add('3,5" Double-Sided, Extended Density (ED)');
-  FloppyImageTypeComboBox.Items.Add('Custom Format');
+  FloppyImageTypeComboBox.Items.Add('5,25" single-sided, double density (DD)');
+  FloppyImageTypeComboBox.Items.Add('5,25" single-sided, double density (DD)');
+  FloppyImageTypeComboBox.Items.Add('5,25" double-sided, double density (DD)');
+  FloppyImageTypeComboBox.Items.Add('5,25" double-sided, double density (DD)');
+  FloppyImageTypeComboBox.Items.Add('3,5" double-sided, double density (DD)');
+  FloppyImageTypeComboBox.Items.Add('5,25" double-sided, high-density (HD)');
+  FloppyImageTypeComboBox.Items.Add('3,5" double-sided, high-density (HD)');
+  FloppyImageTypeComboBox.Items.Add('3,5" double-sided, extended density (ED)');
+  FloppyImageTypeComboBox.Items.Add('Custom format');
 
   JustChanging:=False;
   FloppyImageTypeComboBox.ItemIndex:=6;
@@ -147,6 +157,9 @@ end;
 
 procedure TCreateImageForm.FloppyImageTypeComboBoxChange(Sender: TObject);
 begin
+  FloppyMakeBootableCheckBox.Enabled:=(FloppyImageTypeComboBox.ItemIndex=FloppyDefault);
+  FloppyMakeBootableCheckBox.Checked:=FloppyMakeBootableCheckBox.Checked and FloppyMakeBootableCheckBox.Enabled;
+
   If JustChanging then exit;
   If FloppyImageTypeComboBox.ItemIndex=8 then exit;
 
@@ -178,6 +191,8 @@ begin
   finally
     JustChanging:=False;
     CalcFloppySize;
+    FloppyMakeBootableCheckBox.Enabled:=(FloppyImageTypeComboBox.ItemIndex=FloppyDefault);
+    FloppyMakeBootableCheckBox.Checked:=FloppyMakeBootableCheckBox.Checked and FloppyMakeBootableCheckBox.Enabled;
   end;
 end;
 
@@ -284,7 +299,9 @@ begin
       St.Add(FloppySPTComboBox.Text);
       St.Add(FloppyHeadsComboBox.Text);
       St.Add(FloppyCylindersComboBox.Text);
-      St.Add('1');
+      If (FloppySPTComboBox.Text='36') and (FloppyHeadsComboBox.Text='2') and (FloppyCylindersComboBox.Text='80')
+        then St.Add('2')
+        else St.Add('1');
       St.Add('2');
       St.Add('12');
     end else begin
@@ -357,6 +374,16 @@ begin
     ModalResult:=mrNone;
     exit;
   end;
+end;
+
+procedure TCreateImageForm.HelpButtonClick(Sender: TObject);
+begin
+  Application.HelpCommand(HELP_CONTEXT,ID_ExtrasImagesCreateImage);
+end;
+
+procedure TCreateImageForm.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+begin
+  If (Key=VK_F1) and (Shift=[]) then HelpButtonClick(Sender);
 end;
 
 { global }

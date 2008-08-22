@@ -29,7 +29,7 @@ type
 
 implementation
 
-uses LanguageSetupUnit, VistaToolsUnit, PrgSetupUnit;
+uses LanguageSetupUnit, VistaToolsUnit, PrgSetupUnit, HelpConsts;
 
 {$R *.dfm}
 
@@ -96,6 +96,8 @@ procedure TSetupFrameGamesListColumns.LoadLanguage;
 begin
   ListViewLabel.Caption:=LanguageSetup.SetupFormListViewInfo;
   ColDefaultValueSpeedButton.Hint:=LanguageSetup.SetupFormDefaultValueReset;
+
+  HelpContext:=ID_FileOptionsColumnsInTheGamesList;
 end;
 
 procedure TSetupFrameGamesListColumns.DOSBoxDirChanged;

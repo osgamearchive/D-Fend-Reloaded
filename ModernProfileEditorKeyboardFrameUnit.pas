@@ -29,7 +29,7 @@ type
     { Private-Deklarationen }
   public
     { Public-Deklarationen }
-    Procedure InitGUI(const OnProfileNameChange : TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup, CurrentScummVMGameName : PString);
+    Procedure InitGUI(const InitData : TModernProfileEditorInitData);
     Procedure SetGame(const Game : TGame; const LoadFromTemplate : Boolean);
     Function CheckValue : Boolean;
     Procedure GetGame(const Game : TGame);
@@ -38,13 +38,13 @@ type
 
 implementation
 
-uses LanguageSetupUnit, VistaToolsUnit, CommonTools, PrgSetupUnit;
+uses LanguageSetupUnit, VistaToolsUnit, CommonTools, PrgSetupUnit, HelpConsts;
 
 {$R *.dfm}
 
 { TModernProfileEditorKeyboardFrame }
 
-procedure TModernProfileEditorKeyboardFrame.InitGUI(const OnProfileNameChange: TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup, CurrentScummVMGameName : PString);
+procedure TModernProfileEditorKeyboardFrame.InitGUI(const InitData : TModernProfileEditorInitData);
 Var St : TStringList;
 begin
   NoFlicker(UseScancodesCheckBox);
@@ -58,9 +58,9 @@ begin
   NoFlicker(CustomKeyMapperEdit);
 
   KeyboardLayoutLabel.Caption:=LanguageSetup.GameKeyboardLayout;
-  St:=ValueToList(GameDB.ConfOpt.KeyboardLayout,';,'); try KeyboardLayoutComboBox.Items.AddStrings(St); finally St.Free; end;
+  St:=ValueToList(InitData.GameDB.ConfOpt.KeyboardLayout,';,'); try KeyboardLayoutComboBox.Items.AddStrings(St); finally St.Free; end;
   CodepageLabel.Caption:=LanguageSetup.GameKeyboardCodepage;
-  St:=ValueToList(GameDB.ConfOpt.Codepage,';,'); try CodepageComboBox.Items.AddStrings(St); finally St.Free; end;
+  St:=ValueToList(InitData.GameDB.ConfOpt.Codepage,';,'); try CodepageComboBox.Items.AddStrings(St); finally St.Free; end;
   KeyboardLayoutInfoLabel.Caption:=LanguageSetup.GameKeyboardLayoutInfo;
   UseScancodesCheckBox.Caption:=LanguageSetup.GameUseScanCodes;
   with NumLockRadioGroup do begin
@@ -91,6 +91,8 @@ begin
   DefaultKeyMapperFileRadioButton.Caption:=LanguageSetup.GameKeyMapperDefault;
   CustomKeyMapperFileRadioButton.Caption:=LanguageSetup.GameKeyMapperCustom;
   CustomKeyMapperButton.Hint:=LanguageSetup.ChooseFile;
+
+  HelpContext:=ID_ProfileEditKeyboard;
 end;
 
 procedure TModernProfileEditorKeyboardFrame.SetGame(const Game: TGame; const LoadFromTemplate: Boolean);

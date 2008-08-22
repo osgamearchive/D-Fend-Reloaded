@@ -1,0 +1,102 @@
+unit HelpConsts;
+interface
+
+const ID_Index=1;
+      ID_Introduction=2;
+      ID_FAQs=3;
+      ID_FirstRunWizard=4;
+      ID_Introduction2=5;
+
+      ID_FileExportConf=1001;
+      ID_FileExportProf=1002;
+      ID_FileOptions=1100;
+      ID_FileOptionsGeneral=1101;
+      ID_FileOptionsDirectories=1102;
+      ID_FileOptionsSecurity=1103;
+      ID_FileOptionsCompressionSettings=1104;
+      ID_FileOptionsWineSupport=1105;
+      ID_FileOptionsUserInterface=1106;
+      ID_FileOptionsLanguage=1107;
+      ID_FileOptionsToolbar=1108;
+      ID_FileOptionsColumnsInTheGamesList=1109;
+      ID_FileOptionsAppearanceList=1110;
+      ID_FileOptionsListInScreenshotMode=1111;
+      ID_FileOptionsAppearanceTree=1112;
+      ID_FileOptionsAppearanceScreenshots=1113;
+      ID_FileOptionsProfileEditor=1114;
+      ID_FileOptionsDefaultValues=1115;
+      ID_FileOptionsDOSBox=1116;
+      ID_FileOptionsDOSBoxCVSFeatures=1117;
+      ID_FileOptionsFreeDOS=1118;
+      ID_FileOptionsScummVM=1119;
+      ID_FileOptionsQBasic=1120;
+      ID_FileOptionsWaveEncoder=1121;
+      ID_FileOptionsService=1122;
+      ID_FileOptionsSearchForUpdates=1123;
+
+      ID_ProfileWithWizard=2001;
+      ID_ProfileEditClassic=2002;
+      ID_ProfileCopy=2003;
+      ID_ProfileUninstall=2004;
+      ID_ProfileMakeInstallerPackage=2005;
+      ID_ProfileMakeZipPackage=2006;
+      ID_ProfileViewDOSBoxConfFile=2007;
+      ID_ProfileViewScummVMIniFile=2008;
+      ID_ProfileOpenProgramFolder=2009;
+      ID_ProfileOpenDataFolder=2010;
+      ID_ProfileOpenFileInDataFolder=2011;
+      ID_ProfileInternetAddress=2012;
+      ID_ProfileMarkAsFavorite=2013;
+      ID_ProfileCreateShortCut=2014;
+      ID_ProfileSearchGame=2015;
+
+      ID_FileEdit=2100;
+      ID_ProfileEditProfile=2101;
+      ID_ProfileEditProgramInformation=2102;
+      ID_ProfileEditProgramDirectories=2103;
+      ID_ProfileEditDOSBox=2104;
+      ID_ProfileEditScummVM=2105;
+      ID_ProfileEditCPU=2106;
+      ID_ProfileEditMemory=2107;
+      ID_ProfileEditGraphics=2108;
+      ID_ProfileEditKeyboard=2109;
+      ID_ProfileEditMouse=2110;
+      ID_ProfileEditSound=2111;
+      ID_ProfileEditSoundVolume=2112;
+      ID_ProfileEditSoundSoundBlaster=2113;
+      ID_ProfileEditSoundGUS=2114;
+      ID_ProfileEditSoundMIDI=2115;
+      ID_ProfileEditJoystick=2116;
+      ID_ProfileEditDrives=2117;
+      ID_ProfileEditSerialPorts=2118;
+      ID_ProfileEditNetwork=2119;
+      ID_ProfileEditPrinter=2120;
+      ID_ProfileEditDOSEnvironment=2121;
+      ID_ProfileEditStarting=2122;
+
+      ID_ExtrasManageIcons=3001;
+      ID_ExtrasViewHistory=3002;
+      ID_ExtrasOpenGamesFolder=3003;
+      ID_ExtrasTemplates=3004;
+      ID_ExtrasImagesCreateImageFromFloppy=3005;
+      ID_ExtrasImagesWriteImageToFloppy=3006;
+      ID_ExtrasImagesCreateImage=3007;
+      ID_ExtrasImagesCreateImageFromCD=3008;
+      ID_ExtrasImagesExtractToFolder=3009;
+      ID_ExtrasImagesCreateFromFolder=3010;
+      ID_ExtrasEditMultipleProfiles=3011;
+      ID_ExtrasUninstallMultipleGames=3012;
+      ID_ExtrasTransferProfiles=3013;
+      ID_ExtrasBuildInstallers=3014;
+      ID_ExtrasBuildZipPackages=3015;
+      ID_ExtrasCheckProfiles=3016;
+
+      ID_HelpForum=4001;
+      ID_HelpLanguageEditor=4002;
+      ID_HelpStatistics=4003;
+      ID_HelpOperationMode=4004;
+      ID_HelpSearchForUpdates=4005;
+
+implementation
+
+end.

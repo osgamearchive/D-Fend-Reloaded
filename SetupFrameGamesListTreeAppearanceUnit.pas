@@ -38,7 +38,7 @@ type
 
 implementation
 
-uses LanguageSetupUnit, VistaToolsUnit, PrgSetupUnit, CommonTools;
+uses LanguageSetupUnit, VistaToolsUnit, PrgSetupUnit, CommonTools, HelpConsts;
 
 {$R *.dfm}
 
@@ -110,6 +110,8 @@ begin
   TreeViewGroupsLabel.Caption:=LanguageSetup.SetupFormTreeViewGroupLabel;
   UserKeysList.Caption:=LanguageSetup.SetupFormTreeViewGroupAddButton;
   TreeViewGroupsInfoLabel.Caption:=LanguageSetup.SetupFormTreeViewGroupInfoLabel;
+
+  HelpContext:=ID_FileOptionsAppearanceTree;
 end;
 
 procedure TSetupFrameGamesListTreeAppearance.DOSBoxDirChanged;

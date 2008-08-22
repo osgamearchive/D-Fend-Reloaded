@@ -45,7 +45,7 @@ type
   public
     { Public-Deklarationen }
     PortNr : Integer;
-    Procedure InitGUI(const OnProfileNameChange : TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup, CurrentScummVMGameName : PString);
+    Procedure InitGUI(const InitData : TModernProfileEditorInitData);
     Procedure SetGame(const Game : TGame; const LoadFromTemplate : Boolean);
     Function CheckValue : Boolean;
     Procedure GetGame(const Game : TGame);
@@ -54,13 +54,13 @@ type
 
 implementation
 
-uses Math, VistaToolsUnit, LanguageSetupUnit, CommonTools;
+uses Math, VistaToolsUnit, LanguageSetupUnit, CommonTools, HelpConsts;
 
 {$R *.dfm}
 
 { TModernProfileEditorSerialPortFrame }
 
-procedure TModernProfileEditorSerialPortFrame.InitGUI(const OnProfileNameChange: TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup, CurrentScummVMGameName : PString);
+procedure TModernProfileEditorSerialPortFrame.InitGUI(const InitData : TModernProfileEditorInitData);
 begin
   Name:='SerialPort'+IntToStr(PortNr)+'Frame';
 
@@ -114,6 +114,8 @@ begin
 
   DirectSerialPortEdit.EditLabel.Caption:=LanguageSetup.SerialFormDirectSerialPort;
   DirectSerialRXDelayLabel.Caption:=LanguageSetup.SerialFormRXDelay;
+
+  HelpContext:=ID_ProfileEditSerialPorts;
 end;
 
 procedure TModernProfileEditorSerialPortFrame.SetGame(const Game: TGame; const LoadFromTemplate: Boolean);

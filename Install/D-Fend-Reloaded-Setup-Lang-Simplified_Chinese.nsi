@@ -25,6 +25,7 @@ LangString LANGNAME_NoInstallationFound ${LANG_SIMPCHINESE} "ËùÑ¡ÔñµÄÎÄ¼þ¼ÐÖÐÃ»Ó
 
 LangString LANGNAME_ProgramFiles ${LANG_SIMPCHINESE} "³ÌÐòÎÄ¼þ"
 LangString LANGNAME_LanguageFiles ${LANG_SIMPCHINESE} "ÓïÑÔÎÄ¼þ"
+LangString LANGNAME_VideoCodec ${LANG_SIMPCHINESE} "DOSBox ÊÓÆµ±àÂë½âÂëÆ÷"
 LangString LANGNAME_DOSBox ${LANG_SIMPCHINESE} "DOSBox"
 LangString LANGNAME_Tools ${LANG_SIMPCHINESE} "¹¤¾ß"
 LangString LANGNAME_FreeDosTools ${LANG_SIMPCHINESE} "DosBox µÄ FreeDOS ¹¤¾ß"
@@ -35,6 +36,7 @@ LangString DESC_DFend ${LANG_SIMPCHINESE} "D-Fend Reloaded ÊÇÓÐÍ¼ÐÎÓÃ»§½çÃæµÄ¹ÜÀ
 LangString DESC_DosBox ${LANG_SIMPCHINESE} "DOSBox ÊÇ DOS Ä£ÄâÆ÷,»á±» D-Fend Reloaded µ÷ÓÃ¡£"
 LangString DESC_DosBoxProgramFiles ${LANG_SIMPCHINESE} "DOS Ä£ÄâÆ÷µÄ³ÌÐòÎÄ¼þ¡£"
 LangString DESC_DosBoxLanguageFiles ${LANG_SIMPCHINESE} "DOSBox µÄ¸÷ÖÖÓïÑÔµÄÓïÑÔÎÄ¼þ¡£"
+LangString DESC_VideoCodec ${LANG_SIMPCHINESE} "ÔÚ DOSBox ÖÐ¹Û¿´²¶»ñÊÓÆµËùÐèµÄ±àÂë½âÂëÆ÷"
 LangString DESC_Tools ${LANG_SIMPCHINESE} "ÔÚ DOSBox ÏÂÊ¹ÓÃµÄ¹¤¾ß¡£"
 LangString DESC_FreeDosTools ${LANG_SIMPCHINESE} "ÓÉ FreeDOS ÏîÄ¿ÊÕ¼¯µÄÃüÁîÐÐ¹¤¾ß,ÄÜÔÚ DOSBox ÀïÊ¹ÓÃ¡£"
 LangString DESC_Doszip ${LANG_SIMPCHINESE} "Doszip Commander ÊÇÒ»¸ö Norton Commander ¿ËÂ¡°æ±¾,ÄÜÔÚ DOSBox ÀïÊ¹ÓÃ¡£"

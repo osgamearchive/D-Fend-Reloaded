@@ -4,7 +4,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, 
-  Dialogs, ExtCtrls, StdCtrls, GameDBUnit, Buttons, ComCtrls, Grids, ValEdit;
+  Dialogs, ExtCtrls, StdCtrls, Buttons, ComCtrls, Grids, ValEdit, ImgList,
+  Menus, ToolWin, GameDBUnit, LinkFileUnit;
 
 type
   TWizardGameInfoFrame = class(TFrame)
@@ -18,13 +19,23 @@ type
     NotesMemo: TRichEdit;
     AddButton: TSpeedButton;
     DelButton: TSpeedButton;
+    Panel1: TPanel;
+    ToolBar: TToolBar;
+    SearchGameButton: TToolButton;
+    SearchPopupMenu: TPopupMenu;
+    ImageList: TImageList;
     procedure AddButtonClick(Sender: TObject);
     procedure DelButtonClick(Sender: TObject);
+    procedure SearchClick(Sender: TObject);
   private
     { Private-Deklarationen }
+    LinkFile : TLinkFile;
+    GameName : String;
+    Procedure LoadLinks;
   public
     { Public-Deklarationen }
-    Procedure Init(const GameDB : TGameDB);
+    Procedure Init(const GameDB : TGameDB; const ALinkFile : TLinkFile);
+    Procedure SetGameName(const AName : String);
     Procedure WriteDataToGame(const Game : TGame);
   end;
 
@@ -36,7 +47,7 @@ uses VistaToolsUnit, LanguageSetupUnit, CommonTools;
 
 { TWizardGameInfoFrame }
 
-procedure TWizardGameInfoFrame.Init(const GameDB: TGameDB);
+procedure TWizardGameInfoFrame.Init(const GameDB: TGameDB; const ALinkFile : TLinkFile);
 Var St : TStringList;
 begin
   SetVistaFonts(self);
@@ -80,6 +91,33 @@ begin
 
   Tab.ColWidths[0]:=GameInfoValueListEditor.ColWidths[0];
   Tab.ColWidths[1]:=Tab.ClientWidth-10-Tab.ColWidths[0];
+
+  LinkFile:=ALinkFile;
+  LoadLinks;
+end;
+
+procedure TWizardGameInfoFrame.LoadLinks;
+begin
+  LinkFile.AddLinksToMenu(SearchPopupMenu,0,1,SearchClick,1);
+  SearchGameButton.Caption:=LanguageSetup.ProfileEditorLookUpGame+' '+LinkFile.Name[0];
+  SearchGameButton.Hint:=LinkFile.Link[0];
+end;
+
+procedure TWizardGameInfoFrame.SearchClick(Sender: TObject);
+begin
+  Case (Sender as TComponent).Tag of
+    0 : begin
+          LinkFile.MoveToTop((Sender as TMenuItem).Caption);
+          LoadLinks;
+        end;
+    1 : If LinkFile.EditFile(False) then LoadLinks;
+    2 : OpenLink(LinkFile.Link[0],'<GAMENAME>',GameName);
+  end;
+end;
+
+procedure TWizardGameInfoFrame.SetGameName(const AName: String);
+begin
+  GameName:=AName;
 end;
 
 procedure TWizardGameInfoFrame.AddButtonClick(Sender: TObject);

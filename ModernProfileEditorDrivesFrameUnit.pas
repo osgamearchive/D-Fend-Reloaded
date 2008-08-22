@@ -22,13 +22,15 @@ type
   private
     { Private-Deklarationen }
     Mounting : TStringList;
-    ProfileExe : PString;
+    ProfileExe, ProfileSetup, ProfileName : PString;
     Procedure LoadMountingList;
     function NextFreeDriveLetter: Char;
     Function UsedDriveLetters(const AllowedNr : Integer = -1) : String;
+    function CanReachFile(const FileName: String): Boolean;
   public
     { Public-Deklarationen }
-    Procedure InitGUI(const OnProfileNameChange : TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup, CurrentScummVMGameName : PString);
+    Destructor Destroy; override;
+    Procedure InitGUI(const InitData : TModernProfileEditorInitData);
     Procedure SetGame(const Game : TGame; const LoadFromTemplate : Boolean);
     Function CheckValue : Boolean;
     Procedure GetGame(const Game : TGame);
@@ -38,13 +40,13 @@ type
 implementation
 
 uses Math, VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgSetupUnit,
-     ProfileMountEditorFormUnit;
+     ProfileMountEditorFormUnit, HelpConsts;
 
 {$R *.dfm}
 
 { TModernProfileEditorDrivesFrame }
 
-procedure TModernProfileEditorDrivesFrame.InitGUI(const OnProfileNameChange: TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup, CurrentScummVMGameName : PString);
+procedure TModernProfileEditorDrivesFrame.InitGUI(const InitData : TModernProfileEditorInitData);
 Var L : TListColumn;
 begin
   NoFlicker(MountingListView);
@@ -67,7 +69,11 @@ begin
   L:=MountingListView.Columns.Add; L.Width:=-2; L.Caption:=LanguageSetup.ProfileEditorMountingIOControl;
   AutoMountCheckBox.Caption:=LanguageSetup.ProfileEditorMountingAutoMountCDs;
 
-  ProfileExe:=CurrentProfileExe;
+  ProfileExe:=InitData.CurrentProfileExe;
+  ProfileSetup:=InitData.CurrentProfileSetup;
+  ProfileName:=InitData.CurrentProfileName;
+
+  HelpContext:=ID_ProfileEditDrives;
 end;
 
 procedure TModernProfileEditorDrivesFrame.SetGame(const Game: TGame; const LoadFromTemplate: Boolean);
@@ -96,6 +102,7 @@ Var I : Integer;
     St : TStringList;
     L : TListItem;
     S : String;
+    B : Boolean;
 begin
   MountingListView.Items.BeginUpdate;
   try
@@ -105,13 +112,20 @@ begin
       try
         L:=MountingListView.Items.Add;
         S:=Trim(St[0]);
-        If (St.Count>1) and (Trim(ExtUpperCase(St[1]))='PHYSFS') then begin
+        If (St.Count>1) and ((Trim(ExtUpperCase(St[1]))='PHYSFS') or (Trim(ExtUpperCase(St[1]))='ZIP')) then begin
           If Pos('$',S)<>0 then S:=Copy(S,Pos('$',S)+1,MaxInt)+' (+ '+Copy(S,1,Pos('$',S)-1)+')';
         end else begin
           If Pos('$',S)<>0 then S:=Copy(S,1,Pos('$',S)-1)+' (+'+LanguageSetup.More+')';
         end;
         L.Caption:=S;
-        If St.Count>1 then L.SubItems.Add(St[1]) else L.SubItems.Add('');
+        If St.Count>1 then begin
+          S:=Trim(ExtUpperCase(St[1])); B:=False;
+          If (not B) and (S='DRIVE') then begin L.SubItems.Add('Drive'); B:=True; end;
+          // Language strings
+          If not B then L.SubItems.Add(St[1]);
+        end else begin
+          L.SubItems.Add('');
+        end;
         If St.Count>2 then L.SubItems.Add(St[2]) else L.SubItems.Add('');
         If St.Count>4 then L.SubItems.Add(St[4]) else L.SubItems.Add('');
         If St.Count>3 then begin
@@ -162,15 +176,52 @@ begin
   end;
 end;
 
+Function ShortName(const LongName : String) : String;
+begin
+  SetLength(result,MAX_PATH+10);
+  if GetShortPathName(PChar(LongName),PChar(result),MAX_PATH)=0
+    then result:=LongName
+    else SetLength(result,StrLen(PChar(result)));
+end;
+
+function TModernProfileEditorDrivesFrame.CanReachFile(const FileName: String): Boolean;
+Var S,FilePath : String;
+    St : TStringList;
+    I : Integer;
+begin
+  result:=False;
+  FilePath:=Trim(ExtUpperCase(IncludeTrailingPathDelimiter(ShortName(MakeAbsPath(ExtractFilePath(FileName),PrgSetup.BaseDir)))));
+  For I:=0 to Mounting.Count-1 do begin
+    St:=ValueToList(Mounting[I]);
+    try
+      {Types to check:
+       RealFolder;DRIVE;Letter;False;;FreeSpace
+       RealFolder;FLOPPY;Letter;False;;
+       RealFolder;CDROM;Letter;IO;Label;
+       all other are images}
+      If St.Count<2 then continue;
+      S:=Trim(ExtUpperCase(St[1]));
+      If (S<>'DRIVE') and (S<>'FLOPPY') and (S<>'CDROM') then continue;
+      S:=Trim(ExtUpperCase(IncludeTrailingPathDelimiter(ShortName(MakeAbsPath(St[0],PrgSetup.BaseDir)))));
+
+      result:=(Copy(FilePath,1,length(S))=S);
+      if result then exit;
+    finally
+      St.Free;
+    end;
+  end;
+end;
+
 procedure TModernProfileEditorDrivesFrame.ButtonWork(Sender: TObject);
-Var S : String;
+Var S,T : String;
     I : Integer;
     St : TStringList;
+    B : Boolean;
 begin
   Case (Sender as TComponent).Tag of
     0 : If Mounting.Count<10 then begin
           S:=';Drive;'+NextFreeDriveLetter+';false;;';
-          if not ShowProfileMountEditorDialog(self,S,UsedDriveLetters,IncludeTrailingPathDelimiter(ExtractFilePath(ProfileExe^))) then exit;
+          if not ShowProfileMountEditorDialog(self,S,UsedDriveLetters,IncludeTrailingPathDelimiter(ExtractFilePath(ProfileExe^)),ProfileName^) then exit;
           Mounting.Add(S);
           LoadMountingList;
           MountingListView.ItemIndex:=MountingListView.Items.Count-1;
@@ -179,7 +230,7 @@ begin
           I:=MountingListView.ItemIndex;
           If I<0 then exit;
           S:=Mounting[I];
-          if not ShowProfileMountEditorDialog(self,S,UsedDriveLetters(I),IncludeTrailingPathDelimiter(ExtractFilePath(ProfileExe^))) then exit;
+          if not ShowProfileMountEditorDialog(self,S,UsedDriveLetters(I),IncludeTrailingPathDelimiter(ExtractFilePath(ProfileExe^)),ProfileName^) then exit;
           Mounting[I]:=S;
           LoadMountingList;
           MountingListView.ItemIndex:=I;
@@ -206,8 +257,18 @@ begin
               St.Free;
             end;
           end;
-          If Mounting.Count<10 then
-            Mounting.Insert(0,MakeRelPath(PrgSetup.GameDir,PrgSetup.BaseDir)+';Drive;C;false;');
+          {Add VirtualHD dir}
+          If Mounting.Count<10 then Mounting.Insert(0,MakeRelPath(PrgSetup.GameDir,PrgSetup.BaseDir)+';Drive;C;false;');
+          {Add game dir if needed}
+          If (Mounting.Count<10) and (Trim(ProfileExe^)<>'') and (not CanReachFile(ProfileExe^)) then begin
+            S:=IncludeTrailingPathDelimiter(MakeRelPath(ExtractFilePath(ProfileExe^),PrgSetup.BaseDir));
+            Mounting.Add(S+';DRIVE;'+NextFreeDriveLetter+';False;;105');
+          end;
+          {Add setup dir if needed}
+          If (Mounting.Count<10) and (Trim(ProfileSetup^)<>'') and (not CanReachFile(ProfileSetup^)) then begin
+            S:=IncludeTrailingPathDelimiter(MakeRelPath(ExtractFilePath(ProfileSetup^),PrgSetup.BaseDir));
+            Mounting.Add(S+';DRIVE;'+NextFreeDriveLetter+';False;;105');
+          end;
           LoadMountingList;
         end;
   end;
@@ -247,8 +308,13 @@ begin
   If Mounting.Count>7 then Game.Mount7:=Mounting[7] else Game.Mount7:='';
   If Mounting.Count>8 then Game.Mount8:=Mounting[8] else Game.Mount8:='';
   If Mounting.Count>9 then Game.Mount9:=Mounting[9] else Game.Mount9:='';
-  Mounting.Free;
   Game.AutoMountCDs:=AutoMountCheckBox.Checked;
+end;
+
+Destructor TModernProfileEditorDrivesFrame.Destroy;
+begin
+  Mounting.Free;
+  inherited Destroy;
 end;
 
 end.

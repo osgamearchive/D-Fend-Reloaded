@@ -11,9 +11,11 @@ object ChangeProfilesForm: TChangeProfilesForm
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
+  KeyPreview = True
   OldCreateOrder = False
   Position = poOwnerFormCenter
   OnCreate = FormCreate
+  OnKeyDown = FormKeyDown
   OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
@@ -26,6 +28,10 @@ object ChangeProfilesForm: TChangeProfilesForm
     TabOrder = 0
     object TabSheet1: TTabSheet
       Caption = 'Step 1: Select games'
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object InfoLabel: TLabel
         Left = 8
         Top = 8
@@ -74,6 +80,10 @@ object ChangeProfilesForm: TChangeProfilesForm
     object TabSheet2: TTabSheet
       Caption = 'Step 2: Settings to change'
       ImageIndex = 1
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       DesignSize = (
         601
         477)
@@ -93,7 +103,7 @@ object ChangeProfilesForm: TChangeProfilesForm
         Width = 274
         Height = 21
         Anchors = [akTop, akRight]
-        ItemHeight = 13
+        ItemHeight = 0
         TabOrder = 1
       end
       object DeveloperCheckBox: TCheckBox
@@ -112,7 +122,7 @@ object ChangeProfilesForm: TChangeProfilesForm
         Width = 274
         Height = 21
         Anchors = [akTop, akRight]
-        ItemHeight = 13
+        ItemHeight = 0
         TabOrder = 3
       end
       object PublisherCheckBox: TCheckBox
@@ -131,7 +141,7 @@ object ChangeProfilesForm: TChangeProfilesForm
         Width = 274
         Height = 21
         Anchors = [akTop, akRight]
-        ItemHeight = 13
+        ItemHeight = 0
         TabOrder = 5
       end
       object YearCheckBox: TCheckBox
@@ -150,7 +160,7 @@ object ChangeProfilesForm: TChangeProfilesForm
         Width = 274
         Height = 21
         Anchors = [akTop, akRight]
-        ItemHeight = 13
+        ItemHeight = 0
         TabOrder = 7
       end
       object LanguageCheckBox: TCheckBox
@@ -169,7 +179,7 @@ object ChangeProfilesForm: TChangeProfilesForm
         Width = 274
         Height = 21
         Anchors = [akTop, akRight]
-        ItemHeight = 13
+        ItemHeight = 0
         TabOrder = 9
       end
       object FavouriteCheckBox: TCheckBox
@@ -189,7 +199,7 @@ object ChangeProfilesForm: TChangeProfilesForm
         Height = 21
         Style = csDropDownList
         Anchors = [akTop, akRight]
-        ItemHeight = 13
+        ItemHeight = 0
         TabOrder = 11
       end
       object SetUserInfoCheckBox: TCheckBox
@@ -215,7 +225,7 @@ object ChangeProfilesForm: TChangeProfilesForm
         Top = 176
         Width = 105
         Height = 21
-        ItemHeight = 13
+        ItemHeight = 0
         TabOrder = 14
       end
       object SetUserInfoEdit: TEdit
@@ -231,13 +241,17 @@ object ChangeProfilesForm: TChangeProfilesForm
         Width = 105
         Height = 21
         Style = csDropDownList
-        ItemHeight = 13
+        ItemHeight = 0
         TabOrder = 16
       end
     end
     object TabSheet3: TTabSheet
       Caption = 'Step 2: Settings to change'
       ImageIndex = 2
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       DesignSize = (
         601
         477)
@@ -258,7 +272,7 @@ object ChangeProfilesForm: TChangeProfilesForm
         Height = 21
         Style = csDropDownList
         Anchors = [akTop, akRight]
-        ItemHeight = 13
+        ItemHeight = 0
         TabOrder = 5
       end
       object StartFullscreenCheckBox: TCheckBox
@@ -278,7 +292,7 @@ object ChangeProfilesForm: TChangeProfilesForm
         Height = 21
         Style = csDropDownList
         Anchors = [akTop, akRight]
-        ItemHeight = 13
+        ItemHeight = 0
         TabOrder = 9
       end
       object LockMouseCheckBox: TCheckBox
@@ -298,7 +312,7 @@ object ChangeProfilesForm: TChangeProfilesForm
         Height = 21
         Style = csDropDownList
         Anchors = [akTop, akRight]
-        ItemHeight = 13
+        ItemHeight = 0
         TabOrder = 11
       end
       object UseDoublebufferCheckBox: TCheckBox
@@ -318,7 +332,7 @@ object ChangeProfilesForm: TChangeProfilesForm
         Height = 21
         Style = csDropDownList
         Anchors = [akTop, akRight]
-        ItemHeight = 13
+        ItemHeight = 0
         TabOrder = 14
       end
       object RenderCheckBox: TCheckBox
@@ -337,7 +351,7 @@ object ChangeProfilesForm: TChangeProfilesForm
         Width = 105
         Height = 21
         Anchors = [akTop, akRight]
-        ItemHeight = 13
+        ItemHeight = 0
         TabOrder = 17
       end
       object MemoryCheckBox: TCheckBox
@@ -357,7 +371,7 @@ object ChangeProfilesForm: TChangeProfilesForm
         Height = 21
         Style = csDropDownList
         Anchors = [akTop, akRight]
-        ItemHeight = 13
+        ItemHeight = 0
         TabOrder = 1
       end
       object CPUCyclesCheckBox: TCheckBox
@@ -376,7 +390,7 @@ object ChangeProfilesForm: TChangeProfilesForm
         Width = 105
         Height = 21
         Anchors = [akTop, akRight]
-        ItemHeight = 13
+        ItemHeight = 0
         TabOrder = 4
       end
       object EmulationCoreCheckBox: TCheckBox
@@ -395,7 +409,7 @@ object ChangeProfilesForm: TChangeProfilesForm
         Width = 105
         Height = 21
         Anchors = [akTop, akRight]
-        ItemHeight = 13
+        ItemHeight = 0
         TabOrder = 8
       end
       object WindowResolutionCheckBox: TCheckBox
@@ -414,7 +428,7 @@ object ChangeProfilesForm: TChangeProfilesForm
         Width = 106
         Height = 21
         Anchors = [akTop, akRight]
-        ItemHeight = 13
+        ItemHeight = 0
         TabOrder = 21
       end
       object FullscreenResolutionComboBox: TComboBox
@@ -423,7 +437,7 @@ object ChangeProfilesForm: TChangeProfilesForm
         Width = 105
         Height = 21
         Anchors = [akTop, akRight]
-        ItemHeight = 13
+        ItemHeight = 0
         TabOrder = 25
       end
       object ScaleComboBox: TComboBox
@@ -433,7 +447,7 @@ object ChangeProfilesForm: TChangeProfilesForm
         Height = 21
         Style = csDropDownList
         Anchors = [akTop, akRight]
-        ItemHeight = 13
+        ItemHeight = 0
         TabOrder = 13
       end
       object FullscreenResolutionCheckBox: TCheckBox
@@ -472,7 +486,7 @@ object ChangeProfilesForm: TChangeProfilesForm
         Width = 105
         Height = 21
         Anchors = [akTop, akRight]
-        ItemHeight = 13
+        ItemHeight = 0
         TabOrder = 20
       end
       object CodepageCheckBox: TCheckBox
@@ -491,7 +505,7 @@ object ChangeProfilesForm: TChangeProfilesForm
         Width = 105
         Height = 21
         Anchors = [akTop, akRight]
-        ItemHeight = 13
+        ItemHeight = 0
         TabOrder = 24
       end
     end
@@ -513,8 +527,17 @@ object ChangeProfilesForm: TChangeProfilesForm
     TabOrder = 2
     Kind = bkCancel
   end
-  object PopupMenu: TPopupMenu
+  object HelpButton: TBitBtn
     Left = 232
+    Top = 511
+    Width = 97
+    Height = 25
+    TabOrder = 3
+    OnClick = HelpButtonClick
+    Kind = bkHelp
+  end
+  object PopupMenu: TPopupMenu
+    Left = 416
     Top = 507
   end
 end

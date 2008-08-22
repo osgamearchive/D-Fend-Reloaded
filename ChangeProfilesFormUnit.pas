@@ -63,11 +63,14 @@ type
     SetUserInfoComboBox: TComboBox;
     SetUserInfoEdit: TEdit;
     DelUserInfoComboBox: TComboBox;
+    HelpButton: TBitBtn;
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure OKButtonClick(Sender: TObject);
     procedure CheckBoxClick(Sender: TObject);
     procedure SelectButtonClick(Sender: TObject);
+    procedure HelpButtonClick(Sender: TObject);
+    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
   private
     { Private-Deklarationen }
     Function GetAllUserInfoKeys : TStringList;
@@ -87,7 +90,7 @@ Function ShowChangeProfilesDialog(const AOwner : TComponent; const AGameDB : TGa
 implementation
 
 uses Math, VistaToolsUnit, LanguageSetupUnit, PrgConsts, CommonTools,
-     GameDBToolsUnit;
+     GameDBToolsUnit, HelpConsts;
 
 {$R *.dfm}
 
@@ -151,6 +154,7 @@ begin
   TabSheet3.Caption:=LanguageSetup.ChangeProfilesFormEditProfileSheet+' (2)';
   OKButton.Caption:=LanguageSetup.OK;
   CancelButton.Caption:=LanguageSetup.Cancel;
+  HelpButton.Caption:=LanguageSetup.Help;
   SelectAllButton.Caption:=LanguageSetup.All;
   SelectNoneButton.Caption:=LanguageSetup.None;
   SelectGenreButton.Caption:=LanguageSetup.GameBy;
@@ -306,11 +310,12 @@ procedure TChangeProfilesForm.OKButtonClick(Sender: TObject);
 Var I,J : Integer;
     G : TGame;
     S : String;
-    ScummVM : Boolean;
+    ScummVM,WindowsMode : Boolean;
 begin
   For I:=0 to ListBox.Items.Count-1 do If ListBox.Checked[I] then begin
     G:=TGame(ListBox.Items.Objects[I]);
     ScummVM:=ScummVMMode(G);
+    WindowsMode:=WindowsExeMode(G);
 
     { Page 1 }
 
@@ -325,9 +330,13 @@ begin
 
     { Page 2 }
 
-    If CloseOnExitCheckBox.Checked and (not ScummVM) then G.CloseDosBoxAfterGameExit:=(CloseOnExitComboBox.ItemIndex=1);
-    If StartFullscreenCheckBox.Checked then G.StartFullscreen:=(StartFullscreenComboBox.ItemIndex=1);
-    If not ScummVM then begin
+    If (not ScummVM) and (not WindowsMode) then begin
+      If CloseOnExitCheckBox.Checked then G.CloseDosBoxAfterGameExit:=(CloseOnExitComboBox.ItemIndex=1);
+    end;
+    If not WindowsMode then begin
+      If StartFullscreenCheckBox.Checked then G.StartFullscreen:=(StartFullscreenComboBox.ItemIndex=1);
+    end;
+    If (not ScummVM) and (not WindowsMode) then begin
       If LockMouseCheckBox.Checked then G.AutoLockMouse:=(LockMouseComboBox.ItemIndex=1);
       If UseDoublebufferCheckBox.Checked then G.UseDoublebuffering:=(UseDoublebufferComboBox.ItemIndex=1);
       If RenderCheckBox.Checked then G.Render:=RenderComboBox.Text;
@@ -349,6 +358,16 @@ begin
 
   GameDB.StoreAllValues;
   GameDB.LoadCache;
+end;
+
+procedure TChangeProfilesForm.HelpButtonClick(Sender: TObject);
+begin
+  Application.HelpCommand(HELP_CONTEXT,ID_ExtrasEditMultipleProfiles);
+end;
+
+procedure TChangeProfilesForm.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+begin
+  If (Key=VK_F1) and (Shift=[]) then HelpButtonClick(Sender);
 end;
 
 { global }

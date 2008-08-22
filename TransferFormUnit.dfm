@@ -11,9 +11,11 @@ object TransferForm: TTransferForm
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
+  KeyPreview = True
   OldCreateOrder = False
   Position = poOwnerFormCenter
   OnCreate = FormCreate
+  OnKeyDown = FormKeyDown
   OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
@@ -118,8 +120,17 @@ object TransferForm: TTransferForm
       'er'
     TabOrder = 5
   end
+  object HelpButton: TBitBtn
+    Left = 234
+    Top = 432
+    Width = 97
+    Height = 25
+    TabOrder = 8
+    OnClick = HelpButtonClick
+    Kind = bkHelp
+  end
   object PopupMenu: TPopupMenu
-    Left = 232
-    Top = 426
+    Left = 256
+    Top = 402
   end
 end

@@ -19,6 +19,7 @@ type
     CustomIconRadioButton: TRadioButton;
     CustomIconEdit: TEdit;
     CustomIconButton: TSpeedButton;
+    HelpButton: TBitBtn;
     procedure FormCreate(Sender: TObject);
     procedure ListViewDblClick(Sender: TObject);
     procedure OKButtonClick(Sender: TObject);
@@ -32,6 +33,8 @@ type
     procedure CustomIconButtonClick(Sender: TObject);
     procedure ListViewClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
+    procedure HelpButtonClick(Sender: TObject);
+    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
   private
     { Private-Deklarationen }
     Dir, LastIcon : String;
@@ -49,7 +52,8 @@ Function ShowIconManager(const AOwner : TComponent; var AIcon : String; const AD
 
 implementation
 
-uses LanguageSetupUnit, VistaToolsUnit, CommonTools, PrgConsts, PrgSetupUnit;
+uses LanguageSetupUnit, VistaToolsUnit, CommonTools, PrgConsts, PrgSetupUnit,
+     HelpConsts;
 
 {$R *.dfm}
 
@@ -58,11 +62,13 @@ begin
   SetVistaFonts(self);
   Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName);
 
+  Caption:=LanguageSetup.MenuExtrasIconManagerCaption;
   LibraryIconRadioButton.Caption:=LanguageSetup.MenuExtrasIconManagerIconLibrary;
   CustomIconRadioButton.Caption:=LanguageSetup.MenuExtrasIconManagerIconCustom;
   CustomIconButton.Hint:=LanguageSetup.ChooseFile;
   OKButton.Caption:=LanguageSetup.OK;
   CancelButton.Caption:=LanguageSetup.Cancel;
+  HelpButton.Caption:=LanguageSetup.Help;
   AddButton.Caption:=LanguageSetup.Add;
   DelButton.Caption:=LanguageSetup.Del;
 
@@ -84,6 +90,7 @@ Var I : Integer;
     L : TListItem;
     Icon : TIcon;
     B : Boolean;
+    S : String;
 begin
   ForceDirectories(Dir);
 
@@ -114,8 +121,9 @@ begin
     end;
 
     If ExtractFilePath(Trim(LastIcon))='' then begin
+      S:=ExtUpperCase(LastIcon);
       LibraryIconRadioButton.Checked:=True;
-      For I:=0 to ListView.Items.Count-1 do If ListView.Items[I].Caption=LastIcon then begin
+      For I:=0 to ListView.Items.Count-1 do If ExtUpperCase(ListView.Items[I].Caption)=S then begin
         ListView.ItemIndex:=I; break;
       end;
     end else begin
@@ -209,6 +217,16 @@ begin
   end;
 
   ListView.Items.Delete(ListView.ItemIndex);
+end;
+
+procedure TIconManagerForm.HelpButtonClick(Sender: TObject);
+begin
+  Application.HelpCommand(HELP_CONTEXT,ID_ExtrasManageIcons);
+end;
+
+procedure TIconManagerForm.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+begin
+  If (Key=VK_F1) and (Shift=[]) then HelpButtonClick(Sender);
 end;
 
 { global }

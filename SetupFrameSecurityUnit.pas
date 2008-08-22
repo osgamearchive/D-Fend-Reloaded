@@ -28,7 +28,7 @@ type
 
 implementation
 
-uses LanguageSetupUnit, VistaToolsUnit, PrgSetupUnit;
+uses LanguageSetupUnit, VistaToolsUnit, PrgSetupUnit, HelpConsts;
 
 {$R *.dfm}
 
@@ -57,6 +57,8 @@ begin
   DeleteProectionLabel.Caption:=LanguageSetup.SetupFormDeleteOnlyInBaseDirLabel;
   UseChecksumsCheckBox.Caption:=LanguageSetup.SetupFormUseChecksums;
   UseChecksumsLabel.Caption:=LanguageSetup.SetupFormUseChecksumsInfo;
+
+  HelpContext:=ID_FileOptionsSecurity;
 end;
 
 procedure TSetupFrameSecurity.DOSBoxDirChanged;

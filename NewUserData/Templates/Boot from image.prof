@@ -11,8 +11,8 @@ WWW=
 Language=
 
 [sdl]
-fulldouble=1
-output=overlay
+fulldouble=0
+output=surface
 fullscreen=1
 autolock=0
 usecancodes=1

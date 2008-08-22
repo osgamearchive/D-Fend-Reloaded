@@ -25,6 +25,7 @@ LangString LANGNAME_NoInstallationFound ${LANG_SPANISH} "No existe en esta carpe
 
 LangString LANGNAME_ProgramFiles ${LANG_SPANISH} "Archivos de programa"
 LangString LANGNAME_LanguageFiles ${LANG_SPANISH} "Archivos de idioma"
+LangString LANGNAME_VideoCodec ${LANG_SPANISH} "Códec de vídeo de DOSBox" 
 LangString LANGNAME_DOSBox ${LANG_SPANISH} "DOSBox"
 LangString LANGNAME_Tools ${LANG_SPANISH} "Herramientas"
 LangString LANGNAME_FreeDosTools ${LANG_SPANISH} "Herramientas de FreeDOS para usar con DosBox"
@@ -35,6 +36,7 @@ LangString DESC_DFend ${LANG_SPANISH} "D-Fend Reloaded es una interfaz gráfica p
 LangString DESC_DosBox ${LANG_SPANISH} "DOSBox es el emulador de MS-DOS usado por D-Fend Reloaded."
 LangString DESC_DosBoxProgramFiles ${LANG_SPANISH} "Archivos de programa del emulador de MS-DOS."
 LangString DESC_DosBoxLanguageFiles ${LANG_SPANISH} "Diferentes archivos de idioma para DOSBox."
+LangString DESC_VideoCodec ${LANG_SPANISH} "Códec de vídeo, necesario para poder ver los vídeos creados por DOSBox."
 LangString DESC_Tools ${LANG_SPANISH} "Herramientas para usar con DOSBox."
 LangString DESC_FreeDosTools ${LANG_SPANISH} "Herramientas del proyecto FreeDOS para usar con DOSBox."
 LangString DESC_Doszip ${LANG_SPANISH} "Doszip Commander es un clon de Norton Commander para usar con DOSBox."

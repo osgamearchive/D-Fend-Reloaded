@@ -11,9 +11,11 @@ object BuildImageFromFolderForm: TBuildImageFromFolderForm
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
+  KeyPreview = True
   OldCreateOrder = False
   Position = poOwnerFormCenter
   OnCreate = FormCreate
+  OnKeyDown = FormKeyDown
   PixelsPerInch = 96
   TextHeight = 13
   object FileNameButton: TSpeedButton
@@ -135,9 +137,18 @@ object BuildImageFromFolderForm: TBuildImageFromFolderForm
     Enabled = False
     TabOrder = 4
   end
+  object HelpButton: TBitBtn
+    Left = 232
+    Top = 211
+    Width = 97
+    Height = 25
+    TabOrder = 8
+    OnClick = HelpButtonClick
+    Kind = bkHelp
+  end
   object SaveDialog: TSaveDialog
     DefaultExt = 'img'
-    Left = 232
-    Top = 210
+    Left = 272
+    Top = 170
   end
 end

@@ -11,8 +11,10 @@ object SerialEditForm: TSerialEditForm
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
+  KeyPreview = True
   OldCreateOrder = False
   Position = poOwnerFormCenter
+  OnKeyDown = FormKeyDown
   OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
@@ -136,8 +138,6 @@ object SerialEditForm: TSerialEditForm
       Left = 0
       Top = 0
       Caption = 'Modem'
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object ModemPortLabel: TLabel
         Left = 17
         Top = 48
@@ -179,8 +179,6 @@ object SerialEditForm: TSerialEditForm
       Left = 0
       Top = 0
       Caption = 'NullModem'
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object NullModemPortLabel: TLabel
         Left = 17
         Top = 8
@@ -317,5 +315,14 @@ object SerialEditForm: TSerialEditForm
         Value = 100
       end
     end
+  end
+  object HelpButton: TBitBtn
+    Left = 214
+    Top = 364
+    Width = 97
+    Height = 25
+    TabOrder = 5
+    OnClick = HelpButtonClick
+    Kind = bkHelp
   end
 end

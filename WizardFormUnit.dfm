@@ -11,10 +11,12 @@ object WizardForm: TWizardForm
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
+  KeyPreview = True
   OldCreateOrder = False
   Position = poOwnerFormCenter
   OnCreate = FormCreate
   OnHide = FormHide
+  OnKeyDown = FormKeyDown
   OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
@@ -92,6 +94,15 @@ object WizardForm: TWizardForm
       Height = 25
       TabOrder = 3
       Kind = bkCancel
+    end
+    object HelpButton: TBitBtn
+      Left = 457
+      Top = 8
+      Width = 97
+      Height = 25
+      TabOrder = 4
+      OnClick = HelpButtonClick
+      Kind = bkHelp
     end
   end
 end

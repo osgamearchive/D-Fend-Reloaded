@@ -14,6 +14,7 @@ type
     OKButton: TBitBtn;
     CancelButton: TBitBtn;
     procedure FormCreate(Sender: TObject);
+    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
   private
     { Private-Deklarationen }
   public
@@ -27,7 +28,7 @@ Function ShowWallpaperStyleDialog(const AOwner : TComponent; var WPStyle : TWall
 
 implementation
 
-uses VistaToolsUnit, LanguageSetupUnit;
+uses VistaToolsUnit, LanguageSetupUnit, HelpConsts;
 
 {$R *.dfm}
 
@@ -42,6 +43,10 @@ begin
   StretchRadioButton.Caption:=LanguageSetup.WallpaperStretch;
   OKButton.Caption:=LanguageSetup.OK;
   CancelButton.Caption:=LanguageSetup.Cancel;
+end;
+
+procedure TWallpaperStyleForm.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+begin
 end;
 
 { global }

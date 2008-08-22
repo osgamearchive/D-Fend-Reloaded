@@ -11,12 +11,12 @@ WWW=
 Language=
 
 [sdl]
-fulldouble=1
+fulldouble=0
 fullscreen=1
 autolock=0
 usecancodes=1
 sensitivity=100
-output=overlay
+output=surface
 windowresolution=original
 fullresolution=original
 priority=higher,normal

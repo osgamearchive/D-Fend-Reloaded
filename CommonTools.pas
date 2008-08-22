@@ -32,7 +32,7 @@ Function GetFileVersionAsString : String;
 Function GetNormalFileVersionAsString : String;
 Function GetShortFileVersionAsString : String;
 
-Function CheckDOSBoxVersion(const Path : String = '') : String;
+Function CheckDOSBoxVersion(const Nr : Integer; const Path : String = '') : String;
 Function OldDOSBoxVersion(const Version : String) : Boolean;
 
 Function GetFileDateAsString : String;
@@ -58,6 +58,8 @@ Procedure SetScreensaverAllowStatus(const Enable : Boolean);
 
 procedure SetComboHint(Combo: TComboBox);
 procedure SetComboDropDownDropDownWidth(Combo: TComboBox);
+
+Function GetDefaultEditor : String;
 
 Var TempPrgDir : String = ''; {Temporary overwrite normal PrgDir}
 
@@ -387,7 +389,7 @@ begin
   result:=Format('%d.%d',[I div 65536,I mod 65536]);
 end;
 
-Function CheckDOSBoxVersion(const Path : String) : String;
+Function CheckDOSBoxVersion(const Nr : Integer; const Path : String) : String;
 Var DOSBoxPath : String;
     St : TStringList;
     I : Integer;
@@ -395,7 +397,7 @@ Var DOSBoxPath : String;
 begin
   result:='';
 
-  If Trim(Path)='' then DOSBoxPath:=PrgSetup.DosBoxDir else DOSBOXPath:=Path;
+  If Trim(Path)='' then DOSBoxPath:=PrgSetup.DOSBoxSettings[Nr].DosBoxDir else DOSBOXPath:=Path;
   DOSBOXPath:=IncludeTrailingPathDelimiter(MakeAbsPath(DOSBOXPath,PrgSetup.BaseDir));
   If not FileExists(DOSBoxPath+'Readme.txt') then exit;
 
@@ -751,6 +753,111 @@ begin
       DroppedWidth := Combo.Width;
   end;
   SendMessage( Combo.Handle, CB_SETDROPPEDWIDTH, DroppedWidth, 0 );
+end;
+
+Function TranslateExtendedEnvironmentString(const EnvKey : String; Var EnvValue : String) : Boolean;
+Var Reg : TRegistry;
+    St : TStringList;
+    I : Integer;
+    S : String;
+begin
+  result:=False;
+  S:=ExtUpperCase(EnvKey);
+
+  If (S='SYSTEMROOT') or (S='%SYSTEMROOT%') or (S='WINDIR') or (S='%WINDIR%') then begin
+    SetLength(EnvValue,515);
+    result:=(GetWindowsDirectory(PChar(EnvValue),512)<>0); SetLength(EnvValue,StrLen(PChar(EnvValue)));
+    if result then exit;
+  end;
+
+  If (S='SYSTEMDRIVE') or (S='%SYSTEMDRIVE%') then begin
+    SetLength(EnvValue,515);
+    result:=(GetWindowsDirectory(PChar(EnvValue),512)<>0); SetLength(EnvValue,StrLen(PChar(EnvValue)));
+    result:=result and (length(EnvValue)>=2); EnvValue:=Copy(EnvValue,1,2);
+    if result then exit;
+  end;
+
+  If (S='SYSTEMDIRECTORY') or (S='%SYSTEMDIRECTORY%') then begin
+    EnvValue:=GetSpecialFolder(Application.MainForm.Handle,CSIDL_SYSTEM);
+    result:=length(EnvValue)>=2; EnvValue:=ExcludeTrailingPathDelimiter(EnvValue);
+    if result then exit;
+  end;
+
+  If (S='PROGRAMFILES') or (S='%PROGRAMFILES%') then begin
+    EnvValue:=GetSpecialFolder(Application.MainForm.Handle,CSIDL_PROGRAM_FILES);
+    result:=length(EnvValue)>=2; EnvValue:=ExcludeTrailingPathDelimiter(EnvValue);
+    if result then exit;
+  end;
+
+  Reg:=TRegistry.Create;
+  try
+    Reg.RootKey:=HKEY_LOCAL_MACHINE;
+    if not Reg.OpenKeyReadOnly('\SYSTEM\CurrentControlSet\Control\Session Manager\Environment') then exit;
+    St:=TStringList.Create;
+    try
+      Reg.GetValueNames(St);
+      For I:=0 to St.Count-1 do If (ExtUpperCase(St[I])=S) or ('%'+ExtUpperCase(St[I])+'%'=S) then begin
+        EnvValue:=ExcludeTrailingPathDelimiter(Reg.ReadString(St[I]));
+        result:=True;
+        exit;
+      end;
+    finally
+      St.Free;
+    end;
+  finally
+    Reg.Free;
+  end;
+end;
+
+Function GetDefaultEditor : String;
+Var Reg : TRegistry;
+    S,T : String;
+    I,J,K : Integer;
+begin
+  result:='Notepad.exe';
+
+  Reg:=TRegistry.Create;
+  try
+    {find type name of "*.txt" files}
+    Reg.RootKey:=HKEY_CLASSES_ROOT;
+    If not Reg.OpenKeyReadOnly('\.txt') then exit;
+    S:=Reg.ReadString('');
+    If S='' then exit;
+
+    {find program to open files of this type}
+    if not Reg.OpenKeyReadOnly('\'+S+'\shell\open\command') then exit;
+    S:=Reg.ReadString('');
+
+    {remove leading and trailing "}
+    If (S<>'') and (S[1]='"') then begin
+      S:=Copy(S,2,MaxInt);
+      For I:=1 to length(S) do If S[I]='"' then begin S:=Copy(S,1,I-1); break; end;
+    end;
+
+    {remove "%1"}
+    I:=Pos('"%1"',S); If I>0 then S:=Copy(S,1,I-1)+Copy(S,I+4,MaxInt);
+    I:=Pos('%1',S); If I>0 then S:=Copy(S,1,I-1)+Copy(S,I+2,MaxInt);
+
+    {Translate %SystemRoot% etc.}
+    I:=1;
+    While I<length(S) do begin
+      If S[I]='%' then begin
+        K:=-1;
+        For J:=I+1 to length(S)-1 do if S[J]='%' then begin K:=J; break; end;
+        If K=-1 then break;
+        If TranslateExtendedEnvironmentString(Copy(S,I,K-I+1),T) then begin
+          S:=Copy(S,1,I-1)+T+Copy(S,K+1,MaxInt);
+          continue;
+        end;
+      end;
+      inc(I);
+    end;
+
+    If not FileExists(S) then exit;
+    result:=Trim(S);
+  finally
+    Reg.Free;
+  end;
 end;
 
 end.

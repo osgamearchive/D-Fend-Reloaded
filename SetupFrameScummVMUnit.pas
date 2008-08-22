@@ -34,7 +34,7 @@ type
 implementation
 
 uses ShellAPI, LanguageSetupUnit, VistaToolsUnit, PrgSetupUnit, CommonTools,
-     ScummVMToolsUnit, SetupDosBoxFormUnit, ListScummVMGamesFormUnit;
+     ScummVMToolsUnit, SetupDosBoxFormUnit, ListScummVMGamesFormUnit, HelpConsts;
 
 {$R *.dfm}
 
@@ -67,6 +67,8 @@ begin
   ScummVMDownloadURL.Caption:='http:/'+'/www.scummvm.org/downloads.php';
   with ScummVMDownloadURL.Font do begin Color:=clBlue; Style:=[fsUnderline]; end;
   ScummVMDownloadURL.Cursor:=crHandPoint;
+
+  HelpContext:=ID_FileOptionsScummVM;
 end;
 
 procedure TSetupFrameScummVM.DOSBoxDirChanged;

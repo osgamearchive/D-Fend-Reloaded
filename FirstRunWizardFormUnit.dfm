@@ -3,7 +3,7 @@ object FirstRunWizardForm: TFirstRunWizardForm
   Top = 0
   BorderStyle = bsDialog
   Caption = 'FirstRunWizardForm'
-  ClientHeight = 260
+  ClientHeight = 279
   ClientWidth = 565
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -11,18 +11,20 @@ object FirstRunWizardForm: TFirstRunWizardForm
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
+  KeyPreview = True
   OldCreateOrder = False
   Position = poOwnerFormCenter
   OnCreate = FormCreate
   OnDestroy = FormDestroy
+  OnKeyDown = FormKeyDown
   OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
   object Notebook: TNotebook
-    Left = -4
+    Left = -1
     Top = 0
     Width = 569
-    Height = 225
+    Height = 241
     TabOrder = 0
     object TPage
       Left = 0
@@ -72,8 +74,6 @@ object FirstRunWizardForm: TFirstRunWizardForm
       Left = 0
       Top = 0
       Caption = 'DOSBox'
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object DosBoxButton: TSpeedButton
         Left = 530
         Top = 98
@@ -113,7 +113,7 @@ object FirstRunWizardForm: TFirstRunWizardForm
         Left = 16
         Top = 128
         Width = 537
-        Height = 65
+        Height = 105
         AutoSize = False
         Caption = 
           'When adding games to D-Fend Reloaded, you can specify a custom D' +
@@ -136,8 +136,6 @@ object FirstRunWizardForm: TFirstRunWizardForm
       Left = 0
       Top = 0
       Caption = 'DOSBoxLanguage'
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object DosBoxLangLabel: TLabel
         Left = 16
         Top = 79
@@ -175,7 +173,7 @@ object FirstRunWizardForm: TFirstRunWizardForm
         Width = 290
         Height = 21
         Style = csDropDownList
-        ItemHeight = 0
+        ItemHeight = 13
         TabOrder = 0
       end
     end
@@ -183,8 +181,6 @@ object FirstRunWizardForm: TFirstRunWizardForm
       Left = 0
       Top = 0
       Caption = 'GameDir'
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object GameDirTopInfoLabel: TLabel
         Left = 16
         Top = 16
@@ -244,11 +240,9 @@ object FirstRunWizardForm: TFirstRunWizardForm
       Left = 0
       Top = 0
       Caption = 'Update'
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         569
-        225)
+        241)
       object UpdateLabel: TLabel
         Left = 16
         Top = 168
@@ -319,8 +313,8 @@ object FirstRunWizardForm: TFirstRunWizardForm
     end
   end
   object BackButton: TBitBtn
-    Left = 5
-    Top = 231
+    Left = 8
+    Top = 247
     Width = 97
     Height = 25
     Caption = 'Zur'#252'ck'
@@ -343,8 +337,8 @@ object FirstRunWizardForm: TFirstRunWizardForm
     NumGlyphs = 2
   end
   object NextButton: TBitBtn
-    Left = 108
-    Top = 231
+    Left = 111
+    Top = 247
     Width = 97
     Height = 25
     Caption = 'Next'
@@ -367,13 +361,33 @@ object FirstRunWizardForm: TFirstRunWizardForm
     NumGlyphs = 2
   end
   object OKButton: TBitBtn
-    Left = 108
-    Top = 231
+    Left = 111
+    Top = 247
     Width = 97
     Height = 25
     TabOrder = 3
     Visible = False
     OnClick = OKButtonClick
     Kind = bkOK
+  end
+  object AcceptAllSettingsButton: TBitBtn
+    Left = 317
+    Top = 247
+    Width = 198
+    Height = 25
+    Caption = '&Alle Einstellungen akzeptieren'
+    TabOrder = 5
+    OnClick = OKButtonClick
+    Kind = bkAll
+  end
+  object HelpButton: TBitBtn
+    Left = 214
+    Top = 247
+    Width = 97
+    Height = 25
+    TabOrder = 4
+    Visible = False
+    OnClick = HelpButtonClick
+    Kind = bkHelp
   end
 end

@@ -57,8 +57,7 @@ procedure TTemplateSelectProfileForm.LoadList;
 begin
   ListView.Items.BeginUpdate;
   try
-    ListView.Items.Clear;
-    AddGamesToList(ListView,ListViewImageList,ListviewIconImageList,ImageList,GameDB,'','','',True,ListSort,ListSortReverse,True);
+    AddGamesToList(ListView,ListViewImageList,ListviewIconImageList,ImageList,GameDB,'','','',True,ListSort,ListSortReverse,True,False);
   finally
     ListView.Items.EndUpdate;
   end;

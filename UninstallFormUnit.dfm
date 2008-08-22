@@ -12,10 +12,12 @@ object UninstallForm: TUninstallForm
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
+  KeyPreview = True
   OldCreateOrder = False
   Position = poOwnerFormCenter
   OnCreate = FormCreate
   OnDestroy = FormDestroy
+  OnKeyDown = FormKeyDown
   OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
@@ -62,7 +64,7 @@ object UninstallForm: TUninstallForm
       Kind = bkOK
     end
     object CancelButton: TBitBtn
-      Left = 120
+      Left = 111
       Top = 6
       Width = 97
       Height = 25
@@ -70,23 +72,32 @@ object UninstallForm: TUninstallForm
       Kind = bkCancel
     end
     object SelectAllButton: TBitBtn
-      Left = 232
+      Left = 317
       Top = 6
       Width = 97
       Height = 25
       Caption = 'SelectAllButton'
-      TabOrder = 2
+      TabOrder = 3
       OnClick = SelectButtonClick
     end
     object SelectNoneButton: TBitBtn
       Tag = 1
-      Left = 344
+      Left = 420
       Top = 6
       Width = 97
       Height = 25
       Caption = 'SelectNoneButton'
-      TabOrder = 3
+      TabOrder = 4
       OnClick = SelectButtonClick
+    end
+    object HelpButton: TBitBtn
+      Left = 214
+      Top = 6
+      Width = 97
+      Height = 25
+      TabOrder = 2
+      OnClick = HelpButtonClick
+      Kind = bkHelp
     end
   end
 end

@@ -4,8 +4,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, GameDBUnit, StdCtrls, Buttons, ComCtrls, ExtCtrls, Grids, ValEdit,
-  ImgList, Spin;
+  Dialogs, StdCtrls, Buttons, ComCtrls, ExtCtrls, Grids, ValEdit, ImgList, Spin,
+  GameDBUnit, LinkFileUnit, Menus, ToolWin;
 
 type
   TProfileEditorForm = class(TForm)
@@ -123,6 +123,11 @@ type
     ExtraFilesAddButton: TSpeedButton;
     ExtraFilesEditButton: TSpeedButton;
     ExtraFilesDelButton: TSpeedButton;
+    Panel2: TPanel;
+    ToolBar: TToolBar;
+    SearchGameButton: TToolButton;
+    SearchPopupMenu: TPopupMenu;
+    HelpButton: TBitBtn;
     procedure OKButtonClick(Sender: TObject);
     procedure ButtonWork(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -147,6 +152,9 @@ type
     procedure ExtraFilesListBoxDblClick(Sender: TObject);
     procedure ExtraFilesListBoxKeyDown(Sender: TObject; var Key: Word;
       Shift: TShiftState);
+    procedure SearchClick(Sender: TObject);
+    procedure HelpButtonClick(Sender: TObject);
+    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
   private
     { Private-Deklarationen }
     IconName : String;
@@ -159,6 +167,7 @@ type
     Function NextFreeDriveLetter : Char;
     Function UsedDriveLetters(const AllowedNr : Integer = -1) : String;
     Function CheckProfile : Boolean;
+    procedure LoadLinks;
   public
     { Public-Deklarationen }
     MoveStatus : Integer;
@@ -166,20 +175,21 @@ type
     GameDB : TGameDB;
     RestoreLastPosition : Boolean;
     EditingTemplate : Boolean;
+    LinkFile : TLinkFile;
   end;
 
 var
   ProfileEditorForm: TProfileEditorForm;
 
-Function EditGameProfil(const AOwner : TComponent; const AGameDB : TGameDB; var AGame : TGame; const ADefaultGame : TGame; const GameList : TList = nil) : Boolean;
-Function EditGameTemplate(const AOwner : TComponent; const AGameDB : TGameDB; var AGame : TGame; const ADefaultGame : TGame; const GameList : TList = nil) : Boolean;
+Function EditGameProfil(const AOwner : TComponent; const AGameDB : TGameDB; var AGame : TGame; const ADefaultGame : TGame; const ASearchLinkFile : TLinkFile; const ADeleteOnExit : TStringList; const GameList : TList = nil) : Boolean;
+Function EditGameTemplate(const AOwner : TComponent; const AGameDB : TGameDB; var AGame : TGame; const ADefaultGame : TGame; const ASearchLinkFile : TLinkFile; const ADeleteOnExit : TStringList; const GameList : TList = nil) : Boolean;
 
 implementation
 
 uses Math, LanguageSetupUnit, VistaToolsUnit, CommonTools, PrgConsts,
      PrgSetupUnit, IconManagerFormUnit, ProfileMountEditorFormUnit,
      SerialEditFormUnit, UserInfoFormUnit, IconLoaderUnit, GameDBToolsUnit,
-     ModernProfileEditorFormUnit;
+     ModernProfileEditorFormUnit, DOSBoxUnit, HelpConsts;
 
 {$R *.dfm}
 
@@ -202,6 +212,7 @@ begin
   Caption:=LanguageSetup.ProfileEditor;
   OKButton.Caption:=LanguageSetup.OK;
   CancelButton.Caption:=LanguageSetup.Cancel;
+  HelpButton.Caption:=LanguageSetup.Help;
   PreviousButton.Caption:=RemoveUnderline(LanguageSetup.OK)+' && '+LanguageSetup.Previous;
   NextButton.Caption:=RemoveUnderline(LanguageSetup.OK)+' && '+LanguageSetup.Next;
 
@@ -694,6 +705,15 @@ begin
   CustomSetsValueListEditor.TitleCaptions.Add(LanguageSetup.Value);
   CustomSetsEnvAdd.Caption:=LanguageSetup.Add;
   CustomSetsEnvDel.Caption:=LanguageSetup.Del;
+
+  LoadLinks;
+end;
+
+procedure TProfileEditorForm.LoadLinks;
+begin
+  LinkFile.AddLinksToMenu(SearchPopupMenu,0,1,SearchClick,15);
+  SearchGameButton.Caption:=LanguageSetup.ProfileEditorLookUpGame+' '+LinkFile.Name[0];
+  SearchGameButton.Hint:=LinkFile.Link[0];
 end;
 
 procedure TProfileEditorForm.FormShow(Sender: TObject);
@@ -1188,6 +1208,7 @@ Var I : Integer;
     St : TStringList;
     L : TListItem;
     S : String;
+    B : Boolean;
 begin
   MountingListView.Items.BeginUpdate;
   try
@@ -1197,13 +1218,20 @@ begin
       try
         L:=MountingListView.Items.Add;
         S:=Trim(St[0]);
-        If (St.Count>1) and (Trim(ExtUpperCase(St[1]))='PHYSFS') then begin
+        If (St.Count>1) and ((Trim(ExtUpperCase(St[1]))='PHYSFS') or (Trim(ExtUpperCase(St[1]))='ZIP')) then begin
           If Pos('$',S)<>0 then S:=Copy(S,Pos('$',S)+1,MaxInt)+' (+ '+Copy(S,1,Pos('$',S)-1)+')';
         end else begin
           If Pos('$',S)<>0 then S:=Copy(S,1,Pos('$',S)-1)+' (+'+LanguageSetup.More+')';
         end;
         L.Caption:=S;
-        If St.Count>1 then L.SubItems.Add(St[1]) else L.SubItems.Add('');
+        If St.Count>1 then begin
+          S:=Trim(ExtUpperCase(St[1])); B:=False;
+          If (not B) and (S='DRIVE') then begin L.SubItems.Add('Drive'); B:=True; end;
+          // Language strings
+          If not B then L.SubItems.Add(St[1]);
+        end else begin
+          L.SubItems.Add('');
+        end;
         If St.Count>2 then L.SubItems.Add(St[2]) else L.SubItems.Add('');
         If St.Count>4 then L.SubItems.Add(St[4]) else L.SubItems.Add('');
         If St.Count>3 then begin
@@ -1221,7 +1249,7 @@ end;
 
 function TProfileEditorForm.CheckProfile: Boolean;
 Var I : Integer;
-    S1,S2 : String;
+    S1,S2,S : String;
     B : Boolean;
 begin
   result:=False;
@@ -1242,6 +1270,28 @@ begin
       PageControl.ActivePageIndex:=0; exit;
     end;
   end;
+
+  S1:=ProfileSettingsValueListEditor.Strings.ValueFromIndex[2];
+  S2:=ProfileSettingsValueListEditor.Strings.ValueFromIndex[5];
+  If (not EditingTemplate) and AutoexecBootNormal.Checked then begin
+    If (ProfileSettingsValueListEditor.Strings.ValueFromIndex[3]=RemoveUnderline(LanguageSetup.No)) and (Trim(S1)<>'') then begin
+      S:=MakeAbsPath(S1,PrgSetup.BaseDir);
+      If IsWindowsExe(S) then begin
+        If MessageDlg(Format(LanguageSetup.MessageWindowsExeEditWarning,[S]),mtConfirmation,[mbYes,mbNo],0)<>mrYes then begin
+          PageControl.ActivePageIndex:=0; exit;
+        end;
+      end;
+    end;
+    If (ProfileSettingsValueListEditor.Strings.ValueFromIndex[6]=RemoveUnderline(LanguageSetup.No)) and (Trim(S2)<>'') then begin
+      S:=MakeAbsPath(S2,PrgSetup.BaseDir);
+      If IsWindowsExe(S) then begin
+        If MessageDlg(Format(LanguageSetup.MessageWindowsExeEditWarning,[S]),mtConfirmation,[mbYes,mbNo],0)<>mrYes then begin
+          PageControl.ActivePageIndex:=0; exit;
+        end;
+      end;
+    end;
+  end;
+
 
   { General Sheet }
 
@@ -1650,7 +1700,7 @@ begin
 end;
 
 procedure TProfileEditorForm.ButtonWork(Sender: TObject);
-Var S,T : String;
+Var S,T,U : String;
     I : Integer;
     St : TStringList;
 begin
@@ -1719,7 +1769,8 @@ begin
           If ProfileSettingsValueListEditor.Strings.ValueFromIndex[3]=RemoveUnderline(LanguageSetup.Yes)
             then T:=PrgSetup.GameDir
             else T:=ProfileSettingsValueListEditor.Strings.ValueFromIndex[2];
-          if not ShowProfileMountEditorDialog(self,S,UsedDriveLetters,IncludeTrailingPathDelimiter(ExtractFilePath(T))) then exit;
+          U:=ProfileSettingsValueListEditor.Strings.ValueFromIndex[0];
+          if not ShowProfileMountEditorDialog(self,S,UsedDriveLetters,IncludeTrailingPathDelimiter(ExtractFilePath(T)),U) then exit;
           Mounting.Add(S);
           LoadMountingList;
           MountingListView.ItemIndex:=MountingListView.Items.Count-1;
@@ -1731,7 +1782,8 @@ begin
           If ProfileSettingsValueListEditor.Strings.ValueFromIndex[3]=RemoveUnderline(LanguageSetup.Yes)
             then T:=PrgSetup.GameDir
             else T:=ProfileSettingsValueListEditor.Strings.ValueFromIndex[2];
-          if not ShowProfileMountEditorDialog(self,S,UsedDriveLetters(I),IncludeTrailingPathDelimiter(ExtractFilePath(T))) then exit;
+          U:=ProfileSettingsValueListEditor.Strings.ValueFromIndex[0];
+          if not ShowProfileMountEditorDialog(self,S,UsedDriveLetters(I),IncludeTrailingPathDelimiter(ExtractFilePath(T)),U) then exit;
           Mounting[I]:=S;
           LoadMountingList;
           MountingListView.ItemIndex:=I;
@@ -1882,7 +1934,7 @@ begin
     {GenerateGameDataFolderName}
     19 : begin
            If PrgSetup.DataDir='' then S:=PrgSetup.BaseDir else S:=PrgSetup.DataDir;
-           S:=IncludeTrailingPathDelimiter(S)+ProfileSettingsValueListEditor.Strings.ValueFromIndex[0]+'\';
+           S:=IncludeTrailingPathDelimiter(S)+MakeFileSysOKFolderName(ProfileSettingsValueListEditor.Strings.ValueFromIndex[0])+'\';
            T:=MakeRelPath(S,PrgSetup.BaseDir);
            If T<>'' then GameInfoValueListEditor.Strings.ValueFromIndex[6]:=T;
            If DirectoryExists(S) then exit;
@@ -2019,6 +2071,18 @@ begin
     else Caption:=LanguageSetup.ProfileEditor+' ['+S+']';
 end;
 
+procedure TProfileEditorForm.SearchClick(Sender: TObject);
+begin
+  Case (Sender as TComponent).Tag of
+    0 : begin
+          LinkFile.MoveToTop((Sender as TMenuItem).Caption);
+          LoadLinks;
+        end;
+    1 : If LinkFile.EditFile(False) then LoadLinks;
+    2 : OpenLink(LinkFile.Link[0],'<GAMENAME>',ProfileSettingsValueListEditor.Strings.ValueFromIndex[0]);
+  end;
+end;
+
 procedure TProfileEditorForm.GameInfoValueListEditorEditButtonClick(Sender: TObject);
 Var S : String;
 begin
@@ -2043,7 +2107,7 @@ begin
 
   If GeneralValueListEditor.Row-1=15+ShiftNr then begin
     S:=Trim(GeneralValueListEditor.Strings.ValueFromIndex[15+ShiftNr]);
-    If (S='') or (ExtUpperCase(S)='DEFAULT') then S:=PrgSetup.DosBoxDir;
+    If (S='') or (ExtUpperCase(S)='DEFAULT') then S:=PrgSetup.DOSBoxSettings[0].DosBoxDir;
     S:=MakeAbsPath(S,PrgSetup.BaseDir);
     if not SelectDirectory(Handle,LanguageSetup.ChooseFolder,S) then exit;
     S:=MakeRelPath(S,PrgSetup.BaseDir);
@@ -2053,7 +2117,7 @@ begin
 
   If GeneralValueListEditor.Row-1=16+ShiftNr then begin
     S:=Trim(GeneralValueListEditor.Strings.ValueFromIndex[16+ShiftNr]);
-    If (S='') or (ExtUpperCase(S)='DEFAULT') then S:=PrgSetup.DosBoxMapperFile;
+    If (S='') or (ExtUpperCase(S)='DEFAULT') then S:=PrgSetup.DOSBoxSettings[0].DosBoxMapperFile;
     DosBoxTxtOpenDialog.Title:=LanguageSetup.SetupFormDosBoxMapperFileTitle;
     DosBoxTxtOpenDialog.Filter:=LanguageSetup.SetupFormDosBoxMapperFileFilter;
     If Trim(S)=''
@@ -2133,12 +2197,22 @@ begin
   end;
 end;
 
+procedure TProfileEditorForm.HelpButtonClick(Sender: TObject);
+begin
+  Application.HelpCommand(HELP_CONTEXT,ID_ProfileWithWizard);
+end;
+
+procedure TProfileEditorForm.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+begin
+  If (Key=VK_F1) and (Shift=[]) then HelpButtonClick(Sender);
+end;
+
 { global }
 
-Function EditGameProfilInt(const AOwner : TComponent; const AGameDB : TGameDB; var AGame : TGame; const ADefaultGame : TGame; const PrevButton, NextButton, RestorePos : Boolean; const EditingTemplate : Boolean) : Integer;
+Function EditGameProfilInt(const AOwner : TComponent; const AGameDB : TGameDB; var AGame : TGame; const ADefaultGame : TGame; const ASearchLinkFile : TLinkFile; const ADeleteOnExit : TStringList; const PrevButton, NextButton, RestorePos : Boolean; const EditingTemplate : Boolean) : Integer;
 begin
-  If ScummVMMode(AGame) or ScummVMMode(ADefaultGame) then begin
-    result:=ModernProfileEditorFormUnit.EditGameProfilInt(AOwner,AGameDB,AGame,ADefaultGame,PrevButton,NextButton,RestorePos,EditingTemplate);
+  If ScummVMMode(AGame) or ScummVMMode(ADefaultGame) or WindowsExeMode(AGame) or WindowsExeMode(ADefaultGame) then begin
+    result:=ModernProfileEditorFormUnit.EditGameProfilInt(AOwner,AGameDB,AGame,ADefaultGame,ASearchLinkFile,ADeleteOnExit,PrevButton,NextButton,RestorePos,EditingTemplate);
     exit;
   end;
 
@@ -2153,6 +2227,7 @@ begin
     ProfileEditorForm.PreviousButton.Visible:=PrevButton;
     ProfileEditorForm.NextButton.Visible:=NextButton;
     ProfileEditorForm.EditingTemplate:=EditingTemplate;
+    ProfileEditorForm.LinkFile:=ASearchLinkFile;
     If ProfileEditorForm.ShowModal=mrOK then begin
       result:=ProfileEditorForm.MoveStatus;
       AGame:=ProfileEditorForm.Game;
@@ -2167,7 +2242,7 @@ begin
   end;
 end;
 
-Function EditGameProfil(const AOwner : TComponent; const AGameDB : TGameDB; var AGame : TGame; const ADefaultGame : TGame; const GameList : TList = nil) : Boolean;
+Function EditGameProfil(const AOwner : TComponent; const AGameDB : TGameDB; var AGame : TGame; const ADefaultGame : TGame; const ASearchLinkFile : TLinkFile; const ADeleteOnExit : TStringList; const GameList : TList = nil) : Boolean;
 Var I,J : Integer;
     PrevButton,NextButton,RestorePos : Boolean;
 begin
@@ -2189,13 +2264,13 @@ begin
       NextButton:=(J>=0) and (J<GameList.Count-1);
       PrevButton:=(J>0);
     end;
-    I:=EditGameProfilInt(AOwner,AGameDB,AGame,ADefaultGame,PrevButton,NextButton,RestorePos,False);
+    I:=EditGameProfilInt(AOwner,AGameDB,AGame,ADefaultGame,ASearchLinkFile,ADeleteOnExit,PrevButton,NextButton,RestorePos,False);
     RestorePos:=True;
   until (I=0) or (I=-2);
   result:=(I<>-2);
 end;
 
-Function EditGameTemplate(const AOwner : TComponent; const AGameDB : TGameDB; var AGame : TGame; const ADefaultGame : TGame; const GameList : TList = nil) : Boolean;
+Function EditGameTemplate(const AOwner : TComponent; const AGameDB : TGameDB; var AGame : TGame; const ADefaultGame : TGame; const ASearchLinkFile : TLinkFile; const ADeleteOnExit : TStringList; const GameList : TList = nil) : Boolean;
 Var I,J : Integer;
     PrevButton,NextButton,RestorePos : Boolean;
 begin
@@ -2217,7 +2292,7 @@ begin
       NextButton:=(J>=0) and (J<GameList.Count-1);
       PrevButton:=(J>0);
     end;
-    I:=EditGameProfilInt(AOwner,AGameDB,AGame,ADefaultGame,PrevButton,NextButton,RestorePos,True);
+    I:=EditGameProfilInt(AOwner,AGameDB,AGame,ADefaultGame,ASearchLinkFile,ADeleteOnExit,PrevButton,NextButton,RestorePos,True);
     RestorePos:=True;
   until (I=0) or (I=-2);
   result:=(I<>-2);

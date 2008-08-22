@@ -124,7 +124,6 @@ object ViewImageForm: TViewImageForm
         Caption = 'ZoomButton'
         DropdownMenu = ZoomPopupMenu
         ImageIndex = 6
-        Visible = False
       end
       object BackgroundButton: TToolButton
         Tag = 4
@@ -143,7 +142,7 @@ object ViewImageForm: TViewImageForm
     Height = 19
     Panels = <
       item
-        Width = 150
+        Width = 100
       end
       item
         Width = 75

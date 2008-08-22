@@ -25,7 +25,7 @@ type
 
 implementation
 
-uses LanguageSetupUnit, VistaToolsUnit, PrgSetupUnit, CommonTools;
+uses LanguageSetupUnit, VistaToolsUnit, PrgSetupUnit, CommonTools, HelpConsts;
 
 {$R *.dfm}
 
@@ -43,6 +43,8 @@ begin
 
   MinimizeToTrayCheckBox.Checked:=PrgSetup.MinimizeToTray;
   StartWithWindowsCheckBox.Checked:=PrgSetup.StartWithWindows;
+
+  HelpContext:=ID_FileOptionsGeneral;
 end;
 
 procedure TSetupFrameBase.LoadLanguage;

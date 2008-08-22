@@ -66,7 +66,10 @@ object SetupFrameLanguage: TSetupFrameLanguage
     Height = 21
     Style = csDropDownList
     ItemHeight = 13
+    ParentShowHint = False
+    ShowHint = True
     TabOrder = 1
+    OnChange = DosBoxLangEditComboBoxChange
   end
   object LanguageOpenEditor: TBitBtn
     Left = 16

@@ -7,16 +7,6 @@ object ModernProfileEditorBaseFrame: TModernProfileEditorBaseFrame
   DesignSize = (
     598
     528)
-  object InfoLabel: TLabel
-    Left = 21
-    Top = 455
-    Width = 561
-    Height = 58
-    Anchors = [akLeft, akTop, akRight, akBottom]
-    AutoSize = False
-    Caption = 'InfoLabel'
-    WordWrap = True
-  end
   object IconPanel: TPanel
     Left = 20
     Top = 11
@@ -55,7 +45,7 @@ object ModernProfileEditorBaseFrame: TModernProfileEditorBaseFrame
   object ProfileNameEdit: TLabeledEdit
     Left = 21
     Top = 74
-    Width = 561
+    Width = 428
     Height = 21
     Anchors = [akLeft, akTop, akRight]
     EditLabel.Width = 75
@@ -65,11 +55,11 @@ object ModernProfileEditorBaseFrame: TModernProfileEditorBaseFrame
     OnChange = ProfileNameEditChange
   end
   object ProfileFileNameEdit: TLabeledEdit
-    Left = 20
-    Top = 118
-    Width = 562
+    Left = 455
+    Top = 74
+    Width = 127
     Height = 21
-    Anchors = [akLeft, akTop, akRight]
+    Anchors = [akTop, akRight]
     EditLabel.Width = 91
     EditLabel.Height = 13
     EditLabel.Caption = 'ProfileFileNameEdit'
@@ -77,8 +67,8 @@ object ModernProfileEditorBaseFrame: TModernProfileEditorBaseFrame
     TabOrder = 4
   end
   object GameExeGroup: TGroupBox
-    Left = 20
-    Top = 150
+    Left = 12
+    Top = 110
     Width = 570
     Height = 143
     Anchors = [akLeft, akTop, akRight]
@@ -122,6 +112,7 @@ object ModernProfileEditorBaseFrame: TModernProfileEditorBaseFrame
       EditLabel.Height = 13
       EditLabel.Caption = 'GameExeEdit'
       TabOrder = 0
+      OnChange = GameExeEditChange
     end
     object GameParameterEdit: TLabeledEdit
       Left = 16
@@ -145,16 +136,16 @@ object ModernProfileEditorBaseFrame: TModernProfileEditorBaseFrame
     end
   end
   object SetupExeGroup: TGroupBox
-    Left = 20
-    Top = 302
+    Left = 12
+    Top = 262
     Width = 570
-    Height = 143
+    Height = 187
     Anchors = [akLeft, akTop, akRight]
     Caption = 'SetupExeGroup'
     TabOrder = 6
     DesignSize = (
       570
-      143)
+      187)
     object SetupExeButton: TSpeedButton
       Tag = 1
       Left = 532
@@ -181,6 +172,16 @@ object ModernProfileEditorBaseFrame: TModernProfileEditorBaseFrame
       OnClick = ExeSelectButtonClick
       ExplicitLeft = 431
     end
+    object InfoLabel: TLabel
+      Left = 15
+      Top = 137
+      Width = 540
+      Height = 47
+      Anchors = [akLeft, akTop, akRight, akBottom]
+      AutoSize = False
+      Caption = 'InfoLabel'
+      WordWrap = True
+    end
     object SetupExeEdit: TLabeledEdit
       Left = 16
       Top = 45
@@ -191,6 +192,7 @@ object ModernProfileEditorBaseFrame: TModernProfileEditorBaseFrame
       EditLabel.Height = 13
       EditLabel.Caption = 'SetupExeEdit'
       TabOrder = 0
+      OnChange = SetupExeEditChange
     end
     object SetupParameterEdit: TLabeledEdit
       Left = 16
@@ -215,8 +217,8 @@ object ModernProfileEditorBaseFrame: TModernProfileEditorBaseFrame
     end
   end
   object GameGroup: TGroupBox
-    Left = 20
-    Top = 150
+    Left = 12
+    Top = 110
     Width = 570
     Height = 115
     Anchors = [akLeft, akTop, akRight]
@@ -258,7 +260,7 @@ object ModernProfileEditorBaseFrame: TModernProfileEditorBaseFrame
       Height = 21
       Style = csDropDownList
       Anchors = [akLeft, akTop, akRight]
-      ItemHeight = 0
+      ItemHeight = 13
       TabOrder = 0
       OnChange = GameComboBoxChange
     end
@@ -273,6 +275,29 @@ object ModernProfileEditorBaseFrame: TModernProfileEditorBaseFrame
       EditLabel.Caption = 'GameEdit'
       TabOrder = 1
     end
+  end
+  object ExtraExeFilesButton: TBitBtn
+    Left = 12
+    Top = 456
+    Width = 245
+    Height = 25
+    Caption = 'ExtraExeFilesButton'
+    TabOrder = 8
+    OnClick = ExtraExeFilesButtonClick
+    Glyph.Data = {
+      76010000424D7601000000000000760000002800000020000000100000000100
+      04000000000000010000120B0000120B00001000000000000000000000000000
+      800000800000008080008000000080008000808000007F7F7F00BFBFBF000000
+      FF0000FF000000FFFF00FF000000FF00FF00FFFF0000FFFFFF00333333333333
+      33333FFFFFFFFFFFFFFF000000000000000077777777777777770FFFFFFFFFFF
+      FFF07F3FF3FF3FF3FFF70F00F00F00F000F07F773773773777370FFFFFFFFFFF
+      FFF07F3FF3FF3FF3FFF70F00F00F00F000F07F773773773777370FFFFFFFFFFF
+      FFF07F3FF3FF3FF3FFF70F00F00F00F000F07F773773773777370FFFFFFFFFFF
+      FFF07F3FF3FF3FF3FFF70F00F00F00F000F07F773773773777370FFFFFFFFFFF
+      FFF07FFFFFFFFFFFFFF70CCCCCCCCCCCCCC07777777777777777088CCCCCCCCC
+      C8807FF7777777777FF700000000000000007777777777777777333333333333
+      3333333333333333333333333333333333333333333333333333}
+    NumGlyphs = 2
   end
   object OpenDialog: TOpenDialog
     Left = 536

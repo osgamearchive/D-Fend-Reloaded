@@ -28,7 +28,7 @@ type
     FOldSampleRate, FOldBlockSize, FOldPreBuffer, FOldSpeakerRate, FOldTandyRate : Integer;
   public
     { Public-Deklarationen }
-    Procedure InitGUI(const OnProfileNameChange : TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup, CurrentScummVMGameName : PString);
+    Procedure InitGUI(const InitData : TModernProfileEditorInitData);
     Procedure SetGame(const Game : TGame; const LoadFromTemplate : Boolean);
     Function CheckValue : Boolean;
     Procedure GetGame(const Game : TGame);
@@ -37,13 +37,13 @@ type
 
 implementation
 
-uses VistaToolsUnit, LanguageSetupUnit, CommonTools;
+uses VistaToolsUnit, LanguageSetupUnit, CommonTools, HelpConsts;
 
 {$R *.dfm}
 
 { TModernProfileEditorSoundFrame }
 
-procedure TModernProfileEditorSoundFrame.InitGUI(const OnProfileNameChange: TTextEvent; const GameDB: TGameDB; const CurrentProfileName, CurrentProfileExe, CurrentProfileSetup, CurrentScummVMGameName : PString);
+procedure TModernProfileEditorSoundFrame.InitGUI(const InitData : TModernProfileEditorInitData);
 Var St : TStringList;
 begin
   NoFlicker(ActivateSoundCheckBox);
@@ -59,21 +59,23 @@ begin
   MixerGroupBox.Caption:=LanguageSetup.ProfileEditorSoundMixer;
   SampleRateLabel.Caption:=LanguageSetup.ProfileEditorSoundSampleRate;
 
-  St:=ValueToList(GameDB.ConfOpt.Rate,';,'); try SampleRateComboBox.Items.AddStrings(St); finally St.Free; end;
+  St:=ValueToList(InitData.GameDB.ConfOpt.Rate,';,'); try SampleRateComboBox.Items.AddStrings(St); finally St.Free; end;
   BlockSizeLabel.Caption:=LanguageSetup.ProfileEditorSoundBlockSize;
-  St:=ValueToList(GameDB.ConfOpt.Blocksize,';,'); try BlockSizeComboBox.Items.AddStrings(St); finally St.Free; end;
+  St:=ValueToList(InitData.GameDB.ConfOpt.Blocksize,';,'); try BlockSizeComboBox.Items.AddStrings(St); finally St.Free; end;
   PreBufferLabel.Caption:=LanguageSetup.ProfileEditorSoundPrebuffer;
   with PreBufferComboBox.Items do begin Add('1'); Add('5'); Add('10'); Add('15'); Add('20'); Add('25'); Add('30'); end;
 
   ActivatePCSpeakerCheckBox.Caption:=LanguageSetup.ProfileEditorSoundMiscEnablePCSpeaker;
   PCSpeakerSampleRateLabel.Caption:=LanguageSetup.ProfileEditorSoundMiscPCSpeakerRate;
-  St:=ValueToList(GameDB.ConfOpt.PCRate,';,'); try PCSpeakerSampleRateComboBox.Items.AddStrings(St); finally St.Free; end;
+  St:=ValueToList(InitData.GameDB.ConfOpt.PCRate,';,'); try PCSpeakerSampleRateComboBox.Items.AddStrings(St); finally St.Free; end;
 
   TandyRadioGroup.Caption:=LanguageSetup.ProfileEditorSoundMiscEnableTandy;
   TandySampleRateLabel.Caption:=LanguageSetup.ProfileEditorSoundMiscTandyRate;
-  St:=ValueToList(GameDB.ConfOpt.TandyRate,';,'); try TandyComboBox.Items.AddStrings(St); finally St.Free; end;
+  St:=ValueToList(InitData.GameDB.ConfOpt.TandyRate,';,'); try TandyComboBox.Items.AddStrings(St); finally St.Free; end;
 
   ActivateDisneyCheckBox.Caption:=LanguageSetup.ProfileEditorSoundMiscEnableDisneySoundsSource;
+
+  HelpContext:=ID_ProfileEditSound;
 end;
 
 procedure TModernProfileEditorSoundFrame.SetGame(const Game: TGame; const LoadFromTemplate: Boolean);

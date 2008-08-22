@@ -38,9 +38,12 @@ type
     DirectSerialPortEdit: TLabeledEdit;
     DirectSerialRXDelayEdit: TSpinEdit;
     DirectSerialRXDelayLabel: TLabel;
+    HelpButton: TBitBtn;
     procedure FormShow(Sender: TObject);
     procedure OKButtonClick(Sender: TObject);
     procedure DeviceTypeClick(Sender: TObject);
+    procedure HelpButtonClick(Sender: TObject);
+    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
   private
     { Private-Deklarationen }
     Procedure InitGUI;
@@ -57,7 +60,7 @@ Function ShowSerialEditDialog(const AOwner : TComponent; var AProfileString : St
 
 implementation
 
-uses Math, VistaToolsUnit, LanguageSetupUnit, CommonTools;
+uses Math, VistaToolsUnit, LanguageSetupUnit, CommonTools, HelpConsts;
 
 {$R *.dfm}
 
@@ -249,6 +252,18 @@ begin
     exit;
   end;
 end;
+
+procedure TSerialEditForm.HelpButtonClick(Sender: TObject);
+begin
+  Application.HelpCommand(HELP_CONTEXT,ID_ProfileEditSerialPorts);
+end;
+
+procedure TSerialEditForm.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+begin
+  If (Key=VK_F1) and (Shift=[]) then HelpButtonClick(Sender);
+end;
+
+{ global }
 
 Function ShowSerialEditDialog(const AOwner : TComponent; var AProfileString : String) : Boolean;
 begin

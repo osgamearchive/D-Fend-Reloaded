@@ -4,7 +4,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, ImgList, ComCtrls, ToolWin, Menus, GameDBUnit, GameDBToolsUnit;
+  Dialogs, ImgList, ComCtrls, ToolWin, Menus, GameDBUnit, GameDBToolsUnit,
+  LinkFileUnit;
 
 type
   TTemplateForm = class(TForm)
@@ -74,6 +75,12 @@ type
     MenuEditAddTemplateFromProfile: TMenuItem;
     MenuEditAdd2NewTemplate: TMenuItem;
     MenuEditAdd2TemplateFromProfile: TMenuItem;
+    HelpButton2: TToolButton;
+    HelpButton: TToolButton;
+    ToolButton1: TToolButton;
+    ToolButton4: TToolButton;
+    MenuHelp: TMenuItem;
+    MenuHelpHelp: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure ButtonWork(Sender: TObject);
     procedure ListViewKeyDown(Sender: TObject; var Key: Word;
@@ -91,6 +98,9 @@ type
       Item: TListItem; State: TCustomDrawState; Stage: TCustomDrawStage;
       var DefaultDraw: Boolean);
     procedure PageControlChange(Sender: TObject);
+    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure ListViewDblClick(Sender: TObject);
+    procedure ListView2DblClick(Sender: TObject);
   private
     { Private-Deklarationen }
     TemplateDB, AutoSetupDB : TGameDB;
@@ -105,18 +115,21 @@ type
     { Public-Deklarationen }
     GameDB : TGameDB;
     Template : TGame;
+    SearchLinkFile : TLinkFile;
+    DeleteOnExit : TStringList;
   end;
 
 var
   TemplateForm: TTemplateForm;
 
-Function ShowTemplateDialog(const AOwner : TComponent; const AGameDB : TGameDB) : TGame;
+Function ShowTemplateDialog(const AOwner : TComponent; const AGameDB : TGameDB; const ASearchLinkFile : TLinkFile; const ADeleteOnExit : TStringList) : TGame;
 
 implementation
 
 uses VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgConsts,
      ProfileEditorFormUnit, PrgSetupUnit, TemplateSelectProfileFormUnit,
-     ModernProfileEditorFormUnit, SelectProfilesFormUnit, ChangeProfilesFormUnit;
+     ModernProfileEditorFormUnit, SelectProfilesFormUnit,
+     ChangeProfilesFormUnit, HelpConsts;
 
 {$R *.dfm}
 
@@ -161,6 +174,8 @@ begin
   MenuEditEditMultipleTemplates2.Caption:=LanguageSetup.TemplateFormEditMultipleTemplates;
   MenuEditDelete.Caption:=LanguageSetup.Del;
   MenuEditDelete2.Caption:=LanguageSetup.Del;
+  MenuHelp.Caption:=LanguageSetup.MenuHelp;
+  MenuHelpHelp.Caption:=LanguageSetup.Help;
 
   { Template sheet }
 
@@ -171,6 +186,7 @@ begin
   AddButton.Caption:=LanguageSetup.Add;
   EditButton.Caption:=LanguageSetup.Edit;
   DeleteButton.Caption:=LanguageSetup.Del;
+  HelpButton.Caption:=LanguageSetup.Help;
 
   PopupUse.Caption:=LanguageSetup.Use;
   PopupUseProfile.Caption:=LanguageSetup.TemplateFormUseAsProfile;
@@ -195,6 +211,7 @@ begin
   PopupEdit2.Caption:=LanguageSetup.Edit;
   PopupCopy2.Caption:=LanguageSetup.TemplateFormCopy;
   PopupDel2.Caption:=LanguageSetup.Del;
+  HelpButton2.Caption:=LanguageSetup.Help;
 
   PopupAddNew2.Caption:=LanguageSetup.TemplateFormNewTemplate;
   PopupAddFromProfile2.Caption:=LanguageSetup.TemplateFormNewFromProfile;
@@ -244,8 +261,7 @@ begin
   ListView.Items.BeginUpdate;
   try
     If ListView.Selected<>nil then G:=TGame(ListView.Selected.Data) else G:=nil;
-    ListView.Items.Clear;
-    AddGamesToList(ListView,ListViewImageList,ListViewIconImageList,ImageList,TemplateDB,DefaultTemplate,RemoveUnderline(LanguageSetup.All),'','',True,ListSort,ListSortReverse);
+    AddGamesToList(ListView,ListViewImageList,ListViewIconImageList,ImageList,TemplateDB,DefaultTemplate,RemoveUnderline(LanguageSetup.All),'','',True,ListSort,ListSortReverse,False,False);
     SelectGame(G);
     If (ListView.Selected=nil) and (ListView.Items.Count>0) then ListView.Selected:=ListView.Items[0];
 
@@ -261,8 +277,7 @@ begin
   ListView2.Items.BeginUpdate;
   try
     If ListView2.Selected<>nil then G:=TGame(ListView2.Selected.Data) else G:=nil;
-    ListView2.Items.Clear;
-    AddGamesToList(ListView2,ListViewImageList,ListViewIconImageList,ImageList,AutoSetupDB,RemoveUnderline(LanguageSetup.All),'','',True,ListSort2,ListSortReverse2);
+    AddGamesToList(ListView2,ListViewImageList,ListViewIconImageList,ImageList,AutoSetupDB,RemoveUnderline(LanguageSetup.All),'','',True,ListSort2,ListSortReverse2,False,False);
     SelectGame2(G);
     If (ListView2.Selected=nil) and (ListView2.Items.Count>0) then ListView2.Selected:=ListView2.Items[0];
 
@@ -340,10 +355,24 @@ begin
   LoadList;
 end;
 
+procedure TTemplateForm.ListViewDblClick(Sender: TObject);
+Var Key : Word;
+begin
+  Key:=VK_F2;
+  ListViewKeyDown(Sender,Key,[]);
+end;
+
 procedure TTemplateForm.ListView2ColumnClick(Sender: TObject; Column: TListColumn);
 begin
   SetSortTypeByListViewCol(Column.Index,ListSort2,ListSortReverse2);
   LoadList2;
+end;
+
+procedure TTemplateForm.ListView2DblClick(Sender: TObject);
+Var Key : Word;
+begin
+  Key:=VK_F2;
+  ListView2KeyDown(Sender,Key,[]);
 end;
 
 procedure TTemplateForm.ListViewKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -397,9 +426,9 @@ begin
             For I:=0 to ListView.Items.Count-1 do L.Add(ListView.Items[I].Data);
             G:=TGame(ListView.Selected.Data);
             If PrgSetup.DFendStyleProfileEditor then begin
-              if not EditGameTemplate(self,TemplateDB,G,nil,L) then exit;
+              if not EditGameTemplate(self,TemplateDB,G,nil,SearchLinkFile,DeleteOnExit,L) then exit;
             end else begin
-              if not ModernEditGameTemplate(self,TemplateDB,G,nil,L) then exit;
+              if not ModernEditGameTemplate(self,TemplateDB,G,nil,SearchLinkFile,DeleteOnExit,L) then exit;
             end;
             G.LoadCache;
             LoadList;
@@ -440,9 +469,9 @@ begin
           {Template: Add new}
           G:=nil;
           If PrgSetup.DFendStyleProfileEditor then begin
-            if not EditGameTemplate(self,TemplateDB,G,DefaultTemplate) then exit;
+            if not EditGameTemplate(self,TemplateDB,G,DefaultTemplate,SearchLinkFile,DeleteOnExit) then exit;
           end else begin
-            if not ModernEditGameTemplate(self,TemplateDB,G,DefaultTemplate) then exit;
+            if not ModernEditGameTemplate(self,TemplateDB,G,DefaultTemplate,SearchLinkFile,DeleteOnExit) then exit;
           end;
           G.LoadCache;
           LoadList;
@@ -454,9 +483,9 @@ begin
           If G2=nil then exit;
           G:=nil;
           If PrgSetup.DFendStyleProfileEditor then begin
-            if not EditGameTemplate(self,TemplateDB,G,G2) then exit;
+            if not EditGameTemplate(self,TemplateDB,G,G2,SearchLinkFile,DeleteOnExit) then exit;
           end else begin
-            if not ModernEditGameTemplate(self,TemplateDB,G,G2) then exit;
+            if not ModernEditGameTemplate(self,TemplateDB,G,G2,SearchLinkFile,DeleteOnExit) then exit;
           end;
           G.LoadCache;
           LoadList;
@@ -491,9 +520,9 @@ begin
             For I:=0 to ListView2.Items.Count-1 do L.Add(ListView2.Items[I].Data);
             G:=TGame(ListView2.Selected.Data);
             If PrgSetup.DFendStyleProfileEditor then begin
-              if not EditGameTemplate(self,AutoSetupDB,G,nil,L) then exit;
+              if not EditGameTemplate(self,AutoSetupDB,G,nil,SearchLinkFile,DeleteOnExit,L) then exit;
             end else begin
-              if not ModernEditGameTemplate(self,AutoSetupDB,G,nil,L) then exit;
+              if not ModernEditGameTemplate(self,AutoSetupDB,G,nil,SearchLinkFile,DeleteOnExit,L) then exit;
             end;
             G.LoadCache;
             LoadList2;
@@ -518,9 +547,9 @@ begin
           {AutoSetup: Add new}
           G:=nil;
           If PrgSetup.DFendStyleProfileEditor then begin
-            if not EditGameTemplate(self,AutoSetupDB,G,DefaultTemplate) then exit;
+            if not EditGameTemplate(self,AutoSetupDB,G,DefaultTemplate,SearchLinkFile,DeleteOnExit) then exit;
           end else begin
-            if not ModernEditGameTemplate(self,AutoSetupDB,G,DefaultTemplate) then exit;
+            if not ModernEditGameTemplate(self,AutoSetupDB,G,DefaultTemplate,SearchLinkFile,DeleteOnExit) then exit;
           end;
           G.LoadCache;
           LoadList2;
@@ -583,23 +612,31 @@ begin
           LoadList2;
           SelectGame2(G);
         end;
+   18 : Application.HelpCommand(HELP_CONTEXT,ID_ExtrasTemplates);
   end;
+end;
+
+procedure TTemplateForm.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+begin
+  If (Key=VK_F1) and (Shift=[]) then ButtonWork(HelpButton);
 end;
 
 { global }
 
-Function ShowTemplateDialog(const AOwner : TComponent; const AGameDB : TGameDB) : TGame;
+Function ShowTemplateDialog(const AOwner : TComponent; const AGameDB : TGameDB; const ASearchLinkFile : TLinkFile; const ADeleteOnExit : TStringList) : TGame;
 begin
   result:=nil;
   TemplateForm:=TTemplateForm.Create(AOwner);
   try
     TemplateForm.GameDB:=AGameDB;
+    TemplateForm.SearchLinkFile:=ASearchLinkFile;
+    TemplateForm.DeleteOnExit:=ADeleteOnExit;
     TemplateForm.ShowModal;
     if TemplateForm.Template=nil then exit;
     If PrgSetup.DFendStyleProfileEditor then begin
-      EditGameProfil(AOwner,AGameDB,result,TemplateForm.Template);
+      EditGameProfil(AOwner,AGameDB,result,TemplateForm.Template,ASearchLinkFile,ADeleteOnExit);
     end else begin
-      ModernEditGameProfil(AOwner,AGameDB,result,TemplateForm.Template);
+      ModernEditGameProfil(AOwner,AGameDB,result,TemplateForm.Template,ASearchLinkFile,ADeleteOnExit);
     end;
   finally
     TemplateForm.Free;
