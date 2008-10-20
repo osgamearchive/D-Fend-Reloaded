@@ -27,6 +27,7 @@ object TemplateSelectProfileForm: TTemplateSelectProfileForm
     TabOrder = 0
     ViewStyle = vsReport
     OnColumnClick = ListViewColumnClick
+    OnDblClick = ListViewDblClick
   end
   object OKButton: TBitBtn
     Left = 8

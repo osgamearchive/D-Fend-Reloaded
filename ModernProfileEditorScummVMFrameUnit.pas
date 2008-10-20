@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, 
-  Dialogs, StdCtrls, Spin, GameDBUnit, ModernProfileEditorFormUnit, Buttons;
+  Dialogs, StdCtrls, Spin, Buttons, GameDBUnit, ModernProfileEditorFormUnit;
 
 type
   TModernProfileEditorScummVMFrame = class(TFrame, IModernProfileEditorFrame)
@@ -20,8 +20,16 @@ type
     SavePathCustomRadioButton: TRadioButton;
     SavePathEditButton: TSpeedButton;
     SavePathEdit: TEdit;
+    ConfirmExitCheckBox: TCheckBox;
+    CDGroupBox: TGroupBox;
+    CDRadioButton1: TRadioButton;
+    CDRadioButton2: TRadioButton;
+    CDEdit: TSpinEdit;
+    JoystickLabel: TLabel;
+    JoystickEdit: TSpinEdit;
     procedure SavePathEditButtonClick(Sender: TObject);
     procedure SavePathEditChange(Sender: TObject);
+    procedure CDEditChange(Sender: TObject);
   private
     { Private-Deklarationen }
     LastGameName, SaveLang : String;
@@ -55,15 +63,24 @@ begin
   NoFlicker(SavePathDefaultRadioButton);
   NoFlicker(SavePathCustomRadioButton);
   NoFlicker(SavePathEdit);
+  NoFlicker(CDGroupBox);
+  NoFlicker(CDRadioButton1);
+  NoFlicker(CDRadioButton2);
+  NoFlicker(JoystickEdit);
 
   LanguageLabel.Caption:=LanguageSetup.ProfileEditorScummVMLanguage;
   AutosaveLabel.Caption:=LanguageSetup.ProfileEditorScummVMAutosave;
   TalkSpeedLabel.Caption:=LanguageSetup.ProfileEditorScummVMTextSpeed;
   SubtitlesCheckBox.Caption:=LanguageSetup.ProfileEditorScummVMSubtitles;
-  //SavePathGroupBox.Caption:=LanguageSetup.ScummVMSavePath;
-  //SavePathDefaultRadioButton.Caption:=LanguageSetup.ScummVMSavePathGameDir+' ('+LanguageSetup.Default+')';
-  //SavePathCustomRadioButton.Caption:=LanguageSetup.ScummVMSavePathCustom;
-  SavePathEditButton.Caption:=LanguageSetup.ChooseFolder;
+  ConfirmExitCheckBox.Caption:=LanguageSetup.ProfileEditorScummVMConfirmExit;
+  SavePathGroupBox.Caption:=LanguageSetup.ProfileEditorScummVMSavePath;
+  SavePathDefaultRadioButton.Caption:=LanguageSetup.ProfileEditorScummVMSavePathGameDir+' ('+LanguageSetup.Default+')';
+  SavePathCustomRadioButton.Caption:=LanguageSetup.ProfileEditorScummVMSavePathCustom;
+  SavePathEditButton.Hint:=LanguageSetup.ChooseFolder;
+  CDGroupBox.Caption:=LanguageSetup.ProfileEditorScummVMCDAudioDrive;
+  CDRadioButton1.Caption:=LanguageSetup.ProfileEditorScummVMCDAudioOff;
+  CDRadioButton2.Caption:=LanguageSetup.ProfileEditorScummVMCDAudioNr;
+  JoystickLabel.Caption:=LanguageSetup.ProfileEditorScummVMJoystick;
 
   CurrentGameName:=InitData.CurrentScummVMGameName;
   CurrentScummVMPath:=InitData.CurrentScummVMPath;
@@ -91,9 +108,17 @@ begin
   AutosaveEdit.Value:=Min(86400,Max(1,Game.ScummVMAutosave));
   TalkSpeedEdit.Value:=Min(1000,Max(1,Game.ScummVMTalkSpeed));
   SubtitlesCheckBox.Checked:=Game.ScummVMSubtitles;
+  ConfirmExitCheckBox.Checked:=Game.ScummVMConfirmExit;
 
   SavePathEdit.Text:=Game.ScummVMSavePath;
   SavePathEditChange(self);
+
+  CDEdit.Value:=Min(3,Max(0,Game.ScummVMCDROM));
+  CDRadioButton1.Checked:=(Game.ScummVMCDROM=-1);
+  CDRadioButton2.Checked:=(Game.ScummVMCDROM>=0);
+
+  JoystickEdit.Value:=Min(3,Max(0,Game.ScummVMJoystickNum));
+
   SaveLang:=Game.ScummVMLanguage;
 end;
 
@@ -139,7 +164,10 @@ begin
   Game.ScummVMAutosave:=AutosaveEdit.Value;
   Game.ScummVMTalkSpeed:=TalkSpeedEdit.Value;
   Game.ScummVMSubtitles:=SubtitlesCheckBox.Checked;
+  Game.ScummVMConfirmExit:=ConfirmExitCheckBox.Checked;
   If SavePathDefaultRadioButton.Checked then Game.ScummVMSavePath:='' else Game.ScummVMSavePath:=Trim(SavePathEdit.Text);
+  If CDRadioButton2.Checked then Game.ScummVMCDROM:=CDEdit.Value else Game.ScummVMCDROM:=-1;
+  Game.ScummVMJoystickNum:=JoystickEdit.Value;
 end;
 
 procedure TModernProfileEditorScummVMFrame.SavePathEditChange(Sender: TObject);
@@ -158,6 +186,11 @@ begin
   if not SelectDirectory(Handle,LanguageSetup.ChooseFolder,S) then exit;
   SavePathEdit.Text:=S;
   SavePathEditChange(Sender);
+end;
+
+procedure TModernProfileEditorScummVMFrame.CDEditChange(Sender: TObject);
+begin
+  CDRadioButton2.Checked:=True;
 end;
 
 end.

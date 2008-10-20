@@ -31,7 +31,7 @@ object SerialEditForm: TSerialEditForm
     Top = 364
     Width = 97
     Height = 25
-    TabOrder = 0
+    TabOrder = 3
     OnClick = OKButtonClick
     Kind = bkOK
   end
@@ -40,7 +40,7 @@ object SerialEditForm: TSerialEditForm
     Top = 364
     Width = 97
     Height = 25
-    TabOrder = 1
+    TabOrder = 4
     Kind = bkCancel
   end
   object IRQComboBox: TComboBox
@@ -52,7 +52,7 @@ object SerialEditForm: TSerialEditForm
     Enabled = False
     ItemHeight = 13
     ItemIndex = 0
-    TabOrder = 2
+    TabOrder = 1
     Text = 'None'
     Items.Strings = (
       'None'
@@ -71,7 +71,7 @@ object SerialEditForm: TSerialEditForm
     Width = 185
     Height = 145
     Caption = 'Device type'
-    TabOrder = 3
+    TabOrder = 0
     object SerialTypeDisabledRadioButton: TRadioButton
       Left = 16
       Top = 24
@@ -125,8 +125,8 @@ object SerialEditForm: TSerialEditForm
     Top = 54
     Width = 268
     Height = 296
-    PageIndex = 3
-    TabOrder = 4
+    PageIndex = 1
+    TabOrder = 2
     object TPage
       Left = 0
       Top = 0
@@ -173,6 +173,7 @@ object SerialEditForm: TSerialEditForm
         EditLabel.Height = 13
         EditLabel.Caption = 'Server IP address'
         TabOrder = 2
+        Visible = False
       end
     end
     object TPage

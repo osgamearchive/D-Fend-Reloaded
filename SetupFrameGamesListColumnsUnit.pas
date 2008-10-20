@@ -12,7 +12,6 @@ type
     ListViewListBox: TCheckListBox;
     ListViewUpButton: TSpeedButton;
     ListViewDownButton: TSpeedButton;
-    ColDefaultValueSpeedButton: TSpeedButton;
     procedure ListViewMoveButtonClick(Sender: TObject);
   private
     { Private-Deklarationen }
@@ -43,13 +42,13 @@ end;
 Procedure GetColOrderAndVisible(var O,V : String);
 begin
   V:=PrgSetup.ColVisible;
-  while length(V)<6 do V:=V+'1';
-  If Length(V)>6 then V:=Copy(V,1,6);
+  while length(V)<7 do V:=V+'1';
+  If Length(V)>7 then V:=Copy(V,1,7);
   PrgSetup.ColVisible:=V;
 
   O:=PrgSetup.ColOrder;
-  while length(O)<6 do O:=O+'1';
-  If Length(O)>6 then O:=Copy(O,1,6);
+  while length(O)<7 do O:=O+'1';
+  If Length(O)>7 then O:=Copy(O,1,7);
   PrgSetup.ColOrder:=O;
 end;
 
@@ -61,9 +60,9 @@ begin
   NoFlicker(ListViewListBox);
 
   GetColOrderAndVisible(ColOrder,ColVisible);
-  For I:=0 to 5 do begin
+  For I:=0 to 6 do begin
     try Nr:=StrToInt(ColOrder[I+1]); except Nr:=-1; end;
-    If (Nr<1) or (Nr>6) then continue;
+    If (Nr<1) or (Nr>7) then continue;
     Case Nr-1 of
       0 : ListViewListBox.Items.AddObject(LanguageSetup.GameSetup,Pointer(Nr-1));
       1 : ListViewListBox.Items.AddObject(LanguageSetup.GameGenre,Pointer(Nr-1));
@@ -71,10 +70,11 @@ begin
       3 : ListViewListBox.Items.AddObject(LanguageSetup.GamePublisher,Pointer(Nr-1));
       4 : ListViewListBox.Items.AddObject(LanguageSetup.GameYear,Pointer(Nr-1));
       5 : ListViewListBox.Items.AddObject(LanguageSetup.GameLanguage,Pointer(Nr-1));
+      6 : ListViewListBox.Items.AddObject(LanguageSetup.GameNotes,Pointer(Nr-1));
     end;
     ListViewListBox.Checked[ListViewListBox.Items.Count-1]:=(ColVisible[Nr]<>'0');
   end;
-  For I:=0 to 5 do begin
+  For I:=0 to 6 do begin
     B:=False;
     For J:=0 to ListViewListBox.Items.Count-1 do If Integer(ListViewListBox.Items.Objects[J])=I then begin
       B:=True; break;
@@ -87,6 +87,7 @@ begin
       3 : ListViewListBox.Items.AddObject(LanguageSetup.GamePublisher,Pointer(I));
       4 : ListViewListBox.Items.AddObject(LanguageSetup.GameYear,Pointer(I));
       5 : ListViewListBox.Items.AddObject(LanguageSetup.GameLanguage,Pointer(I));
+      6 : ListViewListBox.Items.AddObject(LanguageSetup.GameNotes,Pointer(I));
     end;
     ListViewListBox.Checked[ListViewListBox.Items.Count-1]:=(ColVisible[I+1]<>'0');
   end;
@@ -95,7 +96,6 @@ end;
 procedure TSetupFrameGamesListColumns.LoadLanguage;
 begin
   ListViewLabel.Caption:=LanguageSetup.SetupFormListViewInfo;
-  ColDefaultValueSpeedButton.Hint:=LanguageSetup.SetupFormDefaultValueReset;
 
   HelpContext:=ID_FileOptionsColumnsInTheGamesList;
 end;
@@ -115,8 +115,8 @@ begin
   S1:=PrgSetup.ColVisible;
   S2:=PrgSetup.ColOrder;
   try
-    PrgSetup.ColVisible:='111111';
-    PrgSetup.ColOrder:='123456';
+    PrgSetup.ColVisible:='1111110';
+    PrgSetup.ColOrder:='1234567';
     ListViewListBox.Items.Clear;
     InitGUIAndLoadSetup(InitData);
   finally
@@ -135,7 +135,7 @@ begin
   PrgSetup.ColOrder:=S;
 
   S:='';
-  For I:=0 to 5 do begin
+  For I:=0 to 6 do begin
     B:=False;
     for J:=0 to ListViewListBox.Items.Count-1 do If Integer(ListViewListBox.Items.Objects[J])=I then begin
       B:=ListViewListBox.Checked[J]; break;
@@ -146,7 +146,6 @@ begin
 end;
 
 procedure TSetupFrameGamesListColumns.ListViewMoveButtonClick(Sender: TObject);
-Var I : Integer;
 begin
   Case (Sender as TComponent).Tag of
     0 : If ListViewListBox.ItemIndex>0 then begin
@@ -155,20 +154,6 @@ begin
     1 : If (ListViewListBox.ItemIndex>=0) and (ListViewListBox.ItemIndex<ListViewListBox.Items.Count-2) then begin
           ListViewListBox.Items.Exchange(ListViewListBox.ItemIndex,ListViewListBox.ItemIndex+1);
         end;
-    2 : begin
-          ListViewListBox.Clear;
-          For I:=0 to 5 do begin
-            Case I of
-              0 : ListViewListBox.Items.AddObject(LanguageSetup.GameSetup,Pointer(I));
-              1 : ListViewListBox.Items.AddObject(LanguageSetup.GameGenre,Pointer(I));
-              2 : ListViewListBox.Items.AddObject(LanguageSetup.GameDeveloper,Pointer(I));
-              3 : ListViewListBox.Items.AddObject(LanguageSetup.GamePublisher,Pointer(I));
-              4 : ListViewListBox.Items.AddObject(LanguageSetup.GameYear,Pointer(I));
-              5 : ListViewListBox.Items.AddObject(LanguageSetup.GameLanguage,Pointer(I));
-            end;
-            ListViewListBox.Checked[ListViewListBox.Items.Count-1]:=True;
-        end;
-    end;
   end;
 end;
 

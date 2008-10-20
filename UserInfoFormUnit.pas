@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, Buttons, Grids, ValEdit, ExtCtrls, GameDBUnit;
+  Dialogs, StdCtrls, Buttons, Grids, ValEdit, ExtCtrls, GameDBUnit, Menus;
 
 type
   TUserInfoForm = class(TForm)
@@ -15,6 +15,7 @@ type
     DelButton: TSpeedButton;
     AddButton: TSpeedButton;
     HelpButton: TBitBtn;
+    AddUserDataPopupMenu: TPopupMenu;
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure OKButtonClick(Sender: TObject);
@@ -25,19 +26,22 @@ type
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
   private
     { Private-Deklarationen }
+    Procedure TabListForCell(ACol, ARow: Integer; var UseDropdownListForCell : Boolean);
+    Procedure TabGetListForCell(ACol, ARow: Integer; DropdownListForCell : TStrings);
   public
     { Public-Deklarationen }
     Game : TGame;
+    GameDB : TGameDB;
   end;
 
 var
   UserInfoForm: TUserInfoForm;
 
-Function ShowUserInfoDialog(const AOwner : TComponent; const AGame : TGame) : Boolean;
+Function ShowUserInfoDialog(const AOwner : TComponent; const AGame : TGame; const AGameDB : TGameDB) : Boolean;
 
 implementation
 
-uses VistaToolsUnit, LanguageSetupUnit, CommonTools, HelpConsts;
+uses VistaToolsUnit, LanguageSetupUnit, CommonTools, HelpConsts, ClassExtensions;
 
 {$R *.dfm}
 
@@ -47,6 +51,11 @@ begin
   Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName);
 
   Caption:=LanguageSetup.ProfileEditorUserdefinedInfo;
+
+  Tab:=TStringGrid(NewWinControlType(Tab,TStringGridEx,ctcmCopyProperties));
+  TStringGridEx(Tab).OnListForCell:=TabListForCell;
+  TStringGridEx(Tab).OnGetListForCell:=TabGetListForCell;
+
   Tab.Cells[0,0]:=LanguageSetup.Key;
   Tab.Cells[1,0]:=LanguageSetup.Value;
   OKButton.Caption:=LanguageSetup.OK;
@@ -86,9 +95,43 @@ begin
 end;
 
 procedure TUserInfoForm.AddButtonClick(Sender: TObject);
+Var M : TMenuItem;
+    St : TStringList;
+    I : Integer;
+    P : TPoint;
 begin
-  Tab.RowCount:=Tab.RowCount+1;
-  Tab.Row:=Tab.RowCount-1;
+  If (Sender as TComponent).Tag>0 then begin
+    If ((Sender as TComponent).Tag=1) or (Trim(Tab.Cells[0,Tab.RowCount-1])<>'') or (Trim(Tab.Cells[1,Tab.RowCount-1])<>'') then begin
+      Tab.RowCount:=Tab.RowCount+1;
+    end;
+    Tab.Row:=Tab.RowCount-1;
+    Tab.Col:=0;
+    If (Sender as TComponent).Tag=2 then begin
+      Tab.Cells[0,Tab.RowCount-1]:=RemoveUnderline((Sender as TMenuItem).Caption);
+      Tab.Col:=1;
+    end;
+
+    Tab.SetFocus;
+    exit;
+  end;
+
+  St:=GameDB.GetUserKeys;
+  try
+    AddUserDataPopupMenu.Items.Clear;
+    M:=TMenuItem.Create(AddUserDataPopupMenu); M.Caption:=LanguageSetup.AddNewEmptyLine; M.Tag:=1; M.OnClick:=AddButtonClick;
+    AddUserDataPopupMenu.Items.Add(M);
+    M:=TMenuItem.Create(AddUserDataPopupMenu); M.Caption:='-';
+    AddUserDataPopupMenu.Items.Add(M);
+    For I:=0 to St.Count-1 do begin
+      M:=TMenuItem.Create(AddUserDataPopupMenu); M.Caption:=St[I]; M.Tag:=2; M.OnClick:=AddButtonClick;
+      AddUserDataPopupMenu.Items.Add(M);
+    end;
+  finally
+    St.Free;
+  end;
+
+  P:=ClientToScreen(Point((Sender as TControl).Left,(Sender as TControl).Top));
+  AddUserDataPopupMenu.Popup(P.X+5,P.Y+5);
 end;
 
 procedure TUserInfoForm.DelButtonClick(Sender: TObject);
@@ -139,13 +182,31 @@ begin
   If (Key=VK_F1) and (Shift=[]) then HelpButtonClick(Sender);
 end;
 
+Procedure TUserInfoForm.TabListForCell(ACol, ARow: Integer; var UseDropdownListForCell : Boolean);
+begin
+  UseDropdownListForCell:=(ACol=1);
+end;
+
+Procedure TUserInfoForm.TabGetListForCell(ACol, ARow: Integer; DropdownListForCell : TStrings);
+Var St : TStringList;
+begin
+  DropdownListForCell.Clear;
+  St:=GameDB.GetKeyValueList(Tab.Cells[0,ARow]);
+  try
+    DropdownListForCell.AddStrings(St);
+  finally
+    St.Free;
+  end;
+end;
+
 { global }
 
-Function ShowUserInfoDialog(const AOwner : TComponent; const AGame : TGame) : Boolean;
+Function ShowUserInfoDialog(const AOwner : TComponent; const AGame : TGame; const AGameDB : TGameDB) : Boolean;
 begin
   UserInfoForm:=TUserInfoForm.Create(AOwner);
   try
     UserInfoForm.Game:=AGame;
+    UserInfoForm.GameDB:=AGameDB;
     result:=(UserInfoForm.ShowModal=mrOK);
   finally
     UserInfoForm.Free;

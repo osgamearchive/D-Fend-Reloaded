@@ -1,10 +1,9 @@
 object HistoryForm: THistoryForm
   Left = 0
   Top = 0
-  BorderStyle = bsDialog
   Caption = 'Verlauf'
-  ClientHeight = 416
-  ClientWidth = 564
+  ClientHeight = 413
+  ClientWidth = 554
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -16,26 +15,20 @@ object HistoryForm: THistoryForm
   Position = poOwnerFormCenter
   OnKeyDown = FormKeyDown
   OnShow = FormShow
+  DesignSize = (
+    554
+    413)
   PixelsPerInch = 96
   TextHeight = 13
-  object ListView: TListView
-    Left = 0
-    Top = 0
-    Width = 564
-    Height = 369
-    Align = alTop
-    Columns = <>
-    TabOrder = 0
-    ViewStyle = vsReport
-  end
   object CloseButton: TBitBtn
     Left = 8
     Top = 383
     Width = 97
     Height = 25
+    Anchors = [akLeft, akBottom]
     Caption = '&Schlie'#223'en'
     ModalResult = 1
-    TabOrder = 1
+    TabOrder = 0
     Glyph.Data = {
       DE010000424DDE01000000000000760000002800000024000000120000000100
       0400000000006801000000000000000000001000000000000000000000000000
@@ -60,9 +53,10 @@ object HistoryForm: THistoryForm
     Top = 383
     Width = 97
     Height = 25
+    Anchors = [akLeft, akBottom]
     Caption = '&L'#246'schen'
     ModalResult = 1
-    TabOrder = 2
+    TabOrder = 1
     OnClick = ClearButtonClick
     Glyph.Data = {
       76010000424D7601000000000000760000002800000020000000100000000100
@@ -84,8 +78,53 @@ object HistoryForm: THistoryForm
     Top = 383
     Width = 97
     Height = 25
-    TabOrder = 3
+    Anchors = [akLeft, akBottom]
+    TabOrder = 2
     OnClick = HelpButtonClick
     Kind = bkHelp
+  end
+  object PageControl: TPageControl
+    Left = 0
+    Top = 0
+    Width = 554
+    Height = 377
+    ActivePage = TabSheet1
+    Align = alTop
+    TabOrder = 3
+    object TabSheet1: TTabSheet
+      Caption = 'Verlauf'
+      object ListView: TListView
+        Left = 0
+        Top = 0
+        Width = 546
+        Height = 369
+        Align = alTop
+        BorderStyle = bsNone
+        Columns = <>
+        ReadOnly = True
+        TabOrder = 0
+        ViewStyle = vsReport
+        OnColumnClick = ListViewColumnClick
+        OnCompare = ListViewCompare
+      end
+    end
+    object TabSheet2: TTabSheet
+      Caption = 'Statistik'
+      ImageIndex = 1
+      object ListView2: TListView
+        Left = 0
+        Top = 0
+        Width = 546
+        Height = 369
+        Align = alTop
+        BorderStyle = bsNone
+        Columns = <>
+        ReadOnly = True
+        TabOrder = 0
+        ViewStyle = vsReport
+        OnColumnClick = ListViewColumnClick
+        OnCompare = ListViewCompare
+      end
+    end
   end
 end

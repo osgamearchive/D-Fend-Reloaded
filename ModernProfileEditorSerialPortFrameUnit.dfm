@@ -115,6 +115,7 @@ object ModernProfileEditorSerialPortFrame: TModernProfileEditorSerialPortFrame
       EditLabel.Height = 13
       EditLabel.Caption = 'Server IP address'
       TabOrder = 0
+      Visible = False
     end
     object ModemPortEdit: TSpinEdit
       Left = 17

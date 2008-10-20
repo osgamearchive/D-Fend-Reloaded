@@ -36,6 +36,7 @@ type
     procedure HomepageLabelClick(Sender: TObject);
     procedure Label1DblClick(Sender: TObject);
     procedure TimerTimer(Sender: TObject);
+    procedure FormKeyPress(Sender: TObject; var Key: Char);
   private
     { Private-Deklarationen }
     FImage : TImage;
@@ -128,7 +129,7 @@ begin
 
     LanguageAuthorsTab.RowCount:=St.Count+1;
     For I:=0 to St.Count-1 do begin
-      Lang:=TLanguageSetup.Create(St[I]);
+      Lang:=TLanguageSetup.Create(St[I],True);
       try
         S:=ChangeFileExt(ExtractFileName(St[I]),'');
         T:=Lang.LocalLanguageName;
@@ -152,6 +153,11 @@ begin
   finally
     St.Free;
   end;
+end;
+
+procedure TInfoForm.FormKeyPress(Sender: TObject; var Key: Char);
+begin
+  If Key=#27 then Close;
 end;
 
 procedure TInfoForm.HomepageLabelClick(Sender: TObject);

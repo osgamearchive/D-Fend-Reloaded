@@ -252,7 +252,7 @@ begin
       If MessageDlg(Format(LanguageSetup.MessageConfirmationOverwriteFile,[ImageFileName]),mtConfirmation,[mbYes,mbNo],0)<>mrYes then begin
         ModalResult:=mrNone; exit;
       end;
-      DeleteFile(ImageFileName);
+      ExtDeleteFile(ImageFileName,ftProfile);
     end;
     CompressImage:=FloppyCompressedCheckBox.Checked;
   end else begin
@@ -266,7 +266,7 @@ begin
       If MessageDlg(Format(LanguageSetup.MessageConfirmationOverwriteFile,[ImageFileName]),mtConfirmation,[mbYes,mbNo],0)<>mrYes then begin
         ModalResult:=mrNone; exit;
       end;
-      DeleteFile(ImageFileName);
+      ExtDeleteFile(ImageFileName,ftProfile);
     end;
     CompressImage:=HDCompressedCheckBox.Checked;
   end;
@@ -287,8 +287,8 @@ const ParamFile='DFend-mkdosfs-InFile.txt';
       ParamBatchFile='DFend-mkdosfs.bat';
 Var St : TStringList;
     I : Integer;
-    StartupInfo : TStartupInfo;
-    ProcessInformation : TProcessInformation;
+    {StartupInfo : TStartupInfo;
+    ProcessInformation : TProcessInformation;}
 begin
   St:=TStringList.Create;
   try
@@ -327,12 +327,13 @@ begin
       St.Add('2');
       St.Add('16');
     end;
-    St.SaveToFile(TempDir+ParamFile);
+
+    if not RunWithInput(PrgDir+MakeDOSFilesystemFileName,'',False,St) then exit;
   finally
     St.Free;
   end;
 
-  St:=TStringList.Create;
+  {St:=TStringList.Create;
   try
     St.Add('"'+PrgDir+MakeDOSFilesystemFileName+'" < "'+TempDir+ParamFile+'"');
     St.SaveToFile(TempDir+ParamBatchFile);
@@ -348,8 +349,8 @@ begin
   CloseHandle(ProcessInformation.hThread);
   CloseHandle(ProcessInformation.hProcess);
 
-  DeleteFile(TempDir+ParamFile);
-  DeleteFile(TempDir+ParamBatchFile);
+  ExtDeleteFile(TempDir+ParamFile,ftTemp);
+  ExtDeleteFile(TempDir+ParamBatchFile,ftTemp);}
   If CompressImage then CompressFile(ImageFileName);
 end;
 
@@ -445,8 +446,8 @@ begin
   CloseHandle(ProcessInformation.hThread);
   CloseHandle(ProcessInformation.hProcess);
 
-  DeleteFile(TempDir+ParamFile);
-  DeleteFile(TempDir+ParamBatchFile);
+  ExtDeleteFile(TempDir+ParamFile,ftTemp);
+  ExtDeleteFile(TempDir+ParamBatchFile,ftTemp);
 
   result:=True;
 end;

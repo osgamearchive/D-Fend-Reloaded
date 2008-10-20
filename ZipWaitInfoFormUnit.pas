@@ -88,16 +88,26 @@ procedure TZipWaitInfoForm.UpdateTree;
 Var I,J : Integer;
     R : TZipRecord;
     N,N2,N3 : TTreeNode;
+    S,T : String;
 begin
   Tree.Items.BeginUpdate;
   try
     Tree.Items.Clear;
     For I:=0 to ZipManager.Count-1 do begin
       R:=ZipManager.Data[I];
-      N:=Tree.Items.AddChild(nil,LanguageSetup.ZipWaitInfoFormDOSBox+': $'+IntToHex(R.DOSBoxHandle,8));
+
+      If R.IsScummVM then begin
+        S:=LanguageSetup.ZipWaitInfoFormDriveScummVM;
+        T:=LanguageSetup.ZipWaitInfoFormScummVM;
+      end else begin
+        S:=LanguageSetup.ZipWaitInfoFormDriveDOSBox;
+        T:=LanguageSetup.ZipWaitInfoFormDOSBox;
+      end;
+
+      N:=Tree.Items.AddChild(nil,T+': $'+IntToHex(R.DOSBoxHandle,8));
       N.ImageIndex:=0; N.SelectedIndex:=0;
       For J:=0 to R.ZipDrives-1 do begin
-        N2:=Tree.Items.AddChild(N,LanguageSetup.ZipWaitInfoFormDrive+' '+R.DriveLetter[J]);
+        N2:=Tree.Items.AddChild(N,S+' '+R.DriveLetter[J]);
         N2.ImageIndex:=1; N2.SelectedIndex:=1;
         N3:=Tree.Items.AddChild(N2,LanguageSetup.ZipWaitInfoFormZipFile+': '+MakeRelPath(R.ZipFile[J],PrgSetup.BaseDir));
         N3.ImageIndex:=2; N3.SelectedIndex:=2;

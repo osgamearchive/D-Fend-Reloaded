@@ -7,13 +7,13 @@ uses Classes, ComCtrls, Controls, Menus, CheckLst, GameDBUnit, LinkFileUnit;
 
 { Load Data to GUI }
 
-Type TSortListBy=(slbName, slbSetup, slbGenre, slbDeveloper, slbPublisher, slbYear, slbLanguage);
+Type TSortListBy=(slbName, slbSetup, slbGenre, slbDeveloper, slbPublisher, slbYear, slbLanguage, slbComment);
 
 Procedure InitTreeViewForGamesList(const ATreeView : TTreeView; const GameDB : TGameDB);
 Procedure InitListViewForGamesList(const AListView : TListView; const ShowExtraInfo : Boolean);
 
-Procedure AddGameToList(const AListView : TListView; var ItemsUsed : Integer; const AListViewImageList, AListViewIconImageList, AImageList : TImageList; const Game : TGame; const ShowExtraInfo : Boolean; const O,V,T : String; const ScreenshotViewMode : Boolean); overload;
-Procedure AddGameToList(const AListView : TListView; var ItemsUsed : Integer; const AListViewImageList, AListViewIconImageList, AImageList : TImageList; const Game : TGame; const ShowExtraInfo, ScreenshotViewMode : Boolean); overload;
+Procedure AddGameToList(const AListView : TListView; var ItemsUsed : Integer; const AListViewImageList, AListViewIconImageList, AImageList : TImageList; const Game : TGame; const ShowExtraInfo : Boolean; const O,V,T : String; const ScreenshotViewMode, ScummVMTemplate : Boolean); overload;
+Procedure AddGameToList(const AListView : TListView; var ItemsUsed : Integer; const AListViewImageList, AListViewIconImageList, AImageList : TImageList; const Game : TGame; const ShowExtraInfo, ScreenshotViewMode, ScummVMTemplate : Boolean); overload;
 Procedure AddGamesToList(const AListView : TListView; const AListViewImageList, AListViewIconImageList, AImageList : TImageList; const GameDB : TGameDB; const Group, SubGroup, SearchString : String; const ShowExtraInfo : Boolean; const SortBy : TSortListBy; const ReverseOrder, HideScummVMProfiles, ScreenshotViewMode : Boolean); overload;
 Procedure AddGamesToList(const AListView : TListView; const AListViewImageList, AListViewIconImageList, AImageList : TImageList; const GameDB : TGameDB; const Game : TGame; const Group, SubGroup, SearchString : String; const ShowExtraInfo : Boolean; const SortBy : TSortListBy; const ReverseOrder, HideScummVMProfiles, ScreenshotViewMode : Boolean); overload;
 
@@ -37,6 +37,7 @@ Procedure ReplaceAbsoluteDirs(const GameDB : TGameDB);
 Function BuildDefaultDosProfile(const GameDB : TGameDB; const CopyFiles : Boolean = True) : TGame;
 Procedure BuildDefaultProfile;
 Procedure ReBuildTemplates;
+Function CopyFiles(Source, Dest : String) : Boolean;
 
 { Extras }
 
@@ -47,6 +48,7 @@ Procedure EditDefaultProfile(const AOwner : TComponent; const GameDB : TGameDB; 
 
 Procedure AddToHistory(const GameName : String);
 Procedure LoadHistory(const AListView : TListView);
+Procedure LoadHistoryStatistics(const AListView : TListView);
 Procedure ClearHistory;
 
 { Import }
@@ -73,6 +75,7 @@ Function GetLastModificationDate(const AGame : TGame) : String;
 
 { ScummVM and Windows files}
 
+Function DOSBoxMode(const Game : TGame) : Boolean;
 Function ScummVMMode(const Game : TGame) : Boolean;
 Function WindowsExeMode(const Game : TGame) : Boolean;
 
@@ -118,7 +121,7 @@ begin
 end;
 
 Procedure InitTreeViewForGamesList(const ATreeView : TTreeView; const GameDB : TGameDB);
-Var N : TTreeNode;
+Var N,N2 : TTreeNode;
     Group, SubGroup : String;
     I : Integer;
     OnChange : TTVChangedEvent;
@@ -163,6 +166,12 @@ begin
         UserGroups.Free;
       end;
 
+      N:=ATreeView.Items.AddChild(nil,LanguageSetup.GameEmulationType);
+      N.ImageIndex:=12; N.SelectedIndex:=12;
+      N2:=ATreeView.Items.AddChild(N,LanguageSetup.GameEmulationTypeDOSBox); N2.ImageIndex:=16; N2.SelectedIndex:=16;
+      N2:=ATreeView.Items.AddChild(N,LanguageSetup.GameEmulationTypeScummVM); N2.ImageIndex:=37; N2.SelectedIndex:=37;
+      N2:=ATreeView.Items.AddChild(N,LanguageSetup.GameEmulationTypeWindows); N2.ImageIndex:=40; N2.SelectedIndex:=40;
+
       If Group='' then exit;
 
       For I:=0 to ATreeview.Items.Count-1 do begin
@@ -184,13 +193,13 @@ end;
 Procedure GetColOrderAndVisible(var O,V : String);
 begin
   V:=PrgSetup.ColVisible;
-  while length(V)<6 do V:=V+'1';
-  If Length(V)>6 then V:=Copy(V,1,6);
+  while length(V)<7 do V:=V+'1';
+  If Length(V)>7 then V:=Copy(V,1,7);
   PrgSetup.ColVisible:=V;
 
   O:=PrgSetup.ColOrder;
-  while length(O)<6 do O:=O+'1';
-  If Length(O)>6 then O:=Copy(O,1,6);
+  while length(O)<7 do O:=O+'1';
+  If Length(O)>7 then O:=Copy(O,1,7);
   PrgSetup.ColOrder:=O;
 end;
 
@@ -207,9 +216,9 @@ begin
   If ColumnIndex=0 then SetListSort(slbName) else begin
     If not PrgSetup.ShowExtraInfo then SetListSort(slbSetup) else begin
       C:=0;
-      For I:=0 to 5 do begin
+      For I:=0 to 6 do begin
         try Nr:=StrToInt(O[I+1]); except Nr:=-1; end;
-        If (Nr<1) or (Nr>6) then continue;
+        If (Nr<1) or (Nr>7) then continue;
         If V[Nr]='0' then continue;
         inc(C);
         If C=ColumnIndex then begin
@@ -220,6 +229,7 @@ begin
             3 : SetListSort(slbPublisher);
             4 : SetListSort(slbYear);
             5 : SetListSort(slbLanguage);
+            6 : SetListSort(slbComment);
           end;
           break;
         end;
@@ -314,6 +324,16 @@ begin
 
   St:=GameDB.GetLanguageList(WithDefaultProfile);
   try BuildSelectPopupSubMenu(Popup,LanguageSetup.GameLanguage,MenuSelect,MenuUnselect,4,OnClick,St); finally St.Free; end;
+
+  St:=TStringList.Create;
+  try
+    St.Add(LanguageSetup.GameEmulationTypeDOSBox);
+    St.Add(LanguageSetup.GameEmulationTypeScummVM);
+    St.Add(LanguageSetup.GameEmulationTypeWindows);
+    BuildSelectPopupSubMenu(Popup,LanguageSetup.GameEmulationType,MenuSelect,MenuUnselect,5,OnClick,St);
+  finally
+    St.Free;
+  end;
 
   { Collect user data }
 
@@ -413,6 +433,11 @@ begin
         2 : S:=G.CachePublisher;
         3 : S:=G.CacheYear;
         4 : S:=G.CacheLanguage;
+        5 : begin
+              S:='DOSBox';
+              If ScummVMMode(G) then S:='ScummVM';
+              If WindowsExeMode(G) then S:='Windows';
+            end;
       end;
       S:=Trim(S);
       If S='' then continue;
@@ -448,9 +473,9 @@ begin
       exit;
     end;
 
-    For I:=0 to 5 do begin
+    For I:=0 to 6 do begin
       try Nr:=StrToInt(O[I+1]); except Nr:=-1; end;
-      If (Nr<1) or (Nr>6) then continue;
+      If (Nr<1) or (Nr>7) then continue;
       If V[Nr]='0' then continue;
 
       C:=AListView.Columns.Add;
@@ -461,6 +486,7 @@ begin
         3 : C.Caption:=LanguageSetup.GamePublisher;
         4 : C.Caption:=LanguageSetup.GameYear;
         5 : C.Caption:=LanguageSetup.GameLanguage;
+        6 : C.Caption:=LanguageSetup.GameNotes;
       end;
       If Nr-1=0 then C.Width:=-2 else C.Width:=-1;
     end;
@@ -513,6 +539,7 @@ Var S,T,U : String;
     I : Integer;
     P : TPicture;
     B : Boolean;
+    St : TStringList;
 begin
   result:=False;
   S:=Trim(Game.CaptureFolder);
@@ -528,19 +555,25 @@ begin
 
   If (not B) and PrgSetup.ScreenshotListUseFirstScreenshot then begin
     T:='';
-    I:=FindFirst(IncludeTrailingPathDelimiter(S)+'*.*',faAnyFile,Rec);
+    St:=TStringList.Create;
     try
-      While I=0 do begin
-        If (Rec.Attr and faDirectory)=0 then begin
-          U:=ExtUpperCase(ExtractFileExt(Rec.Name));
-          If (U='.BMP') or (U='.GIF') or (U='.PNG') or (U='.JPG') or (U='.JPEG') then begin
-            T:=IncludeTrailingPathDelimiter(S)+Rec.Name; break;
+      I:=FindFirst(IncludeTrailingPathDelimiter(S)+'*.*',faAnyFile,Rec);
+      try
+        While I=0 do begin
+          If (Rec.Attr and faDirectory)=0 then begin
+            U:=ExtUpperCase(ExtractFileExt(Rec.Name));
+            If (U='.BMP') or (U='.GIF') or (U='.PNG') or (U='.JPG') or (U='.JPEG') then St.Add(Rec.Name);
           end;
+          I:=FindNext(Rec);
         end;
-        I:=FindNext(Rec);
+      finally
+       FindClose(Rec);
       end;
+      St.Sort;
+
+      If St.Count>0 then T:=IncludeTrailingPathDelimiter(S)+St[Min(St.Count-1,Max(0,PrgSetup.ScreenshotListUseFirstScreenshotNr-1))];
     finally
-     FindClose(Rec);
+      St.Free;
     end;
   end;
   
@@ -551,13 +584,14 @@ begin
   If result then ScaleGraphicToImageList(P.Graphic,ImageList2);
 end;
 
-Procedure AddGameToList(const AListView : TListView; var ItemsUsed : Integer; const AListViewImageList, AListViewIconImageList, AImageList : TImageList; const Game : TGame; const ShowExtraInfo : Boolean; const O,V,T : String; const ScreenshotViewMode : Boolean);
-Var IconNr,I,Nr : Integer;
+Procedure AddGameToList(const AListView : TListView; var ItemsUsed : Integer; const AListViewImageList, AListViewIconImageList, AImageList : TImageList; const Game : TGame; const ShowExtraInfo : Boolean; const O,V,T : String; const ScreenshotViewMode, ScummVMTemplate : Boolean);
+Var IconNr,I,J,Nr : Integer;
     B : Boolean;
     S : String;
     L : TListItem;
     SubUsed,SubCount : Integer;
     Icon : TIcon;
+    St : TStringList;
 begin
   B:=False; IconNr:=0;
 
@@ -566,9 +600,10 @@ begin
     If B then IconNr:=AListViewIconImageList.Count-1;
   end;
 
-  If (not B) and (Trim(Game.Icon)<>'') then begin
-    S:=MakeAbsIconName(Game.Icon);
-    Icon:=IconCache.GetIcon(S);
+  If not B then begin
+    If Trim(Game.Icon)<>'' then S:=MakeAbsIconName(Game.Icon) else S:='';
+    If (S='') and WindowsExeMode(Game) and PrgSetup.UseWindowsExeIcons then S:=MakeAbsIconName(MakeAbsPath(Game.GameExe,PrgSetup.BaseDir));
+    If S<>'' then Icon:=IconCache.GetIcon(S) else Icon:=nil;
     B:=(Icon<>nil);
 
     If B then begin
@@ -586,7 +621,9 @@ begin
   inc(ItemsUsed);
     
   If (Game.CacheName='') and (not Game.OwnINI) then begin
-    L.Caption:=LanguageSetup.TemplateFormDefault;
+    If ScummVMTemplate
+      then L.Caption:=LanguageSetup.TemplateFormDefaultScummVM
+      else L.Caption:=LanguageSetup.TemplateFormDefault;
   end else begin
     If L.Caption<>Game.CacheName then L.Caption:=Game.CacheName;
   end;
@@ -599,9 +636,9 @@ begin
     try
       SubItems.Capacity:=Max(SubItems.Capacity,10);
       If ShowExtraInfo then begin
-        For I:=0 to 5 do begin
+        For I:=0 to 6 do begin
           try Nr:=StrToInt(O[I+1]); except Nr:=-1; end;
-          If (Nr<1) or (Nr>6) then continue;
+          If (Nr<1) or (Nr>7) then continue;
           If V[Nr]='0' then continue;
 
           Case Nr-1 of
@@ -611,6 +648,12 @@ begin
             3 : begin S:=Game.CachePublisher; If Trim(S)='' then S:=T; end;
             4 : begin S:=Game.CacheYear; If Trim(S)='' then S:=T; end;
             5 : begin S:=Game.CacheLanguage; If Trim(S)='' then S:=T; end;
+            6 : begin
+                  St:=StringToStringList(Game.Notes); S:=St.Text; St.Free;
+                  For J:=1 to length(S) do if (S[J]=#10) or (S[J]=#13) then S[J]:=' ';
+                  If length(S)>100 then S:=Copy(S,1,100)+'...';
+                  If Trim(S)='' then S:=T;
+                end;
           end;
           If SubUsed<SubCount then SubItems[SubUsed]:=S else SubItems.Add(S);
           inc(SubUsed);
@@ -632,12 +675,12 @@ begin
   end;
 end;
 
-Procedure AddGameToList(const AListView : TListView; var ItemsUsed : Integer; const AListViewImageList, AListViewIconImageList, AImageList : TImageList; const Game : TGame; const ShowExtraInfo, ScreenshotViewMode : Boolean);
+Procedure AddGameToList(const AListView : TListView; var ItemsUsed : Integer; const AListViewImageList, AListViewIconImageList, AImageList : TImageList; const Game : TGame; const ShowExtraInfo, ScreenshotViewMode, ScummVMTemplate : Boolean);
 Var O,V,T : String;
 begin
   GetColOrderAndVisible(O,V);
   If Trim(PrgSetup.ValueForNotSet)='' then T:=LanguageSetup.NotSet else T:=Trim(PrgSetup.ValueForNotSet);
-  AddGameToList(AListView,ItemsUsed,AListViewImageList,AListViewIconImageList,AImageList,Game,ShowExtraInfo,O,V,T,ScreenshotViewMode);
+  AddGameToList(AListView,ItemsUsed,AListViewImageList,AListViewIconImageList,AImageList,Game,ShowExtraInfo,O,V,T,ScreenshotViewMode,ScummVMTemplate);
 end;
 
 Procedure AddGamesToList(const AListView : TListView; const AListViewImageList, AListViewIconImageList, AImageList : TImageList; const GameDB : TGameDB; const Group, SubGroup, SearchString : String; const ShowExtraInfo : Boolean; const SortBy : TSortListBy; const ReverseOrder, HideScummVMProfiles, ScreenshotViewMode : Boolean);
@@ -648,12 +691,13 @@ end;
 Procedure AddGamesToList(const AListView : TListView; const AListViewImageList, AListViewIconImageList, AImageList : TImageList; const GameDB : TGameDB; const Game : TGame; const Group, SubGroup, SearchString : String; const ShowExtraInfo : Boolean; const SortBy : TSortListBy; const ReverseOrder, HideScummVMProfiles, ScreenshotViewMode : Boolean); overload;
 Var I,J,K,Nr,ItemsUsed : Integer;
     GroupUpper, SubGroupUpper, SearchStringUpper : String;
-    B : Boolean;
+    B, FirstDefaultTemplate : Boolean;
     C : Array of Integer;
     List : TList;
     St,St2 : TStringList;
     S,T : String;
     O,V : String;
+    EmType1,EmType2, EmType3 : String;
     Bitmap : TBitmap;
     {$IFDEF LargeListTest}Ca : Cardinal;{$ENDIF}
 begin
@@ -697,12 +741,17 @@ begin
     end else begin
       GroupUpper:=Trim(ExtUpperCase(Group));
       If SubGroup=LanguageSetup.NotSet then SubGroupUpper:='' else SubGroupUpper:=ExtUpperCase(SubGroup);
-      Nr:=5;
+      Nr:=6;
       If Group=LanguageSetup.GameGenre then Nr:=0;
       If Group=LanguageSetup.GameDeveloper then Nr:=1;
       If Group=LanguageSetup.GamePublisher then Nr:=2;
       If Group=LanguageSetup.GameYear then Nr:=3;
       If Group=LanguageSetup.GameLanguage then Nr:=4;
+      If Group=LanguageSetup.GameEmulationType then Nr:=5;
+
+      EmType1:=ExtUpperCase(LanguageSetup.GameEmulationTypeDOSBox);
+      EmType2:=ExtUpperCase(LanguageSetup.GameEmulationTypeScummVM);
+      EmType3:=ExtUpperCase(LanguageSetup.GameEmulationTypeWindows);
 
       For I:=0 to GameDB.Count-1 do begin
         If HideScummVMProfiles and (ScummVMMode(GameDB[I]) or WindowsExeMode(GameDB[I])) then continue;
@@ -714,6 +763,11 @@ begin
           3 : B:=(GameDB[I].CacheYearUpper=SubGroupUpper);
           4 : B:=(GameDB[I].CacheLanguageUpper=SubGroupUpper);
           5 : begin
+                If (SubGroupUpper=EmType1) then B:=DOSBoxMode(GameDB[I]);
+                If (SubGroupUpper=EmType2) then B:=ScummVMMode(GameDB[I]);
+                If (SubGroupUpper=EmType3) then B:=WindowsExeMode(GameDB[I]);
+              end;
+          6 : begin
                 B:=(SubGroupUpper='');
                 St2:=StringToStringList(GameDB[I].CacheUserInfo);
                 try
@@ -732,24 +786,27 @@ begin
       end;
     end;
 
-    If Game<>nil then List.Add(Game);
+    If Game<>nil then begin
+      List.Add(Game); {DOSBox default template}
+      List.Add(Game); {ScummVM default template}
+    end;
 
     {Sort games}
     St:=TStringList.Create;
     try
       For I:=0 to List.Count-1 do Case SortBy of
-        slbName : St.AddObject(TGame(List[I]).Name,TGame(List[I]));
+        slbName : St.AddObject(TGame(List[I]).CacheName,TGame(List[I]));
         slbSetup : If Trim(TGame(List[I]).SetupExe)<>''
                      then St.AddObject(RemoveUnderline(LanguageSetup.Yes),TGame(List[I]))
                      else St.AddObject(RemoveUnderline(LanguageSetup.No),TGame(List[I]));
-        slbGenre : St.AddObject(TGame(List[I]).Genre,TGame(List[I]));
-        slbDeveloper : St.AddObject(TGame(List[I]).Developer,TGame(List[I]));
-        slbPublisher : St.AddObject(TGame(List[I]).Publisher,TGame(List[I]));
-        slbYear : St.AddObject(TGame(List[I]).Year,TGame(List[I]));
-        slbLanguage : St.AddObject(TGame(List[I]).Language,TGame(List[I]));
+        slbGenre : St.AddObject(TGame(List[I]).CacheGenre,TGame(List[I]));
+        slbDeveloper : St.AddObject(TGame(List[I]).CacheDeveloper,TGame(List[I]));
+        slbPublisher : St.AddObject(TGame(List[I]).CachePublisher,TGame(List[I]));
+        slbYear : St.AddObject(TGame(List[I]).CacheYear,TGame(List[I]));
+        slbLanguage : St.AddObject(TGame(List[I]).CacheLanguage,TGame(List[I]));
+        slbComment : St.AddObject(TGame(List[I]).Notes,TGame(List[I]));
       End;
       St.Sort;
-
 
       {Add games to List}
       ItemsUsed:=0;
@@ -757,10 +814,17 @@ begin
       If Trim(PrgSetup.ValueForNotSet)='' then T:=LanguageSetup.NotSet else T:=Trim(PrgSetup.ValueForNotSet);
       AListView.Items.BeginUpdate;
       try
+        FirstDefaultTemplate:=True;
         If ReverseOrder then begin
-          For I:=St.Count-1 downto 0 do AddGameToList(AListView,ItemsUsed,AListViewImageList,AListViewIconImageList,AImageList,TGame(St.Objects[I]),ShowExtraInfo,O,V,T,ScreenshotViewMode);
+          For I:=St.Count-1 downto 0 do begin
+            AddGameToList(AListView,ItemsUsed,AListViewImageList,AListViewIconImageList,AImageList,TGame(St.Objects[I]),ShowExtraInfo,O,V,T,ScreenshotViewMode,FirstDefaultTemplate);
+            If (TGame(St.Objects[I]).CacheName='') and (not TGame(St.Objects[I]).OwnINI) then FirstDefaultTemplate:=False;
+          end;
         end else begin
-          For I:=0 to St.Count-1 do AddGameToList(AListView,ItemsUsed,AListViewImageList,AListViewIconImageList,AImageList,TGame(St.Objects[I]),ShowExtraInfo,O,V,T,ScreenshotViewMode);
+          For I:=0 to St.Count-1 do begin
+            AddGameToList(AListView,ItemsUsed,AListViewImageList,AListViewIconImageList,AImageList,TGame(St.Objects[I]),ShowExtraInfo,O,V,T,ScreenshotViewMode, not FirstDefaultTemplate);
+            If (TGame(St.Objects[I]).CacheName='') and (not TGame(St.Objects[I]).OwnINI) then FirstDefaultTemplate:=False;
+          end;
         end;
       finally
         AListView.Items.EndUpdate;
@@ -786,6 +850,31 @@ end;
 
 
 Procedure AddScreenshotsToList(const AListView : TListView; const AImageList : TImageList; Dir : String);
+Procedure CalcWH(const OldW, OldH, MaxW, MaxH : Integer; var NewW, NewH : Integer);
+Var F : Double;
+begin
+  F:=OldW/OldH;
+
+  If (OldW<=MaxW) and (OldH<=MaxH) then begin
+    {too small scale up}
+    If MaxH*F>MaxW then begin NewW:=MaxW; NewH:=Round(NewW/F); end else begin NewH:=MaxH; NewW:=Round(NewH*F); end;
+    exit;
+  end;
+
+  {scale down}
+  If OldW>MaxW then begin
+    {too wide}
+    NewW:=MaxW; NewH:=Round(NewW/F);
+    {also to high ?}
+    If NewH>MaxH then begin NewH:=MaxH; NewW:=Round(NewH*F); end;
+    exit;
+  end;
+
+  {too high}
+  NewH:=MaxH; NewW:=Round(NewH*F);
+  {also too wide ?}
+  If NewW>MaxW then begin NewW:=MaxW; NewH:=Round(NewW/F); end;
+end;
 Var I : Integer;
     Rec : TSearchRec;
     P : TPNGObject;
@@ -794,6 +883,7 @@ Var I : Integer;
     B,B2 : TBitmap;
     L : TListItem;
     OK : Boolean;
+    NewW, NewH : Integer;
 begin
   Dir:=IncludeTrailingPathDelimiter(Dir);
 
@@ -806,18 +896,31 @@ begin
         IF OK then begin
           B:=TBitmap.Create;
           try
-            B.Assign(P);
-            B2:=TBitmap.Create;
             try
-              B2.SetSize(AImageList.Width,AImageList.Height);
-              B2.Canvas.StretchDraw(Rect(0,0,AImageList.Width-1,AImageList.Height-1),B);
-              AImageList.AddMasked(B2,clNone);
-            finally
-              B2.Free;
+              B.Assign(P);
+              B2:=TBitmap.Create;
+              try
+                B2.SetSize(AImageList.Width,AImageList.Height);
+                CalcWH(B.Width,B.Height,AImageList.Width,AImageList.Height,NewW,NewH);
+                B2.Canvas.StretchDraw(
+                  Rect(
+                    (AImageList.Width-NewW) div 2,
+                    (AImageList.Height-NewH) div 2,
+                    AImageList.Width-1-((AImageList.Width-NewW) div 2),
+                    AImageList.Height-1-((AImageList.Height-NewH) div 2)
+                  ),
+                  B
+                );
+                AImageList.AddMasked(B2,clNone);
+              finally
+                B2.Free;
+              end;
+            except OK:=True; end;
+            If OK then begin
+              L:=AListView.Items.Add;
+              L.Caption:=Rec.Name;
+              L.ImageIndex:=AImageList.Count-1;
             end;
-            L:=AListView.Items.Add;
-            L.Caption:=Rec.Name;
-            L.ImageIndex:=AImageList.Count-1;
           finally
             B.Free;
           end;
@@ -840,18 +943,31 @@ begin
         If OK then begin
           B:=TBitmap.Create;
           try
-            B.Assign(J);
-            B2:=TBitmap.Create;
             try
-              B2.SetSize(AImageList.Width,AImageList.Height);
-              B2.Canvas.StretchDraw(Rect(0,0,AImageList.Width-1,AImageList.Height-1),B);
-              AImageList.AddMasked(B2,clNone);
-            finally
-              B2.Free;
+              B.Assign(J);
+              B2:=TBitmap.Create;
+              try
+                B2.SetSize(AImageList.Width,AImageList.Height);
+                CalcWH(B.Width,B.Height,AImageList.Width,AImageList.Height,NewW,NewH);
+                B2.Canvas.StretchDraw(
+                  Rect(
+                    (AImageList.Width-NewW) div 2,
+                    (AImageList.Height-NewH) div 2,
+                    AImageList.Width-1-((AImageList.Width-NewW) div 2),
+                    AImageList.Height-1-((AImageList.Height-NewH) div 2)
+                  ),
+                  B
+                );
+                AImageList.AddMasked(B2,clNone);
+              finally
+                B2.Free;
+              end;
+            except OK:=False; end;
+            If OK then begin
+              L:=AListView.Items.Add;
+              L.Caption:=Rec.Name;
+              L.ImageIndex:=AImageList.Count-1;
             end;
-            L:=AListView.Items.Add;
-            L.Caption:=Rec.Name;
-            L.ImageIndex:=AImageList.Count-1;
           finally
             B.Free;
           end;
@@ -874,18 +990,31 @@ begin
         If OK then begin
           B:=TBitmap.Create;
           try
-            B.Assign(J);
-            B2:=TBitmap.Create;
             try
-              B2.SetSize(AImageList.Width,AImageList.Height);
-              B2.Canvas.StretchDraw(Rect(0,0,AImageList.Width-1,AImageList.Height-1),B);
-              AImageList.AddMasked(B2,clNone);
-            finally
-              B2.Free;
+              B.Assign(J);
+              B2:=TBitmap.Create;
+              try
+                B2.SetSize(AImageList.Width,AImageList.Height);
+                CalcWH(B.Width,B.Height,AImageList.Width,AImageList.Height,NewW,NewH);
+                B2.Canvas.StretchDraw(
+                  Rect(
+                    (AImageList.Width-NewW) div 2,
+                    (AImageList.Height-NewH) div 2,
+                    AImageList.Width-1-((AImageList.Width-NewW) div 2),
+                    AImageList.Height-1-((AImageList.Height-NewH) div 2)
+                  ),
+                  B
+                );
+                AImageList.AddMasked(B2,clNone);
+              finally
+                B2.Free;
+              end;
+            except OK:=False end;
+            If OK then begin
+              L:=AListView.Items.Add;
+              L.Caption:=Rec.Name;
+              L.ImageIndex:=AImageList.Count-1;
             end;
-            L:=AListView.Items.Add;
-            L.Caption:=Rec.Name;
-            L.ImageIndex:=AImageList.Count-1;
           finally
             B.Free;
           end;
@@ -908,18 +1037,31 @@ begin
         If OK then begin
           B:=TBitmap.Create;
           try
-            B.Assign(G);
-            B2:=TBitmap.Create;
             try
-              B2.SetSize(AImageList.Width,AImageList.Height);
-              B2.Canvas.StretchDraw(Rect(0,0,AImageList.Width-1,AImageList.Height-1),B);
-              AImageList.AddMasked(B2,clNone);
-            finally
-              B2.Free;
+              B.Assign(G);
+              B2:=TBitmap.Create;
+              try
+                B2.SetSize(AImageList.Width,AImageList.Height);
+                CalcWH(B.Width,B.Height,AImageList.Width,AImageList.Height,NewW,NewH);
+                B2.Canvas.StretchDraw(
+                  Rect(
+                    (AImageList.Width-NewW) div 2,
+                    (AImageList.Height-NewH) div 2,
+                    AImageList.Width-1-((AImageList.Width-NewW) div 2),
+                    AImageList.Height-1-((AImageList.Height-NewH) div 2)
+                  ),
+                  B
+                );
+                AImageList.AddMasked(B2,clNone);
+              finally
+                B2.Free;
+              end;
+            except OK:=False; end;
+            If OK then begin
+              L:=AListView.Items.Add;
+              L.Caption:=Rec.Name;
+              L.ImageIndex:=AImageList.Count-1;
             end;
-            L:=AListView.Items.Add;
-            L.Caption:=Rec.Name;
-            L.ImageIndex:=AImageList.Count-1;
           finally
             B.Free;
           end;
@@ -942,15 +1084,28 @@ begin
         If OK then begin
           B2:=TBitmap.Create;
           try
-            B2.SetSize(AImageList.Width,AImageList.Height);
-            B2.Canvas.StretchDraw(Rect(0,0,AImageList.Width-1,AImageList.Height-1),B);
-            AImageList.AddMasked(B2,clNone);
+            try
+              B2.SetSize(AImageList.Width,AImageList.Height);
+                CalcWH(B.Width,B.Height,AImageList.Width,AImageList.Height,NewW,NewH);
+                B2.Canvas.StretchDraw(
+                  Rect(
+                    (AImageList.Width-NewW) div 2,
+                    (AImageList.Height-NewH) div 2,
+                    AImageList.Width-1-((AImageList.Width-NewW) div 2),
+                    AImageList.Height-1-((AImageList.Height-NewH) div 2)
+                  ),
+                  B
+                );
+              AImageList.AddMasked(B2,clNone);
+            except OK:=False; end;
           finally
             B2.Free;
           end;
-          L:=AListView.Items.Add;
-          L.Caption:=Rec.Name;
-          L.ImageIndex:=AImageList.Count-1;
+          If Ok then begin
+            L:=AListView.Items.Add;
+            L.Caption:=Rec.Name;
+            L.ImageIndex:=AImageList.Count-1;
+          end;
         end;
       finally
         B.Free;
@@ -1062,7 +1217,6 @@ begin
   end;
 end;
 
-
 Procedure DeleteFiles(const ADir, AMask : String);
 Var I : Integer;
     Rec : TSearchRec;
@@ -1072,7 +1226,7 @@ begin
   I:=FindFirst(Dir+AMask,faAnyFile,Rec);
   try
     while I=0 do begin
-      DeleteFile(Dir+Rec.Name);
+      ExtDeleteFile(Dir+Rec.Name,ftProfile);
       I:=FindNext(Rec);
     end;
   finally
@@ -1084,16 +1238,16 @@ Procedure DeleteOldFiles;
 begin
   DeleteFiles(PrgDataDir+GameListSubDir,'*.conf');
   DeleteFiles(PrgDataDir+GameListSubDir,'tempprof.*');
-  DeleteFile(PrgDataDir+'Developers.dat');
-  DeleteFile(PrgDataDir+'dfend.ini');
-  DeleteFile(PrgDataDir+'Genres.dat');
-  DeleteFile(PrgDataDir+'Profiles.dat');
-  DeleteFile(PrgDataDir+'Publisher.dat');
-  DeleteFile(PrgDataDir+'stderr.txt');
-  DeleteFile(PrgDataDir+'stdout.txt');
+  ExtDeleteFile(PrgDataDir+'Developers.dat',ftProfile);
+  ExtDeleteFile(PrgDataDir+'dfend.ini',ftProfile);
+  ExtDeleteFile(PrgDataDir+'Genres.dat',ftProfile);
+  ExtDeleteFile(PrgDataDir+'Profiles.dat',ftProfile);
+  ExtDeleteFile(PrgDataDir+'Publisher.dat',ftProfile);
+  ExtDeleteFile(PrgDataDir+'stderr.txt',ftProfile);
+  ExtDeleteFile(PrgDataDir+'stdout.txt',ftProfile);
   DeleteFiles(PrgDataDir,'temp.*');
-  DeleteFile(PrgDataDir+'Templates.dat');
-  DeleteFile(PrgDataDir+'Years.dat');
+  ExtDeleteFile(PrgDataDir+'Templates.dat',ftProfile);
+  ExtDeleteFile(PrgDataDir+'Years.dat',ftProfile);
 end;
 
 Function RemoveBackslash(const S : String) : String;
@@ -1132,19 +1286,7 @@ begin
     end;
 
     For J:=0 to G.NrOfMounts-1 do begin
-      Case J of
-        0 : St:=ValueToList(G.Mount0);
-        1 : St:=ValueToList(G.Mount1);
-        2 : St:=ValueToList(G.Mount2);
-        3 : St:=ValueToList(G.Mount3);
-        4 : St:=ValueToList(G.Mount4);
-        5 : St:=ValueToList(G.Mount5);
-        6 : St:=ValueToList(G.Mount6);
-        7 : St:=ValueToList(G.Mount7);
-        8 : St:=ValueToList(G.Mount8);
-        9 : St:=ValueToList(G.Mount9);
-        else St:=nil;
-      end;
+      St:=ValueToList(G.Mount[J]);
       try
         S:=Trim(St[0]); T:='';
         K:=Pos('$',S);
@@ -1155,18 +1297,7 @@ begin
         end;
         T:=T+RemoveBackslash(MakeRelPath(Trim(S),PrgSetup.BaseDir));
         St[0]:=T;
-        Case J of
-          0 : G.Mount0:=ListToValue(St);
-          1 : G.Mount1:=ListToValue(St);
-          2 : G.Mount2:=ListToValue(St);
-          3 : G.Mount3:=ListToValue(St);
-          4 : G.Mount4:=ListToValue(St);
-          5 : G.Mount5:=ListToValue(St);
-          6 : G.Mount6:=ListToValue(St);
-          7 : G.Mount7:=ListToValue(St);
-          8 : G.Mount8:=ListToValue(St);
-          9 : G.Mount9:=ListToValue(St);
-        end;
+        G.Mount[J]:=ListToValue(St);
       finally
         St.Free;
       end;
@@ -1618,22 +1749,31 @@ end;
 
 Procedure EditDefaultProfile(const AOwner : TComponent; const GameDB : TGameDB; const ASearchLinkFile : TLinkFile; const ADeleteOnExit : TStringList);
 Var DefaultGame : TGame;
+    L,L2 : TList;
 begin
   DefaultGame:=TGame.Create(PrgSetup);
+  L:=TList.Create;
+  L2:=TList.Create;
   try
+    L.Add(DefaultGame);
+    L2.Add(Pointer(1));
     If PrgSetup.DFendStyleProfileEditor then begin
-      EditGameTemplate(AOwner,GameDB,DefaultGame,nil,ASearchLinkFile,ADeleteOnExit);
+      EditGameTemplate(AOwner,GameDB,DefaultGame,nil,ASearchLinkFile,ADeleteOnExit,L,L2);
     end else begin
-      ModernEditGameTemplate(AOwner,GameDB,DefaultGame,nil,ASearchLinkFile,ADeleteOnExit);
+      ModernEditGameTemplate(AOwner,GameDB,DefaultGame,nil,ASearchLinkFile,ADeleteOnExit,L,L2);
     end;
   finally
     DefaultGame.Free;
+    L.Free;
+    L2.Free;
   end;
 end;
 
 Procedure AddToHistory(const GameName : String);
 Var F : TextFile;
 begin
+  If Trim(GameName)='' then exit;
+
   try
     AssignFile(F,PrgDataDir+HistoryFileName);
     If FileExists(PrgDataDir+HistoryFileName) then Append(F) else Rewrite(F);
@@ -1647,10 +1787,77 @@ begin
   end;
 end;
 
+Type TInfoRec=record
+  Count : Integer;
+  First, Last : TDateTime;
+end;
+
+Var StatisticData : Array of TInfoRec;
+
+Function LoadStatisticData(var RawList, Games : TStringList) : Boolean;
+Var I,J : Integer;
+    S : String;
+    D : TDateTime;
+    Line : TStringList;
+begin
+  RawList:=nil;
+  Games:=nil;
+  SetLength(StatisticData,0);
+  result:=False;
+
+  if not FileExists(PrgDataDir+HistoryFileName) then exit;
+
+  RawList:=TStringList.Create;
+  Games:=TStringList.Create;
+
+  try
+    RawList.LoadFromFile(PrgDataDir+HistoryFileName);
+  except
+    MessageDlg(Format(LanguageSetup.MessageCouldNotOpenFile,[PrgDataDir+HistoryFileName]),mtError,[mbOK],0);
+    FreeAndNil(RawList);
+    FreeAndNil(Games);
+    SetLength(StatisticData,0);
+    exit;
+  end;
+
+  try
+    For I:=0 to RawList.Count-1 do begin
+      S:=Trim(RawList[I]);
+      If S='' then continue;
+      Line:=ValueToList(S);
+      try
+        If Line.Count<0 then continue;
+        J:=Games.IndexOf(Line[0]);
+        If J<0 then begin
+          J:=Games.Add(Line[0]);
+          SetLength(StatisticData,J+1);
+          with StatisticData[J] do begin Count:=0; First:=0; Last:=0; end;
+        end;
+        inc(StatisticData[J].Count);
+        If Line.Count<3 then continue;
+        try
+          D:=StrToDate(Line[1])+StrToTime(Line[2]);
+          If (StatisticData[J].First=0) or (StatisticData[J].First>D) then StatisticData[J].First:=D;
+          If StatisticData[J].Last<D then StatisticData[J].Last:=D;
+         except end;
+      finally
+        Line.Free;
+      end;
+    end;
+  except
+    FreeAndNil(RawList);
+    FreeAndNil(Games);
+    SetLength(StatisticData,0);
+    exit;
+  end;
+
+  result:=True;
+end;
+
 Procedure LoadHistory(const AListView : TListView);
 Var C : TListColumn;
-    St,St2 : TStringList;
-    I : Integer;
+    RawList, Games, Line : TStringList;
+    I,J : Integer;
     S : String;
     L : TListItem;
 begin
@@ -1665,35 +1872,78 @@ begin
     C:=AListView.Columns.Add;
     C.Caption:=LanguageSetup.HistoryTime;
     C.Width:=-2;
+    If PrgSetup.ActivateIncompleteFeatures then begin
+      C:=AListView.Columns.Add;
+      C.Caption:=LanguageSetup.HistoryStarts;
+      C.Width:=-2;
+    end;
 
-    if not FileExists(PrgDataDir+HistoryFileName) then exit;
-
-    St:=TStringList.Create;
+    if not LoadStatisticData(RawList,Games) then exit;
     try
-      try
-        St.LoadFromFile(PrgDataDir+HistoryFileName);
-      except
-        MessageDlg(Format(LanguageSetup.MessageCouldNotOpenFile,[PrgDataDir+HistoryFileName]),mtError,[mbOK],0);
-        exit;
-      end;
-      For I:=0 to St.Count-1 do begin
-        S:=Trim(St[I]);
+      For I:=0 to RawList.Count-1 do begin
+        S:=Trim(RawList[I]);
         If S='' then continue;
-        St2:=ValueToList(S);
+        Line:=ValueToList(S);
         try
-          If St2.Count<1 then continue;
+          If Line.Count<1 then continue;
           L:=AListView.Items.Add;
-          L.Caption:=St2[0];
-          If St2.Count<2 then continue;
-          L.SubItems.Add(St2[1]);
-          If St2.Count<3 then continue;
-          L.SubItems.Add(St2[2]);
+          L.Caption:=Line[0];
+          If Line.Count<2 then continue;
+          L.SubItems.Add(Line[1]);
+          If Line.Count<3 then continue;
+          L.SubItems.Add(Line[2]);
+          If PrgSetup.ActivateIncompleteFeatures then begin
+            J:=Games.IndexOf(Line[0]);
+            If J>=0 then L.SubItems.Add(IntToStr(StatisticData[J].Count)) else L.SubItems.Add('-');
+          end;
         finally
-          St2.Free;
+          Line.Free;
         end;
       end;
     finally
-      St.Free;
+      RawList.Free;
+      Games.Free;
+      SetLength(StatisticData,0);
+    end;
+  finally
+    AListView.Items.EndUpdate;
+  end;
+end;
+
+Procedure LoadHistoryStatistics(const AListView : TListView);
+Var C : TListColumn;
+    RawList,Games : TStringList;
+    I : Integer;
+    L : TListItem;
+begin
+  AListView.Items.BeginUpdate;
+  try
+    C:=AListView.Columns.Add;
+    C.Caption:=LanguageSetup.HistoryGame;
+    C.Width:=-2;
+    C:=AListView.Columns.Add;
+    C.Caption:=LanguageSetup.HistoryStarts;
+    C.Width:=-2;
+    C:=AListView.Columns.Add;
+    C.Caption:=LanguageSetup.HistoryFirst;
+    C.Width:=-2;
+    C:=AListView.Columns.Add;
+    C.Caption:=LanguageSetup.HistoryLast;
+    C.Width:=-2;
+
+    if not LoadStatisticData(RawList,Games) then exit;
+    try
+      For I:=0 to Games.Count-1 do begin
+        L:=AListView.Items.Add;
+        L.Caption:=Games[I];
+        L.SubItems.Add(IntToStr(StatisticData[I].Count));
+        If StatisticData[I].First>0 then L.SubItems.Add(DateToStr(StatisticData[I].First)+' '+TimeToStr(StatisticData[I].First)) else L.SubItems.Add('-');
+        If StatisticData[I].Last>0 then L.SubItems.Add(DateToStr(StatisticData[I].Last)+' '+TimeToStr(StatisticData[I].Last)) else L.SubItems.Add('-');
+      end;
+    finally
+      RawList.Free;
+      Games.Free;
+      SetLength(StatisticData,0);
     end;
   finally
     AListView.Items.EndUpdate;
@@ -1703,7 +1953,7 @@ end;
 Procedure ClearHistory;
 begin
   if not FileExists(PrgDataDir+HistoryFileName) then exit;
-  if not DeleteFile(PrgDataDir+HistoryFileName) then
+  if not ExtDeleteFile(PrgDataDir+HistoryFileName,ftProfile) then
     MessageDlg(Format(LanguageSetup.MessageCouldNotDeleteFile,[PrgDataDir+HistoryFileName]),mtError,[mbOK],0);
 end;
 
@@ -1719,18 +1969,7 @@ begin
   {RealFolder;DRIVE;Letter;False;;FreeSpace}
   S:=MakeRelPath(RealFolder,PrgSetup.BaseDir)+';Drive;'+Letter+';;'+FreeSpace;
 
-  Case Game.NrOfMounts of
-    0 : Game.Mount0:=S;
-    1 : Game.Mount1:=S;
-    2 : Game.Mount2:=S;
-    3 : Game.Mount3:=S;
-    4 : Game.Mount4:=S;
-    5 : Game.Mount5:=S;
-    6 : Game.Mount6:=S;
-    7 : Game.Mount7:=S;
-    8 : Game.Mount8:=S;
-    9 : Game.Mount9:=S;
-  end;
+  Game.Mount[Game.NrOfMounts]:=S;
   Game.NrOfMounts:=Game.NrOfMounts+1;
 end;
 
@@ -1840,7 +2079,7 @@ begin
   try
     ImportConfFileData(AGame,FileName);
   finally
-    DeleteFile(FileName);
+    ExtDeleteFile(FileName,ftProfile);
   end;
 end;
 
@@ -2096,6 +2335,15 @@ begin
   result:=S+' '+T;
 end;
 
+Function DOSBoxMode(const Game : TGame) : Boolean;
+Var S : String;
+begin
+  result:=False;
+  If Game=nil then exit;
+  S:=Trim(ExtUpperCase(Game.ProfileMode));
+  result:=(S<>'SCUMMVM') and (S<>'WINDOWS');
+end;
+
 Function ScummVMMode(const Game : TGame) : Boolean;
 begin
   result:=False;
@@ -2250,7 +2498,7 @@ begin
     finally
       St.Free;
     end;
-  ShellExecute(Application.MainForm.Handle,'open',PChar(GetDefaultEditor),PChar(S),nil,SW_SHOW);
+  OpenFileInEditor(S);
   If DeleteOnExit.IndexOf(S)<0 then DeleteOnExit.Add(S);
 end;
 

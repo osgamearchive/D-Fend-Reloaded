@@ -23,6 +23,15 @@ object SetupFrameGamesListScreenshotModeAppearance: TSetupFrameGamesListScreensh
     Caption = '&H'#246'he der Screenshots'
     FocusControl = HeightEdit
   end
+  object UseFirstScreenshotLabel: TLabel
+    Left = 87
+    Top = 170
+    Width = 474
+    Height = 13
+    Anchors = [akLeft, akTop, akRight]
+    AutoSize = False
+    Caption = '(1=ersten Screenshot verwenden, 2=zweiten Screenshot usw.)'
+  end
   object WidthEdit: TSpinEdit
     Left = 16
     Top = 35
@@ -50,8 +59,18 @@ object SetupFrameGamesListScreenshotModeAppearance: TSetupFrameGamesListScreensh
     Height = 17
     Anchors = [akLeft, akTop, akRight]
     Caption = 
-      'Erste Screenshotdatei verwenden, wenn kein Screenshot ausgew'#228'hlt' +
-      ' ist.'
+      'Screenshotdatei mit folgender Nummer verwenden, wenn kein Screen' +
+      'shot ausgew'#228'hlt ist.'
     TabOrder = 2
+  end
+  object UseFirstScreenshotEdit: TSpinEdit
+    Left = 32
+    Top = 167
+    Width = 49
+    Height = 22
+    MaxValue = 99
+    MinValue = 1
+    TabOrder = 3
+    Value = 1
   end
 end

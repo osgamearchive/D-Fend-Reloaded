@@ -11,6 +11,7 @@ Type TTextEvent=Procedure(Sender : TObject; const ProfileName, ProfileExe, Profi
 Type TModernProfileEditorInitData=record
   OnProfileNameChange : TTextEvent;
   GameDB: TGameDB;
+  EditingTemplate : Boolean;
   CurrentProfileName, CurrentProfileExe, CurrentProfileSetup, CurrentScummVMGameName, CurrentScummVMPath : PString;
   SearchLinkFile : TLinkFile;
 end;
@@ -74,15 +75,17 @@ type
     EditingTemplate : Boolean;
     SearchLinkFile : TLinkFile;
     DeleteOnExit : TStringList;
+    NewExeFileName : String;
+    HideGameInfoPage : Boolean;
   end;
 
 var
   ModernProfileEditorForm: TModernProfileEditorForm;
 
-Function ModernEditGameProfil(const AOwner : TComponent; const AGameDB : TGameDB; var AGame : TGame; const ADefaultGame : TGame; const ASearchLinkFile : TLinkFile; const ADeleteOnExit : TStringList; const GameList : TList = nil) : Boolean;
-Function ModernEditGameTemplate(const AOwner : TComponent; const AGameDB : TGameDB; var AGame : TGame; const ADefaultGame : TGame; const ASearchLinkFile : TLinkFile; const ADeleteOnExit : TStringList; const GameList : TList = nil) : Boolean;
+Function ModernEditGameProfil(const AOwner : TComponent; const AGameDB : TGameDB; var AGame : TGame; const ADefaultGame : TGame; const ASearchLinkFile : TLinkFile; const ADeleteOnExit : TStringList; const ANewExeFile : String; const GameList : TList = nil) : Boolean;
+Function ModernEditGameTemplate(const AOwner : TComponent; const AGameDB : TGameDB; var AGame : TGame; const ADefaultGame : TGame; const ASearchLinkFile : TLinkFile; const ADeleteOnExit : TStringList; const GameList : TList = nil; const TemplateType : TList = nil) : Boolean;
 
-Function EditGameProfilInt(const AOwner : TComponent; const AGameDB : TGameDB; var AGame : TGame; const ADefaultGame : TGame; const ASearchLinkFile : TLinkFile; const ADeleteOnExit : TStringList; const PrevButton, NextButton, RestorePos : Boolean; const EditingTemplate : Boolean) : Integer;
+Function EditGameProfilInt(const AOwner : TComponent; const AGameDB : TGameDB; var AGame : TGame; const ADefaultGame : TGame; const ASearchLinkFile : TLinkFile; const ADeleteOnExit : TStringList; const PrevButton, NextButton, RestorePos : Boolean; const EditingTemplate : Boolean; const ANewExeFile : String; const HideGameInfoPage : Boolean) : Integer;
 
 implementation
 
@@ -99,8 +102,9 @@ uses VistaToolsUnit, LanguageSetupUnit, ModernProfileEditorBaseFrameUnit,
      ModernProfileEditorNetworkFrameUnit, ModernProfileEditorDOSEnvironmentFrameUnit,
      ModernProfileEditorStartFrameUnit, ModernProfileEditorScummVMGraphicsFrameUnit,
      ModernProfileEditorScummVMFrameUnit, ModernProfileEditorScummVMSoundFrameUnit,
-     ModernProfileEditorPrinterFrameUnit, IconLoaderUnit, GameDBToolsUnit,
-     PrgSetupUnit, CommonTools, DOSBoxUnit, HelpConsts;
+     ModernProfileEditorPrinterFrameUnit, ModernProfileEditorScummVMGameFrameUnit,
+     ModernProfileEditorHelperProgramsFrameUnit,
+     IconLoaderUnit, GameDBToolsUnit, PrgSetupUnit, CommonTools, DOSBoxUnit, HelpConsts;
 
 {$R *.dfm}
 
@@ -111,6 +115,8 @@ var LastPage, LastPageExt, LastTop, LastLeft : Integer;
 procedure TModernProfileEditorForm.FormCreate(Sender: TObject);
 begin
   LastUsedPageCode:=-1;
+  NewExeFileName:='';
+  HideGameInfoPage:=False;
 end;
 
 Function TModernProfileEditorForm.AddTreeNode(const ParentTreeNode : TTreeNode; const F : TFrame; const I : IModernProfileEditorFrame; const Name : String; const PageCode : Integer; const ImageIndex : Integer) : TTreeNode;
@@ -139,6 +145,7 @@ begin
   InitData.CurrentScummVMGameName:=@ProfileScummVMGameName;
   InitData.CurrentScummVMPath:=@ProfileScummVMPath;
   InitData.SearchLinkFile:=SearchLinkFile;
+  InitData.EditingTemplate:=EditingTemplate;
   I.InitGUI(InitData);
 end;
 
@@ -179,9 +186,14 @@ begin
     {ScummVM mode}
     F:=TModernProfileEditorBaseFrame.Create(self); N:=AddTreeNode(nil,F,TModernProfileEditorBaseFrame(F),LanguageSetup.ProfileEditorProfileSettingsSheet,0,0);
     BaseFrame:=F;
-    F:=TModernProfileEditorGameInfoFrame.Create(self); AddTreeNode(N,F,TModernProfileEditorGameInfoFrame(F),LanguageSetup.ProfileEditorGameInfoSheet,1,1);
-    F:=TModernProfileEditorScummVMFrame.Create(self); AddTreeNode(nil,F,TModernProfileEditorScummVMFrame(F),LanguageSetup.ProfileEditorScummVMSheet,2,23);
+    If not HideGameInfoPage then begin F:=TModernProfileEditorGameInfoFrame.Create(self); AddTreeNode(N,F,TModernProfileEditorGameInfoFrame(F),LanguageSetup.ProfileEditorGameInfoSheet,1,1); end;
     F:=TModernProfileEditorDirectoryFrame.Create(self); AddTreeNode(N,F,TModernProfileEditorDirectoryFrame(F),LanguageSetup.ProfileEditorGameDirectorySheet,0,8);
+
+    If PrgSetup.ActivateIncompleteFeatures then begin
+      F:=TModernProfileEditorHelperProgramsFrame.Create(self); AddTreeNode(N,F,TModernProfileEditorHelperProgramsFrame(F),LanguageSetup.ProfileEditorHelperProgramsSheet,0,0);
+    end;
+    F:=TModernProfileEditorScummVMFrame.Create(self); N:=AddTreeNode(nil,F,TModernProfileEditorScummVMFrame(F),LanguageSetup.ProfileEditorScummVMSheet,2,23);
+    F:=TModernProfileEditorScummVMGameFrame.Create(self); AddTreeNode(N,F,TModernProfileEditorScummVMGameFrame(F),LanguageSetup.ProfileEditorScummVMGameSheet,6,23);
     F:=TModernProfileEditorHardwareFrame.Create(self); N:=AddTreeNode(nil,F,TModernProfileEditorHardwareFrame(F),LanguageSetup.ProfileEditorHardwareSheet,3,3);
     F:=TModernProfileEditorScummVMGraphicsFrame.Create(self); AddTreeNode(N,F,TModernProfileEditorScummVMGraphicsFrame(F),LanguageSetup.ProfileEditorGraphicsSheet,4,11);
     F:=TModernProfileEditorScummVMSoundFrame.Create(self); AddTreeNode(N,F,TModernProfileEditorScummVMSoundFrame(F),LanguageSetup.ProfileEditorSoundSheet,5,5);
@@ -190,14 +202,20 @@ begin
       {Windows mode}
       F:=TModernProfileEditorBaseFrame.Create(self); N:=AddTreeNode(nil,F,TModernProfileEditorBaseFrame(F),LanguageSetup.ProfileEditorProfileSettingsSheet,0,0);
       BaseFrame:=F;
-      F:=TModernProfileEditorGameInfoFrame.Create(self); AddTreeNode(N,F,TModernProfileEditorGameInfoFrame(F),LanguageSetup.ProfileEditorGameInfoSheet,1,1);
+      If not HideGameInfoPage then begin F:=TModernProfileEditorGameInfoFrame.Create(self); AddTreeNode(N,F,TModernProfileEditorGameInfoFrame(F),LanguageSetup.ProfileEditorGameInfoSheet,1,1); end;
       F:=TModernProfileEditorDirectoryFrame.Create(self); AddTreeNode(N,F,TModernProfileEditorDirectoryFrame(F),LanguageSetup.ProfileEditorGameDirectorySheet,0,8);
+      If PrgSetup.ActivateIncompleteFeatures then begin
+        F:=TModernProfileEditorHelperProgramsFrame.Create(self); AddTreeNode(N,F,TModernProfileEditorHelperProgramsFrame(F),LanguageSetup.ProfileEditorHelperProgramsSheet,0,0);
+      end;
     end else begin
       {DOSBox mode}
       F:=TModernProfileEditorBaseFrame.Create(self); N:=AddTreeNode(nil,F,TModernProfileEditorBaseFrame(F),LanguageSetup.ProfileEditorProfileSettingsSheet,0,0);
       BaseFrame:=F;
-      F:=TModernProfileEditorGameInfoFrame.Create(self); AddTreeNode(N,F,TModernProfileEditorGameInfoFrame(F),LanguageSetup.ProfileEditorGameInfoSheet,1,1);
+      If not HideGameInfoPage then begin F:=TModernProfileEditorGameInfoFrame.Create(self); AddTreeNode(N,F,TModernProfileEditorGameInfoFrame(F),LanguageSetup.ProfileEditorGameInfoSheet,1,1); end;
       F:=TModernProfileEditorDirectoryFrame.Create(self); AddTreeNode(N,F,TModernProfileEditorDirectoryFrame(F),LanguageSetup.ProfileEditorGameDirectorySheet,0,8);
+      If PrgSetup.ActivateIncompleteFeatures then begin
+        F:=TModernProfileEditorHelperProgramsFrame.Create(self); AddTreeNode(N,F,TModernProfileEditorHelperProgramsFrame(F),LanguageSetup.ProfileEditorHelperProgramsSheet,0,0);
+      end;
       F:=TModernProfileEditorDOSBoxFrame.Create(self); AddTreeNode(nil,F,TModernProfileEditorDOSBoxFrame(F),LanguageSetup.ProfileEditorGeneralSheet,2,2);
       F:=TModernProfileEditorHardwareFrame.Create(self); N:=AddTreeNode(nil,F,TModernProfileEditorHardwareFrame(F),LanguageSetup.ProfileEditorHardwareSheet,3,3);
       F:=TModernProfileEditorCPUFrame.Create(self); AddTreeNode(N,F,TModernProfileEditorCPUFrame(F),LanguageSetup.ProfileEditorCPUSheet,3,9);
@@ -253,15 +271,20 @@ begin
   end else begin
     LoadData;
     ProfileEditorOpenCheck(Game);
-    ProfileName:=Game.Name;
+    If Trim(NewExeFileName)<>'' then ProfileName:=NewExeFileName else ProfileName:=Game.Name;
     ProfileExe:=Game.GameExe;
     ProfileSetup:=Game.SetupExe;
     ProfileScummVMGameName:=Game.ScummVMGame;
     ProfileScummVMPath:=Game.ScummVMSavePath;
   end;
+
+  If Trim(NewExeFileName)<>'' then begin
+    TModernProfileEditorBaseFrame(BaseFrame).GameExeEdit.Text:=NewExeFileName;
+  end;
+
   SetProfileNameEvent(self,ProfileName,ProfileExe,ProfileSetup,ProfileScummVMGameName,ProfileScummVMPath);
 
-  If RestoreLastPosition then begin
+    If RestoreLastPosition then begin
     If LastPageExt>=0 then begin
       For I:=0 to length(FrameList)-1 do if FrameList[I].ExtPageCode=LastPageExt then begin
         Tree.Selected:=FrameList[I].TreeNode;
@@ -307,7 +330,17 @@ begin
   ProfileSetup:=AProfileSetup;
   ProfileScummVMGameName:=AProfileScummVMGameName;
   ProfileScummVMPath:=AProfileScummVMPath;
-  If Trim(ProfileName)='' then S:=LanguageSetup.NotSet else S:=ProfileName;
+  If Trim(ProfileName)='' then begin
+    If EditingTemplate and HideGameInfoPage then begin
+      If ScummVMMode(Game)
+        then S:=LanguageSetup.TemplateFormDefaultScummVM
+        else S:=LanguageSetup.TemplateFormDefault;
+    end else begin
+      S:=LanguageSetup.NotSet
+    end;
+  end else begin
+    S:=ProfileName;
+  end;
   If (S=LanguageSetup.ProfileEditorNoFilename) or (S=LanguageSetup.NotSet)
     then Caption:=LanguageSetup.ProfileEditor
     else Caption:=LanguageSetup.ProfileEditor+' ['+S+']';
@@ -429,6 +462,8 @@ begin
       St.Free;
     end;
   end;
+
+  If Trim(Game.CaptureFolder)<>'' then ForceDirectories(MakeAbsPath(Game.CaptureFolder,PrgSetup.BaseDir));
 end;
 
 procedure TModernProfileEditorForm.HelpButtonClick(Sender: TObject);
@@ -462,13 +497,13 @@ begin
       G.Free;
     end;
   finally
-    DeleteFile(TempProf);
+    ExtDeleteFile(TempProf,ftTemp);
   end;
 end;
 
 { global }
 
-Function EditGameProfilInt(const AOwner : TComponent; const AGameDB : TGameDB; var AGame : TGame; const ADefaultGame : TGame; const ASearchLinkFile : TLinkFile; const ADeleteOnExit : TStringList; const PrevButton, NextButton, RestorePos : Boolean; const EditingTemplate : Boolean) : Integer;
+Function EditGameProfilInt(const AOwner : TComponent; const AGameDB : TGameDB; var AGame : TGame; const ADefaultGame : TGame; const ASearchLinkFile : TLinkFile; const ADeleteOnExit : TStringList; const PrevButton, NextButton, RestorePos : Boolean; const EditingTemplate : Boolean; const ANewExeFile : String; const HideGameInfoPage : Boolean) : Integer;
 begin
   ModernProfileEditorForm:=TModernProfileEditorForm.Create(AOwner);
 
@@ -483,6 +518,8 @@ begin
     ModernProfileEditorForm.PreviousButton.Visible:=PrevButton;
     ModernProfileEditorForm.NextButton.Visible:=NextButton;
     ModernProfileEditorForm.EditingTemplate:=EditingTemplate;
+    If ANewExeFile<>'' then ModernProfileEditorForm.NewExeFileName:=ANewExeFile;
+    ModernProfileEditorForm.HideGameInfoPage:=HideGameInfoPage;
     If ModernProfileEditorForm.ShowModal=mrOK then begin
       result:=ModernProfileEditorForm.MoveStatus;
       AGame:=ModernProfileEditorForm.Game;
@@ -497,9 +534,10 @@ begin
   end;
 end;
 
-Function ModernEditGameProfil(const AOwner : TComponent; const AGameDB : TGameDB; var AGame : TGame; const ADefaultGame : TGame; const ASearchLinkFile : TLinkFile; const ADeleteOnExit : TStringList; const GameList : TList = nil) : Boolean;
+Function ModernEditGameProfil(const AOwner : TComponent; const AGameDB : TGameDB; var AGame : TGame; const ADefaultGame : TGame; const ASearchLinkFile : TLinkFile; const ADeleteOnExit : TStringList; const ANewExeFile : String; const GameList : TList = nil) : Boolean;
 Var I,J : Integer;
     PrevButton,NextButton,RestorePos : Boolean;
+    S : String;
 begin
   I:=0; RestorePos:=False;
   repeat
@@ -519,15 +557,17 @@ begin
       NextButton:=(J>=0) and (J<GameList.Count-1);
       PrevButton:=(J>0);
     end;
-    I:=EditGameProfilInt(AOwner,AGameDB,AGame,ADefaultGame,ASearchLinkFile,ADeleteOnExit,PrevButton,NextButton,RestorePos,False);
+    If (GameList=nil) or (GameList.Count=0) then S:=ANewExeFile else S:='';
+    I:=EditGameProfilInt(AOwner,AGameDB,AGame,ADefaultGame,ASearchLinkFile,ADeleteOnExit,PrevButton,NextButton,RestorePos,False,S,False);
     RestorePos:=True;
   until (I=0) or (I=-2);
   result:=(I<>-2);
 end;
 
-Function ModernEditGameTemplate(const AOwner : TComponent; const AGameDB : TGameDB; var AGame : TGame; const ADefaultGame : TGame; const ASearchLinkFile : TLinkFile; const ADeleteOnExit : TStringList; const GameList : TList = nil) : Boolean;
+Function ModernEditGameTemplate(const AOwner : TComponent; const AGameDB : TGameDB; var AGame : TGame; const ADefaultGame : TGame; const ASearchLinkFile : TLinkFile; const ADeleteOnExit : TStringList; const GameList : TList = nil; const TemplateType : TList = nil) : Boolean;
 Var I,J : Integer;
     PrevButton,NextButton,RestorePos : Boolean;
+    TemplateMode : Integer;
 begin
   I:=0; RestorePos:=False;
   repeat
@@ -547,7 +587,20 @@ begin
       NextButton:=(J>=0) and (J<GameList.Count-1);
       PrevButton:=(J>0);
     end;
-    I:=EditGameProfilInt(AOwner,AGameDB,AGame,ADefaultGame,ASearchLinkFile,ADeleteOnExit,PrevButton,NextButton,RestorePos,True);
+
+    If (TemplateType<>nil) then begin
+      TemplateMode:=Integer(TemplateType[GameList.IndexOf(AGame)]);
+    end else begin
+      TemplateMode:=0;
+    end;
+    {TemplateMode: 0=normal template, 1=default template, 2=ScummVM default template}
+
+    If TemplateMode=2 then AGame.ProfileMode:='ScummVM';
+    try
+      I:=EditGameProfilInt(AOwner,AGameDB,AGame,ADefaultGame,ASearchLinkFile,ADeleteOnExit,PrevButton,NextButton,RestorePos,True,'',TemplateMode<>0);
+    finally
+      If TemplateMode=2 then AGame.ProfileMode:='DOSBox';
+    end;
     RestorePos:=True;
   until (I=0) or (I=-2);
   result:=(I<>-2);

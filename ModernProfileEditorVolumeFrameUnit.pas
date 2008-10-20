@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, 
-  Dialogs, GameDBUnit, ModernProfileEditorFormUnit, StdCtrls, Spin, ComCtrls;
+  Dialogs, StdCtrls, Spin, ComCtrls, GameDBUnit, ModernProfileEditorFormUnit;
 
 type
   TModernProfileEditorVolumeFrame = class(TFrame, IModernProfileEditorFrame)

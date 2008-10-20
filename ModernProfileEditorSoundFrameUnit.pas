@@ -70,6 +70,10 @@ begin
   St:=ValueToList(InitData.GameDB.ConfOpt.PCRate,';,'); try PCSpeakerSampleRateComboBox.Items.AddStrings(St); finally St.Free; end;
 
   TandyRadioGroup.Caption:=LanguageSetup.ProfileEditorSoundMiscEnableTandy;
+  TandyRadioGroup.Items[0]:=LanguageSetup.ProfileEditorSoundMiscEnableTandyAuto;
+  TandyRadioGroup.Items[1]:=LanguageSetup.On;
+  TandyRadioGroup.Items[2]:=LanguageSetup.Off;
+
   TandySampleRateLabel.Caption:=LanguageSetup.ProfileEditorSoundMiscTandyRate;
   St:=ValueToList(InitData.GameDB.ConfOpt.TandyRate,';,'); try TandyComboBox.Items.AddStrings(St); finally St.Free; end;
 

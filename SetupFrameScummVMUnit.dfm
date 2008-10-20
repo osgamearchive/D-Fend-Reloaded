@@ -61,14 +61,14 @@ object SetupFrameScummVM: TSetupFrameScummVM
   end
   object ScummVMDownloadURLInfo: TLabel
     Left = 16
-    Top = 176
+    Top = 240
     Width = 162
     Height = 13
     Caption = 'You can download ScummVM from'
   end
   object ScummVMDownloadURL: TLabel
     Left = 16
-    Top = 195
+    Top = 259
     Width = 113
     Height = 13
     Caption = 'ScummVMDownloadURL'
@@ -112,6 +112,7 @@ object SetupFrameScummVM: TSetupFrameScummVM
     Anchors = [akLeft, akTop, akRight]
     Caption = 'D-Fend minimieren, wenn ScummVM gestartet wird'
     TabOrder = 2
+    OnClick = MinimizeDFendScummVMCheckBoxClick
   end
   object ScummVMShowListButton: TBitBtn
     Tag = 19
@@ -120,7 +121,7 @@ object SetupFrameScummVM: TSetupFrameScummVM
     Width = 289
     Height = 25
     Caption = 'Liste unterst'#252'tzter Spiele anzeigen'
-    TabOrder = 3
+    TabOrder = 4
     OnClick = ButtonWork
     Glyph.Data = {
       76010000424D7601000000000000760000002800000020000000100000000100
@@ -136,5 +137,33 @@ object SetupFrameScummVM: TSetupFrameScummVM
       C8807FF7777777777FF700000000000000007777777777777777333333333333
       3333333333333333333333333333333333333333333333333333}
     NumGlyphs = 2
+  end
+  object CenterScummVMCheckBox: TCheckBox
+    Left = 16
+    Top = 182
+    Width = 628
+    Height = 17
+    Anchors = [akLeft, akTop, akRight]
+    Caption = 'Center ScummVM window'
+    TabOrder = 5
+  end
+  object HideConsoleCheckBox: TCheckBox
+    Left = 16
+    Top = 205
+    Width = 628
+    Height = 17
+    Anchors = [akLeft, akTop, akRight]
+    Caption = 'Hide ScummVM console'
+    TabOrder = 6
+  end
+  object RestoreWindowCheckBox: TCheckBox
+    Left = 37
+    Top = 158
+    Width = 607
+    Height = 17
+    Anchors = [akLeft, akTop, akRight]
+    Caption = 'Restore program window when ScummVM is closed'
+    TabOrder = 3
+    Visible = False
   end
 end

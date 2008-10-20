@@ -155,6 +155,7 @@ type
     procedure SearchClick(Sender: TObject);
     procedure HelpButtonClick(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure FormCreate(Sender: TObject);
   private
     { Private-Deklarationen }
     IconName : String;
@@ -168,6 +169,7 @@ type
     Function UsedDriveLetters(const AllowedNr : Integer = -1) : String;
     Function CheckProfile : Boolean;
     procedure LoadLinks;
+    Procedure SetExeFileName(const NewExeFileName : String);
   public
     { Public-Deklarationen }
     MoveStatus : Integer;
@@ -176,13 +178,14 @@ type
     RestoreLastPosition : Boolean;
     EditingTemplate : Boolean;
     LinkFile : TLinkFile;
+    HideGameInfoPage : Boolean;
   end;
 
 var
   ProfileEditorForm: TProfileEditorForm;
 
-Function EditGameProfil(const AOwner : TComponent; const AGameDB : TGameDB; var AGame : TGame; const ADefaultGame : TGame; const ASearchLinkFile : TLinkFile; const ADeleteOnExit : TStringList; const GameList : TList = nil) : Boolean;
-Function EditGameTemplate(const AOwner : TComponent; const AGameDB : TGameDB; var AGame : TGame; const ADefaultGame : TGame; const ASearchLinkFile : TLinkFile; const ADeleteOnExit : TStringList; const GameList : TList = nil) : Boolean;
+Function EditGameProfil(const AOwner : TComponent; const AGameDB : TGameDB; var AGame : TGame; const ADefaultGame : TGame; const ASearchLinkFile : TLinkFile; const ADeleteOnExit : TStringList; const ANewExeFile : String; const GameList : TList = nil) : Boolean;
+Function EditGameTemplate(const AOwner : TComponent; const AGameDB : TGameDB; var AGame : TGame; const ADefaultGame : TGame; const ASearchLinkFile : TLinkFile; const ADeleteOnExit : TStringList; const GameList : TList = nil; const TemplateType : TList = nil) : Boolean;
 
 implementation
 
@@ -194,6 +197,11 @@ uses Math, LanguageSetupUnit, VistaToolsUnit, CommonTools, PrgConsts,
 {$R *.dfm}
 
 var LastPage, LastTop, LastLeft : Integer;
+
+procedure TProfileEditorForm.FormCreate(Sender: TObject);
+begin
+  HideGameInfoPage:=False;
+end;
 
 procedure TProfileEditorForm.InitGUI;
 Var St : TStringList;
@@ -272,38 +280,40 @@ begin
 
   { Game Info Sheet }
 
-  GameInfoSheet.Caption:=LanguageSetup.ProfileEditorGameInfoSheet;
-  GameInfoValueListEditor.TitleCaptions.Clear;
-  GameInfoValueListEditor.TitleCaptions.Add(LanguageSetup.Key);
-  GameInfoValueListEditor.TitleCaptions.Add(LanguageSetup.Value);
-  with GameInfoValueListEditor do begin
-    Strings.Delete(0);
-    Strings.Add(LanguageSetup.GameGenre+'=');
-    ItemProps[Strings.Count-1].EditStyle:=esPickList;
-    St:=GameDB.GetGenreList; try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
-    Strings.Add(LanguageSetup.GameDeveloper+'=');
-    ItemProps[Strings.Count-1].EditStyle:=esPickList;
-    St:=GameDB.GetDeveloperList; try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
-    Strings.Add(LanguageSetup.GamePublisher+'=');
-    ItemProps[Strings.Count-1].EditStyle:=esPickList;
-    St:=GameDB.GetPublisherList; try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
-    Strings.Add(LanguageSetup.GameYear+'=');
-    ItemProps[Strings.Count-1].EditStyle:=esPickList;
-    St:=GameDB.GetYearList; try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
-    Strings.Add(LanguageSetup.GameLanguage+'=');
-    ItemProps[Strings.Count-1].EditStyle:=esPickList;
-    St:=GameDB.GetLanguageList; try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
-    Strings.Add(LanguageSetup.GameWWW+'=');
-    Strings.Add(LanguageSetup.GameDataDir+'=');
-    ItemProps[Strings.Count-1].EditStyle:=esEllipsis;
-    Strings.Add(LanguageSetup.GameFavorite+'=');
-    ItemProps[Strings.Count-1].ReadOnly:=True;
-    ItemProps[Strings.Count-1].PickList.Add(RemoveUnderline(LanguageSetup.Yes));
-    ItemProps[Strings.Count-1].PickList.Add(RemoveUnderline(LanguageSetup.No));
+  If HideGameInfoPage then GameInfoSheet.TabVisible:=False else begin
+    GameInfoSheet.Caption:=LanguageSetup.ProfileEditorGameInfoSheet;
+    GameInfoValueListEditor.TitleCaptions.Clear;
+    GameInfoValueListEditor.TitleCaptions.Add(LanguageSetup.Key);
+    GameInfoValueListEditor.TitleCaptions.Add(LanguageSetup.Value);
+    with GameInfoValueListEditor do begin
+      Strings.Delete(0);
+      Strings.Add(LanguageSetup.GameGenre+'=');
+      ItemProps[Strings.Count-1].EditStyle:=esPickList;
+      St:=GameDB.GetGenreList; try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
+      Strings.Add(LanguageSetup.GameDeveloper+'=');
+      ItemProps[Strings.Count-1].EditStyle:=esPickList;
+      St:=GameDB.GetDeveloperList; try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
+      Strings.Add(LanguageSetup.GamePublisher+'=');
+      ItemProps[Strings.Count-1].EditStyle:=esPickList;
+      St:=GameDB.GetPublisherList; try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
+      Strings.Add(LanguageSetup.GameYear+'=');
+      ItemProps[Strings.Count-1].EditStyle:=esPickList;
+      St:=GameDB.GetYearList; try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
+      Strings.Add(LanguageSetup.GameLanguage+'=');
+      ItemProps[Strings.Count-1].EditStyle:=esPickList;
+      St:=GameDB.GetLanguageList; try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
+      Strings.Add(LanguageSetup.GameWWW+'=');
+      Strings.Add(LanguageSetup.GameDataDir+'=');
+      ItemProps[Strings.Count-1].EditStyle:=esEllipsis;
+      Strings.Add(LanguageSetup.GameFavorite+'=');
+      ItemProps[Strings.Count-1].ReadOnly:=True;
+      ItemProps[Strings.Count-1].PickList.Add(RemoveUnderline(LanguageSetup.Yes));
+      ItemProps[Strings.Count-1].PickList.Add(RemoveUnderline(LanguageSetup.No));
+    end;
+    GenerateGameDataFolderNameButton.Caption:=LanguageSetup.ProfileEditorGenerateGameDataFolder;
+    GameInfoMetaDataButton.Caption:=LanguageSetup.ProfileEditorUserdefinedInfo;
+    NotesLabel.Caption:=LanguageSetup.GameNotes+':';
   end;
-  GenerateGameDataFolderNameButton.Caption:=LanguageSetup.ProfileEditorGenerateGameDataFolder;
-  GameInfoMetaDataButton.Caption:=LanguageSetup.ProfileEditorUserdefinedInfo;
-  NotesLabel.Caption:=LanguageSetup.GameNotes+':';
 
   { General Sheet }
 
@@ -822,21 +832,23 @@ begin
 
   { Game Info Sheet }
 
-  If Game=nil then begin
-    GameInfoValueListEditor.Strings.ValueFromIndex[6]:=RemoveUnderline(LanguageSetup.No);
-  end else begin
-    with GameInfoValueListEditor.Strings do begin
-      If Game.Genre<>'' then ValueFromIndex[0]:=Game.Genre;
-      If Game.Developer<>'' then ValueFromIndex[1]:=Game.Developer;
-      If Game.Publisher<>'' then ValueFromIndex[2]:=Game.Publisher;
-      If Game.Year<>'' then ValueFromIndex[3]:=Game.Year;
-      If Game.Language<>'' then ValueFromIndex[4]:=Game.Language;
-      If Game.WWW<>'' then ValueFromIndex[5]:=Game.WWW;
-      If Game.DataDir<>'' then ValueFromIndex[6]:=Game.DataDir;
-      If Game.Favorite then ValueFromIndex[7]:=RemoveUnderline(LanguageSetup.Yes) else ValueFromIndex[7]:=RemoveUnderline(LanguageSetup.No);
+  If not HideGameInfoPage then begin
+    If Game=nil then begin
+      GameInfoValueListEditor.Strings.ValueFromIndex[6]:=RemoveUnderline(LanguageSetup.No);
+    end else begin
+      with GameInfoValueListEditor.Strings do begin
+        If Game.Genre<>'' then ValueFromIndex[0]:=Game.Genre;
+        If Game.Developer<>'' then ValueFromIndex[1]:=Game.Developer;
+        If Game.Publisher<>'' then ValueFromIndex[2]:=Game.Publisher;
+        If Game.Year<>'' then ValueFromIndex[3]:=Game.Year;
+        If Game.Language<>'' then ValueFromIndex[4]:=Game.Language;
+        If Game.WWW<>'' then ValueFromIndex[5]:=Game.WWW;
+        If Game.DataDir<>'' then ValueFromIndex[6]:=Game.DataDir;
+        If Game.Favorite then ValueFromIndex[7]:=RemoveUnderline(LanguageSetup.Yes) else ValueFromIndex[7]:=RemoveUnderline(LanguageSetup.No);
+      end;
+      St:=StringToStringList(Game.Notes);
+      try NotesMemo.Lines.Assign(St); finally St.Free; end;
     end;
-    St:=StringToStringList(Game.Notes);
-    try NotesMemo.Lines.Assign(St); finally St.Free; end;
   end;
 
   { General Sheet }
@@ -997,16 +1009,8 @@ begin
   { Mounting Sheet }
 
   If Game<>nil then begin
-    If Game.NrOfMounts>=1 then Mounting.Add(Game.Mount0);
-    If Game.NrOfMounts>=2 then Mounting.Add(Game.Mount1);
-    If Game.NrOfMounts>=3 then Mounting.Add(Game.Mount2);
-    If Game.NrOfMounts>=4 then Mounting.Add(Game.Mount3);
-    If Game.NrOfMounts>=5 then Mounting.Add(Game.Mount4);
-    If Game.NrOfMounts>=6 then Mounting.Add(Game.Mount5);
-    If Game.NrOfMounts>=7 then Mounting.Add(Game.Mount6);
-    If Game.NrOfMounts>=8 then Mounting.Add(Game.Mount7);
-    If Game.NrOfMounts>=9 then Mounting.Add(Game.Mount8);
-    If Game.NrOfMounts>=10 then Mounting.Add(Game.Mount9);
+    For I:=0 to 9 do
+    If Game.NrOfMounts>=I+1 then Mounting.Add(Game.Mount[I]) else break;
     LoadMountingList;
     AutoMountCheckBox.Checked:=Game.AutoMountCDs;
   end;
@@ -1226,8 +1230,14 @@ begin
         L.Caption:=S;
         If St.Count>1 then begin
           S:=Trim(ExtUpperCase(St[1])); B:=False;
-          If (not B) and (S='DRIVE') then begin L.SubItems.Add('Drive'); B:=True; end;
-          // Language strings
+          If (not B) and (S='DRIVE') then begin L.SubItems.Add(LanguageSetup.ProfileEditorMountingDriveTypeDRIVE); B:=True; end;
+          If (not B) and (S='CDROM') then begin L.SubItems.Add(LanguageSetup.ProfileEditorMountingDriveTypeCDROM); B:=True; end;
+          If (not B) and (S='CDROMIMAGE') then begin L.SubItems.Add(LanguageSetup.ProfileEditorMountingDriveTypeCDROMIMAGE); B:=True; end;
+          If (not B) and (S='FLOPPY') then begin L.SubItems.Add(LanguageSetup.ProfileEditorMountingDriveTypeFLOPPY); B:=True; end;
+          If (not B) and (S='FLOPPYIMAGE') then begin L.SubItems.Add(LanguageSetup.ProfileEditorMountingDriveTypeFLOPPYIMAGE); B:=True; end;
+          If (not B) and (S='IMAGE') then begin L.SubItems.Add(LanguageSetup.ProfileEditorMountingDriveTypeIMAGE); B:=True; end;
+          If (not B) and (S='PHYSFS') then begin L.SubItems.Add(LanguageSetup.ProfileEditorMountingDriveTypePHYSFS); B:=True; end;
+          If (not B) and (S='ZIP') then begin L.SubItems.Add(LanguageSetup.ProfileEditorMountingDriveTypeZIP); B:=True; end;
           If not B then L.SubItems.Add(St[1]);
         end else begin
           L.SubItems.Add('');
@@ -1291,7 +1301,6 @@ begin
       end;
     end;
   end;
-
 
   { General Sheet }
 
@@ -1489,17 +1498,19 @@ begin
 
   { Game Info Sheet }
 
-  with GameInfoValueListEditor.Strings do begin
-    Game.Genre:=ValueFromIndex[0];
-    Game.Developer:=ValueFromIndex[1];
-    Game.Publisher:=ValueFromIndex[2];
-    Game.Year:=ValueFromIndex[3];
-    Game.Language:=ValueFromIndex[4];
-    Game.WWW:=ValueFromIndex[5];
-    Game.DataDir:=ValueFromIndex[6];
-    Game.Favorite:=(ValueFromIndex[7]=RemoveUnderline(LanguageSetup.Yes));
+  If not HideGameInfoPage then begin
+    with GameInfoValueListEditor.Strings do begin
+      Game.Genre:=ValueFromIndex[0];
+      Game.Developer:=ValueFromIndex[1];
+      Game.Publisher:=ValueFromIndex[2];
+      Game.Year:=ValueFromIndex[3];
+      Game.Language:=ValueFromIndex[4];
+      Game.WWW:=ValueFromIndex[5];
+      Game.DataDir:=ValueFromIndex[6];
+      Game.Favorite:=(ValueFromIndex[7]=RemoveUnderline(LanguageSetup.Yes));
+    end;
+    Game.Notes:=StringListToString(NotesMemo.Lines);
   end;
-  Game.Notes:=StringListToString(NotesMemo.Lines);
 
   { General Sheet }
 
@@ -1574,16 +1585,8 @@ begin
   { Mounting Sheet }
 
   Game.NrOfMounts:=Mounting.Count;
-  If Mounting.Count>0 then Game.Mount0:=Mounting[0] else Game.Mount0:='';
-  If Mounting.Count>1 then Game.Mount1:=Mounting[1] else Game.Mount1:='';
-  If Mounting.Count>2 then Game.Mount2:=Mounting[2] else Game.Mount2:='';
-  If Mounting.Count>3 then Game.Mount3:=Mounting[3] else Game.Mount3:='';
-  If Mounting.Count>4 then Game.Mount4:=Mounting[4] else Game.Mount4:='';
-  If Mounting.Count>5 then Game.Mount5:=Mounting[5] else Game.Mount5:='';
-  If Mounting.Count>6 then Game.Mount6:=Mounting[6] else Game.Mount6:='';
-  If Mounting.Count>7 then Game.Mount7:=Mounting[7] else Game.Mount7:='';
-  If Mounting.Count>8 then Game.Mount8:=Mounting[8] else Game.Mount8:='';
-  If Mounting.Count>9 then Game.Mount9:=Mounting[9] else Game.Mount9:='';
+  For I:=0 to 9 do
+    If Mounting.Count>I then Game.Mount[I]:=Mounting[I] else Game.Mount[I]:='';
   Game.AutoMountCDs:=AutoMountCheckBox.Checked;
 
   { Sound Sheet }
@@ -1692,6 +1695,8 @@ begin
     NewFileName:=IncludeTrailingPathDelimiter(ExtractFilePath(OldFileName))+S;
     Game.RenameINI(NewFileName);
   end;
+
+  If Trim(Game.CaptureFolder)<>'' then ForceDirectories(MakeAbsPath(Game.CaptureFolder,PrgSetup.BaseDir));
 end;
 
 procedure TProfileEditorForm.AutoexecBootHDImageComboBoxChange(Sender: TObject);
@@ -1765,12 +1770,12 @@ begin
         end;
     {Mounting}
     5 : If Mounting.Count<10 then begin
-          S:=';Drive;'+NextFreeDriveLetter+';false;;';
+          S:='';
           If ProfileSettingsValueListEditor.Strings.ValueFromIndex[3]=RemoveUnderline(LanguageSetup.Yes)
             then T:=PrgSetup.GameDir
             else T:=ProfileSettingsValueListEditor.Strings.ValueFromIndex[2];
           U:=ProfileSettingsValueListEditor.Strings.ValueFromIndex[0];
-          if not ShowProfileMountEditorDialog(self,S,UsedDriveLetters,IncludeTrailingPathDelimiter(ExtractFilePath(T)),U) then exit;
+          if not ShowProfileMountEditorDialog(self,S,UsedDriveLetters,IncludeTrailingPathDelimiter(ExtractFilePath(T)),U,NextFreeDriveLetter) then exit;
           Mounting.Add(S);
           LoadMountingList;
           MountingListView.ItemIndex:=MountingListView.Items.Count-1;
@@ -1942,7 +1947,7 @@ begin
            ForceDirectories(S);
          end;
     {Userdefined meta information}
-    23 : ShowUserInfoDialog(self,Game);
+    23 : ShowUserInfoDialog(self,Game,GameDB);
   end;
 end;
 
@@ -2083,6 +2088,12 @@ begin
   end;
 end;
 
+procedure TProfileEditorForm.SetExeFileName(const NewExeFileName: String);
+begin
+  If Trim(NewExeFileName)='' then exit;
+  ProfileSettingsValueListEditor.Strings.ValueFromIndex[2]:=NewExeFileName;
+end;
+
 procedure TProfileEditorForm.GameInfoValueListEditorEditButtonClick(Sender: TObject);
 Var S : String;
 begin
@@ -2209,10 +2220,10 @@ end;
 
 { global }
 
-Function EditGameProfilInt(const AOwner : TComponent; const AGameDB : TGameDB; var AGame : TGame; const ADefaultGame : TGame; const ASearchLinkFile : TLinkFile; const ADeleteOnExit : TStringList; const PrevButton, NextButton, RestorePos : Boolean; const EditingTemplate : Boolean) : Integer;
+Function EditGameProfilInt(const AOwner : TComponent; const AGameDB : TGameDB; var AGame : TGame; const ADefaultGame : TGame; const ASearchLinkFile : TLinkFile; const ADeleteOnExit : TStringList; const PrevButton, NextButton, RestorePos : Boolean; const EditingTemplate : Boolean; const ANewExeFile : String; const HideGameInfoPage : Boolean) : Integer;
 begin
   If ScummVMMode(AGame) or ScummVMMode(ADefaultGame) or WindowsExeMode(AGame) or WindowsExeMode(ADefaultGame) then begin
-    result:=ModernProfileEditorFormUnit.EditGameProfilInt(AOwner,AGameDB,AGame,ADefaultGame,ASearchLinkFile,ADeleteOnExit,PrevButton,NextButton,RestorePos,EditingTemplate);
+    result:=ModernProfileEditorFormUnit.EditGameProfilInt(AOwner,AGameDB,AGame,ADefaultGame,ASearchLinkFile,ADeleteOnExit,PrevButton,NextButton,RestorePos,EditingTemplate,ANewExeFile,HideGameInfoPage);
     exit;
   end;
 
@@ -2228,6 +2239,8 @@ begin
     ProfileEditorForm.NextButton.Visible:=NextButton;
     ProfileEditorForm.EditingTemplate:=EditingTemplate;
     ProfileEditorForm.LinkFile:=ASearchLinkFile;
+    If ANewExeFile<>'' then ProfileEditorForm.SetExeFileName(ANewExeFile);
+    ProfileEditorForm.HideGameInfoPage:=HideGameInfoPage;
     If ProfileEditorForm.ShowModal=mrOK then begin
       result:=ProfileEditorForm.MoveStatus;
       AGame:=ProfileEditorForm.Game;
@@ -2242,9 +2255,10 @@ begin
   end;
 end;
 
-Function EditGameProfil(const AOwner : TComponent; const AGameDB : TGameDB; var AGame : TGame; const ADefaultGame : TGame; const ASearchLinkFile : TLinkFile; const ADeleteOnExit : TStringList; const GameList : TList = nil) : Boolean;
+Function EditGameProfil(const AOwner : TComponent; const AGameDB : TGameDB; var AGame : TGame; const ADefaultGame : TGame; const ASearchLinkFile : TLinkFile; const ADeleteOnExit : TStringList; const ANewExeFile : String; const GameList : TList = nil) : Boolean;
 Var I,J : Integer;
     PrevButton,NextButton,RestorePos : Boolean;
+    S : String;
 begin
   I:=0; RestorePos:=False;
   repeat
@@ -2264,15 +2278,17 @@ begin
       NextButton:=(J>=0) and (J<GameList.Count-1);
       PrevButton:=(J>0);
     end;
-    I:=EditGameProfilInt(AOwner,AGameDB,AGame,ADefaultGame,ASearchLinkFile,ADeleteOnExit,PrevButton,NextButton,RestorePos,False);
+    If (GameList=nil) or (GameList.Count=0) then S:=ANewExeFile else S:='';
+    I:=EditGameProfilInt(AOwner,AGameDB,AGame,ADefaultGame,ASearchLinkFile,ADeleteOnExit,PrevButton,NextButton,RestorePos,False,S,False);
     RestorePos:=True;
   until (I=0) or (I=-2);
   result:=(I<>-2);
 end;
 
-Function EditGameTemplate(const AOwner : TComponent; const AGameDB : TGameDB; var AGame : TGame; const ADefaultGame : TGame; const ASearchLinkFile : TLinkFile; const ADeleteOnExit : TStringList; const GameList : TList = nil) : Boolean;
+Function EditGameTemplate(const AOwner : TComponent; const AGameDB : TGameDB; var AGame : TGame; const ADefaultGame : TGame; const ASearchLinkFile : TLinkFile; const ADeleteOnExit : TStringList; const GameList : TList = nil; const TemplateType : TList = nil) : Boolean;
 Var I,J : Integer;
     PrevButton,NextButton,RestorePos : Boolean;
+    TemplateMode : Integer;    
 begin
   I:=0; RestorePos:=False;
   repeat
@@ -2292,7 +2308,20 @@ begin
       NextButton:=(J>=0) and (J<GameList.Count-1);
       PrevButton:=(J>0);
     end;
-    I:=EditGameProfilInt(AOwner,AGameDB,AGame,ADefaultGame,ASearchLinkFile,ADeleteOnExit,PrevButton,NextButton,RestorePos,True);
+
+    If (TemplateType<>nil) then begin
+      TemplateMode:=Integer(TemplateType[GameList.IndexOf(AGame)]);
+    end else begin
+      TemplateMode:=0;
+    end;
+    {TemplateMode: 0=normal template, 1=default template, 2=ScummVM default template}
+
+    If TemplateMode=2 then AGame.ProfileMode:='ScummVM';
+    try
+      I:=EditGameProfilInt(AOwner,AGameDB,AGame,ADefaultGame,ASearchLinkFile,ADeleteOnExit,PrevButton,NextButton,RestorePos,True,'',TemplateMode<>0);
+    finally
+      If TemplateMode=2 then AGame.ProfileMode:='DOSBox';
+    end;
     RestorePos:=True;
   until (I=0) or (I=-2);
   result:=(I<>-2);

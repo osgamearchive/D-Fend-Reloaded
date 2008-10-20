@@ -128,9 +128,9 @@ begin
 
   Case PortNr of
     1 : S:=Game.Serial1;
-    2 : S:=Game.Serial1;
-    3 : S:=Game.Serial1;
-    4 : S:=Game.Serial1;
+    2 : S:=Game.Serial2;
+    3 : S:=Game.Serial3;
+    4 : S:=Game.Serial4;
     else S:=Game.Serial1;
   end;
   S:=Trim(ExtUpperCase(S));
@@ -163,9 +163,9 @@ begin
       SerialTypeModemRadioButton.Checked:=True;
       For I:=0 to Data.Count-1 do begin
         Divide(Data[I],DataKey,DataValue);
-        If DataKey='IRQ' then SetIRQ(DataValue);
+        {If DataKey='IRQ' then SetIRQ(DataValue);
         If DataKey='SERVER' then ModemIPEdit.Text:=DataValue;
-        If DataKey='PORT' then begin try J:=Min(65535,Max(1,StrToInt(DataValue))); except J:=5000; end; ModemPortEdit.Value:=J; end;
+        If DataKey='PORT' then begin try J:=Min(65535,Max(1,StrToInt(DataValue))); except J:=5000; end; ModemPortEdit.Value:=J; end;}
         If DataKey='LISTENPORT' then begin try J:=Min(65535,Max(1,StrToInt(DataValue))); except J:=5000; end; ModemPortEdit.Value:=J; end;
       end;
       ModemListenCheckBox.Checked:=(ModemIPEdit.Text='');
@@ -233,6 +233,7 @@ begin
   If SerialTypeDirectSerialRadioButton.Checked then SetPanel(DirectSerialPanel);
 
   ModemIPEdit.Enabled:=not ModemListenCheckBox.Checked;
+  ModemPortEdit.Enabled:=ModemListenCheckBox.Checked;
 
   NullModemServerAddressEdit.Enabled:=NullModemClientRadioButton.Checked;
 end;
@@ -265,7 +266,7 @@ begin
     If ModemListenCheckBox.Checked then begin
       S:=S+' Listenport:'+IntToStr(ModemPortEdit.Value);
     end else begin
-      S:=S+' Port:'+IntToStr(ModemPortEdit.Value)+' Server:'+ModemIPEdit.Text;
+      {S:=S+' Port:'+IntToStr(ModemPortEdit.Value)+' Server:'+ModemIPEdit.Text;}
     end;
   end;
 
@@ -286,9 +287,9 @@ begin
 
   Case PortNr of
     1 : Game.Serial1:=S;
-    2 : Game.Serial1:=S;
-    3 : Game.Serial1:=S;
-    4 : Game.Serial1:=S;
+    2 : Game.Serial2:=S;
+    3 : Game.Serial3:=S;
+    4 : Game.Serial4:=S;
   end;
 end;
 

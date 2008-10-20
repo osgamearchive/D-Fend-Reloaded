@@ -30,38 +30,27 @@ object WizardBaseFrame: TWizardBaseFrame
     Anchors = [akLeft, akTop, akRight]
     Shape = bsBottomLine
   end
-  object BaseName: TLabeledEdit
-    Left = 8
-    Top = 104
-    Width = 571
-    Height = 21
-    Anchors = [akLeft, akTop, akRight]
-    EditLabel.Width = 140
-    EditLabel.Height = 13
-    EditLabel.Caption = 'Name des Programms / Spiels'
-    TabOrder = 0
-  end
   object EmulationTypeRadioGroup: TRadioGroup
     Left = 8
-    Top = 144
+    Top = 80
     Width = 571
-    Height = 57
+    Height = 73
     Anchors = [akLeft, akTop, akRight]
     Caption = 'Emulationstyp'
     ItemIndex = 0
     Items.Strings = (
       'DOSBox (erm'#246'glicht die Ausf'#252'hrung beliebiger DOS-Programme)'
-      'Scumm-basierendes Adventure')
-    TabOrder = 1
-    Visible = False
+      'Scumm-basierendes Adventure'
+      'Windows-Spiel')
+    TabOrder = 0
   end
   object ListScummGamesButton: TBitBtn
     Left = 8
-    Top = 216
+    Top = 168
     Width = 353
     Height = 25
     Caption = 'Liste der der unterst'#252'tzten Scumm-Spiele anzeigen'
-    TabOrder = 2
+    TabOrder = 1
     Visible = False
     WordWrap = True
     OnClick = ButtonWork
@@ -83,11 +72,11 @@ object WizardBaseFrame: TWizardBaseFrame
   object ShowInfoButton: TBitBtn
     Tag = 1
     Left = 8
-    Top = 247
+    Top = 199
     Width = 353
     Height = 25
     Caption = 'Informationen zur D-Fend Reloaded Dateistruktur'
-    TabOrder = 3
+    TabOrder = 2
     WordWrap = True
     OnClick = ButtonWork
     Glyph.Data = {

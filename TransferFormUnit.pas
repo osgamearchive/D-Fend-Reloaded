@@ -35,6 +35,7 @@ type
     Function GetDestPrgDataDir(const OpMode : TOperationMode; var DestPrgDataDir : String) : Boolean;
     Function CopyDir(const SourceDir, DestDir : String) : Boolean;
     function CopyFiles(const RelDir, SourceBaseDir, DestBaseDir, GameName: String): Boolean;
+    function CopySingleFile(const RelFile, SourceBaseDir, DestBaseDir, GameName: String): Boolean;
     Function TransferGame(const Game : TGame; const DestDataDir : String) : Boolean;
   public
     { Public-Deklarationen }
@@ -134,13 +135,14 @@ begin
       St.Add('LicenseComponents.txt');
       St.Add('Links.txt');
       St.Add('ChangeLog.txt');
-      St.Add('FAQs.txt');
       St.Add('Readme_OperationMode.txt');
       St.Add('D-Fend Reloaded DataInstaller.nsi');
       St.Add('UpdateCheck.exe');
       St.Add('SetInstallerLanguage.exe');
       St.Add('7za.dll');
       St.Add('DelZip179.dll');
+      St.Add('mediaplr.dll');
+      St.Add('InstallVideoCodec.exe');
       For I:=0 to St.Count-1 do CopyFile(PChar(PrgDir+St[I]),PChar(DestPrgDir+St[I]),False);
     finally
       St.Free;
@@ -391,6 +393,32 @@ begin
   result:=CopyDir(S,T);
 end;
 
+function TTransferForm.CopySingleFile(const RelFile, SourceBaseDir, DestBaseDir, GameName: String): Boolean;
+Var S,T : String;
+begin
+  result:=False;
+
+  S:=IncludeTrailingPathDelimiter(MakeRelPath(RelFile,SourceBaseDir));
+  If Copy(S,2,2)=':\' then begin
+    MessageDlg(Format(LanguageSetup.MessagePathNotRelative,[RelFile,GameName,S]),mtError,[mbOK],0);
+    result:=False; exit;
+  end;
+
+  S:=MakeAbsPath(RelFile,SourceBaseDir);
+  T:=MakeAbsPath(RelFile,DestBaseDir);
+
+  if not ForceDirectories(ExtractFilePath(T)) then begin
+    MessageDlg(Format(LanguageSetup.MessageCouldNotCreateDir,[T]),mtError,[mbOK],0);
+    exit;
+  end;
+
+  if not CopyFile(PChar(S),PChar(T),False) then begin
+    MessageDlg(Format(LanguageSetup.MessageCouldNotCopyFile,[S,T]),mtError,[mbOK],0); exit;
+  end;
+
+  result:=True;
+end;
+
 function TTransferForm.TransferGame(const Game: TGame; const DestDataDir: String): Boolean;
 Var S,T : String;
     I : Integer;
@@ -414,6 +442,10 @@ begin
     If S<>'' then begin
       S:=IncludeTrailingPathDelimiter(S);
       if not CopyFiles(S,PrgDataDir,DestDataDir,Game.Name) then exit;
+    end;
+    S:=Trim(Game.ScummVMZip);
+    If S<>'' then begin
+      if not CopySingleFile(S,PrgDataDir,DestDataDir,Game.Name) then exit;
     end;
     S:=Trim(Game.ScummVMSavePath);
     If S<>'' then begin

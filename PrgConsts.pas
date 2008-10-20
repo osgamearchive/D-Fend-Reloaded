@@ -18,6 +18,8 @@ const DosBoxFileName='DOSBOX.EXE';
       TemplateSubDir='Templates';
       AutoSetupSubDir='AutoSetup';
       NewUserDataSubDir='NewUserData';
+      PhysFSDefaultWriteDir='PhysWrite';
+      ZipTempDir='ZipTemp';
 
       NSIInstallerHelpFile='D-Fend Reloaded DataInstaller.nsi';
 
@@ -28,6 +30,8 @@ const DosBoxFileName='DOSBOX.EXE';
       QBasicPrgFile='QBasic.exe';
       QB45PrgFile='QB.exe';
       QB71PrgFile='QBX.exe';
+
+      MinSupportedDOSBoxVersion=0.72;
 
 var MainSetupFile : String;
     OperationModeConfig : String;

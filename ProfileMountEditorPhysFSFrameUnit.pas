@@ -40,7 +40,7 @@ type
 
 implementation
 
-uses LanguageSetupUnit, CommonTools, PrgSetupUnit;
+uses LanguageSetupUnit, CommonTools, PrgSetupUnit, PrgConsts;
 
 {$R *.dfm}
 
@@ -119,6 +119,12 @@ function TProfileMountEditorPhysFSFrame.Done: String;
 Var S,T : String;
     B : Boolean;
 begin
+  If Trim(ZipFolderEdit.Text)='' then begin
+    MessageDlg(LanguageSetup.MessageNoFolderNameForMounting,mtError,[mbOK],0);
+    result:='';
+    exit;
+  end;
+
   B:=True;
 
   S:=IncludeTrailingPathDelimiter(Trim(ExtUpperCase(MakeRelPath(ZipFolderEdit.Text,PrgSetup.BaseDir))));
@@ -201,7 +207,7 @@ begin
   S:=ExtUpperCase(S);
   If length(S)>8 then SetLength(S,8);
 
-  S:=MakeAbsPath(S,PrgSetup.BaseDir);
+  S:=MakeAbsPath('.\'+PhysFSDefaultWriteDir+'\'+S,PrgSetup.BaseDir);
   If not ForceDirectories(S) then begin
     MessageDlg(Format(LanguageSetup.MessageCouldNotCreateDir,[S]),mtError,[mbOK],0);
   end;

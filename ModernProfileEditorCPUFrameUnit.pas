@@ -19,6 +19,7 @@ type
     CyclesUpEdit: TSpinEdit;
     CyclesDownEdit: TSpinEdit;
     CyclesInfoLabel: TLabel;
+    procedure CPUCyclesChange(Sender: TObject);
   private
     { Private-Deklarationen }
     SaveCycles : String;
@@ -95,6 +96,7 @@ begin
     CyclesValueRadioButton.Checked:=True;
     CyclesComboBox.Text:=Game.Cycles;
   end;
+  CPUCyclesChange(self);
 
   CyclesUpEdit.Value:=Game.CyclesUp;
   CyclesDownEdit.Value:=Game.CyclesDown;
@@ -126,6 +128,11 @@ begin
       end;
     end;
   end;
+end;
+
+procedure TModernProfileEditorCPUFrame.CPUCyclesChange(Sender: TObject);
+begin
+  CyclesComboBox.Enabled:=CyclesValueRadioButton.Checked;
 end;
 
 procedure TModernProfileEditorCPUFrame.GetGame(const Game: TGame);

@@ -15,18 +15,27 @@ object ModernProfileEditorScummVMFrame: TModernProfileEditorScummVMFrame
     Caption = 'LanguageLabel'
   end
   object AutosaveLabel: TLabel
-    Left = 24
-    Top = 72
+    Left = 200
+    Top = 13
     Width = 71
     Height = 13
     Caption = 'AutosaveLabel'
   end
   object TalkSpeedLabel: TLabel
-    Left = 24
-    Top = 128
+    Left = 376
+    Top = 13
     Width = 74
     Height = 13
     Caption = 'TalkSpeedLabel'
+  end
+  object JoystickLabel: TLabel
+    Left = 24
+    Top = 384
+    Width = 561
+    Height = 13
+    Anchors = [akLeft, akTop, akRight]
+    AutoSize = False
+    Caption = 'Use Joystick number'
   end
   object LanguageComboBox: TComboBox
     Left = 24
@@ -39,7 +48,7 @@ object ModernProfileEditorScummVMFrame: TModernProfileEditorScummVMFrame
   end
   object SubtitlesCheckBox: TCheckBox
     Left = 24
-    Top = 192
+    Top = 80
     Width = 561
     Height = 17
     Anchors = [akLeft, akTop, akRight]
@@ -47,8 +56,8 @@ object ModernProfileEditorScummVMFrame: TModernProfileEditorScummVMFrame
     TabOrder = 3
   end
   object AutosaveEdit: TSpinEdit
-    Left = 24
-    Top = 91
+    Left = 200
+    Top = 32
     Width = 105
     Height = 22
     MaxValue = 86400
@@ -57,8 +66,8 @@ object ModernProfileEditorScummVMFrame: TModernProfileEditorScummVMFrame
     Value = 300
   end
   object TalkSpeedEdit: TSpinEdit
-    Left = 24
-    Top = 147
+    Left = 376
+    Top = 32
     Width = 105
     Height = 22
     MaxValue = 1000
@@ -68,13 +77,12 @@ object ModernProfileEditorScummVMFrame: TModernProfileEditorScummVMFrame
   end
   object SavePathGroupBox: TGroupBox
     Left = 24
-    Top = 232
+    Top = 144
     Width = 561
     Height = 105
     Anchors = [akLeft, akTop, akRight]
     Caption = 'Folder for saved games'
-    TabOrder = 4
-    Visible = False
+    TabOrder = 5
     DesignSize = (
       561
       105)
@@ -131,5 +139,65 @@ object ModernProfileEditorScummVMFrame: TModernProfileEditorScummVMFrame
       TabOrder = 2
       OnChange = SavePathEditChange
     end
+  end
+  object ConfirmExitCheckBox: TCheckBox
+    Left = 24
+    Top = 103
+    Width = 561
+    Height = 17
+    Anchors = [akLeft, akTop, akRight]
+    Caption = 'Confirm program exit'
+    TabOrder = 4
+  end
+  object CDGroupBox: TGroupBox
+    Left = 24
+    Top = 263
+    Width = 561
+    Height = 98
+    Anchors = [akLeft, akTop, akRight]
+    Caption = 'CD drive for playing audio'
+    TabOrder = 6
+    DesignSize = (
+      561
+      98)
+    object CDRadioButton1: TRadioButton
+      Left = 16
+      Top = 24
+      Width = 529
+      Height = 17
+      Anchors = [akLeft, akTop, akRight]
+      Caption = 'Do not try to play CD audio'
+      TabOrder = 0
+    end
+    object CDRadioButton2: TRadioButton
+      Left = 16
+      Top = 47
+      Width = 529
+      Height = 17
+      Anchors = [akLeft, akTop, akRight]
+      Caption = 'Use drive number'
+      TabOrder = 1
+    end
+    object CDEdit: TSpinEdit
+      Left = 32
+      Top = 68
+      Width = 57
+      Height = 22
+      MaxValue = 3
+      MinValue = 0
+      TabOrder = 2
+      Value = 0
+      OnChange = CDEditChange
+    end
+  end
+  object JoystickEdit: TSpinEdit
+    Left = 24
+    Top = 403
+    Width = 57
+    Height = 22
+    MaxValue = 3
+    MinValue = 0
+    TabOrder = 7
+    Value = 0
   end
 end

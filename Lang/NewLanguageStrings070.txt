@@ -1,0 +1,42 @@
+[Messages]
+CouldNotCopyDirectoryToCapture=Cannot copy directories to capture folder. (Tried to copy %s to capture folder.)
+CHANGED: NoFolderNameForMounting=No folder for extracting the zip file to was given.
+CouldNotFindScummVM=ScummVM does not exist at: %s
+ShortName.Error.ParentNotFound=Parent directory "%s" does not exist.
+ShortName.Error.DelimiterInFileName=File/subdirectory name "%s" contains path delimiters (\/:).
+ShortName.Error.FileNotFound=File or subdirectory "%s" does not exist in parent directory "%s".
+ShortName.Warning.InvalidChars=File/subdirectory name "%s" converted to DOSBox form, but it has illegal characters. Generated name may be not unavailable under DOSBox.
+ShortName.Warning.SystemShort=File/subdirectory name "%s" converted to DOSBox form has illegal characters, hence system shortname will be used. Generated name may be not portable between different computers.
+ShortName.Warning.ShortAlreadyUsed=File/subdirectory name "%s" converted to DOSBox form has illegal characters, but system shortname cannot be used, because it is already used for another file. Hence DOSBox short name is left, but it may be be not unavailable under DOSBox.
+
+[ProfileEditorForm]
+HelperProgramsSheet=Helper programs
+HelperProgramsSheet.RunBefore=Execute command before main program
+HelperProgramsSheet.RunBeforeLabel=Command before main program
+HelperProgramsSheet.RunAfter=Execute command after main program quits
+HelperProgramsSheet.RunAfterLabel=Command after main program
+
+[SetupForm]
+RestoreWindowWhenScummVMCloses=Restore program window when ScummVM is closed
+ShortWrongShortNameWarnings=Show warning messages on DOSBox path name translation errors
+UseWindowsExeIcons=Use program file icon for Windows games profiles
+WindowsGames=Windows games
+MinimizeDFendOnWindowsGameStart=Minimize D-Fend Reloaded when Windows game starts
+RestoreWindowWhenWindowsGameCloses=Restore program window when Windows game is closed
+RestoreWindowWhenWindowsGameCloses.Info=The main window will only be restored if the Windows program was running at least 5 seconds. So if the called program is only a launcher for the main game the D-Fend Reloaded program window will not be restored immediately.
+
+[HistoryForm]
+Starts=Number of starts
+First=First run
+Last=Last run
+
+[TemplateForm]
+New.FromProfiles.Caption=Select profiles to be added as auto setup templates
+
+[CreateConfForm]
+ExportAsAutoSetup=Export profiles as auto setup templates
+
+[ZipWaitForm]
+CHANGED: Info=D-Fend Reloaded is waiting for the following DOSBox / ScummVM instances for close to repack the zip files:
+ScummVM=ScummVM handle
+Drive.ScummVM=ScummVM drive

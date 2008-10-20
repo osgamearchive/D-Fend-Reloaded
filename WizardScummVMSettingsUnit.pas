@@ -49,9 +49,9 @@ begin
   InfoLabel.Caption:=LanguageSetup.WizardFormPage6Info;
   LanguageLabel.Caption:=LanguageSetup.ProfileEditorScummVMLanguage;
   StartFullscreenCheckBox.Caption:=LanguageSetup.GameStartFullscreen;
-  //SavePathGroupBox.Caption:=LanguageSetup.ScummVMSavePath;
-  //SavePathDefaultRadioButton.Caption:=LanguageSetup.ScummVMSavePathGameDir+' ('+LanguageSetup.Default+')';
-  //SavePathCustomRadioButton.Caption:=LanguageSetup.ScummVMSavePathCustom;
+  SavePathGroupBox.Caption:=LanguageSetup.ProfileEditorScummVMSavePath;
+  SavePathDefaultRadioButton.Caption:=LanguageSetup.ProfileEditorScummVMSavePathGameDir+' ('+LanguageSetup.Default+')';
+  SavePathCustomRadioButton.Caption:=LanguageSetup.ProfileEditorScummVMSavePathCustom;
   LanguageInfoLabel.Caption:=LanguageSetup.WizardFormScummVMLanguageInfo;
 end;
 

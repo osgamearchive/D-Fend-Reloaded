@@ -27,12 +27,15 @@ type
     MoreSettingsButton: TBitBtn;
     DOSBoxEditButton: TSpeedButton;
     PortableModeInfoButton: TBitBtn;
+    WarningButton: TSpeedButton;
+    ShortNameWarningsCheckBox: TCheckBox;
     procedure DosBoxDirEditChange(Sender: TObject);
     procedure ButtonWork(Sender: TObject);
     procedure DOSBoxDownloadURLClick(Sender: TObject);
     procedure MinimizeDFendCheckBoxClick(Sender: TObject);
     procedure DOSBoxInstallationComboBoxChange(Sender: TObject);
     procedure PortableModeInfoButtonClick(Sender: TObject);
+    procedure WarningButtonClick(Sender: TObject);
   private
     { Private-Deklarationen }
     DOSBoxData : Array of TDOSBoxData;
@@ -52,7 +55,7 @@ type
 
 implementation
 
-uses ShellAPI, LanguageSetupUnit, VistaToolsUnit, CommonTools,
+uses ShellAPI, Math, LanguageSetupUnit, VistaToolsUnit, CommonTools,
      SetupDosBoxFormUnit, SetupFrameDOSBoxFormUnit, HelpConsts;
 
 {$R *.dfm}
@@ -78,6 +81,9 @@ begin
   NoFlicker(MinimizeDFendCheckBox);
   NoFlicker(RestoreWindowCheckBox);
   NoFlicker(UseShortPathNamesCheckBox);
+  NoFlicker(ShortNameWarningsCheckBox);
+
+  ShortNameWarningsCheckBox.Visible:=PrgSetup.ActivateIncompleteFeatures;
 
   SetLength(DOSBoxData,PrgSetup.DOSBoxSettingsCount);
   For I:=0 to length(DOSBoxData)-1 do begin
@@ -94,6 +100,7 @@ begin
   MinimizeDFendCheckBox.Checked:=PrgSetup.MinimizeOnDosBoxStart;
   RestoreWindowCheckBox.Checked:=PrgSetup.RestoreWhenDOSBoxCloses;
   UseShortPathNamesCheckBox.Checked:=PrgSetup.UseShortFolderNames;
+  ShortNameWarningsCheckBox.Checked:=PrgSetup.ShowShortNameWarnings;
   MinimizeDFendCheckBoxClick(self);
 
   HelpContext:=ID_FileOptionsDOSBox;
@@ -108,17 +115,18 @@ begin
   DOSBoxUpButton.Hint:=LanguageSetup.SetupFormDOSBoxInstallationUp;
   DOSBoxDownButton.Hint:=LanguageSetup.SetupFormDOSBoxInstallationDown;
   DosBoxDirEdit.EditLabel.Caption:=LanguageSetup.SetupFormDosBoxDir;
+  WarningButton.Hint:=LanguageSetup.MsgDlgWarning;
   DosBoxButton.Hint:=LanguageSetup.ChooseFolder;
   FindDosBoxButton.Hint:=LanguageSetup.SetupFormSearchDosBox;
   MoreSettingsButton.Caption:=LanguageSetup.SetupFormDOSBoxInstallationMoreSettings;
   PortableModeInfoButton.Caption:=LanguageSetup.SetupFormDOSBoxPortableModeInfo;
-  PortableModeInfoButton.Visible:=(OperationMode=omPortable);
   GlobalGroupBox.Caption:=LanguageSetup.SetupFormDOSBoxInstallationGlobal;
 
   MinimizeDFendCheckBox.Caption:=LanguageSetup.SetupFormMinimizeDFend;
   RestoreWindowCheckBox.Caption:=LanguageSetup.SetupFormRestoreWindow;
   UseShortPathNamesCheckBox.Caption:=LanguageSetup.SetupFormUseShortPathNames;
-
+  ShortNameWarningsCheckBox.Caption:=LanguageSetup.SetupFormShortNameWarnings;
+  
   DOSBoxDownloadURLInfo.Caption:=LanguageSetup.SetupFormDOSBoxDownloadURL;
   DOSBoxDownloadURL.Caption:='http:/'+'/www.dosbox.com/download.php?main=1';
   with DOSBoxDownloadURL.Font do begin Color:=clBlue; Style:=[fsUnderline]; end;
@@ -152,6 +160,10 @@ begin
     PortableModeInfoButton.Left:=MoreSettingsButton.Left;
   end;
   DOSBoxDownloadURL.Top:=DOSBoxDownloadURLInfo.Top+19;
+
+  PortableModeInfoButton.Visible:=(OperationMode=omPortable);
+
+  DosBoxDirEditChange(self);
 end;
 
 procedure TSetupFrameDOSBox.RestoreDefaults;
@@ -159,6 +171,9 @@ begin
   MinimizeDFendCheckBox.Checked:=False;
   RestoreWindowCheckBox.Checked:=False;
   UseShortPathNamesCheckBox.Checked:=True;
+  //... ShortNameWarningsCheckBox.Checked:=True;
+  ShortNameWarningsCheckBox.Checked:=False;
+  MinimizeDFendCheckBoxClick(self);
 end;
 
 procedure TSetupFrameDOSBox.SaveSetup;
@@ -175,6 +190,7 @@ begin
   PrgSetup.MinimizeOnDosBoxStart:=MinimizeDFendCheckBox.Checked;
   PrgSetup.RestoreWhenDOSBoxCloses:=RestoreWindowCheckBox.Checked;
   PrgSetup.UseShortFolderNames:=UseShortPathNamesCheckBox.Checked;
+  PrgSetup.ShowShortNameWarnings:=ShortNameWarningsCheckBox.Checked;
 end;
 
 procedure TSetupFrameDOSBox.DOSBoxInstallationComboBoxChange(Sender: TObject);
@@ -200,9 +216,13 @@ end;
 
 procedure TSetupFrameDOSBox.DosBoxDirEditChange(Sender: TObject);
 begin
-  If (PDosBoxDir^=DosBoxDirEdit.Text) or (DOSBoxInstallationComboBox.ItemIndex<>0) then exit;
-  PDosBoxDir^:=DosBoxDirEdit.Text;
-  DosBoxDirChange;
+  If (PDosBoxDir^<>DosBoxDirEdit.Text) and (DOSBoxInstallationComboBox.ItemIndex=0) then begin
+    PDosBoxDir^:=DosBoxDirEdit.Text;
+    DosBoxDirChange;
+  end;
+
+  WarningButton.Visible:=OldDOSBoxVersion(CheckDOSBoxVersion(-1,DosBoxDirEdit.Text));
+  DosBoxDirEdit.Width:=IfThen(WarningButton.Visible,WarningButton.Left-4,WarningButton.Left+WarningButton.Width)-DosBoxDirEdit.Left;
 end;
 
 procedure TSetupFrameDOSBox.ButtonWork(Sender: TObject);
@@ -282,6 +302,11 @@ end;
 procedure TSetupFrameDOSBox.DOSBoxDownloadURLClick(Sender: TObject);
 begin
   ShellExecute(Handle,'open',PChar((Sender as TLabel).Caption),nil,nil,SW_SHOW);
+end;
+
+procedure TSetupFrameDOSBox.WarningButtonClick(Sender: TObject);
+begin
+  DOSBoxOutdatedWarning(DosBoxDirEdit.Text);
 end;
 
 end.

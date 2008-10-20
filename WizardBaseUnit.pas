@@ -9,7 +9,6 @@ uses
 
 type
   TWizardBaseFrame = class(TFrame)
-    BaseName: TLabeledEdit;
     InfoLabel: TLabel;
     Bevel: TBevel;
     EmulationTypeRadioGroup: TRadioGroup;
@@ -39,23 +38,22 @@ begin
 
   InfoLabel.Font.Style:=[fsBold];
   InfoLabel.Caption:=LanguageSetup.WizardFormPage1Info;
-  BaseName.EditLabel.Caption:=LanguageSetup.WizardFormBaseName;
   EmulationTypeRadioGroup.Caption:=LanguageSetup.WizardFormEmulationType;
   EmulationTypeRadioGroup.Items[0]:=LanguageSetup.WizardFormEmulationTypeDOSBox;
   EmulationTypeRadioGroup.Items[1]:=LanguageSetup.WizardFormEmulationTypeScummVM;
+  EmulationTypeRadioGroup.Items[2]:=LanguageSetup.WizardFormEmulationTypeWindows;
   ListScummGamesButton.Caption:=LanguageSetup.WizardFormEmulationTypeListScummVMGames;
   ShowInfoButton.Caption:=LanguageSetup.WizardFormMainInfo;
-  EmulationTypeRadioGroup.Visible:=(Trim(PrgSetup.ScummVMPath)<>'');
+
+  If Trim(PrgSetup.ScummVMPath)='' then EmulationTypeRadioGroup.Items.Delete(1);
   ListScummGamesButton.Visible:=(Trim(PrgSetup.ScummVMPath)<>'');
   If not ListScummGamesButton.Visible then begin
-    ShowInfoButton.Left:=ListScummGamesButton.Left;
-    ShowInfoButton.Top:=EmulationTypeRadioGroup.Top;
+    ShowInfoButton.Top:=ListScummGamesButton.Top;
   end;
 end;
 
 procedure TWizardBaseFrame.WriteDataToGame(const Game: TGame);
 begin
-  Game.Name:=BaseName.Text;
   If EmulationTypeRadioGroup.ItemIndex=0 then begin
     Game.CaptureFolder:='.\'+CaptureSubDir+'\'+MakeFileSysOKFolderName(Game.Name);
     CreateDir(MakeAbsPath(Game.CaptureFolder,PrgSetup.BaseDir));

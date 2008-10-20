@@ -79,6 +79,7 @@ begin
 
   OKButton.Caption:=LanguageSetup.OK;
   CancelButton.Caption:=LanguageSetup.Cancel;
+  HelpButton.Caption:=LanguageSetup.Help;
 
   DeviceTypeGroupBox.Caption:=LanguageSetup.SerialFormDeviceType;
   SerialTypeDisabledRadioButton.Caption:=LanguageSetup.SerialFormDeviceTypeDisabled;
@@ -153,8 +154,8 @@ begin
       For I:=0 to Data.Count-1 do begin
         Divide(Data[I],DataKey,DataValue);
         If DataKey='IRQ' then SetIRQ(DataValue);
-        If DataKey='SERVER' then ModemIPEdit.Text:=DataValue;
-        If DataKey='PORT' then begin try J:=Min(65535,Max(1,StrToInt(DataValue))); except J:=5000; end; ModemPortEdit.Value:=J; end;
+        {If DataKey='SERVER' then ModemIPEdit.Text:=DataValue;}
+        {If DataKey='PORT' then begin try J:=Min(65535,Max(1,StrToInt(DataValue))); except J:=5000; end; ModemPortEdit.Value:=J; end;}
         If DataKey='LISTENPORT' then begin try J:=Min(65535,Max(1,StrToInt(DataValue))); except J:=5000; end; ModemPortEdit.Value:=J; end;
       end;
       ModemListenCheckBox.Checked:=(ModemIPEdit.Text='');
@@ -206,6 +207,7 @@ begin
   If SerialTypeDirectSerialRadioButton.Checked then Notebook.PageIndex:=3;
 
   ModemIPEdit.Enabled:=not ModemListenCheckBox.Checked;
+  ModemPortEdit.Enabled:=ModemListenCheckBox.Checked;
 
   NullModemServerAddressEdit.Enabled:=NullModemClientRadioButton.Checked;
 end;
@@ -230,7 +232,7 @@ begin
     If ModemListenCheckBox.Checked then begin
       ProfileString:=ProfileString+' Listenport:'+IntToStr(ModemPortEdit.Value);
     end else begin
-      ProfileString:=ProfileString+' Port:'+IntToStr(ModemPortEdit.Value)+' Server:'+ModemIPEdit.Text;
+      {ProfileString:=ProfileString+' Port:'+IntToStr(ModemPortEdit.Value)+' Server:'+ModemIPEdit.Text;}
     end;
     exit;
   end;

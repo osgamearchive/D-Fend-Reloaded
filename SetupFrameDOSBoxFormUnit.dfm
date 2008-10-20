@@ -22,7 +22,7 @@ object SetupFrameDOSBoxForm: TSetupFrameDOSBoxForm
   PixelsPerInch = 96
   TextHeight = 13
   object DosBoxMapperButton: TSpeedButton
-    Tag = 7
+    Tag = 2
     Left = 787
     Top = 114
     Width = 23
@@ -66,7 +66,6 @@ object SetupFrameDOSBoxForm: TSetupFrameDOSBoxForm
     WordWrap = True
   end
   object DosBoxButton: TSpeedButton
-    Tag = 4
     Left = 758
     Top = 24
     Width = 23
@@ -88,9 +87,10 @@ object SetupFrameDOSBoxForm: TSetupFrameDOSBoxForm
     NumGlyphs = 2
     ParentShowHint = False
     ShowHint = True
+    OnClick = ButtonWork
   end
   object FindDosBoxButton: TSpeedButton
-    Tag = 5
+    Tag = 1
     Left = 787
     Top = 24
     Width = 23
@@ -112,6 +112,7 @@ object SetupFrameDOSBoxForm: TSetupFrameDOSBoxForm
     NumGlyphs = 2
     ParentShowHint = False
     ShowHint = True
+    OnClick = ButtonWork
   end
   object DosBoxLangLabel: TLabel
     Left = 14
@@ -119,6 +120,26 @@ object SetupFrameDOSBoxForm: TSetupFrameDOSBoxForm
     Width = 84
     Height = 13
     Caption = 'DosBoxLangLabel'
+  end
+  object WarningButton: TSpeedButton
+    Left = 729
+    Top = 24
+    Width = 23
+    Height = 22
+    Anchors = [akTop, akRight]
+    Glyph.Data = {
+      F6000000424DF600000000000000760000002800000010000000100000000100
+      0400000000008000000000000000000000001000000000000000000000000000
+      8000008000000080800080000000800080008080000080808000C0C0C0000000
+      FF0000FF000000FFFF00FF000000FF00FF00FFFF0000FFFFFF00EEEEEEEEEEEE
+      EEEEEEEEEEEEEEEEEEEEEEEE99999999EEEEEEE9999009999EEEEE9999900999
+      99EEEE999999999999EEEE999999999999EEEE999990099999EEEE9999900999
+      99EEEE999990099999EEEE999990099999EEEE999990099999EEEEE999900999
+      9EEEEEEE99999999EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE}
+    ParentShowHint = False
+    ShowHint = True
+    Visible = False
+    OnClick = WarningButtonClick
   end
   object DosBoxMapperEdit: TLabeledEdit
     Left = 14

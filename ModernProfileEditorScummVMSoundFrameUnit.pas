@@ -90,11 +90,13 @@ begin
   end;
   If MusicDriverComboBox.Items.Count>1 then MusicDriverComboBox.ItemIndex:=1;
   S:=Trim(ExtUpperCase(Game.ScummVMMusicDriver));
+  If (S<>'') and (S[length(S)]=')') then SetLength(S,length(S)-1);
   For I:=0 to MusicDriverComboBox.Items.Count-1 do begin
     T:=Trim(MusicDriverComboBox.Items[I]);
     If (T<>'') and (T[length(T)]=')') then begin
       For J:=length(T)-1 downto 1 do If T[J]='(' then begin T:=Trim(Copy(T,J+1,MaxInt)); break; end;
     end;
+    If (T<>'') and (T[length(T)]=')') then SetLength(T,length(T)-1);
     If ExtUpperCase(T)=S then begin MusicDriverComboBox.ItemIndex:=I; break; end;
   end;
   NativeMT32CheckBox.Checked:=Game.ScummVMNativeMT32;
@@ -130,6 +132,7 @@ begin
   If (S<>'') and (S[length(S)]=')') then begin
     For I:=length(S)-1 downto 1 do If S[I]='(' then begin S:=Trim(Copy(S,I+1,MaxInt)); break; end;
   end;
+  If (S<>'') and (S[length(S)]=')') then SetLength(S,length(S)-1);
   Game.ScummVMMusicDriver:=S;
 
   Game.ScummVMNativeMT32:=NativeMT32CheckBox.Checked;

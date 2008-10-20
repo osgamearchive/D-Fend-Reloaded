@@ -59,14 +59,14 @@ object SetupFrameDOSBox: TSetupFrameDOSBox
   end
   object DOSBoxDownloadURLInfo: TLabel
     Left = 16
-    Top = 287
+    Top = 295
     Width = 154
     Height = 13
     Caption = 'You can download DOSBox from'
   end
   object DOSBoxDownloadURL: TLabel
     Left = 16
-    Top = 306
+    Top = 314
     Width = 105
     Height = 13
     Caption = 'DOSBoxDownloadURL'
@@ -203,6 +203,26 @@ object SetupFrameDOSBox: TSetupFrameDOSBox
     ShowHint = True
     OnClick = ButtonWork
   end
+  object WarningButton: TSpeedButton
+    Left = 563
+    Top = 72
+    Width = 23
+    Height = 22
+    Anchors = [akTop, akRight]
+    Glyph.Data = {
+      F6000000424DF600000000000000760000002800000010000000100000000100
+      0400000000008000000000000000000000001000000000000000000000000000
+      8000008000000080800080000000800080008080000080808000C0C0C0000000
+      FF0000FF000000FFFF00FF000000FF00FF00FFFF0000FFFFFF00EEEEEEEEEEEE
+      EEEEEEEEEEEEEEEEEEEEEEEE99999999EEEEEEE9999009999EEEEE9999900999
+      99EEEE999999999999EEEE999999999999EEEE999990099999EEEE9999900999
+      99EEEE999990099999EEEE999990099999EEEE999990099999EEEEE999900999
+      9EEEEEEE99999999EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE}
+    ParentShowHint = False
+    ShowHint = True
+    Visible = False
+    OnClick = WarningButtonClick
+  end
   object DosBoxDirEdit: TLabeledEdit
     Left = 16
     Top = 72
@@ -222,7 +242,7 @@ object SetupFrameDOSBox: TSetupFrameDOSBox
     Height = 21
     Style = csDropDownList
     Anchors = [akLeft, akTop, akRight]
-    ItemHeight = 0
+    ItemHeight = 13
     TabOrder = 0
     OnChange = DOSBoxInstallationComboBoxChange
   end
@@ -230,13 +250,13 @@ object SetupFrameDOSBox: TSetupFrameDOSBox
     Left = 16
     Top = 151
     Width = 628
-    Height = 106
+    Height = 130
     Anchors = [akLeft, akTop, akRight]
     Caption = 'Global settings (for all installations)'
     TabOrder = 3
     DesignSize = (
       628
-      106)
+      130)
     object MinimizeDFendCheckBox: TCheckBox
       Left = 16
       Top = 24
@@ -264,6 +284,15 @@ object SetupFrameDOSBox: TSetupFrameDOSBox
       Anchors = [akLeft, akTop, akRight]
       Caption = 'Use short path names for mount commands'
       TabOrder = 2
+    end
+    object ShortNameWarningsCheckBox: TCheckBox
+      Left = 16
+      Top = 102
+      Width = 601
+      Height = 17
+      Anchors = [akLeft, akTop, akRight]
+      Caption = 'Show warning messages on DOSBox path name translation errors'
+      TabOrder = 3
     end
   end
   object MoreSettingsButton: TBitBtn

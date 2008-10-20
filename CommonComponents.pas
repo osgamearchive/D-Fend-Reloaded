@@ -44,7 +44,6 @@ Type TBasePrgSetup=class
     Procedure AddStringRec(const Nr : Integer; const Section, Key : String; const Default : String);
     function GetBoolean(const Index: Integer): Boolean;
     function GetInteger(const Index: Integer): Integer;
-    function GetString(const Index: Integer): String; inline;
     procedure SetBoolean(const Index: Integer; const Value: Boolean);
     procedure SetInteger(const Index, Value: Integer);
     procedure SetString(const Index: Integer; const Value: String);
@@ -54,12 +53,14 @@ Type TBasePrgSetup=class
     Constructor Create(const ABasePrgSetup : TBasePrgSetup); overload;
     Destructor Destroy; override;
     Procedure AssignFrom(const ABasePrgSetup : TBasePrgSetup);
+    Procedure AssignFromPartially(const ABasePrgSetup : TBasePrgSetup; const SettingsToKeep : Array of Integer);
     Procedure StoreAllValues;
     Procedure ResetToDefault;
     Function CheckAndUpdateTimeStamp : TFileChangeStatus;
     Procedure ReloadINI; virtual;
     Procedure RenameINI(const NewFile : String);
     Procedure SetChanged;
+    function GetString(const Index: Integer): String; inline;
     property SetupFile : String read FSetupFile;
     property FirstRun : Boolean read FFirstRun;
     property StoreConfigOnExit : Boolean read FStoreConfigOnExit write FStoreConfigOnExit;
@@ -199,17 +200,32 @@ begin
 end;
 
 procedure TBasePrgSetup.AssignFrom(const ABasePrgSetup: TBasePrgSetup);
-Var I : Integer;
+begin
+  AssignFromPartially(ABasePrgSetup,[]); 
+end;
+
+Procedure TBasePrgSetup.AssignFromPartially(const ABasePrgSetup : TBasePrgSetup; const SettingsToKeep : Array of Integer);
+Var I,J : Integer;
+    B : Boolean;
 begin
   For I:=0 to length(BooleanList)-1 do begin
+    B:=True;
+    For J:=Low(SettingsToKeep) to High(SettingsToKeep) do if SettingsToKeep[J]=BooleanList[I].Nr then begin B:=False; break; end;
+    If not B then continue;
     BooleanList[I].Cached:=True;
     BooleanList[I].CacheValueBool:=ABasePrgSetup.GetBoolean(BooleanList[I].Nr);
   end;
   For I:=0 to length(IntegerList)-1 do begin
+    B:=True;
+    For J:=Low(SettingsToKeep) to High(SettingsToKeep) do if SettingsToKeep[J]=IntegerList[I].Nr then begin B:=False; break; end;
+    If not B then continue;
     IntegerList[I].Cached:=True;
     IntegerList[I].CacheValueInteger:=ABasePrgSetup.GetInteger(IntegerList[I].Nr);
   end;
   For I:=0 to length(StringList)-1 do begin
+    B:=True;
+    For J:=Low(SettingsToKeep) to High(SettingsToKeep) do if SettingsToKeep[J]=StringList[I].Nr then begin B:=False; break; end;
+    If not B then continue;
     StringList[I].Cached:=True;
     StringList[I].CacheValueString:=ABasePrgSetup.GetString(StringList[I].Nr);
   end;

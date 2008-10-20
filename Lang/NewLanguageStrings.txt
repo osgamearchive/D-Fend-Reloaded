@@ -1,5 +1,206 @@
 [Global]
+Add.HintTemplate=Adds a new template to the list.
+Add.NewEmptyLine=Add new empty line
+Edit.HintTemplate=Opens the selected template in the profile editor.
+Del.HintTemplate=Removes the selected template from the list.
+Save.HintImageViewer=Saves the selected image in a new file.
+Save.HintSoundPlayer=Saves the selected sound file in a new file.
+Save.HintVideoPlayer=Saves the selected video file in a new file.
+Close.WindowHint=Closes the window.
+Use.HintTemplate=Uses the selected template to create a new profile.
+Copy.CopyHintImageViewer=Copies the image to the clipboard.
+Clear.HintMediaViewer=Deletes the selected file.
+Previous.HintMediaViewer=Changes to the previous file.
+Next.HintMediaViewer=Changes to the next file.
+Help.Hint=Opens the online help.
 Default=Default
 
+[Messages]
+CouldNotCopyFiles=Could not copy files from folder %s to folder %s.
+ConfirmationDeleteFile=Do you really want to delete %s ?
+ConfirmationDeleteFolder=Do you really want to delete %s with all its files and subfolders ?
+DOSBoxOutdated=You are currently using DOSBox %s. D-Fend Reloaded requires DOSBox %s or higher. You should upgrade your DOSBox installation.
+DirectoryAlreadyExists=The directory %s can not be created because it already exists.
+
 [Menu]
+View.QuickStarter=Show quick starter window
+Profile.OpenCaptureFolder=Open &capture folder
 Extras.IconManager.Caption=Icon manager
+Button.Open=&Open
+Button.Close.HintMainWindow=Closes D-Fend Reloaded.
+Button.Run.HintMainWindow=Start the program file of the selected profile.
+Button.Setup.HintMainWindow=Starts the setup file of the selected profile.
+Button.Add.HintMainWindow=Adds a new profile to the list.
+Button.Edit.HintMainWindow=Opens the selected profile in the profile editor.
+Button.Delete.HintMainWindow=Removes the selected profile from the list.
+Button.Run.HintFile=Opens or starts the select file.
+Popup.OpenCaptureFolder=Open &capture folder
+ScreenshotPopup.OpenExternal=Open in default viewer
+
+[ProfileEditorForm]
+Mounting.DriveType.Drive=Harddisk
+Mounting.DriveType.CDROM=CDROM drive
+Mounting.DriveType.CDROMIMAGE=CD image
+Mounting.DriveType.Floppy=Floppy drive
+Mounting.DriveType.FloppyImage=Floppy image
+Mounting.DriveType.Image=Harddisk image
+Mounting.DriveType.PHYSFS=Harddisk (PHYSFS)
+Mounting.DriveType.=Harddisk (zip)
+Sound.Misc.Tandy.Auto=Auto
+ScummVM.GameZipFile=Extract game files from this zip file to the folder (and repack them later again)
+ScummVM.GameZipFileInfo=If the zip file option is activated the given zip file will be extracted into the folder entered above. ScummVM will be run as usual with this folder. After ScummVM closes the content of the folder will be repacked to the archive file and the folder will be deleted.
+ScummVM.ConfirmExit=Confirm program exit
+ScummVM.SavePath=Folder for saved games
+ScummVM.SavePath.GameDir=Use game folder
+ScummVM.SavePath.Custom=Use this custom folder
+ScummVM.AudioCDDrive=CD drive for playing audio
+ScummVM.AudioCDDrive.Off=Do not try to play CD audio
+ScummVM.AudioCDDrive.Number=Use drive number
+ScummVM.JoystickNumber=Use Joystick number
+ScummVMGameSheet=Game specific settings
+ScummVMGame.AltIntro=Alternative intro
+ScummVMGame.GFXDetails=Graphics details
+ScummVMGame.ObjectLabels=Show object labels
+ScummVMGame.ReverseStereo=Reverse stereo
+ScummVMGame.MusicMute=Mute music
+ScummVMGame.SFXMute=Mute sound effects
+ScummVMGame.Walkspeed=Walkspeed
+
+[SetupForm]
+CenterScummVMWindow=Center ScummVM window
+HideScummVMConsole=Hide ScummVM console
+CHANGED: DeleteOnlyInBaseDir=Never delete files outside the base folder when uninstalling games
+DeleteToRecycleBin=Move files to recycle bin when deleting:
+DeleteToRecycleBin.Profiles=Profiles and configuration files
+DeleteToRecycleBin.MediaViewer=Captured screenshots, sounds and videos
+DeleteToRecycleBin.DataViewer=Files from game data folders
+DeleteToRecycleBin.Uninstall=Game files when uninstalling games
+DeleteToRecycleBin.QuickStart=Files deleted in quick starter
+DeleteToRecycleBin.ZipOperation=Temporary folders when using zip files as drives
+DeleteToRecycleBin.Temp=Temporary files
+CHANGED: ScreenshotsModeListViewUseFirstScreenshot=Use screenshot with the following number if no screenshot is selected
+ScreenshotsModeListViewUseFirstScreenshot.Info=(1=Use first screenshot, 2=second screenshot etc.)
+ShowGridLinesInDetailsMode=Show grid lines in view style "report"
+TextEditor=Text editor
+TextEditor.Default=Use default editor for file type
+TextEditor.Default.Fallback=If no default editor is registered for given file type use default editor for txt files
+TextEditor.Notepad=Always use Notepad
+TextEditor.Custom=Use custom editor
+TextEditor.Custom.OpenCaption=Select text editor to be used
+TextEditor.FixLineWrap=Automatically fix line wrap on opening files if needed
+MediaViewer=Media viewers
+MediaViewer.Images=Images
+MediaViewer.Sounds=Sounds
+MediaViewer.Videos=Videos
+MediaViewer.Internal=Use internal viewer
+MediaViewer.Default=Use default program for opening files
+MediaViewer.Custom=Use custom program
+MediaViewer.Custom.OpenCaption=Select viewer to be used
+
+[TemplateForm]
+DefaultTemplateScummVM=Default template for ScummVM profiles
+
+[DeinstallGame]
+SaveDir=Saved games folder
+
+[ViewImageForm]
+BackgroundImage.Hint=Uses the selected image as desktop background image.
+Zoom.Hint=Changes the zoom factor.
+
+[WizardForm]
+CHANGED: Page1Info=Please choose the type of profile you want to create.
+CHANGED: Page4Info=Please define the meta information for the new game or programm. All the information are optional and can be changed and complated via the profile editor at any time. This means there is no need to fill out all this fields now but it is recommended to choose at least a name for the profile.
+EmulationType.Windows=Windows game
+TemplateType5.Settings=Settings for default wizard template
+
+[GameSetup]
+Priority.Lower=Lower
+Priority.Normal=Normal
+Priority.Higher=Higher
+Priority.Highest=Highest
+EmulationType=Emulation type
+EmulationType.DOSBox=DOSBox
+EmulationType.ScummVM=ScummVM
+EmulationType.Windows=Windows
+
+[SoundCapure]
+PlayPause.Hint=Pauses or resumes playing the file.
+
+[FirstRunWizard]
+SearchForUpdatesNow=Search for updates now
+
+[DragDropError]
+NoProfileSelectedForVideoFiles=There is currently no profile selected, where video files could be imported (while trying to import "%s").
+
+[MissingFilesCheck]
+GameFile=The program file "%s" does not exist.
+
+[ZipForm]
+CHANGED: WaitInfoLabel=At the moment at least one instance of DOSBox or ScummVM is running which is using files from a zip archive. As soon as this DOSBox or ScummVM instance is closed, D-Fend Reloaded will repack this files to the zip archive.
+CHANGED: CloseWarning=D-Fend Reloaded is waiting for the termination of a DOSBox or a ScummVM instance to repack the used files in a zip archive. If you close D-Fend Reloaded now, the files will not be repacked to the zip archive. Do you really want to quit D-Fend Reloaded now ?
+CHANGED: ZipFileInUseWarning=The archive file "%s" is already in use as a drive in an other DOSBox or ScummVM instance. Please close this DOSBox or ScummVM instance before trying to use this file again.
+
+[ViewDataFiles]
+CreateFolder=Create folder...
+OpenInDefaultViewer=Open in default viewer
+Rename=Rename...
+Rename.CaptionFolder=Rename folder
+Rename.CaptionFile=Rename file
+Rename.Label=New name
+Delete=Delete
+
+[QuickStarter]
+Caption=Quick starter
+Type.GamesDir=Games folder
+Type.CaptureDir=Capture folder
+Type.DataDir=Games data folder
+Type.Full=All Folders
+Update=Update
+Update.Hint=Update directory list.
+Columns.Name=Name
+Columns.Size=Size
+Columns.Type=Type
+Columns.Type.DOS=DOS program file
+Columns.Type.Windows=Windows program file
+Columns.Type.Batch=Batch file
+Columns.Type.Text=Text file
+Columns.Type.Configuration=Configuration file
+Columns.Type.Image=Image file
+Columns.Type.Sound=Sound file
+Columns.Type.PDF=Portable document file
+Columns.Type.HTML=HTML file
+Columns.Type.RTF=Rich text file
+Columns.Type.Archive=Archive file
+Columns.Type.Image=Floppy/harddisk image
+Columns.Type.ISOImage=ISO image
+Columns.Type.DLL=Windows dynamic link library
+Columns.Type.DOSDriver=DOS driver file
+Columns.Type.Icon=Icon file
+Columns.Type.Video=Video file
+Menu.ViewMode=View mode
+Menu.ViewMode.Games=Games folder
+Menu.ViewMode.Capture=Capture folder
+Menu.ViewMode.Data=Games data folder
+Menu.ViewModes.Full=All folders
+Menu.OpenFolderInExplorer=Open folder in Explorer
+Menu.OpenFolderInDOSBox=Open folder in DOSBox
+Menu.MakeProfile=Make profile from file...
+Menu.MakeProfileWizard=Make profile from file (wizard)...
+Menu.CreateFolder=Create folder...
+Menu.CreateFolder.DefaultName=New folder
+Menu.CreateFolder.DialogCaption=Create folder
+Menu.CreateFolder.DialogLabel=Name for new folder
+Menu.Rename=Rename...
+Menu.Rename.CaptionFolder=Rename folder
+Menu.Rename.CaptionFile=Rename file
+Menu.Rename.Label=New name
+Menu.Delete=Delete
+Menu.OpenInTextEditor=Open in text editor
+Menu.RunWithParameters=Run with parameters...
+Menu.RunWithParameters.Caption=Run program with parameters
+Menu.RunWithParameters.Label=Parameters:
+Menu.OpenInDefaultViewer=Open in default viewer
+Setup.FullscreenMode=Fullscreen mode
+Setup.WindowMode=Window mode
+Setup.AutoClose=Close DOSBox when program closes
+Setup.NoAutoClose=Do not automatically close DOSBox

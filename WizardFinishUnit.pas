@@ -143,16 +143,8 @@ begin
   {Load from template}
   If Template=nil then G:=TGame.Create(PrgSetup) else G:=Template;
   try
-    If G.NrOfMounts>=1 then Mounting.Add(G.Mount0);
-    If G.NrOfMounts>=2 then Mounting.Add(G.Mount1);
-    If G.NrOfMounts>=3 then Mounting.Add(G.Mount2);
-    If G.NrOfMounts>=4 then Mounting.Add(G.Mount3);
-    If G.NrOfMounts>=5 then Mounting.Add(G.Mount4);
-    If G.NrOfMounts>=6 then Mounting.Add(G.Mount5);
-    If G.NrOfMounts>=7 then Mounting.Add(G.Mount6);
-    If G.NrOfMounts>=8 then Mounting.Add(G.Mount7);
-    If G.NrOfMounts>=9 then Mounting.Add(G.Mount8);
-    If G.NrOfMounts>=10 then Mounting.Add(G.Mount9);
+    For I:=0 to 9 do
+      If G.NrOfMounts>=I+1 then Mounting.Add(G.Mount[I]) else break;
   finally
     If Template=nil then G.Free;
   end;
@@ -267,8 +259,8 @@ Var S : String;
 begin
   Case (Sender as TComponent).Tag of
     0 : If Mounting.Count<10 then begin
-          S:=';Drive;'+NextFreeDriveLetter+';false;;';
-          if not ShowProfileMountEditorDialog(self,S,UsedDriveLetters,IncludeTrailingPathDelimiter(ExtractFilePath(CurrentGameFile)),CurrentGameName) then exit;
+          S:='';
+          if not ShowProfileMountEditorDialog(self,S,UsedDriveLetters,IncludeTrailingPathDelimiter(ExtractFilePath(CurrentGameFile)),CurrentGameName,NextFreeDriveLetter) then exit;
           Mounting.Add(S);
           LoadMountingList;
           MountingListView.ItemIndex:=MountingListView.Items.Count-1;
@@ -316,18 +308,11 @@ begin
 end;
 
 procedure TWizardFinishFrame.WriteDataToGame(const Game: TGame);
+Var I : Integer;
 begin
   Game.NrOfMounts:=Mounting.Count;
-  If Mounting.Count>0 then Game.Mount0:=Mounting[0] else Game.Mount0:='';
-  If Mounting.Count>1 then Game.Mount1:=Mounting[1] else Game.Mount1:='';
-  If Mounting.Count>2 then Game.Mount2:=Mounting[2] else Game.Mount2:='';
-  If Mounting.Count>3 then Game.Mount3:=Mounting[3] else Game.Mount3:='';
-  If Mounting.Count>4 then Game.Mount4:=Mounting[4] else Game.Mount4:='';
-  If Mounting.Count>5 then Game.Mount5:=Mounting[5] else Game.Mount5:='';
-  If Mounting.Count>6 then Game.Mount6:=Mounting[6] else Game.Mount6:='';
-  If Mounting.Count>7 then Game.Mount7:=Mounting[7] else Game.Mount7:='';
-  If Mounting.Count>8 then Game.Mount8:=Mounting[8] else Game.Mount8:='';
-  If Mounting.Count>9 then Game.Mount9:=Mounting[9] else Game.Mount9:='';
+  For I:=0 to 9 do
+    If Mounting.Count>I then Game.Mount[I]:=Mounting[I] else Game.Mount[I]:='';
   Game.AutoMountCDs:=False;
 end;
 

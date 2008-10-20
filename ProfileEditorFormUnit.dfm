@@ -14,6 +14,7 @@ object ProfileEditorForm: TProfileEditorForm
   KeyPreview = True
   OldCreateOrder = False
   Position = poOwnerFormCenter
+  OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnKeyDown = FormKeyDown
   OnShow = FormShow
@@ -30,10 +31,6 @@ object ProfileEditorForm: TProfileEditorForm
     TabOrder = 0
     object ProfileSettingsSheet: TTabSheet
       Caption = 'ProfileSettingsSheet'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object ExtraDirsLabel: TLabel
         Left = 13
         Top = 437
@@ -296,10 +293,6 @@ object ProfileEditorForm: TProfileEditorForm
     object GameInfoSheet: TTabSheet
       Caption = 'GameInfoSheet'
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object NotesLabel: TLabel
         Left = 12
         Top = 282
@@ -398,10 +391,6 @@ object ProfileEditorForm: TProfileEditorForm
     object GeneralSheet: TTabSheet
       Caption = 'GeneralSheet'
       ImageIndex = 2
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object GeneralValueListEditor: TValueListEditor
         Left = 11
         Top = 16
@@ -419,10 +408,6 @@ object ProfileEditorForm: TProfileEditorForm
     object EnvironmentSheet: TTabSheet
       Caption = 'EnvironmentSheet'
       ImageIndex = 3
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object KeyboardLayoutInfoLabel: TLabel
         Left = 12
         Top = 524
@@ -448,10 +433,6 @@ object ProfileEditorForm: TProfileEditorForm
     object MountingSheet: TTabSheet
       Caption = 'MountingSheet'
       ImageIndex = 4
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object MountingListView: TListView
         Left = 3
         Top = 16
@@ -568,10 +549,6 @@ object ProfileEditorForm: TProfileEditorForm
     object SoundSheet: TTabSheet
       Caption = 'SoundSheet'
       ImageIndex = 5
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object SoundValueListEditor: TValueListEditor
         Left = 12
         Top = 16
@@ -595,10 +572,6 @@ object ProfileEditorForm: TProfileEditorForm
         object SoundSBSheet: TTabSheet
           Caption = 'SoundSBSheet'
           ImageIndex = 8
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
           object SoundSBValueListEditor: TValueListEditor
             Left = 3
             Top = 16
@@ -615,10 +588,6 @@ object ProfileEditorForm: TProfileEditorForm
         object SoundGUSSheet: TTabSheet
           Caption = 'SoundGUSSheet'
           ImageIndex = 9
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
           object SoundGUSValueListEditor: TValueListEditor
             Left = 3
             Top = 16
@@ -635,10 +604,6 @@ object ProfileEditorForm: TProfileEditorForm
         object SoundMIDISheet: TTabSheet
           Caption = 'SoundMIDISheet'
           ImageIndex = 10
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
           object SoundMIDIValueListEditor: TValueListEditor
             Left = 3
             Top = 16
@@ -655,10 +620,6 @@ object ProfileEditorForm: TProfileEditorForm
         object SoundJoystickSheet: TTabSheet
           Caption = 'SoundJoystickSheet'
           ImageIndex = 11
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
           object SoundJoystickValueListEditor: TValueListEditor
             Left = 3
             Top = 16
@@ -675,10 +636,6 @@ object ProfileEditorForm: TProfileEditorForm
         object SoundMiscSheet: TTabSheet
           Caption = 'SoundMiscSheet'
           ImageIndex = 12
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
           object SoundMiscValueListEditor: TValueListEditor
             Left = 3
             Top = 16
@@ -695,10 +652,6 @@ object ProfileEditorForm: TProfileEditorForm
         object SoundVolumeSheet: TTabSheet
           Caption = 'SoundVolumeSheet'
           ImageIndex = 13
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
           object SoundVolumeLeftLabel: TLabel
             Left = 148
             Top = 13
@@ -881,10 +834,6 @@ object ProfileEditorForm: TProfileEditorForm
     object AutoexecSheet: TTabSheet
       Caption = 'AutoexecSheet'
       ImageIndex = 6
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         529
         567)
@@ -1050,20 +999,15 @@ object ProfileEditorForm: TProfileEditorForm
         Left = 16
         Top = 96
         Width = 505
-        Height = 243
+        Height = 227
         ActivePage = AutoexecSheet1
         Anchors = [akLeft, akTop, akRight, akBottom]
         TabOrder = 2
-        ExplicitHeight = 251
         object AutoexecSheet1: TTabSheet
           Caption = 'Autoexec.bat'
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
           object Panel1: TPanel
             Left = 0
-            Top = 194
+            Top = 170
             Width = 497
             Height = 29
             Align = alBottom
@@ -1146,7 +1090,7 @@ object ProfileEditorForm: TProfileEditorForm
             Left = 0
             Top = 0
             Width = 497
-            Height = 194
+            Height = 170
             Align = alClient
             PlainText = True
             ScrollBars = ssBoth
@@ -1157,13 +1101,9 @@ object ProfileEditorForm: TProfileEditorForm
         object AutoexecSheet2: TTabSheet
           Caption = 'Abschluss'
           ImageIndex = 1
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
           object Panel12: TPanel
             Left = 0
-            Top = 194
+            Top = 170
             Width = 497
             Height = 29
             Align = alBottom
@@ -1246,7 +1186,7 @@ object ProfileEditorForm: TProfileEditorForm
             Left = 0
             Top = 0
             Width = 497
-            Height = 194
+            Height = 170
             Align = alClient
             PlainText = True
             ScrollBars = ssBoth
@@ -1259,10 +1199,6 @@ object ProfileEditorForm: TProfileEditorForm
     object CustomSetsSheet: TTabSheet
       Caption = 'CustomSetsSheet'
       ImageIndex = 7
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object CustomSetsEnvLabel: TLabel
         Left = 13
         Top = 275

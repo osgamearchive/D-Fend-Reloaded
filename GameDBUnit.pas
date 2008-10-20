@@ -210,28 +210,54 @@ const NR_Name=1;
 
       NR_ScummVMGame=1401;
       NR_ScummVMPath=1402;
-      NR_ScummVMFilter=1403;
-      NR_ScummVMAutosave=1404;
-      NR_ScummVMLanguage=1405;
-      NR_ScummVMMusicVolume=1406;
-      NR_ScummVMSpeechVolume=1407;
-      NR_ScummVMSFXVolume=1408;
-      NR_ScummVMMIDIGain=1409;
-      NR_ScummVMSampleRate=1410;
-      NR_ScummVMMusicDriver=1411;
-      NR_ScummVMNativeMT32=1412;
-      NR_ScummVMEnableGS=1413;
-      NR_ScummVMMultiMIDI=1414;
-      NR_ScummVMTalkSpeed=1415;
-      NR_ScummVMSpeechMute=1416;
-      NR_ScummVMSubtitles=1417;
-      NR_ScummVMSavePath=1418;
+      NR_ScummVMZip=1403;
+      NR_ScummVMFilter=1404;
+      NR_ScummVMAutosave=1405;
+      NR_ScummVMLanguage=1406;
+      NR_ScummVMMusicVolume=1407;
+      NR_ScummVMSpeechVolume=1408;
+      NR_ScummVMSFXVolume=1409;
+      NR_ScummVMMIDIGain=1410;
+      NR_ScummVMSampleRate=1411;
+      NR_ScummVMMusicDriver=1412;
+      NR_ScummVMNativeMT32=1413;
+      NR_ScummVMEnableGS=1414;
+      NR_ScummVMMultiMIDI=1415;
+      NR_ScummVMTalkSpeed=1416;
+      NR_ScummVMSpeechMute=1417;
+      NR_ScummVMSubtitles=1418;
+      NR_ScummVMSavePath=1419;
+
+      NR_ScummVMConfirmExit=1419;
+      NR_ScummVMCDROM=1420;
+      NR_ScummVMJoystickNum=1421;
+      NR_ScummVMAltIntro=1422;
+      NR_ScummVMGFXDetails=1423;
+      NR_ScummVMMusicMute=1424;
+      NR_ScummVMObjectLabels=1425;
+      NR_ScummVMReverseStereo=1426;
+      NR_ScummVMSFXMute=1427;
+      NR_ScummVMWalkspeed=1428;
+
+      NR_CommandBeforeExecution=1450;
+      NR_CommandAfterExecution=1451;
+
+const ScummVMSettings : Array[0..28] of Integer =(
+  NR_ScummVMGame, NR_ScummVMPath, NR_ScummVMZip, NR_ScummVMFilter, NR_ScummVMAutosave,
+  NR_ScummVMLanguage, NR_ScummVMMusicVolume, NR_ScummVMSpeechVolume, NR_ScummVMSFXVolume, NR_ScummVMMIDIGain,
+  NR_ScummVMSampleRate, NR_ScummVMMusicDriver, NR_ScummVMNativeMT32, NR_ScummVMEnableGS, NR_ScummVMMultiMIDI,
+  NR_ScummVMTalkSpeed, NR_ScummVMSpeechMute, NR_ScummVMSubtitles, NR_ScummVMSavePath, NR_ScummVMConfirmExit,
+  NR_ScummVMCDROM, NR_ScummVMJoystickNum, NR_ScummVMAltIntro, NR_ScummVMGFXDetails, NR_ScummVMMusicMute,
+  NR_ScummVMObjectLabels, NR_ScummVMReverseStereo, NR_ScummVMSFXMute, NR_ScummVMWalkspeed
+);
 
 Type TGame=class(TBasePrgSetup)
   private
     Procedure InitData;
     Function GetExtraPrgFile(I : Integer) : String;
     Procedure SetExtraPrgFile(I : Integer; S : String);
+    function GetMount(I: Integer): String;
+    procedure SetMount(I: Integer; const Value: String);
   protected
     Procedure UpdatingFile; override;
   public
@@ -249,6 +275,8 @@ Type TGame=class(TBasePrgSetup)
 
     Procedure LoadCache;
     Procedure ReloadINI; override;
+
+    Procedure AssignFromButKeepScummVMSettings(const AGame : TGame);
 
     property Name : String index NR_Name read GetString write SetString;
 
@@ -348,6 +376,7 @@ Type TGame=class(TBasePrgSetup)
     property Mount8 : String index NR_Mount8 read GetString write SetString;
     property Mount9 : String index NR_Mount9 read GetString write SetString;
     property AutoMountCDs : Boolean index NR_AutoMountCDs read GetBoolean write SetBoolean;
+    property Mount[I : Integer] : String read GetMount write SetMount;
 
     property MixerNosound : Boolean index NR_MixerNosound read GetBoolean write SetBoolean;
     property MixerRate : Integer index NR_MixerRate read GetInteger write SetInteger;
@@ -411,6 +440,7 @@ Type TGame=class(TBasePrgSetup)
 
     property ScummVMGame : String index NR_ScummVMGame read GetString write SetString;
     property ScummVMPath : String index NR_ScummVMPath read GetString write SetString;
+    property ScummVMZip : String index NR_ScummVMZip read GetString write SetString;
     property ScummVMFilter : String index NR_ScummVMFilter read GetString write SetString;
     property ScummVMAutosave : Integer index NR_ScummVMAutosave read GetInteger write SetInteger;
     property ScummVMLanguage : String index NR_ScummVMLanguage read GetString write SetString;
@@ -427,6 +457,19 @@ Type TGame=class(TBasePrgSetup)
     property ScummVMSpeechMute : Boolean index NR_ScummVMSpeechMute read GetBoolean write SetBoolean;
     property ScummVMSubtitles : Boolean index NR_ScummVMSubtitles read GetBoolean write SetBoolean;
     property ScummVMSavePath : String index NR_ScummVMSavePath read GetString write SetString;
+    property ScummVMConfirmExit : Boolean index NR_ScummVMConfirmExit read GetBoolean write SetBoolean;
+    property ScummVMCDROM : Integer index NR_ScummVMCDROM read GetInteger write SetInteger;
+    property ScummVMJoystickNum : Integer index NR_ScummVMJoystickNum read GetInteger write SetInteger;
+    property ScummVMAltIntro : Boolean index NR_ScummVMAltIntro read GetBoolean write SetBoolean;
+    property ScummVMGFXDetails : Integer index NR_ScummVMGFXDetails read GetInteger write SetInteger;
+    property ScummVMMusicMute : Boolean index NR_ScummVMMusicMute read GetBoolean write SetBoolean;
+    property ScummVMObjectLabels : Boolean index NR_ScummVMObjectLabels read GetBoolean write SetBoolean;
+    property ScummVMReverseStereo : Boolean index NR_ScummVMReverseStereo read GetBoolean write SetBoolean;
+    property ScummVMSFXMute : Boolean index NR_ScummVMSFXMute read GetBoolean write SetBoolean;
+    property ScummVMWalkspeed : Integer index NR_ScummVMWalkspeed read GetInteger write SetInteger;
+
+    property CommandBeforeExecution : String index NR_CommandBeforeExecution read GetString write SetString;
+    property CommandAfterExecution : String index NR_CommandAfterExecution read GetString write SetString;
 end;
 
 Type TGameDB=class
@@ -474,7 +517,9 @@ Var DefaultValueReaderGame : TGame = nil;
 Const DefaultValuesResolution='original,320x200,640x432,640x480,720x480,800x600,1024x768,1152x864,1280x720,1280x768,1280x960,1280x1024,1600x1200,1920x1080,1920x1200';
       DefaultValuesJoysticks='none,auto,2axis,4axis,fcs,ch';
       DefaultValuesScale='No Scaling (none),Nearest neighbor upscaling with factor 2 (normal2x),Nearest neighbor upscaling with factor 3 (normal3x),'+
-                         'Advanced upscaling with factor 2 (advmame2x),Advanced upscaling with factor 3 (advmame3x),Advanced interpoling with factor 2 (advinterp2x),Advanced interpoling with factor 3 (advinterp3x),'+
+                         'Advanced upscaling with factor 2 (advmame2x),Advanced upscaling with factor 3 (advmame3x),'+
+                         'high quality with factor 2 (hq2x), high quality with factor 3 (hq3x),2xsai (2xsai), super2xsai (super2xsai), supereagle (supereagle),'+
+                         'Advanced interpoling with factor 2 (advinterp2x),Advanced interpoling with factor 3 (advinterp3x),'+
                          'Advanced upscaling with sharpening with factor 2 (tv2x),Advanced upscaling with sharpening with factor 3 (tv3x),Simulates the phopsphors on a dot trio CRT with factor 2 (rgb2x),Simulates the phopsphors on a dot trio CRT with factor 3 (rgb3x),'+
                          'Nearest neighbor with black lines with factor 2 (scan2x),Nearest neighbor with black lines with factor 3 (scan3x)';
       DefaultValueRender='surface,overlay,opengl,openglnb,ddraw';
@@ -774,6 +819,7 @@ begin
 
   AddStringRec(NR_ScummVMGame,'ScummVM','GameName','');
   AddStringRec(NR_ScummVMPath,'ScummVM','GamePath','');
+  AddStringRec(NR_ScummVMZip,'ScummVM','GameZipFile','');
   AddStringRec(NR_ScummVMFilter,'ScummVM','Filter','2x');
   AddIntegerRec(NR_ScummVMAutosave,'ScummVM','AutosavePeriod',300);
   AddStringRec(NR_ScummVMLanguage,'ScummVM','Language','en');
@@ -790,6 +836,19 @@ begin
   AddBooleanRec(NR_ScummVMSpeechMute,'ScummVM','SpeechMute',False);
   AddBooleanRec(NR_ScummVMSubtitles,'ScummVM','Subtitles',True);
   AddStringRec(NR_ScummVMSavePath,'ScummVM','Savepath','');
+  AddBooleanRec(NR_ScummVMConfirmExit,'ScummVM','ConfirmExit',False);
+  AddIntegerRec(NR_ScummVMCDROM,'ScummVM','CDROM',0);
+  AddIntegerRec(NR_ScummVMJoystickNum,'ScummVM','JoystickNum',0);
+  AddBooleanRec(NR_ScummVMAltIntro,'ScummVM','AltIntro',False);
+  AddIntegerRec(NR_ScummVMGFXDetails,'ScummVM','GFXDetails',3);
+  AddBooleanRec(NR_ScummVMMusicMute,'ScummVM','MusicMute',False);
+  AddBooleanRec(NR_ScummVMObjectLabels,'ScummVM','ObjectLabels',False);
+  AddBooleanRec(NR_ScummVMReverseStereo,'ScummVM','ReverseStereo',False);
+  AddBooleanRec(NR_ScummVMSFXMute,'ScummVM','SFXMute',False);
+  AddIntegerRec(NR_ScummVMWalkspeed,'ScummVM','Walkspeed',2);
+
+  AddStringRec(NR_CommandBeforeExecution,'ExtraCommands','BeforeExecution','');
+  AddStringRec(NR_CommandAfterExecution,'ExtraCommands','AfterExecution','');
 end;
 
 Function TGame.GetExtraPrgFile(I : Integer) : String;
@@ -803,6 +862,42 @@ Procedure TGame.SetExtraPrgFile(I : Integer; S : String);
 begin
   If (I<0) or (I>9) then exit;
   SetString(NR_ExtraPrgFile+I,S);
+end;
+
+function TGame.GetMount(I: Integer): String;
+begin
+  If (I<0) or (I>9) then result:='' else result:=GetString(NR_Mount0+I);
+
+ {Gives a compiler warning for (for me) unknown reason:
+ Case I of
+    0 : result:=Mount0;
+    1 : result:=Mount1;
+    2 : result:=Mount2;
+    3 : result:=Mount3;
+    4 : result:=Mount4;
+    5 : result:=Mount5;
+    6 : result:=Mount6;
+    7 : result:=Mount7;
+    8 : result:=Mount8;
+    9 : result:=Mount9;
+    else result:='';
+  end;}
+end;
+
+procedure TGame.SetMount(I: Integer; const Value: String);
+begin
+  Case I of
+    0 : Mount0:=Value;
+    1 : Mount1:=Value;
+    2 : Mount2:=Value;
+    3 : Mount3:=Value;
+    4 : Mount4:=Value;
+    5 : Mount5:=Value;
+    6 : Mount6:=Value;
+    7 : Mount7:=Value;
+    8 : Mount8:=Value;
+    9 : Mount9:=Value;
+  end;
 end;
 
 procedure TGame.LoadCache;
@@ -832,6 +927,11 @@ procedure TGame.UpdatingFile;
 begin
   inherited UpdatingFile;
   LastModification:=IntToStr(Round(Int(Now)))+'-'+IntToStr(Round(Frac(Now)*86400));
+end;
+
+Procedure TGame.AssignFromButKeepScummVMSettings(const AGame : TGame);
+begin
+  AssignFromPartially(AGame,ScummVMSettings);
 end;
 
 { TGameDB }
@@ -909,7 +1009,7 @@ begin
   I:=FindFirst(FDir+'*.conf',faAnyFile,Rec);
   try
     while I=0 do begin
-      DeleteFile(FDir+Rec.Name);
+      ExtDeleteFile(FDir+Rec.Name,ftProfile);
       I:=FindNext(Rec);
     end;
   finally
@@ -919,7 +1019,7 @@ begin
   I:=FindFirst(FDir+'Tempprof.*',faAnyFile,Rec);
   try
     while I=0 do begin
-      DeleteFile(FDir+Rec.Name);
+      ExtDeleteFile(FDir+Rec.Name,ftProfile);
       I:=FindNext(Rec);
     end;
   finally
@@ -981,7 +1081,7 @@ begin
   FGameList.Delete(Index);
 
   If FileExists(FileName) then begin
-    If not DeleteFile(FileName) then MessageDlg(Format(LanguageSetup.MessageCouldNotDeleteFile,[FileName]),mtError,[mbOK],0);
+    If not ExtDeleteFile(FileName,ftProfile) then MessageDlg(Format(LanguageSetup.MessageCouldNotDeleteFile,[FileName]),mtError,[mbOK],0);
   end;
 end;
 

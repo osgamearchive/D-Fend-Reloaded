@@ -13,10 +13,13 @@ object PlayVideoForm: TPlayVideoForm
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
+  KeyPreview = True
   OldCreateOrder = False
   Position = poOwnerFormCenter
   OnCreate = FormCreate
   OnDestroy = FormDestroy
+  OnKeyDown = FormKeyDown
+  OnMouseWheel = FormMouseWheel
   OnResize = FormResize
   OnShow = FormShow
   PixelsPerInch = 96
@@ -46,26 +49,30 @@ object PlayVideoForm: TPlayVideoForm
       EdgeBorders = [ebBottom]
       Images = ImageList
       List = True
+      ParentShowHint = False
       ShowCaptions = True
+      ShowHint = True
       TabOrder = 0
       Wrapable = False
       object PreviousButton: TToolButton
         Left = 0
         Top = 0
+        AutoSize = True
         Caption = 'PreviousButton'
         ImageIndex = 1
         OnClick = ButtonWork
       end
       object NextButton: TToolButton
         Tag = 1
-        Left = 100
+        Left = 104
         Top = 0
+        AutoSize = True
         Caption = 'NextButton'
         ImageIndex = 2
         OnClick = ButtonWork
       end
       object ToolButton1: TToolButton
-        Left = 200
+        Left = 190
         Top = 0
         Width = 8
         Caption = 'ToolButton1'
@@ -73,14 +80,15 @@ object PlayVideoForm: TPlayVideoForm
       end
       object SaveButton: TToolButton
         Tag = 2
-        Left = 208
+        Left = 198
         Top = 0
+        AutoSize = True
         Caption = 'Speichern'
         ImageIndex = 0
         OnClick = ButtonWork
       end
       object ToolButton2: TToolButton
-        Left = 308
+        Left = 276
         Top = 0
         Width = 8
         Caption = 'ToolButton2'
@@ -89,14 +97,15 @@ object PlayVideoForm: TPlayVideoForm
       end
       object PlayPauseButton: TToolButton
         Tag = 3
-        Left = 316
+        Left = 284
         Top = 0
+        AutoSize = True
         Caption = 'Play/Pause'
         ImageIndex = 3
         OnClick = ButtonWork
       end
       object ToolButton3: TToolButton
-        Left = 416
+        Left = 368
         Top = 0
         Width = 8
         Caption = 'ToolButton3'
@@ -104,8 +113,9 @@ object PlayVideoForm: TPlayVideoForm
         Style = tbsSeparator
       end
       object ZoomButton: TToolButton
-        Left = 424
+        Left = 376
         Top = 0
+        AutoSize = True
         Caption = 'ZoomButton'
         DropdownMenu = ZoomPopupMenu
         ImageIndex = 4
@@ -493,6 +503,7 @@ object PlayVideoForm: TPlayVideoForm
     Top = 24
   end
   object ZoomPopupMenu: TPopupMenu
+    OnPopup = ZoomPopupMenuPopup
     Left = 152
     Top = 24
     object ZoomMenuItem1: TMenuItem

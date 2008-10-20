@@ -81,6 +81,8 @@ type
     ToolButton4: TToolButton;
     MenuHelp: TMenuItem;
     MenuHelpHelp: TMenuItem;
+    MenuEditCopy: TMenuItem;
+    MenuEditCopy2: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure ButtonWork(Sender: TObject);
     procedure ListViewKeyDown(Sender: TObject; var Key: Word;
@@ -109,12 +111,13 @@ type
     ListSortReverse, ListSortReverse2 : Boolean;
     Procedure LoadList;
     Procedure LoadList2;
-    procedure SelectGame(const AGame: TGame);
+    procedure SelectGame(const AGame: TGame; const AGameName : String);
     procedure SelectGame2(const AGame: TGame);
   public
     { Public-Deklarationen }
     GameDB : TGameDB;
     Template : TGame;
+    TemplateScummVM : Boolean;
     SearchLinkFile : TLinkFile;
     DeleteOnExit : TStringList;
   end;
@@ -123,6 +126,8 @@ var
   TemplateForm: TTemplateForm;
 
 Function ShowTemplateDialog(const AOwner : TComponent; const AGameDB : TGameDB; const ASearchLinkFile : TLinkFile; const ADeleteOnExit : TStringList) : TGame;
+
+Procedure RemoveNonAutoSetupValues(const G : TGame);
 
 implementation
 
@@ -149,10 +154,13 @@ begin
   ListSortReverse2:=False;
 
   Template:=nil;
+  TemplateScummVM:=False;
 
   Caption:=LanguageSetup.TemplateForm;
   TemplateTab.Caption:=LanguageSetup.TemplateForm;
   AutoSetupSheet.Caption:=LanguageSetup.TemplateFormAutoSetupCaption;
+
+  CoolBar.Font.Size:=PrgSetup.ToolbarFontSize;
 
   { Menu }
 
@@ -168,10 +176,13 @@ begin
   MenuEditAdd2.Caption:=LanguageSetup.MenuProfileAdd;
   MenuEditAdd2NewTemplate.Caption:=LanguageSetup.TemplateFormNewTemplate;
   MenuEditAdd2TemplateFromProfile.Caption:=LanguageSetup.TemplateFormNewFromProfile;
-  MenuEditEditMultipleTemplates.Caption:=LanguageSetup.TemplateFormEditMultipleTemplates;
   MenuEditEdit.Caption:=LanguageSetup.MenuProfileEdit;
   MenuEditEdit2.Caption:=LanguageSetup.MenuProfileEdit;
+  MenuEditCopy.Caption:=LanguageSetup.TemplateFormCopy;
+  MenuEditCopy2.Caption:=LanguageSetup.TemplateFormCopy;
+  MenuEditEditMultipleTemplates.Caption:=LanguageSetup.TemplateFormEditMultipleTemplates;
   MenuEditEditMultipleTemplates2.Caption:=LanguageSetup.TemplateFormEditMultipleTemplates;
+
   MenuEditDelete.Caption:=LanguageSetup.Del;
   MenuEditDelete2.Caption:=LanguageSetup.Del;
   MenuHelp.Caption:=LanguageSetup.MenuHelp;
@@ -180,18 +191,25 @@ begin
   { Template sheet }
 
   CloseButton.Caption:=LanguageSetup.Close;
+  CloseButton.Hint:=LanguageSetup.CloseHintWindow;
+
   UseButton.Caption:=LanguageSetup.Use;
+  UseButton.Hint:=LanguageSetup.UseHintTemplate;
   PopupUseProfile2.Caption:=LanguageSetup.TemplateFormUseAsProfile;
   PopupUseDefault2.Caption:=LanguageSetup.TemplateFormUseAsDefault;
   AddButton.Caption:=LanguageSetup.Add;
+  AddButton.Hint:=LanguageSetup.AddHintTemplate;
   EditButton.Caption:=LanguageSetup.Edit;
+  EditButton.Hint:=LanguageSetup.EditHintTemplate;
   DeleteButton.Caption:=LanguageSetup.Del;
+  DeleteButton.Hint:=LanguageSetup.DelHintTemplate;
   HelpButton.Caption:=LanguageSetup.Help;
+  HelpButton.Hint:=LanguageSetup.HelpHint;
 
   PopupUse.Caption:=LanguageSetup.Use;
   PopupUseProfile.Caption:=LanguageSetup.TemplateFormUseAsProfile;
   PopupUseDefault.Caption:=LanguageSetup.TemplateFormUseAsDefault;
-  PopupEdit.Caption:=LanguageSetup.Edit;
+  PopupEdit.Caption:=LanguageSetup.MenuProfileEdit;
   PopupCopy.Caption:=LanguageSetup.TemplateFormCopy;
   PopupDel.Caption:=LanguageSetup.Del;
 
@@ -204,14 +222,20 @@ begin
   { AutoSetup sheet }
 
   CloseButton2.Caption:=LanguageSetup.Close;
-  AddButton2.Caption:=LanguageSetup.Add;
-  EditButton2.Caption:=LanguageSetup.Edit;
-  DeleteButton2.Caption:=LanguageSetup.Del;
+  CloseButton2.Hint:=LanguageSetup.CloseHintWindow;
 
-  PopupEdit2.Caption:=LanguageSetup.Edit;
+  AddButton2.Caption:=LanguageSetup.Add;
+  AddButton2.Hint:=LanguageSetup.AddHintTemplate;
+  EditButton2.Caption:=LanguageSetup.Edit;
+  EditButton2.Hint:=LanguageSetup.EditHintTemplate;
+  DeleteButton2.Caption:=LanguageSetup.Del;
+  DeleteButton2.Hint:=LanguageSetup.DelHintTemplate;
+  HelpButton2.Caption:=LanguageSetup.Help;
+  HelpButton2.Hint:=LanguageSetup.HelpHint;
+
+  PopupEdit2.Caption:=LanguageSetup.MenuProfileEdit;
   PopupCopy2.Caption:=LanguageSetup.TemplateFormCopy;
   PopupDel2.Caption:=LanguageSetup.Del;
-  HelpButton2.Caption:=LanguageSetup.Help;
 
   PopupAddNew2.Caption:=LanguageSetup.TemplateFormNewTemplate;
   PopupAddFromProfile2.Caption:=LanguageSetup.TemplateFormNewFromProfile;
@@ -238,31 +262,43 @@ begin
   DefaultTemplate.Free;
 end;
 
-procedure TTemplateForm.SelectGame(const AGame: TGame);
+procedure TTemplateForm.SelectGame(const AGame: TGame; const AGameName : String);
 Var I : Integer;
 begin
+  If AGame<>nil then begin
     For I:=0 to ListView.Items.Count-1 do If TGame(ListView.Items[I].Data)=AGame then begin ListView.Selected:=ListView.Items[I]; break; end;
-    ListViewSelectItem(self,ListView.Selected,ListView.Selected<>nil);
+  end else If AGameName<>'' then begin
+    For I:=0 to ListView.Items.Count-1 do If (TGame(ListView.Items[I].Data)=DefaultTemplate) and (ListView.Items[I].Caption=AGameName) then begin ListView.Selected:=ListView.Items[I]; break; end;
+  end;
+  ListViewSelectItem(self,ListView.Selected,ListView.Selected<>nil);
 end;
 
 procedure TTemplateForm.SelectGame2(const AGame: TGame);
 Var I : Integer;
 begin
-    For I:=0 to ListView2.Items.Count-1 do If TGame(ListView2.Items[I].Data)=AGame then begin ListView2.Selected:=ListView2.Items[I]; break; end;
-    ListView2SelectItem(self,ListView2.Selected,ListView2.Selected<>nil);
+  For I:=0 to ListView2.Items.Count-1 do If TGame(ListView2.Items[I].Data)=AGame then begin ListView2.Selected:=ListView2.Items[I]; break; end;
+  ListView2SelectItem(self,ListView2.Selected,ListView2.Selected<>nil);
 end;
 
 procedure TTemplateForm.LoadList;
-Var G : TGame;
+Var G, OldDefaultTemplate : TGame;
+    GName : String;
 begin
+  OldDefaultTemplate:=DefaultTemplate;
   DefaultTemplate.Free;
   DefaultTemplate:=TGame.Create(PrgSetup);
 
   ListView.Items.BeginUpdate;
   try
-    If ListView.Selected<>nil then G:=TGame(ListView.Selected.Data) else G:=nil;
+    If ListView.Selected<>nil then begin
+      G:=TGame(ListView.Selected.Data);
+      If G=OldDefaultTemplate then begin G:=nil; GName:=ListView.Selected.Caption; end else GName:='';
+    end else begin
+      G:=nil;
+      GName:='';
+    end;
     AddGamesToList(ListView,ListViewImageList,ListViewIconImageList,ImageList,TemplateDB,DefaultTemplate,RemoveUnderline(LanguageSetup.All),'','',True,ListSort,ListSortReverse,False,False);
-    SelectGame(G);
+    SelectGame(G,GName);
     If (ListView.Selected=nil) and (ListView.Items.Count>0) then ListView.Selected:=ListView.Items[0];
 
     StatusBar.Panels[0].Text:=IntToStr(ListView.Items.Count)+' '+LanguageSetup.StatisticsNumberTemplates;
@@ -295,21 +331,28 @@ begin
   MenuFileUse.Visible:=CoolBar.Visible;
   MenuEditAdd.Visible:=CoolBar.Visible;
   MenuEditEdit.Visible:=CoolBar.Visible;
+  MenuEditCopy.Visible:=CoolBar.Visible;
   MenuEditEditMultipleTemplates.Visible:=CoolBar.Visible;
   MenuEditDelete.Visible:=CoolBar.Visible;
 
   MenuEditAdd2.Visible:=CoolBar1.Visible;
   MenuEditEdit2.Visible:=CoolBar1.Visible;
+  MenuEditCopy2.Visible:=CoolBar1.Visible;
   MenuEditEditMultipleTemplates2.Visible:=CoolBar1.Visible;
   MenuEditDelete2.Visible:=CoolBar1.Visible;
 end;
 
 procedure TTemplateForm.ListViewSelectItem(Sender: TObject; Item: TListItem; Selected: Boolean);
-Var B,B2 : Boolean;
+Var B,B2,ScummVM : Boolean;
 begin
   B:=Selected and (Item<>nil) and (Item.Data<>nil);
 
   B2:=B and (TGame(Item.Data)<>DefaultTemplate);
+  If B and (not B2) then begin
+    ScummVM:=(TGame(ListView.Selected.Data)=DefaultTemplate) and (ListView.Selected.Caption<>LanguageSetup.TemplateFormDefault);
+  end else begin
+    ScummVM:=False;
+  end;
 
   UseButton.Enabled:=B;
   EditButton.Enabled:=B;
@@ -317,6 +360,7 @@ begin
 
   PopupUse.Enabled:=B;
   PopupEdit.Enabled:=B;
+  PopupCopy.Enabled:=B and (not ScummVM);
   PopupDel.Enabled:=B2;
 
   PopupUseDefault.Enabled:=B2;
@@ -325,6 +369,7 @@ begin
   MenuFileUse.Enabled:=B;
   MenuFileUseAsDefault.Enabled:=B2;
   MenuEditEdit.Enabled:=B;
+  MenuEditCopy.Enabled:=B and (not ScummVM);
   MenuEditDelete.Enabled:=B2;
 end;
 
@@ -337,9 +382,11 @@ begin
   DeleteButton2.Enabled:=B;
 
   PopupEdit2.Enabled:=B;
+  PopupCopy2.Enabled:=B;
   PopupDel2.Enabled:=B;
 
   MenuEditEdit2.Enabled:=B;
+  MenuEditCopy2.Enabled:=B;
   MenuEditDelete2.Enabled:=B;
 end;
 
@@ -399,9 +446,10 @@ end;
 
 procedure TTemplateForm.ButtonWork(Sender: TObject);
 Var G,G2 : TGame;
+    GName : String;
     P : TPoint;
     S : String;
-    L : TList;
+    L,L2 : TList;
     I : Integer;
 begin
   Case (Sender as TComponent).Tag of
@@ -421,20 +469,48 @@ begin
           If (ListView.Selected=nil) or (ListView.Selected.Data=nil) then begin
             MessageDlg(LanguageSetup.MessageNoGameSelected,mtError,[mbOK],0); exit;
           end;
-          L:=TList.Create;
-          try
-            For I:=0 to ListView.Items.Count-1 do L.Add(ListView.Items[I].Data);
-            G:=TGame(ListView.Selected.Data);
-            If PrgSetup.DFendStyleProfileEditor then begin
-              if not EditGameTemplate(self,TemplateDB,G,nil,SearchLinkFile,DeleteOnExit,L) then exit;
-            end else begin
-              if not ModernEditGameTemplate(self,TemplateDB,G,nil,SearchLinkFile,DeleteOnExit,L) then exit;
+          {Because "Default template" and "Default ScummVM template" are the same object, cannot handle them in one list, IndexOf will not find the right one}
+          If TGame(ListView.Selected.Data)=DefaultTemplate then begin
+            {Default template or ScummVM default template}
+            L:=TList.Create;
+            L2:=TList.Create;
+            try
+              G:=TGame(ListView.Selected.Data);
+              L.Add(G);
+              If ListView.Selected.Caption=LanguageSetup.TemplateFormDefault then L2.Add(Pointer(1)) else L2.Add(Pointer(2));
+              GName:=ListView.Selected.Caption;
+              If PrgSetup.DFendStyleProfileEditor then begin
+                if not EditGameTemplate(self,TemplateDB,G,nil,SearchLinkFile,DeleteOnExit,L,L2) then exit;
+              end else begin
+                if not ModernEditGameTemplate(self,TemplateDB,G,nil,SearchLinkFile,DeleteOnExit,L,L2) then exit;
+              end;
+              G.LoadCache;
+              LoadList;
+              SelectGame(nil,GName);
+            finally
+              L.Free;
+              L2.Free;
             end;
-            G.LoadCache;
-            LoadList;
-            SelectGame(G);
-          finally
-            L.Free;
+          end else begin
+            {Normal template}
+            L:=TList.Create;
+            try
+              For I:=0 to ListView.Items.Count-1 do begin
+                If TGame(ListView.Items[I].Data)=DefaultTemplate then continue;
+                L.Add(ListView.Items[I].Data);
+              end;
+              G:=TGame(ListView.Selected.Data);
+              If PrgSetup.DFendStyleProfileEditor then begin
+                if not EditGameTemplate(self,TemplateDB,G,nil,SearchLinkFile,DeleteOnExit,L,nil) then exit;
+              end else begin
+                if not ModernEditGameTemplate(self,TemplateDB,G,nil,SearchLinkFile,DeleteOnExit,L,nil) then exit;
+              end;
+              G.LoadCache;
+              LoadList;
+              SelectGame(G,'');
+            finally
+              L.Free;
+            end;
           end;
         end;
     4 : begin
@@ -454,14 +530,16 @@ begin
           If (ListView.Selected=nil) or (ListView.Selected.Data=nil) then begin
              MessageDlg(LanguageSetup.MessageNoGameSelected,mtError,[mbOK],0); exit;
            end;
-           Template:=TGame(ListView.Selected.Data); Close;
+           Template:=TGame(ListView.Selected.Data);
+           TemplateScummVM:=(TGame(ListView.Selected.Data)=DefaultTemplate) and (ListView.Selected.Caption<>LanguageSetup.TemplateFormDefault);
+           Close;
         end;
     6 : begin
           {Template: Use a new default template}
           If (ListView.Selected=nil) or (ListView.Selected.Data=nil) then begin
              MessageDlg(LanguageSetup.MessageNoGameSelected,mtError,[mbOK],0); exit;
            end;
-           DefaultTemplate.AssignFrom(TGame(ListView.Selected.Data));
+           DefaultTemplate.AssignFromButKeepScummVMSettings(TGame(ListView.Selected.Data));
            DefaultTemplate.Name:='';
            LoadList;
         end;
@@ -475,7 +553,7 @@ begin
           end;
           G.LoadCache;
           LoadList;
-          SelectGame(G);
+          SelectGame(G,'');
         end;
     8 : begin
           {Template: Add from profile}
@@ -489,13 +567,15 @@ begin
           end;
           G.LoadCache;
           LoadList;
-          SelectGame(G);
+          SelectGame(G,'');
         end;
     9 : begin
           {Template: Copy}
           If (ListView.Selected=nil) or (ListView.Selected.Data=nil) then begin
             MessageDlg(LanguageSetup.MessageNoGameSelected,mtError,[mbOK],0); exit;
           end;
+          If (TGame(ListView.Selected.Data)=DefaultTemplate) and (ListView.Selected.Caption<>LanguageSetup.TemplateFormDefault) then exit;
+          S:=TGame(ListView.Selected.Data).CacheName;
           If not InputQuery(LanguageSetup.MenuProfileCopyTitle,LanguageSetup.MenuProfileCopyPrompt,S) then exit;
           G:=TemplateDB[TemplateDB.Add(S)];
           G.AssignFrom(TGame(ListView.Selected.Data));
@@ -503,7 +583,7 @@ begin
           G.LoadCache;
           G.StoreAllValues;
           LoadList;
-          SelectGame(G);
+          SelectGame(G,'');
         end;
    10 : begin
           {AutoSetup: Add button}
@@ -553,7 +633,7 @@ begin
           end;
           G.LoadCache;
           LoadList2;
-          SelectGame(G);
+          SelectGame2(G);
         end;
    14 : begin
           {AutoSetup: Add from profile}
@@ -569,17 +649,12 @@ begin
               G.AssignFrom(TGame(L[I]));
 
               {Delete not template-useable values}
-              If Trim(G.GameExe)<>'' then G.GameExe:=ExtractFileName(G.GameExe);
-              If Trim(G.SetupExe)<>'' then G.SetupExe:=ExtractFileName(G.SetupExe);
-              G.CaptureFolder:='';
-              G.DataDir:='';
-              G.ExtraDirs:='';
-              G.ExtraFiles:='';
-              G.CustomDOSBoxDir:='';
+              RemoveNonAutoSetupValues(G);
               G.LoadCache;
               G.StoreAllValues;
             end;
             LoadList2;
+            SelectGame2(G);
           finally
             L.Free;
           end;
@@ -589,6 +664,7 @@ begin
           If (ListView2.Selected=nil) or (ListView2.Selected.Data=nil) then begin
             MessageDlg(LanguageSetup.MessageNoGameSelected,mtError,[mbOK],0); exit;
           end;
+          S:=TGame(ListView2.Selected.Data).CacheName;
           If not InputQuery(LanguageSetup.MenuProfileCopyTitle,LanguageSetup.MenuProfileCopyPrompt,S) then exit;
           G:=AutoSetupDB[AutoSetupDB.Add(S)];
           G.AssignFrom(TGame(ListView2.Selected.Data));
@@ -601,9 +677,12 @@ begin
    16 : begin
           {Template: Multi edit}
           ShowChangeProfilesDialog(self,TemplateDB,True);
-          If ListView.Selected=nil then G:=nil else G:=TGame(ListView.Selected.Data);
+          If ListView.Selected=nil then begin G:=nil; GName:=''; end else begin
+            G:=TGame(ListView.Selected.Data);
+            If G=DefaultTemplate then begin G:=nil; GName:=ListView.Selected.Caption; end else GName:='';
+          end;
           LoadList;
-          SelectGame(G);
+          SelectGame(G,GName);
         end;
    17 : begin
           {AutoSetup: Multi edit}
@@ -623,6 +702,17 @@ end;
 
 { global }
 
+Procedure RemoveNonAutoSetupValues(const G : TGame);
+begin
+  If Trim(G.GameExe)<>'' then G.GameExe:=ExtractFileName(G.GameExe);
+  If Trim(G.SetupExe)<>'' then G.SetupExe:=ExtractFileName(G.SetupExe);
+  G.CaptureFolder:='';
+  G.DataDir:='';
+  G.ExtraDirs:='';
+  G.ExtraFiles:='';
+  G.CustomDOSBoxDir:='';
+end;
+
 Function ShowTemplateDialog(const AOwner : TComponent; const AGameDB : TGameDB; const ASearchLinkFile : TLinkFile; const ADeleteOnExit : TStringList) : TGame;
 begin
   result:=nil;
@@ -633,10 +723,16 @@ begin
     TemplateForm.DeleteOnExit:=ADeleteOnExit;
     TemplateForm.ShowModal;
     if TemplateForm.Template=nil then exit;
-    If PrgSetup.DFendStyleProfileEditor then begin
-      EditGameProfil(AOwner,AGameDB,result,TemplateForm.Template,ASearchLinkFile,ADeleteOnExit);
-    end else begin
-      ModernEditGameProfil(AOwner,AGameDB,result,TemplateForm.Template,ASearchLinkFile,ADeleteOnExit);
+
+    If TemplateForm.TemplateScummVM then TemplateForm.Template.ProfileMode:='ScummVM';
+    try
+      If PrgSetup.DFendStyleProfileEditor and (not TemplateForm.TemplateScummVM) then begin
+        EditGameProfil(AOwner,AGameDB,result,TemplateForm.Template,ASearchLinkFile,ADeleteOnExit,'');
+      end else begin
+        ModernEditGameProfil(AOwner,AGameDB,result,TemplateForm.Template,ASearchLinkFile,ADeleteOnExit,'');
+      end;
+    finally
+      If TemplateForm.TemplateScummVM then TemplateForm.Template.ProfileMode:='DOSBox';
     end;
   finally
     TemplateForm.Free;

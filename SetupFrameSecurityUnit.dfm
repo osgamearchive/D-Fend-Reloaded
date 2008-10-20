@@ -2,16 +2,16 @@ object SetupFrameSecurity: TSetupFrameSecurity
   Left = 0
   Top = 0
   Width = 653
-  Height = 240
+  Height = 405
   TabOrder = 0
   DesignSize = (
     653
-    240)
+    405)
   object DeleteProectionLabel: TLabel
-    Left = 40
-    Top = 88
-    Width = 601
-    Height = 57
+    Left = 32
+    Top = 66
+    Width = 609
+    Height = 47
     Anchors = [akLeft, akTop, akRight]
     AutoSize = False
     Caption = 
@@ -19,13 +19,12 @@ object SetupFrameSecurity: TSetupFrameSecurity
       'nfigurierten Profilen niemals Dateien, die nicht zu D-Fend geh'#246'r' +
       'en, gel'#246'scht werden k'#246'nnen.'
     WordWrap = True
-    ExplicitWidth = 545
   end
   object UseChecksumsLabel: TLabel
-    Left = 40
-    Top = 167
-    Width = 601
-    Height = 58
+    Left = 32
+    Top = 137
+    Width = 609
+    Height = 66
     Anchors = [akLeft, akTop, akRight]
     AutoSize = False
     Caption = 
@@ -36,9 +35,18 @@ object SetupFrameSecurity: TSetupFrameSecurity
       'el gedacht war und ob sich Programmdateien ver'#228'ndert haben.'
     WordWrap = True
   end
+  object RecycleBinLabel: TLabel
+    Left = 16
+    Top = 209
+    Width = 625
+    Height = 13
+    Anchors = [akLeft, akTop, akRight]
+    AutoSize = False
+    Caption = 'Dateien beim L'#246'schen in den Papierkorb verschieben:'
+  end
   object AskBeforeDeleteCheckBox: TCheckBox
     Left = 16
-    Top = 24
+    Top = 16
     Width = 625
     Height = 17
     Anchors = [akLeft, akTop, akRight]
@@ -47,7 +55,7 @@ object SetupFrameSecurity: TSetupFrameSecurity
   end
   object DeleteProectionCheckBox: TCheckBox
     Left = 16
-    Top = 64
+    Top = 48
     Width = 625
     Height = 17
     Anchors = [akLeft, akTop, akRight]
@@ -56,10 +64,27 @@ object SetupFrameSecurity: TSetupFrameSecurity
   end
   object UseChecksumsCheckBox: TCheckBox
     Left = 16
-    Top = 144
+    Top = 119
     Width = 569
     Height = 17
     Caption = 'DOS-Programmdateien per Pr'#252'fsumme auf '#196'nderungen '#252'berpr'#252'fen'
     TabOrder = 2
+  end
+  object RecycleBinListBox: TCheckListBox
+    Left = 16
+    Top = 224
+    Width = 625
+    Height = 109
+    Anchors = [akLeft, akTop, akRight]
+    ItemHeight = 13
+    Items.Strings = (
+      '0'
+      '1'
+      '2'
+      '3'
+      '4'
+      '5'
+      '6')
+    TabOrder = 3
   end
 end

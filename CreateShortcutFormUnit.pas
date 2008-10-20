@@ -171,7 +171,7 @@ begin
 
       DOSBoxNr:=GetDOSBoxNr(Game);
       If DOSBoxNr>=0 then S:=MakeAbsPath(PrgSetup.DOSBoxSettings[DOSBoxNr].DosBoxDir,PrgSetup.BaseDir) else S:=Trim(Game.CustomDOSBoxDir);
-      St.Add(UnmapDrive(IncludeTrailingPathDelimiter(S)+DosBoxFileName,ptDOSBox)+' -conf '+UnmapDrive(ConfFile,ptDOSBox));
+      St.Add(UnmapDrive(IncludeTrailingPathDelimiter(S)+DosBoxFileName,ptDOSBox)+' -conf "'+UnmapDrive(ConfFile,ptDOSBox)+'"');
       try
         St.SaveToFile(SaveDialog.FileName);
       except

@@ -566,6 +566,21 @@ begin
       end;
       AddFiles(S);
     end;
+    S:=Trim(Game.ScummVMZip);
+    If S<>'' then begin
+      S:=MakeRelPath(S,PrgSetup.BaseDir);
+      If Copy(S,2,2)=':\' then begin
+        MessageDlg(Format(LanguageSetup.MessagePathNotRelative,[S,Game.Name,PrgSetup.BaseDir]),mtError,[mbOK],0);
+        result:=False; exit;
+      end;
+      T:=ExtractFilePath(S);
+      If (T<>'') and (T[1]='.') then Delete(T,1,1);
+      If (T<>'') and (T[1]='\') then Delete(T,1,1);
+      If (T<>'') and (T[length(T)]='\') then Delete(T,length(T),1);
+      NSI.Add('  SetOutPath "$DataInstDir\'+T+'"');
+      If (S<>'') and (S[1]='\') then S:='.'+S;
+      NSI.Add('  File /nonfatal "'+S+'"');
+    end;
     S:=Trim(Game.ScummVMSavePath);
     If S<>'' then begin
       S:=IncludeTrailingPathDelimiter(MakeRelPath(S,PrgSetup.BaseDir));
@@ -616,6 +631,7 @@ begin
       If (T<>'') and (T[1]='\') then Delete(T,1,1);
       If (T<>'') and (T[length(T)]='\') then Delete(T,length(T),1);
       NSI.Add('  SetOutPath "$DataInstDir\'+T+'"');
+      If (S<>'') and (S[1]='\') then S:='.'+S;
       NSI.Add('  File /nonfatal "'+S+'"');
     end;
   end;
@@ -645,6 +661,7 @@ begin
         If (T<>'') and (T[1]='\') then Delete(T,1,1);
         If (T<>'') and (T[length(T)]='\') then Delete(T,length(T),1);
         NSI.Add('  SetOutPath "$DataInstDir\'+T+'"');
+        If (S<>'') and (S[1]='\') then S:='.'+S;
         NSI.Add('  File /nonfatal "'+S+'"');
       end;
     finally
@@ -682,6 +699,7 @@ begin
       If (T<>'') and (T[1]='\') then Delete(T,1,1);
       If (T<>'') and (T[length(T)]='\') then Delete(T,length(T),1);
       NSI.Add('  SetOutPath "$DataInstDir\'+T+'"');
+      If (S<>'') and (S[1]='\') then S:='.'+S;
       NSI.Add('  File /nonfatal "'+S+'"');
     end;
     For I:=0 to Folders.Count-1 do begin

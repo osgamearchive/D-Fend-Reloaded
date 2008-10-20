@@ -29,6 +29,10 @@ object BuildInstallerForm: TBuildInstallerForm
     TabOrder = 0
     object GamesSheet: TTabSheet
       Caption = 'GamesSheet'
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object InfoLabel: TLabel
         Left = 8
         Top = 8

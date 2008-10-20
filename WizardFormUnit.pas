@@ -33,14 +33,17 @@ type
     WizardFinishFrame : TWizardFinishFrame;
     WizardScummVMFrame : TWizardScummVMFrame;
     WizardScummVMSettingsFrame : TWizardScummVMSettingsFrame;
-    UserGameInfo, InsecureTemplate : Boolean;
-    ScummVM : Boolean;
+    InsecureTemplate : Boolean;
+    ScummVM, WindowsMode : Boolean;
     Procedure SetActivePage(NewPage : Integer);
+    Function CalcProfileName : String;
+    Function CalcProfileNameFromFile : String;
   public
     { Public-Deklarationen }
     GameDB : TGameDB;
     Game : TGame;
     ExeFile : String;
+    WindowsExe : Boolean;
     OpenEditorNow : Boolean;
     LinkFile : TLinkFile;
   end;
@@ -48,7 +51,7 @@ type
 var
   WizardForm: TWizardForm;
 
-Function ShowWizardDialog(const AOwner : TComponent; const AGameDB : TGameDB; const AExeFile : String; var AGame : TGame; var OpenEditorNow : Boolean; const ASearchLinkFile : TLinkFile) : Boolean;
+Function ShowWizardDialog(const AOwner : TComponent; const AGameDB : TGameDB; const AExeFile : String; const AWindowsExe : Boolean; var AGame : TGame; var OpenEditorNow : Boolean; const ASearchLinkFile : TLinkFile) : Boolean;
 
 implementation
 
@@ -56,6 +59,41 @@ uses VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgSetupUnit,
      GameDBToolsUnit, DOSBoxUnit, HelpConsts;
 
 {$R *.dfm}
+
+function TWizardForm.CalcProfileName: String;
+begin
+  If ScummVM then begin
+    result:=WizardScummVMFrame.GameNameComboBox.Text;
+    exit;
+  end;
+
+  If WindowsMode then begin
+    result:=CalcProfileNameFromFile;
+    exit;
+  end;
+
+  If WizardTemplateFrame.TemplateType1.Checked then begin result:=WizardTemplateFrame.TemplateType1List.Text; exit; end;
+  If WizardTemplateFrame.TemplateType2.Checked then begin result:=WizardTemplateFrame.TemplateType2List.Text; exit; end;
+  If WizardTemplateFrame.TemplateType3.Checked then begin result:=WizardTemplateFrame.TemplateType3List.Text; exit; end;
+  result:=CalcProfileNameFromFile;
+end;
+
+function TWizardForm.CalcProfileNameFromFile: String;
+Var S : String;
+    I : Integer;
+begin
+  S:=Trim(WizardPrgFileFrame.ProgramEdit.Text);
+  If S='' then S:=Trim(WizardPrgFileFrame.SetupEdit.Text);
+
+  If S='' then begin result:='Game'; exit; end;
+
+  S:=ChangeFileExt(ExtractFileName(S),'');
+  For I:=1 to length(S) do If I=1
+    then S[I]:=ExtUpperCase(S[I])[1]
+    else S[I]:=ExtLowerCase(S[I])[1];
+
+  result:=S;
+end;
 
 procedure TWizardForm.FormCreate(Sender: TObject);
 begin
@@ -70,7 +108,6 @@ begin
   HelpButton.Caption:=LanguageSetup.Help;
   
   ActivePage:=0;
-  UserGameInfo:=True;
   InsecureTemplate:=False;
   OpenEditorNow:=False;
 end;
@@ -107,8 +144,14 @@ begin
   WizardScummVMSettingsFrame.TabOrder:=6;
   BottomPanel.TabOrder:=7;
 
-  If Trim(ExeFile)<>'' then
+  If Trim(ExeFile)<>'' then begin
     WizardPrgFileFrame.ProgramEdit.Text:=MakeRelPath(ExeFile,PrgSetup.BaseDir);
+    If WindowsExe then WizardBaseFrame.EmulationTypeRadioGroup.ItemIndex:=WizardBaseFrame.EmulationTypeRadioGroup.Items.Count-1;
+    WizardBaseFrame.EmulationTypeRadioGroup.Visible:=False;
+    WizardBaseFrame.ListScummGamesButton.Visible:=False;
+  end else begin
+    WizardBaseFrame.EmulationTypeRadioGroup.ItemIndex:=0;
+  end;
 
   SetActivePage(0);
 end;
@@ -125,11 +168,8 @@ begin
   Case ActivePage of
     0 : begin
           {Start page}
-          If (NewPage=1) and (Trim(WizardBaseFrame.BaseName.Text)='') then begin
-            MessageDlg(LanguageSetup.MessageNoProfileName,mtError,[mbOK],0);
-            exit;
-          end;
-          ScummVM:=(WizardBaseFrame.EmulationTypeRadioGroup.ItemIndex=1);
+          ScummVM:=(WizardBaseFrame.EmulationTypeRadioGroup.ItemIndex=1) and (WizardBaseFrame.EmulationTypeRadioGroup.Items.Count=3);
+          WindowsMode:=(WizardBaseFrame.EmulationTypeRadioGroup.ItemIndex=WizardBaseFrame.EmulationTypeRadioGroup.Items.Count-1);
           If ScummVM then WizardScummVMFrame.ShowScummVMFrame;
         end;
     1 : If NewPage=2 then begin
@@ -138,19 +178,36 @@ begin
             If Trim(WizardPrgFileFrame.ProgramEdit.Text)='' then begin
               If MessageDlg(LanguageSetup.MessageNoGameFileNameWarning,mtConfirmation,[mbYes,mbNo],0)<>mrYes then exit;
             end;
-            If Trim(WizardPrgFileFrame.ProgramEdit.Text)<>'' then begin
-              S:=MakeAbsPath(WizardPrgFileFrame.ProgramEdit.Text,PrgSetup.BaseDir);
-              If IsWindowsExe(S) then begin
-                If MessageDlg(Format(LanguageSetup.MessageWindowsExeEditWarning,[S]),mtConfirmation,[mbYes,mbNo],0)<>mrYes then exit;
+            If WindowsMode then begin
+              If Trim(WizardPrgFileFrame.ProgramEdit.Text)<>'' then begin
+                S:=MakeAbsPath(WizardPrgFileFrame.ProgramEdit.Text,PrgSetup.BaseDir);
+                If IsDOSExe(S) then begin
+                  If MessageDlg(Format(LanguageSetup.MessageDOSExeEditWarning,[S]),mtConfirmation,[mbYes,mbNo],0)<>mrYes then exit;
+                end;
               end;
-            end;
-            If Trim(WizardPrgFileFrame.SetupEdit.Text)<>'' then begin
-              S:=MakeAbsPath(WizardPrgFileFrame.SetupEdit.Text,PrgSetup.BaseDir);
-              If IsWindowsExe(S) then begin
-                If MessageDlg(Format(LanguageSetup.MessageWindowsExeEditWarning,[S]),mtConfirmation,[mbYes,mbNo],0)<>mrYes then exit;
+              If Trim(WizardPrgFileFrame.SetupEdit.Text)<>'' then begin
+                S:=MakeAbsPath(WizardPrgFileFrame.SetupEdit.Text,PrgSetup.BaseDir);
+                If IsDOSExe(S) then begin
+                  If MessageDlg(Format(LanguageSetup.MessageDOSExeEditWarning,[S]),mtConfirmation,[mbYes,mbNo],0)<>mrYes then exit;
+                end;
               end;
+              WizardGameInfoFrame.SetGameName(CalcProfileName,nil);
+              NewPage:=3;
+            end else begin
+              If Trim(WizardPrgFileFrame.ProgramEdit.Text)<>'' then begin
+                S:=MakeAbsPath(WizardPrgFileFrame.ProgramEdit.Text,PrgSetup.BaseDir);
+                If IsWindowsExe(S) then begin
+                  If MessageDlg(Format(LanguageSetup.MessageWindowsExeEditWarning,[S]),mtConfirmation,[mbYes,mbNo],0)<>mrYes then exit;
+                end;
+              end;
+              If Trim(WizardPrgFileFrame.SetupEdit.Text)<>'' then begin
+                S:=MakeAbsPath(WizardPrgFileFrame.SetupEdit.Text,PrgSetup.BaseDir);
+                If IsWindowsExe(S) then begin
+                  If MessageDlg(Format(LanguageSetup.MessageWindowsExeEditWarning,[S]),mtConfirmation,[mbYes,mbNo],0)<>mrYes then exit;
+                end;
+              end;
+              WizardTemplateFrame.SearchTemplates(WizardPrgFileFrame.ProgramEdit.Text);
             end;
-            WizardTemplateFrame.SearchTemplates(WizardPrgFileFrame.ProgramEdit.Text);
           end else begin
             If Trim(WizardScummVMFrame.ProgramEdit.Text)='' then begin
               If MessageDlg(LanguageSetup.MessageNoGameFileNameWarning,mtConfirmation,[mbYes,mbNo],0)<>mrYes then exit;
@@ -159,42 +216,31 @@ begin
           end;
         end;
     2 : If NewPage=3 then begin
+          {Template or ScummVM settings page -> game info page}
           If not ScummVM then begin
-            {Template page -> game info page (or to mount page if UserGameInfo=False)}
-            InsecureTemplate:=not WizardTemplateFrame.SelectedProfileSecure;
+             InsecureTemplate:=not WizardTemplateFrame.SelectedProfileSecure;
             if InsecureTemplate then begin
               If MessageDlg(LanguageSetup.MessageTemplateInsecureWarning,mtWarning,[mbYes,mbNo],0)<>mrYes then exit;
             end;
-            UserGameInfo:=WizardTemplateFrame.TemplateType4.Checked or WizardTemplateFrame.TemplateType5.Checked;
-          end else begin
-            {ScummVM settings page -> game info page}
-            UserGameInfo:=True; 
           end;
+          WizardGameInfoFrame.SetGameName(CalcProfileName,WizardTemplateFrame.GetTemplate);
         end;
     3 : If NewPage=4 then begin
           {Game info page -> mount page}
           WizardFinishFrame.SetInsecureStatus(InsecureTemplate);
-          WizardFinishFrame.LoadData(WizardTemplateFrame.GetTemplate,WizardPrgFileFrame.ProgramEdit.Text,WizardPrgFileFrame.SetupEdit.Text,WizardBaseFrame.BaseName.Text);
+          WizardFinishFrame.LoadData(WizardTemplateFrame.GetTemplate,WizardPrgFileFrame.ProgramEdit.Text,WizardPrgFileFrame.SetupEdit.Text,WizardGameInfoFrame.BaseName.Text);
         end;
   end;
 
-  If (NewPage=3) and (not UserGameInfo) and not ScummVM then begin
-    {If auto setup template has been selected, do not show game info page}
-    If ActivePage=4 then begin
-      {directly go back to select template page}
-      NewPage:=2
-    end else begin
-      {directly go forward to mount page}
-      NewPage:=4;
-      WizardFinishFrame.SetInsecureStatus(InsecureTemplate);
-      WizardFinishFrame.LoadData(WizardTemplateFrame.GetTemplate,WizardPrgFileFrame.ProgramEdit.Text,WizardPrgFileFrame.SetupEdit.Text,WizardBaseFrame.BaseName.Text);
-    end;
-  end;
-
-  If NewPage=3 then WizardGameInfoFrame.SetGameName(WizardBaseFrame.BaseName.Text);
+  If (NewPage=2) and WindowsMode then NewPage:=1; 
 
   WizardBaseFrame.Visible:=(NewPage=0);
   WizardPrgFileFrame.Visible:=(NewPage=1) and (not ScummVM);
+  If (NewPage=1) and (not ScummVM) then begin
+    WizardPrgFileFrame.GamesFolderEdit.Visible:=not WindowsMode;
+    WizardPrgFileFrame.GamesFolderButton.Visible:=not WindowsMode;
+    WizardPrgFileFrame.FolderInfoButton.Visible:=not WindowsMode;
+  end;
   WizardScummVMFrame.Visible:=(NewPage=1) and ScummVM;
   WizardTemplateFrame.Visible:=(NewPage=2) and (not ScummVM);
   WizardScummVMSettingsFrame.Visible:=(NewPage=2) and ScummVM;
@@ -206,13 +252,17 @@ begin
   PreviousButton.Enabled:=(ActivePage>0);
   If ScummVM then begin
     NextButton.Enabled:=(ActivePage<3);
-    OKButton.Enabled:=(ActivePage=3);
+    OKButton.Enabled:=(ActivePage>=2);
   end else begin
-    NextButton.Enabled:=(ActivePage<4);
-    OKButton.Enabled:=(ActivePage=4);
+    If WindowsMode then begin
+      NextButton.Enabled:=(ActivePage<3);
+      OKButton.Enabled:=(ActivePage>=1);
+    end else begin
+      NextButton.Enabled:=(ActivePage<4);
+      OKButton.Enabled:=(ActivePage>=2);
+    end;
   end;
 end;
-
 
 procedure TWizardForm.StepButtonWork(Sender: TObject);
 begin
@@ -224,14 +274,32 @@ end;
 
 procedure TWizardForm.OKButtonClick(Sender: TObject);
 begin
-  If ScummVM
-    then Game:=WizardScummVMSettingsFrame.CreateGame(WizardBaseFrame.BaseName.Text)
-    else Game:=WizardTemplateFrame.CreateGame(WizardBaseFrame.BaseName.Text);
+  if NextButton.Enabled and (not ScummVM) and (not WindowsMode) then begin
+    If ActivePage=2 then begin
+      {Template page -> game info page}
+      InsecureTemplate:=not WizardTemplateFrame.SelectedProfileSecure;
+      if InsecureTemplate then begin
+        If MessageDlg(LanguageSetup.MessageTemplateInsecureWarning,mtWarning,[mbYes,mbNo],0)<>mrYes then begin ModalResult:=mrNone; exit; end;
+      end;
+      WizardGameInfoFrame.SetGameName(CalcProfileName,WizardTemplateFrame.GetTemplate);
+    end;
+    {Game info page -> mount page}
+    WizardFinishFrame.SetInsecureStatus(InsecureTemplate);
+    WizardFinishFrame.LoadData(WizardTemplateFrame.GetTemplate,WizardPrgFileFrame.ProgramEdit.Text,WizardPrgFileFrame.SetupEdit.Text,WizardGameInfoFrame.BaseName.Text);
+  end;
+
+  If ScummVM then begin
+    Game:=WizardScummVMSettingsFrame.CreateGame(WizardGameInfoFrame.BaseName.Text);
+  end else begin
+    If WindowsMode
+      then Game:=WizardTemplateFrame.CreateWindowsGame(WizardGameInfoFrame.BaseName.Text)
+      else Game:=WizardTemplateFrame.CreateGame(WizardGameInfoFrame.BaseName.Text);
+  end;
   WizardBaseFrame.WriteDataToGame(Game);
   If ScummVM
     then WizardScummVMFrame.WriteDataToGame(Game)
     else WizardPrgFileFrame.WriteDataToGame(Game);
-  If UserGameInfo then WizardGameInfoFrame.WriteDataToGame(Game);
+  WizardGameInfoFrame.WriteDataToGame(Game);
   WizardFinishFrame.WriteDataToGame(Game);
   OpenEditorNow:=WizardFinishFrame.ProfileEditorCheckBox.Checked;
   If not ScummVM then begin
@@ -254,13 +322,14 @@ end;
 
 { global }
 
-Function ShowWizardDialog(const AOwner : TComponent; const AGameDB : TGameDB; const AExeFile : String; var AGame : TGame; var OpenEditorNow : Boolean; const ASearchLinkFile : TLinkFile) : Boolean;
+Function ShowWizardDialog(const AOwner : TComponent; const AGameDB : TGameDB; const AExeFile : String; const AWindowsExe : Boolean; var AGame : TGame; var OpenEditorNow : Boolean; const ASearchLinkFile : TLinkFile) : Boolean;
 begin
   WizardForm:=TWizardForm.Create(AOwner);
   try
     WizardForm.GameDB:=AGameDB;
     WizardForm.LinkFile:=ASearchLinkFile;
     WizardForm.ExeFile:=AExeFile;
+    WizardForm.WindowsExe:=AWindowsExe;
     result:=(WizardForm.ShowModal=mrOK);
     if result then begin
       AGame:=WizardForm.Game;
@@ -272,3 +341,4 @@ begin
 end;
 
 end.
+

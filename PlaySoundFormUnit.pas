@@ -24,7 +24,6 @@ type
     ToolButton2: TToolButton;
     PreviousButton: TToolButton;
     NextButton: TToolButton;
-    MediaPlayer: TMediaPlayer;
     PlayPauseButton: TToolButton;
     procedure FormShow(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -32,6 +31,9 @@ type
     procedure TrackBarChange(Sender: TObject);
     procedure TimerTimer(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
+    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure FormMouseWheel(Sender: TObject; Shift: TShiftState;
+      WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
   private
     { Private-Deklarationen }
     JustChanging : Boolean;
@@ -49,7 +51,8 @@ Procedure PlaySoundDialog(const AOwner : TComponent; const AFileName : String; c
 
 implementation
 
-uses ShellAPI, VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgSetupUnit;
+uses ShellAPI, MediaInterface, VistaToolsUnit, LanguageSetupUnit, CommonTools,
+     PrgSetupUnit;
 
 {$R *.dfm}
 
@@ -59,14 +62,19 @@ begin
   Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName);
 
   PreviousButton.Caption:=LanguageSetup.Previous;
+  PreviousButton.Hint:=LanguageSetup.PreviousHintMediaViewer;
   NextButton.Caption:=LanguageSetup.Next;
+  NextButton.Hint:=LanguageSetup.NextHintMediaViewer;
   SaveButton.Caption:=LanguageSetup.Save;
+  SaveButton.Hint:=LanguageSetup.SaveHintSoundPlayer;
   PlayPauseButton.Caption:=LanguageSetup.SoundCapturePlayPause;
+  PlayPauseButton.Hint:=LanguageSetup.SoundCapturePlayPauseHint;
   MenuSave.Caption:=LanguageSetup.ScreenshotPopupSave;
   MenuSaveMp3.Caption:=LanguageSetup.SoundsPopupSaveMp3;
   MenuSaveOgg.Caption:=LanguageSetup.SoundsPopupSaveOgg;
 
-  MediaPlayer.TimeFormat:=tfMilliseconds;
+  CoolBar.Font.Size:=PrgSetup.ToolbarFontSize;
+
   JustChanging:=False;
 
   PrevSounds:=TStringList.Create;
@@ -75,23 +83,24 @@ end;
 
 procedure TPlaySoundForm.FormShow(Sender: TObject);
 Var S : String;
+    OK : Boolean;
 begin
+  Timer.Enabled:=False;
+
+  If MediaStreamAvailable then begin
+    stopMediaStream;
+    resetMediaStream;
+  end;
+
   PreviousButton.Enabled:=(PrevSounds.Count>0);
   NextButton.Enabled:=(NextSounds.Count>0);
 
   Caption:=LanguageSetup.CaptureSounds+' ['+MakeRelPath(FileName,PrgSetup.BaseDir)+']';
   FileDamaged:=False;
 
-  MediaPlayer.FileName:=FileName;
-  try
-    MediaPlayer.Open;
-    StatusBar.Panels[0].Text:=FloatToStrF(MediaPlayer.Position/1000,ffFixed,15,3)+'/'+FloatToStrF(MediaPlayer.Length/1000,ffFixed,15,3);
-    MediaPlayer.Play;
-    StatusBar.Panels[1].Text:=FileName;
-  except
-    MessageDlg(MediaPlayer.ErrorMessage,mtError,[mbOK],0);
-    FileDamaged:=True;
-  end;
+  StatusBar.Panels[1].Text:=FileName;
+  loadMediaFile(FileName,Handle);
+  FileDamaged:=not MediaStreamAvailable;
 
   SaveButton.Enabled:=not FileDamaged;
   PlayPauseButton.Enabled:=not FileDamaged;
@@ -99,12 +108,41 @@ begin
   S:=ExtUpperCase(ExtractFileExt(FileName));
   MenuSaveMp3.Enabled:=(S='.WAV') and FileExists(PrgSetup.WaveEncMp3);
   MenuSaveOgg.Enabled:=(S='.WAV') and FileExists(PrgSetup.WaveEncOgg);
+
+  If MediaStreamAvailable then begin
+    JustChanging:=True;
+    try
+      TrackBar.Position:=0;
+    finally
+      JustChanging:=False;
+    end;
+    ButtonWork(PlayPauseButton);
+  end;
+
+  Timer.Enabled:=True;
 end;
 
 procedure TPlaySoundForm.FormDestroy(Sender: TObject);
 begin
+  freeMediaStream;
   PrevSounds.Free;
   NextSounds.Free;
+end;
+
+procedure TPlaySoundForm.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+begin
+  If Shift=[] then Case Key of
+    VK_LEFT, VK_UP, VK_PRIOR : ButtonWork(PreviousButton);
+    VK_RIGHT, VK_DOWN, VK_NEXT : ButtonWork(NextButton);
+    VK_ESCAPE : Close;
+  end;
+end;
+
+procedure TPlaySoundForm.FormMouseWheel(Sender: TObject; Shift: TShiftState; WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
+begin
+  If Shift=[] then begin
+    If WheelDelta>0 then ButtonWork(PreviousButton) else ButtonWork(NextButton);
+  end;
 end;
 
 procedure TPlaySoundForm.TimerTimer(Sender: TObject);
@@ -113,8 +151,11 @@ begin
   JustChanging:=True;
   try
     try
-      TrackBar.Position:=Round(100*MediaPlayer.Position/MediaPlayer.Length);
-      StatusBar.Panels[0].Text:=FloatToStrF(MediaPlayer.Position/1000,ffFixed,15,3)+'/'+FloatToStrF(MediaPlayer.Length/1000,ffFixed,15,3);
+      If MediaStreamAvailable and (getMediaStreamDuration>0) then begin
+        TrackBar.Position:=Round(100*getMediaStreamPos/getMediaStreamDuration);
+        StatusBar.Panels[0].Text:=FloatToStrF(getMediaStreamPos/1000/10000,ffFixed,15,3)+'/'+FloatToStrF(getMediaStreamDuration/1000/10000,ffFixed,15,3);
+        If (getMediaStreamPos=getMediaStreamDuration) and MediaStreamPlayed then pauseMediaStream;
+      end;
     except end;
   finally
     JustChanging:=False;
@@ -123,9 +164,8 @@ end;
 
 procedure TPlaySoundForm.TrackBarChange(Sender: TObject);
 begin
-  If JustChanging or FileDamaged then exit;
-  MediaPlayer.Position:=Round(TrackBar.Position*MediaPlayer.Length/100);
-  StatusBar.Panels[0].Text:=FloatToStrF(MediaPlayer.Position/1000,ffFixed,15,3)+'/'+FloatToStrF(MediaPlayer.Length/1000,ffFixed,15,3);
+  If JustChanging or FileDamaged or (not MediaStreamAvailable) then exit;
+  setMediaStreamPos(Round(TrackBar.Position*getMediaStreamDuration/100));
 end;
 
 procedure TPlaySoundForm.ButtonWork(Sender: TObject);
@@ -134,12 +174,14 @@ Var P : TPoint;
 begin
   Case (Sender as TComponent).Tag of
     0 : If PrevSounds.Count>0 then begin
+          Timer.Enabled:=False;
           NextSounds.Insert(0,FileName);
           FileName:=PrevSounds[PrevSounds.Count-1];
           PrevSounds.Delete(PrevSounds.Count-1);
           FormShow(Sender);
         end;
     1 : if NextSounds.Count>0 then begin
+          Timer.Enabled:=False;
           PrevSounds.Add(FileName);
           FileName:=NextSounds[0];
           NextSounds.Delete(0);
@@ -178,7 +220,12 @@ begin
           S:=SaveDialog.FileName;
           ShellExecute(Handle,'open',PChar(PrgSetup.WaveEncOgg),PChar(Format(PrgSetup.WaveEncOggParameters,[FileName,S])),nil,SW_SHOW);
         end;
-    6 : If MediaPlayer.Mode=mpPlaying then MediaPlayer.Pause else MediaPlayer.Play;
+    6 : if MediaStreamAvailable then begin
+          If MediaStreamPlayed and (getMediaStreamPos<>getMediaStreamDuration) then pauseMediaStream else begin
+            If getMediaStreamPos=getMediaStreamDuration then setMediaStreamPos(0);
+            playMediaStream;
+          end;
+        end;
   end;
 end;
 
@@ -187,13 +234,20 @@ end;
 Procedure PlaySoundDialog(const AOwner : TComponent; const AFileName : String; const APrevSounds, ANextSounds : TStringList);
 Var S : String;
 begin
+  If OpenMediaFile(PrgSetup.SoundPlayer,AFileName) then exit;
+
   S:=ExtUpperCase(ExtractFileExt(AFileName));
-  If (S<>'.WAV') and (S<>'.MP3') {and (S<>'.OGG')} then exit;
+  If (S<>'.WAV') and (S<>'.MP3') and (S<>'.OGG') then exit;
   PlaySoundForm:=TPlaySoundForm.Create(AOwner);
   try
     PlaySoundForm.FileName:=AFileName;
     If APrevSounds<>nil then PlaySoundForm.PrevSounds.Assign(APrevSounds);
     If ANextSounds<>nil then PlaySoundForm.NextSounds.Assign(ANextSounds);
+    If (APrevSounds=nil) and (ANextSounds=nil) then begin
+      PlaySoundForm.PreviousButton.Visible:=False;
+      PlaySoundForm.NextButton.Visible:=False;
+      PlaySoundForm.ToolButton1.Visible:=False;
+    end;
     PlaySoundForm.ShowModal;
   finally
     PlaySoundForm.Free;

@@ -8,7 +8,7 @@ object WizardScummVMSettingsFrame: TWizardScummVMSettingsFrame
     592
     511)
   object LanguageLabel: TLabel
-    Left = 8
+    Left = 20
     Top = 85
     Width = 72
     Height = 13
@@ -35,9 +35,9 @@ object WizardScummVMSettingsFrame: TWizardScummVMSettingsFrame
     Shape = bsBottomLine
   end
   object LanguageInfoLabel: TLabel
-    Left = 3
-    Top = 176
-    Width = 569
+    Left = 20
+    Top = 284
+    Width = 552
     Height = 137
     Anchors = [akLeft, akTop, akRight]
     AutoSize = False
@@ -45,7 +45,7 @@ object WizardScummVMSettingsFrame: TWizardScummVMSettingsFrame
     WordWrap = True
   end
   object LanguageComboBox: TComboBox
-    Left = 8
+    Left = 19
     Top = 104
     Width = 105
     Height = 21
@@ -54,7 +54,7 @@ object WizardScummVMSettingsFrame: TWizardScummVMSettingsFrame
     TabOrder = 0
   end
   object StartFullscreenCheckBox: TCheckBox
-    Left = 8
+    Left = 20
     Top = 144
     Width = 569
     Height = 17
@@ -63,14 +63,13 @@ object WizardScummVMSettingsFrame: TWizardScummVMSettingsFrame
     TabOrder = 1
   end
   object SavePathGroupBox: TGroupBox
-    Left = 3
-    Top = 176
+    Left = 19
+    Top = 184
     Width = 561
     Height = 86
     Anchors = [akLeft, akTop, akRight]
     Caption = 'Folder for saved games'
     TabOrder = 2
-    Visible = False
     DesignSize = (
       561
       86)

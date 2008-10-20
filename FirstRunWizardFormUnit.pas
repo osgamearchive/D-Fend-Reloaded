@@ -37,6 +37,8 @@ type
     GameDirInfoLabel: TLabel;
     AcceptAllSettingsButton: TBitBtn;
     HelpButton: TBitBtn;
+    UpdateNowCheckBox: TCheckBox;
+    WarningButton: TSpeedButton;
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure LanguageComboBoxChange(Sender: TObject);
@@ -48,6 +50,8 @@ type
     procedure GameDirButtonClick(Sender: TObject);
     procedure HelpButtonClick(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure DosBoxDirEditChange(Sender: TObject);
+    procedure WarningButtonClick(Sender: TObject);
   private
     { Private-Deklarationen }
     DosBoxLang : TStringList;
@@ -61,11 +65,11 @@ type
 var
   FirstRunWizardForm: TFirstRunWizardForm;
 
-Function ShowFirstRunWizardDialog(const AOwner : TComponent) : Boolean;
+Function ShowFirstRunWizardDialog(const AOwner : TComponent; var SearchForUpdatesNow : Boolean) : Boolean;
 
 implementation
 
-uses IniFiles, Registry, VistaToolsUnit, LanguageSetupUnit, PrgSetupUnit,
+uses Math, IniFiles, Registry, VistaToolsUnit, LanguageSetupUnit, PrgSetupUnit,
      CommonTools, PrgConsts, HelpConsts;
 
 {$R *.dfm}
@@ -73,13 +77,12 @@ uses IniFiles, Registry, VistaToolsUnit, LanguageSetupUnit, PrgSetupUnit,
 procedure TFirstRunWizardForm.FormCreate(Sender: TObject);
 begin
   SetVistaFonts(self);
-  Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName);
 
-  LanguageTopInfoLabel.Font.Style:=[fsbold];
-  DOSBoxTopInfoLabel.Font.Style:=[fsbold];
-  DOSBoxLanguageTopInfoLabel.Font.Style:=[fsbold];
-  GameDirTopInfoLabel.Font.Style:=[fsbold];
-  UpdateTopInfoLabel.Font.Style:=[fsbold];
+  LanguageTopInfoLabel.Font.Style:=[fsBold];
+  DOSBoxTopInfoLabel.Font.Style:=[fsBold];
+  DOSBoxLanguageTopInfoLabel.Font.Style:=[fsBold];
+  GameDirTopInfoLabel.Font.Style:=[fsBold];
+  UpdateTopInfoLabel.Font.Style:=[fsBold];
 
   DosBoxLang:=TStringList.Create;
   InitGUI;
@@ -87,6 +90,13 @@ end;
 
 procedure TFirstRunWizardForm.InitGUI;
 begin
+  Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName);
+  LanguageTopInfoLabel.Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName);
+  DOSBoxTopInfoLabel.Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName);
+  DOSBoxLanguageTopInfoLabel.Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName);
+  GameDirTopInfoLabel.Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName);
+  UpdateTopInfoLabel.Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName);
+
   Caption:=LanguageSetup.FirstRunWizard;
 
   BackButton.Caption:=LanguageSetup.WizardFormButtonPrevious;
@@ -100,6 +110,7 @@ begin
 
   DOSBoxTopInfoLabel.Caption:=LanguageSetup.FirstRunWizardInfoDOSBox;
   DosBoxDirEdit.EditLabel.Caption:=LanguageSetup.SetupFormDosBoxDir;
+  WarningButton.Hint:=LanguageSetup.MsgDlgWarning;
   DosBoxButton.Hint:=LanguageSetup.ChooseFolder;
   DOSBoxInfoLabel.Caption:=LanguageSetup.FirstRunWizardInfoDOSBox2;
   If OperationMode=omPortable then begin
@@ -122,12 +133,16 @@ begin
   Update3RadioButton.Caption:=LanguageSetup.SetupFormUpdate3;
   UpdateCheckBox.Caption:=LanguageSetup.SetupFormUpdateVersionSpecific;
   UpdateLabel.Caption:=LanguageSetup.SetupFormUpdateInfo;
+  UpdateNowCheckBox.Caption:=LanguageSetup.FirstRunWizardUpdateNow;
+
+  Notebook.PageIndex:=0;
 end;
 
 procedure TFirstRunWizardForm.FormShow(Sender: TObject);
 begin
   LoadAndSetupLanguageList;
   DosBoxDirEdit.Text:=PrgSetup.DOSBoxSettings[0].DosBoxDir;
+  DosBoxDirEditChange(Sender);
   case PrgSetup.CheckForUpdates of
     0 : Update0RadioButton.Checked:=True;
     1 : Update1RadioButton.Checked:=True;
@@ -316,6 +331,17 @@ begin
   if SelectDirectory(Handle,LanguageSetup.SetupFormDosBoxDir,S) then DosBoxDirEdit.Text:=IncludeTrailingPathDelimiter(S);
 end;
 
+procedure TFirstRunWizardForm.DosBoxDirEditChange(Sender: TObject);
+begin
+  WarningButton.Visible:=OldDOSBoxVersion(CheckDOSBoxVersion(-1,DosBoxDirEdit.Text));
+  DosBoxDirEdit.Width:=IfThen(WarningButton.Visible,WarningButton.Left-4,WarningButton.Left+WarningButton.Width)-DosBoxDirEdit.Left;
+end;
+
+procedure TFirstRunWizardForm.WarningButtonClick(Sender: TObject);
+begin
+  DOSBoxOutdatedWarning(DosBoxDirEdit.Text);
+end;
+
 procedure TFirstRunWizardForm.GameDirButtonClick(Sender: TObject);
 Var S : String;
 begin
@@ -335,12 +361,13 @@ end;
 
 { global }
 
-Function ShowFirstRunWizardDialog(const AOwner : TComponent) : Boolean;
+Function ShowFirstRunWizardDialog(const AOwner : TComponent; var SearchForUpdatesNow : Boolean) : Boolean;
 begin
   FirstRunWizardForm:=TFirstRunWizardForm.Create(AOwner);
   try
     result:=(FirstRunWizardForm.ShowModal=mrOK);
     if not result then LoadLanguage(PrgSetup.Language);
+    SearchForUpdatesNow:=result and FirstRunWizardForm.UpdateNowCheckBox.Checked;
   finally
     FirstRunWizardForm.Free;
   end;

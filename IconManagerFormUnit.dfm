@@ -66,8 +66,6 @@ object IconManagerForm: TIconManagerForm
     OnClick = ListViewClick
     OnDblClick = ListViewDblClick
     OnKeyDown = ListViewKeyDown
-    ExplicitWidth = 564
-    ExplicitHeight = 249
   end
   object OKButton: TBitBtn
     Left = 8
@@ -78,7 +76,6 @@ object IconManagerForm: TIconManagerForm
     TabOrder = 4
     OnClick = OKButtonClick
     Kind = bkOK
-    ExplicitTop = 324
   end
   object CancelButton: TBitBtn
     Left = 111
@@ -88,7 +85,6 @@ object IconManagerForm: TIconManagerForm
     Anchors = [akLeft, akBottom]
     TabOrder = 5
     Kind = bkCancel
-    ExplicitTop = 324
   end
   object AddButton: TBitBtn
     Left = 214
@@ -113,7 +109,6 @@ object IconManagerForm: TIconManagerForm
       333333333337733333FF3333333C333330003333333733333777333333333333
       3000333333333333377733333333333333333333333333333333}
     NumGlyphs = 2
-    ExplicitTop = 324
   end
   object DelButton: TBitBtn
     Left = 317
@@ -138,7 +133,6 @@ object IconManagerForm: TIconManagerForm
       333333377F33333333FF3333C333333330003333733333333777333333333333
       3000333333333333377733333333333333333333333333333333}
     NumGlyphs = 2
-    ExplicitTop = 324
   end
   object LibraryIconRadioButton: TRadioButton
     Left = 8
@@ -150,8 +144,6 @@ object IconManagerForm: TIconManagerForm
     Checked = True
     TabOrder = 1
     TabStop = True
-    ExplicitTop = 255
-    ExplicitWidth = 548
   end
   object CustomIconRadioButton: TRadioButton
     Left = 8
@@ -161,7 +153,6 @@ object IconManagerForm: TIconManagerForm
     Anchors = [akLeft, akBottom]
     Caption = 'Use custom icon'
     TabOrder = 2
-    ExplicitTop = 280
   end
   object CustomIconEdit: TEdit
     Left = 224
@@ -171,8 +162,6 @@ object IconManagerForm: TIconManagerForm
     Anchors = [akLeft, akRight, akBottom]
     TabOrder = 3
     OnChange = CustomIconEditChange
-    ExplicitTop = 278
-    ExplicitWidth = 298
   end
   object HelpButton: TBitBtn
     Left = 420
@@ -183,7 +172,6 @@ object IconManagerForm: TIconManagerForm
     TabOrder = 8
     OnClick = HelpButtonClick
     Kind = bkHelp
-    ExplicitTop = 324
   end
   object ImageList: TImageList
     Height = 32

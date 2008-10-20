@@ -23,7 +23,6 @@ object ModernProfileEditorGameInfoFrame: TModernProfileEditorGameInfoFrame
     Caption = 'UserDefinedDataLabel'
   end
   object DelButton: TSpeedButton
-    Tag = 4
     Left = 593
     Top = 219
     Width = 23
@@ -48,7 +47,6 @@ object ModernProfileEditorGameInfoFrame: TModernProfileEditorGameInfoFrame
     OnClick = DelButtonClick
   end
   object AddButton: TSpeedButton
-    Tag = 2
     Left = 564
     Top = 219
     Width = 23
@@ -293,5 +291,9 @@ object ModernProfileEditorGameInfoFrame: TModernProfileEditorGameInfoFrame
     Images = ImageList
     Left = 536
     Top = 24
+  end
+  object AddUserDataPopupMenu: TPopupMenu
+    Left = 528
+    Top = 216
   end
 end

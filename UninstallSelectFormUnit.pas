@@ -115,11 +115,19 @@ begin
           If (S<>'') and (not UsedByOtherGame(GameDB,G,IncludeTrailingPathDelimiter(S))) then begin
             S:=ExtractFilePath(MakeAbsPath(IncludeTrailingPathDelimiter(S),PrgSetup.BaseDir));
             if (not DeleteDir(S,ContinueNext)) and (not ContinueNext) then exit;
+            Application.ProcessMessages;
+          end;
+          S:=Trim(G.ScummVMZip);
+          If (S<>'') and (not ExtraFileUsedByOtherGame(GameDB,G,S)) then begin
+            S:=MakeAbsPath(S,PrgSetup.BaseDir);
+            if (not DeleteSingleFile(S,ContinueNext,ftUninstall)) and (not ContinueNext) then exit;
+            Application.ProcessMessages;
           end;
           S:=Trim(G.ScummVMSavePath);
           If (S<>'') and (not UsedByOtherGame(GameDB,G,IncludeTrailingPathDelimiter(S))) then begin
             S:=ExtractFilePath(MakeAbsPath(IncludeTrailingPathDelimiter(S),PrgSetup.BaseDir));
             if (not DeleteDir(S,ContinueNext)) and (not ContinueNext) then exit;
+            Application.ProcessMessages;
           end;
         end else begin
           S:=Trim(G.GameExe);
@@ -130,6 +138,7 @@ begin
           If (S<>'') and (not UsedByOtherGame(GameDB,G,IncludeTrailingPathDelimiter(S))) then begin
             S:=ExtractFilePath(MakeAbsPath(IncludeTrailingPathDelimiter(S),PrgSetup.BaseDir));
             if (not DeleteDir(S,ContinueNext)) and (not ContinueNext) then exit;
+            Application.ProcessMessages;
           end;
         end;
       end;
@@ -139,17 +148,20 @@ begin
         If (S<>'') and (not UsedByOtherGame(GameDB,G,IncludeTrailingPathDelimiter(S))) then begin
           S:=ExtractFilePath(MakeAbsPath(IncludeTrailingPathDelimiter(S),PrgSetup.BaseDir));
           if (not DeleteDir(S,ContinueNext)) and (not ContinueNext) then exit;
+          Application.ProcessMessages;
         end;
 
         S:=MakeAbsIconName(G.Icon);
         If (S<>'') and FileExists(S) and (not IconUsedByOtherGame(GameDB,G,S)) then begin
-          If (not DeleteSingleFile(S,ContinueNext)) and (not ContinueNext) then exit;
+          If (not DeleteSingleFile(S,ContinueNext,ftUninstall)) and (not ContinueNext) then exit;
+          Application.ProcessMessages;
         end;
 
         S:=Trim(G.DataDir);
         If (S<>'') and (not UsedByOtherGame(GameDB,G,IncludeTrailingPathDelimiter(S))) then begin
           S:=ExtractFilePath(MakeAbsPath(IncludeTrailingPathDelimiter(S),PrgSetup.BaseDir));
           if (not DeleteDir(S,ContinueNext)) and (not ContinueNext) then exit;
+          Application.ProcessMessages;
         end;
 
         S:=Trim(G.ExtraFiles);
@@ -158,7 +170,8 @@ begin
           try
             For J:=0 to St.Count-1 do If (Trim(St[J])<>'') and (not ExtraFileUsedByOtherGame(GameDB,G,St[J])) then begin
               S:=MakeAbsPath(St[J],PrgSetup.BaseDir);
-              If not DeleteSingleFile(S,ContinueNext) and (not ContinueNext) then exit;
+              If not DeleteSingleFile(S,ContinueNext,ftUninstall) and (not ContinueNext) then exit;
+              Application.ProcessMessages;
             end;
           finally
             St.Free;
@@ -172,6 +185,7 @@ begin
             For J:=0 to St.Count-1 do If (Trim(St[J])<>'') and (not UsedByOtherGame(GameDB,G,IncludeTrailingPathDelimiter(St[J]))) then begin
               S:=ExtractFilePath(MakeAbsPath(IncludeTrailingPathDelimiter(St[J]),PrgSetup.BaseDir));
               if (not DeleteDir(S,ContinueNext)) and (not ContinueNext) then exit;
+              Application.ProcessMessages;
             end;
           finally
             St.Free;
@@ -183,11 +197,13 @@ begin
           For J:=0 to Files.Count-1 do begin
             S:=Files[J];
             ListBox.Items.Add(LanguageSetup.UninstallFormExtraFile+': '+S);
-            If not DeleteSingleFile(S,ContinueNext) and (not ContinueNext) then exit;
+            If not DeleteSingleFile(S,ContinueNext,ftUninstall) and (not ContinueNext) then exit;
+            Application.ProcessMessages;
           end;
           For J:=0 to Folders.Count-1 do begin
             S:=Files[J];
             if (not DeleteDir(S,ContinueNext)) and (not ContinueNext) then exit;
+            Application.ProcessMessages;
           end;
         finally
           Files.Free;

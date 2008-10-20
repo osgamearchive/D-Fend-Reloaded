@@ -1,4 +1,12 @@
+Program icon by T.B.@Vogons
+
 Used as part of the D-Fend Reloaded source code:
+
+Parts of the DOSBox source code
+(for making short path names in D-Fend Reloaded the DOSBox way)
+written by the DOSBox Teams,
+translation to D-Fend Reloaded by Alexander Katz (skatz@svitonline.com)
+(http://www.dosbox.com/)
 
 Portable Network Graphics Delphi
 written by Gustavo Daud

@@ -64,6 +64,8 @@ type
     SetUserInfoEdit: TEdit;
     DelUserInfoComboBox: TComboBox;
     HelpButton: TBitBtn;
+    AspectCheckBox: TCheckBox;
+    AspectComboBox: TComboBox;
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure OKButtonClick(Sender: TObject);
@@ -198,6 +200,8 @@ begin
   St:=ValueToList(GameDB.ConfOpt.Resolution,';,'); try FullscreenResolutionComboBox.Items.Assign(St); finally St.Free; end; FullscreenResolutionComboBox.ItemIndex:=0;
   ScaleCheckBox.Caption:=LanguageSetup.GameScale;
   St:=ValueToList(GameDB.ConfOpt.Scale,';,'); try ScaleComboBox.Items.Assign(St); finally St.Free; end; ScaleComboBox.ItemIndex:=1;
+  with AspectComboBox do begin Items.Add(RemoveUnderline(LanguageSetup.No)); Items.Add(RemoveUnderline(LanguageSetup.Yes)); ItemIndex:=0; end;
+  AspectCheckBox.Caption:=LanguageSetup.GameAspectCorrection;
   MemoryCheckBox.Caption:=LanguageSetup.GameMemory;
   St:=ValueToList(GameDB.ConfOpt.Memory,';,'); try MemoryComboBox.Items.Assign(St); finally St.Free; end; MemoryComboBox.Text:='32';
   CPUCyclesCheckBox.Caption:=LanguageSetup.GameCycles;
@@ -254,6 +258,7 @@ begin
   WindowResolutionComboBox.Enabled:=WindowResolutionCheckBox.Checked;
   FullscreenResolutionComboBox.Enabled:=FullscreenResolutionCheckBox.Checked;
   ScaleComboBox.Enabled:=ScaleCheckBox.Checked;
+  AspectComboBox.Enabled:=AspectCheckBox.Checked;
   MemoryComboBox.Enabled:=MemoryCheckBox.Checked;
   CPUCyclesComboBox.Enabled:=CPUCyclesCheckBox.Checked;
   EmulationCoreComboBox.Enabled:=EmulationCoreCheckBox.Checked;
@@ -335,6 +340,7 @@ begin
     end;
     If not WindowsMode then begin
       If StartFullscreenCheckBox.Checked then G.StartFullscreen:=(StartFullscreenComboBox.ItemIndex=1);
+      If AspectCheckBox.Checked then G.AspectCorrection:=(AspectComboBox.ItemIndex=1);
     end;
     If (not ScummVM) and (not WindowsMode) then begin
       If LockMouseCheckBox.Checked then G.AutoLockMouse:=(LockMouseComboBox.ItemIndex=1);

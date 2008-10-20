@@ -151,7 +151,18 @@ uses
   HelpTools in 'HelpTools.pas',
   HelpConsts in 'HelpConsts.pas',
   BuildZipPackagesFormUnit in 'BuildZipPackagesFormUnit.pas' {BuildZipPackagesForm},
-  FullscreenInfoFormUnit in 'FullscreenInfoFormUnit.pas' {FullscreenInfoForm};
+  FullscreenInfoFormUnit in 'FullscreenInfoFormUnit.pas' {FullscreenInfoForm},
+  DOSBoxCountUnit in 'DOSBoxCountUnit.pas',
+  QuickStartFormUnit in 'QuickStartFormUnit.pas' {QuickStartForm},
+  ModernProfileEditorScummVMGameFrameUnit in 'ModernProfileEditorScummVMGameFrameUnit.pas' {ModernProfileEditorScummVMGameFrame: TFrame},
+  SetupFrameEditorUnit in 'SetupFrameEditorUnit.pas' {SetupFrameEditor: TFrame},
+  SetupFrameViewerUnit in 'SetupFrameViewerUnit.pas' {SetupFrameViewer: TFrame},
+  ClassExtensions in 'ClassExtensions.pas',
+  DOSBoxShortNameUnit in 'DOSBoxShortNameUnit.pas',
+  FileNameConvertor in 'FileNameConvertor.pas',
+  RunPrgManagerUnit in 'RunPrgManagerUnit.pas',
+  ModernProfileEditorHelperProgramsFrameUnit in 'ModernProfileEditorHelperProgramsFrameUnit.pas' {ModernProfileEditorHelperProgramsFrame: TFrame},
+  SetupFrameWindowsGamesUnit in 'SetupFrameWindowsGamesUnit.pas' {SetupFrameWindowsGames: TFrame};
 
 {$R *.res}
 

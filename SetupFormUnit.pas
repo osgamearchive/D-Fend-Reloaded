@@ -92,16 +92,17 @@ implementation
 
 uses VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgSetupUnit,
      IconLoaderUnit, LanguageEditorFormUnit, LanguageEditorStartFormUnit,
-     SetupFrameBaseUnit, SetupFrameDirectoriesUnit, SetupFrameSurfaceUnit,
-     SetupFrameLanguageUnit, SetupFrameToolbarUnit, SetupFrameGamesListColumnsUnit,
-     SetupFrameGamesListAppearanceUnit, SetupFrameGamesListTreeAppearanceUnit,
-     SetupFrameGamesListScreenshotAppearanceUnit, SetupFrameProfileEditorUnit,
-     SetupFrameDefaultValuesUnit, SetupFrameProgramsUnit, SetupFrameDOSBoxUnit,
-     SetupFrameDOSBoxExtUnit, SetupFrameFreeDOSUnit, SetupFrameScummVMUnit,
-     SetupFrameQBasicUnit, SetupFrameWaveEncoderUnit, SetupFrameSecurityUnit,
-     SetupFrameServiceUnit, SetupFrameUpdateUnit, SetupFrameWineUnit,
-     SetupFrameCompressionUnit, SetupFrameGamesListScreenshotModeAppearanceUnit,
-     HelpConsts;
+     HelpConsts, SetupFrameBaseUnit, SetupFrameDirectoriesUnit,
+     SetupFrameSurfaceUnit, SetupFrameLanguageUnit, SetupFrameToolbarUnit,
+     SetupFrameGamesListColumnsUnit, SetupFrameGamesListAppearanceUnit,
+     SetupFrameGamesListTreeAppearanceUnit, SetupFrameGamesListScreenshotAppearanceUnit,
+     SetupFrameProfileEditorUnit, SetupFrameDefaultValuesUnit,
+     SetupFrameProgramsUnit, SetupFrameDOSBoxUnit, SetupFrameDOSBoxExtUnit,
+     SetupFrameFreeDOSUnit, SetupFrameScummVMUnit, SetupFrameQBasicUnit,
+     SetupFrameWaveEncoderUnit, SetupFrameSecurityUnit, SetupFrameServiceUnit,
+     SetupFrameUpdateUnit, SetupFrameWineUnit, SetupFrameCompressionUnit,
+     SetupFrameGamesListScreenshotModeAppearanceUnit, SetupFrameEditorUnit,
+     SetupFrameViewerUnit, SetupFrameWindowsGamesUnit;
 
 {$R *.dfm}
 
@@ -109,7 +110,6 @@ procedure TSetupForm.FormCreate(Sender: TObject);
 begin
   DoubleBuffered:=True;
   SetVistaFonts(self);
-  Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName);
 
   NoFlicker(MainPanel);
   NoFlicker(BottomPanel);
@@ -203,7 +203,12 @@ begin
   F:=TSetupFrameFreeDOS.Create(self); AddTreeNode(Root,F,TSetupFrameFreeDOS(F),False,15,True);
   F:=TSetupFrameScummVM.Create(self); AddTreeNode(Root,F,TSetupFrameScummVM(F),False,10);
   F:=TSetupFrameQBasic.Create(self); AddTreeNode(Root,F,TSetupFrameQBasic(F),False,11);
-  F:=TSetupFrameWaveEncoder.Create(self); AddTreeNode(Root,F,TSetupFrameWaveEncoder(F),False,9,True);
+  F:=TSetupFrameWaveEncoder.Create(self); AddTreeNode(Root,F,TSetupFrameWaveEncoder(F),False,9,False);
+  F:=TSetupFrameEditor.Create(self); AddTreeNode(Root,F,TSetupFrameEditor(F),True,17,False);
+  F:=TSetupFrameViewer.Create(self); AddTreeNode(Root,F,TSetupFrameViewer(F),True,18,False);
+  If PrgSetup.ActivateIncompleteFeatures then begin
+    F:=TSetupFrameWindowsGames.Create(self); AddTreeNode(Root,F,TSetupFrameWindowsGames(F),True,8,False);
+  end;
 
   F:=TSetupFrameService.Create(self); AddTreeNode(nil,F,TSetupFrameService(F),False,7,True); Root:=F;
   F:=TSetupFrameUpdate.Create(self); AddTreeNode(Root,F,TSetupFrameUpdate(F),False,14);
@@ -212,6 +217,8 @@ end;
 procedure TSetupForm.LoadLanguage;
 Var I : Integer;
 begin
+  Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName);
+
   Caption:=LanguageSetup.SetupForm;
   OKButton.Caption:=LanguageSetup.OK;
   CancelButton.Caption:=LanguageSetup.Cancel;
@@ -225,7 +232,10 @@ begin
 
   ModeComboBoxChange(self);
 
-  For I:=0 to length(Frames)-1 do Frames[I].IFrame.LoadLanguage;
+  For I:=0 to length(Frames)-1 do begin
+    Frames[I].IFrame.LoadLanguage;
+    Frames[I].Frame.Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName);
+  end;
 end;
 
 procedure TSetupForm.DOSBoxDirChanged;

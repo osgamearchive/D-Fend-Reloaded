@@ -65,7 +65,7 @@ object FirstRunWizardForm: TFirstRunWizardForm
         Width = 290
         Height = 21
         Style = csDropDownList
-        ItemHeight = 13
+        ItemHeight = 0
         TabOrder = 0
         OnChange = LanguageComboBoxChange
       end
@@ -74,6 +74,11 @@ object FirstRunWizardForm: TFirstRunWizardForm
       Left = 0
       Top = 0
       Caption = 'DOSBox'
+      ExplicitWidth = 0
+      ExplicitHeight = 0
+      DesignSize = (
+        569
+        241)
       object DosBoxButton: TSpeedButton
         Left = 530
         Top = 98
@@ -121,6 +126,26 @@ object FirstRunWizardForm: TFirstRunWizardForm
           'dialog will be used as the default DOSBox folder for games.'
         WordWrap = True
       end
+      object WarningButton: TSpeedButton
+        Left = 501
+        Top = 97
+        Width = 23
+        Height = 22
+        Anchors = [akTop, akRight]
+        Glyph.Data = {
+          F6000000424DF600000000000000760000002800000010000000100000000100
+          0400000000008000000000000000000000001000000000000000000000000000
+          8000008000000080800080000000800080008080000080808000C0C0C0000000
+          FF0000FF000000FFFF00FF000000FF00FF00FFFF0000FFFFFF00EEEEEEEEEEEE
+          EEEEEEEEEEEEEEEEEEEEEEEE99999999EEEEEEE9999009999EEEEE9999900999
+          99EEEE999999999999EEEE999999999999EEEE999990099999EEEE9999900999
+          99EEEE999990099999EEEE999990099999EEEE999990099999EEEEE999900999
+          9EEEEEEE99999999EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE}
+        ParentShowHint = False
+        ShowHint = True
+        Visible = False
+        OnClick = WarningButtonClick
+      end
       object DosBoxDirEdit: TLabeledEdit
         Left = 16
         Top = 98
@@ -130,12 +155,15 @@ object FirstRunWizardForm: TFirstRunWizardForm
         EditLabel.Height = 13
         EditLabel.Caption = 'DosBoxDirEdit'
         TabOrder = 0
+        OnChange = DosBoxDirEditChange
       end
     end
     object TPage
       Left = 0
       Top = 0
       Caption = 'DOSBoxLanguage'
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object DosBoxLangLabel: TLabel
         Left = 16
         Top = 79
@@ -173,7 +201,7 @@ object FirstRunWizardForm: TFirstRunWizardForm
         Width = 290
         Height = 21
         Style = csDropDownList
-        ItemHeight = 13
+        ItemHeight = 0
         TabOrder = 0
       end
     end
@@ -181,6 +209,8 @@ object FirstRunWizardForm: TFirstRunWizardForm
       Left = 0
       Top = 0
       Caption = 'GameDir'
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object GameDirTopInfoLabel: TLabel
         Left = 16
         Top = 16
@@ -240,13 +270,15 @@ object FirstRunWizardForm: TFirstRunWizardForm
       Left = 0
       Top = 0
       Caption = 'Update'
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       DesignSize = (
         569
         241)
       object UpdateLabel: TLabel
-        Left = 16
-        Top = 168
-        Width = 550
+        Left = 32
+        Top = 156
+        Width = 534
         Height = 45
         Anchors = [akLeft, akTop, akRight]
         AutoSize = False
@@ -266,7 +298,7 @@ object FirstRunWizardForm: TFirstRunWizardForm
       end
       object Update0RadioButton: TRadioButton
         Left = 16
-        Top = 43
+        Top = 35
         Width = 540
         Height = 17
         Anchors = [akLeft, akTop, akRight]
@@ -277,7 +309,7 @@ object FirstRunWizardForm: TFirstRunWizardForm
       end
       object Update1RadioButton: TRadioButton
         Left = 16
-        Top = 66
+        Top = 58
         Width = 540
         Height = 17
         Anchors = [akLeft, akTop, akRight]
@@ -286,7 +318,7 @@ object FirstRunWizardForm: TFirstRunWizardForm
       end
       object Update2RadioButton: TRadioButton
         Left = 16
-        Top = 89
+        Top = 81
         Width = 540
         Height = 17
         Anchors = [akLeft, akTop, akRight]
@@ -295,7 +327,7 @@ object FirstRunWizardForm: TFirstRunWizardForm
       end
       object Update3RadioButton: TRadioButton
         Left = 16
-        Top = 112
+        Top = 104
         Width = 540
         Height = 17
         Anchors = [akLeft, akTop, akRight]
@@ -304,11 +336,20 @@ object FirstRunWizardForm: TFirstRunWizardForm
       end
       object UpdateCheckBox: TCheckBox
         Left = 16
-        Top = 140
+        Top = 135
         Width = 550
         Height = 17
         Caption = 'Kennung der aktuellen Version in die Abfrage-URL integrieren'
         TabOrder = 4
+      end
+      object UpdateNowCheckBox: TCheckBox
+        Left = 16
+        Top = 207
+        Width = 540
+        Height = 17
+        Anchors = [akLeft, akTop, akRight]
+        Caption = 'Jetzt nach Updates suchen'
+        TabOrder = 5
       end
     end
   end
@@ -386,7 +427,6 @@ object FirstRunWizardForm: TFirstRunWizardForm
     Width = 97
     Height = 25
     TabOrder = 4
-    Visible = False
     OnClick = HelpButtonClick
     Kind = bkHelp
   end

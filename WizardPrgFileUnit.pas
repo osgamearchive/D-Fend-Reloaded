@@ -38,7 +38,7 @@ type
 
 implementation
 
-uses ShellAPI, VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgSetupUnit;
+uses ShellAPI, ShlObj, VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgSetupUnit;
 
 {$R *.dfm}
 
@@ -86,9 +86,13 @@ begin
             else OpenDialog.Filter:=LanguageSetup.ProfileEditorEXEFilter;
           If Trim(ProgramEdit.Text)='' then begin
             If Trim(SetupEdit.Text)='' then begin
-              If PrgSetup.GameDir=''
-                then OpenDialog.InitialDir:=PrgSetup.BaseDir
-                else OpenDialog.InitialDir:=PrgSetup.GameDir;
+              If GamesFolderEdit.Visible=False {=Windows Mode} then begin
+                OpenDialog.InitialDir:=GetSpecialFolder(Application.MainForm.Handle,CSIDL_PROGRAM_FILES);
+              end else begin
+                If PrgSetup.GameDir=''
+                  then OpenDialog.InitialDir:=PrgSetup.BaseDir
+                  else OpenDialog.InitialDir:=PrgSetup.GameDir;
+              end;
             end else begin
               OpenDialog.InitialDir:=ExtractFilePath(MakeAbsPath(SetupEdit.Text,PrgSetup.BaseDir));
             end;
@@ -110,9 +114,13 @@ begin
             else OpenDialog.Filter:=LanguageSetup.ProfileEditorEXEFilter;
           If Trim(SetupEdit.Text)='' then begin
             If Trim(ProgramEdit.Text)='' then begin
-              If PrgSetup.GameDir=''
-                then OpenDialog.InitialDir:=PrgSetup.BaseDir
-                else OpenDialog.InitialDir:=PrgSetup.GameDir;
+              If GamesFolderEdit.Visible=False {=Windows Mode} then begin
+                OpenDialog.InitialDir:=GetSpecialFolder(Application.MainForm.Handle,CSIDL_PROGRAM_FILES);
+              end else begin
+                If PrgSetup.GameDir=''
+                  then OpenDialog.InitialDir:=PrgSetup.BaseDir
+                  else OpenDialog.InitialDir:=PrgSetup.GameDir;
+              end;
             end else begin
               OpenDialog.InitialDir:=ExtractFilePath(MakeAbsPath(ProgramEdit.Text,PrgSetup.BaseDir));
             end;

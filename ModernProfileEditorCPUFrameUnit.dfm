@@ -53,6 +53,7 @@ object ModernProfileEditorCPUFrame: TModernProfileEditorCPUFrame
       Height = 17
       Caption = 'Auto'
       TabOrder = 0
+      OnClick = CPUCyclesChange
     end
     object CyclesMaxRadioButton: TRadioButton
       Left = 16
@@ -61,6 +62,7 @@ object ModernProfileEditorCPUFrame: TModernProfileEditorCPUFrame
       Height = 17
       Caption = 'Max'
       TabOrder = 1
+      OnClick = CPUCyclesChange
     end
     object CyclesValueRadioButton: TRadioButton
       Left = 16
@@ -69,6 +71,7 @@ object ModernProfileEditorCPUFrame: TModernProfileEditorCPUFrame
       Height = 17
       Caption = 'Value'
       TabOrder = 2
+      OnClick = CPUCyclesChange
     end
     object CyclesComboBox: TComboBox
       Left = 96

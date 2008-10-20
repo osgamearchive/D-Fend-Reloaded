@@ -172,7 +172,12 @@ begin
 end;
 
 procedure TIconManagerForm.AddButtonClick(Sender: TObject);
+Var S : String;
 begin
+  S:=ExtractFilePath(MakeAbsIconName(Trim(CustomIconEdit.Text)));
+  If S='' then S:=DefaultCustomIconFolder;
+  If S='' then S:=PrgSetup.BaseDir;
+  If S<>'' then OpenDialog.InitialDir:=S;
   if not OpenDialog.Execute then exit;
 
   if not CopyFile(PChar(OpenDialog.FileName),PChar(Dir+ExtractFileName(OpenDialog.FileName)),True) then begin
@@ -211,7 +216,7 @@ begin
   If ListView.ItemIndex<0 then exit;
 
   S:=Dir+ListView.Items[ListView.ItemIndex].Caption;
-  If not DeleteFile(S) then begin
+  If not ExtDeleteFile(S,ftProfile) then begin
     MessageDlg(Format(LanguageSetup.MessageCouldNotDeleteFile,[S]),mtError,[mbOK],0);
     exit;
   end;

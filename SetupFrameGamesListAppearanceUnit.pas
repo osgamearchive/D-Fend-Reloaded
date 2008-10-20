@@ -29,6 +29,7 @@ type
     CheckBoxItalic: TCheckBox;
     CheckBoxUnderline: TCheckBox;
     GridLinesCheckBox: TCheckBox;
+    WindowsExeIconsCheckBox: TCheckBox;
     procedure GamesListBackgroundColorBoxChange(Sender: TObject);
     procedure GamesListBackgroundEditChange(Sender: TObject);
     procedure GamesListBackgroundButtonClick(Sender: TObject);
@@ -64,6 +65,8 @@ procedure TSetupFrameGamesListAppearance.InitGUIAndLoadSetup(InitData: TInitData
 Var S : String;
     C : TColor;
 begin
+  If PrgSetup.ActivateIncompleteFeatures then WindowsExeIconsCheckBox.Visible:=True;
+
   PBaseDir:=InitData.PBaseDir;
 
   NoFlicker(GamesListBackgroundRadioButton1);
@@ -83,6 +86,7 @@ begin
   NoFlicker(CheckBoxItalic);
   NoFlicker(CheckBoxUnderline);
   NoFlicker(GridLinesCheckBox);
+  NoFlicker(WindowsExeIconsCheckBox);
 
   S:=Trim(PrgSetup.GamesListViewBackground);
   If S='' then GamesListBackgroundRadioButton1.Checked:=True else begin
@@ -106,11 +110,17 @@ begin
   CheckBoxBold.Font.Style:=[fsBold];
   CheckBoxItalic.Font.Style:=[fsItalic];
   CheckBoxUnderline.Font.Style:=[fsUnderline];
+
+  CheckBoxBold.Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName);
+  CheckBoxItalic.Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName);
+  CheckBoxUnderline.Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName);
+
   CheckBoxBold.Checked:=PrgSetup.FavoritesBold;
   CheckBoxItalic.Checked:=PrgSetup.FavoritesItalic;
   CheckBoxUnderline.Checked:=PrgSetup.FavoritesUnderline;
 
   GridLinesCheckBox.Checked:=PrgSetup.GridLinesInGamesList;
+  WindowsExeIconsCheckBox.Checked:=PrgSetup.UseWindowsExeIcons;
 end;
 
 procedure TSetupFrameGamesListAppearance.LoadLanguage;
@@ -138,7 +148,8 @@ begin
   CheckBoxItalic.Caption:=LanguageSetup.FontStyleForFavoritesItalic;
   CheckBoxUnderline.Caption:=LanguageSetup.FontStyleForFavoritesUnderline;
 
-  //GridLinesCheckBox.Caption:=LanguageSetup.
+  GridLinesCheckBox.Caption:=LanguageSetup.SetupFormShowGridLines;
+  WindowsExeIconsCheckBox.Caption:=LanguageSetup.SetupFormUseWindowsExeIcons;
 
   HelpContext:=ID_FileOptionsAppearanceList;
 end;
@@ -168,6 +179,9 @@ begin
   CheckBoxUnderline.Checked:=False;
 
   GridLinesCheckBox.Checked:=False;
+
+  //... WindowsExeIconsCheckBox.Checked:=True;
+  WindowsExeIconsCheckBox.Checked:=False;
 end;
 
 procedure TSetupFrameGamesListAppearance.SaveSetup;
@@ -184,6 +198,7 @@ begin
   PrgSetup.FavoritesItalic:=CheckBoxItalic.Checked;
   PrgSetup.FavoritesUnderline:=CheckBoxUnderline.Checked;
   PrgSetup.GridLinesInGamesList:=GridLinesCheckBox.Checked;
+  PrgSetup.UseWindowsExeIcons:=WindowsExeIconsCheckBox.Checked;
 end;
 
 procedure TSetupFrameGamesListAppearance.GamesListBackgroundColorBoxChange(Sender: TObject);

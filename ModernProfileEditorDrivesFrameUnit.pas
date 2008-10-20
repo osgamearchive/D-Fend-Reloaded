@@ -77,18 +77,11 @@ begin
 end;
 
 procedure TModernProfileEditorDrivesFrame.SetGame(const Game: TGame; const LoadFromTemplate: Boolean);
+Var I : Integer;
 begin
   Mounting:=TStringList.Create;
-  If Game.NrOfMounts>=1 then Mounting.Add(Game.Mount0);
-  If Game.NrOfMounts>=2 then Mounting.Add(Game.Mount1);
-  If Game.NrOfMounts>=3 then Mounting.Add(Game.Mount2);
-  If Game.NrOfMounts>=4 then Mounting.Add(Game.Mount3);
-  If Game.NrOfMounts>=5 then Mounting.Add(Game.Mount4);
-  If Game.NrOfMounts>=6 then Mounting.Add(Game.Mount5);
-  If Game.NrOfMounts>=7 then Mounting.Add(Game.Mount6);
-  If Game.NrOfMounts>=8 then Mounting.Add(Game.Mount7);
-  If Game.NrOfMounts>=9 then Mounting.Add(Game.Mount8);
-  If Game.NrOfMounts>=10 then Mounting.Add(Game.Mount9);
+  For I:=0 to 9 do
+    If Game.NrOfMounts>=I+1 then Mounting.Add(Game.Mount[I]) else break;
   LoadMountingList;
   AutoMountCheckBox.Checked:=Game.AutoMountCDs;
 end;
@@ -120,8 +113,14 @@ begin
         L.Caption:=S;
         If St.Count>1 then begin
           S:=Trim(ExtUpperCase(St[1])); B:=False;
-          If (not B) and (S='DRIVE') then begin L.SubItems.Add('Drive'); B:=True; end;
-          // Language strings
+          If (not B) and (S='DRIVE') then begin L.SubItems.Add(LanguageSetup.ProfileEditorMountingDriveTypeDRIVE); B:=True; end;
+          If (not B) and (S='CDROM') then begin L.SubItems.Add(LanguageSetup.ProfileEditorMountingDriveTypeCDROM); B:=True; end;
+          If (not B) and (S='CDROMIMAGE') then begin L.SubItems.Add(LanguageSetup.ProfileEditorMountingDriveTypeCDROMIMAGE); B:=True; end;
+          If (not B) and (S='FLOPPY') then begin L.SubItems.Add(LanguageSetup.ProfileEditorMountingDriveTypeFLOPPY); B:=True; end;
+          If (not B) and (S='FLOPPYIMAGE') then begin L.SubItems.Add(LanguageSetup.ProfileEditorMountingDriveTypeFLOPPYIMAGE); B:=True; end;
+          If (not B) and (S='IMAGE') then begin L.SubItems.Add(LanguageSetup.ProfileEditorMountingDriveTypeIMAGE); B:=True; end;
+          If (not B) and (S='PHYSFS') then begin L.SubItems.Add(LanguageSetup.ProfileEditorMountingDriveTypePHYSFS); B:=True; end;
+          If (not B) and (S='ZIP') then begin L.SubItems.Add(LanguageSetup.ProfileEditorMountingDriveTypeZIP); B:=True; end;
           If not B then L.SubItems.Add(St[1]);
         end else begin
           L.SubItems.Add('');
@@ -220,8 +219,8 @@ Var S,T : String;
 begin
   Case (Sender as TComponent).Tag of
     0 : If Mounting.Count<10 then begin
-          S:=';Drive;'+NextFreeDriveLetter+';false;;';
-          if not ShowProfileMountEditorDialog(self,S,UsedDriveLetters,IncludeTrailingPathDelimiter(ExtractFilePath(ProfileExe^)),ProfileName^) then exit;
+          S:='';
+          if not ShowProfileMountEditorDialog(self,S,UsedDriveLetters,IncludeTrailingPathDelimiter(ExtractFilePath(ProfileExe^)),ProfileName^,NextFreeDriveLetter) then exit;
           Mounting.Add(S);
           LoadMountingList;
           MountingListView.ItemIndex:=MountingListView.Items.Count-1;
@@ -260,12 +259,12 @@ begin
           {Add VirtualHD dir}
           If Mounting.Count<10 then Mounting.Insert(0,MakeRelPath(PrgSetup.GameDir,PrgSetup.BaseDir)+';Drive;C;false;');
           {Add game dir if needed}
-          If (Mounting.Count<10) and (Trim(ProfileExe^)<>'') and (not CanReachFile(ProfileExe^)) then begin
+          If (Mounting.Count<10) and (Trim(ProfileExe^)<>'') and (not CanReachFile(ProfileExe^)) and (ExtUpperCase(Copy(ProfileExe^,1,7))<>'DOSBOX:') then begin
             S:=IncludeTrailingPathDelimiter(MakeRelPath(ExtractFilePath(ProfileExe^),PrgSetup.BaseDir));
             Mounting.Add(S+';DRIVE;'+NextFreeDriveLetter+';False;;105');
           end;
           {Add setup dir if needed}
-          If (Mounting.Count<10) and (Trim(ProfileSetup^)<>'') and (not CanReachFile(ProfileSetup^)) then begin
+          If (Mounting.Count<10) and (Trim(ProfileSetup^)<>'') and (not CanReachFile(ProfileSetup^)) and (ExtUpperCase(Copy(ProfileSetup^,1,7))<>'DOSBOX:') then begin
             S:=IncludeTrailingPathDelimiter(MakeRelPath(ExtractFilePath(ProfileSetup^),PrgSetup.BaseDir));
             Mounting.Add(S+';DRIVE;'+NextFreeDriveLetter+';False;;105');
           end;
@@ -296,18 +295,11 @@ begin
 end;
 
 procedure TModernProfileEditorDrivesFrame.GetGame(const Game: TGame);
+Var I : Integer;
 begin
   Game.NrOfMounts:=Mounting.Count;
-  If Mounting.Count>0 then Game.Mount0:=Mounting[0] else Game.Mount0:='';
-  If Mounting.Count>1 then Game.Mount1:=Mounting[1] else Game.Mount1:='';
-  If Mounting.Count>2 then Game.Mount2:=Mounting[2] else Game.Mount2:='';
-  If Mounting.Count>3 then Game.Mount3:=Mounting[3] else Game.Mount3:='';
-  If Mounting.Count>4 then Game.Mount4:=Mounting[4] else Game.Mount4:='';
-  If Mounting.Count>5 then Game.Mount5:=Mounting[5] else Game.Mount5:='';
-  If Mounting.Count>6 then Game.Mount6:=Mounting[6] else Game.Mount6:='';
-  If Mounting.Count>7 then Game.Mount7:=Mounting[7] else Game.Mount7:='';
-  If Mounting.Count>8 then Game.Mount8:=Mounting[8] else Game.Mount8:='';
-  If Mounting.Count>9 then Game.Mount9:=Mounting[9] else Game.Mount9:='';
+  For I:=0 to 9 do
+    If Mounting.Count>I then Game.Mount[I]:=Mounting[I] else Game.Mount[I]:='';
   Game.AutoMountCDs:=AutoMountCheckBox.Checked;
 end;
 

@@ -19,6 +19,7 @@ type
     SelectGenreButton: TBitBtn;
     PopupMenu: TPopupMenu;
     HelpButton: TBitBtn;
+    ExportAutoSetupTemplatesCheckBox: TCheckBox;
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure SelectButtonClick(Sender: TObject);
@@ -43,7 +44,7 @@ Function ExportProfFiles(const AOwner : TComponent; const AGameDB : TGameDB) : B
 implementation
 
 uses ShlObj, VistaToolsUnit, LanguageSetupUnit, DosBoxUnit, CommonTools,
-     PrgSetupUnit, GameDBToolsUnit, ScummVMUnit, HelpConsts;
+     PrgSetupUnit, GameDBToolsUnit, ScummVMUnit, HelpConsts, TemplateFormUnit;
 
 {$R *.dfm}
 
@@ -62,13 +63,17 @@ begin
   SelectAllButton.Caption:=LanguageSetup.All;
   SelectNoneButton.Caption:=LanguageSetup.None;
   SelectGenreButton.Caption:=LanguageSetup.GameBy;
+  ExportAutoSetupTemplatesCheckBox.Caption:=LanguageSetup.CreateConfFormAutoSetup;
 
   ProfFileMode:=False;
 end;
 
 procedure TCreateConfForm.FormShow(Sender: TObject);
 begin
-  If ProfFileMode then Caption:=LanguageSetup.CreateConfFormProfMode;
+  If ProfFileMode then begin
+    Caption:=LanguageSetup.CreateConfFormProfMode;
+    ExportAutoSetupTemplatesCheckBox.Visible:=PrgSetup.ActivateIncompleteFeatures;
+  end;
 
   BuildCheckList(ListBox,GameDB,True,False,True);
   BuildSelectPopupMenu(PopupMenu,GameDB,SelectButtonClick,True);
@@ -103,7 +108,7 @@ end;
 
 procedure TCreateConfForm.OKButtonClick(Sender: TObject);
 Var I : Integer;
-    G : TGame;
+    G,G2 : TGame;
     Dir,S : String;
     St : TStringList;
 begin
@@ -119,10 +124,27 @@ begin
     G:=TGame(ListBox.Items.Objects[I]);
     If ProfFileMode then begin
       G.StoreAllValues;
-      If not CopyFile(PChar(G.SetupFile),PChar(Dir+ExtractFileName(G.SetupFile)),True) then begin
-        MessageDlg(Format(LanguageSetup.MessageCouldNotCopyFile,[G.SetupFile,Dir+ExtractFileName(G.SetupFile)]),mtError,[mbOK],0);
-        ModalResult:=mrNone;
-        exit;
+      If ExportAutoSetupTemplatesCheckBox.Checked then begin
+        {export as auto setup template}
+        If ScummVMMode(G) then continue;
+        CreateGameCheckSum(G,False);
+        CreateSetupCheckSum(G,False);
+        G2:=TGame.Create(Dir+ExtractFileName(G.SetupFile));
+        try
+          G2.AssignFrom(G);
+          RemoveNonAutoSetupValues(G2);
+          G2.LoadCache;
+          G2.StoreAllValues;
+        finally
+          G2.Free;
+        end;
+      end else begin
+        {just copy profile file}
+        If not CopyFile(PChar(G.SetupFile),PChar(Dir+ExtractFileName(G.SetupFile)),True) then begin
+          MessageDlg(Format(LanguageSetup.MessageCouldNotCopyFile,[G.SetupFile,Dir+ExtractFileName(G.SetupFile)]),mtError,[mbOK],0);
+          ModalResult:=mrNone;
+          exit;
+        end;
       end;
     end else begin
       If ScummVMMode(G) then begin

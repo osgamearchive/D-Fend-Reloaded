@@ -56,12 +56,14 @@ begin
   ProgramEdit.EditLabel.Caption:=LanguageSetup.WizardFormProgramFolder;
   ProgramButton.Hint:=LanguageSetup.ChooseFolder;
   GamesFolderEdit.EditLabel.Caption:=LanguageSetup.WizardFormGamesFolder;
+  GamesFolderButton.Caption:=LanguageSetup.WizardFormExplorer;
   GameNameLabel.Caption:=LanguageSetup.ProfileEditorScummVMGame;
   DataFolderShowButton.Caption:=LanguageSetup.WizardFormDataFolderButton;
   BaseInfoLabel3.Caption:=LanguageSetup.WizardFormInfoLabel3;
   DataFolderEdit.EditLabel.Caption:=LanguageSetup.WizardFormDataFolder;
   DataFolderButton.Hint:=LanguageSetup.ChooseFolder;
   BaseDataFolderEdit.EditLabel.Caption:=LanguageSetup.WizardFormBaseDataFolder;
+  BaseDataFolderButton.Caption:=LanguageSetup.WizardFormExplorer;
 
   GamesFolderEdit.Text:=PrgSetup.GameDir;
   BaseDataFolderEdit.Text:=PrgSetup.DataDir;

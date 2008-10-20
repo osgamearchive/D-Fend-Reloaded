@@ -27,6 +27,7 @@ type
     DosBoxLangLabel: TLabel;
     DosBoxLangEditComboBox: TComboBox;
     WaitOnErrorCheckBox: TCheckBox;
+    WarningButton: TSpeedButton;
     procedure FormCreate(Sender: TObject);
     procedure RestoreDefaultValuesButtonClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -34,6 +35,7 @@ type
     procedure ButtonWork(Sender: TObject);
     procedure DosBoxDirEditChange(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
+    procedure WarningButtonClick(Sender: TObject);
   private
     { Private-Deklarationen }
     DosBoxLang : TStringList;
@@ -63,6 +65,7 @@ begin
   DosBoxLang:=TStringList.Create;
 
   DosBoxDirEdit.EditLabel.Caption:=LanguageSetup.SetupFormDosBoxDir;
+  WarningButton.Hint:=LanguageSetup.MsgDlgWarning;
   DosBoxButton.Hint:=LanguageSetup.ChooseFolder;
   FindDosBoxButton.Hint:=LanguageSetup.SetupFormSearchDosBox;
   DosBoxLangLabel.Caption:=LanguageSetup.SetupFormDosBoxLang;
@@ -140,6 +143,9 @@ begin
 
   I:=DosBoxLang.IndexOf(PrgSetup.DOSBoxSettings[0].DosBoxLanguage);
   If I>=0 then DosBoxLangEditComboBox.ItemIndex:=I else DosBoxLangEditComboBox.ItemIndex:=0;
+
+  WarningButton.Visible:=OldDOSBoxVersion(CheckDOSBoxVersion(-1,DosBoxDirEdit.Text));
+  DosBoxDirEdit.Width:=IfThen(WarningButton.Visible,WarningButton.Left-4,WarningButton.Left+WarningButton.Width)-DosBoxDirEdit.Left;
 end;
 
 procedure TSetupFrameDOSBoxForm.ButtonWork(Sender: TObject);
@@ -188,6 +194,11 @@ begin
   CenterDOSBoxCheckBox.Checked:=False;
   DisableScreensaverCheckBox.Checked:=False;
   If IsWindowsVista then SDLVideoDriverComboBox.ItemIndex:=1 else SDLVideoDriverComboBox.ItemIndex:=0;
+end;
+
+procedure TSetupFrameDOSBoxForm.WarningButtonClick(Sender: TObject);
+begin
+  DOSBoxOutdatedWarning(DosBoxDirEdit.Text);
 end;
 
 { global }

@@ -16,7 +16,7 @@
 ; ============================================================
 
 !define VER_MAYOR 0
-!define VER_MINOR1 5
+!define VER_MINOR1 6
 !define VER_MINOR2 0
 
 !define PrgName "D-Fend Reloaded ${VER_MAYOR}.${VER_MINOR1}.${VER_MINOR2}"
@@ -59,6 +59,7 @@ ReserveFile "ioFileDanish.ini"
 ReserveFile "ioFileEnglish.ini"
 ReserveFile "ioFileFrench.ini"
 ReserveFile "ioFileGerman.ini"
+ReserveFile "ioFilePolish.ini"
 ReserveFile "ioFileRussian.ini"
 ReserveFile "ioFileSimplified_Chinese.ini"
 ReserveFile "ioFileSpanish.ini"
@@ -135,6 +136,7 @@ Var AdminOK
 !insertmacro MUI_LANGUAGE "Danish"
 !insertmacro MUI_LANGUAGE "French"
 !insertmacro MUI_LANGUAGE "German"
+!insertmacro MUI_LANGUAGE "Polish"
 !insertmacro MUI_LANGUAGE "Russian"
 !insertmacro MUI_LANGUAGE "SimpChinese"
 !insertmacro MUI_LANGUAGE "Spanish"
@@ -144,6 +146,7 @@ Var AdminOK
 !include "D-Fend-Reloaded-Setup-Lang-English.nsi"
 !include "D-Fend-Reloaded-Setup-Lang-French.nsi"
 !include "D-Fend-Reloaded-Setup-Lang-German.nsi"
+!include "D-Fend-Reloaded-Setup-Lang-Polish.nsi"
 !include "D-Fend-Reloaded-Setup-Lang-Russian.nsi"
 !include "D-Fend-Reloaded-Setup-Lang-Simplified_Chinese.nsi"
 !include "D-Fend-Reloaded-Setup-Lang-Spanish.nsi"
@@ -445,6 +448,7 @@ Function .onInit
   !insertmacro MUI_INSTALLOPTIONS_EXTRACT "ioFileEnglish.ini"
   !insertmacro MUI_INSTALLOPTIONS_EXTRACT "ioFileFrench.ini"
   !insertmacro MUI_INSTALLOPTIONS_EXTRACT "ioFileGerman.ini"
+  !insertmacro MUI_INSTALLOPTIONS_EXTRACT "ioFilePolish.ini"
   !insertmacro MUI_INSTALLOPTIONS_EXTRACT "ioFileRussian.ini"
   !insertmacro MUI_INSTALLOPTIONS_EXTRACT "ioFileSimplified_Chinese.ini"
   !insertmacro MUI_INSTALLOPTIONS_EXTRACT "ioFileSpanish.ini"
@@ -454,7 +458,8 @@ Function .onInit
   MessageBox MB_YESNO "$(LANGNAME_NeedAdminRights)" IDYES UAC_Elevate IDNO InitReturn
 
   InitReturn:
-  ;MessageBox MB_OK "This is not D-Fend Reloaded 0.5.0 ! This is the release candiate 3 of version 0.5.0 ! This means this version is very close to the final release 0.5.0 but there might be some unfixed bugs etc. Please do not use this version unless you want to do beta testing. The final release of 0.5.0 will be released very soon."
+  ; MessageBox MB_OK "This is a beta version of D-Fend Reloaded 0.6 ! The final version of D-Fend Reloaded 0.6 has not yet been released. This version is for testing only."
+  ; MessageBox MB_OK "This is not D-Fend Reloaded 0.6.0 ! This is the release candiate 2 of version 0.6.0 ! This means this version is very close to the final release 0.6.0 but there might be some unfixed bugs etc. Please do not use this version unless you want to do beta testing. The final release of 0.6.0 will be released very soon."
 FunctionEnd  
 
 Function un.onInit  

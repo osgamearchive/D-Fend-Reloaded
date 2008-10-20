@@ -28,6 +28,10 @@ object CreateImageForm: TCreateImageForm
     TabOrder = 0
     object FloppyImageSheet: TTabSheet
       Caption = 'Floppy Image'
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object FloppyImageTypeLabel: TLabel
         Left = 16
         Top = 16
@@ -94,7 +98,7 @@ object CreateImageForm: TCreateImageForm
         Width = 516
         Height = 21
         Style = csDropDownList
-        ItemHeight = 13
+        ItemHeight = 0
         TabOrder = 0
         OnChange = FloppyImageTypeComboBoxChange
       end
@@ -104,7 +108,7 @@ object CreateImageForm: TCreateImageForm
         Width = 96
         Height = 21
         Style = csDropDownList
-        ItemHeight = 13
+        ItemHeight = 0
         TabOrder = 1
         OnChange = FloppyDataChange
       end
@@ -114,7 +118,7 @@ object CreateImageForm: TCreateImageForm
         Width = 96
         Height = 21
         Style = csDropDownList
-        ItemHeight = 13
+        ItemHeight = 0
         TabOrder = 2
         OnChange = FloppyDataChange
       end
@@ -124,7 +128,7 @@ object CreateImageForm: TCreateImageForm
         Width = 96
         Height = 21
         Style = csDropDownList
-        ItemHeight = 13
+        ItemHeight = 0
         TabOrder = 3
         OnChange = FloppyDataChange
       end
@@ -190,6 +194,10 @@ object CreateImageForm: TCreateImageForm
     object HDImageSheet: TTabSheet
       Caption = 'HD Image'
       ImageIndex = 1
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       DesignSize = (
         548
         317)

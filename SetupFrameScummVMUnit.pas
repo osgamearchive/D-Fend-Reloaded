@@ -16,8 +16,12 @@ type
     ScummVMReadList: TBitBtn;
     MinimizeDFendScummVMCheckBox: TCheckBox;
     ScummVMShowListButton: TBitBtn;
+    CenterScummVMCheckBox: TCheckBox;
+    HideConsoleCheckBox: TCheckBox;
+    RestoreWindowCheckBox: TCheckBox;
     procedure ButtonWork(Sender: TObject);
     procedure ScummVMDownloadURLClick(Sender: TObject);
+    procedure MinimizeDFendScummVMCheckBoxClick(Sender: TObject);
   private
     { Private-Deklarationen }
   public
@@ -47,12 +51,22 @@ end;
 
 procedure TSetupFrameScummVM.InitGUIAndLoadSetup(InitData: TInitData);
 begin
+  If PrgSetup.ActivateIncompleteFeatures then RestoreWindowCheckBox.Visible:=True;
+
   NoFlicker(ScummVMDirEdit);
   NoFlicker(ScummVMReadList);
   NoFlicker(MinimizeDFendScummVMCheckBox);
+  Noflicker(RestoreWindowCheckBox);
+  NoFlicker(CenterScummVMCheckBox);
+  NoFlicker(HideConsoleCheckBox);
 
   ScummVMDirEdit.Text:=PrgSetup.ScummVMPath;
   MinimizeDFendScummVMCheckBox.Checked:=PrgSetup.MinimizeOnScummVMStart;
+  RestoreWindowCheckBox.Checked:=PrgSetup.RestoreWhenScummVMCloses;
+  CenterScummVMCheckBox.Checked:=PrgSetup.CenterScummVMWindow;
+  HideConsoleCheckBox.Checked:=PrgSetup.HideScummVMConsole;
+
+  MinimizeDFendScummVMCheckBoxClick(self);
 end;
 
 procedure TSetupFrameScummVM.LoadLanguage;
@@ -63,6 +77,9 @@ begin
   ScummVMReadList.Caption:=LanguageSetup.SetupFormReadScummVMGamesList;
   ScummVMShowListButton.Caption:=LanguageSetup.WizardFormEmulationTypeListScummVMGames;
   MinimizeDFendScummVMCheckBox.Caption:=LanguageSetup.SetupFormMinimizeDFendScummVM;
+  RestoreWindowCheckBox.Caption:=LanguageSetup.SetupFormRestoreWhenScummVMCloses;
+  CenterScummVMCheckBox.Caption:=LanguageSetup.SetupFormCenterScummVMWindow;
+  HideConsoleCheckBox.Caption:=LanguageSetup.SetupFormHideScummVMConsole;
   ScummVMDownloadURLInfo.Caption:=LanguageSetup.SetupFormScummVMDownloadURL;
   ScummVMDownloadURL.Caption:='http:/'+'/www.scummvm.org/downloads.php';
   with ScummVMDownloadURL.Font do begin Color:=clBlue; Style:=[fsUnderline]; end;
@@ -71,17 +88,29 @@ begin
   HelpContext:=ID_FileOptionsScummVM;
 end;
 
+procedure TSetupFrameScummVM.MinimizeDFendScummVMCheckBoxClick(Sender: TObject);
+begin
+  RestoreWindowCheckBox.Enabled:=MinimizeDFendScummVMCheckBox.Checked;
+end;
+
 procedure TSetupFrameScummVM.DOSBoxDirChanged;
 begin
 end;
 
 procedure TSetupFrameScummVM.ShowFrame(const AdvencedMode: Boolean);
-begin
+begin                                                
+  MinimizeDFendScummVMCheckBox.Visible:=AdvencedMode;
+  CenterScummVMCheckBox.Visible:=AdvencedMode;
+  HideConsoleCheckBox.Visible:=AdvencedMode;
 end;
 
 procedure TSetupFrameScummVM.RestoreDefaults;
 begin
   MinimizeDFendScummVMCheckBox.Checked:=False;
+  RestoreWindowCheckBox.Checked:=False;
+  CenterScummVMCheckBox.Checked:=False;
+  HideConsoleCheckBox.Checked:=False;
+  MinimizeDFendScummVMCheckBoxClick(self);
 end;
 
 procedure TSetupFrameScummVM.SaveSetup;
@@ -90,6 +119,9 @@ begin
     then PrgSetup.ScummVMPath:=IncludeTrailingPathDelimiter(ScummVMDirEdit.Text)
     else PrgSetup.ScummVMPath:='';
   PrgSetup.MinimizeOnScummVMStart:=MinimizeDFendScummVMCheckBox.Checked;
+  PrgSetup.RestoreWhenScummVMCloses:=RestoreWindowCheckBox.Checked;
+  PrgSetup.CenterScummVMWindow:=CenterScummVMCheckBox.Checked;
+  PrgSetup.HideScummVMConsole:=HideConsoleCheckBox.Checked;
 end;
 
 procedure TSetupFrameScummVM.ButtonWork(Sender: TObject);

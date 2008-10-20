@@ -15,7 +15,7 @@
 ; ============================================================
 
 !define VER_MAYOR 0
-!define VER_MINOR1 5
+!define VER_MINOR1 6
 !define VER_MINOR2 0
 
 !define PrgName "D-Fend Reloaded ${VER_MAYOR}.${VER_MINOR1}.${VER_MINOR2}"
@@ -98,6 +98,7 @@ Var InstallDataType
 !insertmacro MUI_LANGUAGE "Danish"
 !insertmacro MUI_LANGUAGE "French"
 !insertmacro MUI_LANGUAGE "German"
+!insertmacro MUI_LANGUAGE "Polish"
 !insertmacro MUI_LANGUAGE "Russian"
 !insertmacro MUI_LANGUAGE "SimpChinese"
 !insertmacro MUI_LANGUAGE "Spanish"
@@ -107,6 +108,7 @@ Var InstallDataType
 !include "D-Fend-Reloaded-Setup-Lang-English.nsi"
 !include "D-Fend-Reloaded-Setup-Lang-French.nsi"
 !include "D-Fend-Reloaded-Setup-Lang-German.nsi"
+!include "D-Fend-Reloaded-Setup-Lang-Polish.nsi"
 !include "D-Fend-Reloaded-Setup-Lang-Russian.nsi"
 !include "D-Fend-Reloaded-Setup-Lang-Simplified_Chinese.nsi"
 !include "D-Fend-Reloaded-Setup-Lang-Spanish.nsi"
@@ -195,6 +197,7 @@ Section "$(LANGNAME_DFendReloaded)" ID_DFend
   WriteINIStr $DataInstDir\ConfOpt.dat OPLRate value 8000,11025,22050,32000,44100,48000,50000
   WriteINIStr $DataInstDir\ConfOpt.dat PCRate value 8000,11025,22050,32000,44100,48000,50000
   WriteINIStr $DataInstDir\ConfOpt.dat Rate value 8000,11025,22050,32000,44100,48000,50000
+  WriteINIStr $DataInstDir\ConfOpt.dat scale value "No Scaling (none),Nearest neighbor upscaling with factor 2 (normal2x),Nearest neighbor upscaling with factor 3 (normal3x),Advanced upscaling with factor 2 (advmame2x),Advanced upscaling with factor 3 (advmame3x),high quality with factor 2 (hq2x), high quality with factor 3 (hq3x),2xsai (2xsai), super2xsai (super2xsai), supereagle (supereagle),Advanced interpoling with factor 2 (advinterp2x),Advanced interpoling with factor 3 (advinterp3x),Advanced upscaling with sharpening with factor 2 (tv2x),Advanced upscaling with sharpening with factor 3 (tv3x),Simulates the phopsphors on a dot trio CRT with factor 2 (rgb2x),Simulates the phopsphors on a dot trio CRT with factor 3 (rgb3x),Nearest neighbor with black lines with factor 2 (scan2x),Nearest neighbor with black lines with factor 3 (scan3x)"
   
   ; Update templates
   

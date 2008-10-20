@@ -59,27 +59,31 @@ object ViewImageForm: TViewImageForm
       Caption = 'ToolBar'
       Images = ImageList
       List = True
+      ParentShowHint = False
       ShowCaptions = True
+      ShowHint = True
       TabOrder = 0
       Wrapable = False
       object PreviousButton: TToolButton
         Tag = 5
         Left = 0
         Top = 0
+        AutoSize = True
         Caption = 'PreviousButton'
         ImageIndex = 4
         OnClick = ButtonWork
       end
       object NextButton: TToolButton
         Tag = 6
-        Left = 115
+        Left = 104
         Top = 0
+        AutoSize = True
         Caption = 'NextButton'
         ImageIndex = 5
         OnClick = ButtonWork
       end
       object ToolButton2: TToolButton
-        Left = 230
+        Left = 190
         Top = 0
         Width = 8
         Caption = 'ToolButton2'
@@ -88,30 +92,33 @@ object ViewImageForm: TViewImageForm
       end
       object CopyButton: TToolButton
         Tag = 1
-        Left = 238
+        Left = 198
         Top = 0
+        AutoSize = True
         Caption = 'CopyButton'
         ImageIndex = 1
         OnClick = ButtonWork
       end
       object SaveButton: TToolButton
         Tag = 2
-        Left = 353
+        Left = 286
         Top = 0
+        AutoSize = True
         Caption = 'SaveButton'
         ImageIndex = 1
         OnClick = ButtonWork
       end
       object ClearButton: TToolButton
         Tag = 3
-        Left = 468
+        Left = 373
         Top = 0
+        AutoSize = True
         Caption = 'ClearButton'
         ImageIndex = 2
         OnClick = ButtonWork
       end
       object ToolButton1: TToolButton
-        Left = 583
+        Left = 461
         Top = 0
         Width = 8
         Caption = 'ToolButton1'
@@ -119,16 +126,18 @@ object ViewImageForm: TViewImageForm
         Style = tbsSeparator
       end
       object ZoomButton: TToolButton
-        Left = 591
+        Left = 469
         Top = 0
+        AutoSize = True
         Caption = 'ZoomButton'
         DropdownMenu = ZoomPopupMenu
         ImageIndex = 6
       end
       object BackgroundButton: TToolButton
         Tag = 4
-        Left = 706
+        Left = 558
         Top = 0
+        AutoSize = True
         Caption = 'BackgroundButton'
         ImageIndex = 3
         OnClick = ButtonWork
@@ -427,11 +436,12 @@ object ViewImageForm: TViewImageForm
       000000000000}
   end
   object SaveDialog: TSaveDialog
-    FileName = 'png'
+    DefaultExt = 'png'
     Left = 488
     Top = 8
   end
   object ZoomPopupMenu: TPopupMenu
+    OnPopup = ZoomPopupMenuPopup
     Left = 552
     Top = 8
     object ZoomMenuItem1: TMenuItem

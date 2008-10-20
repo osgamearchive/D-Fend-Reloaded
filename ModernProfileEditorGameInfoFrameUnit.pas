@@ -22,6 +22,7 @@ type
     SearchGameButton: TToolButton;
     ImageList: TImageList;
     SearchPopupMenu: TPopupMenu;
+    AddUserDataPopupMenu: TPopupMenu;
     procedure FrameResize(Sender: TObject);
     procedure AddButtonClick(Sender: TObject);
     procedure DelButtonClick(Sender: TObject);
@@ -30,7 +31,10 @@ type
     { Private-Deklarationen }
     LinkFile : TLinkFile;
     PProfileName : PString;
+    GameDB : TGameDB;
     Procedure LoadLinks;
+    Procedure TabListForCell(ACol, ARow: Integer; var UseDropdownListForCell : Boolean);
+    Procedure TabGetListForCell(ACol, ARow: Integer; DropdownListForCell : TStrings);
   public
     { Public-Deklarationen }
     Procedure InitGUI(const InitData : TModernProfileEditorInitData);
@@ -42,7 +46,7 @@ type
 
 implementation
 
-uses LanguageSetupUnit, VistaToolsUnit, CommonTools, HelpConsts;
+uses LanguageSetupUnit, VistaToolsUnit, CommonTools, HelpConsts, ClassExtensions;
 
 {$R *.dfm}
 
@@ -81,6 +85,11 @@ begin
   FavouriteCheckBox.Caption:=LanguageSetup.GameFavorite;
 
   UserDefinedDataLabel.Caption:=LanguageSetup.ProfileEditorUserdefinedInfo+':';
+
+  Tab:=TStringGrid(NewWinControlType(Tab,TStringGridEx,ctcmCopyProperties));
+  TStringGridEx(Tab).OnListForCell:=TabListForCell;
+  TStringGridEx(Tab).OnGetListForCell:=TabGetListForCell;
+
   Tab.Cells[0,0]:=LanguageSetup.Key;
   Tab.Cells[1,0]:=LanguageSetup.Value;
   Tab.RowHeights[0]:=GameInfoValueListEditor.RowHeights[0];
@@ -92,6 +101,7 @@ begin
 
   PProfileName:=InitData.CurrentProfileName;
   LinkFile:=InitData.SearchLinkFile;
+  GameDB:=InitData.GameDB;
 
   LoadLinks;
 
@@ -204,10 +214,44 @@ begin
 end;
 
 procedure TModernProfileEditorGameInfoFrame.AddButtonClick(Sender: TObject);
+Var M : TMenuItem;
+    St : TStringList;
+    I : Integer;
+    P : TPoint;
 begin
-  Tab.RowCount:=Tab.RowCount+1;
-  Tab.Row:=Tab.RowCount-1;
-  Tab.RowHeights[Tab.RowCount-1]:=GameInfoValueListEditor.RowHeights[0];
+  If (Sender as TComponent).Tag>0 then begin
+    If ((Sender as TComponent).Tag=1) or (Trim(Tab.Cells[0,Tab.RowCount-1])<>'') or (Trim(Tab.Cells[1,Tab.RowCount-1])<>'') then begin
+      Tab.RowCount:=Tab.RowCount+1;
+      Tab.RowHeights[Tab.RowCount-1]:=GameInfoValueListEditor.RowHeights[0];
+    end;
+    Tab.Row:=Tab.RowCount-1;
+    Tab.Col:=0;
+    If (Sender as TComponent).Tag=2 then begin
+      Tab.Cells[0,Tab.RowCount-1]:=RemoveUnderline((Sender as TMenuItem).Caption);
+      Tab.Col:=1;
+    end;
+
+    Tab.SetFocus;
+    exit;
+  end;
+
+  St:=GameDB.GetUserKeys;
+  try
+    AddUserDataPopupMenu.Items.Clear;
+    M:=TMenuItem.Create(AddUserDataPopupMenu); M.Caption:=LanguageSetup.AddNewEmptyLine; M.Tag:=1; M.OnClick:=AddButtonClick;
+    AddUserDataPopupMenu.Items.Add(M);
+    M:=TMenuItem.Create(AddUserDataPopupMenu); M.Caption:='-';
+    AddUserDataPopupMenu.Items.Add(M);
+    For I:=0 to St.Count-1 do begin
+      M:=TMenuItem.Create(AddUserDataPopupMenu); M.Caption:=St[I]; M.Tag:=2; M.OnClick:=AddButtonClick;
+      AddUserDataPopupMenu.Items.Add(M);
+    end;
+  finally
+    St.Free;
+  end;
+
+  P:=ClientToScreen(Point((Sender as TControl).Left,(Sender as TControl).Top));
+  AddUserDataPopupMenu.Popup(P.X+5,P.Y+5);
 end;
 
 procedure TModernProfileEditorGameInfoFrame.DelButtonClick(Sender: TObject);
@@ -229,6 +273,23 @@ begin
     Tab.Cells[1,I-1]:=Tab.Cells[1,I];
   end;
   Tab.RowCount:=Tab.RowCount-1;
+end;
+
+Procedure TModernProfileEditorGameInfoFrame.TabListForCell(ACol, ARow: Integer; var UseDropdownListForCell : Boolean);
+begin
+  UseDropdownListForCell:=(ACol=1);
+end;
+
+Procedure TModernProfileEditorGameInfoFrame.TabGetListForCell(ACol, ARow: Integer; DropdownListForCell : TStrings);
+Var St : TStringList;
+begin
+  DropdownListForCell.Clear;
+  St:=GameDB.GetKeyValueList(Tab.Cells[0,ARow]);
+  try
+    DropdownListForCell.AddStrings(St);
+  finally
+    St.Free;
+  end;
 end;
 
 end.

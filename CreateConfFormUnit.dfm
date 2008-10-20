@@ -3,7 +3,7 @@ object CreateConfForm: TCreateConfForm
   Top = 0
   BorderStyle = bsDialog
   Caption = 'Conf-Dateien erstellen'
-  ClientHeight = 434
+  ClientHeight = 453
   ClientWidth = 424
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -88,19 +88,19 @@ object CreateConfForm: TCreateConfForm
   end
   object OKButton: TBitBtn
     Left = 16
-    Top = 401
+    Top = 420
     Width = 97
     Height = 25
-    TabOrder = 5
+    TabOrder = 6
     OnClick = OKButtonClick
     Kind = bkOK
   end
   object CancelButton: TBitBtn
     Left = 119
-    Top = 401
+    Top = 420
     Width = 97
     Height = 25
-    TabOrder = 6
+    TabOrder = 7
     Kind = bkCancel
   end
   object SelectGenreButton: TBitBtn
@@ -115,15 +115,24 @@ object CreateConfForm: TCreateConfForm
   end
   object HelpButton: TBitBtn
     Left = 222
-    Top = 401
+    Top = 420
     Width = 97
     Height = 25
-    TabOrder = 7
+    TabOrder = 8
     OnClick = HelpButtonClick
     Kind = bkHelp
   end
+  object ExportAutoSetupTemplatesCheckBox: TCheckBox
+    Left = 16
+    Top = 394
+    Width = 393
+    Height = 17
+    Caption = 'Export profiles as auto setup templates'
+    TabOrder = 5
+    Visible = False
+  end
   object PopupMenu: TPopupMenu
-    Left = 368
-    Top = 400
+    Left = 336
+    Top = 416
   end
 end

@@ -3,8 +3,8 @@ object UserInfoForm: TUserInfoForm
   Top = 0
   BorderIcons = [biSystemMenu, biMaximize]
   Caption = 'Benutzerdefinierte Informationen'
-  ClientHeight = 407
-  ClientWidth = 497
+  ClientHeight = 439
+  ClientWidth = 501
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -22,18 +22,17 @@ object UserInfoForm: TUserInfoForm
   TextHeight = 13
   object Panel1: TPanel
     Left = 0
-    Top = 368
-    Width = 497
+    Top = 400
+    Width = 501
     Height = 39
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 0
     DesignSize = (
-      497
+      501
       39)
     object DelButton: TSpeedButton
-      Tag = 4
-      Left = 465
+      Left = 469
       Top = 6
       Width = 23
       Height = 22
@@ -55,10 +54,10 @@ object UserInfoForm: TUserInfoForm
       ParentShowHint = False
       ShowHint = True
       OnClick = DelButtonClick
+      ExplicitLeft = 465
     end
     object AddButton: TSpeedButton
-      Tag = 2
-      Left = 436
+      Left = 440
       Top = 6
       Width = 23
       Height = 22
@@ -80,6 +79,7 @@ object UserInfoForm: TUserInfoForm
       ParentShowHint = False
       ShowHint = True
       OnClick = AddButtonClick
+      ExplicitLeft = 436
     end
     object OKButton: TBitBtn
       Left = 8
@@ -111,13 +111,17 @@ object UserInfoForm: TUserInfoForm
   object Tab: TStringGrid
     Left = 0
     Top = 0
-    Width = 497
-    Height = 368
+    Width = 501
+    Height = 400
     Align = alClient
     ColCount = 2
     FixedCols = 0
     RowCount = 2
     Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goEditing, goAlwaysShowEditor, goThumbTracking]
     TabOrder = 1
+  end
+  object AddUserDataPopupMenu: TPopupMenu
+    Left = 408
+    Top = 400
   end
 end

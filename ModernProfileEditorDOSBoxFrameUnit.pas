@@ -90,9 +90,19 @@ begin
   NoFlicker(CustomSetsSaveButton);
 
   DOSBoxForegroundPriorityRadioGroup.Caption:=LanguageSetup.GamePriorityForeground;
-  For I:=0 to length(Priority)-1 do DOSBoxForegroundPriorityRadioGroup.Items.Add(Priority[I]);
+  with DOSBoxForegroundPriorityRadioGroup.Items do begin
+    Add(LanguageSetup.GamePriorityLower);
+    Add(LanguageSetup.GamePriorityNormal);
+    Add(LanguageSetup.GamePriorityHigher);
+    Add(LanguageSetup.GamePriorityHighest);
+  end;
   DOSBoxBackgroundPriorityRadioGroup.Caption:=LanguageSetup.GamePriorityBackground;
-  For I:=0 to length(Priority)-1 do DOSBoxBackgroundPriorityRadioGroup.Items.Add(Priority[I]);
+  with DOSBoxBackgroundPriorityRadioGroup.Items do begin
+    Add(LanguageSetup.GamePriorityLower);
+    Add(LanguageSetup.GamePriorityNormal);
+    Add(LanguageSetup.GamePriorityHigher);
+    Add(LanguageSetup.GamePriorityHighest);
+  end;
   CloseDOSBoxOnExitCheckBox.Caption:=LanguageSetup.GameCloseDosBoxAfterGameExit;
   DefaultDOSBoxInstallationRadioButton.Caption:=LanguageSetup.GameDOSBoxVersionDefault;
   CustomDOSBoxInstallationRadioButton.Caption:=LanguageSetup.GameDOSBoxVersionCustom;
@@ -128,13 +138,13 @@ begin
   end;
   S:=Trim(ExtUpperCase(S));
   DOSBoxForegroundPriorityRadioGroup.ItemIndex:=1;
-  For I:=0 to DOSBoxForegroundPriorityRadioGroup.Items.Count-1 do If ExtUpperCase(DOSBoxForegroundPriorityRadioGroup.Items[I])=S then begin
+  For I:=0 to DOSBoxForegroundPriorityRadioGroup.Items.Count-1 do If ExtUpperCase(Priority[I])=S then begin
     DOSBoxForegroundPriorityRadioGroup.ItemIndex:=I;
     break;
   end;
   T:=Trim(ExtUpperCase(T));
   DOSBoxBackgroundPriorityRadioGroup.ItemIndex:=2;
-  For I:=0 to DOSBoxBackgroundPriorityRadioGroup.Items.Count-1 do If ExtUpperCase(DOSBoxBackgroundPriorityRadioGroup.Items[I])=T then begin
+  For I:=0 to DOSBoxBackgroundPriorityRadioGroup.Items.Count-1 do If ExtUpperCase(Priority[I])=T then begin
     DOSBoxBackgroundPriorityRadioGroup.ItemIndex:=I;
     break;
   end;
@@ -251,7 +261,7 @@ begin
     Game.CustomDOSBoxDir:=CustomDOSBoxInstallationEdit.Text;
   end;
 
-  If UserLanguageCheckBox.Checked then Game.CustomDOSBoxLanguage:=DosBoxLang[UserLanguageComboBox.ItemIndex] else Game.CustomDOSBoxLanguage:='default';
+  If UserLanguageCheckBox.Checked then Game.CustomDOSBoxLanguage:=ExtractFileName(DosBoxLang[UserLanguageComboBox.ItemIndex]) else Game.CustomDOSBoxLanguage:='default';
 
   Game.CustomSettings:=StringListToString(CustomSetsMemo.Lines);
 end;

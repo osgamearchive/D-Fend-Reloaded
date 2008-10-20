@@ -217,7 +217,7 @@ object ChangeProfilesForm: TChangeProfilesForm
         Width = 281
         Height = 17
         Caption = 'Del user info'
-        TabOrder = 13
+        TabOrder = 15
         OnClick = CheckBoxClick
       end
       object SetUserInfoComboBox: TComboBox
@@ -226,14 +226,14 @@ object ChangeProfilesForm: TChangeProfilesForm
         Width = 105
         Height = 21
         ItemHeight = 0
-        TabOrder = 14
+        TabOrder = 13
       end
       object SetUserInfoEdit: TEdit
         Left = 423
         Top = 176
         Width = 162
         Height = 21
-        TabOrder = 15
+        TabOrder = 14
       end
       object DelUserInfoComboBox: TComboBox
         Left = 312
@@ -262,7 +262,7 @@ object ChangeProfilesForm: TChangeProfilesForm
         Height = 17
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Close on exit'
-        TabOrder = 3
+        TabOrder = 0
         OnClick = CheckBoxClick
       end
       object CloseOnExitComboBox: TComboBox
@@ -273,7 +273,7 @@ object ChangeProfilesForm: TChangeProfilesForm
         Style = csDropDownList
         Anchors = [akTop, akRight]
         ItemHeight = 0
-        TabOrder = 5
+        TabOrder = 1
       end
       object StartFullscreenCheckBox: TCheckBox
         Left = 16
@@ -282,7 +282,7 @@ object ChangeProfilesForm: TChangeProfilesForm
         Height = 17
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Start fullscreen'
-        TabOrder = 7
+        TabOrder = 2
         OnClick = CheckBoxClick
       end
       object StartFullscreenComboBox: TComboBox
@@ -293,7 +293,7 @@ object ChangeProfilesForm: TChangeProfilesForm
         Style = csDropDownList
         Anchors = [akTop, akRight]
         ItemHeight = 0
-        TabOrder = 9
+        TabOrder = 3
       end
       object LockMouseCheckBox: TCheckBox
         Left = 16
@@ -302,7 +302,7 @@ object ChangeProfilesForm: TChangeProfilesForm
         Height = 17
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Lock mouse'
-        TabOrder = 10
+        TabOrder = 4
         OnClick = CheckBoxClick
       end
       object LockMouseComboBox: TComboBox
@@ -313,7 +313,7 @@ object ChangeProfilesForm: TChangeProfilesForm
         Style = csDropDownList
         Anchors = [akTop, akRight]
         ItemHeight = 0
-        TabOrder = 11
+        TabOrder = 5
       end
       object UseDoublebufferCheckBox: TCheckBox
         Left = 16
@@ -322,7 +322,7 @@ object ChangeProfilesForm: TChangeProfilesForm
         Height = 17
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Use doublebuffer'
-        TabOrder = 12
+        TabOrder = 6
         OnClick = CheckBoxClick
       end
       object UseDoublebufferComboBox: TComboBox
@@ -333,7 +333,7 @@ object ChangeProfilesForm: TChangeProfilesForm
         Style = csDropDownList
         Anchors = [akTop, akRight]
         ItemHeight = 0
-        TabOrder = 14
+        TabOrder = 7
       end
       object RenderCheckBox: TCheckBox
         Left = 16
@@ -342,7 +342,7 @@ object ChangeProfilesForm: TChangeProfilesForm
         Height = 17
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Render'
-        TabOrder = 15
+        TabOrder = 8
         OnClick = CheckBoxClick
       end
       object RenderComboBox: TComboBox
@@ -352,65 +352,65 @@ object ChangeProfilesForm: TChangeProfilesForm
         Height = 21
         Anchors = [akTop, akRight]
         ItemHeight = 0
-        TabOrder = 17
+        TabOrder = 9
       end
       object MemoryCheckBox: TCheckBox
         Left = 16
-        Top = 233
+        Top = 261
         Width = 296
         Height = 17
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Memory'
-        TabOrder = 0
+        TabOrder = 18
         OnClick = CheckBoxClick
       end
       object MemoryComboBox: TComboBox
         Left = 311
-        Top = 231
+        Top = 259
         Width = 106
         Height = 21
         Style = csDropDownList
         Anchors = [akTop, akRight]
         ItemHeight = 0
-        TabOrder = 1
+        TabOrder = 19
       end
       object CPUCyclesCheckBox: TCheckBox
         Left = 16
-        Top = 260
+        Top = 288
         Width = 296
         Height = 17
         Anchors = [akLeft, akTop, akRight]
         Caption = 'CPU cycles'
-        TabOrder = 2
+        TabOrder = 20
         OnClick = CheckBoxClick
       end
       object CPUCyclesComboBox: TComboBox
         Left = 312
-        Top = 258
+        Top = 286
         Width = 105
         Height = 21
         Anchors = [akTop, akRight]
         ItemHeight = 0
-        TabOrder = 4
+        TabOrder = 21
       end
       object EmulationCoreCheckBox: TCheckBox
         Left = 16
-        Top = 287
+        Top = 315
         Width = 296
         Height = 17
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Emulation core'
-        TabOrder = 6
+        TabOrder = 22
         OnClick = CheckBoxClick
       end
       object EmulationCoreComboBox: TComboBox
         Left = 312
-        Top = 285
+        Top = 313
         Width = 105
         Height = 21
         Anchors = [akTop, akRight]
         ItemHeight = 0
-        TabOrder = 8
+        TabOrder = 23
       end
       object WindowResolutionCheckBox: TCheckBox
         Left = 16
@@ -419,7 +419,7 @@ object ChangeProfilesForm: TChangeProfilesForm
         Height = 17
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Fenster-Aufl'#246'sung'
-        TabOrder = 19
+        TabOrder = 10
         OnClick = CheckBoxClick
       end
       object WindowResolutionComboBox: TComboBox
@@ -429,7 +429,7 @@ object ChangeProfilesForm: TChangeProfilesForm
         Height = 21
         Anchors = [akTop, akRight]
         ItemHeight = 0
-        TabOrder = 21
+        TabOrder = 11
       end
       object FullscreenResolutionComboBox: TComboBox
         Left = 312
@@ -438,7 +438,7 @@ object ChangeProfilesForm: TChangeProfilesForm
         Height = 21
         Anchors = [akTop, akRight]
         ItemHeight = 0
-        TabOrder = 25
+        TabOrder = 13
       end
       object ScaleComboBox: TComboBox
         Left = 311
@@ -448,7 +448,7 @@ object ChangeProfilesForm: TChangeProfilesForm
         Style = csDropDownList
         Anchors = [akTop, akRight]
         ItemHeight = 0
-        TabOrder = 13
+        TabOrder = 15
       end
       object FullscreenResolutionCheckBox: TCheckBox
         Left = 16
@@ -457,7 +457,7 @@ object ChangeProfilesForm: TChangeProfilesForm
         Height = 17
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Vollbild-Aufl'#246'sung'
-        TabOrder = 23
+        TabOrder = 12
         OnClick = CheckBoxClick
       end
       object ScaleCheckBox: TCheckBox
@@ -467,46 +467,66 @@ object ChangeProfilesForm: TChangeProfilesForm
         Height = 17
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Skalierung'
-        TabOrder = 16
+        TabOrder = 14
         OnClick = CheckBoxClick
       end
       object KeyboardLayoutCheckBox: TCheckBox
         Left = 16
-        Top = 314
+        Top = 342
         Width = 296
         Height = 17
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Keyboard layout'
-        TabOrder = 18
+        TabOrder = 24
         OnClick = CheckBoxClick
       end
       object KeyboardLayoutComboBox: TComboBox
         Left = 312
-        Top = 312
+        Top = 340
         Width = 105
         Height = 21
         Anchors = [akTop, akRight]
         ItemHeight = 0
-        TabOrder = 20
+        TabOrder = 25
       end
       object CodepageCheckBox: TCheckBox
         Left = 16
-        Top = 341
+        Top = 369
         Width = 296
         Height = 17
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Codepage'
-        TabOrder = 22
+        TabOrder = 26
         OnClick = CheckBoxClick
       end
       object CodepageComboBox: TComboBox
         Left = 312
-        Top = 339
+        Top = 367
         Width = 105
         Height = 21
         Anchors = [akTop, akRight]
         ItemHeight = 0
-        TabOrder = 24
+        TabOrder = 27
+      end
+      object AspectCheckBox: TCheckBox
+        Left = 16
+        Top = 234
+        Width = 296
+        Height = 17
+        Anchors = [akLeft, akTop, akRight]
+        Caption = 'Aspect correction'
+        TabOrder = 16
+        OnClick = CheckBoxClick
+      end
+      object AspectComboBox: TComboBox
+        Left = 311
+        Top = 232
+        Width = 106
+        Height = 21
+        Style = csDropDownList
+        Anchors = [akTop, akRight]
+        ItemHeight = 0
+        TabOrder = 17
       end
     end
   end

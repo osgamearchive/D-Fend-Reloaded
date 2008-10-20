@@ -1,16 +1,16 @@
 object WizardTemplateFrame: TWizardTemplateFrame
   Left = 0
   Top = 0
-  Width = 592
-  Height = 494
+  Width = 666
+  Height = 473
   TabOrder = 0
   DesignSize = (
-    592
-    494)
+    666
+    473)
   object InfoLabel: TLabel
     Left = 8
     Top = 16
-    Width = 543
+    Width = 617
     Height = 49
     Anchors = [akLeft, akTop, akRight]
     AutoSize = False
@@ -18,24 +18,19 @@ object WizardTemplateFrame: TWizardTemplateFrame
       'Bitte geben Sie an, auf welcher Vorlage das neue Profil angelegt' +
       ' werden soll.'
     WordWrap = True
+    ExplicitWidth = 543
   end
   object Bevel: TBevel
     Left = 3
     Top = 56
-    Width = 589
+    Width = 663
     Height = 18
     Anchors = [akLeft, akTop, akRight]
     Shape = bsBottomLine
-  end
-  object CPULabel: TLabel
-    Left = 32
-    Top = 338
-    Width = 68
-    Height = 13
-    Caption = 'CPU-Leistung:'
+    ExplicitWidth = 589
   end
   object HelpButton: TSpeedButton
-    Left = 557
+    Left = 631
     Top = 16
     Width = 23
     Height = 22
@@ -55,10 +50,11 @@ object WizardTemplateFrame: TWizardTemplateFrame
       3333333773FFFF77333333333FBFBF3333333333377777333333}
     NumGlyphs = 2
     OnClick = HelpButtonClick
+    ExplicitLeft = 557
   end
   object SpeedButton1: TSpeedButton
     Tag = 1
-    Left = 557
+    Left = 631
     Top = 113
     Width = 23
     Height = 22
@@ -78,10 +74,11 @@ object WizardTemplateFrame: TWizardTemplateFrame
       3333333773FFFF77333333333FBFBF3333333333377777333333}
     NumGlyphs = 2
     OnClick = HelpButtonClick
+    ExplicitLeft = 557
   end
   object SpeedButton2: TSpeedButton
     Tag = 2
-    Left = 557
+    Left = 631
     Top = 167
     Width = 23
     Height = 22
@@ -101,10 +98,11 @@ object WizardTemplateFrame: TWizardTemplateFrame
       3333333773FFFF77333333333FBFBF3333333333377777333333}
     NumGlyphs = 2
     OnClick = HelpButtonClick
+    ExplicitLeft = 557
   end
   object SpeedButton3: TSpeedButton
     Tag = 3
-    Left = 557
+    Left = 631
     Top = 221
     Width = 23
     Height = 22
@@ -124,10 +122,11 @@ object WizardTemplateFrame: TWizardTemplateFrame
       3333333773FFFF77333333333FBFBF3333333333377777333333}
     NumGlyphs = 2
     OnClick = HelpButtonClick
+    ExplicitLeft = 557
   end
   object SpeedButton4: TSpeedButton
     Tag = 4
-    Left = 557
+    Left = 631
     Top = 275
     Width = 23
     Height = 22
@@ -147,11 +146,12 @@ object WizardTemplateFrame: TWizardTemplateFrame
       3333333773FFFF77333333333FBFBF3333333333377777333333}
     NumGlyphs = 2
     OnClick = HelpButtonClick
+    ExplicitLeft = 557
   end
   object TemplateType1: TRadioButton
     Left = 16
     Top = 96
-    Width = 561
+    Width = 635
     Height = 17
     Anchors = [akLeft, akTop, akRight]
     Caption = 'Passende Autosetup Vorlage verwenden (empfohlen)'
@@ -170,7 +170,7 @@ object WizardTemplateFrame: TWizardTemplateFrame
   object TemplateType1List: TComboBox
     Left = 32
     Top = 114
-    Width = 519
+    Width = 593
     Height = 21
     Style = csDropDownList
     Anchors = [akLeft, akTop, akRight]
@@ -182,7 +182,7 @@ object WizardTemplateFrame: TWizardTemplateFrame
     Tag = 1
     Left = 32
     Top = 168
-    Width = 519
+    Width = 593
     Height = 21
     Style = csDropDownList
     Anchors = [akLeft, akTop, akRight]
@@ -193,7 +193,7 @@ object WizardTemplateFrame: TWizardTemplateFrame
   object TemplateType4: TRadioButton
     Left = 16
     Top = 258
-    Width = 561
+    Width = 635
     Height = 17
     Anchors = [akLeft, akTop, akRight]
     Caption = 'Benutzervorlage verwenden'
@@ -203,7 +203,7 @@ object WizardTemplateFrame: TWizardTemplateFrame
     Tag = 3
     Left = 32
     Top = 276
-    Width = 519
+    Width = 593
     Height = 21
     Style = csDropDownList
     Anchors = [akLeft, akTop, akRight]
@@ -219,61 +219,6 @@ object WizardTemplateFrame: TWizardTemplateFrame
     Caption = 'Standard-Assistentenvorlage verwenden'
     TabOrder = 8
   end
-  object StartFullscreenCheckBox: TCheckBox
-    Tag = 4
-    Left = 32
-    Top = 362
-    Width = 537
-    Height = 17
-    Anchors = [akLeft, akTop, akRight]
-    Caption = 'Im Vollbildmodus starten'
-    Checked = True
-    State = cbChecked
-    TabOrder = 10
-    OnClick = IndirectTypeChange
-  end
-  object CloseDosBoxOnExitCheckBox: TCheckBox
-    Tag = 4
-    Left = 32
-    Top = 385
-    Width = 537
-    Height = 17
-    Anchors = [akLeft, akTop, akRight]
-    Caption = 'DosBox beim Beenden schlie'#223'en'
-    Checked = True
-    State = cbChecked
-    TabOrder = 11
-    OnClick = IndirectTypeChange
-  end
-  object MoreRAMCheckBox: TCheckBox
-    Tag = 4
-    Left = 32
-    Top = 408
-    Width = 537
-    Height = 17
-    Anchors = [akLeft, akTop, akRight]
-    Caption = 'Programm ben'#246'tigt viel Arbeitsspeicher'
-    TabOrder = 12
-    OnClick = IndirectTypeChange
-  end
-  object CPUComboBox: TComboBox
-    Tag = 4
-    Left = 160
-    Top = 335
-    Width = 391
-    Height = 21
-    Style = csDropDownList
-    Anchors = [akLeft, akTop, akRight]
-    ItemHeight = 13
-    ItemIndex = 0
-    TabOrder = 9
-    Text = 'gering (Jump&&Run- und Brett-Spiele)'
-    OnChange = IndirectTypeChange
-    Items.Strings = (
-      'gering (Jump&&Run- und Brett-Spiele)'
-      'mehr (grafisch aufwendige Spiele)'
-      'viel (3D-Spiele)')
-  end
   object TemplateType3: TRadioButton
     Left = 16
     Top = 204
@@ -286,7 +231,7 @@ object WizardTemplateFrame: TWizardTemplateFrame
     Tag = 2
     Left = 32
     Top = 222
-    Width = 519
+    Width = 593
     Height = 21
     Style = csDropDownList
     Anchors = [akLeft, akTop, akRight]
@@ -297,14 +242,14 @@ object WizardTemplateFrame: TWizardTemplateFrame
   object InfoPanel: TPanel
     Left = 8
     Top = 80
-    Width = 393
-    Height = 81
+    Width = 467
+    Height = 60
     Anchors = [akLeft, akTop, akRight, akBottom]
-    TabOrder = 13
+    TabOrder = 9
     Visible = False
     DesignSize = (
-      393
-      81)
+      467
+      60)
     object PanelInfoLabel: TLabel
       Left = 16
       Top = 16
@@ -319,7 +264,7 @@ object WizardTemplateFrame: TWizardTemplateFrame
     end
     object OKButton: TBitBtn
       Left = 16
-      Top = 48
+      Top = 27
       Width = 97
       Height = 25
       Anchors = [akLeft, akBottom]
@@ -348,13 +293,87 @@ object WizardTemplateFrame: TWizardTemplateFrame
     end
     object OperationModeInfoButton: TBitBtn
       Left = 128
-      Top = 48
+      Top = 27
       Width = 177
       Height = 25
       Anchors = [akLeft, akBottom]
       Caption = 'Operation mode info'
       TabOrder = 1
       OnClick = OperationModeInfoButtonClick
+    end
+  end
+  object TemplateType5GroupBox: TGroupBox
+    Left = 32
+    Top = 335
+    Width = 619
+    Height = 130
+    Anchors = [akLeft, akTop, akRight]
+    Caption = 'Einstellungen zur Standard-Assistentenvorlage'
+    TabOrder = 10
+    DesignSize = (
+      619
+      130)
+    object CPULabel: TLabel
+      Left = 8
+      Top = 24
+      Width = 68
+      Height = 13
+      Caption = 'CPU-Leistung:'
+    end
+    object CPUComboBox: TComboBox
+      Tag = 4
+      Left = 88
+      Top = 21
+      Width = 515
+      Height = 21
+      Style = csDropDownList
+      Anchors = [akLeft, akTop, akRight]
+      ItemHeight = 13
+      ItemIndex = 0
+      TabOrder = 0
+      Text = 'gering (Jump&&Run- und Brett-Spiele)'
+      OnChange = IndirectTypeChange
+      Items.Strings = (
+        'gering (Jump&&Run- und Brett-Spiele)'
+        'mehr (grafisch aufwendige Spiele)'
+        'viel (3D-Spiele)')
+    end
+    object MoreRAMCheckBox: TCheckBox
+      Tag = 4
+      Left = 8
+      Top = 102
+      Width = 592
+      Height = 17
+      Anchors = [akLeft, akTop, akRight]
+      Caption = 'Programm ben'#246'tigt viel Arbeitsspeicher'
+      TabOrder = 1
+      OnClick = IndirectTypeChange
+    end
+    object CloseDosBoxOnExitCheckBox: TCheckBox
+      Tag = 4
+      Left = 8
+      Top = 79
+      Width = 592
+      Height = 17
+      Anchors = [akLeft, akTop, akRight]
+      Caption = 'DosBox beim Beenden schlie'#223'en'
+      Checked = True
+      State = cbChecked
+      TabOrder = 2
+      OnClick = IndirectTypeChange
+    end
+    object StartFullscreenCheckBox: TCheckBox
+      Tag = 4
+      Left = 8
+      Top = 56
+      Width = 592
+      Height = 17
+      Anchors = [akLeft, akTop, akRight]
+      Caption = 'Im Vollbildmodus starten'
+      Checked = True
+      State = cbChecked
+      TabOrder = 3
+      OnClick = IndirectTypeChange
     end
   end
 end

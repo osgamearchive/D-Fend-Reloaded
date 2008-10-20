@@ -17,11 +17,6 @@ type
     TemplateType4: TRadioButton;
     TemplateType4List: TComboBox;
     TemplateType5: TRadioButton;
-    StartFullscreenCheckBox: TCheckBox;
-    CloseDosBoxOnExitCheckBox: TCheckBox;
-    MoreRAMCheckBox: TCheckBox;
-    CPULabel: TLabel;
-    CPUComboBox: TComboBox;
     TemplateType3: TRadioButton;
     TemplateType3List: TComboBox;
     HelpButton: TSpeedButton;
@@ -33,6 +28,12 @@ type
     SpeedButton3: TSpeedButton;
     SpeedButton4: TSpeedButton;
     OperationModeInfoButton: TBitBtn;
+    TemplateType5GroupBox: TGroupBox;
+    CPUComboBox: TComboBox;
+    MoreRAMCheckBox: TCheckBox;
+    CloseDosBoxOnExitCheckBox: TCheckBox;
+    StartFullscreenCheckBox: TCheckBox;
+    CPULabel: TLabel;
     procedure IndirectTypeChange(Sender: TObject);
     procedure HelpButtonClick(Sender: TObject);
     procedure OKButtonClick(Sender: TObject);
@@ -47,6 +48,7 @@ type
     Procedure Done;
     Procedure SearchTemplates(const GameFile : String);
     Function CreateGame(const GameName : String) : TGame;
+    Function CreateWindowsGame(const GameName : String) : TGame;
     Function SelectedProfileSecure : Boolean;
     Function GetTemplate : TGame;
   end;
@@ -94,6 +96,7 @@ begin
   TemplateType3.Caption:=LanguageSetup.WizardFormTemplateType3;
   TemplateType4.Caption:=LanguageSetup.WizardFormTemplateType4;
   TemplateType5.Caption:=LanguageSetup.WizardFormTemplateType5;
+  TemplateType5GroupBox.Caption:=LanguageSetup.WizardFormTemplateType5Settings;
   CPULabel.Caption:=LanguageSetup.WizardFormCPU;
   CPUComboBox.Items[0]:=LanguageSetup.WizardFormCPUType1;
   CPUComboBox.Items[1]:=LanguageSetup.WizardFormCPUType2;
@@ -185,19 +188,7 @@ begin
   If not result then exit;
 
   For I:=0 to Template.NrOfMounts-1 do begin
-    S:='';
-    Case I of
-      0 : S:=Template.Mount0;
-      1 : S:=Template.Mount1;
-      2 : S:=Template.Mount2;
-      3 : S:=Template.Mount3;
-      4 : S:=Template.Mount4;
-      5 : S:=Template.Mount5;
-      6 : S:=Template.Mount6;
-      7 : S:=Template.Mount7;
-      8 : S:=Template.Mount8;
-      9 : S:=Template.Mount9;
-    end;
+    S:=Template.Mount[I];
     St:=ValueToList(S);
     try
       {Types to check:
@@ -270,6 +261,20 @@ begin
   end;
 end;
 
+function TWizardTemplateFrame.CreateWindowsGame(const GameName: String): TGame;
+Var DefaultTemplate : TGame;
+begin
+  result:=FGameDB[FGameDB.Add(GameName)];
+  DefaultTemplate:=TGame.Create(PrgSetup);
+  try
+    result.AssignFrom(DefaultTemplate);
+  finally
+    DefaultTemplate.Free;
+  end;
+  result.ProfileMode:='Windows';
+  result.Name:=GameName;
+end;
+
 procedure TWizardTemplateFrame.HelpButtonClick(Sender: TObject);
 begin
   Case (Sender as TComponent).Tag of
@@ -280,6 +285,7 @@ begin
           SpeedButton3.Visible:=False;
           SpeedButton4.Visible:=False;
           CPULabel.Visible:=False;
+          TemplateType5GroupBox.Visible:=False;
           InfoPanel.Width:=ClientWidth-2*InfoPanel.Left;
           InfoPanel.Height:=ClientHeight-8-InfoPanel.Top;
           PanelInfoLabel.Width:=InfoPanel.ClientWidth-32;
@@ -303,6 +309,7 @@ begin
   SpeedButton2.Visible:=True;
   SpeedButton3.Visible:=True;
   SpeedButton4.Visible:=True;
+  TemplateType5GroupBox.Visible:=True;
   (Parent as TWizardForm).BottomPanel.Visible:=True;
 end;
 

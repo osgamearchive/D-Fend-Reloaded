@@ -1,9 +1,9 @@
 object TemplateForm: TTemplateForm
   Left = 0
   Top = 0
-  BorderIcons = [biSystemMenu]
+  BorderIcons = [biSystemMenu, biMaximize]
   Caption = 'Vorlagen'
-  ClientHeight = 451
+  ClientHeight = 471
   ClientWidth = 705
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -24,8 +24,8 @@ object TemplateForm: TTemplateForm
     Left = 0
     Top = 52
     Width = 705
-    Height = 380
-    ActivePage = AutoSetupSheet
+    Height = 400
+    ActivePage = TemplateTab
     Align = alClient
     TabOrder = 0
     OnChange = PageControlChange
@@ -35,7 +35,7 @@ object TemplateForm: TTemplateForm
         Left = 0
         Top = 0
         Width = 697
-        Height = 352
+        Height = 372
         Align = alClient
         BorderStyle = bsNone
         Columns = <>
@@ -57,7 +57,7 @@ object TemplateForm: TTemplateForm
         Left = 0
         Top = 0
         Width = 697
-        Height = 352
+        Height = 372
         Align = alClient
         BorderStyle = bsNone
         Columns = <>
@@ -74,7 +74,7 @@ object TemplateForm: TTemplateForm
   end
   object StatusBar: TStatusBar
     Left = 0
-    Top = 432
+    Top = 452
     Width = 705
     Height = 19
     Panels = <
@@ -116,18 +116,21 @@ object TemplateForm: TTemplateForm
       EdgeBorders = [ebTop, ebBottom]
       Images = ImageList
       List = True
+      ParentShowHint = False
       ShowCaptions = True
+      ShowHint = True
       TabOrder = 0
       Transparent = False
       object CloseButton: TToolButton
         Left = 0
         Top = 0
+        AutoSize = True
         Caption = 'CloseButton'
         ImageIndex = 1
         OnClick = ButtonWork
       end
       object ToolButton7: TToolButton
-        Left = 90
+        Left = 89
         Top = 0
         Width = 8
         Caption = 'ToolButton7'
@@ -136,14 +139,15 @@ object TemplateForm: TTemplateForm
       end
       object UseButton: TToolButton
         Tag = 1
-        Left = 98
+        Left = 97
         Top = 0
+        AutoSize = True
         Caption = 'UseButton'
         ImageIndex = 2
         OnClick = ButtonWork
       end
       object ToolButton3: TToolButton
-        Left = 188
+        Left = 178
         Top = 0
         Width = 8
         Caption = 'ToolButton3'
@@ -152,30 +156,33 @@ object TemplateForm: TTemplateForm
       end
       object AddButton: TToolButton
         Tag = 2
-        Left = 196
+        Left = 186
         Top = 0
+        AutoSize = True
         Caption = 'AddButton'
         ImageIndex = 3
         OnClick = ButtonWork
       end
       object EditButton: TToolButton
         Tag = 3
-        Left = 286
+        Left = 268
         Top = 0
+        AutoSize = True
         Caption = 'EditButton'
         ImageIndex = 4
         OnClick = ButtonWork
       end
       object DeleteButton: TToolButton
         Tag = 4
-        Left = 376
+        Left = 349
         Top = 0
+        AutoSize = True
         Caption = 'DeleteButton'
         ImageIndex = 5
         OnClick = ButtonWork
       end
       object ToolButton4: TToolButton
-        Left = 466
+        Left = 443
         Top = 0
         Width = 8
         Caption = 'ToolButton4'
@@ -184,8 +191,9 @@ object TemplateForm: TTemplateForm
       end
       object HelpButton: TToolButton
         Tag = 18
-        Left = 474
+        Left = 451
         Top = 0
+        AutoSize = True
         Caption = 'HelpButton'
         ImageIndex = 6
         OnClick = ButtonWork
@@ -220,18 +228,21 @@ object TemplateForm: TTemplateForm
       EdgeBorders = [ebTop, ebBottom]
       Images = ImageList
       List = True
+      ParentShowHint = False
       ShowCaptions = True
+      ShowHint = True
       TabOrder = 0
       Transparent = False
       object CloseButton2: TToolButton
         Left = 0
         Top = 0
+        AutoSize = True
         Caption = 'CloseButton'
         ImageIndex = 1
         OnClick = ButtonWork
       end
       object ToolButton2: TToolButton
-        Left = 90
+        Left = 89
         Top = 0
         Width = 8
         Caption = 'ToolButton7'
@@ -240,30 +251,33 @@ object TemplateForm: TTemplateForm
       end
       object AddButton2: TToolButton
         Tag = 10
-        Left = 98
+        Left = 97
         Top = 0
+        AutoSize = True
         Caption = 'AddButton'
         ImageIndex = 3
         OnClick = ButtonWork
       end
       object EditButton2: TToolButton
         Tag = 11
-        Left = 188
+        Left = 179
         Top = 0
+        AutoSize = True
         Caption = 'EditButton'
         ImageIndex = 4
         OnClick = ButtonWork
       end
       object DeleteButton2: TToolButton
         Tag = 12
-        Left = 278
+        Left = 260
         Top = 0
+        AutoSize = True
         Caption = 'DeleteButton'
         ImageIndex = 5
         OnClick = ButtonWork
       end
       object ToolButton1: TToolButton
-        Left = 368
+        Left = 354
         Top = 0
         Width = 8
         Caption = 'ToolButton1'
@@ -272,8 +286,9 @@ object TemplateForm: TTemplateForm
       end
       object HelpButton2: TToolButton
         Tag = 18
-        Left = 376
+        Left = 362
         Top = 0
+        AutoSize = True
         Caption = 'HelpButton2'
         ImageIndex = 6
         OnClick = ButtonWork
@@ -709,6 +724,7 @@ object TemplateForm: TTemplateForm
         object MenuEditAddNewTemplate: TMenuItem
           Tag = 7
           Caption = 'neue Vorlage'
+          ShortCut = 45
           OnClick = ButtonWork
         end
         object MenuEditAddTemplateFromProfile: TMenuItem
@@ -723,6 +739,7 @@ object TemplateForm: TTemplateForm
         object MenuEditAdd2NewTemplate: TMenuItem
           Tag = 13
           Caption = 'neue Vorlage'
+          ShortCut = 45
           OnClick = ButtonWork
         end
         object MenuEditAdd2TemplateFromProfile: TMenuItem
@@ -735,12 +752,14 @@ object TemplateForm: TTemplateForm
         Tag = 3
         Caption = 'Edit...'
         ImageIndex = 4
+        ShortCut = 113
         OnClick = ButtonWork
       end
       object MenuEditEdit2: TMenuItem
         Tag = 11
         Caption = 'Edit...'
         ImageIndex = 4
+        ShortCut = 113
         OnClick = ButtonWork
       end
       object MenuEditEditMultipleTemplates: TMenuItem
@@ -753,16 +772,30 @@ object TemplateForm: TTemplateForm
         Caption = 'Edit multiple templates...'
         OnClick = ButtonWork
       end
+      object MenuEditCopy: TMenuItem
+        Tag = 9
+        Caption = 'Copy...'
+        ShortCut = 8237
+        OnClick = ButtonWork
+      end
+      object MenuEditCopy2: TMenuItem
+        Tag = 15
+        Caption = 'Copy...'
+        ShortCut = 8237
+        OnClick = ButtonWork
+      end
       object MenuEditDelete: TMenuItem
         Tag = 4
         Caption = 'Delete'
         ImageIndex = 5
+        ShortCut = 46
         OnClick = ButtonWork
       end
       object MenuEditDelete2: TMenuItem
         Tag = 12
         Caption = 'Delete'
         ImageIndex = 5
+        ShortCut = 46
         OnClick = ButtonWork
       end
     end
@@ -772,6 +805,7 @@ object TemplateForm: TTemplateForm
         Tag = 18
         Caption = '&Help'
         ImageIndex = 6
+        ShortCut = 112
         OnClick = ButtonWork
       end
     end

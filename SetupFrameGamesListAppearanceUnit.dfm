@@ -10,7 +10,7 @@ object SetupFrameGamesListAppearance: TSetupFrameGamesListAppearance
   object GamesListBackgroundButton: TSpeedButton
     Tag = 7
     Left = 544
-    Top = 77
+    Top = 67
     Width = 23
     Height = 22
     Anchors = [akTop, akRight]
@@ -34,14 +34,14 @@ object SetupFrameGamesListAppearance: TSetupFrameGamesListAppearance
   end
   object GamesListFontSizeLabel: TLabel
     Left = 16
-    Top = 120
+    Top = 104
     Width = 59
     Height = 13
     Caption = 'Schriftgr'#246#223'e'
   end
   object GamesListFontColorLabel: TLabel
     Left = 140
-    Top = 120
+    Top = 104
     Width = 61
     Height = 13
     Caption = 'Schriftfarbe:'
@@ -59,7 +59,7 @@ object SetupFrameGamesListAppearance: TSetupFrameGamesListAppearance
   end
   object GamesListBackgroundRadioButton2: TRadioButton
     Left = 16
-    Top = 48
+    Top = 42
     Width = 129
     Height = 17
     Caption = 'Hintergrundfarbe'
@@ -67,7 +67,7 @@ object SetupFrameGamesListAppearance: TSetupFrameGamesListAppearance
   end
   object GamesListBackgroundRadioButton3: TRadioButton
     Left = 16
-    Top = 80
+    Top = 67
     Width = 129
     Height = 17
     Caption = 'Hintergrundbild'
@@ -75,7 +75,7 @@ object SetupFrameGamesListAppearance: TSetupFrameGamesListAppearance
   end
   object GamesListBackgroundColorBox: TColorBox
     Left = 151
-    Top = 46
+    Top = 40
     Width = 130
     Height = 22
     ItemHeight = 16
@@ -84,7 +84,7 @@ object SetupFrameGamesListAppearance: TSetupFrameGamesListAppearance
   end
   object GamesListBackgroundEdit: TEdit
     Left = 151
-    Top = 78
+    Top = 67
     Width = 387
     Height = 21
     Anchors = [akLeft, akTop, akRight]
@@ -93,7 +93,7 @@ object SetupFrameGamesListAppearance: TSetupFrameGamesListAppearance
   end
   object GamesListFontSizeEdit: TSpinEdit
     Left = 16
-    Top = 136
+    Top = 120
     Width = 59
     Height = 22
     MaxValue = 48
@@ -103,7 +103,7 @@ object SetupFrameGamesListAppearance: TSetupFrameGamesListAppearance
   end
   object GamesListFontColorBox: TColorBox
     Left = 140
-    Top = 136
+    Top = 120
     Width = 130
     Height = 22
     ItemHeight = 16
@@ -111,7 +111,7 @@ object SetupFrameGamesListAppearance: TSetupFrameGamesListAppearance
   end
   object NotSetGroupBox: TGroupBox
     Left = 16
-    Top = 172
+    Top = 156
     Width = 551
     Height = 60
     Anchors = [akLeft, akTop, akRight]
@@ -157,7 +157,7 @@ object SetupFrameGamesListAppearance: TSetupFrameGamesListAppearance
   end
   object FavoriteGroupBox: TGroupBox
     Left = 16
-    Top = 238
+    Top = 222
     Width = 551
     Height = 59
     Anchors = [akLeft, akTop, akRight]
@@ -190,12 +190,21 @@ object SetupFrameGamesListAppearance: TSetupFrameGamesListAppearance
   end
   object GridLinesCheckBox: TCheckBox
     Left = 16
-    Top = 312
+    Top = 296
     Width = 551
     Height = 17
     Anchors = [akLeft, akTop, akRight]
     Caption = 'Gitterlinien im Ansichtsmodus "Details" anzeigen'
     TabOrder = 9
+  end
+  object WindowsExeIconsCheckBox: TCheckBox
+    Left = 16
+    Top = 319
+    Width = 551
+    Height = 17
+    Anchors = [akLeft, akTop, akRight]
+    Caption = 'Bei Windows-Profilen Icon aus Programmdatei verwenden'
+    TabOrder = 10
     Visible = False
   end
   object ImageOpenDialog: TOpenDialog

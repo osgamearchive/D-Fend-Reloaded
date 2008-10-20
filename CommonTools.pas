@@ -4,6 +4,7 @@ interface
 uses Windows, Classes, Graphics, StdCtrls;
 
 Function ExtUpperCase(const S : String) : String;
+Function ExtLowerCase(const S : String) : String;
 
 Function StrToFloatEx(S : String) : Double;
 
@@ -32,8 +33,16 @@ Function GetFileVersionAsString : String;
 Function GetNormalFileVersionAsString : String;
 Function GetShortFileVersionAsString : String;
 
+Procedure RunAndWait(const PrgFile, Path : String; const HideWindow : Boolean);
+Function RunAndGetOutput(const PrgFile, Parameters : String; const HideWindow : Boolean): TStringList;
+Function RunWithInput(PrgFile, Parameters : String; const HideWindow : Boolean; StdIn : TStringList) : Boolean;
+Procedure CenterWindowFromProcessID(const ProcessID : THandle);
+Procedure HideWindowFromProcessIDAndTitle(const ProcessID : THandle; const Title : String);
+Function CheckDOSBoxVersionDirect(const Nr : Integer; const Path : String) : String; {saidly not working}
+Function CheckDOSBoxVersionDirect2(const Nr : Integer; const Path : String) : String; {saidly not working}
 Function CheckDOSBoxVersion(const Nr : Integer; const Path : String = '') : String;
 Function OldDOSBoxVersion(const Version : String) : Boolean;
+Procedure DOSBoxOutdatedWarning(const DOSBoxPath : String);
 
 Function GetFileDateAsString : String;
 
@@ -41,7 +50,8 @@ Procedure CreateLink(const TargetName, Parameters, LinkFile, IconFile, Descripti
 Procedure SetStartWithWindows(const Enabled : Boolean);
 
 Function LoadImageFromFile(const FileName : String) : TPicture;
-Procedure SaveImageToFile(const Picture : TPicture; const FileName : String);
+Procedure SaveImageToFile(const Picture : TPicture; const FileName : String); overload;
+Procedure SaveImageToFile(const OldFileName, NewFileName : String); overload;
 
 Type TWallpaperStyle=(WSTile=0,WSCenter=1,WSStretch=2);
 
@@ -59,14 +69,26 @@ Procedure SetScreensaverAllowStatus(const Enable : Boolean);
 procedure SetComboHint(Combo: TComboBox);
 procedure SetComboDropDownDropDownWidth(Combo: TComboBox);
 
-Function GetDefaultEditor : String;
+Function GetDefaultEditor(Extension : String; const FileTypeFallback : Boolean; const RemoveParameters : Boolean = True) : String;
+Procedure OpenFileInEditor(const FileName : String);
+Function OpenMediaFile(const SetupString, FileName : String) : Boolean; {true=request handled by external program}
+
+Function FileSizeToStr(const Size : Int64) : String;
+
+Type TDeleteFileType=(ftQuickStart=0,ftTemp=1,ftProfile=2,ftUninstall=3,ftDataViewer=4,ftMediaViewer=5,ftZipOperation=6);
+Function ExtDeleteFile(const FileName : String; const FileType : TDeleteFileType; const DeletePrgSetupRecord : String ='') : Boolean;
+Function ExtDeleteFolder(const Folder : String; const FolderType : TDeleteFileType; const DeletePrgSetupRecord : String ='') : Boolean;
+Function DeleteFileToRecycleBin(const FileName : String) : Boolean;
+
+Function ForceForegroundWindow(Wnd:HWND):Boolean;
 
 Var TempPrgDir : String = ''; {Temporary overwrite normal PrgDir}
 
 implementation
 
-uses SysUtils, Forms, ShlObj, ActiveX, Messages, Math, ComObj, Registry, JPEG,
-     GIFImage, PNGImage, LanguageSetupUnit, PrgSetupUnit, PrgConsts;
+uses SysUtils, Forms, ShellAPI, ShlObj, ActiveX, Messages, Dialogs, Math,
+     Controls, ComObj, Registry, JPEG, GIFImage, PNGImage, LanguageSetupUnit,
+     PrgSetupUnit, PrgConsts;
 
 Function ExtUpperCase(const S : String) : String;
 Var I,J : Integer;
@@ -79,6 +101,20 @@ begin
     end;
     J:=Pos(result[I],LanguageSpecialLowerCase);
     If J>0 then result[I]:=LanguageSpecialUpperCase[J];
+  end;
+end;
+
+Function ExtLowerCase(const S : String) : String;
+Var I,J : Integer;
+begin
+  result:=Trim(S);
+  For I:=1 to length(result) do begin
+    If (result[I]>='A') and (result[I]<='Z') then begin
+      result[I]:=chr(ord(result[I])+(ord('a')-ord('A')));
+      continue;
+    end;
+    J:=Pos(result[I],LanguageSpecialUpperCase);
+    If J>0 then result[I]:=LanguageSpecialLowerCase[J];
   end;
 end;
 
@@ -371,7 +407,8 @@ Var I,J : Integer;
 begin
   I:=GetFileVersion(ExpandFileName(Application.ExeName));
   J:=GetFileVersionEx(ExpandFileName(Application.ExeName));
-  result:=Format('Version %d.%d.%d (Build %d)',[I div 65536,I mod 65536, J div 65536, J mod 65536]);
+  {result:=Format('Version %d.%d.%d (Build %d)',[I div 65536,I mod 65536, J div 65536, J mod 65536]);}
+  result:=Format('Version %d.%d.%d',[I div 65536,I mod 65536, J div 65536]);
 end;
 
 Function GetNormalFileVersionAsString : String;
@@ -389,6 +426,361 @@ begin
   result:=Format('%d.%d',[I div 65536,I mod 65536]);
 end;
 
+Procedure RunAndWait(const PrgFile, Path : String; const HideWindow : Boolean);
+Var StartupInfo : TStartupInfo;
+    ProcessInformation : TProcessInformation;
+begin
+  StartupInfo.cb:=SizeOf(StartupInfo);
+  with StartupInfo do begin lpReserved:=nil; lpDesktop:=nil; dwFlags:=0; cbReserved2:=0; lpReserved2:=nil; end;
+
+  If HideWindow then begin
+    StartupInfo.dwFlags:=STARTF_USESHOWWINDOW;
+    StartupInfo.wShowWindow:=SW_HIDE;
+  end;
+
+  CreateProcess(PChar(PrgFile),PChar('"'+PrgFile+'"'),nil,nil,False,0,nil,PChar(Path),StartupInfo,ProcessInformation);
+
+  WaitForSingleObject(ProcessInformation.hThread,INFINITE);
+  CloseHandle(ProcessInformation.hThread);
+  CloseHandle(ProcessInformation.hProcess);
+end;
+
+Function RunAndGetOutput(const PrgFile, Parameters : String; const HideWindow : Boolean): TStringList;
+Type TByteArray=Array[0..MaxInt-1] of Byte;
+const DataBlockSize=10*1024;
+Var hStdOutReadPipe, hStdOutWritePipe, hStdInReadPipe, hStdInWritePipe : THandle;
+    PipeSecurityAttributes : TSecurityAttributes;
+    StartupInfo : TStartupInfo;
+    ProcessInformation : TProcessInformation;
+    MSt : TMemoryStream;
+    I,J,K: Cardinal;
+    S : String;
+    LastLoop : Boolean;
+begin
+  {See also msdn.microsoft.com/en-us/library/ms682499.aspx}
+
+  result:=nil;
+  If not FileExists(PrgFile) then exit;
+
+  {Set the bInheritHandle flag so pipe handles are inherited.}
+  with PipeSecurityAttributes do begin
+    nLength:=SizeOf(TSecurityAttributes);
+    bInheritHandle:=True;
+    lpSecurityDescriptor:=nil;
+  end;
+
+  {Create a pipe for the child process's STDOUT.}
+  if not CreatePipe(hStdOutReadPipe,hStdOutWritePipe,@PipeSecurityAttributes,0) then exit;
+  try
+    {Create a pipe for the child process's STDIN.}
+    if not CreatePipe(hStdInReadPipe,hStdInWritePipe,@PipeSecurityAttributes,0) then exit;
+    try
+      {Ensure the read handle to the pipe for STDOUT is not inherited.}
+      if not SetHandleInformation(hStdOutReadPipe,HANDLE_FLAG_INHERIT,0) then exit;
+
+      {Ensure the write handle to the pipe for STDIN is not inherited.}
+      if not SetHandleInformation(hStdInWritePipe,HANDLE_FLAG_INHERIT,0) then exit;
+
+      {Run program}
+      StartupInfo.cb:=SizeOf(StartupInfo);
+      with StartupInfo do begin
+        lpReserved:=nil;
+        lpDesktop:=nil;
+        dwFlags:=STARTF_USESTDHANDLES;
+        cbReserved2:=0;
+        lpReserved2:=nil;
+        hStdInput:=hStdInReadPipe;
+        hStdOutput:=hStdOutWritePipe;
+        hStdError:=hStdOutWritePipe;
+      end;
+      If HideWindow then with StartupInfo do begin
+        dwFlags:=dwFlags or STARTF_USESHOWWINDOW;
+        wShowWindow:=SW_HIDE;
+      end;
+      If Parameters<>'' then S:=' '+Parameters else S:='';
+      if not CreateProcess(PChar(PrgFile),PChar('"'+PrgFile+'"'+S),nil,nil,True,0,nil,PChar(ExtractFilePath(PrgFile)),StartupInfo,ProcessInformation) then exit;
+      CloseHandle(ProcessInformation.hProcess);
+      try
+
+        {Wait for termination of program (or buffer full)}
+        WaitForSingleObject(ProcessInformation.hThread,250);
+
+        MSt:=TMemoryStream.Create;
+        try
+          {Read data from pipe}
+          MSt.Size:=0;
+
+          {if pipe buffer is too small for all output data program won't terminate until all data is written}
+          repeat
+            LastLoop:=(WaitForSingleObject(ProcessInformation.hThread,250)=WAIT_OBJECT_0);
+            {So begin reading the first blocks from pipe buffer}
+            repeat
+              MSt.Size:=MSt.Size+DataBlockSize;
+
+              {Do not try to read data if no data is available}
+              PeekNamedPipe(hStdOutReadPipe,nil,0,@I,@J,@K);
+              If J>0 then begin
+                If not ReadFile(hStdOutReadPipe,TByteArray(MSt.Memory^)[MSt.Size-DataBlockSize],DataBlockSize,I,nil) then exit;
+              end else begin
+                I:=0;
+              end;
+              If I<DataBlockSize then begin
+                MSt.Size:=MSt.Size-(DataBlockSize-I);
+                break;
+              end;
+            until False;
+          until LastLoop;
+
+          {Copy data to TStringList}
+          result:=TStringList.Create;
+          Mst.Position:=0;
+          result.LoadFromStream(MSt);
+        finally
+          MSt.Free;
+        end;
+      finally
+        CloseHandle(ProcessInformation.hThread);
+      end;
+    finally
+      CloseHandle(hStdInReadPipe);
+      CloseHandle(hStdInWritePipe);
+    end;
+  finally
+    CloseHandle(hStdOutReadPipe);
+    CloseHandle(hStdOutWritePipe);
+  end;
+end;
+
+Function RunWithInput(PrgFile, Parameters : String; const HideWindow : Boolean; StdIn : TStringList) : Boolean;
+Type TByteArray=Array[0..MaxInt-1] of Byte;
+const OutputReaderSize=10*1024;
+Var hStdOutReadPipe, hStdOutWritePipe, hStdInReadPipe, hStdInWritePipe : THandle;
+    PipeSecurityAttributes : TSecurityAttributes;
+    StartupInfo : TStartupInfo;
+    ProcessInformation : TProcessInformation;
+    MSt : TMemoryStream;
+    I,J,K : Cardinal;
+    S : String;
+    WritePos : Integer;
+    OutputReaderBlock : Array[0..OutputReaderSize-1] of Byte;
+begin
+  {See also msdn.microsoft.com/en-us/library/ms682499.aspx}
+
+  result:=False;
+  If not FileExists(PrgFile) then exit;
+
+  {Set the bInheritHandle flag so pipe handles are inherited.}
+  with PipeSecurityAttributes do begin
+    nLength:=SizeOf(TSecurityAttributes);
+    bInheritHandle:=True;
+    lpSecurityDescriptor:=nil;
+  end;
+
+  {Create a pipe for the child process's STDOUT.}
+  if not CreatePipe(hStdOutReadPipe,hStdOutWritePipe,@PipeSecurityAttributes,0) then exit;
+  try
+    {Create a pipe for the child process's STDIN.}
+    if not CreatePipe(hStdInReadPipe,hStdInWritePipe,@PipeSecurityAttributes,0) then exit;
+    try
+      {Ensure the read handle to the pipe for STDOUT is not inherited.}
+      if not SetHandleInformation(hStdOutReadPipe,HANDLE_FLAG_INHERIT,0) then exit;
+
+      {Ensure the write handle to the pipe for STDIN is not inherited.}
+      if not SetHandleInformation(hStdInWritePipe,HANDLE_FLAG_INHERIT,0) then exit;
+
+      MSt:=TMemoryStream.Create;
+      try
+        StdIn.SaveToStream(MSt);
+        WritePos:=0;
+
+        {Run program}
+        StartupInfo.cb:=SizeOf(StartupInfo);
+        with StartupInfo do begin
+          lpReserved:=nil;
+          lpDesktop:=nil;
+          dwFlags:=STARTF_USESTDHANDLES;
+          cbReserved2:=0;
+          lpReserved2:=nil;
+          hStdInput:=hStdInReadPipe;
+          hStdOutput:=hStdOutWritePipe;
+          hStdError:=hStdOutWritePipe;
+        end;
+        If HideWindow then with StartupInfo do begin
+          dwFlags:=dwFlags or STARTF_USESHOWWINDOW;
+          wShowWindow:=SW_HIDE;
+        end;
+        If Parameters<>'' then S:=' '+Parameters else S:='';
+        if not CreateProcess(PChar(PrgFile),PChar('"'+PrgFile+'"'+S),nil,nil,True,0,nil,PChar(ExtractFilePath(PrgFile)),StartupInfo,ProcessInformation) then exit;
+        CloseHandle(ProcessInformation.hProcess);
+
+        try
+          While (WritePos<MSt.Size) and (not (WaitForSingleObject(ProcessInformation.hThread,0)=WAIT_OBJECT_0)) do begin
+            {Read data from StdOut buffer}
+            PeekNamedPipe(hStdOutReadPipe,nil,0,@I,@J,@K);
+            If J>0 then ReadFile(hStdOutReadPipe,OutputReaderBlock,OutputReaderSize,I,nil);
+
+            {Write own data to StdIn buffer}
+            if not WriteFile(hStdInWritePipe,TByteArray(MSt.Memory^)[WritePos],MSt.Size-WritePos,I,nil) then exit;
+            inc(WritePos,I);
+          end;
+
+          repeat
+            {Read remaining data from StdOut buffer so program is not blocked and can terminate}
+            PeekNamedPipe(hStdOutReadPipe,nil,0,@I,@J,@K);
+            If J>0 then ReadFile(hStdOutReadPipe,OutputReaderBlock,OutputReaderSize,I,nil);
+          until (WaitForSingleObject(ProcessInformation.hThread,250)=WAIT_OBJECT_0);
+
+          result:=(WritePos=MSt.Size);
+        finally
+          CloseHandle(ProcessInformation.hThread);
+        end;
+      finally
+        MSt.Free;
+      end;
+    finally
+      CloseHandle(hStdInReadPipe);
+      CloseHandle(hStdInWritePipe);
+    end;
+  finally
+    CloseHandle(hStdOutReadPipe);
+    CloseHandle(hStdOutWritePipe);
+  end;
+end;
+
+Procedure CenterWindow(Const hWindow : HWnd);
+Var R : TRect;
+begin
+ GetWindowRect(hWindow,R);
+ SetWindowPos(
+   hWindow,
+   HWND_TOP,
+   (Screen.Width div 2)-((R.Right-R.Left) div 2),
+   (Screen.Height div 2)-((R.Bottom-R.Top) div 2),
+   0,
+   0,
+   SWP_SHOWWINDOW or SWP_NOSIZE
+ );
+end;
+
+Function EnumWindowsFunc(const hWindow : THandle; const lParam : Integer) : Boolean; StdCall;
+Var dwProcessID : Cardinal;
+    C : Cardinal;
+    {S : String;}
+begin
+  result:=True;
+  GetWindowThreadProcessId(hWindow,dwProcessID);
+  If dwProcessID<>Cardinal(lParam) then exit;
+
+  C:=GetWindowLong(hWindow,GWL_STYLE);
+  If ((C and WS_VISIBLE)<>0) and ((C and WS_CAPTION)<>0) and ((C and WS_SYSMENU)<>0) and ((C and WS_DISABLED)=0) and ((C and WS_TABSTOP)=0)  then begin
+
+    {SetLength(S,255);
+    GetWindowText(hWindow,PChar(S),250);
+    SetLength(S,StrLen(PChar(S)));
+    ShowMessage(S+#13+IntToStr(C));}
+
+    CenterWindow(hWindow);
+  end;
+end;
+
+Procedure CenterWindowFromProcessID(const ProcessID : THandle);
+begin
+  EnumWindows(@EnumWindowsFunc,ProcessID);
+end;
+
+var GlobalHideTitle : String = '';
+
+Function EnumWindowsFunc2(const hWindow : THandle; const lParam : Integer) : Boolean; StdCall;
+Var dwProcessID : Cardinal;
+    S : String;
+begin
+  result:=True;
+  GetWindowThreadProcessId(hWindow,dwProcessID);
+  If dwProcessID<>Cardinal(lParam) then exit;
+
+  SetLength(S,255);
+  If GetWindowText(hWindow,PChar(S),250)=0 then exit;
+  SetLength(S,StrLen(PChar(S)));
+  S:=Trim(ExtUpperCase(S));
+  If Copy(S,length(S)+1-length(GlobalHideTitle),length(GlobalHideTitle))<>GlobalHideTitle then exit;
+
+  ShowWindow(hWindow,SW_HIDE)
+end;
+
+Procedure HideWindowFromProcessIDAndTitle(const ProcessID : THandle; const Title : String);
+begin
+  GlobalHideTitle:=ExtUpperCase(Title);
+  EnumWindows(@EnumWindowsFunc2,ProcessID);
+end;
+
+Function CheckDOSBoxVersionDirect(const Nr : Integer; const Path : String) : String;
+Var DOSBoxPath : String;
+    St : TStringList;
+    TempTxt, TempBat : String;
+begin
+  result:='';
+
+  If Trim(Path)='' then DOSBoxPath:=PrgSetup.DOSBoxSettings[Nr].DosBoxDir else DOSBOXPath:=Path;
+  DOSBoxPath:=IncludeTrailingPathDelimiter(MakeAbsPath(DOSBOXPath,PrgSetup.BaseDir));
+
+  If not DirectoryExists(DOSBoxPath) then exit;
+
+  TempTxt:=TempDir+'D-Fend-Reloaded-DOSBoxVer.txt';
+  TempBat:=TempDir+'D-Fend-Reloaded-DOSBoxVer.bat';
+
+  { Create batch file to run }
+  try
+    St:=TStringList.Create;
+    try
+      St.Add('"'+DOSBoxPath+DosBoxFileName+'" -version >> "'+TempTxt+'"');
+      St.SaveToFile(TempBat);
+    finally
+      St.Free;
+    end;
+  except
+    exit;
+  end;
+
+  { Run DOSBox }
+  RunAndWait(TempBat,DOSBoxPath,True);
+  ExtDeleteFile(TempBat,ftTemp);
+
+  { Read list file }
+  If not FileExists(TempTxt) then exit;
+
+  St:=TStringList.Create;
+  try
+    try
+      St.LoadFromFile(TempTxt);
+    except exit; end;
+    If St.Count>0 then result:=St.Text;
+  finally
+    St.Free;
+  end;
+
+  ExtDeleteFile(TempTxt,ftTemp);
+end;
+
+Function CheckDOSBoxVersionDirect2(const Nr : Integer; const Path : String) : String;
+Var DOSBoxPath : String;
+    St : TStringList;
+begin
+  result:='';
+
+  If Trim(Path)='' then DOSBoxPath:=PrgSetup.DOSBoxSettings[Nr].DosBoxDir else DOSBOXPath:=Path;
+  DOSBoxPath:=IncludeTrailingPathDelimiter(MakeAbsPath(DOSBOXPath,PrgSetup.BaseDir));
+
+  If not DirectoryExists(DOSBoxPath) then exit;
+
+  St:=RunAndGetOutput(DOSBoxPath+DosBoxFileName,'-version',True);
+  If St=nil then exit;
+  try
+    If St.Count>0 then result:=St.Text;
+  finally
+    St.Free;
+  end;
+end;
+
 Function CheckDOSBoxVersion(const Nr : Integer; const Path : String) : String;
 Var DOSBoxPath : String;
     St : TStringList;
@@ -397,8 +789,8 @@ Var DOSBoxPath : String;
 begin
   result:='';
 
-  If Trim(Path)='' then DOSBoxPath:=PrgSetup.DOSBoxSettings[Nr].DosBoxDir else DOSBOXPath:=Path;
-  DOSBOXPath:=IncludeTrailingPathDelimiter(MakeAbsPath(DOSBOXPath,PrgSetup.BaseDir));
+  If (Trim(Path)='') and (Nr>=0) then DOSBoxPath:=PrgSetup.DOSBoxSettings[Nr].DosBoxDir else DOSBoxPath:=Path;
+  DOSBoxPath:=IncludeTrailingPathDelimiter(MakeAbsPath(DOSBoxPath,PrgSetup.BaseDir));
   If not FileExists(DOSBoxPath+'Readme.txt') then exit;
 
   S:='';
@@ -415,10 +807,24 @@ end;
 
 Function OldDOSBoxVersion(const Version : String) : Boolean;
 Var D : Double;
+    S : String;
+    I : Integer;
 begin
   result:=False;
-  try D:=StrToFloat(Version); except exit; end;
-  result:=(D<0.72);
+  S:=Trim(Version);
+  If Trim(S)='' then exit;
+  For I:=1 to length(S) do If (S[I]=',') or (S[I]='.') then S[I]:=DecimalSeparator;
+  try D:=StrToFloat(S); except exit; end;
+  result:=(D<MinSupportedDOSBoxVersion-0.0000001);
+end;
+
+Procedure DOSBoxOutdatedWarning(const DOSBoxPath : String);
+Var S : String;
+    I : Integer;
+begin
+  S:=FloatToStr(MinSupportedDOSBoxVersion);
+  For I:=1 to length(S) do If S[I]=',' then S[I]:='.';
+  MessageDlg(Format(LanguageSetup.MessageDOSBoxOutdated,[CheckDOSBoxVersion(-1,DOSBoxPath),S]),mtWarning,[mbOk],0);
 end;
 
 Function GetFileDateAsString : String;
@@ -490,50 +896,107 @@ begin
   Bitmap:=TBitmap.Create;
   try
     Bitmap.Assign(Picture.Graphic);
+    Bitmap.Palette:=Picture.Graphic.Palette;
 
-  If (Ext='.JPG') or (Ext='.JPEG') then begin
-    JPEGImage:=TJPEGImage.Create;
-    try
-      JPEGImage.Assign(Bitmap);
-      JPEGImage.CompressionQuality:=95;
-      JPEGImage.SaveToFile(FileName);
-    finally
-      JPEGImage.Free;
+    If Picture.Graphic is TPNGObject then begin
+      TPNGObject(Picture.Graphic).Draw(Bitmap.Canvas,Rect(0,0,Bitmap.Width-1,Bitmap.Height-1));
     end;
-    exit;
-  end;
 
-  If (Ext='.BMP') then begin
-    Bitmap.SaveToFile(FileName);
-    exit;
-  end;
-
-  If (Ext='.GIF') then begin
-    GifImage:=TGIFImage.Create;
-    try
-      GifImage.ColorReduction:=rmQuantizeWindows;
-      GifImage.Assign(Bitmap);
-      GifImage.SaveToFile(FileName);
-    finally
-      GifImage.Free;
+    If (Ext='.JPG') or (Ext='.JPEG') then begin
+      JPEGImage:=TJPEGImage.Create;
+      try
+        If Picture.Graphic is TJPEGImage then begin
+          try
+            JPEGImage.Assign(Picture.Graphic);
+          except
+            JPEGImage.Assign(Bitmap);
+          end;
+        end else begin
+          JPEGImage.Assign(Bitmap);
+        end;
+        JPEGImage.Palette:=Picture.Graphic.Palette;
+        JPEGImage.CompressionQuality:=95;
+        JPEGImage.SaveToFile(FileName);
+      finally
+        JPEGImage.Free;
+      end;
+      exit;
     end;
-    exit;
-  end;
 
-  If (Ext='.PNG') then begin
-    PNGObject:=TPNGObject.Create;
-    try
-      PNGObject.Assign(Bitmap);
-      PNGObject.SaveToFile(FileName);
-    finally
-      PNGObject.Free;
+    If (Ext='.BMP') then begin
+      Bitmap.SaveToFile(FileName);
+      exit;
     end;
-    exit;
-  end;
+
+    If (Ext='.GIF') then begin
+      GifImage:=TGIFImage.Create;
+      try
+        GifImage.ColorReduction:=rmQuantizeWindows;
+        If Picture.Graphic is TGIFImage then begin
+          try
+            GifImage.Assign(Picture.Graphic);
+          except
+            GifImage.Assign(Bitmap);
+          end;
+        end else begin
+          GifImage.Assign(Bitmap);
+        end;
+        GifImage.Palette:=Picture.Graphic.Palette;
+        GifImage.SaveToFile(FileName);
+      finally
+        GifImage.Free;
+      end;
+      exit;
+    end;
+
+    If (Ext='.PNG') then begin
+      PNGObject:=TPNGObject.Create;
+      try
+        If Picture.Graphic is TPNGObject then begin
+          try
+            PNGObject.Assign(Picture.Graphic);
+          except
+            PNGObject.Assign(Bitmap);
+          end;
+        end else begin
+          PNGObject.Assign(Bitmap);
+        end;
+        PNGObject.Palette:=Picture.Graphic.Palette;
+        PNGObject.SaveToFile(FileName);
+      finally
+        PNGObject.Free;
+      end;
+      exit;
+    end;
 
     Picture.SaveToFile(FileName);
   finally
     Bitmap.Free;
+  end;
+end;
+
+Procedure SaveImageToFile(const OldFileName, NewFileName : String);
+Var P : TPicture;
+begin
+  If FileExists(NewFileName) then begin
+    If MessageDlg(Format(LanguageSetup.MessageConfirmationOverwriteFile,[NewFileName]),mtConfirmation,[mbYes,mbNo],0)<>mrYes then exit;
+  end;
+
+  If Trim(ExtUpperCase(ExtractFileExt(OldFileName)))=Trim(ExtUpperCase(ExtractFileExt(NewFileName))) then begin
+    If not CopyFile(PChar(OldFileName),PChar(NewFileName),False) then
+      MessageDlg(Format(LanguageSetup.MessageCouldNotCopyFile,[OldFileName,NewFileName]),mtError,[mbOK],0);
+    exit;
+  end;
+
+  P:=LoadImageFromFile(OldFileName);
+  try
+    try
+      SaveImageToFile(P,NewFileName);
+    except
+      MessageDlg(Format(LanguageSetup.MessageCouldNotSaveFile,[NewFileName]),mtError,[mbOK],0);
+    end;
+  finally
+    P.Free;
   end;
 end;
 
@@ -543,20 +1006,25 @@ Var Ext : String;
 begin
   Ext:=Trim(ExtUpperCase(ExtractFileExt(FileName)));
 
-  If Ext='.GIF' then begin
-    GIFImage:=TGIFImage.Create;
-    try
-      GIFImage.LoadFromFile(FileName);
-      result:=TPicture.Create;
-      result.Assign(GIFImage);
-    finally
-      GIFImage.Free;
-    end;
-    exit;
-  end;
+  result:=nil;
 
-  result:=TPicture.Create;
-  result.LoadFromFile(FileName);
+  try
+    If Ext='.GIF' then begin
+      GIFImage:=TGIFImage.Create;
+      try
+        GIFImage.LoadFromFile(FileName);
+        result:=TPicture.Create;
+        result.Assign(GIFImage);
+      finally
+        GIFImage.Free;
+      end;
+      exit;
+    end;
+    result:=TPicture.Create;
+    result.LoadFromFile(FileName);
+  except
+    If result<>nil then FreeAndNil(result);
+  end;
 end;
 
 const CLSID_ActiveDesktop : TGUID = '{75048700-EF1F-11D0-9888-006097DEACF9}';
@@ -809,34 +1277,36 @@ begin
   end;
 end;
 
-Function GetDefaultEditor : String;
+Function GetEditorForInt(Extension : String; const RegKey : String; const RemoveParameters : Boolean) : String;
 Var Reg : TRegistry;
     S,T : String;
     I,J,K : Integer;
 begin
-  result:='Notepad.exe';
+  result:='';
+  If Extension='' then exit;
+  If Extension[1]<>'.' then Extension:='.'+Extension;
+  Extension:=LowerCase(Extension);
 
   Reg:=TRegistry.Create;
   try
     {find type name of "*.txt" files}
     Reg.RootKey:=HKEY_CLASSES_ROOT;
-    If not Reg.OpenKeyReadOnly('\.txt') then exit;
+    If not Reg.OpenKeyReadOnly('\'+Extension) then exit;
     S:=Reg.ReadString('');
     If S='' then exit;
 
     {find program to open files of this type}
-    if not Reg.OpenKeyReadOnly('\'+S+'\shell\open\command') then exit;
+    if not Reg.OpenKeyReadOnly('\'+S+RegKey) then exit;
     S:=Reg.ReadString('');
 
     {remove leading and trailing "}
-    If (S<>'') and (S[1]='"') then begin
-      S:=Copy(S,2,MaxInt);
-      For I:=1 to length(S) do If S[I]='"' then begin S:=Copy(S,1,I-1); break; end;
-    end;
+    If  (S<>'') and (S[1]='"') and (S[length(S)]='"') then S:=Copy(S,2,length(S)-2);
 
-    {remove "%1"}
-    I:=Pos('"%1"',S); If I>0 then S:=Copy(S,1,I-1)+Copy(S,I+4,MaxInt);
-    I:=Pos('%1',S); If I>0 then S:=Copy(S,1,I-1)+Copy(S,I+2,MaxInt);
+    If RemoveParameters then begin
+      {remove "%1"}
+      I:=Pos('"%1"',S); If I>0 then S:=Copy(S,1,I-1)+Copy(S,I+4,MaxInt);
+      I:=Pos('%1',S); If I>0 then S:=Copy(S,1,I-1)+Copy(S,I+2,MaxInt);
+    end;
 
     {Translate %SystemRoot% etc.}
     I:=1;
@@ -853,11 +1323,233 @@ begin
       inc(I);
     end;
 
-    If not FileExists(S) then exit;
+    If (Pos('%1',S)=0) and (not FileExists(S)) then exit;
     result:=Trim(S);
   finally
     Reg.Free;
   end;
+end;
+
+Function GetEditorFor(Extension : String; const RemoveParameters : Boolean) : String;
+Var S : String;
+begin
+  result:=GetEditorForInt(Extension,'\shell\edit\command',RemoveParameters);
+
+  S:=ExtUpperCase(Extension); If (S<>'') and (S[1]<>'.') then S:='.'+S;
+  If S='.TXT' then begin
+    If result='' then result:=GetEditorForInt(Extension,'\shell\open\command',RemoveParameters);
+  end;
+end;
+
+Procedure TestAndFixLineWrap(const FileName : String);
+const BufSize=512;
+Var FSt : TFileStream;
+    NeedFix : Boolean;
+    Buffer : Array[0..BufSize] of Char;
+    LastChar : Char;
+    I,J : Integer;
+    St : TStringList;
+    S : String;
+begin
+  S:=Trim(ExtUpperCase(ExtractFileExt(FileName)));
+  If (S<>'.BAT') and (S<>'.TXT') and (S<>'.NFO') and (S<>'.DIZ') and (S<>'.1ST') and (S<>'.INI') and (S<>'.PROF') and (S<>'.CONF') then exit;
+
+  {#10 -> #13#10}
+  try
+    NeedFix:=False;
+    FSt:=TFileStream.Create(FileName,fmOpenRead);
+    try
+      LastChar:=#0;
+      while FSt.Position<FSt.Size-1 do begin
+        I:=Min(BufSize,FSt.Size-FSt.Position-1);
+        FSt.ReadBuffer(Buffer,I);
+        For J:=0 to I-1 do If Buffer[J]=#10 then begin
+          If J>0 then begin
+            NeedFix:=(Buffer[J-1]<>#13); break;
+          end else begin
+            If LastChar<>#0 then begin
+              NeedFix:=(LastChar<>#13); break;
+            end;
+          end;
+        end;
+      end;
+    finally
+      FSt.Free;
+    end;
+
+    If not NeedFix then exit;
+
+    St:=TStringList.Create;
+    try
+      St.LoadFromFile(FileName);
+      St.SaveToFile(FileName);
+    finally
+      St.Free;
+    end;
+  except
+    exit;
+  end;
+end;
+
+Function GetDefaultEditor(Extension : String; const FileTypeFallback : Boolean; const RemoveParameters : Boolean) : String;
+begin
+  result:=GetEditorFor(Extension,RemoveParameters);
+  If (result='') and FileTypeFallback then result:=GetEditorFor('.txt',RemoveParameters);
+  If result='' then result:='Notepad.exe';
+end;
+
+Procedure OpenFileInEditor(const FileName : String);
+Var S,Editor : String;
+    I : Integer;
+    StartupInfo : TStartupInfo;
+    ProcessInformation : TProcessInformation;
+begin
+  If PrgSetup.AutoFixLineWrap then TestAndFixLineWrap(FileName);
+
+  Editor:='Notepad.exe';
+  S:=Trim(ExtUpperCase(PrgSetup.TextEditor));
+  If S='' then begin
+    Editor:=GetDefaultEditor(ExtractFileExt(FileName),PrgSetup.FileTypeFallbackForEditor,False);
+  end else begin
+    If (S<>'NOTEPAD') and (S<>'NOTEPAD.EXE') then begin
+      If FileExists(PrgSetup.TextEditor) then Editor:=PrgSetup.TextEditor;
+    end;
+  end;
+
+  I:=Pos('%1',Editor);
+  If I=0 then begin
+    ShellExecute(Application.MainForm.Handle,'open',PChar(Editor),PChar('"'+FileName+'"'),PChar(ExtractFilePath(FileName)),SW_SHOW);
+  end else begin
+    Editor:=Copy(Editor,1,I-1)+FileName+Copy(Editor,I+2,MaxInt);
+    {ShellExecute(Application.MainForm.Handle,'open',PChar(Editor),nil,PChar(ExtractFilePath(FileName)),SW_SHOW);}
+    StartupInfo.cb:=SizeOf(StartupInfo);
+    with StartupInfo do begin lpReserved:=nil; lpDesktop:=nil; dwFlags:=0; cbReserved2:=0; lpReserved2:=nil; end;
+    CreateProcess(nil,PChar(Editor),nil,nil,False,0,nil,PChar(ExtractFilePath(FileName)),StartupInfo,ProcessInformation);
+    CloseHandle(ProcessInformation.hThread);
+    CloseHandle(ProcessInformation.hProcess);
+  end;
+end;
+
+Function OpenMediaFile(const SetupString, FileName : String) : Boolean;
+Var S : String;
+begin
+  result:=True;
+
+  S:=Trim(ExtUpperCase(SetupString));
+  If S='DEFAULT' then begin
+    ShellExecute(Application.MainForm.Handle,'open',PChar(FileName),nil,PChar(ExtractFilePath(FileName)),SW_SHOW);
+    exit;
+  end;
+  If (S<>'') and (S<>'INTERNAL') and FileExists(SetupString) then begin
+    ShellExecute(Application.MainForm.Handle,'open',PChar(SetupString),PChar('"'+FileName+'"'),PChar(ExtractFilePath(FileName)),SW_SHOW);
+    exit;
+  end;
+
+  result:=False;
+end;
+
+Function FileSizeToStr(const Size : Int64) : String;
+begin
+  If Size<1024 then begin result:=IntToStr(Size)+' Bytes'; exit; end;
+  If Size<1024*1024 then begin result:=Format('%.1fKB',[Size/1024]); exit; end;
+  If Size<1024*1024*1024 then begin result:=Format('%.1fMB',[Size/1024/1024]); exit; end;
+  result:=Format('%.1fGB',[Size/1024/1024/1024]);
+end;
+
+Function DeleteFolderInt(const Dir: String) : Boolean;
+Var Rec : TSearchRec;
+    I : Integer;
+begin
+  result:=False;
+
+  If not DirectoryExists(Dir) then begin result:=True; exit; end;
+
+  If Pos('..',Dir)<>0 then exit;
+
+  I:=FindFirst(Dir+'*.*',faAnyFile,Rec);
+  try
+    while I=0 do begin
+      if (Rec.Attr and faDirectory)=faDirectory then begin
+        If Rec.Name[1]<>'.' then begin
+          if not DeleteFolderInt(Dir+Rec.Name+'\') then exit;
+        end;
+      end else begin
+        if not DeleteFile(Dir+Rec.Name) then exit;
+      end;
+      I:=FindNext(Rec);
+    end;
+  finally
+    FindClose(Rec);
+  end;
+
+  if not RemoveDir(Dir) then exit;
+
+  result:=True;
+end;
+
+Function ExtDeleteFile(const FileName : String; const FileType : TDeleteFileType; const DeletePrgSetupRecord : String) : Boolean;
+Var S : String;
+begin
+  If DeletePrgSetupRecord='' then begin
+    S:=Copy(PrgSetup.DeleteToRecycleBin,1,7);
+    S:=S+Copy('1011110',length(S)+1,MaxInt);
+  end else begin
+    S:=DeletePrgSetupRecord;
+  end;
+
+  If S[Integer(FileType)+1]='1'
+    then result:=DeleteFileToRecycleBin(FileName)
+    else result:=DeleteFile(FileName);
+end;
+
+Function ExtDeleteFolder(const Folder : String; const FolderType : TDeleteFileType; const DeletePrgSetupRecord : String) : Boolean;
+Var S : String;
+begin
+  If DeletePrgSetupRecord='' then begin
+    S:=Copy(PrgSetup.DeleteToRecycleBin,1,7);
+    S:=S+Copy('1011110',length(S)+1,MaxInt);
+  end else begin
+    S:=DeletePrgSetupRecord;
+  end;
+
+  S:=Copy(PrgSetup.DeleteToRecycleBin,1,7);
+  S:=S+Copy('1011110',length(S)+1,MaxInt);
+
+  If S[Integer(FolderType)+1]='1' then begin
+    result:=DeleteFileToRecycleBin(Folder);
+    exit;
+  end;
+
+  result:=DeleteFolderInt(Folder);
+end;
+
+Function DeleteFileToRecycleBin(const FileName : String) : Boolean;
+Var FileOp : TSHFileOpStruct;
+    ExtFileName : String;
+begin
+  ExtFileName:=ExcludeTrailingPathDelimiter(FileName)+#0+#0;
+  with FileOp do begin
+    Wnd:=0;
+    wFunc:=FO_DELETE;
+    pFrom:=PChar(ExtFileName);
+    pTo:=nil;
+    fFlags:=FOF_NOCONFIRMATION+FOF_NOERRORUI+FOF_SILENT+FOF_ALLOWUNDO;
+    fAnyOperationsAborted:=False;
+    hNameMappings:=nil;
+    lpszProgressTitle:=nil;
+  end;
+
+  result:=(SHFileOperation(FileOp)=0) and (not FileOp.fAnyOperationsAborted);
+end;
+
+{ This method was discovered by user DRON from www.delphikingdom.com site }
+function ForceForegroundWindow(Wnd:HWND):Boolean;
+var
+  Input:TInput;
+begin
+  FillChar(Input,SizeOf(Input),0);
+  SendInput(1,Input,SizeOf(TInput));
+  Result:=SetForegroundWindow(Wnd);
 end;
 
 end.

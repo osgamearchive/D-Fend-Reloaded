@@ -51,6 +51,7 @@ InstallDirRegKey HKLM "Software\D-Fend Reloaded" "ProgramFolder"
 !insertmacro MUI_LANGUAGE "English"
 !insertmacro MUI_LANGUAGE "French"
 !insertmacro MUI_LANGUAGE "German"
+!insertmacro MUI_LANGUAGE "Polish"
 !insertmacro MUI_LANGUAGE "Russian"
 !insertmacro MUI_LANGUAGE "Spanish"
 
@@ -67,6 +68,10 @@ LangString LANGNAME_RunDFend ${LANG_FRENCH} "Lancer D-Fend Reloaded maintenant"
 LangString LANGNAME_WelcomeText ${LANG_GERMAN} "Dieser Assistent wird Sie durch die Installation begleiten.\r\n\r\nBitte beenden Sie D-Fend Reloaded, bevor Sie fortfahren.\r\n\r\nKlicken Sie auf Weiter, um fortzufahren."
 LangString LANGNAME_InstallError ${LANG_GERMAN} "Die Datei $INSTDIR\DFend.dat existiert nicht."
 LangString LANGNAME_RunDFend ${LANG_GERMAN} "Fend Reloaded jetzt ausfьhren"
+
+LangString LANGNAME_WelcomeText ${LANG_POLISH} "Ten kreator poprowadzi cie przez proces instalacji.\r\n\r\nZamknij D-Fend Reloaded zanim kontynuujesz.\r\n\r\nKliknij Dalej, aby kontynuowac."
+LangString LANGNAME_InstallError ${LANG_POLISH} "$INSTDIR\DFend.dat nie znaleziony."
+LangString LANGNAME_RunDFend ${LANG_POLISH} "Uruchom D-Fend Reloaded"
 
 LangString LANGNAME_WelcomeText ${LANG_RUSSIAN} "Этот мастер поможет вам выполнить установку.\r\n\r\nПожалуйста, закройте D-Fend Reloaded перед тем, как продолжить.\r\n\r\nНажмите кнопку 'Далее' для продолжения."
 LangString LANGNAME_InstallError ${LANG_RUSSIAN} "$INSTDIR\DFend.dat не обнаружен."

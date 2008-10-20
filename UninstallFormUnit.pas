@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, Buttons, CheckLst, ExtCtrls, GameDBUnit;
+  Dialogs, StdCtrls, Buttons, CheckLst, ExtCtrls, GameDBUnit, CommonTools;
 
 type
   TUninstallForm = class(TForm)
@@ -38,8 +38,8 @@ var
 
 Function UninstallGame(const AOwner : TComponent; const AGameDB : TGameDB; const AGame : TGame) : Boolean;
 
-Function DeleteSingleFile(const FileName: String; var ContinueNext : Boolean) : Boolean;
-Function DeleteDir(const Dir: String; var ContinueNext : Boolean) : Boolean;
+Function DeleteSingleFile(const FileName: String; var ContinueNext : Boolean; const FileType : TDeleteFileType; const DeletePrgSetupRecord : String ='') : Boolean;
+Function DeleteDir(const Dir: String; var ContinueNext : Boolean; const DeletePrgSetupRecord : String ='') : Boolean;
 Function UsedByOtherGame(const GameDB : TGameDB; const Game : TGame; Dir: String): Boolean;
 Function IconUsedByOtherGame(const GameDB : TGameDB; const Game : TGame; Icon: String): Boolean;
 Function ExtraFileUsedByOtherGame(const GameDB : TGameDB; const Game : TGame; ExtraFile: String): Boolean;
@@ -49,7 +49,7 @@ Procedure UnusedFileAndFoldersFromDrives(const GameDB : TGameDB; const Game : TG
 
 implementation
 
-uses VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgSetupUnit, PrgConsts,
+uses VistaToolsUnit, LanguageSetupUnit, PrgSetupUnit, PrgConsts,
      GameDBToolsUnit, HelpConsts;
 
 {$R *.dfm}
@@ -88,10 +88,16 @@ begin
       ListBox.Items.Add(LanguageSetup.UninstallFormProgramDir+': '+S);
       DirList.Add(S);
     end;
+    S:=Trim(Game.ScummVMZip);
+    If (S<>'') and (not ExtraFileUsedByOtherGame(GameDB,Game,S)) then begin
+      S:=MakeAbsPath(S,PrgSetup.BaseDir);
+      ListBox.Items.Add(LanguageSetup.UninstallFormExtraFile+': '+S);
+      DirList.AddObject(S,TObject(1)); {TObject(1) = is file not folder}
+    end;
     S:=Trim(Game.ScummVMSavePath);
     If (S<>'') and (not UsedByOtherGame(GameDB,Game,IncludeTrailingPathDelimiter(S))) then begin
       S:=ExtractFilePath(MakeAbsPath(IncludeTrailingPathDelimiter(S),PrgSetup.BaseDir));
-      //ListBox.Items.Add(LanguageSetup.UninstallFormSaveDir+': '+S);
+      ListBox.Items.Add(LanguageSetup.UninstallFormSaveDir+': '+S);
       DirList.Add(S);
     end;
   end else begin
@@ -182,7 +188,7 @@ begin
 
   For I:=1 to ListBox.Count-1 do If ListBox.Checked[I] then begin
     If Integer(DirList.Objects[I])<>0 then begin
-      If (not DeleteSingleFile(DirList[I],ContinueNext)) and (not ContinueNext) then exit;
+      If (not DeleteSingleFile(DirList[I],ContinueNext,ftUninstall)) and (not ContinueNext) then exit;
     end else begin
       If (not DeleteDir(DirList[I],ContinueNext)) and (not ContinueNext) then exit;
     end;
@@ -228,11 +234,11 @@ begin
   end;
 end;
 
-Function DeleteSingleFile(const FileName: String; var ContinueNext : Boolean) : Boolean;
+Function DeleteSingleFile(const FileName: String; var ContinueNext : Boolean; const FileType : TDeleteFileType; const DeletePrgSetupRecord : String ='') : Boolean;
 begin
   result:=False;
   repeat
-    if not DeleteFile(FileName) then begin
+    if not ExtDeleteFile(FileName,FileType,DeletePrgSetupRecord) then begin
       Case MessageDlg(Format(LanguageSetup.MessageCouldNotDeleteFile,[FileName])+#13+#13+SysErrorMessage(GetLastError),mtError,[mbAbort,mbRetry,mbIgnore],0) of
         mrIgnore : begin ContinueNext:=True; exit; end;
         mrRetry : ;
@@ -245,10 +251,18 @@ begin
   result:=True;
 end;
 
-Function DeleteDir(const Dir: String; var ContinueNext : Boolean) : Boolean;
+Function DeleteDir(const Dir: String; var ContinueNext : Boolean; const DeletePrgSetupRecord : String ='') : Boolean;
 Var Rec : TSearchRec;
     I : Integer;
+    S : String;
 begin
+  If DeletePrgSetupRecord='' then begin
+    S:=Copy(PrgSetup.DeleteToRecycleBin,1,7);
+    S:=S+Copy('1011110',length(S)+1,MaxInt);
+  end else begin
+    S:=DeletePrgSetupRecord;
+  end;
+
   result:=False;
   ContinueNext:=False;
 
@@ -264,15 +278,20 @@ begin
     exit;
   end;
 
+  If S[Integer(ftUninstall)+1]='1' then begin
+    result:=DeleteFileToRecycleBin(Dir);
+    exit;
+  end;
+
   I:=FindFirst(Dir+'*.*',faAnyFile,Rec);
   try
     while I=0 do begin
       if (Rec.Attr and faDirectory)=faDirectory then begin
         If Rec.Name[1]<>'.' then begin
-          if not DeleteDir(Dir+Rec.Name+'\',ContinueNext) then exit;
+          if not DeleteDir(Dir+Rec.Name+'\',ContinueNext,S) then exit;
         end;
       end else begin
-        if not DeleteSingleFile(Dir+Rec.Name,ContinueNext) then exit;
+        if not DeleteSingleFile(Dir+Rec.Name,ContinueNext,ftUninstall,S) then exit;
       end;
       I:=FindNext(Rec);
     end;
@@ -281,7 +300,7 @@ begin
   end;
 
   repeat
-    if not RemoveDir(Dir) then begin
+    if not ExtDeleteFolder(Dir,ftUninstall) then begin
       Case MessageDlg(Format(LanguageSetup.MessageCouldNotDeleteDir,[Dir])+#13+#13+SysErrorMessage(GetLastError),mtError,[mbAbort,mbRetry,mbIgnore],0) of
         mrIgnore : begin ContinueNext:=True; exit; end;
         mrRetry : ;
@@ -384,6 +403,8 @@ begin
         Folders.Free;
       end;
     end;
+
+    If ScummVMMode(GameDB[I]) and SameFile(GameDB[I].ScummVMZip) then exit;
   end;
 
   result:=False;
@@ -398,18 +419,7 @@ begin
   Folders:=TStringList.Create;
 
   For I:=0 to 9 do begin
-    Case I of
-      0 : S:=Game.Mount0;
-      1 : S:=Game.Mount1;
-      2 : S:=Game.Mount2;
-      3 : S:=Game.Mount3;
-      4 : S:=Game.Mount4;
-      5 : S:=Game.Mount5;
-      6 : S:=Game.Mount6;
-      7 : S:=Game.Mount7;
-      8 : S:=Game.Mount8;
-      9 : S:=Game.Mount9;
-    end;
+    S:=Game.Mount[I];
     If S='' then continue;
 
     St:=ValueToList(S);

@@ -14,10 +14,13 @@ object PlaySoundForm: TPlaySoundForm
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
+  KeyPreview = True
   OldCreateOrder = False
   Position = poOwnerFormCenter
   OnCreate = FormCreate
   OnDestroy = FormDestroy
+  OnKeyDown = FormKeyDown
+  OnMouseWheel = FormMouseWheel
   OnShow = FormShow
   DesignSize = (
     484
@@ -75,26 +78,30 @@ object PlaySoundForm: TPlaySoundForm
       HotImages = ImageList
       Images = ImageList
       List = True
+      ParentShowHint = False
       ShowCaptions = True
+      ShowHint = True
       TabOrder = 0
       Wrapable = False
       object PreviousButton: TToolButton
         Left = 0
         Top = 0
+        AutoSize = True
         Caption = 'PreviousButton'
         ImageIndex = 1
         OnClick = ButtonWork
       end
       object NextButton: TToolButton
         Tag = 1
-        Left = 100
+        Left = 104
         Top = 0
+        AutoSize = True
         Caption = 'NextButton'
         ImageIndex = 2
         OnClick = ButtonWork
       end
       object ToolButton1: TToolButton
-        Left = 200
+        Left = 190
         Top = 0
         Width = 8
         Caption = 'ToolButton1'
@@ -102,14 +109,15 @@ object PlaySoundForm: TPlaySoundForm
       end
       object SaveButton: TToolButton
         Tag = 2
-        Left = 208
+        Left = 198
         Top = 0
+        AutoSize = True
         Caption = 'Speichern'
         ImageIndex = 0
         OnClick = ButtonWork
       end
       object ToolButton2: TToolButton
-        Left = 308
+        Left = 276
         Top = 0
         Width = 8
         Caption = 'ToolButton2'
@@ -118,22 +126,14 @@ object PlaySoundForm: TPlaySoundForm
       end
       object PlayPauseButton: TToolButton
         Tag = 6
-        Left = 316
+        Left = 284
         Top = 0
+        AutoSize = True
         Caption = 'Play/Pause'
         ImageIndex = 3
         OnClick = ButtonWork
       end
     end
-  end
-  object MediaPlayer: TMediaPlayer
-    Left = 164
-    Top = 61
-    Width = -2
-    Height = 22
-    VisibleButtons = [btPlay, btPause, btStop]
-    Visible = False
-    TabOrder = 3
   end
   object ImageList: TImageList
     Left = 56
@@ -435,6 +435,7 @@ object PlaySoundForm: TPlaySoundForm
     Top = 56
   end
   object Timer: TTimer
+    Enabled = False
     Interval = 50
     OnTimer = TimerTimer
     Left = 120

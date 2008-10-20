@@ -1,5 +1,124 @@
 D-Fend Reloaded Changelog
 
+Version 0.6.0 (10/20/2008)
+==========================
+- Polish language file (thanks to Adam Sosnowski)
+- Explorer-like quick starter interface for easy browsing through the games
+  folder and directly starting DOS program files and making profiles of an
+  existing DOS program file.
+- You can specify zip files as ScummVM games now. D-Fend Reloaded will
+  automatically extract the zip file, run ScummVM and repack the game folder
+  content to the zip file when ScummVM has closed.
+- The profile editor and the profile wizard now also support setting a saved
+  games path for ScummVM profiles.
+- The profile editor now supports all game specific settings known in ScummVM.
+- Now the games list can also be filtered by emulation type (DOSBox, ScummVM
+  and Windows).
+- German online help.
+- New language file "French Canada" (same as "French" but will select qwerty
+  keyboard layout instead of azerty and codepage 437 instead of 850 in DOSBox).
+- Now you can also create profiles for Windows games via the profile wizard.
+- In the template dialog now you can also edit the ScummVM default template.
+- In the profile wizard you do not need to go to the last page before the
+  "Ok" button will be activated.
+- The profile wizard will now automatically suggest a name for the new profile
+  from the selected template or the program file name. (To allow this
+  D-Fend Reloaded will not ask for the profile name on the first page of the
+  profile wizard but on the game information page.)
+- New program icon (thanks to T.B. from vogons.zetafleet.com)
+- The game data folder viewer on the bottom of the main window will now
+  automatically update its file list if the folder on harddisk changes.
+  Additionally files and folders can be renamed and deleted and new folders can
+  be created via context menu of the data folder viewer now.
+- Now you can configurate in the setup dialog which files should be moved to
+  the recycle bin and which should be deleted irrevocable when deleting files
+  from within D-Fend Reloaded.
+- New optional column "notes" in list view mode "report".
+- New setup option for configuration the appearance of the games list: Show
+  grid lines in view mode "report".
+- Option to open the capture folder in the Explorer right from the context menu
+  of the capture viewer area.
+- The player for captured sounds can also play ogg files (if there is a codec
+  installed on the system for ogg files) now.
+- The user data section on the game information page of the profile editor will
+  suggest names for keys and values from the existing profiles when adding
+  lines or changing values.
+- In the setup dialog now you can choose which text editor D-Fend Reloaded
+  should use when opening text files. Additionally you can setup to
+  automatically fix the line wraping of text files if needed when opening them.
+- In the setup dialog now you can choose which viewers/players for images,
+  sounds and videos should be used when doubleclicking a file in the captured
+  data viewer on the bottom of the main window.
+- When creating ScummVM ini files all settings from the default ScummVM
+  configuration file are also added.
+- When dragging files to the D-Fend Reloaded program window to copy them to
+  the data folder of the active profile, now you can also drag and drop
+  complete directories.
+- Now you can drop files directly to the screenshots/sounds/videos viewer or to
+  the data viewer pane (including subdirectories).
+- Smarter method of detecting the running DOSBox instances when using the
+  "Restore program window when DOSBox closes function".
+- Now you can zoom the image in the screenshot viewer and videos in the video
+  previewer by pressing + or - and by moving the mouse wheel while holding
+  Ctrl. By pressing * or 0 you can go back to 100% zoom. And by pressing escape
+  you can close the preview dialog.
+- New options "Center ScummVM window" and "Hide ScummVM console" in program
+  settings dialog.
+- When adding a drive to a profile the edit drive dialog will offer the drive
+  type used the last time when added a new drive to a profile at first in the
+  drive type dropdown box.
+- On the setup page for the screenshot view mode now you can define which
+  screenshot number to use if no explicit screenshot is defined for a game.
+- [Fix] When using some other DOSBox installation than the one in the "DOSBox"
+  subdirectory of the D-Fend Reloaded program directory as default DOSBox
+  installation, D-Fend Reloaded will reset the path at each start.
+- [Fix] The game and the setup program parameters for Windows games were
+  inverted.
+- [Fix] When switching between profiles with and without a data folders the
+  data folder tab at the bottom of the main windows could have displayed some
+  wrong content.
+- [Fix] Clicking the buttons for selecting or searching the DOSBox directory
+  and for selecting a mapper file in the "More DOSBox settings" dialog (on
+  DOSBox settings page of the program options dialog) did nothing.
+- [Fix] When creating a portable D-Fend Reloaded installation from the transfer
+  profiles dialog the mediaplr.dll file was not copyed to the destination
+  folder and so the D-Fend.exe in the destination folder could not start.
+- [Fix] In profile editor all four serial port pages showed data for first
+  serial port.
+- [Fix] The chosen music driver in ScummVM profiles was not given to ScummVM
+  when starting a profile.
+- [Fix] Until now D-Fend Reloaded tried to find the scummvm.ini file for
+  reading the default theme path etc. in the ScummVM program directory instead
+  of the path reported by ScummVM (usualy $APPDATA\ScummVM).
+- [Fix] When trying to display damaged images in the screenshot viewer area an
+  unhandled exception could occur.
+- [Fix] Wrong colors or reduction of the number of colors when exporting
+  captured screenshots.
+- [Fix] D-Fend Reloaded failed to play video files of other types than avi via
+  the captured videos player.
+- [Fix] When switching between images of the same size in the screenshot
+  previewer the statusbar was not updated.
+- [Fix] When creating a zip package for a ScummVM profile the ScummVM ini file
+  needed to use the zip file without D-Fend Reloaded was not included to it.
+- [Fix] When dragging video files to the main window they got copied into the
+  data folder instead of into the capture folder.
+- [Fix] When using the minimize to tray option and restoring the program window
+  it loses the input focus right after restore.
+- [Fix] In screenshots view mode sometimes there are wrong images associated to
+  wrong games in games list.
+- [Fix] The DOSBox language selected in the profile editor was not used when
+  starting DOSBox.
+- [Fix] Screenshots may got displayed distorted in the screenshot preview area.
+- [Fix] Function "Restore main window when DOSBox closes" will not restore the
+  D-Fend Reloaded main window if it was already minimized before DOSBox was
+  started (because of using the tray area mini starter).
+- [Fix] Added missing default values in "scaler" section of the profile editor.
+- [Fix] Current selected game is deselected after closing setup dialog.
+- [Fix] The drive type names on the "Drives" page and the priority levels on
+  the "DOSBox settings" page of the profile editor were not translateable. Also
+  the info label on the data folder panel was not translated.
+
+
 Version 0.5.0 (08/22/2008)
 ==========================
 - Danish language file (thanks to Jens Peter Jensen)
@@ -59,10 +178,11 @@ Version 0.5.0 (08/22/2008)
   using notepad.
 - Some more speed improvements when working with large profile lists.
 - [Fix] The "Run setup" toolbar button was not working.
-- [Fix] Creation of 2880KB ("extended density") floppy images failed.
 - [Fix] When using long folder names inside a DOSBox drive D-Fend Reloaded may
-  tryed to start files in the wrong folder because Windows and DOSBox used
-  different ways of translating long to short file names.
+  tried to start files in the wrong folder because Windows and DOSBox used
+  different ways of translating long to short file names. (Thanks to skatz from
+  the vogons forum for the new algorithm.)
+- [Fix] Creation of 2880KB ("extended density") floppy images failed.
 - [Fix] When "UseShortFolderNames" was turned off in the DFend.ini the loading
   of PhysFS drives with spaces in their file oder folder names failed.
 - [Fix] Adding a new profile if the modern profile editor is activated and

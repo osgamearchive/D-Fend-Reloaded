@@ -50,11 +50,16 @@ type
     procedure ButtonWork(Sender: TObject);
     procedure FormResize(Sender: TObject);
     procedure InstallButtonClick(Sender: TObject);
+    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure FormMouseWheel(Sender: TObject; Shift: TShiftState;
+      WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
+    procedure ZoomPopupMenuPopup(Sender: TObject);
   private
     { Private-Deklarationen }
     JustChanging : Boolean;
     procedure CenterWindow;
     Function VideoFileDamaged : Boolean;
+    procedure Zoom(const ZoomDirection: Integer);
   public
     { Public-Deklarationen }
     FileName : String;
@@ -68,8 +73,8 @@ Procedure PlayVideoDialog(const AOwner : TComponent; const AFileName : String; c
 
 implementation
 
-uses ShellAPI, MediaInterface, VistaToolsUnit, LanguageSetupUnit, CommonTools,
-     PrgSetupUnit;
+uses ShellAPI, Math, MediaInterface, VistaToolsUnit, LanguageSetupUnit,
+     CommonTools, PrgSetupUnit;
 
 {$R *.dfm}
 
@@ -81,14 +86,22 @@ begin
   InfoLabel.Font.Color:=clWhite;
 
   PreviousButton.Caption:=LanguageSetup.Previous;
+  PreviousButton.Hint:=LanguageSetup.PreviousHintMediaViewer;
   NextButton.Caption:=LanguageSetup.Next;
+  NextButton.Hint:=LanguageSetup.NextHintMediaViewer;
   SaveButton.Caption:=LanguageSetup.Save;
+  SaveButton.Hint:=LanguageSetup.SaveHintVideoPlayer;
   PlayPauseButton.Caption:=LanguageSetup.SoundCapturePlayPause;
+  PlayPauseButton.Hint:=LanguageSetup.SoundCapturePlayPauseHint;
   ZoomButton.Caption:=LanguageSetup.ViewImageFormZoomButton;
+  ZoomButton.Hint:=LanguageSetup.ViewImageFormZoomButtonHint;
   InfoLabel.Caption:=LanguageSetup.CaptureVideosInstallCodecInfo;
   InstallButton.Caption:=LanguageSetup.CaptureVideosInstallCodec;
 
+  CoolBar.Font.Size:=PrgSetup.ToolbarFontSize;
+
   JustChanging:=False;
+  
   PrevVideos:=TStringList.Create;
   NextVideos:=TStringList.Create;
 end;
@@ -138,6 +151,8 @@ begin
   S:=MakeAbsPath(FileName,PrgSetup.BaseDir);
   if not FileExists(S) then exit;
 
+  If Trim(ExtUpperCase(ExtractFileExt(S)))<>'.AVI' then exit;
+
   try FSt:=TFileStream.Create(S,fmOpenRead); except exit; end;
   try
     try FSt.ReadBuffer(C,4); except result:=True; exit; end;
@@ -152,6 +167,65 @@ begin
   freeMediaStream;
   PrevVideos.Free;
   NextVideos.Free;
+end;
+
+procedure TPlayVideoForm.Zoom(const ZoomDirection: Integer);
+Var I,J : Integer;
+    F : Double;
+begin
+  If WindowState=wsMaximized then WindowState:=wsNormal;
+
+  I:=(MediaPanel.ClientWidth+10)*100 div getVideoWidth;
+  J:=(MediaPanel.ClientHeight+10)*100 div getCoupledVideoHeight(getVideoWidth);
+
+  I:=Round(Min(I,J)/25)*25;
+  If ZoomDirection=0 then I:=100 else begin
+    If ZoomDirection<0 then I:=Max(10,I-25) else I:=Max(10,I+25);
+  end;
+
+  F:=I/100;
+  Width:=Round(getVideoWidth*F)+(Width-MediaPanel.ClientWidth+10);
+  Height:=Round(getCoupledVideoHeight(getVideoWidth)*F)+(Height-MediaPanel.ClientHeight+10);
+  CenterWindow;
+end;
+
+procedure TPlayVideoForm.ZoomPopupMenuPopup(Sender: TObject);
+Var I,J : Integer;
+    S : String;
+begin
+  I:=(MediaPanel.ClientWidth+10)*100 div getVideoWidth;
+  J:=(MediaPanel.ClientHeight+10)*100 div getCoupledVideoHeight(getVideoWidth);
+  J:=Round(Min(I,J)/25)*25;
+
+  For I:=0 to ZoomPopupMenu.Items.Count-1 do begin
+    ZoomPopupMenu.Items[I].ShortCut:=0;
+    S:=RemoveUnderline(ZoomPopupMenu.Items[I].Caption);
+    ZoomPopupMenu.Items[I].Enabled:=(S<>IntToStr(J)+'%');
+    If S=IntToStr(J-25)+'%' then ZoomPopupMenu.Items[I].ShortCut:=ShortCut(VK_OEM_MINUS,[]);
+    If S=IntToStr(J+25)+'%' then ZoomPopupMenu.Items[I].ShortCut:=ShortCut(VK_OEM_PLUS,[]);
+    If S='100%' then ZoomPopupMenu.Items[I].ShortCut:=ShortCut(ord('0'),[]);
+  end;
+end;
+
+procedure TPlayVideoForm.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+begin
+  If Shift=[] then Case Key of
+    VK_LEFT, VK_UP, VK_PRIOR : ButtonWork(PreviousButton);
+    VK_RIGHT, VK_DOWN, VK_NEXT : ButtonWork(NextButton);
+    VK_ADD, VK_OEM_PLUS : Zoom(1);
+    VK_SUBTRACT, VK_OEM_MINUS  : Zoom(-1);
+    ord('0'), VK_MULTIPLY, VK_NUMPAD0 : Zoom(0);
+    VK_ESCAPE : Close;
+  end;
+end;
+
+procedure TPlayVideoForm.FormMouseWheel(Sender: TObject; Shift: TShiftState; WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
+begin
+  If Shift=[] then begin
+    If WheelDelta>0 then ButtonWork(PreviousButton) else ButtonWork(NextButton);
+  end else begin
+    If WheelDelta>0 then Zoom(-1) else Zoom(1);
+  end;
 end;
 
 procedure TPlayVideoForm.FormResize(Sender: TObject);
@@ -197,11 +271,19 @@ end;
 
 procedure TPlayVideoForm.CenterWindow;
 Var P : TForm;
+    F : TFrame;
 begin
-  P:=(Owner as TForm);
+  If Owner is TForm then begin
+    P:=Owner as TForm;
+    Left:=(P.Left+P.Width div 2)-Width div 2;
+    Top:=(P.Top+P.Height div 2)-Height div 2;
+  end;
 
-  Left:=(P.Left+P.Width div 2)-Width div 2;
-  Top:=(P.Top+P.Height div 2)-Height div 2;
+  If Owner is TFrame then begin
+    F:=Owner as TFrame;
+    Left:=(F.Left+F.Width div 2)-Width div 2;
+    Top:=(F.Top+F.Height div 2)-Height div 2;
+  end;
 end;
 
 procedure TPlayVideoForm.ButtonWork(Sender: TObject);
@@ -266,11 +348,18 @@ end;
 
 Procedure PlayVideoDialog(const AOwner : TComponent; const AFileName : String; const APrevVideos, ANextVideos : TStringList);
 begin
+  If OpenMediaFile(PrgSetup.VideoPlayer,AFileName) then exit;
+
   PlayVideoForm:=TPlayVideoForm.Create(AOwner);
   try
     PlayVideoForm.FileName:=AFileName;
     If APrevVideos<>nil then PlayVideoForm.PrevVideos.Assign(APrevVideos);
     If ANextVideos<>nil then PlayVideoForm.NextVideos.Assign(ANextVideos);
+    If (APrevVideos=nil) and (ANextVideos=nil) then begin
+      PlayVideoForm.PreviousButton.Visible:=False;
+      PlayVideoForm.NextButton.Visible:=False;
+      PlayVideoForm.ToolButton1.Visible:=False;
+    end;
     PlayVideoForm.ShowModal;
   finally
     PlayVideoForm.Free;

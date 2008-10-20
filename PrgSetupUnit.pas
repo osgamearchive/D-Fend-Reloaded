@@ -96,6 +96,13 @@ end;
     property LinuxShellScriptPreamble : String index 24 read GetString write SetString;
     property QBasic : String index 25 read GetString write SetString;
     property QBasicParam : String index 26 read GetString write SetString;
+    property LastAddedDriveType : String index 27 read GetString write SetString;
+    property QuickStarterDOSBoxTemplate : String index 28 read GetString write SetString;
+    property TextEditor : String index 29 read GetString write SetString;
+    property ImageViewer : String index 30 read GetString write SetString;
+    property SoundPlayer : String index 31 read GetString write SetString;
+    property VideoPlayer : String index 32 read GetString write SetString;
+    property DeleteToRecycleBin : String index 33 read GetString write SetString;
 
     property LinuxRemap[DriveLetter : Char]  : String read GetDriveLetter write SetDriveLetter;
 
@@ -147,6 +154,19 @@ end;
     property ScreenshotListUseFirstScreenshot : Boolean index 45 read GetBoolean write SetBoolean;
     property FullscreenInfo : Boolean index 46 read GetBoolean write SetBoolean;
     property GridLinesInGamesList : Boolean index 47 read GetBoolean write SetBoolean;
+    property QuickStarterMaximized : Boolean index 48 read GetBoolean write SetBoolean;
+    property QuickStarterDOSBoxFullscreen : Boolean index 49 read GetBoolean write SetBoolean;
+    property QuickStarterDOSBoxAutoClose : Boolean index 50 read GetBoolean write SetBoolean;
+    property FileTypeFallbackForEditor : Boolean index 51 read GetBoolean write SetBoolean;
+    property AutoFixLineWrap : Boolean index 52 read GetBoolean write SetBoolean;
+    property CenterScummVMWindow : Boolean index 53 read GetBoolean write SetBoolean;
+    property HideScummVMConsole : Boolean index 54 read GetBoolean write SetBoolean;
+    property ShowShortNameWarnings : Boolean index 55 read GetBoolean write SetBoolean;
+    property RestoreWhenScummVMCloses : Boolean index 56 read GetBoolean write SetBoolean;
+    property UseWindowsExeIcons : Boolean index 57 read GetBoolean write SetBoolean;
+    property MinimizeOnWindowsGameStart : Boolean index 58 read GetBoolean write SetBoolean;
+    property RestoreWhenWindowsGameCloses : Boolean index 59 read GetBoolean write SetBoolean;
+    property ActivateIncompleteFeatures : Boolean index 60 read GetBoolean write SetBoolean;
 
     property MainLeft : Integer index 0 read GetInteger write SetInteger;
     property MainTop : Integer index 1 read GetInteger write SetInteger;
@@ -166,6 +186,12 @@ end;
     property CompressionLevel : Integer index 15 read GetInteger write SetInteger;
     property ScreenshotListViewWidth : Integer index 16 read GetInteger write SetInteger;
     property ScreenshotListViewHeight : Integer index 17 read GetInteger write SetInteger;
+    property QuickStarterLeft : Integer index 18 read GetInteger write SetInteger;
+    property QuickStarterTop : Integer index 19 read GetInteger write SetInteger;
+    property QuickStarterWidth : Integer index 20 read GetInteger write SetInteger;
+    property QuickStarterHeight : Integer index 21 read GetInteger write SetInteger;
+    property ScreenshotListUseFirstScreenshotNr : Integer index 22 read GetInteger write SetInteger;
+    property DOSBoxShortFileNameAlgorithm : Integer index 23 read GetInteger write SetInteger;
 
     property DOSBoxSettingsCount : Integer read GetDOSBoxSettingsCount;
     property DOSBoxSettings[I : Integer] : TDOSBoxSetting read GetDOSBoxSettings;
@@ -315,8 +341,8 @@ begin
   AddStringRec(1,'ProgramSets','DefLoc',PrgDataDir);
   AddStringRec(2,'ProgramSets','DefDataLoc',PrgDataDir+'GameData\');
   AddStringRec(3,'ProgramSets','LanguageFile','English.ini');
-  AddStringRec(4,'ProgramSets','ColOrder','123456');
-  AddStringRec(5,'ProgramSets','ColVisible','111111');
+  AddStringRec(4,'ProgramSets','ColOrder','1234567');
+  AddStringRec(5,'ProgramSets','ColVisible','1111110');
   AddStringRec(6,'ProgramSets','ILVS','List');
   AddStringRec(7,'ProgramSets','PathToFREEDOS','.\VirtualHD\FREEDOS\');
   AddStringRec(8,'ProgramSets','UpdateCheckURL','http:/'+'/dfendreloaded.sourceforge.net/UpdateInfo.txt');
@@ -338,6 +364,13 @@ begin
   AddStringRec(24,'WineSupport','ShellScriptPreamble','#!/bin/bash');
   AddStringRec(25,'ProgramSets','QBasic','');
   AddStringRec(26,'ProgramSets','QBasicParams','/run %s');
+  AddStringRec(27,'ProgramSets','LastAddedDriveType','Drive');
+  AddStringRec(28,'ProgramSets','QuickStarterDOSBoxTemplate','');
+  AddStringRec(29,'ProgramSets','TextEditor','');
+  AddStringRec(30,'ProgramSets','ImageViewer','');
+  AddStringRec(31,'ProgramSets','SoundPlayer','');
+  AddStringRec(32,'ProgramSets','VideoPlayer','');
+  AddStringRec(33,'ProgramSets','DeleteToRecycleBin','1011110');
 
   For I:=0 to 25 do AddStringRec(1000+I,'WineSupport',chr(ord('A')+I),'');
 
@@ -389,6 +422,19 @@ begin
   AddBooleanRec(45,'ProgramSets','ScreenshotsGamesList.UseFirstScreenshot',True);
   AddBooleanRec(46,'ProgramSets','ShowFullscreenInfo',True);
   AddBooleanRec(47,'ProgramSets','GridLinesInGamesList',False);
+  AddBooleanRec(48,'ProgramSets','QuickStarterMaximized',False);
+  AddBooleanRec(49,'ProgramSets','QuickStarterDOSBoxFullscreen',False);
+  AddBooleanRec(50,'ProgramSets','QuickStarterDOSBoxAutoClose',True);
+  AddBooleanRec(51,'ProgramSets','FileTypeFallbackForEditor',True);
+  AddBooleanRec(52,'ProgramSets','AutoFixLineWrap',False);
+  AddBooleanRec(53,'ProgramSets','CenterScummVMWindow',False);
+  AddBooleanRec(54,'ProgramSets','HideScummVMConsole',False);
+  AddBooleanRec(55,'ProgramSets','ShowShortNameWarnings',False); //... Change default value to "true" in 0.7.0 (= when GUI is ready)
+  AddBooleanRec(56,'ProgramSets','RestoreWhenScummVMCloses',False);
+  AddBooleanRec(57,'ProgramSets','UseWindowsExeIcons',False); //... Change default value to "true" in 0.7.0 (= when GUI is ready)
+  AddBooleanRec(58,'ProgramSets','MinimizeOnWindowsGameStart',False);
+  AddBooleanRec(59,'ProgramSets','RestoreWhenWindowsGameCloses',False);
+  AddBooleanRec(60,'ProgramSets','ActivateIncompleteFeatures',False);
 
   AddIntegerRec(0,'ProgramSets','MainLeft',-1);
   AddIntegerRec(1,'ProgramSets','MainTop',-1);
@@ -408,6 +454,12 @@ begin
   AddIntegerRec(15,'ProgramSets','CompressionLevel',3);
   AddIntegerRec(16,'ProgramSets','ScreenshotsGamesList.Width',150);
   AddIntegerRec(17,'ProgramSets','ScreenshotsGamesList.Height',100);
+  AddIntegerRec(18,'ProgramSets','QuickStarterLeft',-1);
+  AddIntegerRec(19,'ProgramSets','QuickStarterTop',-1);
+  AddIntegerRec(20,'ProgramSets','QuickStarterWidth',-1);
+  AddIntegerRec(21,'ProgramSets','QuickStarterHeight',-1);
+  AddIntegerRec(22,'ProgramSets','ScreenshotsGamesList.UseScreenshotNr',1);
+  AddIntegerRec(23,'ProgramSets','DOSBoxShortFileNameAlgorithm',3);
 end;
 
 Procedure TPrgSetup.UpdateFile;

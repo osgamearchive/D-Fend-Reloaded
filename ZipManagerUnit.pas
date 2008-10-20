@@ -8,6 +8,7 @@ Type TZipRecord=record
   DOSBoxHandle : THandle;
   InavlidDOSBox : Boolean;
   ZipDrives : Integer;
+  IsScummVM : Boolean;
   Folder,ZipFile : Array[0..9] of String;
   DeleteType : Array[0..9] of Integer;
   DriveLetter : Array[0..9] of String;
@@ -26,6 +27,8 @@ Type TZipManager=class
     Procedure RepackData(const Folder, ZipFile: String; const DeleteType : Integer; const AddToZipFile : Boolean);
     Function UnpackData(const Folder, ZipFile : String) : Boolean;
     function GetData(I: Integer): TZipRecord;
+    Function AddGameDOSBox(const Game : TGame; var Error : Boolean) : Integer;
+    Function AddGameScummVM(const Game : TGame; var Error : Boolean) : Integer;
   public
     Constructor Create;
     Destructor Destroy; override;
@@ -41,7 +44,7 @@ Var ZipManager : TZipManager;
 implementation
 
 uses Windows, SysUtils, Forms, Dialogs, LanguageSetupUnit, CommonTools,
-     PrgSetupUnit, DOSBoxUnit, ZipInfoFormUnit, SevenZipVCL;
+     GameDBToolsUnit, PrgSetupUnit, DOSBoxUnit, ZipInfoFormUnit, SevenZipVCL;
 
 { TZipManager }
 
@@ -133,7 +136,6 @@ begin
       Folder:=ShortName(St2[0]);
       ZipFile:=ShortName(St2[1]);
     end;
-
   finally
     St.Free;
     St2.Free;
@@ -141,6 +143,13 @@ begin
 end;
 
 function TZipManager.AddGame(const Game: TGame; var Error : Boolean): Integer;
+begin
+  If ScummVMMode(Game)
+    then result:=AddGameScummVM(Game,Error)
+    else result:=AddGameDOSBox(Game,Error);
+end;
+
+Function TZipManager.AddGameDOSBox(const Game : TGame; var Error : Boolean) : Integer;
 Var I,J,K,Nr,DeleteType : Integer;
     S,Folder,ZipFile,DriveLetter : String;
     IsPhysFS : Boolean;
@@ -150,18 +159,7 @@ begin
 
   Nr:=-1;
   For I:=0 to 9 do begin
-    Case I of
-      0 : S:=Game.Mount0;
-      1 : S:=Game.Mount1;
-      2 : S:=Game.Mount2;
-      3 : S:=Game.Mount3;
-      4 : S:=Game.Mount4;
-      5 : S:=Game.Mount5;
-      6 : S:=Game.Mount6;
-      7 : S:=Game.Mount7;
-      8 : S:=Game.Mount8;
-      9 : S:=Game.Mount9;
-    end;
+    S:=Game.Mount[I];
     If S='' then continue;
     If CheckMountCommand(S,Folder,ZipFile,DeleteType,DriveLetter,IsPhysFS) then begin
       If Nr<0 then begin
@@ -170,14 +168,15 @@ begin
         SetLength(List,Nr+1);
         List[Nr].Nr:=NrCount;
         List[Nr].DOSBoxHandle:=INVALID_HANDLE_VALUE;
+        List[Nr].IsScummVM:=False;
         List[Nr].InavlidDOSBox:=False;
         List[Nr].ZipDrives:=0;
       end;
 
-     For J:=0 to length(List)-2 do For K:=0 to List[J].ZipDrives-1 do If Trim(ExtUpperCase(MakeRelPath(List[J].ZipFile[K],PrgSetup.BaseDir)))=Trim(ExtUpperCase(MakeRelPath(ZipFile,PrgSetup.BaseDir))) then begin
-       MessageDlg(Format(LanguageSetup.ZipFormZipFileInUseWarning,[ZipFile]),mtError,[mbOK],0);
-       Error:=True; dec(NrCount); SetLength(List,length(List)-1); exit;
-     end;
+      For J:=0 to length(List)-2 do For K:=0 to List[J].ZipDrives-1 do If Trim(ExtUpperCase(MakeRelPath(List[J].ZipFile[K],PrgSetup.BaseDir)))=Trim(ExtUpperCase(MakeRelPath(ZipFile,PrgSetup.BaseDir))) then begin
+        MessageDlg(Format(LanguageSetup.ZipFormZipFileInUseWarning,[ZipFile]),mtError,[mbOK],0);
+        Error:=True; dec(NrCount); SetLength(List,length(List)-1); exit;
+      end;
 
       List[Nr].Folder[List[Nr].ZipDrives]:=Folder;
       List[Nr].ZipFile[List[Nr].ZipDrives]:=ZipFile;
@@ -196,6 +195,42 @@ begin
       end;
     end;
   end;
+end;
+
+Function TZipManager.AddGameScummVM(const Game : TGame; var Error : Boolean) : Integer;
+Var Zip, Folder : String;
+    Nr,J,K : Integer;
+begin
+  Error:=False;
+  result:=-1;
+
+  If Trim(Game.ScummVMZip)='' then exit;
+  Zip:=MakeAbsPath(Game.ScummVMZip,PrgSetup.BaseDir);
+  Folder:=MakeAbsPath(Game.ScummVMPath,PrgSetup.BaseDir);
+
+  Error:=not UnpackData(Folder,Zip); If Error then exit;
+
+  inc(NrCount);
+  Nr:=length(List);
+  SetLength(List,Nr+1);
+  List[Nr].Nr:=NrCount;
+  List[Nr].DOSBoxHandle:=INVALID_HANDLE_VALUE;
+  List[Nr].IsScummVM:=True;
+  List[Nr].InavlidDOSBox:=False;
+  List[Nr].ZipDrives:=1;
+
+  For J:=0 to length(List)-2 do For K:=0 to List[J].ZipDrives-1 do If Trim(ExtUpperCase(MakeRelPath(List[J].ZipFile[K],PrgSetup.BaseDir)))=Trim(ExtUpperCase(Zip)) then begin
+    MessageDlg(Format(LanguageSetup.ZipFormZipFileInUseWarning,[Zip]),mtError,[mbOK],0);
+    Error:=True; dec(NrCount); SetLength(List,length(List)-1); exit;
+  end;
+
+  List[Nr].Folder[0]:=Folder;
+  List[Nr].ZipFile[0]:=Zip;
+  List[Nr].DeleteType[0]:=2; {2=Delete whole folder}
+  List[Nr].DriveLetter[0]:='';
+  List[Nr].OnlyRepack[List[Nr].ZipDrives]:=False;
+
+  result:=List[Nr].Nr;
 end;
 
 Function TZipManager.UnpackData(const Folder, ZipFile: String) : Boolean;

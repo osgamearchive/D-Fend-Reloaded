@@ -17,7 +17,6 @@ Function IsDOSExe(const FileName : String) : Boolean;
 var MinimizedAtDOSBoxStart : Boolean = False;
 
 Function ShortName(const LongName : String) : String;
-Function DOSBoxShortName(const RootPath, LongName : String) : String;
 Function LongPath(const ShortPath : String) : String; overload;
 Function LongPath(const Root, ShortPath : String) : String; overload;
 
@@ -25,7 +24,8 @@ implementation
 
 uses Windows, SysUtils, ShellAPI, Forms, Dialogs, Math,
      CommonTools, PrgSetupUnit, PrgConsts, LanguageSetupUnit, GameDBToolsUnit,
-     ZipManagerUnit, ScreensaverControlUnit, FullscreenInfoFormUnit;
+     ZipManagerUnit, ScreensaverControlUnit, FullscreenInfoFormUnit,
+     DOSBoxCountUnit, DOSBoxShortNameUnit, RunPrgManagerUnit;
 
 Function BoolToStr(const B : Boolean) : String;
 begin
@@ -41,59 +41,6 @@ begin
       else SetLength(result,StrLen(PChar(result)));
   end else begin
     result:=LongName;
-  end;
-end;
-
-Function DOSBoxShortName(const RootPath, LongName : String) : String;
-Var Path,ReferenceShortName,S : String;
-    Rec : TSearchRec;
-    I : Integer;
-    St : TStringList;
-    S1,S2 : String;
-begin
-  Path:=IncludeTrailingPathDelimiter(RootPath);
-
-  {Check if LongName is already ok}
-  S1:=ExtUpperCase(ShortName(Path+LongName));
-  S:=ExtUpperCase(IncludeTrailingPathDelimiter(ShortName(Path)));
-  S1:=Copy(S1,length(S)+1,MaxInt);
-
-  S2:=ExtUpperCase(Path+LongName);
-  S:=ExtUpperCase(IncludeTrailingPathDelimiter(Path));
-  S2:=Copy(S2,length(S)+1,MaxInt);
-
-  If S1=S2 then begin result:=ExtUpperCase(LongName); exit; end;
-
-  {Create short name for compareing}
-  ReferenceShortName:=ExtractFileName(ExtUpperCase(ShortName(Path+LongName)));
-  If length(ReferenceShortName)>2 then SetLength(ReferenceShortName,length(ReferenceShortName)-2);
-  result:=ReferenceShortName+'~1';
-
-  St:=TStringList.Create;
-  try
-    {Find all files with the same shortname (without ~x}
-    I:=FindFirst(Path+'*.*',faAnyFile,Rec);
-    try
-      While I=0 do begin
-        S:=ExtUpperCase(ShortName(Path+Rec.Name));
-        While Pos('\',S)>0 do S:=Copy(S,Pos('\',S)+1,MaxInt);
-        If length(S)>2 then SetLength(S,length(S)-2);
-        If S=ReferenceShortName then St.Add(Rec.Name);
-        I:=FindNext(Rec);
-      end;
-    finally
-      FindClose(Rec);
-    end;
-
-    {Find new number}
-    St.Sort;
-    For I:=0 to St.Count-1 do begin
-      If ExtUpperCase(St[I])=ExtUpperCase(LongName) then begin
-        result:=ReferenceShortName+'~'+IntToStr(I+1); exit;
-      end;
-    end;
-  finally
-    St.Free;
   end;
 end;
 
@@ -144,6 +91,26 @@ begin
   result:=True;
 end;
 
+Function MakeDOSBoxPath(Part, Root : String) : String;
+Var S : String;
+    I : Integer;
+begin
+  Root:=IncludeTrailingPathDelimiter(Root);
+  result:='';
+  Part:=ExcludeTrailingPathDelimiter(Part);
+  If (Part<>'') and (Part[1]='\') then Part:=Copy(Part,2,MaxInt);
+
+  while Part<>'' do begin
+    I:=Pos('\',Part);
+    If I=0 then begin S:=Part; Part:=''; end else begin S:=Copy(Part,1,I-1); Part:=Copy(Part,I+1,MaxInt); end;
+    S:=LongPath(Root,S);
+    result:=result+'\'+DOSBoxShortName(Root,S);
+    Root:=Root+S+'\';
+  end;
+
+  If result='' then result:='\';
+end;
+
 Function SpecialMultiImgMount(const DriveLetter : String; const Imgs : TStringList; const FreeDriveLetters : String; const MountCommandAdd : String) : String;
 Var I : Integer;
     TempDrive : Char;
@@ -155,8 +122,8 @@ begin
 
   Path:=IncludeTrailingPathDelimiter(ExtractFilePath(ShortName(Imgs[0])));
 
-  S:='"'+TempDrive+':\'+ExtractFileName(ShortName(Imgs[0]))+'"';
-  For I:=1 to Imgs.Count-1 do S:=S+' "'+TempDrive+':\'+ExtractFileName(ShortName(Imgs[I]))+'"';
+  S:='"'+TempDrive+':\'+DOSBoxShortName(ExtractFilePath(Imgs[0]),ExtractFileName(Imgs[0]))+'"';
+  For I:=1 to Imgs.Count-1 do S:=S+' "'+TempDrive+':\'+DOSBoxShortName(ExtractFilePath(Imgs[I]),ExtractFileName(Imgs[I]))+'"';
 
   result:=
     'mount '+TempDrive+' "'+UnmapDrive(Path,ptMount)+'"'+#13+
@@ -289,19 +256,7 @@ begin
 
   UseDir:='';
   For I:=0 to Game.NrOfMounts-1 do begin
-    Case I of
-      0 : St:=ValueToList(Game.Mount0);
-      1 : St:=ValueToList(Game.Mount1);
-      2 : St:=ValueToList(Game.Mount2);
-      3 : St:=ValueToList(Game.Mount3);
-      4 : St:=ValueToList(Game.Mount4);
-      5 : St:=ValueToList(Game.Mount5);
-      6 : St:=ValueToList(Game.Mount6);
-      7 : St:=ValueToList(Game.Mount7);
-      8 : St:=ValueToList(Game.Mount8);
-      9 : St:=ValueToList(Game.Mount9);
-      else St:=TStringList.Create;
-    end;
+    St:=ValueToList(Game.Mount[I]);
     try
       S:=IncludeTrailingPathDelimiter(MakeAbsPath(IncludeTrailingPathDelimiter(St[0]),PrgSetup.BaseDir));
       If ExtUpperCase(Copy(FreeDOSPath,1,length(S)))=ExtUpperCase(S) then begin
@@ -365,19 +320,7 @@ begin
   T:=MakePathShort(Trim(ExtractFilePath(QBFile)));
   Path:=''; Drive:='';
   For I:=0 to Game.NrOfMounts-1 do begin
-    Case I of
-      0 : St:=ValueToList(Game.Mount0);
-      1 : St:=ValueToList(Game.Mount1);
-      2 : St:=ValueToList(Game.Mount2);
-      3 : St:=ValueToList(Game.Mount3);
-      4 : St:=ValueToList(Game.Mount4);
-      5 : St:=ValueToList(Game.Mount5);
-      6 : St:=ValueToList(Game.Mount6);
-      7 : St:=ValueToList(Game.Mount7);
-      8 : St:=ValueToList(Game.Mount8);
-      9 : St:=ValueToList(Game.Mount9);
-      else St:=TStringList.Create;
-    end;
+    St:=ValueToList(Game.Mount[I]);
     try
       If St.Count=3 then St.Add('false');
       If St.Count=4 then St.Add('');
@@ -407,26 +350,6 @@ begin
   result:=True;
 end;
 
-Function MakeDOSBoxPath(Part, Root : String) : String;
-Var S : String;
-    I : Integer;
-begin
-  Root:=IncludeTrailingPathDelimiter(Root);
-  result:='';
-  Part:=ExcludeTrailingPathDelimiter(Part);
-  If (Part<>'') and (Part[1]='\') then Part:=Copy(Part,2,MaxInt);
-
-  while Part<>'' do begin
-    I:=Pos('\',Part);
-    If I=0 then begin S:=Part; Part:=''; end else begin S:=Copy(Part,1,I-1); Part:=Copy(Part,I+1,MaxInt); end;
-    S:=LongPath(Root,S);
-    result:=result+'\'+DOSBoxShortName(Root,S);
-    Root:=Root+S+'\';
-  end;
-
-  If result='' then result:='\';
-end;
-
 Function BuildRunCommands(const St : TStringList; const ProgramFile, ProgramParameters : String; const UseLoadFix : Boolean; const LoadFixMemory : Integer; const Use4DOS, UseDOS32A : Boolean; const Game : TGame; const FreeDriveLetters : String; const WarnIfNotReachable, WarnIfWindowsExe : Boolean) : Boolean;
 Var Prefix,S,T,UsePath,Mount,Unmount : String;
     I : Integer;
@@ -451,10 +374,12 @@ begin
   end else begin
     {Find path to file}
     If (Trim(ProgramFile)<>'') and (not FileExists(MakeAbsPath(ProgramFile,PrgSetup.BaseDir))) and WarnIfNotReachable then begin
+      Application.Restore;
       MessageDlg(Format(LanguageSetup.MessageCouldNotFindFile,[MakeAbsPath(ProgramFile,PrgSetup.BaseDir)]),mtError,[mbOK],0);
     end;
 
     If IsWindowsExe(MakeAbsPath(ProgramFile,PrgSetup.BaseDir)) and WarnIfNotReachable and WarnIfWindowsExe then begin
+      Application.Restore;
       MessageDlg(Format(LanguageSetup.MessageWindowsExeExecuteWarning,[MakeAbsPath(ProgramFile,PrgSetup.BaseDir)]),mtError,[mbOK],0);
     end;
 
@@ -463,19 +388,7 @@ begin
     If (Trim(ProgramFile)<>'') and (T<>'') then begin
       Path:=''; Drive:=''; RootPath:='';
       For I:=0 to Game.NrOfMounts-1 do begin
-        Case I of
-          0 : St2:=ValueToList(Game.Mount0);
-          1 : St2:=ValueToList(Game.Mount1);
-          2 : St2:=ValueToList(Game.Mount2);
-          3 : St2:=ValueToList(Game.Mount3);
-          4 : St2:=ValueToList(Game.Mount4);
-          5 : St2:=ValueToList(Game.Mount5);
-          6 : St2:=ValueToList(Game.Mount6);
-          7 : St2:=ValueToList(Game.Mount7);
-          8 : St2:=ValueToList(Game.Mount8);
-          9 : St2:=ValueToList(Game.Mount9);
-          else St2:=TStringList.Create;
-        end;
+        St2:=ValueToList(Game.Mount[I]);
         try
           If St2.Count=3 then St2.Add('false');
           If St2.Count=4 then St2.Add('');
@@ -506,6 +419,7 @@ begin
         St.Add('Rem !!! Trying to interpret the path to the file as a DOSBox relative path. !!!');
         BuildLocalRunCommands(St,Trim(ProgramFile),ProgramParameters,UseLoadFix,LoadFixMemory,Use4DOS,UseDOS32A,Game,FreeDriveLetters,WarnIfNotReachable);
         If WarnIfNotReachable then begin
+          Application.Restore;
           MessageDlg(Format(LanguageSetup.MessageNoMountToReachFolder,[ExtractFilePath(MakeAbsPath(ProgramFile,PrgSetup.BaseDir))]),mtError,[mbOK],0);
           result:=False;
         end;
@@ -519,6 +433,7 @@ begin
     {Run via QBasic}
     if not MountQBasic(St,Game,FreeDriveLetters,S) then begin
       If WarnIfNotReachable then
+        Application.Restore;
         MessageDlg(Format(LanguageSetup.MessageQBasicNeededToExecuteFile,[ExtractFileName(ProgramFile)]),mtError,[mbOK],0);
     end;
     T:=Trim(PrgSetup.QBasicParam); If T='' then T:='/run %s';
@@ -603,18 +518,7 @@ begin
   {Check which CD drives are mounted regularly}
   AlreadyMounted:='';
   For I:=0 to Game.NrOfMounts do begin
-    Case I of
-      1 : S:=Game.Mount0;
-      2 : S:=Game.Mount1;
-      3 : S:=Game.Mount2;
-      4 : S:=Game.Mount3;
-      5 : S:=Game.Mount4;
-      6 : S:=Game.Mount5;
-      7 : S:=Game.Mount6;
-      8 : S:=Game.Mount7;
-      9 : S:=Game.Mount8;
-     10 : S:=Game.Mount9;
-    end;
+    S:=Game.Mount[I];
     St2:=ValueToList(S);
     try
       If St2.Count<2 then continue;
@@ -716,16 +620,8 @@ begin
 
   FreeDriveLetters:='---DEFGHIJKLMNOPQRSTUVWXY-';
   if not Game.AutoexecOverrideMount then begin
-    If Game.NrOfMounts>=1 then MultiLineAdd(St,BuildMountData(Game.Mount0,FreeDriveLetters));
-    If Game.NrOfMounts>=2 then MultiLineAdd(St,BuildMountData(Game.Mount1,FreeDriveLetters));
-    If Game.NrOfMounts>=3 then MultiLineAdd(St,BuildMountData(Game.Mount2,FreeDriveLetters));
-    If Game.NrOfMounts>=4 then MultiLineAdd(St,BuildMountData(Game.Mount3,FreeDriveLetters));
-    If Game.NrOfMounts>=5 then MultiLineAdd(St,BuildMountData(Game.Mount4,FreeDriveLetters));
-    If Game.NrOfMounts>=6 then MultiLineAdd(St,BuildMountData(Game.Mount5,FreeDriveLetters));
-    If Game.NrOfMounts>=7 then MultiLineAdd(St,BuildMountData(Game.Mount6,FreeDriveLetters));
-    If Game.NrOfMounts>=8 then MultiLineAdd(St,BuildMountData(Game.Mount7,FreeDriveLetters));
-    If Game.NrOfMounts>=9 then MultiLineAdd(St,BuildMountData(Game.Mount8,FreeDriveLetters));
-    If Game.NrOfMounts>=10 then MultiLineAdd(St,BuildMountData(Game.Mount9,FreeDriveLetters));
+    For I:=0 to 9 do
+      If Game.NrOfMounts>=I+1 then MultiLineAdd(St,BuildMountData(Game.Mount[I],FreeDriveLetters)) else break;
     If Game.AutoMountCDs then AutoMountCDs(St,Game,FreeDriveLetters);
   end;
 
@@ -841,7 +737,9 @@ begin
     If (S='') or (S='DEFAULT') then S:='' else begin
       T:=Trim(ExtUpperCase(Game.CustomDOSBoxDir));
       If (T='') or (T='DEFAULT') then T:=PrgSetup.DOSBoxSettings[DOSBoxNr].DosBoxDir;
-      If FileExists(IncludeTrailingPathDelimiter(T)+S) then S:=IncludeTrailingPathDelimiter(T)+S else S:='';
+      If FileExists(IncludeTrailingPathDelimiter(T)+S) then S:=IncludeTrailingPathDelimiter(T)+S else begin
+        If not FileExists(S) then S:='';
+      end;
     end;
     If S='' then S:=PrgSetup.DOSBoxSettings[DOSBoxNr].DosBoxLanguage;
     If FileExists(S) then result.Add('language='+UnmapDrive(S,ptDOSBox));
@@ -950,10 +848,14 @@ begin
 
   result.Add('');
   result.Add('[serial]');
-  result.Add('Serial1='+Game.Serial1);
-  result.Add('Serial2='+Game.Serial2);
-  result.Add('Serial3='+Game.Serial3);
-  result.Add('Serial4='+Game.Serial4);
+  S:=ExtLowerCase(Game.Serial1);
+  result.Add('serial1='+S);
+  S:=ExtLowerCase(Game.Serial2);
+  result.Add('serial2='+S);
+  S:=ExtLowerCase(Game.Serial3);
+  result.Add('serial3='+S);
+  S:=ExtLowerCase(Game.Serial4);
+  result.Add('serial4='+S);
 
   If Game.IPX then begin
     result.Add('');
@@ -997,39 +899,6 @@ begin
   end;
 end;
 
-Procedure CenterWindow(Const hWindow : HWnd);
-Var R : TRect;
-begin
- GetWindowRect(hWindow,R);
- SetWindowPos(
-   hWindow,
-   HWND_TOP,
-   (Screen.Width div 2)-((R.Right-R.Left) div 2),
-   (Screen.Height div 2)-((R.Bottom-R.Top) div 2),
-   0,
-   0,
-   SWP_SHOWWINDOW or SWP_NOSIZE
- );
-end;
-
-Function EnumWindowsFunc(const hWindow : THandle; const lParam : Integer) : Boolean; StdCall;
-Var S : String;
-begin
-  result:=True;
-
-  SetLength(S,255);
-  If GetWindowText(hWindow,PChar(S),250)=0 then exit;
-  SetLength(S,StrLen(PChar(S)));
-  If Copy(Trim(ExtUpperCase(S)),1,6)<>'DOSBOX' then exit;
-
-  CenterWindow(hWindow);
-end;
-
-Procedure CenterDOSBoxWindow;
-begin
-  EnumWindows(@EnumWindowsFunc,0);
-end;
-
 Type TCharArray=Array[0..MaxInt-1] of Char;
      PCharArray=^TCharArray;
 
@@ -1041,6 +910,7 @@ Var Add : String;
     I,Size : Integer;
     P : PCharArray;
     Q : Array of Char;
+    Waited : Boolean;
 begin
   Add:='';
   if PrgSetup.DOSBoxSettings[DOSBoxNr].HideDosBoxConsole then Add:=' -NOCONSOLE';
@@ -1055,13 +925,14 @@ begin
   If not FileExists(PrgFile) then FindAlternativeDOSBoxFile(PrgFile);
 
   if not FileExists(PrgFile) then begin
+    Application.Restore;
     MessageDlg(Format(LanguageSetup.MessageCouldNotFindDosBox,[PrgFile]),mtError,[mbOK],0);
     result:=INVALID_HANDLE_VALUE;
     exit;
   end;
 
   PrgFile:=UnmapDrive(PrgFile,ptDOSBox);
-  Params:='-CONF '+ConfFile+Add;
+  Params:='-CONF "'+ConfFile+'"'+Add;
 
   S:=Trim(ExtUpperCase(PrgSetup.DOSBoxSettings[DOSBoxNr].SDLVideodriver));
   Env:='';
@@ -1110,6 +981,7 @@ begin
     StartupInfo,
     ProcessInformation
   ) then begin
+    Application.Restore;
     MessageDlg(Format(LanguageSetup.MessageCouldNotStartProgram,[PrgFile]),mtError,[mbOK],0);
     result:=INVALID_HANDLE_VALUE;
     exit;
@@ -1118,17 +990,21 @@ begin
   result:=ProcessInformation.hProcess;
   CloseHandle(ProcessInformation.hThread);
 
-  {ShellExecute(Application.MainForm.Handle,'open',PChar(IncludeTrailingPathDelimiter(PrgSetup.DosBoxDir)+DosBoxFileName),PChar('-CONF '+ConfFile+Add),PChar(IncludeTrailingPathDelimiter((ExtractFilePath(ConfFile)))),SW_SHOW);}
+  {ShellExecute(Application.MainForm.Handle,'open',PChar(IncludeTrailingPathDelimiter(PrgSetup.DosBoxDir)+DosBoxFileName),PChar('-CONF "'+ConfFile+'"'+Add),PChar(IncludeTrailingPathDelimiter((ExtractFilePath(ConfFile)))),SW_SHOW);}
 
   If PrgSetup.DOSBoxSettings[DOSBoxNr].CenterDOSBoxWindow and (not FullScreen) then begin
-    Sleep(1000);
-    CenterDOSBoxWindow;
+    Sleep(1000); Waited:=True;
+    CenterWindowFromProcessID(ProcessInformation.dwProcessId);
+  end else begin
+    Waited:=False;
   end;
 
   If PrgSetup.MinimizeOnDosBoxStart then begin
-    Sleep(1000);
-    MinimizedAtDOSBoxStart:=True;
+    If not Waited then Sleep(1000);
+    {MinimizedAtDOSBoxStart:=True; -> RunGameInt}
   end;
+
+  DOSBoxCounter.Add(result);
 end;
 
 Procedure RunGameInt(const Game : TGame; const RunSetup : Boolean; const DosBoxCommandLine : String; const RunExtraFile : Integer = -1);
@@ -1138,40 +1014,58 @@ Var St : TStringList;
     DOSBoxHandle : THandle;
     Error : Boolean;
     DOSBoxNr : Integer;
+    AlreadyMinimized : Boolean;
 begin
   If not RunCheck(Game,RunSetup,RunExtraFile) then exit;
 
   DOSBoxNr:=GetDOSBoxNr(Game);
 
-  If PrgSetup.MinimizeOnDosBoxStart then Application.Minimize;
-
-  ForceDirectories(MakeAbsPath(Game.CaptureFolder,PrgSetup.BaseDir));
-
-  St:=BuildConfFile(Game,RunSetup,True,RunExtraFile);
+  If PrgSetup.MinimizeOnDosBoxStart then begin
+    AlreadyMinimized:=(Application.MainForm.WindowState=wsMinimized);
+    Application.Minimize;
+  end else begin
+    AlreadyMinimized:=False;
+  end;
 
   try
-    try
-      St.SaveToFile(TempDir+DosBoxConfFileName);
-    except
-      MessageDlg(Format(LanguageSetup.MessageCouldNotSaveFile,[TempDir+DosBoxConfFileName]),mtError,[mbOK],0);
-      exit;
+    If Trim(Game.CaptureFolder)='' then begin
+      Game.CaptureFolder:=MakeRelPath(IncludeTrailingPathDelimiter(PrgDataDir+CaptureSubDir),PrgSetup.BaseDir);
+      Game.StoreAllValues;
     end;
-    AddToHistory(Game.Name);
+    ForceDirectories(MakeAbsPath(Game.CaptureFolder,PrgSetup.BaseDir));
 
-    If DOSBoxNr>=0 then T:=MakeAbsPath(PrgSetup.DOSBoxSettings[DOSBoxNr].DosBoxDir,PrgSetup.BaseDir) else T:=Trim(Game.CustomDOSBoxDir);
+    St:=BuildConfFile(Game,RunSetup,True,RunExtraFile);
 
-    ZipRecNr:=ZipManager.AddGame(Game,Error);
-    If Error then exit;
-
-    DOSBoxHandle:=RunDosBox(T,Max(0,DOSBoxNr),TempDir+DosBoxConfFileName,Game.StartFullscreen,DosBoxCommandLine);
     try
-      If ZipRecNr>=0 then ZipManager.ActivateRepackCheck(ZipRecNr,DOSBoxHandle);
-      ScreensaverControl.DOSBoxStarted(DOSBoxHandle,PrgSetup.DOSBoxSettings[Max(0,DOSBoxNr)].DisableScreensaver);
+      try
+        St.SaveToFile(TempDir+DosBoxConfFileName);
+      except
+        Application.Restore;
+        MessageDlg(Format(LanguageSetup.MessageCouldNotSaveFile,[TempDir+DosBoxConfFileName]),mtError,[mbOK],0);
+        exit;
+      end;
+      AddToHistory(Game.Name);
+
+      If DOSBoxNr>=0 then T:=MakeAbsPath(PrgSetup.DOSBoxSettings[DOSBoxNr].DosBoxDir,PrgSetup.BaseDir) else T:=Trim(Game.CustomDOSBoxDir);
+
+      ZipRecNr:=ZipManager.AddGame(Game,Error);
+      If Error then exit;
+
+      RunPrgManager.RunBeforeExecutionCommand(Game);
+      DOSBoxHandle:=RunDosBox(T,Max(0,DOSBoxNr),TempDir+DosBoxConfFileName,Game.StartFullscreen,DosBoxCommandLine);
+
+      try
+        If ZipRecNr>=0 then ZipManager.ActivateRepackCheck(ZipRecNr,DOSBoxHandle);
+        RunPrgManager.AddCommand(Game,DOSBoxHandle);
+        ScreensaverControl.DOSBoxStarted(DOSBoxHandle,PrgSetup.DOSBoxSettings[Max(0,DOSBoxNr)].DisableScreensaver);
+      finally
+        CloseHandle(DOSBoxHandle);
+      end;
     finally
-      CloseHandle(DOSBoxHandle);
+      St.Free;
     end;
   finally
-    St.Free;
+    If PrgSetup.MinimizeOnDosBoxStart and (not AlreadyMinimized) then MinimizedAtDOSBoxStart:=True;
   end;
 end;
 

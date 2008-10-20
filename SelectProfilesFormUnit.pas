@@ -41,7 +41,7 @@ begin
   SetVistaFonts(self);
   Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName);
 
-  Caption:=LanguageSetup.UninstallSelectForm;
+  Caption:=LanguageSetup.TemplateFormNewFromProfilesCaption;
   OKButton.Caption:=LanguageSetup.OK;
   CancelButton.Caption:=LanguageSetup.Cancel;
   SelectAllButton.Caption:=LanguageSetup.All;

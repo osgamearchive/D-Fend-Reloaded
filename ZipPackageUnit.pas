@@ -10,18 +10,19 @@ implementation
 
 uses Windows, SysUtils, Controls, Dialogs, SevenZipVCL, CommonTools,
      LanguageSetupUnit, GameDBToolsUnit, PrgSetupUnit, PrgConsts,
-     UninstallFormUnit, ZipInfoFormUnit, DosBoxUnit;
+     UninstallFormUnit, ZipInfoFormUnit, DosBoxUnit, ScummVMUnit;
 
 Function CopyFileWithMsg(const Source, Dest : String) : Boolean;
 begin
-  result:=CopyFile(PChar(Source),PChar(Dest),False);
+  result:=ForceDirectories(ExtractFilePath(Dest));
+  if result then result:=CopyFile(PChar(Source),PChar(Dest),False);
   if not result then MessageDlg(Format(LanguageSetup.MessageCouldNotCopyFile,[Source,Dest]),mtError,[mbOK],0);
 end;
 
 Function CopyFolderWithMsg(Source, Dest : String; const IgnoreProfConfInRootDir : Boolean = False) : Boolean;
 Var I : Integer;
     Rec : TSearchRec;
-    S : String;
+    S,T : String;
     B : Boolean;
 begin
   result:=False;
@@ -45,8 +46,8 @@ begin
         end;
       end else begin
         If IgnoreProfConfInRootDir then begin
-          S:=Trim(ExtUpperCase(ExtractFileExt(Rec.Name)));
-          B:=(S<>'.CONF') and (S<>'.PROF');
+          T:=Trim(ExtUpperCase(Rec.Name)); S:=ExtractFileExt(T);
+          B:=(S<>'.CONF') and (S<>'.PROF') and (T<>'INSTALLREADME.TXT');
         end else B:=True;
         If B then begin
           If not CopyFileWithMsg(Source+Rec.Name,Dest+Rec.Name) then exit;
@@ -56,6 +57,48 @@ begin
     end;
   finally
     FindClose(Rec);
+  end;
+
+  result:=True;
+end;
+
+Function CreateInfoFile(const Game : TGame; const Dir : String) : Boolean;
+Var St : TStringList;
+begin
+  result:=False;
+
+  St:=TStringList.Create;
+  try
+    St.Add('This is a D-Fend Reloaded game package for the game');
+    St.Add('"'+Game.CacheName+'".');
+    St.Add('');
+    St.Add('If you are using D-Fend Reloaded, you can just install this package via');
+    St.Add('File|Import|Import zip-file or by just dragging the zip file to the');
+    St.Add('D-Fend Reloaded program window.');
+    St.Add('');
+    St.Add('If you do not have a D-Fend Reloaded installation on your system, you can');
+    St.Add('download it here for free:');
+    St.Add('http:/'+'/dfendreloaded.sourceforge.net/Download.html');
+    St.Add('');
+    If ScummVMMode(Game) then begin
+      St.Add('You can also run the game from this package without having D-Fend Reloaded');
+      St.Add('installed. All you need is ScummVM (http:/'+'/www.scummvm.org/). You can just use');
+      St.Add('the ini file from this folder to run the game inside ScummVM.');
+    end else begin
+      St.Add('You can also run the game from this package without having D-Fend Reloaded');
+      St.Add('installed. All you need is DOSBox (http:/'+'/www.dosbox.com). You can just use');
+      St.Add('the conf file from this folder to run the game inside DOSBox.');
+    end;
+    St.Add('');
+    St.Add('You can find all files needed to run the game in the subfolders of this folder.');
+    try
+      St.SaveToFile(IncludeTrailingPathDelimiter(Dir)+'InstallReadme.txt');
+    except
+      MessageDlg(Format(LanguageSetup.MessageCouldNotSaveFile,[IncludeTrailingPathDelimiter(Dir)+'InstallReadme.txt']),mtError,[mbOK],0);
+      exit;
+    end;
+  finally
+    St.Free;
   end;
 
   result:=True;
@@ -73,11 +116,21 @@ begin
   if not CopyFileWithMsg(Game.SetupFile,Dir+ExtractFileName(Game.SetupFile)) then exit;
 
   S:=Dir+ChangeFileExt(ExtractFileName(Game.SetupFile),'.conf');
-  St:=BuildConfFile(Game,False,False);
-  try
-    try St.SaveToFile(S); except MessageDlg(Format(LanguageSetup.MessageCouldNotSaveFile,[S]),mtError,[mbOK],0); exit; end;
-  finally
-    St.Free;
+  If DOSBoxMode(Game) then begin
+    St:=BuildConfFile(Game,False,False);
+    try
+      try St.SaveToFile(S); except MessageDlg(Format(LanguageSetup.MessageCouldNotSaveFile,[S]),mtError,[mbOK],0); exit; end;
+    finally
+      St.Free;
+    end;
+  end;
+  If ScummVMMode(Game) then begin
+    St:=BuildScummVMIniFile(Game);
+    try
+      try St.SaveToFile(S); except MessageDlg(Format(LanguageSetup.MessageCouldNotSaveFile,[S]),mtError,[mbOK],0); exit; end;
+    finally
+      St.Free;
+    end;
   end;
 
   If ScummVMMode(Game) then begin
@@ -89,6 +142,19 @@ begin
         result:=False; exit;
       end;
       if not CopyFolderWithMsg(MakeAbsPath(S,PrgSetup.BaseDir),MakeAbsPath(S,Dir)) then exit;
+    end;
+    S:=Trim(Game.ScummVMZip);
+    If S<>'' then begin
+      S:=MakeRelPath(S,PrgSetup.BaseDir);
+      If Copy(S,2,2)=':\' then begin
+        MessageDlg(Format(LanguageSetup.MessagePathNotRelative,[S,Game.Name,PrgSetup.BaseDir]),mtError,[mbOK],0);
+        result:=False; exit;
+      end;
+      T:=ExtractFilePath(S);
+      If (T<>'') and (T[1]='.') then Delete(T,1,1);
+      If (T<>'') and (T[1]='\') then Delete(T,1,1);
+      If (T<>'') and (T[length(T)]='\') then Delete(T,length(T),1);
+      if not CopyFileWithMsg(MakeAbsPath(S,PrgSetup.BaseDir),Dir+T+'\'+ExtractFileName(S)) then exit;
     end;
     S:=Trim(Game.ScummVMSavePath);
     If S<>'' then begin
@@ -217,6 +283,8 @@ begin
     Folders.Free;
   end;
 
+  CreateInfoFile(Game, Dir);
+
   result:=True;
 end;
 
@@ -242,7 +310,7 @@ begin
           if not DeleteTempDir(Dir+Rec.Name+'\',ContinueNext) then exit;
         end;
       end else begin
-        if not DeleteSingleFile(Dir+Rec.Name,ContinueNext) then exit;
+        if not DeleteSingleFile(Dir+Rec.Name,ContinueNext,ftZipOperation) then exit;
       end;
       I:=FindNext(Rec);
     end;
@@ -251,7 +319,7 @@ begin
   end;
 
   repeat
-    if not RemoveDir(Dir) then begin
+    if not ExtDeleteFolder(Dir,ftZipOperation) then begin
       Case MessageDlg(Format(LanguageSetup.MessageCouldNotDeleteDir,[Dir])+#13+#13+SysErrorMessage(GetLastError),mtError,[mbAbort,mbRetry,mbIgnore],0) of
         mrIgnore : begin ContinueNext:=True; exit; end;
         mrRetry : ;

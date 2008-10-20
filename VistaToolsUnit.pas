@@ -8,6 +8,7 @@ procedure SetVistaFonts(const AForm: TCustomForm); overload;
 procedure SetVistaFonts(const AFrame: TFrame); overload;
 procedure SetVistaFonts(const ASpeedButton: TSpeedButton); overload;
 procedure SetVistaFonts(const AToolbar: TToolbar); overload;
+procedure SetVistaFonts(const AHintWindow: THintWindow); overload;
 
 procedure SetVistaFontsOnly(const Font: TFont); overload;
 
@@ -52,6 +53,11 @@ end;
 procedure SetVistaFonts(const AToolbar: TToolbar);
 begin
   SetVistaFonts(AToolbar.Font);
+end;
+
+procedure SetVistaFonts(const AHintWindow: THintWindow); overload;
+begin
+  SetVistaFonts(AHintWindow.Font);
 end;
 
 procedure SetVistaFontsOnly(const Font: TFont);

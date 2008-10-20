@@ -31,6 +31,10 @@ type
     GameButton: TSpeedButton;
     InfoLabel: TLabel;
     ExtraExeFilesButton: TBitBtn;
+    GameZipCheckBox: TCheckBox;
+    GameZipEdit: TEdit;
+    GameZipButton: TSpeedButton;
+    GameZipLabel: TLabel;
     procedure IconButtonClick(Sender: TObject);
     procedure ExeSelectButtonClick(Sender: TObject);
     procedure ProfileNameEditChange(Sender: TObject);
@@ -39,6 +43,7 @@ type
     procedure ExtraExeFilesButtonClick(Sender: TObject);
     procedure SetupExeEditChange(Sender: TObject);
     procedure GameExeEditChange(Sender: TObject);
+    procedure GameZipEditChange(Sender: TObject);
   private
     { Private-Deklarationen }
     FOnProfileNameChange : TTextEvent;
@@ -98,6 +103,8 @@ begin
   NoFlicker(GameGroup);
   NoFlicker(GameComboBox);
   NoFlicker(GameEdit);
+  NoFlicker(GameZipCheckBox);
+  NoFlicker(GameZipEdit);
 
   FOnProfileNameChange:=InitData.OnProfileNameChange;
 
@@ -124,6 +131,9 @@ begin
   GameGroup.Caption:=LanguageSetup.ProfileEditorScummVMGame;
   GameEdit.EditLabel.Caption:=LanguageSetup.ProfileEditorScummVMGameFolder;
   GameButton.Hint:=LanguageSetup.ChooseFolder;
+  GameZipCheckBox.Caption:=LanguageSetup.ProfileEditorScummVMGameZipFile;
+  GameZipButton.Hint:=LanguageSetup.ChooseFile;
+  GameZipLabel.Caption:=LanguageSetup.ProfileEditorScummVMGameZipFileInfo;
 
   ProfileName:=InitData.CurrentProfileName;
   ProfileExe:=InitData.CurrentProfileExe;
@@ -185,6 +195,8 @@ begin
       break;
     end;
     GameEdit.Text:=Game.ScummVMPath;
+    GameZipEdit.Text:=Trim(Game.ScummVMZip);
+    GameZipCheckBox.Checked:=(GameZipEdit.Text<>'');
   end else begin
     If WindowsExeMode(Game) then begin
       { Windows mode }
@@ -229,6 +241,9 @@ begin
     GameGroup.Visible:=True;
   end else begin
     GameGroup.Visible:=False;
+    GameExeGroup.Top:=GameGroup.Top;
+    SetupExeGroup.Top:=GameExeGroup.BoundsRect.Bottom+8;
+    ExtraExeFilesButton.Top:=SetupExeGroup.BoundsRect.Bottom+8;
     If WindowsMode then begin
       GameRelPathCheckBox.Visible:=False;
       SetupRelPathCheckBox.Visible:=False;
@@ -270,6 +285,12 @@ begin
       then Game.ScummVMGame:=ScummVMGamesList.NameFromDescription(GameComboBox.Text)
       else Game.ScummVMGame:='';
     Game.ScummVMPath:=GameEdit.Text;
+    If GameZipCheckBox.Checked then begin
+      Game.ScummVMZip:=Trim(GameZipEdit.Text);
+      GameZipEditChange(self);
+    end else begin
+      Game.ScummVMZip:='';
+    end;
   end else begin
     If WindowsMode then begin
       { Windows mode }
@@ -309,21 +330,35 @@ begin
 end;
 
 procedure TModernProfileEditorBaseFrame.GameExeEditChange(Sender: TObject);
+Var S : String;
 begin
-  FOnProfileNameChange(Sender,ProfileName^,GameExeEdit.Text,ProfileSetup^,ProfileScummVMGameName^,ProfileScummVMPath^);
+  If GameRelPathCheckBox.Checked then S:='DOSBox:' else S:='';
+  FOnProfileNameChange(Sender,ProfileName^,S+GameExeEdit.Text,ProfileSetup^,ProfileScummVMGameName^,ProfileScummVMPath^);
 end;
 
 procedure TModernProfileEditorBaseFrame.SetupExeEditChange(Sender: TObject);
+Var S : String;
 begin
-  FOnProfileNameChange(Sender,ProfileName^,ProfileExe^,SetupExeEdit.Text,ProfileScummVMGameName^,ProfileScummVMPath^);
+  If SetupRelPathCheckBox.Checked then S:='DOSBox:' else S:='';
+  FOnProfileNameChange(Sender,ProfileName^,ProfileExe^,S+SetupExeEdit.Text,ProfileScummVMGameName^,ProfileScummVMPath^);
 end;
 
 procedure TModernProfileEditorBaseFrame.RelPathCheckBoxClick(Sender: TObject);
+Var S,T : String;
 begin
   Case (Sender as TComponent).Tag of
     0 : GameExeButton.Visible:=not GameRelPathCheckBox.Checked;
     1 : SetupExeButton.Visible:=not SetupRelPathCheckBox.Checked;
   end;
+
+  If GameRelPathCheckBox.Checked then S:='DOSBox:' else S:='';
+  If SetupRelPathCheckBox.Checked then T:='DOSBox:' else T:='';
+  FOnProfileNameChange(Sender,ProfileName^,S+GameExeEdit.Text,T+SetupExeEdit.Text,ProfileScummVMGameName^,ProfileScummVMPath^);
+end;
+
+procedure TModernProfileEditorBaseFrame.GameZipEditChange(Sender: TObject);
+begin
+  If Trim(GameZipEdit.Text)<>'' then GameZipCheckBox.Checked:=True;
 end;
 
 procedure TModernProfileEditorBaseFrame.IconButtonClick(Sender: TObject);
@@ -404,6 +439,19 @@ begin
             S:=MakeAbsPath(GameEdit.Text,PrgSetup.BaseDir);
           end;
           If SelectDirectory(Handle,LanguageSetup.ProfileEditorScummVMGameFolderCaption,S) then GameEdit.Text:=MakeRelPath(S,PrgSetup.BaseDir);
+        end;
+    3 : begin
+          If Trim(GameZipEdit.Text)='' then begin
+            If PrgSetup.GameDir='' then S:=PrgSetup.BaseDir else S:=PrgSetup.GameDir;
+          end else S:=GameZipEdit.Text;
+          S:=MakeAbsPath(S,PrgSetup.BaseDir);
+          OpenDialog.DefaultExt:='zip';
+          OpenDialog.InitialDir:=ExtractFilePath(S);
+          OpenDialog.Title:=LanguageSetup.ProfileMountingZipFile;
+          OpenDialog.Filter:=LanguageSetup.ProfileMountingZipFileFilter2;
+          if not OpenDialog.Execute then exit;
+          GameZipEdit.Text:=MakeRelPath(OpenDialog.FileName,PrgSetup.BaseDir);
+          GameZipEditChange(Sender);
         end;
   end;
 end;

@@ -56,7 +56,7 @@ type
 var
   ProfileMountEditorForm: TProfileMountEditorForm;
 
-Function ShowProfileMountEditorDialog(const AOwner : TComponent; var AData : String; const AUsedDriveLetters : String; const ADefaultInitialDir : String; const AProfileFileName : String) : Boolean;
+Function ShowProfileMountEditorDialog(const AOwner : TComponent; var AData : String; const AUsedDriveLetters : String; const ADefaultInitialDir : String; const AProfileFileName : String; const NextFreeDriveLetter : String ='' {for adding new drives}) : Boolean;
 
 implementation
 
@@ -104,7 +104,9 @@ begin
 
   InfoData.Data:=Data;
   InfoData.UsedDriveLetters:=UsedDriveLetters;
-  InfoData.DefaultInitialDir:=DefaultInitialDir;
+  If ExtUpperCase(Copy(DefaultInitialDir,1,7))='DOSBOX:'
+    then InfoData.DefaultInitialDir:=MakeAbsPath(PrgSetup.GameDir,PrgSetup.BaseDir)
+    else InfoData.DefaultInitialDir:=DefaultInitialDir;
   InfoData.ProfileFileName:=ProfileFileName;
 
   If FrameI.Init(InfoData) then LastVisible:=I;
@@ -186,8 +188,13 @@ end;
 
 { global }
 
-Function ShowProfileMountEditorDialog(const AOwner : TComponent; var AData : String; const AUsedDriveLetters : String; const ADefaultInitialDir : String; const AProfileFileName : String) : Boolean;
+Function ShowProfileMountEditorDialog(const AOwner : TComponent; var AData : String; const AUsedDriveLetters : String; const ADefaultInitialDir : String; const AProfileFileName : String; const NextFreeDriveLetter : String) : Boolean;
+Var S : String;
 begin
+  If AData='' then begin
+    S:=Trim(PrgSetup.LastAddedDriveType); If S='' then S:='Drive';
+    AData:=';'+S+';'+NextFreeDriveLetter+';';
+  end;
   ProfileMountEditorForm:=TProfileMountEditorForm.Create(AOwner);
   try
     ProfileMountEditorForm.Data:=AData;
@@ -197,7 +204,15 @@ begin
     ProfileMountEditorForm.UsedDriveLetters:=AUsedDriveLetters;
     ProfileMountEditorForm.ProfileFileName:=AProfileFileName;
     result:=(ProfileMountEditorForm.ShowModal=mrOK);
-    if result then AData:=ProfileMountEditorForm.Data;
+    if result then begin
+      AData:=ProfileMountEditorForm.Data;
+      S:=Trim(AData);
+      If Pos(';',S)>0 then begin
+        S:=Trim(Copy(S,Pos(';',S)+1,MaxInt));
+        If Pos(';',S)>0 then S:=Trim(Copy(S,1,Pos(';',S)-1));
+        PrgSetup.LastAddedDriveType:=S;
+      end;
+    end;
   finally
     ProfileMountEditorForm.Free;
   end;

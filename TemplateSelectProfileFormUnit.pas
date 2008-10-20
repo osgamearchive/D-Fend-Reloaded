@@ -18,6 +18,7 @@ type
     procedure OKButtonClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure ListViewColumnClick(Sender: TObject; Column: TListColumn);
+    procedure ListViewDblClick(Sender: TObject);
   private
     { Private-Deklarationen }
     ListSort : TSortListBy;
@@ -74,6 +75,11 @@ procedure TTemplateSelectProfileForm.ListViewColumnClick(Sender: TObject; Column
 begin
   SetSortTypeByListViewCol(Column.Index,ListSort,ListSortReverse);
   LoadList;
+end;
+
+procedure TTemplateSelectProfileForm.ListViewDblClick(Sender: TObject);
+begin
+  OKButton.Click;
 end;
 
 procedure TTemplateSelectProfileForm.OKButtonClick(Sender: TObject);

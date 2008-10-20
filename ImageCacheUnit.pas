@@ -37,7 +37,7 @@ var IconCache : TImageCache = nil;
 
 implementation
 
-uses SysUtils, CommonTools;
+uses Windows, SysUtils, ShellAPI, CommonTools;
 
 { TImageData }
 
@@ -56,11 +56,21 @@ begin
 end;
 
 function TImageData.LoadIcon(const AFileName: String): Boolean;
+Var FileInfo: SHFILEINFO;
 begin
   result:=False;
   If not FileExists(AFileName) then exit;
   FIcon:=TIcon.Create;
-  try FIcon.LoadFromFile(AFileName); except FreeAndNil(FIcon); exit; end;
+  try
+    If ExtUpperCase(ExtractFileExt(AFileName))='.EXE' then begin
+      If SHGetFileInfo(PChar(AFileName), 0, FileInfo, SizeOf(FileInfo), SHGFI_ICON)<>0 then FIcon.Handle:=FileInfo.hIcon;
+    end else begin
+      FIcon.LoadFromFile(AFileName);
+    end;
+  except
+    FreeAndNil(FIcon);
+    exit;
+  end;
   FPath:=IncludeTrailingPathDelimiter(ExtUpperCase(ExtractFilePath(AFileName)));
   result:=True;
 end;
@@ -110,23 +120,16 @@ begin
 end;
 
 function TImageCache.FindFile(const AFileName: String): Integer;
-Var S,T,U : String;
-    MinPos,MaxPos,I : Integer;
+Var S,T : String;
+    MinPos,I : Integer;
 begin
   result:=-1;
   S:=ExtUpperCase(ExtractFileName(AFileName));
   T:=IncludeTrailingPathDelimiter(ExtUpperCase(ExtractFilePath(AFileName)));
 
-  MinPos:=0; MaxPos:=FImageList.Count-1;
-  If MaxPos<0 then exit;
-  while MaxPos-MinPos>5 do begin
-    I:=(MaxPos+MinPos) div 2;
-    U:=FImageList[I];
-    If U=S then begin result:=I; exit; end;
-    If U<S then MinPos:=I else MaxPos:=I;
-  end;
-  While (FImageList[MinPos]>=S) and (MinPos>0) do dec(MinPos);
-
+  MinPos:=FImageList.IndexOf(S);
+  If MinPos<0 then exit;
+  While (MinPos>0) and (FImageList[MinPos-1]=S) do dec(MinPos);
   For I:=MinPos to FImageList.Count-1 do If (FImageList[I]=S) and (TImageData(FImageList.Objects[I]).Path=T) then begin result:=I; exit; end;
 end;
 

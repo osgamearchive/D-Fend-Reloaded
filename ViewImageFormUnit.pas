@@ -44,10 +44,12 @@ type
     procedure FormMouseWheel(Sender: TObject; Shift: TShiftState;
       WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
     procedure FormResize(Sender: TObject);
+    procedure ZoomPopupMenuPopup(Sender: TObject);
   private
     { Private-Deklarationen }
     Procedure CenterWindow;
     Procedure LoadImage(const MoveWindow : Boolean);
+    Procedure Zoom(const ZoomDirection : Integer);
   public
     { Public-Deklarationen }
     ImageFile : String;
@@ -68,11 +70,19 @@ uses Math, ClipBrd, VistaToolsUnit, LanguageSetupUnit, PNGImage, CommonTools,
 
 procedure TViewImageForm.CenterWindow;
 Var P : TForm;
+    F : TFrame;
 begin
-  P:=(Owner as TForm);
+  If Owner is TForm then begin
+    P:=Owner as TForm;
+    Left:=Max(0,(P.Left+P.Width div 2)-Width div 2);
+    Top:=Max(0,(P.Top+P.Height div 2)-Height div 2);
+  end;
 
-  Left:=Max(0,(P.Left+P.Width div 2)-Width div 2);
-  Top:=Max(0,(P.Top+P.Height div 2)-Height div 2);
+  If Owner is TFrame then begin
+    F:=Owner as TFrame;
+    Left:=Max(0,(F.Left+F.Width div 2)-Width div 2);
+    Top:=Max(0,(F.Top+F.Height div 2)-Height div 2);
+  end;
 end;
 
 procedure TViewImageForm.FormCreate(Sender: TObject);
@@ -83,12 +93,21 @@ begin
 
   Caption:=LanguageSetup.ViewImageForm;
   PreviousButton.Caption:=LanguageSetup.Previous;
+  PreviousButton.Hint:=LanguageSetup.PreviousHintMediaViewer;
   NextButton.Caption:=LanguageSetup.Next;
+  NextButton.Hint:=LanguageSetup.NextHintMediaViewer;
   CopyButton.Caption:=LanguageSetup.Copy;
+  CopyButton.Hint:=LanguageSetup.CopyHintImageViewer;
   SaveButton.Caption:=LanguageSetup.Save;
+  SaveButton.Hint:=LanguageSetup.SaveHintImageViewer;
   ClearButton.Caption:=LanguageSetup.Clear;
+  ClearButton.Hint:=LanguageSetup.ClearMediaViewer;
   ZoomButton.Caption:=LanguageSetup.ViewImageFormZoomButton;
+  ZoomButton.Hint:=LanguageSetup.ViewImageFormZoomButtonHint;
   BackgroundButton.Caption:=LanguageSetup.ViewImageFormBackgroundButton;
+  BackgroundButton.Hint:=LanguageSetup.ViewImageFormBackgroundButtonHint;
+
+  CoolBar.Font.Size:=PrgSetup.ToolbarFontSize;
 
   PrevImages:=TStringList.Create;
   NextImages:=TStringList.Create;
@@ -116,6 +135,44 @@ begin
   ClientWidth:=Min(Max(850,W),Screen.WorkAreaWidth-10-(Width-Image.ClientWidth));
 
   If MoveWindow or (Left+Width>=Screen.WorkAreaWidth-10) or (Top+Height>=Screen.WorkAreaHeight-10) then CenterWindow;
+
+  FormResize(self);
+end;
+
+procedure TViewImageForm.Zoom(const ZoomDirection: Integer);
+Var I,J : Integer;
+    F : Double;
+begin
+  I:=Round(Image.ClientWidth/Image.Picture.Width*100);
+  J:=Round(Image.ClientHeight/Image.Picture.Height*100);
+
+  I:=Round(Min(I,J)/25)*25;
+  If ZoomDirection=0 then I:=100 else begin
+    If ZoomDirection<0 then I:=Max(10,I-25) else I:=Max(10,I+25);
+  end;
+
+  F:=I/100;
+  ClientHeight:=Min(Max(100,Round(F*Image.Picture.Height)+(ClientHeight-Image.Height)),Screen.WorkAreaHeight-10);
+  ClientWidth:=Min(Max(850,Round(F*Image.Picture.Width)),Screen.WorkAreaWidth-10);
+  CenterWindow;
+end;
+
+procedure TViewImageForm.ZoomPopupMenuPopup(Sender: TObject);
+Var I,J : Integer;
+    S : String;
+begin
+  I:=Round(Image.ClientWidth/Image.Picture.Width*100);
+  J:=Round(Image.ClientHeight/Image.Picture.Height*100);
+  J:=Round(Min(I,J)/25)*25;
+
+  For I:=0 to ZoomPopupMenu.Items.Count-1 do begin
+    ZoomPopupMenu.Items[I].ShortCut:=0;
+    S:=RemoveUnderline(ZoomPopupMenu.Items[I].Caption);
+    ZoomPopupMenu.Items[I].Enabled:=(S<>IntToStr(J)+'%');
+    If S=IntToStr(J-25)+'%' then ZoomPopupMenu.Items[I].ShortCut:=ShortCut(VK_OEM_MINUS,[]);
+    If S=IntToStr(J+25)+'%' then ZoomPopupMenu.Items[I].ShortCut:=ShortCut(VK_OEM_PLUS,[]);
+    If S='100%' then ZoomPopupMenu.Items[I].ShortCut:=ShortCut(ord('0'),[]);
+  end;
 end;
 
 procedure TViewImageForm.ButtonWork(Sender: TObject);
@@ -126,13 +183,14 @@ begin
   Case (Sender as TComponent).Tag of
     1 : Clipboard.Assign(Image.Picture);
     2 : begin
+          SaveDialog.FileName:='';
           SaveDialog.Title:=LanguageSetup.ViewImageFormSaveTitle;
           SaveDialog.Filter:=LanguageSetup.ViewImageFormSaveFilter;
           if not SaveDialog.Execute then exit;
-          SaveImageToFile(Image.Picture,SaveDialog.FileName);
+          SaveImageToFile(ImageFile,SaveDialog.FileName);
         end;
     3 : begin
-          if not DeleteFile(ImageFile) then begin
+          if not ExtDeleteFile(ImageFile,ftMediaViewer) then begin
             MessageDlg(Format(LanguageSetup.MessageCouldNotDeleteFile,[ImageFile]),mtError,[mbOK],0);
             exit;
           end;
@@ -173,16 +231,23 @@ end;
 
 procedure TViewImageForm.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
-  If Shift<>[] then exit;
-  Case Key of
+  If Shift=[] then Case Key of
     VK_LEFT, VK_UP, VK_PRIOR : ButtonWork(PreviousButton);
     VK_RIGHT, VK_DOWN, VK_NEXT : ButtonWork(NextButton);
+    VK_ADD, VK_OEM_PLUS : Zoom(1);
+    VK_SUBTRACT, VK_OEM_MINUS  : Zoom(-1);
+    ord('0'), VK_MULTIPLY, VK_NUMPAD0 : Zoom(0);
+    VK_ESCAPE : Close;
   end;
 end;
 
 procedure TViewImageForm.FormMouseWheel(Sender: TObject; Shift: TShiftState; WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
 begin
-  If WheelDelta>0 then ButtonWork(PreviousButton) else ButtonWork(NextButton);
+  If Shift=[] then begin
+    If WheelDelta>0 then ButtonWork(PreviousButton) else ButtonWork(NextButton);
+  end else begin
+    If WheelDelta>0 then Zoom(-1) else Zoom(1);
+  end;
 end;
 
 procedure TViewImageForm.FormResize(Sender: TObject);
@@ -203,11 +268,18 @@ end;
 
 Procedure ShowImageDialog(const AOwner : TComponent; const AImageFile : String; const APrevImages, ANextImages : TStringList);
 begin
+  If OpenMediaFile(PrgSetup.ImageViewer,AImageFile) then exit;
+
   ViewImageForm:=TViewImageForm.Create(AOwner);
   try
     ViewImageForm.ImageFile:=AImageFile;
     If APrevImages<>nil then ViewImageForm.PrevImages.Assign(APrevImages);
     If ANextImages<>nil then ViewImageForm.NextImages.Assign(ANextImages);
+    If (APrevImages=nil) and (ANextImages=nil) then begin
+      ViewImageForm.PreviousButton.Visible:=False;
+      ViewImageForm.NextButton.Visible:=False;
+      ViewImageForm.ToolButton2.Visible:=False;
+    end;
     ViewImageForm.ShowModal;
   finally
     ViewImageForm.Free;

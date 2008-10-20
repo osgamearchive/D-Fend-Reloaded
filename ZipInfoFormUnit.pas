@@ -89,7 +89,7 @@ begin
       If (FDeleteMode<>dmNoNoWarning) and (FDeleteMode<>dmFilesNoWarning) and (FDeleteMode<>dmFolderNoWarning) then begin
         If MessageDlg(Format(LanguageSetup.ZipFormOverwriteWarning,[ZipFile]),mtWarning,[mbYes,mbNo],0)<>mrYes then exit;
       end;
-      If not DeleteFile(ZipFile) then begin MessageDlg(Format(LanguageSetup.MessageCouldNotDeleteFile,[ZipFile]),mtError,[mbOK],0); exit; end;
+      If not ExtDeleteFile(ZipFile,ftZipOperation) then begin MessageDlg(Format(LanguageSetup.MessageCouldNotDeleteFile,[ZipFile]),mtError,[mbOK],0); exit; end;
     end;
   end;
 
@@ -370,7 +370,7 @@ begin
           if not DeleteFolder(Folder+Rec.Name,False) then exit;
         end;
       end else begin
-        If not DeleteFile(Folder+Rec.Name) then begin
+        If not ExtDeleteFile(Folder+Rec.Name,ftZipOperation) then begin
           MessageDlg(Format(LanguageSetup.MessageCouldNotDeleteFile,[Folder+Rec.Name]),mtError,[mbOK],0);
           exit;
         end;
@@ -382,7 +382,7 @@ begin
   end;
 
   If (not ThisIsMainFolder) or (FDeleteMode=dmFolder) or (FDeleteMode=dmFolderNoWarning) then begin
-    if not RemoveDirectory(PChar(Folder)) then begin
+    if not ExtDeleteFolder(Folder,ftZipOperation) then begin
       MessageDlg(Format(LanguageSetup.MessageCouldNotDeleteDir,[Folder]),mtError,[mbOK],0);
       exit;
     end;
