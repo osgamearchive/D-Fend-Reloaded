@@ -298,5 +298,7 @@
     <Transaction>2008.10.05 18:25:32.905.dfm,C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\Unit1.dfm=C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\ModernProfileEditorHelperProgramsFrameUnit.dfm</Transaction>
     <Transaction>2008.10.17 11:50:13.211.pas,C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\Unit1.pas=C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\SetupFrameWindowsGamesUnit.pas</Transaction>
     <Transaction>2008.10.17 11:50:13.241.dfm,C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\Unit1.dfm=C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\SetupFrameWindowsGamesUnit.dfm</Transaction>
+    <Transaction>2008.10.21 10:10:54.827.pas,C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\Unit1.pas=C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\SetupFrameZipPrgsUnit.pas</Transaction>
+    <Transaction>2008.10.21 10:10:54.827.dfm,C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\Unit1.dfm=C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\SetupFrameZipPrgsUnit.dfm</Transaction>
   </Transactions>
 </BorlandProject>

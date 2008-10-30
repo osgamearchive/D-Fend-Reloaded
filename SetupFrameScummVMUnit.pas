@@ -37,8 +37,9 @@ type
 
 implementation
 
-uses ShellAPI, LanguageSetupUnit, VistaToolsUnit, PrgSetupUnit, CommonTools,
-     ScummVMToolsUnit, SetupDosBoxFormUnit, ListScummVMGamesFormUnit, HelpConsts;
+uses ShellAPI, ShlObj, LanguageSetupUnit, VistaToolsUnit, PrgSetupUnit,
+     CommonTools, ScummVMToolsUnit, SetupDosBoxFormUnit,
+     ListScummVMGamesFormUnit, HelpConsts;
 
 {$R *.dfm}
 
@@ -130,6 +131,7 @@ begin
   Case (Sender as TComponent).Tag of
    16 : begin
           S:=ScummVMDirEdit.Text;
+          If S='' then S:=GetSpecialFolder(Application.MainForm.Handle,CSIDL_PROGRAM_FILES);
           if SelectDirectory(Handle,LanguageSetup.SetupFormScummVMDir,S) then ScummVMDirEdit.Text:=S;
         end;
    17 : if SearchScummVM(self) then ScummVMDirEdit.Text:=PrgSetup.ScummVMPath;

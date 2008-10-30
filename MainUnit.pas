@@ -10,11 +10,11 @@ uses
 
 {
 0.7:
-- Changelog: Statistic functions in history dialog, Profile editor: Run program before/after main program, Setup dialog: Use program icon for Windows profiles if no icon is defined, Setup dialog: Restore program window after ScummVM quits, Setup dialog: Minimize/restore program window when Windows game is started/quits, Creating auto setup templates via the export menu, Warning messages
+- Changelog: Statistic functions in history dialog, Profile editor: Run program before/after main program, Setup dialog: Use program icon for Windows profiles if no icon is defined, Setup dialog: Restore program window after ScummVM quits, Setup dialog: Minimize/restore program window when Windows game is started/quits, Creating auto setup templates via the export menu, Warning messages, external zip support
 - Change default value for WindowsExeIcons (SetupFrameGamesListAppearanceUnit and PrgSetupUnit) / Remove ActivateIncompleteFeatures
-- Help pages for ModernProfileEditorHelperProgramsFrameUnit, SetupFrameWindowsGamesUnit, (only update) CreateConfFormUnit, (only update) SetupFrameDOSBoxUnit
-
-- Support external zip packers
+- Help pages for ModernProfileEditorHelperProgramsFrameUnit, SetupFrameWindowsGamesUnit, (only update) CreateConfFormUnit, (only update) SetupFrameDOSBoxUnit, SetupFrameZipPrgs
+- Support external zip packers: Zip file select dialogs
+- Wave encoder: %s -> %1, %2 (auto change old settings, update help)
 - more scummVM special settings for some games
 - ScummVM:
   - Add 'do not use' to joystick selector like in CD-ROM selector
@@ -24,18 +24,18 @@ uses
   - soundfont - (any file) presently it is used only for fluidsynt as midi_gain (not available under windows). But maybe in future version we will have it.
   - language - move hardcoded values to default list. And may be add checkbox for use any language from full list (to support future fan/official translations)
   - extrapath - allow game to specify folder with its own extra data (and don't write empty value, [scummvm] section should have default).
-- cue/bin support in open dialogs
 - Auto search for cd-roms (change profile to CD drive with mounted CD, or ask user)
 - CD mount based on drive label or certain file location
 - Wizard:
   - Option to scan VirtualHD for new games and automatically add them
   - "I'm happy" mode: Just filename, all others things automatically
-- Importing of zip files without prof file (expand, than I'm happy installation)
-<beta1>
+- Importing of zip files without prof file (expand, then I'm happy installation)
 - Default DOSBox keyboard layout/code page in setup dialog
 - Move config files in own subfolder (update Introduction.html)
 - More CVS settings (CPU type, 0x0, pixelshader, securemode etc.)
 - Solve possible directory collisions when importing packages / transfering profiles
+- Make "Genre" and "Language" fields in game information translateable
+- More default settings for packers
 - Use one imagelist for all icons (change icons.ini)
 - Chinese and Danish translation for D-Fend Reloaded DataInstaller.nsi
 
@@ -1080,8 +1080,8 @@ begin
 
   InitViewStyle;
   with ScreenshotListView do begin ViewStyle:=vsReport; ViewStyle:=vsIcon; end;
-  with SoundListView do begin ViewStyle:=vsReport; ViewStyle:=vsIcon; end;
-  with VideoListView do begin ViewStyle:=vsReport; ViewStyle:=vsIcon; end;
+  with SoundListView do begin ViewStyle:=vsReport; ViewStyle:=vsList; end;
+  with VideoListView do begin ViewStyle:=vsReport; ViewStyle:=vsList; end;
 
   ProcessParams;
 
@@ -1195,7 +1195,11 @@ begin
         then AddGamesToList(ListView,IL2,IL1,ImageList,GameDB,TreeView.Selected.Text,'',S,PrgSetup.ShowExtraInfo,ListSort,ListSortReverse,False,MenuViewsScreenshots.Checked)
         else AddGamesToList(ListView,IL2,IL1,ImageList,GameDB,TreeView.Selected.Parent.Text,TreeView.Selected.Text,S,PrgSetup.ShowExtraInfo,ListSort,ListSortReverse,False,MenuViewsScreenshots.Checked);
     end;
-    If G<>nil then SelectGame(G);
+    If G<>nil then begin
+      SelectGame(G);
+    end else begin
+      If ListView.Items.Count>0 then SelectGame(TGame(ListView.Items[0].Data));
+    end;
   finally
     ListView.Items.EndUpdate;
   end;
@@ -1394,8 +1398,11 @@ begin
 end;
 
 Procedure TDFendReloadedMainForm.UpdateScreenshotList;
-Var S : String;
+Var S,SelItem : String;
+    I : Integer;
 begin
+  SelItem:='';
+  If ScreenshotListView.Selected<>nil then SelItem:=ScreenshotListView.Selected.Caption;
   ScreenshotListView.Items.BeginUpdate;
   try
     ScreenshotListView.Items.Clear;
@@ -1407,6 +1414,10 @@ begin
     end;
   finally
     ScreenshotListView.Items.EndUpdate;
+  end;
+  For I:=0 to ScreenshotListView.Items.Count-1 do If ScreenshotListView.Items[I].Caption=SelItem then begin
+    ScreenshotListView.Selected:=ScreenshotListView.Items[I];
+    break;
   end;
 
   ScreenshotsInfoPanel.Visible:=(ScreenshotListView.Items.Count=0) and (ListView.Selected<>nil);
@@ -1422,6 +1433,8 @@ begin
   end;
   ScreenshotListViewSelectItem(self,ScreenshotListView.Selected,True);
 
+  SelItem:='';
+  If SoundListView.Selected<>nil then SelItem:=SoundListView.Selected.Caption;
   SoundListView.Items.BeginUpdate;
   try
     SoundListView.Items.Clear;
@@ -1433,10 +1446,16 @@ begin
   finally
     SoundListView.Items.EndUpdate;
   end;
+  For I:=0 to SoundListView.Items.Count-1 do If SoundListView.Items[I].Caption=SelItem then begin
+    SoundListView.Selected:=SoundListView.Items[I];
+    break;
+  end;
   SoundInfoPanel.Visible:=(SoundListView.Items.Count=0) and (ListView.Selected<>nil) and (not ScummVMMode(TGame(ListView.Selected.Data))) and (not WindowsExeMode(TGame(ListView.Selected.Data)));
   SoundInfoPanel.Height:=IfThen(SoundInfoPanel.Visible,17,0);
   SoundListViewSelectItem(self,SoundListView.Selected,True);
 
+  SelItem:='';
+  If VideoListView.Selected<>nil then SelItem:=VideoListView.Selected.Caption;
   VideoListView.Items.BeginUpdate;
   try
     VideoListView.Items.Clear;
@@ -1447,6 +1466,10 @@ begin
     end;
   finally
     VideoListView.Items.EndUpdate;
+  end;
+  For I:=0 to VideoListView.Items.Count-1 do If VideoListView.Items[I].Caption=SelItem then begin
+    VideoListView.Selected:=VideoListView.Items[I];
+    break;
   end;
   VideoInfoPanel.Visible:=(VideoListView.Items.Count=0) and (ListView.Selected<>nil) and (not ScummVMMode(TGame(ListView.Selected.Data))) and (not WindowsExeMode(TGame(ListView.Selected.Data)));
   VideoInfoPanel.Height:=IfThen(VideoInfoPanel.Visible,17,0);
@@ -2085,6 +2108,7 @@ begin
                G:=TGame(ListView.Selected.Data);
                ListView.Selected:=nil;
                ListView.Items.Clear;
+               ViewFilesFrame.SetGame(nil);
                UninstallGame(self,GameDB,G);
                InitTreeViewForGamesList(TreeView,GameDB);
                TreeViewChange(Sender,TreeView.Selected);
@@ -2173,6 +2197,7 @@ begin
       5006 : begin
                ListView.Selected:=nil;
                ListView.Items.Clear;
+               ViewFilesFrame.SetGame(nil);
                UninstallMultipleGames(self,GameDB);
                InitTreeViewForGamesList(TreeView,GameDB);
                TreeViewChange(Sender,TreeView.Selected);
@@ -2572,8 +2597,15 @@ begin
           If not InputQuery(LanguageSetup.ScreenshotPopupRenameCaption,LanguageSetup.ScreenshotPopupRenameLabel,T) then exit;
           T:=T+ExtractFileExt(ScreenshotListView.Selected.Caption);
           If not RenameFile(S+ScreenshotListView.Selected.Caption,S+T) then
-            MessageDlg(Format(LanguageSetup.MessageCouldNotRenameFile,[S+SoundListView.Selected.Caption,S+T]),mtError,[mbOK],0);
+            MessageDlg(Format(LanguageSetup.MessageCouldNotRenameFile,[S+ScreenshotListView.Selected.Caption,S+T]),mtError,[mbOK],0);
           ListViewSelectItem(Sender,ListView.Selected,True);
+          T:=Trim(ExtUpperCase(T));
+          For I:=0 to ScreenshotListView.Items.Count-1 do
+            If Trim(ExtUpperCase(ScreenshotListView.Items[I].Caption))=T then begin
+            ScreenshotListView.Selected:=ScreenshotListView.Items[I];
+            break;
+          end;
+          ScreenshotListViewSelectItem(Sender,ScreenshotListView.Selected,ScreenshotListView.Selected<>nil);
         end;
     9 : If (ScreenshotListView.Selected<>nil) and (ListView.Selected<>nil) then begin
           S:=ScreenshotListView.Selected.Caption;
@@ -2760,6 +2792,13 @@ begin
           If not RenameFile(S+SoundListView.Selected.Caption,S+T) then
             MessageDlg(Format(LanguageSetup.MessageCouldNotRenameFile,[S+SoundListView.Selected.Caption,S+T]),mtError,[mbOK],0);
           ListViewSelectItem(Sender,ListView.Selected,True);
+          T:=Trim(ExtUpperCase(T));
+          For I:=0 to SoundListView.Items.Count-1 do
+            If Trim(ExtUpperCase(SoundListView.Items[I].Caption))=T then begin
+            SoundListView.Selected:=SoundListView.Items[I];
+            break;
+          end;
+          SoundListViewSelectItem(Sender,SoundListView.Selected,SoundListView.Selected<>nil);
         end;
   end;
 end;
@@ -2869,6 +2908,13 @@ begin
           If not RenameFile(S+VideoListView.Selected.Caption,S+T) then
             MessageDlg(Format(LanguageSetup.MessageCouldNotRenameFile,[S+VideoListView.Selected.Caption,S+T]),mtError,[mbOK],0);
           ListViewSelectItem(Sender,ListView.Selected,True);
+          T:=Trim(ExtUpperCase(T));
+          For I:=0 to VideoListView.Items.Count-1 do
+            If Trim(ExtUpperCase(VideoListView.Items[I].Caption))=T then begin
+            VideoListView.Selected:=VideoListView.Items[I];
+            break;
+          end;
+          VideoListViewSelectItem(Sender,VideoListView.Selected,VideoListView.Selected<>nil);
         end;
   end;
 end;

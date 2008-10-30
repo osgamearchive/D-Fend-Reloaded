@@ -12,6 +12,9 @@ type
     Command2Edit: TLabeledEdit;
     Command1CheckBox: TCheckBox;
     Command2CheckBox: TCheckBox;
+    RunMinimized1CheckBox: TCheckBox;
+    Wait1CheckBox: TCheckBox;
+    RunMinimized2CheckBox: TCheckBox;
     procedure Command1EditChange(Sender: TObject);
     procedure Command2EditChange(Sender: TObject);
   private
@@ -37,13 +40,19 @@ procedure TModernProfileEditorHelperProgramsFrame.InitGUI(const InitData: TModer
 begin
   NoFlicker(Command1CheckBox);
   NoFlicker(Command1Edit);
+  NoFlicker(RunMinimized1CheckBox);
+  NoFlicker(Wait1CheckBox);
   NoFlicker(Command2CheckBox);
   NoFlicker(Command2Edit);
+  NoFlicker(RunMinimized2CheckBox);
 
   Command1CheckBox.Caption:=LanguageSetup.ProfileEditorHelperProgramsRunBefore;
   Command1Edit.EditLabel.Caption:=LanguageSetup.ProfileEditorHelperProgramsRunBeforeEditLabel;
+  RunMinimized1CheckBox.Caption:=LanguageSetup.ProfileEditorHelperProgramsRunMinimized;
+  Wait1CheckBox.Caption:=LanguageSetup.ProfileEditorHelperProgramsRunWait;
   Command2CheckBox.Caption:=LanguageSetup.ProfileEditorHelperProgramsRunAfter;
   Command2Edit.EditLabel.Caption:=LanguageSetup.ProfileEditorHelperProgramsRunAfterEditLabel;
+  RunMinimized2CheckBox.Caption:=LanguageSetup.ProfileEditorHelperProgramsRunMinimized;
 
   HelpContext:=ID_ProfileEditHelperPrograms;
 end;
@@ -54,10 +63,13 @@ begin
   S:=Trim(Game.CommandBeforeExecution);
   Command1CheckBox.Checked:=(S<>'');
   Command1Edit.Text:=S;
+  RunMinimized1CheckBox.Checked:=Game.CommandBeforeExecutionMinimized;
+  Wait1CheckBox.Checked:=Game.CommandBeforeExecutionWait;
 
   S:=Trim(Game.CommandAfterExecution);
   Command2CheckBox.Checked:=(S<>'');
   Command2Edit.Text:=S;
+  RunMinimized2CheckBox.Checked:=Game.CommandAfterExecutionMinimized;
 end;
 
 procedure TModernProfileEditorHelperProgramsFrame.ShowFrame;
@@ -82,7 +94,10 @@ end;
 procedure TModernProfileEditorHelperProgramsFrame.GetGame(const Game: TGame);
 begin
   If Command1CheckBox.Checked then Game.CommandBeforeExecution:=Trim(Command1Edit.Text) else Game.CommandBeforeExecution:='';
+  Game.CommandBeforeExecutionMinimized:=RunMinimized1CheckBox.Checked;
+  Game.CommandBeforeExecutionWait:=Wait1CheckBox.Checked;
   If Command2CheckBox.Checked then Game.CommandAfterExecution:=Trim(Command2Edit.Text) else Game.CommandAfterExecution:='';
+  Game.CommandAfterExecutionMinimized:=RunMinimized2CheckBox.Checked;
 end;
 
 end.

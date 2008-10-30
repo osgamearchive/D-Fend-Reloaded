@@ -16,7 +16,8 @@
 <h1>Versionsgeschichte</h1>
 
 <p class="small">
-  <a href="#ver060">Version 0.6.0 (??.10.2008)</a><br />
+  <a href="#ver061">Version 0.6.1 (31.10.2008)</a><br />
+  <a href="#ver060">Version 0.6.0 (20.10.2008)</a><br />
   <a href="#ver050">Version 0.5.0 (22.08.2008)</a><br />
   <a href="#ver041">Version 0.4.1 (22.05.2008)</a><br />
   <a href="#ver040">Version 0.4.0 (14.05.2008)</a><br />
@@ -33,7 +34,24 @@
 Die einzelnen Eintr&auml;ge zur Versionsgeschichte liegen leider nur auf englisch vor.
 </p>
 
-<a onclick="Work('ver060')" name="ver060" href="#"><h2>&raquo; Version 0.6.0 (??.10.2008)</h2></a>
+<a onclick="Work('ver061')" name="ver061" href="#"><h2>&raquo; Version 0.6.1 (31.10.2008)</h2></a>
+<div id="ver061">
+<ul>
+  <li>Improved Windows long pathname to DOSBox short pathname converter (thanks to Alexander Katz).</li>
+  <li>The select image dialog for adding image files as harddisks in the profile editor will now also show cue sheet files.</li>
+  <li>Smarter initial directory when opening selection dialog for text editor, wave encoder and ScummVM.</li>
+  <li>[Fix] Opening text files in "Use default editor for file type" mode sometimes did not work.</li>
+  <li>[Fix] Sometimes an access violation occured just after uninstalling a game.</li>
+  <li>[Fix] Selecting/Unselecting profiles via the "Select by..." buttons in the "Build installer" dialog etc. did not work with "Not set" values.</li>
+  <li>[Fix] Wrong view style (icon instead of list) in the sounds and the videos previewer area at the bottom of the main window.</li>
+  <li>[Fix] Access violation while displaying an error message if renameing a screenshot is not possible (for example because a file with the new entered name already exists).</li>
+  <li>[Fix] Execution of Windows programs could fail under some rare conditions (this only affected helper programs like text editors etc. and not Windows games started via the games list).</li>
+  <li>[Fix] Problem if virtual serial port is working as a modem in DOSBox and "Listen for connections" is turned off.</li>
+  <li>[Fix] Screenshots, sounds and videos lists not always sorted correctly.</li>
+</ul>
+</div>
+
+<a onclick="Work('ver060')" name="ver060" href="#"><h2>&raquo; Version 0.6.0 (20.10.2008)</h2></a>
 <div id="ver060">
 <ul>
   <li>Polish language file (thanks to Adam Sosnowski)</li>

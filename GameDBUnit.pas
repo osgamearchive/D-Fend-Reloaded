@@ -241,6 +241,10 @@ const NR_Name=1;
 
       NR_CommandBeforeExecution=1450;
       NR_CommandAfterExecution=1451;
+      NR_CommandBeforeExecutionWait=1452;
+      NR_CommandBeforeExecutionMinimized=1453;
+      NR_CommandAfterExecutionMinimized=1454;
+
 
 const ScummVMSettings : Array[0..28] of Integer =(
   NR_ScummVMGame, NR_ScummVMPath, NR_ScummVMZip, NR_ScummVMFilter, NR_ScummVMAutosave,
@@ -258,8 +262,6 @@ Type TGame=class(TBasePrgSetup)
     Procedure SetExtraPrgFile(I : Integer; S : String);
     function GetMount(I: Integer): String;
     procedure SetMount(I: Integer; const Value: String);
-  protected
-    Procedure UpdatingFile; override;
   public
     CacheName, CacheNameUpper : String;
     CacheGenre, CacheGenreUpper : String;
@@ -272,6 +274,7 @@ Type TGame=class(TBasePrgSetup)
     Constructor Create(const ASetupFile : String); overload;
     Constructor Create(const ABasePrgSetup : TBasePrgSetup); overload;
     Destructor Destroy; override;
+    Procedure UpdateFile; override;
 
     Procedure LoadCache;
     Procedure ReloadINI; override;
@@ -470,6 +473,9 @@ Type TGame=class(TBasePrgSetup)
 
     property CommandBeforeExecution : String index NR_CommandBeforeExecution read GetString write SetString;
     property CommandAfterExecution : String index NR_CommandAfterExecution read GetString write SetString;
+    property CommandBeforeExecutionWait : Boolean index NR_CommandBeforeExecutionWait read GetBoolean write SetBoolean;
+    property CommandBeforeExecutionMinimized : Boolean index NR_CommandBeforeExecutionMinimized read GetBoolean write SetBoolean;
+    property CommandAfterExecutionMinimized : Boolean index NR_CommandAfterExecutionMinimized read GetBoolean write SetBoolean;
 end;
 
 Type TGameDB=class
@@ -495,11 +501,11 @@ Type TGameDB=class
     Function Delete(const AGame : TGame) : Boolean; overload;
     Function IndexOf(const AGame : TGame) : Integer; overload;
     Function IndexOf(const AGame : String) : Integer; overload;
-    Function GetGenreList(WithDefaultProfile : Boolean =True) : TStringList;
-    Function GetDeveloperList(WithDefaultProfile : Boolean =True) : TStringList;
-    Function GetPublisherList(WithDefaultProfile : Boolean =True) : TStringList;
-    Function GetYearList(WithDefaultProfile : Boolean =True) : TStringList;
-    Function GetLanguageList(WithDefaultProfile : Boolean =True) : TStringList;
+    Function GetGenreList(WithDefaultProfile : Boolean =True; const HideWindowsProfiles : Boolean = False) : TStringList;
+    Function GetDeveloperList(WithDefaultProfile : Boolean =True; const HideWindowsProfiles : Boolean = False) : TStringList;
+    Function GetPublisherList(WithDefaultProfile : Boolean =True; const HideWindowsProfiles : Boolean = False) : TStringList;
+    Function GetYearList(WithDefaultProfile : Boolean =True; const HideWindowsProfiles : Boolean = False) : TStringList;
+    Function GetLanguageList(WithDefaultProfile : Boolean =True; const HideWindowsProfiles : Boolean = False) : TStringList;
     Function GetKeyValueList(const Key : String; WithDefaultProfile : Boolean =True) : TStringList;
     Function GetUserKeys : TStringList;
     Function GetSortedGamesList : TList;
@@ -572,7 +578,8 @@ Const DefaultValuesResolution='original,320x200,640x432,640x480,720x480,800x600,
 
 implementation
 
-uses Windows, SysUtils, Dialogs, CommonTools, PrgConsts, PrgSetupUnit, LanguageSetupUnit;
+uses Windows, SysUtils, Dialogs, CommonTools, PrgConsts, PrgSetupUnit,
+     LanguageSetupUnit, GameDBToolsUnit;
 
 { TConfOpt }
 
@@ -849,6 +856,9 @@ begin
 
   AddStringRec(NR_CommandBeforeExecution,'ExtraCommands','BeforeExecution','');
   AddStringRec(NR_CommandAfterExecution,'ExtraCommands','AfterExecution','');
+  AddBooleanRec(NR_CommandBeforeExecutionWait,'ExtraCommands','BeforeExecution.Wait',True);
+  AddBooleanRec(NR_CommandBeforeExecutionMinimized,'ExtraCommands','BeforeExecution.Minimized',False);
+  AddBooleanRec(NR_CommandAfterExecutionMinimized,'ExtraCommands','AfterExecution.Minimized',False);
 end;
 
 Function TGame.GetExtraPrgFile(I : Integer) : String;
@@ -923,9 +933,9 @@ begin
   LoadCache;
 end;
 
-procedure TGame.UpdatingFile;
+procedure TGame.UpdateFile;
 begin
-  inherited UpdatingFile;
+  inherited UpdateFile;
   LastModification:=IntToStr(Round(Int(Now)))+'-'+IntToStr(Round(Frac(Now)*86400));
 end;
 
@@ -1130,7 +1140,7 @@ begin
   end;
 end;
 
-function TGameDB.GetGenreList(WithDefaultProfile : Boolean): TStringList;
+function TGameDB.GetGenreList(WithDefaultProfile : Boolean; const HideWindowsProfiles : Boolean): TStringList;
 Var StUpper : TStringList;
     I : Integer;
     S : String;
@@ -1139,6 +1149,7 @@ begin
   StUpper:=TStringList.Create;
   try
     For I:=0 to FGameList.Count-1 do If WithDefaultProfile or (TGame(FGameList[I]).Name<>DosBoxDOSProfile) then begin
+      If HideWindowsProfiles and WindowsExeMode(TGame(FGameList[I])) then continue;
       S:=ExtUpperCase(TGame(FGameList[I]).CacheGenre);
       If StUpper.IndexOf(S)<0 then begin
         StUpper.Add(S);
@@ -1152,7 +1163,7 @@ begin
   result.Sort;
 end;
 
-function TGameDB.GetDeveloperList(WithDefaultProfile : Boolean): TStringList;
+function TGameDB.GetDeveloperList(WithDefaultProfile : Boolean; const HideWindowsProfiles : Boolean): TStringList;
 Var StUpper : TStringList;
     I : Integer;
     S : String;
@@ -1161,6 +1172,7 @@ begin
   StUpper:=TStringList.Create;
   try
     For I:=0 to FGameList.Count-1 do If WithDefaultProfile or (TGame(FGameList[I]).Name<>DosBoxDOSProfile) then begin
+      If HideWindowsProfiles and WindowsExeMode(TGame(FGameList[I])) then continue;
       S:=ExtUpperCase(TGame(FGameList[I]).CacheDeveloper);
       If StUpper.IndexOf(S)<0 then begin
         StUpper.Add(S);
@@ -1174,7 +1186,7 @@ begin
   result.Sort;
 end;
 
-function TGameDB.GetPublisherList(WithDefaultProfile : Boolean): TStringList;
+function TGameDB.GetPublisherList(WithDefaultProfile : Boolean; const HideWindowsProfiles : Boolean): TStringList;
 Var StUpper : TStringList;
     I : Integer;
     S : String;
@@ -1183,6 +1195,7 @@ begin
   StUpper:=TStringList.Create;
   try
     For I:=0 to FGameList.Count-1 do If WithDefaultProfile or (TGame(FGameList[I]).Name<>DosBoxDOSProfile) then begin
+      If HideWindowsProfiles and WindowsExeMode(TGame(FGameList[I])) then continue;
       S:=ExtUpperCase(TGame(FGameList[I]).CachePublisher);
       If StUpper.IndexOf(S)<0 then begin
         StUpper.Add(S);
@@ -1196,7 +1209,7 @@ begin
   result.Sort;
 end;
 
-function TGameDB.GetYearList(WithDefaultProfile : Boolean): TStringList;
+function TGameDB.GetYearList(WithDefaultProfile : Boolean; const HideWindowsProfiles : Boolean): TStringList;
 Var StUpper : TStringList;
     I : Integer;
     S : String;
@@ -1205,6 +1218,7 @@ begin
   StUpper:=TStringList.Create;
   try
     For I:=0 to FGameList.Count-1 do If WithDefaultProfile or (TGame(FGameList[I]).Name<>DosBoxDOSProfile) then begin
+      If HideWindowsProfiles and WindowsExeMode(TGame(FGameList[I])) then continue;
       S:=ExtUpperCase(TGame(FGameList[I]).CacheYear);
       If Trim(S)='' then S:=LanguageSetup.NotSet;
       If StUpper.IndexOf(S)<0 then begin
@@ -1219,7 +1233,7 @@ begin
   result.Sort;
 end;
 
-function TGameDB.GetLanguageList(WithDefaultProfile : Boolean): TStringList;
+function TGameDB.GetLanguageList(WithDefaultProfile : Boolean; const HideWindowsProfiles : Boolean): TStringList;
 Var StUpper : TStringList;
     I : Integer;
     S : String;
@@ -1228,6 +1242,7 @@ begin
   StUpper:=TStringList.Create;
   try
     For I:=0 to FGameList.Count-1 do If WithDefaultProfile or (TGame(FGameList[I]).Name<>DosBoxDOSProfile) then begin
+      If HideWindowsProfiles and WindowsExeMode(TGame(FGameList[I])) then continue;
       S:=ExtUpperCase(TGame(FGameList[I]).CacheLanguage);
       If Trim(S)='' then S:=LanguageSetup.NotSet;
       If StUpper.IndexOf(S)<0 then begin

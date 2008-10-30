@@ -431,18 +431,18 @@ Var StartupInfo : TStartupInfo;
     ProcessInformation : TProcessInformation;
 begin
   StartupInfo.cb:=SizeOf(StartupInfo);
-  with StartupInfo do begin lpReserved:=nil; lpDesktop:=nil; dwFlags:=0; cbReserved2:=0; lpReserved2:=nil; end;
+  with StartupInfo do begin lpReserved:=nil; lpDesktop:=nil; lpTitle:=nil; dwFlags:=0; cbReserved2:=0; lpReserved2:=nil; end;
 
   If HideWindow then begin
     StartupInfo.dwFlags:=STARTF_USESHOWWINDOW;
     StartupInfo.wShowWindow:=SW_HIDE;
   end;
 
-  CreateProcess(PChar(PrgFile),PChar('"'+PrgFile+'"'),nil,nil,False,0,nil,PChar(Path),StartupInfo,ProcessInformation);
-
-  WaitForSingleObject(ProcessInformation.hThread,INFINITE);
-  CloseHandle(ProcessInformation.hThread);
-  CloseHandle(ProcessInformation.hProcess);
+  If CreateProcess(PChar(PrgFile),PChar('"'+PrgFile+'"'),nil,nil,False,0,nil,PChar(Path),StartupInfo,ProcessInformation) then begin
+    WaitForSingleObject(ProcessInformation.hThread,INFINITE);
+    CloseHandle(ProcessInformation.hThread);
+    CloseHandle(ProcessInformation.hProcess);
+  end;
 end;
 
 Function RunAndGetOutput(const PrgFile, Parameters : String; const HideWindow : Boolean): TStringList;
@@ -486,6 +486,7 @@ begin
       with StartupInfo do begin
         lpReserved:=nil;
         lpDesktop:=nil;
+        lpTitle:=nil;
         dwFlags:=STARTF_USESTDHANDLES;
         cbReserved2:=0;
         lpReserved2:=nil;
@@ -598,6 +599,7 @@ begin
         with StartupInfo do begin
           lpReserved:=nil;
           lpDesktop:=nil;
+          lpTitle:=nil;
           dwFlags:=STARTF_USESTDHANDLES;
           cbReserved2:=0;
           lpReserved2:=nil;
@@ -1300,7 +1302,10 @@ begin
     S:=Reg.ReadString('');
 
     {remove leading and trailing "}
-    If  (S<>'') and (S[1]='"') and (S[length(S)]='"') then S:=Copy(S,2,length(S)-2);
+    If  (S<>'') and (S[1]='"') then begin
+      Delete(S,1,1);
+      For I:=1 to length(S) do If S[I]='"' then begin Delete(S,I,1); break; end;
+    end;
 
     If RemoveParameters then begin
       {remove "%1"}
@@ -1423,7 +1428,7 @@ begin
     Editor:=Copy(Editor,1,I-1)+FileName+Copy(Editor,I+2,MaxInt);
     {ShellExecute(Application.MainForm.Handle,'open',PChar(Editor),nil,PChar(ExtractFilePath(FileName)),SW_SHOW);}
     StartupInfo.cb:=SizeOf(StartupInfo);
-    with StartupInfo do begin lpReserved:=nil; lpDesktop:=nil; dwFlags:=0; cbReserved2:=0; lpReserved2:=nil; end;
+    with StartupInfo do begin lpReserved:=nil; lpDesktop:=nil; lpTitle:=nil; dwFlags:=0; cbReserved2:=0; lpReserved2:=nil; end;
     CreateProcess(nil,PChar(Editor),nil,nil,False,0,nil,PChar(ExtractFilePath(FileName)),StartupInfo,ProcessInformation);
     CloseHandle(ProcessInformation.hThread);
     CloseHandle(ProcessInformation.hProcess);

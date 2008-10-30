@@ -44,6 +44,7 @@ type
     Procedure SevenZipProgress(Sender: TObject; Filename: WideString; FilePosArc, FilePosFile: Int64);
     Procedure SevenZipExtractOverwrite(Sender: TObject; FileName: WideString; var DoOverwrite: Boolean);
     Procedure SevenZipMessage( Sender: TObject; ErrCode: Integer; Message: string;Filename:Widestring );
+    Function ExternalWork(const Nr : Integer) : Boolean;
     Function DeleteFolder(Folder : String; const ThisIsMainFolder : Boolean) : Boolean;
     Function DeleteFiles : Boolean;
   public
@@ -59,6 +60,9 @@ var
 Function ExtractZipFile(const AOwner : TComponent; const AZipFile, ADestFolder : String) : Boolean;
 Function CreateZipFile(const AOwner : TComponent; const AZipFile, ADestFolder : String; const DeleteMode : TDeleteMode = dmNo; const CompressStrength : TCompressStrength = MAXIMUM) : Boolean;
 Function AddToZipFile(const AOwner : TComponent; const AZipFile, ADestFolder : String; const DeleteMode : TDeleteMode = dmNo; const CompressStrength : TCompressStrength = MAXIMUM) : Boolean;
+
+Function CheckExtensionsList(Extensions : String) : String;
+Function ExtensionInList(Extension, List : String) : Boolean;
 
 implementation
 
@@ -117,25 +121,45 @@ end;
 
 procedure TZipInfoForm.PostShow(var Msg: TMessage);
 Var Ext,SaveDir : String;
-    B : Boolean;
+    Ok, Handled : Boolean;
+    I : Integer;
 begin
   Start:=GetTickCount;
-  B:=False;
 
   SaveDir:=GetCurrentDir;
   try
     SetCurrentDir(ExtractFilePath(ExpandFileName(Application.ExeName)));
     Ext:=Trim(UpperCase(ExtractFileExt(ZipFile)));
-    If Ext='.ZIP' then B:=ZipWork;
-    If Ext='.7Z' then B:=SevenZipWork;
 
-    If B and ((Mode=zmCreateAndDelete) or (Mode=zmAddAndDelete)) then
-      B:=DeleteFiles;
+    If (Mode in [zmCreate, zmAdd, zmCreateAndDelete, zmAddAndDelete]) and (not DirectoryExists(Folder)) then begin
+      MessageDlg(Format(LanguageSetup.MessageDirectoryNotFound,[Folder]),mtError,[mbOk],0);
+      ModalResult:=mrCancel;
+      PostMessage(Handle,WM_CLOSE,0,0);
+      exit;
+    end;
+
+
+    Handled:=False; Ok:=False;
+    For I:=0 to PrgSetup.PackerSettingsCount-1 do If ExtensionInList(Ext,PrgSetup.PackerSettings[I].FileExtensions) then begin
+      Handled:=True;
+      Ok:=ExternalWork(I);
+    end;
+
+    If not Handled then begin
+      If Ext='.ZIP' then begin Handled:=True; Ok:=ZipWork; end;
+      If Ext='.7Z' then begin Handled:=True; Ok:=SevenZipWork; end;
+    end;
+
+    If not Handled then begin
+      MessageDlg(Format(LanguageSetup.ZipFormUnknownExtension,[Ext]),mtError,[mbOK],0);
+    end;
+
+    If Ok and ((Mode=zmCreateAndDelete) or (Mode=zmAddAndDelete)) then Ok:=DeleteFiles;
   finally
     SetCurrentDir(SaveDir);
   end;
 
-  If B then ModalResult:=mrOK else ModalResult:=mrCancel;
+  If Ok then ModalResult:=mrOK else ModalResult:=mrCancel;
   PostMessage(Handle,WM_CLOSE,0,0);
 end;
 
@@ -345,6 +369,63 @@ begin
   end;
 end;
 
+Function TZipInfoForm.ExternalWork(const Nr : Integer) : Boolean;
+Var PrgName,Parameters,ParametersOrig : String;
+    StartupInfo : TStartupInfo;
+    ProcessInformation : TProcessInformation;
+    I : Integer;
+begin
+  result:=True;
+
+  PrgName:=PrgSetup.PackerSettings[Nr].ZipFileName;
+  If not FileExists(PrgName) then begin
+    MessageDlg(Format(LanguageSetup.MessageFileNotFound,[PrgName]),mtError,[mbOK],0);
+    result:=False;
+    exit;
+  end;
+
+  Case Mode of
+    zmExtract : Parameters:=PrgSetup.PackerSettings[Nr].ExtractFile;
+    zmCreate, zmCreateAndDelete : Parameters:=PrgSetup.PackerSettings[Nr].CreateFile;
+    zmAdd, zmAddAndDelete : Parameters:=PrgSetup.PackerSettings[Nr].UpdateFile;
+  end;
+  ParametersOrig:=Parameters;
+
+  I:=Pos('%1',Parameters);
+  If I=0 then begin
+    MessageDlg(Format(LanguageSetup.ZipFormInvalidParameters,[ParametersOrig]),mtError,[mbOK],0);
+    result:=False;
+    exit;
+  end;
+  Parameters:=Copy(Parameters,1,I-1)+ZipFile+Copy(Parameters,I+2,MaxInt);
+
+  I:=Pos('%2',Parameters);
+  If I=0 then begin
+    MessageDlg(Format(LanguageSetup.ZipFormInvalidParameters,[ParametersOrig]),mtError,[mbOK],0);
+    result:=False;
+    exit;
+  end;
+  Parameters:=Copy(Parameters,1,I-1)+Folder+Copy(Parameters,I+2,MaxInt);
+
+  StartupInfo.cb:=SizeOf(StartupInfo);
+  with StartupInfo do begin lpReserved:=nil; lpDesktop:=nil; lpTitle:=nil; dwFlags:=0; cbReserved2:=0; lpReserved2:=nil; end;
+
+  If not CreateProcess(PChar(PrgName),PChar('"'+PrgName+'" '+Parameters),nil,nil,False,0,nil,nil,StartupInfo,ProcessInformation) then begin
+    MessageDlg(Format(LanguageSetup.MessageCouldNotStartProgram,[PrgName]),mtError,[mbOK],0);
+    exit;
+  end;
+
+  try
+    While not (WaitForSingleObject(ProcessInformation.hProcess,0)=WAIT_OBJECT_0) do begin
+      Sleep(100);
+      Application.ProcessMessages;
+    end;
+  finally
+    CloseHandle(ProcessInformation.hThread);
+    CloseHandle(ProcessInformation.hProcess);
+  end;
+end;
+
 Function TZipInfoForm.DeleteFolder(Folder : String; const ThisIsMainFolder : Boolean) : Boolean;
 Var Rec : TSearchRec;
     I : Integer;
@@ -430,6 +511,63 @@ begin
   If (DeleteMode<>dmNo) and (DeleteMode<>dmNoNoWarning)
     then result:=ZipDialogWork(AOwner,AZipFile,ADestFolder,zmAddAndDelete,CompressStrength,DeleteMode)
     else result:=ZipDialogWork(AOwner,AZipFile,ADestFolder,zmAdd,CompressStrength,DeleteMode);
+end;
+
+Function CheckExtension(Extension : String) : String;
+begin
+  result:='';
+
+  If Extension='' then exit;
+  If Extension[1]='*' then Delete(Extension,1,1);
+
+  If Extension='' then exit;
+  If Extension[1]='.' then Delete(Extension,1,1);
+
+  result:=Extension;
+end;
+
+Function CheckExtensionsList(Extensions : String) : String;
+Var I : Integer;
+    S : String;
+begin
+  result:='';
+  Extensions:=Trim(Extensions);
+
+  repeat
+    I:=Pos(';',Extensions);
+    If I>0 then begin
+      S:=CheckExtension(Trim(Copy(Extensions,1,I-1)));
+      Extensions:=Trim(Copy(Extensions,I+1,MaxInt));
+    end else begin
+      S:=CheckExtension(Extensions);
+      Extensions:='';
+    end;
+    If S<>'' then begin
+      If result<>'' then result:=result+';';
+      result:=result+S;
+    end;
+  until I=0;
+end;
+
+Function ExtensionInList(Extension, List : String) : Boolean;
+Var I : Integer;
+    S : String;
+begin
+  result:=False;
+  Extension:=Trim(ExtUpperCase(CheckExtension(Extension)));
+
+  List:=Trim(List);
+  repeat
+    I:=Pos(';',List);
+    If I>0 then begin
+      S:=CheckExtension(Trim(Copy(List,1,I-1)));
+      List:=Trim(Copy(List,I+1,MaxInt));
+    end else begin
+      S:=CheckExtension(List);
+      List:='';
+    end;
+    If Trim(ExtUpperCase(S))=Extension then begin result:=True; exit; end;
+  until I=0;
 end;
 
 end.

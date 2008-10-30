@@ -9,6 +9,7 @@ uses
 type
   TSetupFrameCompression = class(TFrame, ISetupFrame)
     CompressRadioGroup: TRadioGroup;
+    InfoLabel: TLabel;
   private
     { Private-Deklarationen }
   public
@@ -51,6 +52,7 @@ begin
   CompressRadioGroup.Items[2]:=LanguageSetup.SetupFormCompressionNormal;
   CompressRadioGroup.Items[3]:=LanguageSetup.SetupFormCompressionGood;
   CompressRadioGroup.Items[4]:=LanguageSetup.SetupFormCompressionMaximum;
+  InfoLabel.Caption:=LanguageSetup.SetupFormCompressionInfoLabel;
 
   HelpContext:=ID_FileOptionsCompressionSettings;
 end;
@@ -61,6 +63,7 @@ end;
 
 procedure TSetupFrameCompression.ShowFrame(const AdvencedMode: Boolean);
 begin
+  InfoLabel.Visible:=PrgSetup.ActivateIncompleteFeatures;
 end;
 
 procedure TSetupFrameCompression.RestoreDefaults;

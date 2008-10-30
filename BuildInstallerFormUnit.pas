@@ -174,7 +174,7 @@ begin
   BuildCheckList(ListBox,GameDB,False,False,True);
   BuildCheckList(ListBox3,TemplateDB,False,False,True);
   BuildCheckList(ListBox2,AutoSetupDB,False,False,True);
-  BuildSelectPopupMenu(PopupMenu,GameDB,SelectButtonClick,False);
+  BuildSelectPopupMenu(PopupMenu,GameDB,SelectButtonClick,False,True);
   BuildSelectPopupMenu(PopupMenu3,TemplateDB,SelectButtonClick3,False);
   BuildSelectPopupMenu(PopupMenu2,AutoSetupDB,SelectButtonClick2,False);
 end;

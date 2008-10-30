@@ -55,7 +55,7 @@ type
 
 implementation
 
-uses ShellAPI, Math, LanguageSetupUnit, VistaToolsUnit, CommonTools,
+uses ShellAPI, ShlObj, Math, LanguageSetupUnit, VistaToolsUnit, CommonTools,
      SetupDosBoxFormUnit, SetupFrameDOSBoxFormUnit, HelpConsts;
 
 {$R *.dfm}
@@ -278,6 +278,7 @@ begin
         end;
     5 : If DOSBoxInstallationComboBox.ItemIndex>=0 then begin
           S:=DosBoxDirEdit.Text;
+          If S='' then S:=GetSpecialFolder(Application.MainForm.Handle,CSIDL_PROGRAM_FILES);
           if SelectDirectory(Handle,LanguageSetup.SetupFormDosBoxDir,S) then begin
             DosBoxDirEdit.Text:=S;
             DosBoxDirEditChange(Sender);

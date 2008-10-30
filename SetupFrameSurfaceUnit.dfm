@@ -14,7 +14,7 @@ object SetupFrameSurface: TSetupFrameSurface
   object StartSizeComboBox: TComboBox
     Left = 16
     Top = 37
-    Width = 233
+    Width = 281
     Height = 21
     Style = csDropDownList
     ItemHeight = 13

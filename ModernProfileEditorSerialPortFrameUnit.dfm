@@ -125,7 +125,7 @@ object ModernProfileEditorSerialPortFrame: TModernProfileEditorSerialPortFrame
       MaxValue = 65535
       MinValue = 1
       TabOrder = 1
-      Value = 5000
+      Value = 23
     end
     object ModemListenCheckBox: TCheckBox
       Left = 17

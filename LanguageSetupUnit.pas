@@ -553,6 +553,8 @@ const NR_Author=1;
       NR_ProfileEditorHelperProgramsRunBeforeEditLabel=41978;
       NR_ProfileEditorHelperProgramsRunAfter=41979;
       NR_ProfileEditorHelperProgramsRunAfterEditLabel=41980;
+      NR_ProfileEditorHelperProgramsRunMinimized=41981;
+      NR_ProfileEditorHelperProgramsRunWait=41982;
 
       NR_ProfileMounting=42001;
       NR_ProfileMountingFolderSheet=42002;
@@ -814,11 +816,23 @@ const NR_Author=1;
       NR_SetupFormCompressionNormal=44105;
       NR_SetupFormCompressionGood=44106;
       NR_SetupFormCompressionMaximum=44107;
+      NR_SetupFormCompressionInfoLabel=44108;
 
       NR_SetupFormWindows=44201;
       NR_SetupFormWindowsMinimizeDFendWindowsGame=44202;
       NR_SetupFormWindowsRestoreWhenWindowsGameCloses=44203;
       NR_SetupFormWindowsRestoreWhenWindowsGameClosesInfo=44204;
+
+      NR_SetupFormExternalPackers=44301;
+      NR_SetupFormExternalPackersSelect=44302;
+      NR_SetupFormExternalPackersFileName=44303;
+      NR_SetupFormExternalPackersFileNameTitle=44304;
+      NR_SetupFormExternalPackersExtensions=44305;
+      NR_SetupFormExternalPackersCommandExtract=44306;
+      NR_SetupFormExternalPackersCommandCreate=44307;
+      NR_SetupFormExternalPackersCommandAdd=44308;
+      NR_SetupFormExternalPackersInfo=44309;
+      NR_SetupFormExternalPackersSetupButton=44310;
 
       NR_HistoryForm=44901;
       NR_HistoryGame=44902;
@@ -1290,6 +1304,8 @@ const NR_Author=1;
       NR_ZipFormWaitInfo=84014;
       NR_ZipFormCloseWarning=84015;
       NR_ZipFormZipFileInUseWarning=84016;
+      NR_ZipFormInvalidParameters=84017;
+      NR_ZipFormUnknownExtension=84018;
 
       NR_ZipWaitInfoForm=85001;
       NR_ZipWaitInfoFormInfo=85002;
@@ -1945,6 +1961,8 @@ Type TLanguageSetup=class(TBasePrgSetup)
     property ProfileEditorHelperProgramsRunBeforeEditLabel : String index NR_ProfileEditorHelperProgramsRunBeforeEditLabel read GetString write SetString;
     property ProfileEditorHelperProgramsRunAfter : String index NR_ProfileEditorHelperProgramsRunAfter read GetString write SetString;
     property ProfileEditorHelperProgramsRunAfterEditLabel : String index NR_ProfileEditorHelperProgramsRunAfterEditLabel read GetString write SetString;
+    property ProfileEditorHelperProgramsRunMinimized : String index NR_ProfileEditorHelperProgramsRunMinimized read GetString write SetString;
+    property ProfileEditorHelperProgramsRunWait : String index NR_ProfileEditorHelperProgramsRunWait read GetString write SetString;
 
     property ProfileMounting : String index NR_ProfileMounting read GetString write SetString;
     property ProfileMountingFolderSheet : String index NR_ProfileMountingFolderSheet read GetString write SetString;
@@ -2201,11 +2219,23 @@ Type TLanguageSetup=class(TBasePrgSetup)
     property SetupFormCompressionNormal : String index NR_SetupFormCompressionNormal read GetString write SetString;
     property SetupFormCompressionGood : String index NR_SetupFormCompressionGood read GetString write SetString;
     property SetupFormCompressionMaximum : String index NR_SetupFormCompressionMaximum read GetString write SetString;
+    property SetupFormCompressionInfoLabel : String index NR_SetupFormCompressionInfoLabel read GetString write SetString;
 
     property SetupFormWindows : String index NR_SetupFormWindows read GetString write SetString;
     property SetupFormWindowsMinimizeDFendWindowsGame : String index NR_SetupFormWindowsMinimizeDFendWindowsGame read GetString write SetString;
     property SetupFormWindowsRestoreWhenWindowsGameCloses : String index NR_SetupFormWindowsRestoreWhenWindowsGameCloses read GetString write SetString;
     property SetupFormWindowsRestoreWhenWindowsGameClosesInfo : String index NR_SetupFormWindowsRestoreWhenWindowsGameClosesInfo read GetString write SetString;
+
+    property SetupFormExternalPackers : String index NR_SetupFormExternalPackers read GetString write SetString;
+    property SetupFormExternalPackersSelect : String index NR_SetupFormExternalPackersSelect read GetString write SetString;
+    property SetupFormExternalPackersFileName : String index NR_SetupFormExternalPackersFileName read GetString write SetString;
+    property SetupFormExternalPackersFileNameTitle : String index NR_SetupFormExternalPackersFileNameTitle read GetString write SetString;
+    property SetupFormExternalPackersExtensions : String index NR_SetupFormExternalPackersExtensions read GetString write SetString;
+    property SetupFormExternalPackersCommandExtract : String index NR_SetupFormExternalPackersCommandExtract read GetString write SetString;
+    property SetupFormExternalPackersCommandCreate : String index NR_SetupFormExternalPackersCommandCreate read GetString write SetString;
+    property SetupFormExternalPackersCommandAdd : String index NR_SetupFormExternalPackersCommandAdd read GetString write SetString;
+    property SetupFormExternalPackersInfo : String index NR_SetupFormExternalPackersInfo read GetString write SetString;
+    property SetupFormExternalPackersSetupButton : String index NR_SetupFormExternalPackersSetupButton read GetString write SetString;
 
     property HistoryForm : String index NR_HistoryForm read GetString write SetString;
     property HistoryGame : String index NR_HistoryGame read GetString write SetString;
@@ -2676,6 +2706,8 @@ Type TLanguageSetup=class(TBasePrgSetup)
     property ZipFormWaitInfo : String index NR_ZipFormWaitInfo read GetString write SetString;
     property ZipFormCloseWarning : String index NR_ZipFormCloseWarning read GetString write SetString;
     property ZipFormZipFileInUseWarning : String index NR_ZipFormZipFileInUseWarning read GetString write SetString;
+    property ZipFormInvalidParameters : String index NR_ZipFormInvalidParameters read GetString write SetString;
+    property ZipFormUnknownExtension : String index NR_ZipFormUnknownExtension read GetString write SetString;
 
     property ZipWaitInfoForm : String index NR_ZipWaitInfoForm read GetString write SetString;
     property ZipWaitInfoFormInfo : String index NR_ZipWaitInfoFormInfo read GetString write SetString;
@@ -3381,6 +3413,8 @@ begin
   AddStringRec(NR_ProfileEditorHelperProgramsRunBeforeEditLabel,'ProfileEditorForm','HelperProgramsSheet.RunBeforeLabel','Command before main program');
   AddStringRec(NR_ProfileEditorHelperProgramsRunAfter,'ProfileEditorForm','HelperProgramsSheet.RunAfter','Execute command after main program quits');
   AddStringRec(NR_ProfileEditorHelperProgramsRunAfterEditLabel,'ProfileEditorForm','HelperProgramsSheet.RunAfterLabel','Command after main program');
+  AddStringRec(NR_ProfileEditorHelperProgramsRunMinimized,'ProfileEditorForm','HelperProgramsSheet.RunMinimized','Run mimized');
+  AddStringRec(NR_ProfileEditorHelperProgramsRunWait,'ProfileEditorForm','HelperProgramsSheet.Wait','Wait before execution of the main program');
 
   AddStringRec(NR_ProfileMounting,'ProfileMountingForm','Caption','Edit drive');
   AddStringRec(NR_ProfileMountingFolderSheet,'ProfileMountingForm','FolderSheet','Folder as hard disk');
@@ -3637,11 +3671,23 @@ begin
   AddStringRec(NR_SetupFormCompressionNormal,'SetupForm','Compression.Mode.Normal','Normal');
   AddStringRec(NR_SetupFormCompressionGood,'SetupForm','Compression.Mode.Good','Good compression');
   AddStringRec(NR_SetupFormCompressionMaximum,'SetupForm','Compression.Mode.Maximum','Maximum compression level, may be very slow');
+  AddStringRec(NR_SetupFormCompressionInfoLabel,'SetupForm','Compression.InfoLabel','This settings will only apply to the internal packer. For external archiving programs you will have to setup the compression level via the command line parameters.'); 
 
   AddStringRec(NR_SetupFormWindows,'SetupForm','WindowsGames','Windows games');
   AddStringRec(NR_SetupFormWindowsMinimizeDFendWindowsGame,'SetupForm','MinimizeDFendOnWindowsGameStart','Minimize D-Fend Reloaded when Windows game starts');
   AddStringRec(NR_SetupFormWindowsRestoreWhenWindowsGameCloses,'SetupForm','RestoreWindowWhenWindowsGameCloses','Restore program window when Windows game is closed');
   AddStringRec(NR_SetupFormWindowsRestoreWhenWindowsGameClosesInfo,'SetupForm','RestoreWindowWhenWindowsGameCloses.Info','The main window will only be restored if the Windows program was running at least 5 seconds. So if the called program is only a launcher for the main game the D-Fend Reloaded program window will not be restored immediately.');
+
+  AddStringRec(NR_SetupFormExternalPackers,'SetupForm','ExternalPackers','Archiving programs');
+  AddStringRec(NR_SetupFormExternalPackersSelect,'SetupForm','ExternalPackers.Select','Name of archiving program:');
+  AddStringRec(NR_SetupFormExternalPackersFileName,'SetupForm','ExternalPackers.Filename','Program filename');
+  AddStringRec(NR_SetupFormExternalPackersFileNameTitle,'SetupForm','ExternalPackers.Filename.Title','Choose program file');
+  AddStringRec(NR_SetupFormExternalPackersExtensions,'SetupForm','ExternalPackers.Extensions','File extensions to handle (list with ";" as divider)');
+  AddStringRec(NR_SetupFormExternalPackersCommandExtract,'SetupForm','ExternalPackers.CommandExtract','Commandline for extracting an archive file (%1=file, %2=destination folder)');
+  AddStringRec(NR_SetupFormExternalPackersCommandCreate,'SetupForm','ExternalPackers.CommandCreate','Commandline for creating an archive file (%1=file, %2=source folder)');
+  AddStringRec(NR_SetupFormExternalPackersCommandAdd,'SetupForm','ExternalPackers.CommandAdd','Commandline for adding files / updating an archive file (%1=file, %2=source folder)');
+  AddStringRec(NR_SetupFormExternalPackersInfo,'SetupForm','ExternalPackers.Info','If you define a archiving program for the extensions "zip" or "7z" this external program will be used instead of the internal packer.');
+  AddStringRec(NR_SetupFormExternalPackersSetupButton,'SetupForm','ExternalPackers.SetupButton','Set default values for');
 
   AddStringRec(NR_HistoryForm,'HistoryForm','Caption','History');
   AddStringRec(NR_HistoryGame,'HistoryForm','Game','Game');
@@ -3779,7 +3825,10 @@ begin
   AddStringRec(NR_CreateShortcutFormUseProfileIcon,'CreateShortcutForm','UseProfileIcon','Use icon from profile');
   AddStringRec(NR_CreateShortcutFormFilter,'CreateShortcutForm','Filter','All files (*.*)|*.*');
   AddStringRec(NR_CreateShortcutFormNoLinuxScummVMLinks,'CreateShortcutForm','NoLinuxScummVMLinks','Creating ScummVM shell scripts is not supported.');
+end;
 
+Procedure TLanguageSetup.SetupLanguageStrings2;
+begin
   AddStringRec(NR_CreateImageForm,'CreateImageForm','Caption','Create image file');
   AddStringRec(NR_CreateImageFormFloppyImageType,'CreateImageForm','Floppy.ImageType','Disk type');
   AddStringRec(NR_CreateImageFormCylinders,'CreateImageForm','Floppy.Tracks','Tracks');
@@ -3796,10 +3845,7 @@ begin
   AddStringRec(NR_CreateImageFormHDImageType,'CreateImageForm','HDImageType','Image type');
   AddStringRec(NR_CreateImageFormHDImageTypePlain,'CreateImageForm','HDImageType.Plain','Create plain empty file (you will need to create a partition by using fdisk)');
   AddStringRec(NR_CreateImageFormHDImageTypeFAT,'CreateImageForm','HDImageType.FAT','Create a preformated image');
-end;
 
-Procedure TLanguageSetup.SetupLanguageStrings2;
-begin
   AddStringRec(NR_InfoForm,'InfoForm','Caption','Program info');
   AddStringRec(NR_InfoFormMain,'InfoForm','MainSheet','Info');
   AddStringRec(NR_InfoFormLanguage,'InfoForm','LanguageSheet','Language files');
@@ -4137,6 +4183,8 @@ begin
   AddStringRec(NR_ZipFormCloseWarning,'ZipForm','CloseWarning','D-Fend Reloaded is waiting for the termination of a DOSBox or a ScummVM instance to repack the used files in a zip archive. If you close D-Fend Reloaded now, the files will not be repacked to the zip archive. '+
                                                                'Do you really want to quit D-Fend Reloaded now ?');
   AddStringRec(NR_ZipFormZipFileInUseWarning,'ZipForm','ZipFileInUseWarning','The archive file "%s" is already in use as a drive in an other DOSBox or ScummVM instance. Please close this DOSBox or ScummVM instance before trying to use this file again.');
+  AddStringRec(NR_ZipFormInvalidParameters,'ZipForm','InvalidParameters','The given parameters %s are invalid. The command line parameters must contain %1 and %2.');
+  AddStringRec(NR_ZipFormUnknownExtension,'ZipForm','UnknownExtension','There is no archiving program defined to handle archive files of the type "%s".');
 
   AddStringRec(NR_ZipWaitInfoForm,'ZipWaitForm','Caption','Zip drive management');
   AddStringRec(NR_ZipWaitInfoFormInfo,'ZipWaitForm','Info','D-Fend Reloaded is waiting for the following DOSBox / ScummVM instances for close to repack the zip files:');

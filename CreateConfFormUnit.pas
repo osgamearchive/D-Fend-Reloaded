@@ -76,7 +76,7 @@ begin
   end;
 
   BuildCheckList(ListBox,GameDB,True,False,True);
-  BuildSelectPopupMenu(PopupMenu,GameDB,SelectButtonClick,True);
+  BuildSelectPopupMenu(PopupMenu,GameDB,SelectButtonClick,True,True);
 
   FolderEdit.Text:=GetSpecialFolder(Handle,CSIDL_DESKTOPDIRECTORY);
 end;

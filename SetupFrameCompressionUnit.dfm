@@ -7,6 +7,17 @@ object SetupFrameCompression: TSetupFrameCompression
   DesignSize = (
     578
     415)
+  object InfoLabel: TLabel
+    Left = 16
+    Top = 168
+    Width = 537
+    Height = 73
+    Anchors = [akLeft, akTop, akRight]
+    AutoSize = False
+    Caption = 'InfoLabel'
+    Visible = False
+    WordWrap = True
+  end
   object CompressRadioGroup: TRadioGroup
     Left = 16
     Top = 16

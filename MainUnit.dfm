@@ -3,7 +3,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
   Top = 0
   ActiveControl = TreeView
   Caption = 'D-Fend Reloaded'
-  ClientHeight = 798
+  ClientHeight = 838
   ClientWidth = 774
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -1846,7 +1846,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
   object Splitter: TSplitter
     Left = 169
     Top = 24
-    Height = 734
+    Height = 774
     ResizeStyle = rsUpdate
     ExplicitLeft = 224
     ExplicitTop = 192
@@ -1856,7 +1856,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
     Left = 0
     Top = 24
     Width = 169
-    Height = 734
+    Height = 774
     Align = alLeft
     HideSelection = False
     Images = ImageList
@@ -1985,13 +1985,13 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
     Left = 172
     Top = 24
     Width = 602
-    Height = 734
+    Height = 774
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 2
     object Splitter1: TSplitter
       Left = 0
-      Top = 531
+      Top = 571
       Width = 602
       Height = 3
       Cursor = crVSplit
@@ -2004,9 +2004,10 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
       Left = 0
       Top = 0
       Width = 602
-      Height = 531
+      Height = 571
       Align = alClient
       Columns = <>
+      HideSelection = False
       LargeImages = ListviewIconImageList
       ReadOnly = True
       RowSelect = True
@@ -2025,7 +2026,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
     end
     object CapturePageControl: TPageControl
       Left = 0
-      Top = 534
+      Top = 574
       Width = 602
       Height = 200
       ActivePage = CaptureScreenshotsTab
@@ -2157,7 +2158,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
   end
   object ZipInfoPanel: TPanel
     Left = 0
-    Top = 758
+    Top = 798
     Width = 774
     Height = 40
     Align = alBottom

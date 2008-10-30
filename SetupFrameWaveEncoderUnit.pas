@@ -33,7 +33,7 @@ type
 
 implementation
 
-uses LanguageSetupUnit, VistaToolsUnit, PrgSetupUnit, CommonTools,
+uses ShlObj, LanguageSetupUnit, VistaToolsUnit, PrgSetupUnit, CommonTools,
      SetupDosBoxFormUnit, HelpConsts;
 
 {$R *.dfm}
@@ -98,6 +98,7 @@ begin
   Case (Sender as TComponent).Tag of
    10 : begin
           S:=Trim(WaveEncMp3Edit.Text); If S<>'' then S:=ExtractFilePath(S);
+          If S='' then S:=GetSpecialFolder(Application.MainForm.Handle,CSIDL_PROGRAM_FILES);
           PrgOpenDialog.Title:=LanguageSetup.SetupFormWaveEncMp3;
           PrgOpenDialog.Filter:=LanguageSetup.SetupFormExeFilter;
           If S<>'' then PrgOpenDialog.InitialDir:=S;
@@ -108,6 +109,7 @@ begin
    11 : if SearchLame(self) then WaveEncMp3Edit.Text:=PrgSetup.WaveEncMp3;
    12 : begin
           S:=Trim(WaveEncOggEdit.Text); If S<>'' then S:=ExtractFilePath(S);
+          If S='' then S:=GetSpecialFolder(Application.MainForm.Handle,CSIDL_PROGRAM_FILES);
           PrgOpenDialog.Title:=LanguageSetup.SetupFormWaveEncOgg;
           PrgOpenDialog.Filter:=LanguageSetup.SetupFormExeFilter;
           If S<>'' then PrgOpenDialog.InitialDir:=S;

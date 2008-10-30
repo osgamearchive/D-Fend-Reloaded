@@ -162,7 +162,7 @@ object SerialEditForm: TSerialEditForm
         MaxValue = 65535
         MinValue = 1
         TabOrder = 1
-        Value = 5000
+        Value = 23
       end
       object ModemIPEdit: TLabeledEdit
         Left = 17

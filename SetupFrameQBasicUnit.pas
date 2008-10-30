@@ -32,8 +32,8 @@ type
 
 implementation
 
-uses ShellAPI, LanguageSetupUnit, VistaToolsUnit, PrgSetupUnit, CommonTools,
-     SetupDosBoxFormUnit, HelpConsts;
+uses ShellAPI, ShlObj, LanguageSetupUnit, VistaToolsUnit, PrgSetupUnit,
+     CommonTools, SetupDosBoxFormUnit, HelpConsts;
 
 {$R *.dfm}
 
@@ -92,6 +92,7 @@ begin
   Case (Sender as TComponent).Tag of
    19 : begin
           S:=Trim(QBasicEdit.Text); If S<>'' then S:=ExtractFilePath(S);
+          If S='' then S:=GetSpecialFolder(Application.MainForm.Handle,CSIDL_PROGRAM_FILES);
           PrgOpenDialog.Title:=LanguageSetup.SetupFormQBasicFile;
           PrgOpenDialog.Filter:=LanguageSetup.SetupFormExeFilter;
           If S<>'' then PrgOpenDialog.InitialDir:=S;

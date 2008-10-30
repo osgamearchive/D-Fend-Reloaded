@@ -52,8 +52,8 @@ Function ShowSetupFrameDOSBoxDialog(const AOwner : TComponent; var DOSBoxData : 
 
 implementation
 
-uses Math, LanguageSetupUnit, VistaToolsUnit, CommonTools, SetupDosBoxFormUnit,
-     PrgConsts;
+uses ShlObj, Math, LanguageSetupUnit, VistaToolsUnit, CommonTools,
+     SetupDosBoxFormUnit, PrgConsts;
 
 {$R *.dfm}
 
@@ -154,6 +154,7 @@ begin
   Case (Sender as TComponent).Tag of
     0 : begin
           S:=DosBoxDirEdit.Text;
+          If S='' then S:=GetSpecialFolder(Application.MainForm.Handle,CSIDL_PROGRAM_FILES);
           if SelectDirectory(Handle,LanguageSetup.SetupFormDosBoxDir,S) then begin
             DosBoxDirEdit.Text:=S;
           end;

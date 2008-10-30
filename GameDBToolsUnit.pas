@@ -27,7 +27,7 @@ Procedure SetSortTypeByListViewCol(const ColumnIndex : Integer; var ListSort : T
 { Selection lists }
 
 Procedure BuildCheckList(const CheckListBox : TCheckListBox; const GameDB : TGameDB; const WithDefaultProfile, HideScummVMAndWindowsProfiles : Boolean; const HideWindowsProfiles : Boolean = False);
-Procedure BuildSelectPopupMenu(const Popup : TPopupMenu; const GameDB : TGameDB; const OnClick : TNotifyEvent; const WithDefaultProfile : Boolean);
+Procedure BuildSelectPopupMenu(const Popup : TPopupMenu; const GameDB : TGameDB; const OnClick : TNotifyEvent; const WithDefaultProfile : Boolean; const HideWindowsProfiles : Boolean = False);
 Procedure SelectGamesByPopupMenu(const Sender : TObject; const CheckListBox : TCheckListBox);
 
 { Upgrade from D-Fend / First-run init / Repair }
@@ -290,7 +290,7 @@ Type TUserDataRecord=record
   Values, ValuesUpper : TStringList;
 end;
 
-Procedure BuildSelectPopupMenu(const Popup : TPopupMenu; const GameDB : TGameDB; const OnClick : TNotifyEvent; const WithDefaultProfile : Boolean);
+Procedure BuildSelectPopupMenu(const Popup : TPopupMenu; const GameDB : TGameDB; const OnClick : TNotifyEvent; const WithDefaultProfile : Boolean; const HideWindowsProfiles : Boolean);
 Var MenuSelect, MenuUnselect : TMenuItem;
     St : TStringList;
     I,J,K,Nr : Integer;
@@ -310,26 +310,26 @@ begin
 
   { Add normal meta data submenus }
 
-  St:=GameDB.GetGenreList(WithDefaultProfile);
+  St:=GameDB.GetGenreList(WithDefaultProfile,HideWindowsProfiles);
   try BuildSelectPopupSubMenu(Popup,LanguageSetup.GameGenre,MenuSelect,MenuUnselect,0,OnClick,St); finally St.Free; end;
 
-  St:=GameDB.GetDeveloperList(WithDefaultProfile);
+  St:=GameDB.GetDeveloperList(WithDefaultProfile,HideWindowsProfiles);
   try BuildSelectPopupSubMenu(Popup,LanguageSetup.GameDeveloper,MenuSelect,MenuUnselect,1,OnClick,St); finally St.Free; end;
 
-  St:=GameDB.GetPublisherList(WithDefaultProfile);
+  St:=GameDB.GetPublisherList(WithDefaultProfile,HideWindowsProfiles);
   try BuildSelectPopupSubMenu(Popup,LanguageSetup.GamePublisher,MenuSelect,MenuUnselect,2,OnClick,St); finally St.Free; end;
 
-  St:=GameDB.GetYearList(WithDefaultProfile);
+  St:=GameDB.GetYearList(WithDefaultProfile,HideWindowsProfiles);
   try BuildSelectPopupSubMenu(Popup,LanguageSetup.GameYear,MenuSelect,MenuUnselect,3,OnClick,St); finally St.Free; end;
 
-  St:=GameDB.GetLanguageList(WithDefaultProfile);
+  St:=GameDB.GetLanguageList(WithDefaultProfile,HideWindowsProfiles);
   try BuildSelectPopupSubMenu(Popup,LanguageSetup.GameLanguage,MenuSelect,MenuUnselect,4,OnClick,St); finally St.Free; end;
 
   St:=TStringList.Create;
   try
     St.Add(LanguageSetup.GameEmulationTypeDOSBox);
     St.Add(LanguageSetup.GameEmulationTypeScummVM);
-    St.Add(LanguageSetup.GameEmulationTypeWindows);
+    If HideWindowsProfiles then St.Add(LanguageSetup.GameEmulationTypeWindows);
     BuildSelectPopupSubMenu(Popup,LanguageSetup.GameEmulationType,MenuSelect,MenuUnselect,5,OnClick,St);
   finally
     St.Free;
@@ -418,6 +418,7 @@ begin
   If not (Sender is TMenuItem) then exit;
   M:=Sender as TMenuItem;
   CategoryValue:=RemoveUnderline(Trim(ExtUpperCase(M.Caption)));
+  If CategoryValue=Trim(ExtUpperCase(LanguageSetup.NotSet)) then CategoryValue:=''; 
   Category:=M.Parent.Tag;
   Select:=(M.Parent.Parent.Tag=1);
   If Category=-1 then CategoryName:=RemoveUnderline(ExtUpperCase(M.Parent.Caption)) else CategoryName:='';
@@ -440,7 +441,6 @@ begin
             end;
       end;
       S:=Trim(S);
-      If S='' then continue;
       If ExtUpperCase(S)<>CategoryValue then continue;
     end;
     CheckListBox.Checked[I]:=Select;
@@ -1115,6 +1115,9 @@ begin
   finally
     FindClose(Rec);
   end;
+
+  AListView.SortType:=stNone;
+  AListView.SortType:=stText;
 end;
 
 Procedure AddSoundsToList(const AListView : TListView; Dir : String; ImageListIndex : Integer);
@@ -1159,6 +1162,9 @@ begin
   finally
     FindClose(Rec);
   end;
+
+  AListView.SortType:=stNone;
+  AListView.SortType:=stText;
 end;
 
 Procedure AddVideosToList(const AListView : TListView; Dir : String; ImageListIndex : Integer);
@@ -1215,6 +1221,9 @@ begin
   finally
     FindClose(Rec);
   end;
+
+  AListView.SortType:=stNone;
+  AListView.SortType:=stText;
 end;
 
 Procedure DeleteFiles(const ADir, AMask : String);

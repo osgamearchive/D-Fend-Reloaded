@@ -162,7 +162,8 @@ uses
   FileNameConvertor in 'FileNameConvertor.pas',
   RunPrgManagerUnit in 'RunPrgManagerUnit.pas',
   ModernProfileEditorHelperProgramsFrameUnit in 'ModernProfileEditorHelperProgramsFrameUnit.pas' {ModernProfileEditorHelperProgramsFrame: TFrame},
-  SetupFrameWindowsGamesUnit in 'SetupFrameWindowsGamesUnit.pas' {SetupFrameWindowsGames: TFrame};
+  SetupFrameWindowsGamesUnit in 'SetupFrameWindowsGamesUnit.pas' {SetupFrameWindowsGames: TFrame},
+  SetupFrameZipPrgsUnit in 'SetupFrameZipPrgsUnit.pas' {SetupFrameZipPrgs: TFrame};
 
 {$R *.res}
 

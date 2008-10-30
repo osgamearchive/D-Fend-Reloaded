@@ -66,7 +66,7 @@ end;
 procedure TUninstallSelectForm.FormShow(Sender: TObject);
 begin
   BuildCheckList(ListBox,GameDB,False,False,True);
-  BuildSelectPopupMenu(PopupMenu,GameDB,SelectButtonClick,False);
+  BuildSelectPopupMenu(PopupMenu,GameDB,SelectButtonClick,False,True);
 end;
 
 procedure TUninstallSelectForm.SelectButtonClick(Sender: TObject);

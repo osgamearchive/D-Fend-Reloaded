@@ -76,7 +76,7 @@ end;
 procedure TTransferForm.FormShow(Sender: TObject);
 begin
   BuildCheckList(ListBox,GameDB,False,False,True);
-  BuildSelectPopupMenu(PopupMenu,GameDB,SelectButtonClick,False);
+  BuildSelectPopupMenu(PopupMenu,GameDB,SelectButtonClick,False,True);
 end;
 
 procedure TTransferForm.SelectButtonClick(Sender: TObject);

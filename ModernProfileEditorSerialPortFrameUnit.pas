@@ -166,9 +166,16 @@ begin
         {If DataKey='IRQ' then SetIRQ(DataValue);
         If DataKey='SERVER' then ModemIPEdit.Text:=DataValue;
         If DataKey='PORT' then begin try J:=Min(65535,Max(1,StrToInt(DataValue))); except J:=5000; end; ModemPortEdit.Value:=J; end;}
-        If DataKey='LISTENPORT' then begin try J:=Min(65535,Max(1,StrToInt(DataValue))); except J:=5000; end; ModemPortEdit.Value:=J; end;
+        If DataKey='LISTENPORT' then begin
+          If Trim(DataValue)='0' then begin
+            ModemListenCheckBox.Checked:=False;
+          end else begin
+            ModemListenCheckBox.Checked:=True;
+            try J:=Min(65535,Max(1,StrToInt(DataValue))); except J:=5000; end;
+            ModemPortEdit.Value:=J;
+          end;
+        end;
       end;
-      ModemListenCheckBox.Checked:=(ModemIPEdit.Text='');
       exit;
     end;
 
@@ -266,6 +273,7 @@ begin
     If ModemListenCheckBox.Checked then begin
       S:=S+' Listenport:'+IntToStr(ModemPortEdit.Value);
     end else begin
+      S:=S+' Listenport:0';
       {S:=S+' Port:'+IntToStr(ModemPortEdit.Value)+' Server:'+ModemIPEdit.Text;}
     end;
   end;

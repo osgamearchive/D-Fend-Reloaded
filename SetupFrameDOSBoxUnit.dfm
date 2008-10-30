@@ -293,6 +293,7 @@ object SetupFrameDOSBox: TSetupFrameDOSBox
       Anchors = [akLeft, akTop, akRight]
       Caption = 'Show warning messages on DOSBox path name translation errors'
       TabOrder = 3
+      Visible = False
     end
   end
   object MoreSettingsButton: TBitBtn

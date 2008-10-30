@@ -84,7 +84,6 @@ object SetupFrameQBasic: TSetupFrameQBasic
     EditLabel.Height = 13
     EditLabel.Caption = 'QBasicEdit'
     TabOrder = 0
-    ExplicitWidth = 572
   end
   object QBasicParamEdit: TLabeledEdit
     Left = 16
@@ -96,7 +95,6 @@ object SetupFrameQBasic: TSetupFrameQBasic
     EditLabel.Height = 13
     EditLabel.Caption = 'QBasicParamEdit'
     TabOrder = 1
-    ExplicitWidth = 572
   end
   object PrgOpenDialog: TOpenDialog
     DefaultExt = 'exe'

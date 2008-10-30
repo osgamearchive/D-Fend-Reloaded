@@ -47,11 +47,11 @@ Type TBasePrgSetup=class
     procedure SetBoolean(const Index: Integer; const Value: Boolean);
     procedure SetInteger(const Index, Value: Integer);
     procedure SetString(const Index: Integer; const Value: String);
-    Procedure UpdatingFile; virtual;
   public
     Constructor Create(const ASetupFile : String); overload;
     Constructor Create(const ABasePrgSetup : TBasePrgSetup); overload;
     Destructor Destroy; override;
+    Procedure UpdateFile; virtual;
     Procedure AssignFrom(const ABasePrgSetup : TBasePrgSetup);
     Procedure AssignFromPartially(const ABasePrgSetup : TBasePrgSetup; const SettingsToKeep : Array of Integer);
     Procedure StoreAllValues;
@@ -143,7 +143,7 @@ begin
     try
       If FStoreConfigOnExit then begin
         ForceDirectories(ExtractFilePath(Ini.FileName));
-        If FChanged then UpdatingFile;
+        If FChanged then UpdateFile;
       end;
     except end;
     ClearLists;
@@ -152,7 +152,7 @@ begin
     try
       If FStoreConfigOnExit and (Ini<>nil) then begin
         ForceDirectories(ExtractFilePath(Ini.FileName));
-        If FChanged then UpdatingFile;
+        If FChanged then UpdateFile;
       end;
     except end;
   end;
@@ -259,13 +259,13 @@ begin
   For I:=0 to length(StringList)-1 do
     Ini.WriteString(StringList[I].Section,StringList[I].Key,GetString(StringList[I].Nr));
 
-  If FChanged then UpdatingFile; 
+  If FChanged then UpdateFile;
   FChanged:=False;
 
   CheckAndUpdateTimeStamp;
 end;
 
-procedure TBasePrgSetup.UpdatingFile;
+procedure TBasePrgSetup.UpdateFile;
 begin
   try Ini.UpdateFile; except end; {Language Files may be read only in program foldes}
 end;
@@ -282,7 +282,7 @@ begin
   For I:=0 to length(StringList)-1 do
     SetString(StringList[I].Nr,StringList[I].DefaultString);
 
-  UpdatingFile;
+  UpdateFile;
   FChanged:=False;
 
   CheckAndUpdateTimeStamp;

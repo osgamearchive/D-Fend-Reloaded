@@ -37,6 +37,7 @@ const ID_Index=1;
       ID_FileOptionsService=1124;
       ID_FileOptionsSearchForUpdates=1125;
       ID_FileOptionsWindows=1; //...
+      ID_FileOptionsZipPackers=1; //...
 
       ID_ViewQuickStarter=1501;
 

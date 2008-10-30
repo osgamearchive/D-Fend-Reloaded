@@ -15,15 +15,31 @@ HelperProgramsSheet.RunBefore=Execute command before main program
 HelperProgramsSheet.RunBeforeLabel=Command before main program
 HelperProgramsSheet.RunAfter=Execute command after main program quits
 HelperProgramsSheet.RunAfterLabel=Command after main program
+HelperProgramsSheet.RunMinimized=Run mimized
+HelperProgramsSheet.Wait=Wait before execution of the main program
+
+[ProfileMountingForm]
+CHANGED: FileFilter=Image files (*.iso,*.img,*.cue)|*.iso;*.img;*.cue|All files (*.*)|*.*
 
 [SetupForm]
 RestoreWindowWhenScummVMCloses=Restore program window when ScummVM is closed
 ShortWrongShortNameWarnings=Show warning messages on DOSBox path name translation errors
 UseWindowsExeIcons=Use program file icon for Windows games profiles
+Compression.InfoLabel=This settings will only apply to the internal packer. For external archiving programs you will have to setup the compression level via the command line parameters.
 WindowsGames=Windows games
 MinimizeDFendOnWindowsGameStart=Minimize D-Fend Reloaded when Windows game starts
 RestoreWindowWhenWindowsGameCloses=Restore program window when Windows game is closed
 RestoreWindowWhenWindowsGameCloses.Info=The main window will only be restored if the Windows program was running at least 5 seconds. So if the called program is only a launcher for the main game the D-Fend Reloaded program window will not be restored immediately.
+ExternalPackers=Archiving programs
+ExternalPackers.Select=Name of archiving program
+ExternalPackers.Filename=Program filename
+ExternalPackers.Filename.Title=Choose program file
+ExternalPackers.Extensions=File extensions to handle (list with ";" as divider)
+ExternalPackers.CommandExtract=Commandline for extracting an archive file (%1=file, %2=destination folder)
+ExternalPackers.CommandCreate=Commandline for creating an archive file (%1=file, %2=source folder)
+ExternalPackers.CommandAdd=Commandline for adding files / updating an archive file (%1=file, %2=source folder)
+ExternalPackers.Info=If you define a archiving program for the extensions "zip" or "7z" this external program will be used instead of the internal packer.
+ExternalPackers.SetupButton=Set default values for
 
 [HistoryForm]
 Starts=Number of starts
@@ -35,6 +51,13 @@ New.FromProfiles.Caption=Select profiles to be added as auto setup templates
 
 [CreateConfForm]
 ExportAsAutoSetup=Export profiles as auto setup templates
+
+[ExtractImage]
+CHANGED: ImageFile.DialogFilter=All images (*.img,*.iso,*.cue)|*.img;*.iso;*.cue|IMG images (*.img)|*.img|ISO images (*.iso)|*.iso|CUE images (*.cue)|*.cue|All files (*.*)|*.*
+
+[ZipForm]
+InvalidParameters=The given parameters %s are invalid. The command line parameters must contain %1 and %2.
+UnknownExtension=There is no archiving program defined to handle archive files of the type "%s".
 
 [ZipWaitForm]
 CHANGED: Info=D-Fend Reloaded is waiting for the following DOSBox / ScummVM instances for close to repack the zip files:

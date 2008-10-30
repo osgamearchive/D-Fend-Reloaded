@@ -29,10 +29,6 @@ object BuildInstallerForm: TBuildInstallerForm
     TabOrder = 0
     object GamesSheet: TTabSheet
       Caption = 'GamesSheet'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object InfoLabel: TLabel
         Left = 8
         Top = 8
@@ -160,10 +156,6 @@ object BuildInstallerForm: TBuildInstallerForm
     object TemplatesSheet: TTabSheet
       Caption = 'TemplatesSheet'
       ImageIndex = 2
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object InfoLabel3: TLabel
         Left = 8
         Top = 8
@@ -291,10 +283,6 @@ object BuildInstallerForm: TBuildInstallerForm
     object AutoSetupSheet: TTabSheet
       Caption = 'AutoSetupSheet'
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object InfoLabel2: TLabel
         Left = 8
         Top = 8

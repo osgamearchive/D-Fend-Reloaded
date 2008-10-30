@@ -102,7 +102,7 @@ uses VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgSetupUnit,
      SetupFrameWaveEncoderUnit, SetupFrameSecurityUnit, SetupFrameServiceUnit,
      SetupFrameUpdateUnit, SetupFrameWineUnit, SetupFrameCompressionUnit,
      SetupFrameGamesListScreenshotModeAppearanceUnit, SetupFrameEditorUnit,
-     SetupFrameViewerUnit, SetupFrameWindowsGamesUnit;
+     SetupFrameViewerUnit, SetupFrameWindowsGamesUnit, SetupFrameZipPrgsUnit;
 
 {$R *.dfm}
 
@@ -204,6 +204,9 @@ begin
   F:=TSetupFrameScummVM.Create(self); AddTreeNode(Root,F,TSetupFrameScummVM(F),False,10);
   F:=TSetupFrameQBasic.Create(self); AddTreeNode(Root,F,TSetupFrameQBasic(F),False,11);
   F:=TSetupFrameWaveEncoder.Create(self); AddTreeNode(Root,F,TSetupFrameWaveEncoder(F),False,9,False);
+  If PrgSetup.ActivateIncompleteFeatures then begin
+    F:=TSetupFrameZipPrgs.Create(self); AddTreeNode(Root,F,TSetupFrameZipPrgs(F),True,16,False);
+  end;
   F:=TSetupFrameEditor.Create(self); AddTreeNode(Root,F,TSetupFrameEditor(F),True,17,False);
   F:=TSetupFrameViewer.Create(self); AddTreeNode(Root,F,TSetupFrameViewer(F),True,18,False);
   If PrgSetup.ActivateIncompleteFeatures then begin

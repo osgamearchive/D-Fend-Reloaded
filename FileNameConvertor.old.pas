@@ -13,16 +13,9 @@ Type
  end;
  PFilenameInfo = ^TFileNameInfo;
 
- TLongName = record
-   fnInfo: PFilenameInfo;
-   LongName: string;
- end;
- PLongName = ^TLongName;
-
  TFileNameConvertor = class(TObject)
  private
     ItemList: TList;
-    LongNameList: TList;
  protected
     function GetItem(Index: Integer): TFileNameInfo;
     procedure NewItem(LongName: String; isDir: Boolean);
@@ -70,7 +63,6 @@ uses Windows, SysUtils, FileCtrl;
 constructor TFileNameConvertor.Create;
 begin
     ItemList:=TList.Create;
-    LongNameList:=TList.Create;
     LinuxMode:=False;
 end;
 
@@ -92,7 +84,6 @@ destructor TFileNameConvertor.Destroy;
 begin
   Clear;
   ItemList.Free;
-  LongNameList.free;
 end;
 
 procedure TFileNameConvertor.Clear;
@@ -105,13 +96,6 @@ begin
           if ItemList[I]<>nil then
             Dispose(PFileNameInfo(ItemList[I]));
         ItemList.Clear;
-    end;
-    if LongNameList<>nil then
-    begin
-        for I:=0 to LongNameList.Count-1 do
-          if LongNameList[I]<>nil then
-            Dispose(PLongName(LongNameList[I]));
-        LongNameList.Clear;
     end;
 end;
 
@@ -193,37 +177,9 @@ begin
     else Result:= CompareStr(PFileNameInfo(Item1).ShortName,PFileNameInfo(Item2).ShortName);
 end;
 
-function CompareLongItems(Item1: Pointer; Item2: Pointer): Integer;
-begin
-    if Item1 = nil then
-    begin
-        if Item2=nil then Result:=0 else Result:=-1;
-    end
-    else if Item2 = nil then
-        Result:=-1
-    else
-        Result:=CompareStr(PLongName(Item1).LongName,PLongName(Item2).LongName);
-end;
-
-function CompareLongItemsAnsi(Item1: Pointer; Item2: Pointer): Integer;
-begin
-    if Item1 = nil then
-    begin
-        if Item2=nil then Result:=0 else Result:=-1;
-    end
-    else if Item2 = nil then
-        Result:=-1
-    else
-        Result:=AnsiCompareFileName(PLongName(Item1).LongName,PLongName(Item2).LongName);
-end;
-
 procedure TFileNameConvertor.SortItems;
 begin
     ItemList.Sort(CompareItems);
-    if LinuxMode then
-        LongNameList.sort(CompareLongItems)
-    else
-        LongNameList.sort(CompareLongItemsAnsi);
 end;
 
 function TFileNameConvertor.GetItemsCount;
@@ -290,25 +246,23 @@ var
     low, high, mid, res: Integer;
 begin
     Result:=-1;
-
     low:=0;
-    high:=LongNameList.Count-1;
+    high:=ItemList.Count-1;
     while low<=high do
     begin
         mid:= (low+high) div 2;
         if LinuxMode then
-            res:=CompareStr(LongName,PLongName(LongNameList[mid]).LongName)
+            res:=CompareStr(LongName,PFileNameInfo(ItemList[mid]).LongName)
         else
-            res:=AnsiCompareFileName(LongName,PLongName(LongNameList[mid]).LongName);
+            res:=AnsiCompareFileName(LongName,PFileNameInfo(ItemList[mid]).LongName);
         if res>0 then low:=mid+1
         else if res<0 then high:=mid-1
         else
         begin
-            Result:=IndexOfShortName(PLongName(LongNameList[mid]).fnInfo.shortName);
+            Result:=mid;
             exit;
         end;
     end;
-    
 end;
 
 
@@ -316,7 +270,6 @@ procedure TFileNameConvertor.NewItem(LongName: String; isDir: Boolean);
 var
     Item: TFileNameInfo;
     PItem: PFileNameInfo;
-    PLongN: PLongName;
 begin
     Item.LongName:=LongName;
     Item.ShortName:='';
@@ -326,10 +279,6 @@ begin
     New(PItem);
     PItem^:=Item;
     ItemList.Add(PItem);
-    New(PLongN);
-    PLongN.LongName:=LongName;
-    PLongN.fnInfo:=PItem;
-    LongNameList.Add(PLongN);
 end;
 
 function TFileNameConvertor.RemoveSpaces(var S: String): Boolean;
@@ -524,5 +473,7 @@ begin
     end;
 end;
 
+{UseLinuxMode
+UseSystemFallback}
 
 end.

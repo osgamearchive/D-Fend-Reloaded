@@ -18,11 +18,9 @@ Type TDOSBoxData=record
   HideDosBoxConsole, CenterDOSBoxWindow, DisableScreensaver, WaitOnError : Boolean;
 end;
 
-Type TPrgSetup=class;
-
-     TDOSBoxSetting=class
+Type TDOSBoxSetting=class
   private
-    FPrgSetup : TPrgSetup;
+    FPrgSetup : TBasePrgSetup;
     FNr : Integer;
     FName, FDosBoxDir, FDosBoxMapperFile, FDosBoxLanguage, FSDLVideodriver, FCommandLineParameters : String;
     FHideDosBoxConsole, FCenterDOSBoxWindow, FDisableScreensaver, FWaitOnError : Boolean;
@@ -31,7 +29,7 @@ Type TPrgSetup=class;
     Procedure InitDirs;
     Procedure DoneDirs;
   public
-    Constructor Create(const APrgSetup : TPrgSetup; const ANr : Integer);
+    Constructor Create(const APrgSetup : TBasePrgSetup; const ANr : Integer);
     Destructor Destroy; override;
     property Nr : Integer read FNr write FNr;
 
@@ -48,9 +46,30 @@ Type TPrgSetup=class;
     property WaitOnError : Boolean read FWaitOnError write FWaitOnError;
 end;
 
-     TPrgSetup=class(TBasePrgSetup)
+Type TPackerSetting=class
   private
-    FDOSBox : TList;
+    FPrgSetup : TBasePrgSetup;
+    FNr : Integer;
+    FName, FZipFileName, FFileExtensions : String;
+    FExtractFile, FCreateFile, FUpdateFile : String;
+    Procedure ReadSettings;
+    Procedure WriteSettings;
+  public
+    Constructor Create(const APrgSetup : TBasePrgSetup; const ANr : Integer);
+    Destructor Destroy; override;
+    property Nr : Integer read FNr write FNr;
+
+    property Name : String read FName write FName;
+    property ZipFileName : String read FZipFileName write FZipFileName;
+    property FileExtensions : String read FFileExtensions write FFileExtensions;
+    property ExtractFile : String read FExtractFile write FExtractFile;
+    property CreateFile : String read FCreateFile write FCreateFile;
+    property UpdateFile : String read FUpdateFile write FUpdateFile;
+ end;
+
+Type TPrgSetup=class(TBasePrgSetup)
+  private
+    FDOSBox, FPacker : TList;
     Procedure ReadSettings;
     Procedure InitDirs;
     Procedure DoneDirs;
@@ -58,16 +77,22 @@ end;
     Procedure SetDriveLetter(DriveLetter: Char; const Value: String);
     Procedure LoadDOSBoxSettings;
     Procedure DeleteOldDOSBoxSettings;
-    Function GetDOSBoxSettingsCount : Integer;
+    Procedure LoadPackerSettings;
+    Procedure DeleteOldPackerSettings;
+    Function GetListCount(Index : Integer) : Integer;
     Function GetDOSBoxSettings(I : Integer) : TDOSBoxSetting;
+    Function GetPackerSettings(I : Integer) : TPackerSetting;
   public
     Constructor Create(const SetupFile : String = '');
     Destructor Destroy; override;
-    Procedure UpdateFile;
 
     Function AddDOSBoxSettings(const Name : String) : Integer;
     Function DeleteDOSBoxSettings(const ANr : Integer) : Boolean;
     Function SwapDOSBoxSettings(const ANr1, ANr2 : Integer) : Boolean;
+
+    Function AddPackerSettings(const Name : String) : Integer;
+    Function DeletePackerSettings(const ANr : Integer) : Boolean;
+    Function SwapPackerSettings(const ANr1, ANr2 : Integer) : Boolean;
 
     property GameDir : String index 0 read GetString write SetString;
     property BaseDir : String index 1 read GetString write SetString;
@@ -193,8 +218,11 @@ end;
     property ScreenshotListUseFirstScreenshotNr : Integer index 22 read GetInteger write SetInteger;
     property DOSBoxShortFileNameAlgorithm : Integer index 23 read GetInteger write SetInteger;
 
-    property DOSBoxSettingsCount : Integer read GetDOSBoxSettingsCount;
+    property DOSBoxSettingsCount : Integer index 0 read GetListCount;
     property DOSBoxSettings[I : Integer] : TDOSBoxSetting read GetDOSBoxSettings;
+
+    property PackerSettingsCount : Integer index 1 read GetListCount;
+    property PackerSettings[I : Integer] : TPackerSetting read GetPackerSettings;
 end;
 
 var PrgSetup : TPrgSetup;
@@ -213,7 +241,7 @@ uses ShlObj, SysUtils, Forms, CommonTools, PrgConsts;
 
 { TDOSBoxSetting }
 
-constructor TDOSBoxSetting.Create(const APrgSetup: TPrgSetup; const ANr: Integer);
+constructor TDOSBoxSetting.Create(const APrgSetup: TBasePrgSetup; const ANr: Integer);
 begin
   inherited Create;
   FPrgSetup:=APrgSetup;
@@ -287,6 +315,50 @@ begin
   end;
 end;
 
+{ TPackerSetting }
+
+constructor TPackerSetting.Create(const APrgSetup: TBasePrgSetup; const ANr: Integer);
+begin
+  inherited Create;
+  FPrgSetup:=APrgSetup;
+  FNr:=ANr;
+  ReadSettings;
+end;
+
+destructor TPackerSetting.Destroy;
+begin
+  WriteSettings;
+  inherited Destroy;
+end;
+
+procedure TPackerSetting.ReadSettings;
+Var Section : String;
+begin
+  Section:='Packer-'+IntToStr(FNr+1);
+
+  FName:=FPrgSetup.MemIni.ReadString(Section,'Name','');
+  FZipFileName:=FPrgSetup.MemIni.ReadString(Section,'Filename','');
+  FFileExtensions:=FPrgSetup.MemIni.ReadString(Section,'FileExtensions','');
+  FExtractFile:=FPrgSetup.MemIni.ReadString(Section,'ExtractFile','');
+  FCreateFile:=FPrgSetup.MemIni.ReadString(Section,'CreateFile','');
+  FUpdateFile:=FPrgSetup.MemIni.ReadString(Section,'UpdateFile','');
+end;
+
+procedure TPackerSetting.WriteSettings;
+Var Section : String;
+begin
+  Section:='Packer-'+IntToStr(FNr+1);
+
+  PrgSetup.MemIni.WriteString(Section,'Name',FName);
+  PrgSetup.MemIni.WriteString(Section,'Filename',FZipFileName);
+  PrgSetup.MemIni.WriteString(Section,'FileExtensions',FFileExtensions);
+  PrgSetup.MemIni.WriteString(Section,'ExtractFile',FExtractFile);
+  PrgSetup.MemIni.WriteString(Section,'CreateFile',FCreateFile);
+  PrgSetup.MemIni.WriteString(Section,'UpdateFile',FUpdateFile);
+
+  FPrgSetup.UpdateFile;
+end;
+
 { TPrgSetup }
 
 constructor TPrgSetup.Create(const SetupFile : String);
@@ -300,7 +372,9 @@ begin
   If ExtUpperCase(Language)='Deutsch.ini' then Language:='German.ini';
 
   FDOSBox:=TList.Create;
+  FPacker:=TList.Create;
   LoadDOSBoxSettings;
+  LoadPackerSettings;
 end;
 
 destructor TPrgSetup.Destroy;
@@ -309,6 +383,10 @@ begin
   DeleteOldDOSBoxSettings;
   For I:=0 to FDOSBox.Count-1 do TDOSBoxSetting(FDOSBox[I]).Free;
   FDOSBox.Free;
+
+  DeleteOldPackerSettings;
+  For I:=0 to FPacker.Count-1 do TPackerSetting(FPacker[I]).Free;
+  FPacker.Free;
 
   DoneDirs;
   inherited Destroy;
@@ -330,6 +408,25 @@ begin
   I:=FDOSBox.Count+1;
   While MemIni.SectionExists('DOSBox-'+IntToStr(I)) do begin
     MemIni.EraseSection('DOSBox-'+IntToStr(I));
+    Inc(I);
+  end;
+end;
+
+Procedure TPrgSetup.LoadPackerSettings;
+Var I : Integer;
+begin
+  For I:=1 to MaxInt-1 do begin
+    If not MemIni.SectionExists('Packer-'+IntToStr(I)) then break;
+    FPacker.Add(TPackerSetting.Create(self,I-1));
+  end;
+end;
+
+Procedure TPrgSetup.DeleteOldPackerSettings;
+Var I : Integer;
+begin
+  I:=FPacker.Count+1;
+  While MemIni.SectionExists('Packer-'+IntToStr(I)) do begin
+    MemIni.EraseSection('Packer-'+IntToStr(I));
     Inc(I);
   end;
 end;
@@ -462,11 +559,6 @@ begin
   AddIntegerRec(23,'ProgramSets','DOSBoxShortFileNameAlgorithm',3);
 end;
 
-Procedure TPrgSetup.UpdateFile;
-begin
-  UpdatingFile;
-end;
-
 Procedure TPrgSetup.InitDirs;
 begin
   If BaseDir='' then BaseDir:=PrgDataDir;
@@ -509,14 +601,23 @@ begin
   SetString(1000+(ord(UpCase(DriveLetter)))-ord('A'),Value);
 end;
 
-Function TPrgSetup.GetDOSBoxSettingsCount : Integer;
+Function TPrgSetup.GetListCount(Index : Integer) : Integer;
 begin
-  result:=FDOSBox.Count;
+  Case Index of
+    0 : result:=FDOSBox.Count;
+    1 : result:=FPacker.Count;
+    else result:=0;
+  end;
 end;
 
 Function TPrgSetup.GetDOSBoxSettings(I : Integer) : TDOSBoxSetting;
 begin
   If (I<0) or (I>=FDOSBox.Count) then result:=nil else result:=TDOSBoxSetting(FDOSBox[I]);
+end;
+
+Function TPrgSetup.GetPackerSettings(I : Integer) : TPackerSetting;
+begin
+  If (I<0) or (I>=FPacker.Count) then result:=nil else result:=TPackerSetting(FPacker[I]);
 end;
 
 Function TPrgSetup.AddDOSBoxSettings(const Name : String) : Integer;
@@ -544,6 +645,33 @@ begin
   FDOSBox.Exchange(ANr1,ANr2);
   TDOSBoxSetting(FDOSBox[ANr1]).Nr:=ANr1;
   TDOSBoxSetting(FDOSBox[ANr2]).Nr:=ANr2;
+end;
+
+Function TPrgSetup.AddPackerSettings(const Name : String) : Integer;
+begin
+  result:=FPacker.Add(TPackerSetting.Create(self,FPacker.Count));
+  TPackerSetting(FPacker[result]).Name:=Name;
+end;
+
+Function TPrgSetup.DeletePackerSettings(const ANr : Integer) : Boolean;
+Var I : Integer;
+begin
+  result:=(ANr>=0) and (ANr<FPacker.Count);
+  If not result then exit;
+
+  TPackerSetting(FPacker[ANr]).Free;
+  FPacker.Delete(ANr);
+  For I:=ANr to FPacker.Count-1 do TPackerSetting(FPacker[I]).Nr:=I;
+end;
+
+Function TPrgSetup.SwapPackerSettings(const ANr1, ANr2 : Integer) : Boolean;
+begin
+  result:=(ANr1>=0) and (ANr1<FPacker.Count) and (ANr2>=0) and (ANr2<FPacker.Count);
+  If not result then exit;
+
+  FPacker.Exchange(ANr1,ANr2);
+  TPackerSetting(FPacker[ANr1]).Nr:=ANr1;
+  TPackerSetting(FPacker[ANr2]).Nr:=ANr2;
 end;
 
 { global }

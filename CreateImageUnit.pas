@@ -439,7 +439,7 @@ begin
   end;
 
   StartupInfo.cb:=SizeOf(StartupInfo);
-  with StartupInfo do begin lpReserved:=nil; lpDesktop:=nil; dwFlags:=0; cbReserved2:=0; lpReserved2:=nil; end;
+  with StartupInfo do begin lpReserved:=nil; lpDesktop:=nil; lpTitle:=nil; dwFlags:=0; cbReserved2:=0; lpReserved2:=nil; end;
   CreateProcess(PChar(TempDir+ParamBatchFile),PChar('"'+TempDir+ParamBatchFile+'"'),nil,nil,False,0,nil,PChar(PrgDir),StartupInfo,ProcessInformation);
 
   WaitForSingleObject(ProcessInformation.hThread,INFINITE);

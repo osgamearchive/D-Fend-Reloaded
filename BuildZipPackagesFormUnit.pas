@@ -68,7 +68,7 @@ begin
   DestFolderEdit.Text:=IncludeTrailingPathDelimiter(GetSpecialFolder(Handle,CSIDL_DESKTOPDIRECTORY));
 
   BuildCheckList(ListBox,GameDB,False,False,True);
-  BuildSelectPopupMenu(PopupMenu,GameDB,SelectButtonClick,False);
+  BuildSelectPopupMenu(PopupMenu,GameDB,SelectButtonClick,False,True);
 end;
 
 procedure TBuildZipPackagesForm.SelectButtonClick(Sender: TObject);

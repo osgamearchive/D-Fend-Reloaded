@@ -68,7 +68,7 @@ end;
 procedure TCreateXMLForm.FormShow(Sender: TObject);
 begin
   BuildCheckList(ListBox,GameDB,True,True);
-  BuildSelectPopupMenu(PopupMenu,GameDB,SelectButtonClick,True);
+  BuildSelectPopupMenu(PopupMenu,GameDB,SelectButtonClick,True,True);
 end;
 
 procedure TCreateXMLForm.SelectButtonClick(Sender: TObject);
