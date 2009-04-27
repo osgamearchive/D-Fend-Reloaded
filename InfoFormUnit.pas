@@ -32,11 +32,13 @@ type
     EasterImage3: TImage;
     Timer: TTimer;
     Image2: TImage;
+    Image3: TImage;
     procedure FormShow(Sender: TObject);
     procedure HomepageLabelClick(Sender: TObject);
     procedure Label1DblClick(Sender: TObject);
     procedure TimerTimer(Sender: TObject);
     procedure FormKeyPress(Sender: TObject; var Key: Char);
+    procedure Image3Click(Sender: TObject);
   private
     { Private-Deklarationen }
     FImage : TImage;
@@ -86,11 +88,23 @@ begin
   LanguageAuthorsTab.ColWidths[2]:=75;
   LanguageAuthorsTab.ColWidths[1]:=LanguageAuthorsTab.ClientWidth-LanguageAuthorsTab.ColWidths[0]-LanguageAuthorsTab.ColWidths[2]-5;
 
-  try LicenseMemo.Lines.LoadFromFile(PrgDir+'License.txt'); except end;
+  If FileExists(PrgDir+'License.txt') then begin
+    try LicenseMemo.Lines.LoadFromFile(PrgDir+'License.txt'); except end;
+  end else begin
+    try LicenseMemo.Lines.LoadFromFile(PrgDir+BinFolder+'\'+'License.txt'); except end;
+  end;
   LicenseMemo.Lines.Insert(0,'');
-  try CompLicenseMemo.Lines.LoadFromFile(PrgDir+'LicenseComponents.txt'); except end;
+  If FileExists(PrgDir+'LicenseComponents.txt') then begin
+    try CompLicenseMemo.Lines.LoadFromFile(PrgDir+'LicenseComponents.txt'); except end;
+  end else begin
+    try CompLicenseMemo.Lines.LoadFromFile(PrgDir+BinFolder+'\'+'LicenseComponents.txt'); except end;
+  end;
   CompLicenseMemo.Lines.Insert(0,'');
-  try ChangeLogMemo.Lines.LoadFromFile(PrgDir+'ChangeLog.txt'); except end;
+  If FileExists(PrgDir+'ChangeLog.txt') then begin
+    try ChangeLogMemo.Lines.LoadFromFile(PrgDir+'ChangeLog.txt'); except end;
+  end else begin
+    try ChangeLogMemo.Lines.LoadFromFile(PrgDir+BinFolder+'\'+'ChangeLog.txt'); except end;
+  end;
   If ChangeLogMemo.Lines.Count>0 then ChangeLogMemo.Lines.Delete(0);
   ChangeLogMemo.Font.Name:='Courier New';
 
@@ -101,7 +115,7 @@ begin
       I:=FindFirst(PrgDir+LanguageSubDir+'\*.ini',faAnyFile,Rec);
       try
         while I=0 do begin
-          If StShort.IndexOf(ExtUpperCase(Rec.Name))<0 then begin
+          If (ExtLowerCase(Copy(Rec.Name,length(Rec.Name)-10))<>'.custom.ini') and (StShort.IndexOf(ExtUpperCase(Rec.Name))<0) then begin
             St.Add(PrgDir+LanguageSubDir+'\'+Rec.Name);
             StShort.Add(ExtUpperCase(Rec.Name));
           end;
@@ -116,7 +130,7 @@ begin
       I:=FindFirst(PrgDataDir+LanguageSubDir+'\*.ini',faAnyFile,Rec);
       try
         while I=0 do begin
-          If StShort.IndexOf(ExtUpperCase(Rec.Name))<0 then begin
+          If (ExtLowerCase(Copy(Rec.Name,length(Rec.Name)-10))<>'.custom.ini') and (StShort.IndexOf(ExtUpperCase(Rec.Name))<0) then begin
             St.Add(PrgDataDir+LanguageSubDir+'\'+Rec.Name);
             StShort.Add(ExtUpperCase(Rec.Name));
           end;
@@ -163,6 +177,11 @@ end;
 procedure TInfoForm.HomepageLabelClick(Sender: TObject);
 begin
   ShellExecute(Handle,'open',PChar(HomepageLabel.Caption),nil,nil,SW_SHOW);
+end;
+
+procedure TInfoForm.Image3Click(Sender: TObject);
+begin
+  ShellExecute(Handle,'open',PChar('http:/'+'/gplv3.fsf.org/'),nil,nil,SW_SHOW);
 end;
 
 procedure TInfoForm.Label1DblClick(Sender: TObject);

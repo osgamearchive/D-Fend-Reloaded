@@ -192,10 +192,10 @@ object WizardScummVMFrame: TWizardScummVMFrame
   object DataFolderShowButton: TBitBtn
     Left = 8
     Top = 241
-    Width = 217
+    Width = 257
     Height = 25
     Caption = 'Zus'#228'tzliche Dateien konfigurieren'
-    TabOrder = 2
+    TabOrder = 3
     OnClick = DataFolderShowButtonClick
     Glyph.Data = {
       76010000424D7601000000000000760000002800000020000000100000000100
@@ -221,7 +221,7 @@ object WizardScummVMFrame: TWizardScummVMFrame
     EditLabel.Width = 241
     EditLabel.Height = 13
     EditLabel.Caption = 'Verzeichnis mit den zus'#228'tzlichen Dateien (optional)'
-    TabOrder = 3
+    TabOrder = 4
     Visible = False
   end
   object BaseDataFolderEdit: TLabeledEdit
@@ -236,7 +236,7 @@ object WizardScummVMFrame: TWizardScummVMFrame
       'Empfohlenes '#252'bergeordnetes Verzeichnis f'#252'r das Zusatzdaten-Verze' +
       'ichnis'
     ReadOnly = True
-    TabOrder = 4
+    TabOrder = 5
     Visible = False
   end
   object GameNameComboBox: TComboBox
@@ -247,6 +247,15 @@ object WizardScummVMFrame: TWizardScummVMFrame
     Style = csDropDownList
     Anchors = [akLeft, akTop, akRight]
     ItemHeight = 13
-    TabOrder = 5
+    TabOrder = 6
+  end
+  object DataFolderAutomaticCheckBox: TCheckBox
+    Left = 8
+    Top = 220
+    Width = 569
+    Height = 17
+    Anchors = [akLeft, akTop, akRight]
+    Caption = 'Verzeichnis f'#252'r zus'#228'tzliche Dateien automatisch festlegen'
+    TabOrder = 2
   end
 end

@@ -21,9 +21,11 @@ type
     { Public-Deklarationen }
     Function GetName : String;
     Procedure InitGUIAndLoadSetup(InitData : TInitData);
+    Procedure BeforeChangeLanguage;
     Procedure LoadLanguage;
     Procedure DOSBoxDirChanged;
     Procedure ShowFrame(const AdvencedMode : Boolean);
+    procedure HideFrame;
     Procedure RestoreDefaults;
     Procedure SaveSetup;
   end;
@@ -61,6 +63,10 @@ begin
   RecycleBinListBox.Checked[6]:=(S[Integer(ftTemp)+1]='1');
 end;
 
+procedure TSetupFrameSecurity.BeforeChangeLanguage;
+begin
+end;
+
 procedure TSetupFrameSecurity.LoadLanguage;
 begin
   NoFlicker(AskBeforeDeleteCheckBox);
@@ -91,6 +97,10 @@ begin
 end;
 
 procedure TSetupFrameSecurity.ShowFrame(const AdvencedMode: Boolean);
+begin
+end;
+
+procedure TSetupFrameSecurity.HideFrame;
 begin
 end;
 

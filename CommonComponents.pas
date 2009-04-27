@@ -267,7 +267,7 @@ end;
 
 procedure TBasePrgSetup.UpdateFile;
 begin
-  try Ini.UpdateFile; except end; {Language Files may be read only in program foldes}
+  try ForceDirectories(ExtractFilePath(Ini.FileName)); Ini.UpdateFile; except end; {Language Files may be read only in program foldes}
 end;
 
 procedure TBasePrgSetup.ResetToDefault;

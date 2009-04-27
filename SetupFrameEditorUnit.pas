@@ -25,16 +25,19 @@ type
     { Public-Deklarationen }
     Function GetName : String;
     Procedure InitGUIAndLoadSetup(InitData : TInitData);
+    Procedure BeforeChangeLanguage;
     Procedure LoadLanguage;
     Procedure DOSBoxDirChanged;
     Procedure ShowFrame(const AdvencedMode : Boolean);
+    procedure HideFrame;
     Procedure RestoreDefaults;
     Procedure SaveSetup;
   end;
 
 implementation
 
-uses ShlObj, CommonTools, LanguageSetupUnit, VistaToolsUnit, PrgSetupUnit, HelpConsts;
+uses ShlObj, CommonTools, LanguageSetupUnit, VistaToolsUnit, PrgSetupUnit,
+     HelpConsts, IconLoaderUnit;
 
 {$R *.dfm}
 
@@ -65,7 +68,13 @@ begin
   FallbackCheckBox.Checked:=PrgSetup.FileTypeFallbackForEditor;
   FixLineWrapCheckBox.Checked:=PrgSetup.AutoFixLineWrap;
 
+  UserIconLoader.DialogImage(DI_SelectFile,CustomButton);
+
   RadioButtonClick(self);
+end;
+
+procedure TSetupFrameEditor.BeforeChangeLanguage;
+begin
 end;
 
 procedure TSetupFrameEditor.LoadLanguage;
@@ -87,6 +96,10 @@ begin
 end;
 
 procedure TSetupFrameEditor.ShowFrame(const AdvencedMode: Boolean);
+begin
+end;
+
+procedure TSetupFrameEditor.HideFrame;
 begin
 end;
 

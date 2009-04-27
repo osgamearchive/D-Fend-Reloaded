@@ -38,7 +38,7 @@ Function ShowExpandImageDialog(const AOwner : TComponent) : Boolean;
 implementation
 
 uses ShellAPI, VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgSetupUnit,
-     GameDBUnit, DOSBoxUnit, ImageTools, HelpConsts;
+     GameDBUnit, DOSBoxUnit, ImageTools, HelpConsts, IconLoaderUnit;
 
 {$R *.dfm}
 
@@ -49,7 +49,7 @@ begin
 
   Caption:=LanguageSetup.ExtractImageCaption;
   FileNameEdit.EditLabel.Caption:=LanguageSetup.ExtractImageImageFile;
-  FileNamebutton.Hint:=LanguageSetup.ChooseFile;
+  FileNameButton.Hint:=LanguageSetup.ChooseFile;
   FolderEdit.EditLabel.Caption:=LanguageSetup.ExtractImageDestinationFolder;
   FolderButton.Hint:=LanguageSetup.ChooseFolder;
   OpenFolderCheckBox.Caption:=LanguageSetup.ExtractImageOpenDestinationFolder;
@@ -64,6 +64,9 @@ begin
   HelpButton.Caption:=LanguageSetup.Help;
   OpenDialog.Title:=LanguageSetup.ExtractImageOpenFileTitle;
   OpenDialog.Filter:=LanguageSetup.ExtractImageOpenFileFilter;
+
+  UserIconLoader.DialogImage(DI_SelectFile,FileNameButton);
+  UserIconLoader.DialogImage(DI_SelectFolder,FolderButton);
 end;
 
 procedure TExpandImageForm.ButtonWork(Sender: TObject);

@@ -36,8 +36,10 @@ const ID_Index=1;
       ID_FileOptionsMediaViewers=1123;
       ID_FileOptionsService=1124;
       ID_FileOptionsSearchForUpdates=1125;
-      ID_FileOptionsWindows=1; //...
-      ID_FileOptionsZipPackers=1; //...
+      ID_FileOptionsWindows=1126;
+      ID_FileOptionsZipPackers=1127;
+      ID_FileOptionsGamesListTranslations=1128;
+      ID_FileOptionsGameListInIconMode=1129;
 
       ID_ViewQuickStarter=1501;
 
@@ -81,7 +83,8 @@ const ID_Index=1;
       ID_ProfileEditPrinter=2121;
       ID_ProfileEditDOSEnvironment=2122;
       ID_ProfileEditStarting=2123;
-      ID_ProfileEditHelperPrograms=1; //...
+      ID_ProfileEditHelperPrograms=2124;
+      ID_ProfileEditHardware=2125;
 
       ID_ExtrasManageIcons=3001;
       ID_ExtrasViewHistory=3002;
@@ -93,18 +96,21 @@ const ID_Index=1;
       ID_ExtrasImagesCreateImageFromCD=3008;
       ID_ExtrasImagesExtractToFolder=3009;
       ID_ExtrasImagesCreateFromFolder=3010;
-      ID_ExtrasEditMultipleProfiles=3011;
-      ID_ExtrasUninstallMultipleGames=3012;
-      ID_ExtrasTransferProfiles=3013;
-      ID_ExtrasBuildInstallers=3014;
-      ID_ExtrasBuildZipPackages=3015;
-      ID_ExtrasCheckProfiles=3016;
+      ID_ExtrasScanGamesFolder=3011;
+      ID_ExtrasEditMultipleProfiles=3012;
+      ID_ExtrasUninstallMultipleGames=3013;
+      ID_ExtrasTransferProfiles=3014;
+      ID_ExtrasBuildInstallers=3015;
+      ID_ExtrasBuildZipPackages=3016;
+      ID_ExtrasCheckProfiles=3017;
+      ID_ExtrasCreateShortcuts=3018;
 
       ID_HelpForum=4001;
       ID_HelpLanguageEditor=4002;
       ID_HelpStatistics=4003;
       ID_HelpOperationMode=4004;
       ID_HelpSearchForUpdates=4005;
+	  ID_HelpOldGames=4006;
 
 implementation
 

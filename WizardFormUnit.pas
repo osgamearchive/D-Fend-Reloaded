@@ -35,6 +35,8 @@ type
     WizardScummVMSettingsFrame : TWizardScummVMSettingsFrame;
     InsecureTemplate : Boolean;
     ScummVM, WindowsMode : Boolean;
+    WizardMode : Integer;
+    DoOKButtonClick : Boolean;
     Procedure SetActivePage(NewPage : Integer);
     Function CalcProfileName : String;
     Function CalcProfileNameFromFile : String;
@@ -56,7 +58,7 @@ Function ShowWizardDialog(const AOwner : TComponent; const AGameDB : TGameDB; co
 implementation
 
 uses VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgSetupUnit,
-     GameDBToolsUnit, DOSBoxUnit, HelpConsts;
+     GameDBToolsUnit, DOSBoxUnit, HelpConsts, IconLoaderUnit;
 
 {$R *.dfm}
 
@@ -106,7 +108,11 @@ begin
   OKButton.Caption:=LanguageSetup.OK;
   CancelButton.Caption:=LanguageSetup.Cancel;
   HelpButton.Caption:=LanguageSetup.Help;
-  
+
+  UserIconLoader.DialogImage(DI_Previous,PreviousButton);
+  UserIconLoader.DialogImage(DI_Next,NextButton);
+
+  DoOKButtonClick:=False;
   ActivePage:=0;
   InsecureTemplate:=False;
   OpenEditorNow:=False;
@@ -171,6 +177,7 @@ begin
           ScummVM:=(WizardBaseFrame.EmulationTypeRadioGroup.ItemIndex=1) and (WizardBaseFrame.EmulationTypeRadioGroup.Items.Count=3);
           WindowsMode:=(WizardBaseFrame.EmulationTypeRadioGroup.ItemIndex=WizardBaseFrame.EmulationTypeRadioGroup.Items.Count-1);
           If ScummVM then WizardScummVMFrame.ShowScummVMFrame;
+          WizardMode:=WizardBaseFrame.WizardModeRadioGroup.ItemIndex;
         end;
     1 : If NewPage=2 then begin
           {Progam file page -> next page (template or ScummVM settings)}
@@ -193,6 +200,7 @@ begin
               end;
               WizardGameInfoFrame.SetGameName(CalcProfileName,nil);
               NewPage:=3;
+              If WizardMode<2 then DoOKButtonClick:=True;
             end else begin
               If Trim(WizardPrgFileFrame.ProgramEdit.Text)<>'' then begin
                 S:=MakeAbsPath(WizardPrgFileFrame.ProgramEdit.Text,PrgSetup.BaseDir);
@@ -207,12 +215,18 @@ begin
                 end;
               end;
               WizardTemplateFrame.SearchTemplates(WizardPrgFileFrame.ProgramEdit.Text);
+
+              If (WizardMode=0) or ((WizardTemplateFrame.TemplateType1List.Items.Count>0) and (WizardMode=1)) then begin
+                If WizardTemplateFrame.TemplateType1List.Items.Count>0 then begin WizardTemplateFrame.TemplateType1List.ItemIndex:=0; WizardTemplateFrame.TemplateType1.Checked:=True; end;
+                DoOKButtonClick:=True;
+              end;
             end;
           end else begin
             If Trim(WizardScummVMFrame.ProgramEdit.Text)='' then begin
               If MessageDlg(LanguageSetup.MessageNoGameFileNameWarning,mtConfirmation,[mbYes,mbNo],0)<>mrYes then exit;
             end;
             WizardScummVMSettingsFrame.SetScummVMGameName(WizardScummVMFrame.GetScummVMGameName,WizardScummVMFrame.ProgramEdit.Text);
+            If WizardMode<2 then DoOKButtonClick:=True;
           end;
         end;
     2 : If NewPage=3 then begin
@@ -270,6 +284,10 @@ begin
     0 : SetActivePage(ActivePage-1);
     1 : SetActivePage(ActivePage+1);
   end;
+  If DoOKButtonClick then begin
+    OKButtonClick(Sender);
+    ModalResult:=mrOK;
+  end;
 end;
 
 procedure TWizardForm.OKButtonClick(Sender: TObject);
@@ -296,10 +314,15 @@ begin
       else Game:=WizardTemplateFrame.CreateGame(WizardGameInfoFrame.BaseName.Text);
   end;
   WizardBaseFrame.WriteDataToGame(Game);
-  If ScummVM
-    then WizardScummVMFrame.WriteDataToGame(Game)
+  If ScummVM then begin
+    WizardScummVMFrame.WriteDataToGame(Game);
+  end
     else WizardPrgFileFrame.WriteDataToGame(Game);
   WizardGameInfoFrame.WriteDataToGame(Game);
+  If (Trim(Game.Name)='') and (WizardScummVMFrame.GameNameComboBox.ItemIndex>=0) then begin
+    Game.Name:=CalcProfileName;
+  end;
+
   WizardFinishFrame.WriteDataToGame(Game);
   OpenEditorNow:=WizardFinishFrame.ProfileEditorCheckBox.Checked;
   If not ScummVM then begin

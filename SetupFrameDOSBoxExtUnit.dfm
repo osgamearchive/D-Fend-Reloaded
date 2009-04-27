@@ -2,22 +2,23 @@ object SetupFrameDOSBoxExt: TSetupFrameDOSBoxExt
   Left = 0
   Top = 0
   Width = 585
-  Height = 588
+  Height = 636
   TabOrder = 0
   object ScrollBox: TScrollBox
     Left = 0
     Top = 0
     Width = 585
-    Height = 588
+    Height = 636
     HorzScrollBar.Visible = False
     VertScrollBar.Smooth = True
     VertScrollBar.Tracking = True
     Align = alClient
     BorderStyle = bsNone
     TabOrder = 0
+    ExplicitHeight = 613
     DesignSize = (
       585
-      588)
+      636)
     object WarningLabel: TLabel
       Left = 16
       Top = 16
@@ -32,13 +33,13 @@ object SetupFrameDOSBoxExt: TSetupFrameDOSBoxExt
       Left = 16
       Top = 96
       Width = 545
-      Height = 73
+      Height = 121
       Anchors = [akLeft, akTop, akRight]
       Caption = 'MountDialogGroupBox'
       TabOrder = 0
       DesignSize = (
         545
-        73)
+        121)
       object MultiFloppyImageCheckBox: TCheckBox
         Left = 16
         Top = 24
@@ -57,18 +58,36 @@ object SetupFrameDOSBoxExt: TSetupFrameDOSBoxExt
         Caption = 'Activate PhysFS tab'
         TabOrder = 1
       end
+      object SecureModeCheckBox: TCheckBox
+        Left = 16
+        Top = 72
+        Width = 513
+        Height = 17
+        Anchors = [akLeft, akTop, akRight]
+        Caption = 'Allow activating secure mode'
+        TabOrder = 2
+      end
+      object MoreIOCTLSettingsCheckBox: TCheckBox
+        Left = 16
+        Top = 95
+        Width = 513
+        Height = 17
+        Anchors = [akLeft, akTop, akRight]
+        Caption = 'Allow more IOCTL settings'
+        TabOrder = 3
+      end
     end
     object GraphicsGroupBox: TGroupBox
       Left = 16
-      Top = 183
+      Top = 231
       Width = 545
-      Height = 146
+      Height = 170
       Anchors = [akLeft, akTop, akRight]
       Caption = 'GraphicsGroupBox'
       TabOrder = 1
       DesignSize = (
         545
-        146)
+        170)
       object ExtendedTextModeCheckBox: TCheckBox
         Left = 16
         Top = 24
@@ -117,10 +136,21 @@ object SetupFrameDOSBoxExt: TSetupFrameDOSBoxExt
         TabOrder = 4
         OnClick = DefaultValueChanged
       end
+      object PixelShaderCheckBox: TCheckBox
+        Tag = 1
+        Left = 16
+        Top = 141
+        Width = 513
+        Height = 17
+        Anchors = [akLeft, akTop, akRight]
+        Caption = 'Activate pixel shader settings'
+        TabOrder = 5
+        OnClick = DefaultValueChanged
+      end
     end
     object SoundGroupBox: TGroupBox
       Left = 16
-      Top = 344
+      Top = 416
       Width = 545
       Height = 57
       Anchors = [akLeft, akTop, akRight]
@@ -143,7 +173,7 @@ object SetupFrameDOSBoxExt: TSetupFrameDOSBoxExt
     end
     object PrinterGroupBox: TGroupBox
       Left = 16
-      Top = 415
+      Top = 487
       Width = 545
       Height = 58
       Anchors = [akLeft, akTop, akRight]
@@ -153,6 +183,27 @@ object SetupFrameDOSBoxExt: TSetupFrameDOSBoxExt
         545
         58)
       object PrinterCheckBox: TCheckBox
+        Left = 16
+        Top = 24
+        Width = 513
+        Height = 17
+        Anchors = [akLeft, akTop, akRight]
+        Caption = 'Activate printer settings'
+        TabOrder = 0
+      end
+    end
+    object CPUGroupBox: TGroupBox
+      Left = 16
+      Top = 559
+      Width = 545
+      Height = 58
+      Anchors = [akLeft, akTop, akRight]
+      Caption = 'CPUGroupBox'
+      TabOrder = 4
+      DesignSize = (
+        545
+        58)
+      object CPUTypeCheckBox: TCheckBox
         Left = 16
         Top = 24
         Width = 513

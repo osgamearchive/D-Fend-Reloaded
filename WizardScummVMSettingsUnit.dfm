@@ -52,6 +52,7 @@ object WizardScummVMSettingsFrame: TWizardScummVMSettingsFrame
     Style = csDropDownList
     ItemHeight = 13
     TabOrder = 0
+    OnChange = LanguageComboBoxChange
   end
   object StartFullscreenCheckBox: TCheckBox
     Left = 20
@@ -126,5 +127,13 @@ object WizardScummVMSettingsFrame: TWizardScummVMSettingsFrame
       TabOrder = 2
       OnChange = SavePathEditChange
     end
+  end
+  object CustomLanguageEdit: TEdit
+    Left = 130
+    Top = 104
+    Width = 50
+    Height = 21
+    TabOrder = 3
+    Visible = False
   end
 end

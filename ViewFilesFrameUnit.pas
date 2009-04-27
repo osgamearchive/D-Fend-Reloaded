@@ -36,6 +36,8 @@ type
     ListOpenInDefaultViewer: TMenuItem;
     TreeCreateFolder: TMenuItem;
     ListCreateFolder: TMenuItem;
+    N1: TMenuItem;
+    ListUseInScreenshotList: TMenuItem;
     procedure SetupDataDirButtonClick(Sender: TObject);
     procedure ButtonWork(Sender: TObject);
     procedure TreeChange(Sender: TObject; Node: TTreeNode);
@@ -53,6 +55,7 @@ type
     hChangeNotification : THandle;
     Timer : TTimer;
     PopupSelNode : TTreeNode;
+    FOnUpdateGamesList : TNotifyEvent;
     Function GetNewDataFolderName : String;
     Function ReadTree(const ParentNode : TTreeNode; const Dir, OldSelNode : String) : TTreeNode;
     Function GetCurrentPath(const  TreeNode : TTreeNode = nil) : String;
@@ -66,13 +69,14 @@ type
     Procedure Init;
     Procedure LoadLanguage;
     Procedure SetGame(const AGame : TGame);
+    property OnUpdateGamesList : TNotifyEvent read FOnUpdateGamesList write FOnUpdateGamesList;
   end;
 
 implementation
 
 uses ShellAPI, VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgSetupUnit,
      ViewImageFormUnit, PlaySoundFormUnit, PlayVideoFormUnit, GameDBToolsUnit,
-     ClassExtensions;
+     ClassExtensions, IconLoaderUnit;
 
 {$R *.dfm}
 
@@ -140,19 +144,37 @@ begin
   ListRename.Caption:=LanguageSetup.ViewDataFilesRename;
   ListDelete.Caption:=LanguageSetup.ViewDataFilesDelete;
   ListExplorer.Caption:=LanguageSetup.ViewDataFilesOpen;
+  ListUseInScreenshotList.Caption:=LanguageSetup.ScreenshotPopupUseInScreenshotList;
+
+  UserIconLoader.DialogImage(DI_Folder,ImageList,0);
+  UserIconLoader.DialogImage(DI_SelectFolder,ImageList,1);
+  UserIconLoader.DialogImage(DI_Update,ImageList,2);
+  UserIconLoader.DialogImage(DI_ExploreFolder,ImageList,3);
+  UserIconLoader.DialogImage(DI_TextFile,ImageList,4);
+  UserIconLoader.DialogImage(DI_Image,ImageList,5);
+  UserIconLoader.DialogImage(DI_Sound,ImageList,6);
+  UserIconLoader.DialogImage(DI_Video,ImageList,7);
+  UserIconLoader.DialogImage(DI_InternetPage,ImageList,8);
+  UserIconLoader.DialogImage(DI_Edit,ImageList,9);
+  UserIconLoader.DialogImage(DI_Clear,ImageList,10);
 
   ToolBar.Font.Size:=PrgSetup.ToolbarFontSize;
 end;
 
 function TViewFilesFrame.GetNewDataFolderName: String;
-Var S : String;
+Var S,T : String;
+    I : Integer;
 begin
   result:='';
   If Game=nil then exit;
 
   If PrgSetup.DataDir='' then S:=PrgSetup.BaseDir else S:=PrgSetup.DataDir;
-  S:=IncludeTrailingPathDelimiter(S)+MakeFileSysOKFolderName(Game.Name)+'\';
-  result:=MakeRelPath(S,PrgSetup.BaseDir);
+  T:=IncludeTrailingPathDelimiter(S)+MakeFileSysOKFolderName(Game.Name)+'\';
+  I:=0;
+  While DirectoryExists(T) do begin
+    inc(I); T:=IncludeTrailingPathDelimiter(S)+MakeFileSysOKFolderName(Game.Name)+IntToStr(I)+'\';
+  end;
+  result:=MakeRelPath(T,PrgSetup.BaseDir);
 end;
 
 procedure TViewFilesFrame.SetGame(const AGame: TGame);
@@ -170,6 +192,16 @@ begin
 
   B:=(Trim(Game.DataDir)<>'');
 
+  If B then begin
+    If not DirectoryExists(MakeAbsPath(Game.DataDir,PrgSetup.BaseDir)) then begin
+      If not ForceDirectories(MakeAbsPath(Game.DataDir,PrgSetup.BaseDir)) then begin
+        Game.DataDir:='';
+        Game.StoreAllValues;
+        B:=False;
+      end;
+    end;
+  end;
+  
   {To fix problems with buttons no hiden the right way when setting game while Frame is invisible}
   ToolBar.Visible:=True;
   Tree.Visible:=True;
@@ -301,7 +333,7 @@ Var Path : String;
     Rec : TSearchRec;
     S,SelSaveText : String;
 begin
-  TreeDelete.Visible:=(Node<>nil) and (Node.Parent<>nil);
+  TreeDelete.Visible:=(Node<>nil);
   TreeRename.Visible:=(Node<>nil) and (Node.Parent<>nil);
   TreeExplorer.Visible:=(Node<>nil);
   ListExplorer.Visible:=(Node<>nil);
@@ -351,7 +383,7 @@ end;
 procedure TViewFilesFrame.TreePopupMenuPopup(Sender: TObject);
 begin
   TreeRename.Visible:=(Tree.Selected<>nil) and (Tree.Selected.Parent<>nil);
-  TreeDelete.Visible:=(Tree.Selected<>nil) and (Tree.Selected.Parent<>nil);
+  TreeDelete.Visible:=(Tree.Selected<>nil);
   PopupSelNode:=Tree.Selected;
 end;
 
@@ -385,6 +417,15 @@ begin
     If (S='.AVI') or (S='.MPG') or (S='.MPEG') or (S='.WMV') or (S='.ASF') then T:=PrgSetup.VideoPlayer;
     T:=Trim(ExtUpperCase(T));
     ListOpenInDefaultViewer.Visible:=(T='') or (T='INTERNAL');
+  end;
+
+  If OpenFileButton.Enabled then begin
+    S:=ExtUpperCase(ExtractFileExt(List.Selected.Caption));
+    ListUseInScreenshotList.Visible:=(S='.JPG') or (S='.JPEG') or (S='.BMP') or (S='.PNG') or (S='.GIF');
+    If ListUseInScreenshotList.Visible then begin
+      S:=GetCurrentPath+List.Selected.Caption;
+      ListUseInScreenshotList.Checked:=((Trim(ExtUpperCase(S))=Trim(ExtUpperCase(MakeAbsPath(Game.ScreenshotListScreenshot,PrgSetup.BaseDir)))));
+    end;
   end;
 end;
 
@@ -436,6 +477,7 @@ end;
 
 procedure TViewFilesFrame.MenuWork(Sender: TObject);
 Var S,T : String;
+    IsRoot : Boolean;
 begin
   If PopupSelNode<>nil then Tree.Selected:=PopupSelNode;
   PopupSelNode:=nil;
@@ -454,13 +496,19 @@ begin
            ButtonWork(UpdateButton);
          end;
 
-    22 : If (Tree.Selected<>nil) and (Tree.Selected.Parent<>nil) then begin
+    22 : If Tree.Selected<>nil then begin
            If MessageDlg(Format(LanguageSetup.MessageConfirmationDeleteFolder,[GetCurrentPath]),mtConfirmation,[mbYes,mbNo],0)<>mrYes then exit;
+           IsRoot:=(Tree.Selected.Parent=nil);
            If not ExtDeleteFolder(GetCurrentPath,ftDataViewer) then begin
              MessageDlg(Format(LanguageSetup.MessageCouldNotDeleteDir,[GetCurrentPath]),mtError,[mbOK],0);
              exit;
            end;
-           Tree.Selected:=Tree.Selected.Parent;
+           If IsRoot then begin
+             Game.DataDir:='';
+             Game.StoreAllValues;
+           end else begin
+             Tree.Selected:=Tree.Selected.Parent;
+           end;
            ButtonWork(UpdateButton);
          end;
     23 : begin
@@ -497,6 +545,13 @@ begin
            ButtonWork(UpdateButton);
          end;
     34 : RunFile(True);
+    35 : If List.Selected<>nil then begin
+          S:=GetCurrentPath+List.Selected.Caption;
+          If Trim(ExtUpperCase(S))=Trim(ExtUpperCase(MakeAbsPath(Game.ScreenshotListScreenshot,PrgSetup.BaseDir)))
+            then Game.ScreenshotListScreenshot:=''
+            else Game.ScreenshotListScreenshot:=MakeRelPath(S,PrgSetup.BaseDir);
+          If Assigned(FOnUpdateGamesList) then FOnUpdateGamesList(self);
+        end;
   end;
 end;
 
@@ -533,7 +588,7 @@ begin
           MessageDlg(Format(LanguageSetup.MessageCouldNotCreateDir,[S]),mtError,[mbOK],0);
           exit;
         end;
-        If not CopyFiles(FileName,S) then begin
+        If not CopyFiles(FileName,S,True) then begin
           MessageDlg(Format(LanguageSetup.MessageCouldNotCopyFiles,[FileName,S]),mtError,[mbOK],0);
           exit;
         end;
@@ -568,7 +623,7 @@ begin
           MessageDlg(Format(LanguageSetup.MessageCouldNotCreateDir,[S]),mtError,[mbOK],0);
           exit;
         end;
-        If not CopyFiles(FileName,S) then begin
+        If not CopyFiles(FileName,S,True) then begin
           MessageDlg(Format(LanguageSetup.MessageCouldNotCopyFiles,[FileName,S]),mtError,[mbOK],0);
           exit;
         end;

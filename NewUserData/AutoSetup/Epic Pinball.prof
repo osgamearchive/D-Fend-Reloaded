@@ -9,13 +9,13 @@ NrOfMounts=1
 Tab=1
 Tab2=0
 Exe=PINBALL.EXE
-ExeMD5=CAF0205C1F92DC7275227FFBDEDD98AD
-Setup=SETUP.EXE
-SetupMD5=710C4D085587B0178635C95A8FAEE28F
+ExeMD5=0352CF4F4D356D018849EAF101B50004
+Setup=
+SetupMD5=
 GameParameters=
 SetupParameters=
-LastModification=39539-76191
-0=.\VirtualHD\;Drive;C;false;
+LastModification=39549-83446
+0=.\VirtualHD;Drive;C;False;;
 1=
 2=
 3=
@@ -25,7 +25,7 @@ LastModification=39539-76191
 7=
 8=
 9=
-autoexec=
+autoexec=[13]
 BootImage=
 Finalization=
 CustomSettings=
@@ -46,19 +46,19 @@ Year=1993
 Notes=
 WWW=
 Language=English
-UserInfo=License=Shareware[13]
+UserInfo=
 
 [sdl]
 fullscreen=1
 autolock=0
-fulldouble=1
+fulldouble=0
 usecancodes=1
 sensitivity=100
-output=overlay
+output=surface
 windowresolution=original
 fullresolution=original
 priority=higher,normal
-mapperfile=default
+mapperfile=mapper.txt
 
 [dos]
 Force2ButtonMouseMode=0
@@ -86,6 +86,17 @@ ipx=0
 type=none
 address=
 port=213
+
+[glide]
+glide=0
+
+[printer]
+printer=0
+multipage=0
+dpi=360
+width=85
+height=110
+printoutput=ps
 
 [mixer]
 nosound=0
@@ -159,7 +170,7 @@ Language=en
 MusicDriver=auto
 
 [dosbox]
-memsize=32
+memsize=16
 captures=
 DOSBoxDirectory=
 machine=vga
@@ -167,8 +178,12 @@ machine=vga
 [cpu]
 cyclesup=500
 cyclesdown=20
-core=dynamic
-cycles=10000
+core=normal
+cycles=3000
+
+[vga]
+videoram=2048
+svgachipset=s3
 
 [serial]
 serial1=Dummy

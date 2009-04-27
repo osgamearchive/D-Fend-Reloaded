@@ -53,7 +53,7 @@ Function ShowIconManager(const AOwner : TComponent; var AIcon : String; const AD
 implementation
 
 uses LanguageSetupUnit, VistaToolsUnit, CommonTools, PrgConsts, PrgSetupUnit,
-     HelpConsts;
+     HelpConsts, IconLoaderUnit;
 
 {$R *.dfm}
 
@@ -76,6 +76,8 @@ begin
   OpenDialog.Filter:=LanguageSetup.MenuExtrasIconManagerFilter;
 
   Dir:=IncludeTrailingPathDelimiter(PrgDataDir+IconsSubDir);
+
+  UserIconLoader.DialogImage(DI_SelectFile,CustomIconButton);
 end;
 
 procedure TIconManagerForm.FormShow(Sender: TObject);

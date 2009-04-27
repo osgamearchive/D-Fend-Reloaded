@@ -53,6 +53,19 @@ zu CD-Laufwerken usw. k&ouml;nnen nicht erkannt werden und folglich auch nicht
 automatisch erstellt werden.)
 </p>
 
+<ul class="big">
+  <li><b>Zusätzlich alle aktuell verfügbaren CDs automatisch mounten</b><br />
+    Wenn diese Funktion aktiviert ist, bindet D-Fend Reloaded zusätzlich zu den explizit
+	in der oben stehenden Liste angegebenen Laufwerken auch noch alle CD-Laufwerke beim DOSBox-Start ein.
+  </li>
+  <li><b>Einbinden von Laufwerken nach dem DOSBox-Start verhindern</b> <font color="red">(*)</font><br />
+    Wenn dieser Sicherheitsmodus aktiv ist, können Sie (bzw. Programme, die in DOSBox laufen) nach dem
+	Programmstart von DOSBox keine weiteren Laufwerke mehr einbinden. Wenn diese Option eingeschaltet ist,
+	können Sie also sicher sein, dass selbst ein Virus nicht Zugriff auf Daten, die Sie nicht hier explizit
+	eingebunden haben, erlangen kann.
+  </li>
+</ul>
+
 <h2>Der "Laufwerk bearbeiten"-Dialog</h2>
 
 <p>
@@ -83,9 +96,11 @@ folgenden Laufwerkstypen w&auml;hlen:
   </li>
   <li><b>CD-Laufwerk</b><br />
   Diese Option erlaubt es, ein reales CD-Laufwerk als virtuelles CD-Laufwerk
-  in DOSBox einzubinden. Der Pfad, den Sie in dem Eingabefeld
-  "Verzeichnis zum Mounten" angeben k&ouml;nnen, sollte auf das Wurzelverzeichnis
-  eines realen CD-Laufwerks verweisen.
+  in DOSBox einzubinden. Sie haben dabei mehrere Möglichkeiten, nach der
+  das Laufwerk beim Start von DOSBox ausgewählt werden soll. U.a. ist es möglich,
+  das zu verwendende Laufwerk an Hand der eingelegten CD automatisch auszuwählen.
+  Wenn Sie einen festen Pfad als CD-Laufwerk mounten wollen, so sollte der Pfad
+  auf das Wurzelverzeichnis eines realen CD-Laufwerks verweisen.
   </li>
   <li><b>Diskettenimage</b><br />
   Diese Option erlaubt es, ein Diskettenimage als virtuelles Diskettenlaufwerk
@@ -124,10 +139,10 @@ folgenden Laufwerkstypen w&auml;hlen:
 </ul>
 
 <p>
-Die mit <font color="red">(*)</font> markierte Option ist nur verf&uuml;gbar, wenn die
+Die mit <font color="red">(*)</font> markierten Optionen sind nur verf&uuml;gbar, wenn die
 zugeh&ouml;rige Option auf der Dialogseite <a href="FileOptionsDOSBoxCVSFeatures.html">DOSBox CVS-Features</a>
-des <a href="FileOptionsDOSBox.html">Programmeinstellungen</a>-Dialogs aktiviert ist. The offizielle DOSBox
-Version 0.72, die mit D-Fend Reloaded ausgeliefert wird, unterst&uuml;tzt diesen Mount-Typ nicht.
+des <a href="FileOptionsDOSBox.html">Programmeinstellungen</a>-Dialogs aktiviert ist. Die offizielle DOSBox
+Version 0.72, die mit D-Fend Reloaded ausgeliefert wird, unterst&uuml;tzt diesen Mount-Typ und den Sicherheitsmodus nicht.
 </p>
 
 <p>

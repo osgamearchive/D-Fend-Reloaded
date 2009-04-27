@@ -72,7 +72,7 @@ implementation
 
 uses ShellAPI, VistaToolsUnit, LanguageSetupUnit, DiskImageToolsUnit,
      PrgSetupUnit, CommonTools, PrgConsts, GameDBUnit, DOSBoxUnit, ImageTools,
-     HelpConsts;
+     HelpConsts, IconLoaderUnit;
 
 {$R *.dfm}
 
@@ -117,13 +117,18 @@ begin
   CancelButton.Caption:=LanguageSetup.Cancel;
   HelpButton.Caption:=LanguageSetup.Help;
 
+  UserIconLoader.DialogImage(DI_SelectFile,FloppyFileButton);
+  UserIconLoader.DialogImage(DI_SelectFile,HDFileButton);
+  UserIconLoader.DialogImage(DI_ImageFloppy,ImageList,0);
+  UserIconLoader.DialogImage(DI_ImageHD,ImageList,1);
+
   If DirectoryExists(IncludeTrailingPathDelimiter(MakeAbsPath(PrgSetup.PathToFREEDOS,PrgSetup.BaseDir))) then begin
     FloppyNeedFreeDOSLabel.Font.Color:=clGrayText;
   end else begin
     FloppyNeedFreeDOSLabel.Font.Color:=clRed;
   end;
 
-  If FileExists(PrgDir+MakeDOSFilesystemFileName) then begin
+  If FileExists(PrgDir+MakeDOSFilesystemFileName) or FileExists(PrgDir+BinFolder+'\'+MakeDOSFilesystemFileName) then begin
     FloppyCylindersComboBox.Items.Add('40');
     FloppyCylindersComboBox.Items.Add('80');
     FloppySPTComboBox.Items.Add('8');
@@ -271,7 +276,7 @@ begin
     CompressImage:=HDCompressedCheckBox.Checked;
   end;
 
-  If (not FileExists(PrgDir+MakeDOSFilesystemFileName)) or ((PageControl.ActivePageIndex=1) and (ImageTypeRadioGroup.ItemIndex=0)) then begin
+  If ((not FileExists(PrgDir+MakeDOSFilesystemFileName)) and (not FileExists(PrgDir+BinFolder+'\'+MakeDOSFilesystemFileName))) or ((PageControl.ActivePageIndex=1) and (ImageTypeRadioGroup.ItemIndex=0)) then begin
     SimpleImageCreator;
   end else begin
     FATImageCreator;
@@ -328,7 +333,11 @@ begin
       St.Add('16');
     end;
 
-    if not RunWithInput(PrgDir+MakeDOSFilesystemFileName,'',False,St) then exit;
+    If FileExists(PrgDir+MakeDOSFilesystemFileName) then begin
+      if not RunWithInput(PrgDir+MakeDOSFilesystemFileName,'',False,St) then exit;
+    end else begin
+      if not RunWithInput(PrgDir+BinFolder+'\'+MakeDOSFilesystemFileName,'',False,St) then exit;
+    end;
   finally
     St.Free;
   end;
@@ -410,8 +419,8 @@ Var St : TStringList;
 begin
   result:=False;
 
-  If not FileExists(PrgDir+MakeDOSFilesystemFileName) then begin
-    MessageDlg(Format(LanguageSetup.MessageCouldNotFindFile,[PrgDir+MakeDOSFilesystemFileName]),mtError,[mbOK],0);
+  If (not FileExists(PrgDir+MakeDOSFilesystemFileName)) and (not FileExists(PrgDir+BinFolder+'\'+MakeDOSFilesystemFileName)) then begin
+    MessageDlg(Format(LanguageSetup.MessageCouldNotFindFile,[PrgDir+BinFolder+'\'+MakeDOSFilesystemFileName]),mtError,[mbOK],0);
     exit;
   end;
 
@@ -432,7 +441,11 @@ begin
 
   St:=TStringList.Create;
   try
-    St.Add('"'+PrgDir+MakeDOSFilesystemFileName+'" < "'+TempDir+ParamFile+'"');
+    If FileExists(PrgDir+MakeDOSFilesystemFileName) then begin
+      St.Add('"'+PrgDir+MakeDOSFilesystemFileName+'" < "'+TempDir+ParamFile+'"');
+    end else begin
+      St.Add('"'+PrgDir+BinFolder+'\'+MakeDOSFilesystemFileName+'" < "'+TempDir+ParamFile+'"');
+    end;
     St.SaveToFile(TempDir+ParamBatchFile);
   finally
     St.Free;

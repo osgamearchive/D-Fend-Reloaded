@@ -41,7 +41,8 @@ Function ShowUserInfoDialog(const AOwner : TComponent; const AGame : TGame; cons
 
 implementation
 
-uses VistaToolsUnit, LanguageSetupUnit, CommonTools, HelpConsts, ClassExtensions;
+uses VistaToolsUnit, LanguageSetupUnit, CommonTools, HelpConsts,
+     ClassExtensions, IconLoaderUnit;
 
 {$R *.dfm}
 
@@ -63,6 +64,9 @@ begin
   HelpButton.Caption:=LanguageSetup.Help;
   AddButton.Hint:=RemoveUnderline(LanguageSetup.Add);
   DelButton.Hint:=RemoveUnderline(LanguageSetup.Del);
+
+  UserIconLoader.DialogImage(DI_Add,AddButton);
+  UserIconLoader.DialogImage(DI_Delete,DelButton);
 end;
 
 procedure TUserInfoForm.FormShow(Sender: TObject);

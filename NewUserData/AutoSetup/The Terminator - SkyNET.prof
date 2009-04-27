@@ -50,7 +50,7 @@ DataDir=
 Favorite=0
 Name=The Terminator - SkyNET
 Icon=
-Genre=First person shooter
+Genre=First Person
 Developer=Bethesda Softworks
 Publisher=Bethesda Softworks
 Year=1996
@@ -223,4 +223,7 @@ config=
 [ExtraCommands]
 BeforeExecution=
 AfterExecution=
+BeforeExecution.Wait=1
+BeforeExecution.Minimized=0
+AfterExecution.Minimized=0
 

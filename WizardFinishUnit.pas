@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, 
-  Dialogs, ExtCtrls, StdCtrls, GameDBUnit, ComCtrls, Buttons;
+  Dialogs, ExtCtrls, StdCtrls, GameDBUnit, ComCtrls, Buttons, ImgList, Menus;
 
 type
   TWizardFinishFrame = class(TFrame)
@@ -19,6 +19,11 @@ type
     MountingDelButton: TBitBtn;
     MountingDeleteAllButton: TBitBtn;
     MountingAutoCreateButton: TBitBtn;
+    PopupMenu: TPopupMenu;
+    PopupAdd: TMenuItem;
+    PopupEdit: TMenuItem;
+    PopupDelete: TMenuItem;
+    ImageList: TImageList;
     procedure MountingListViewDblClick(Sender: TObject);
     procedure MountingListViewKeyDown(Sender: TObject; var Key: Word;
       Shift: TShiftState);
@@ -43,7 +48,7 @@ type
 implementation
 
 uses Math, VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgSetupUnit,
-     ProfileMountEditorFormUnit;
+     ProfileMountEditorFormUnit, GameDBToolsUnit, IconLoaderUnit;
 
 {$R *.dfm}
 
@@ -63,13 +68,21 @@ begin
   MountingDelButton.Caption:=LanguageSetup.ProfileEditorMountingDel;
   MountingDeleteAllButton.Caption:=LanguageSetup.ProfileEditorMountingDelAll;
   MountingAutoCreateButton.Caption:=LanguageSetup.ProfileEditorMountingAutoCreate;
-  L:=MountingListView.Columns.Add; L.Width:=-2; L.Caption:=LanguageSetup.ProfileEditorMountingFolderImage;
-  L:=MountingListView.Columns.Add; L.Width:=-2; L.Caption:=LanguageSetup.ProfileEditorMountingAs;
-  L:=MountingListView.Columns.Add; L.Width:=-2; L.Caption:=LanguageSetup.ProfileEditorMountingLetter;
-  L:=MountingListView.Columns.Add; L.Width:=-2; L.Caption:=LanguageSetup.ProfileEditorMountingLabel;
-  L:=MountingListView.Columns.Add; L.Width:=-2; L.Caption:=LanguageSetup.ProfileEditorMountingIOControl;
+  InitMountingListView(MountingListView);
   ProfileEditorCheckBox.Caption:=LanguageSetup.WizardFormOpenProfileEditor;
   ProfileEditorLabel.Caption:=LanguageSetup.WizardFormOpenProfileEditorInfo;
+  UserIconLoader.DialogImage(DI_Add,MountingAddButton);
+  UserIconLoader.DialogImage(DI_Edit,MountingEditButton);
+  UserIconLoader.DialogImage(DI_Delete,MountingDelButton);
+  UserIconLoader.DialogImage(DI_Wizard,MountingAutoCreateButton);
+
+  PopupAdd.Caption:=LanguageSetup.ProfileEditorMountingAdd;
+  PopupEdit.Caption:=LanguageSetup.ProfileEditorMountingEdit;
+  PopupDelete.Caption:=LanguageSetup.ProfileEditorMountingDel;
+  PopupEdit.ShortCut:=ShortCut(VK_Return,[]);
+  UserIconLoader.DialogImage(DI_Add,ImageList,0);
+  UserIconLoader.DialogImage(DI_Edit,ImageList,1);
+  UserIconLoader.DialogImage(DI_Delete,ImageList,2);
 
   Mounting:=TStringList.Create;
   MountingSave:=TStringList.Create;
@@ -163,7 +176,7 @@ begin
       St.Free;
     end;
   end;
-  if not B then Mounting.Add(MakeRelPath(PrgSetup.GameDir,PrgSetup.BaseDir)+';DRIVE;'+NextFreeDriveLetter+';False;;105');
+  if not B then Mounting.Add(MakeRelPath(PrgSetup.GameDir,PrgSetup.BaseDir,True)+';DRIVE;'+NextFreeDriveLetter+';False;;105');
 
   {Load from game}
   If (Trim(GameFile)<>'') and (not CanReachFile(GameFile)) then begin
@@ -183,39 +196,8 @@ begin
 end;
 
 procedure TWizardFinishFrame.LoadMountingList;
-Var I : Integer;
-    St : TStringList;
-    L : TListItem;
-    S : String;
 begin
-  MountingListView.Items.BeginUpdate;
-  try
-    MountingListView.Items.Clear;
-    For I:=0 to Mounting.Count-1 do begin
-      St:=ValueToList(Mounting[I]);
-      try
-        L:=MountingListView.Items.Add;
-        S:=Trim(St[0]);
-        If (St.Count>1) and (Trim(ExtUpperCase(St[1]))='PHYSFS') then begin
-          If Pos('$',S)<>0 then S:=Copy(S,Pos('$',S)+1,MaxInt)+' (+ '+Copy(S,1,Pos('$',S)-1)+')';
-        end else begin
-          If Pos('$',S)<>0 then S:=Copy(S,1,Pos('$',S)-1)+' (+'+LanguageSetup.More+')';
-        end;
-        L.Caption:=S;
-        If St.Count>1 then L.SubItems.Add(St[1]) else L.SubItems.Add('');
-        If St.Count>2 then L.SubItems.Add(St[2]) else L.SubItems.Add('');
-        If St.Count>4 then L.SubItems.Add(St[4]) else L.SubItems.Add('');
-        If St.Count>3 then begin
-          If Trim(ExtUpperCase(St[3]))='TRUE' then L.SubItems.Add(RemoveUnderline(LanguageSetup.Yes)) else L.SubItems.Add(RemoveUnderline(LanguageSetup.No));
-        end else L.SubItems.Add(RemoveUnderline(LanguageSetup.No));
-      finally
-        St.Free;
-      end;
-    end;
-    If MountingListView.Items.Count>0 then MountingListView.ItemIndex:=0;
-  finally
-    MountingListView.Items.EndUpdate;
-  end;
+  LoadMountingListView(MountingListView,Mounting);
 end;
 
 function TWizardFinishFrame.NextFreeDriveLetter: Char;

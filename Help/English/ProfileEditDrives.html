@@ -48,6 +48,19 @@ CD drive connections D-Fend Reloaded will not be able to setup all needed
 drive records automatically.
 </p>
 
+<ul class="big">
+  <li><b>Additional automatically mount all available CDs</b><br />
+    If this option is activated, D-Fend Reloaded will also mount all not explicitely mounted CD drives
+	when starting DOSBox.
+  </li>
+  <li><b>Disable mounting of drives after DOSBox start</b> <font color="red">(*)</font><br />
+    If this secure mode is activated, you (or any program inside DOSBox) will not be able to
+	mount any further drives as soon as DOSBox is started. Whis this option activated you can be
+	sure even a virus will not be able to damage any data you have not explicitely mounted
+	in this dialog.
+  </li>
+</ul>
+
 <h2>The "Edit drive" dialog</h2>
 
 <p>
@@ -69,8 +82,10 @@ following drive types:
   </li>
   <li><b>CD-drive</b><br />
   This options allows you to mount a real CD drive a a virtual CD drive
-  inside DOSBox. The path entered in the field "Folder for mounting" should
-  be the root folder of a real CD drive.
+  inside DOSBox. You can select the CD drive via a fixed path (which should
+  be the root folder of a real CD drive) or let D-Fend Reloaded automatically
+  select the CD drive on DOSBox start via a file or a folder on the CD or
+  via the name of the CD.
   </li>
   <li><b>Floppy image</b><br />
   This options allows you to mount an image file as a virtual floppy drive.
@@ -104,10 +119,10 @@ following drive types:
 </ul>
 
 <p>
-The option marked with <font color="red">(*)</font> is only available if the corresponding
+The options marked with <font color="red">(*)</font> are only available if the corresponding
 DOSBox CVS feature is enabled on the <a href="FileOptionsDOSBoxCVSFeatures.html">DOSBox CVS features</a>
 page of the <a href="FileOptionsDOSBox.html">program options</a> dialog. The official DOSBox 0.72 build
-delivered with D-Fend Reloaded does not support is mount type.
+delivered with D-Fend Reloaded does not support this mount type and does not support the secure mode.
 </p>
 
 <p>

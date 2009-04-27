@@ -4,19 +4,26 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, Buttons, Grids;
+  Dialogs, StdCtrls, Buttons, Grids, ExtCtrls;
 
 type
   TLinkFileEditForm = class(TForm)
-    OKButton: TBitBtn;
-    CancelButton: TBitBtn;
     Tab: TStringGrid;
-    InfoLabel: TLabel;
+    TopPanel: TPanel;
     AddButton: TBitBtn;
     DeleteButton: TBitBtn;
     MoveUpButton: TBitBtn;
     MoveDownButton: TBitBtn;
+    BottomPanel: TPanel;
+    OKButton: TBitBtn;
+    CancelButton: TBitBtn;
     HelpButton: TBitBtn;
+    InfoPanel: TPanel;
+    InfoLabel: TLabel;
+    ImportButton: TBitBtn;
+    ExportButton: TBitBtn;
+    OpenDialog: TOpenDialog;
+    SaveDialog: TSaveDialog;
     procedure FormCreate(Sender: TObject);
     procedure OKButtonClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -24,22 +31,25 @@ type
     procedure TabClick(Sender: TObject);
     procedure HelpButtonClick(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure FormResize(Sender: TObject);
   private
     { Private-Deklarationen }
+    Function GetLinks : TStringList;
   public
     { Public-Deklarationen }
     Links : TStringList;
-    AllowLines : Boolean;
+    AllowLinesAndSubs : Boolean;
+    HelpID : Integer;
   end;
 
 var
   LinkFileEditForm: TLinkFileEditForm;
 
-Function ShowLinkFileEditDialog(const AOwner : TComponent; const ALinks : TStringList; const AAllowLines : Boolean) : Boolean;
+Function ShowLinkFileEditDialog(const AOwner : TComponent; const ALinks : TStringList; const AAllowLinesAndSubs : Boolean; const AHelpID : Integer) : Boolean;
 
 implementation
 
-uses Math, LanguageSetupUnit, VistaToolsUnit, CommonTools, HelpConsts;
+uses ShlObj, Math, LanguageSetupUnit, VistaToolsUnit, CommonTools, IconLoaderUnit;
 
 {$R *.dfm}
 
@@ -49,12 +59,17 @@ procedure TLinkFileEditForm.FormCreate(Sender: TObject);
 begin
   SetVistaFonts(self);
   Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName);
+  NoFlicker(TopPanel);
+  NoFlicker(BottomPanel);
+  NoFlicker(InfoPanel);
 
   Caption:=LanguageSetup.EditLinkCaption;
   AddButton.Caption:=LanguageSetup.Add;
   DeleteButton.Caption:=LanguageSetup.Del;
   MoveUpButton.Caption:=LanguageSetup.MoveUp;
   MoveDownButton.Caption:=LanguageSetup.MoveDown;
+  ImportButton.Caption:=LanguageSetup.EditLinkImport;
+  ExportButton.Caption:=LanguageSetup.EditLinkExport;
   Tab.Cells[0,0]:=LanguageSetup.EditLinkName;
   Tab.Cells[1,0]:=LanguageSetup.EditLinkLink;
   InfoLabel.Caption:=LanguageSetup.EditLinkInfo;
@@ -62,18 +77,26 @@ begin
   CancelButton.Caption:=LanguageSetup.Cancel;
   HelpButton.Caption:=LanguageSetup.Help;
 
-  Tab.ColWidths[0]:=(Tab.ClientWidth-5)*2 div 5;
-  Tab.ColWidths[1]:=(Tab.ClientWidth-5)*3 div 5;
+  OpenDialog.Title:=LanguageSetup.EditLinkImportTitle;
+  OpenDialog.Filter:=LanguageSetup.EditLinkImportFilter;
+  SaveDialog.Title:=LanguageSetup.EditLinkExportTitle;
+  SaveDialog.Filter:=LanguageSetup.EditLinkExportFilter;
+
+  UserIconLoader.DialogImage(DI_Add,AddButton);
+  UserIconLoader.DialogImage(DI_Delete,DeleteButton);
+  UserIconLoader.DialogImage(DI_Up,MoveUpButton);
+  UserIconLoader.DialogImage(DI_Down,MoveDownButton);
+  UserIconLoader.DialogImage(DI_Import,ImportButton);
+  UserIconLoader.DialogImage(DI_Export,ExportButton);
+
+  FormResize(Sender);
 end;
 
 procedure TLinkFileEditForm.FormShow(Sender: TObject);
 Var I : Integer;
     S : String;
 begin
-  If not AllowLines then begin
-    InfoLabel.Visible:=False;
-    Tab.Height:=OKButton.Top-Tab.Top-8;
-  end;
+  If not AllowLinesAndSubs then InfoPanel.Visible:=False;
 
   Tab.RowCount:=Max(2,Links.Count+1);
   If Links.Count=0 then exit;
@@ -97,6 +120,7 @@ end;
 procedure TLinkFileEditForm.ButtonWork(Sender: TObject);
 Var I,J : Integer;
     S : String;
+    St : TStringList;
 begin
   Case (Sender as TComponent).Tag of
     0 : begin
@@ -115,6 +139,7 @@ begin
           Tab.Row:=Max(1,I-1);
           Tab.Col:=J;
           TabClick(Sender);
+          Tab.Repaint;
         end;
     2 : begin
           I:=Tab.Row; J:=Tab.Col;
@@ -131,23 +156,62 @@ begin
           Tab.Row:=I+1;
           Tab.Col:=J;
           TabClick(Sender);
-        end;    
+        end;
+    4 : begin
+          OpenDialog.InitialDir:=GetSpecialFolder(Handle,CSIDL_DESKTOPDIRECTORY);
+          If not OpenDialog.Execute then exit;
+          St:=TStringList.Create;
+          try
+            try St.LoadFromFile(OpenDialog.FileName); except MessageDlg(Format(LanguageSetup.MessageCouldNotOpenFile,[OpenDialog.FileName]),mtError,[mbOK],0); end;
+            If St.Count=0 then exit;
+            I:=Tab.RowCount;
+            Tab.RowCount:=I+St.Count;
+            For J:=0 to St.Count-1 do begin
+              S:=Trim(St[J]);
+              If (S<>'') and (Pos(';',S)>0) then begin
+                Tab.Cells[0,J+I]:=Trim(Copy(S,1,Pos(';',S)-1));;
+                Tab.Cells[1,J+I]:=Trim(Copy(S,Pos(';',S)+1,MaxInt));;
+              end;
+            end;
+            TabClick(Sender);
+          finally
+            St.Free;
+          end;
+        end;
+    5 : begin
+          SaveDialog.InitialDir:=GetSpecialFolder(Handle,CSIDL_DESKTOPDIRECTORY);
+          If not SaveDialog.Execute then exit;
+          St:=GetLinks;
+          try
+            try St.SaveToFile(SaveDialog.FileName); except MessageDlg(Format(LanguageSetup.MessageCouldNotSaveFile,[SaveDialog.FileName]),mtError,[mbOK],0); end;
+          finally
+            St.Free;
+          end;
+        end;
   end;
   Tab.SetFocus;
 end;
 
-procedure TLinkFileEditForm.OKButtonClick(Sender: TObject);
+function TLinkFileEditForm.GetLinks: TStringList;
 Var I : Integer;
 begin
-  Links.Clear;
+  result:=TStringList.Create;
+
   For I:=1 to Tab.RowCount-1 do If (Trim(Tab.Cells[0,I])='') and (Trim(Tab.Cells[1,I])='')
-    then Links.Add('')
-    else Links.Add(Trim(Tab.Cells[0,I])+';'+Trim(Tab.Cells[1,I]));
+    then result.Add('')
+    else result.Add(Trim(Tab.Cells[0,I])+';'+Trim(Tab.Cells[1,I]));
+end;
+
+procedure TLinkFileEditForm.OKButtonClick(Sender: TObject);
+Var St : TStringList;
+begin
+  Links.Clear;
+  St:=GetLinks; try Links.AddStrings(St); finally St.Free; end;
 end;
 
 procedure TLinkFileEditForm.HelpButtonClick(Sender: TObject);
 begin
-  Application.HelpCommand(HELP_CONTEXT,ID_ProfileSearchGame);
+  Application.HelpCommand(HELP_CONTEXT,HelpID);
 end;
 
 procedure TLinkFileEditForm.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -155,14 +219,21 @@ begin
   If (Key=VK_F1) and (Shift=[]) then HelpButtonClick(Sender);
 end;
 
+procedure TLinkFileEditForm.FormResize(Sender: TObject);
+begin
+  Tab.ColWidths[0]:=(Tab.ClientWidth-5)*2 div 5;
+  Tab.ColWidths[1]:=(Tab.ClientWidth-5)*3 div 5;
+end;
+
 { global }
 
-Function ShowLinkFileEditDialog(const AOwner : TComponent; const ALinks : TStringList; const AAllowLines : Boolean) : Boolean;
+Function ShowLinkFileEditDialog(const AOwner : TComponent; const ALinks : TStringList; const AAllowLinesAndSubs : Boolean; const AHelpID : Integer) : Boolean;
 begin
   LinkFileEditForm:=TLinkFileEditForm.Create(AOwner);
   try
     LinkFileEditForm.Links:=ALinks;
-    LinkFileEditForm.AllowLines:=AAllowLines;
+    LinkFileEditForm.AllowLinesAndSubs:=AAllowLinesAndSubs;
+    LinkFileEditForm.HelpID:=AHelpID;
     result:=(LinkFileEditForm.ShowModal=mrOK);
   finally
     LinkFileEditForm.Free;

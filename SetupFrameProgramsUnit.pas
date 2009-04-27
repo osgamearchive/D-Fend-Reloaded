@@ -15,9 +15,11 @@ type
     { Public-Deklarationen }
     Function GetName : String;
     Procedure InitGUIAndLoadSetup(InitData : TInitData);
+    Procedure BeforeChangeLanguage;
     Procedure LoadLanguage;
     Procedure DOSBoxDirChanged;
     Procedure ShowFrame(const AdvencedMode : Boolean);
+    procedure HideFrame;
     Procedure RestoreDefaults;
     Procedure SaveSetup;
   end;
@@ -39,6 +41,10 @@ procedure TSetupFramePrograms.InitGUIAndLoadSetup(InitData: TInitData);
 begin
 end;
 
+procedure TSetupFramePrograms.BeforeChangeLanguage;
+begin
+end;
+
 procedure TSetupFramePrograms.LoadLanguage;
 begin
   InfoLabel.Caption:=LanguageSetup.SetupFormProgramsInfo;
@@ -49,6 +55,10 @@ begin
 end;
 
 procedure TSetupFramePrograms.ShowFrame(const AdvencedMode: Boolean);
+begin
+end;
+
+procedure TSetupFramePrograms.HideFrame;
 begin
 end;
 

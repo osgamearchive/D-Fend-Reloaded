@@ -28,11 +28,13 @@ type
     Function Init(const AInfoData : TInfoData) : Boolean;
     Function Done : String;
     Function GetName : String;
+    Procedure ShowFrame;
   end;
 
 implementation
 
-uses LanguageSetupUnit, CommonTools, PrgSetupUnit, ImageTools, CreateImageUnit;
+uses LanguageSetupUnit, CommonTools, PrgSetupUnit, ImageTools, CreateImageUnit,
+     IconLoaderUnit;
 
 {$R *.dfm}
 
@@ -40,7 +42,7 @@ uses LanguageSetupUnit, CommonTools, PrgSetupUnit, ImageTools, CreateImageUnit;
 
 function TProfileMountEditorHDImageFrame.Init(const AInfoData: TInfoData): Boolean;
 Var C : Char;
-    St,St2 : TStringList;
+    St : TStringList;
     S : String;
     I : Integer;
 begin
@@ -64,6 +66,9 @@ begin
   finally
     ImageDriveLetterComboBox.Items.EndUpdate;
   end;
+
+  UserIconLoader.DialogImage(DI_SelectFile,ImageButton);
+  UserIconLoader.DialogImage(DI_ImageHD,ImageCreateButton);
 
   St:=ValueToList(InfoData.Data);
   try
@@ -90,6 +95,10 @@ begin
   end;
 
   ImageDriveLetterComboBoxChange(self);
+end;
+
+procedure TProfileMountEditorHDImageFrame.ShowFrame;
+begin
 end;
 
 function TProfileMountEditorHDImageFrame.Done: String;

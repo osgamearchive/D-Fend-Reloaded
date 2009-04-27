@@ -31,6 +31,14 @@ object ModernProfileEditorCPUFrame: TModernProfileEditorCPUFrame
     Caption = 'CyclesInfoLabel'
     WordWrap = True
   end
+  object CPUTypeLabel: TLabel
+    Left = 256
+    Top = 24
+    Width = 69
+    Height = 13
+    Caption = 'CPUTypeLabel'
+    Visible = False
+  end
   object CPUCoreRadioGroup: TRadioGroup
     Left = 24
     Top = 24
@@ -101,5 +109,15 @@ object ModernProfileEditorCPUFrame: TModernProfileEditorCPUFrame
     MinValue = 1
     TabOrder = 3
     Value = 20
+  end
+  object CPUTypeComboBox: TComboBox
+    Left = 256
+    Top = 43
+    Width = 145
+    Height = 21
+    Style = csDropDownList
+    ItemHeight = 13
+    TabOrder = 4
+    Visible = False
   end
 end

@@ -50,7 +50,7 @@ DataDir=
 Favorite=0
 Name=LHX - Attack Chopper
 Icon=
-Genre=Flugsimulator
+Genre=Flightsimulation
 Developer=Electronic Arts
 Publisher=Electronic Arts
 Year=1990
@@ -223,4 +223,7 @@ config=
 [ExtraCommands]
 BeforeExecution=
 AfterExecution=
+BeforeExecution.Wait=1
+BeforeExecution.Minimized=0
+AfterExecution.Minimized=0
 

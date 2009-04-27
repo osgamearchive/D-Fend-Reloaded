@@ -33,7 +33,8 @@ Procedure ShowZipWaitInfoDialog(const AOwner : TComponent);
 
 implementation
 
-uses CommonTools, LanguageSetupUnit, VistaToolsUnit, ZipManagerUnit, PrgSetupUnit;
+uses CommonTools, LanguageSetupUnit, VistaToolsUnit, ZipManagerUnit,
+     PrgSetupUnit, IconLoaderUnit;
 
 {$R *.dfm}
 
@@ -55,6 +56,10 @@ begin
   Caption:=LanguageSetup.ZipWaitInfoForm;
   InfoLabel.Caption:=LanguageSetup.ZipWaitInfoFormInfo;
   CloseButton.Caption:=LanguageSetup.Close;
+
+  UserIconLoader.DialogImage(DI_ImageHD,ImageList,1);
+  UserIconLoader.DialogImage(DI_ZipFile,ImageList,2);
+  UserIconLoader.DialogImage(DI_SelectFolder,ImageList,3);
 
   SaveInfoBarNotify:=nil;
 end;
@@ -111,7 +116,7 @@ begin
         N2.ImageIndex:=1; N2.SelectedIndex:=1;
         N3:=Tree.Items.AddChild(N2,LanguageSetup.ZipWaitInfoFormZipFile+': '+MakeRelPath(R.ZipFile[J],PrgSetup.BaseDir));
         N3.ImageIndex:=2; N3.SelectedIndex:=2;
-        N3:=Tree.Items.AddChild(N2,LanguageSetup.ZipWaitInfoFormFolder+': '+MakeRelPath(R.Folder[J],PrgSetup.BaseDir));
+        N3:=Tree.Items.AddChild(N2,LanguageSetup.ZipWaitInfoFormFolder+': '+MakeRelPath(R.Folder[J],PrgSetup.BaseDir,True));
         N3.ImageIndex:=3; N3.SelectedIndex:=3;
       end;
     end;

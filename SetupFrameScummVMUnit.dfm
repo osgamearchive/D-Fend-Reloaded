@@ -164,6 +164,5 @@ object SetupFrameScummVM: TSetupFrameScummVM
     Anchors = [akLeft, akTop, akRight]
     Caption = 'Restore program window when ScummVM is closed'
     TabOrder = 3
-    Visible = False
   end
 end

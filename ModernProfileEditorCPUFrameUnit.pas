@@ -19,6 +19,8 @@ type
     CyclesUpEdit: TSpinEdit;
     CyclesDownEdit: TSpinEdit;
     CyclesInfoLabel: TLabel;
+    CPUTypeLabel: TLabel;
+    CPUTypeComboBox: TComboBox;
     procedure CPUCyclesChange(Sender: TObject);
   private
     { Private-Deklarationen }
@@ -34,7 +36,7 @@ type
 
 implementation
 
-uses CommonTools, LanguageSetupUnit, VistaToolsUnit, HelpConsts;
+uses CommonTools, LanguageSetupUnit, VistaToolsUnit, HelpConsts, PrgSetupUnit;
 
 {$R *.dfm}
 
@@ -52,9 +54,12 @@ begin
   NoFlicker(CyclesValueRadioButton);
   NoFlicker(CyclesUpEdit);
   NoFlicker(CyclesDownEdit);
+  NoFlicker(CPUTypeComboBox);
 
   CPUCoreRadioGroup.Caption:=LanguageSetup.GameCore;
   CPUCyclesGroupBox.Caption:=LanguageSetup.GameCycles;
+  CyclesAutoRadioButton.Caption:=LanguageSetup.GameCyclesAuto;
+  CyclesMaxRadioButton.Caption:=LanguageSetup.GameCyclesMax;
   CyclesValueRadioButton.Caption:=LanguageSetup.Value;
 
   St:=ValueToList(InitData.GameDB.ConfOpt.Core,';,'); try CPUCoreRadioGroup.Items.AddStrings(St); finally St.Free; end;
@@ -75,6 +80,16 @@ begin
   CyclesUpLabel.Caption:=LanguageSetup.GameCyclesUp;
   CyclesDownLabel.Caption:=LanguageSetup.GameCyclesDown;
   CyclesInfoLabel.Caption:=LanguageSetup.GameCyclesInfo;
+
+  CPUTypeLabel.Caption:=LanguageSetup.GameCPUType;
+
+  St:=ValueToList(InitData.GameDB.ConfOpt.CPUType,';,');
+  try
+    CPUTypeComboBox.Items.Clear;
+    CPUTypeComboBox.Items.AddStrings(St);
+  finally
+    St.Free;
+  end;
 
   HelpContext:=ID_ProfileEditCPU;
 end;
@@ -100,10 +115,18 @@ begin
 
   CyclesUpEdit.Value:=Game.CyclesUp;
   CyclesDownEdit.Value:=Game.CyclesDown;
+
+  CPUTypeComboBox.ItemIndex:=0;
+  S:=Trim(ExtUpperCase(Game.CPUType));
+  For I:=0 to CPUTypeComboBox.Items.Count-1 do If S=Trim(ExtUpperCase(CPUTypeComboBox.Items[I])) then begin
+    CPUTypeComboBox.ItemIndex:=I; break;
+  end;
 end;
 
 procedure TModernProfileEditorCPUFrame.ShowFrame;
 begin
+  CPUTypeLabel.Visible:=PrgSetup.AllowCPUType;
+  CPUTypeComboBox.Visible:=PrgSetup.AllowCPUType;
 end;
 
 function TModernProfileEditorCPUFrame.CheckValue: Boolean;
@@ -145,6 +168,8 @@ begin
 
   Game.CyclesUp:=CyclesUpEdit.Value;
   Game.CyclesDown:=CyclesDownEdit.Value;
+
+  Game.CPUType:=CPUTypeComboBox.Text;
 end;
 
 end.

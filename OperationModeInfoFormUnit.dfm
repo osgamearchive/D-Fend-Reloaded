@@ -3,7 +3,7 @@ object OperationModeInfoForm: TOperationModeInfoForm
   Top = 0
   BorderStyle = bsDialog
   Caption = 'OperationModeInfoForm'
-  ClientHeight = 322
+  ClientHeight = 367
   ClientWidth = 621
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -18,7 +18,7 @@ object OperationModeInfoForm: TOperationModeInfoForm
   OnKeyDown = FormKeyDown
   DesignSize = (
     621
-    322)
+    367)
   PixelsPerInch = 96
   TextHeight = 13
   object TopLabel: TLabel
@@ -37,16 +37,17 @@ object OperationModeInfoForm: TOperationModeInfoForm
   end
   object OKButton: TBitBtn
     Left = 16
-    Top = 289
+    Top = 334
     Width = 97
     Height = 25
     Anchors = [akLeft, akBottom]
     TabOrder = 0
     Kind = bkOK
+    ExplicitTop = 289
   end
   object PrgDirEdit: TLabeledEdit
     Left = 16
-    Top = 207
+    Top = 204
     Width = 597
     Height = 21
     Anchors = [akLeft, akRight, akBottom]
@@ -54,11 +55,12 @@ object OperationModeInfoForm: TOperationModeInfoForm
     EditLabel.Height = 13
     EditLabel.Caption = 'PrgDirEdit'
     ReadOnly = True
-    TabOrder = 1
+    TabOrder = 7
+    ExplicitTop = 197
   end
   object PrgDataDirEdit: TLabeledEdit
     Left = 16
-    Top = 255
+    Top = 252
     Width = 597
     Height = 21
     Anchors = [akLeft, akRight, akBottom]
@@ -66,7 +68,8 @@ object OperationModeInfoForm: TOperationModeInfoForm
     EditLabel.Height = 13
     EditLabel.Caption = 'PrgDataDirEdit'
     ReadOnly = True
-    TabOrder = 2
+    TabOrder = 8
+    ExplicitTop = 245
   end
   object CheckBox1: TCheckBox
     Left = 16
@@ -76,7 +79,7 @@ object OperationModeInfoForm: TOperationModeInfoForm
     Anchors = [akLeft, akTop, akRight]
     Caption = 'Program settings are stored in program folder'
     Enabled = False
-    TabOrder = 3
+    TabOrder = 2
   end
   object CheckBox3: TCheckBox
     Left = 16
@@ -118,16 +121,30 @@ object OperationModeInfoForm: TOperationModeInfoForm
     Anchors = [akLeft, akTop, akRight]
     Caption = 'Program settings are stored in the user profile folder'
     Enabled = False
-    TabOrder = 7
+    TabOrder = 3
   end
   object HelpButton: TBitBtn
     Left = 124
-    Top = 289
+    Top = 334
     Width = 97
     Height = 25
     Anchors = [akLeft, akBottom]
-    TabOrder = 8
+    TabOrder = 1
     OnClick = HelpButtonClick
     Kind = bkHelp
+    ExplicitTop = 289
+  end
+  object BaseDirEdit: TLabeledEdit
+    Left = 16
+    Top = 300
+    Width = 597
+    Height = 21
+    Anchors = [akLeft, akRight, akBottom]
+    EditLabel.Width = 54
+    EditLabel.Height = 13
+    EditLabel.Caption = 'BaseDirEdit'
+    ReadOnly = True
+    TabOrder = 9
+    ExplicitTop = 293
   end
 end

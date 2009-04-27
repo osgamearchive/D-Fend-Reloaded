@@ -50,8 +50,8 @@ DataDir=
 Favorite=0
 Name=Super Street Fighter 2 Turbo
 Icon=
-Genre=Action
-Developer=Capcom 
+Genre=Arcade
+Developer=Capcom
 Publisher=GameTek
 Year=1995
 Notes=
@@ -223,4 +223,7 @@ config=
 [ExtraCommands]
 BeforeExecution=
 AfterExecution=
+BeforeExecution.Wait=1
+BeforeExecution.Minimized=0
+AfterExecution.Minimized=0
 

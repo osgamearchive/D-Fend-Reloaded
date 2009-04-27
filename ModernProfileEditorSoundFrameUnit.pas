@@ -58,7 +58,6 @@ begin
   ActivateSoundCheckBox.Caption:=LanguageSetup.ProfileEditorSoundEnableSound;
   MixerGroupBox.Caption:=LanguageSetup.ProfileEditorSoundMixer;
   SampleRateLabel.Caption:=LanguageSetup.ProfileEditorSoundSampleRate;
-
   St:=ValueToList(InitData.GameDB.ConfOpt.Rate,';,'); try SampleRateComboBox.Items.AddStrings(St); finally St.Free; end;
   BlockSizeLabel.Caption:=LanguageSetup.ProfileEditorSoundBlockSize;
   St:=ValueToList(InitData.GameDB.ConfOpt.Blocksize,';,'); try BlockSizeComboBox.Items.AddStrings(St); finally St.Free; end;

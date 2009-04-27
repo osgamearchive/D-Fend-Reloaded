@@ -50,7 +50,7 @@ DataDir=
 Favorite=0
 Name=F14 Tomcat
 Icon=
-Genre=Flugsimulator
+Genre=Flightsimulation
 Developer=Activision
 Publisher=Activision
 Year=1990
@@ -223,4 +223,7 @@ config=
 [ExtraCommands]
 BeforeExecution=
 AfterExecution=
+BeforeExecution.Wait=1
+BeforeExecution.Minimized=0
+AfterExecution.Minimized=0
 

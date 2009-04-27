@@ -33,20 +33,25 @@ Installationspaket aufgenommen werden und muss separat installiert werden.
 <p>
 Auf dieser Seite k&ouml;nnen Sie angeben, in welchen Verzeichnissen sich die Wave-zu-ogg
 und Wave-zu-mp3 Encoder befinden und mit welchen Kommandozeilenschaltern sie aufgerufen
-werden m&uuml;ssen. In die Kommandozeilenparaleter muss an zwei Stellen ein
-"<tt>%s</tt>" eingef&uuml;gt werden. Das erste Auftreten dieser Zeichenkombination wird
-durch den Pfad und Namen der Ausgangsdatei ersetzt und das zweite Auftreten durch den
-Pfad und Namen der Zieldatei.
+werden m&uuml;ssen. In die Kommandozeilenparameter müssen dabei dir Platzhalter
+"<tt>%1</tt>" und "<tt>%2</tt>" eingef&uuml;gt werden. Der "<tt>%1</tt>" Platzhalter wird dabei
+durch den Pfad und Namen der Ausgangsdatei ersetzt und der "<tt>%2</tt>" Platzhalter
+wird durch den Pfad und Namen der Zieldatei ersetzt.
 </p>
 
 <p>
 Die Vorgabekommandozeilenparameter f&uuml;r den mp3-Encoder (z.B. Lame) lauten:<br />
-<tt>-h -V 0 "%s" "%s"</tt>
+<tt>-h -V 0 "%1" "%2"</tt>
 </p>
 
 <p>
 Die Vorgabekommandozeilenparameter f&uuml;r den ogg-Encoder (Oggenc2) lauten:<br />
-<tt>"%s" --output="%s" --quality=10</tt>
+<tt>"%1" --output="%2" --quality=10</tt>
+</p>
+
+<p>
+Der Platzhalter <tt>%1</tt> wird dabei durch den Namen der Eingabedatei (inkl. vollständigem Pfad)
+ersetzt und <tt>%2</tt> durch den Dateinamen der Ausgabedatei (ebenfalls inkl. dem vollständigen Pfad).
 </p>
  
 <p>&nbsp;</p>

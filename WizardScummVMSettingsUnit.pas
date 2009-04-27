@@ -19,8 +19,10 @@ type
     SavePathDefaultRadioButton: TRadioButton;
     SavePathCustomRadioButton: TRadioButton;
     SavePathEdit: TEdit;
+    CustomLanguageEdit: TEdit;
     procedure SavePathEditChange(Sender: TObject);
     procedure SavePathEditButtonClick(Sender: TObject);
+    procedure LanguageComboBoxChange(Sender: TObject);
   private
     { Private-Deklarationen }
     FGameDB : TGameDB;
@@ -34,7 +36,8 @@ type
 
 implementation
 
-uses VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgSetupUnit;
+uses VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgSetupUnit,
+     IconLoaderUnit;
 
 {$R *.dfm}
 
@@ -53,50 +56,53 @@ begin
   SavePathDefaultRadioButton.Caption:=LanguageSetup.ProfileEditorScummVMSavePathGameDir+' ('+LanguageSetup.Default+')';
   SavePathCustomRadioButton.Caption:=LanguageSetup.ProfileEditorScummVMSavePathCustom;
   LanguageInfoLabel.Caption:=LanguageSetup.WizardFormScummVMLanguageInfo;
+
+  UserIconLoader.DialogImage(DI_SelectFolder,SavePathEditButton);
 end;
 
-Type TLangRec=record
-  Game, Lang : String;
+procedure TWizardScummVMSettingsFrame.LanguageComboBoxChange(Sender: TObject);
+begin
+  CustomLanguageEdit.Visible:=(LanguageComboBox.ItemIndex=LanguageComboBox.Items.Count-1);
 end;
-
-const LangData : Array[0..7] of TLangRec=(
-  (Game: 'maniac'; Lang: 'en,de,fr,it,es'),
-  (Game: 'zak'; Lang: 'en,de,fr,it,es'),
-  (Game: 'dig'; Lang: 'jp, zh,kr'),
-  (Game: 'comi'; Lang: 'en,de,fr,it,pt,es,jp,zh,kr'),
-  (Game: 'sky'; Lang: 'gb,en,de,fr,it,pt,es,se'),
-  (Game: 'sword1'; Lang: 'en,de,fr,it,es,pt,cz'),
-  (Game: 'simon1'; Lang: 'en,de,fr,it,es,hb,pl,ru'),
-  (Game: 'simon2'; Lang: 'en,de,fr,it,es,hb,pl,ru')
-);
 
 procedure TWizardScummVMSettingsFrame.SetScummVMGameName(const Name, Path : String);
 Var S : String;
-    I : Integer;
-    St : TStringList;
+    I,J : Integer;
+    St,St2 : TStringList;
 begin
-  If LanguageComboBox.ItemIndex>=0 then S:=LanguageComboBox.Text else S:='';
   LanguageComboBox.Items.BeginUpdate;
   try
     LanguageComboBox.Items.Clear;
-    For I:=Low(LangData) to High(LangData) do If LangData[I].Game=Name then begin
-      St:=ValueToList(LangData[I].Lang,','); try LanguageComboBox.Items.AddStrings(St); finally St.Free; end;
-      break;
+
+    St:=ValueToList(FGameDB.ConfOpt.ScummVMLanguages,';,');
+    try
+      S:=Trim(ExtUpperCase(Name));
+      For I:=0 to St.Count-1 do begin
+        J:=Pos(':',St[I]);
+        If J=0 then continue;
+        If Trim(ExtUpperCase(Copy(St[I],1,J-1)))=S then begin
+          St2:=ValueToList(Copy(St[I],J+1,MaxInt),'-');
+          try
+            LanguageComboBox.Items.AddStrings(St2);
+          finally
+            St2.Free;
+          end;
+          break;
+        end;
+      end;
+    finally
+      St.Free;
     end;
+
+    If LanguageComboBox.Items.Count=0 then LanguageComboBox.Items.Add(LanguageSetup.Default);
+
+    LanguageComboBox.Items.Add(LanguageSetup.Custom);
   finally
     LanguageComboBox.Items.EndUpdate;
   end;
 
-  LanguageComboBox.Enabled:=(LanguageComboBox.Items.Count>0);
-  LanguageLabel.Enabled:=(LanguageComboBox.Items.Count>0);
-  LanguageInfoLabel.Visible:=(LanguageComboBox.Items.Count>0);
-
-  If LanguageComboBox.Items.Count>0 then begin
-    If S='' then LanguageComboBox.ItemIndex:=0 else begin
-      I:=LanguageComboBox.Items.IndexOf(S);
-      If I>=0 then LanguageComboBox.ItemIndex:=I;
-    end;
-  end;
+  LanguageComboBox.ItemIndex:=0;
+  LanguageComboBoxChange(self);
 
   ScummVMPath:=Path;
 end;
@@ -107,7 +113,15 @@ begin
   result.ProfileMode:='ScummVM';
   result.Name:=GameName;
 
-  If LanguageComboBox.ItemIndex>=0 then result.ScummVMLanguage:=LanguageComboBox.Text else result.ScummVMLanguage:='';
+  If LanguageComboBox.ItemIndex>=0 then begin
+    result.ScummVMLanguage:=Trim(ExtUpperCase(LanguageComboBox.Text));
+    If result.ScummVMLanguage=Trim(ExtUpperCase(LanguageSetup.Custom)) then result.ScummVMLanguage:=Trim(ExtUpperCase(CustomLanguageEdit.Text));
+    If result.ScummVMLanguage=Trim(ExtUpperCase(LanguageSetup.Default)) then result.ScummVMLanguage:='';
+  end else begin
+    result.ScummVMLanguage:='';
+  end;
+  result.ScummVMLanguage:=ExtLowerCase(result.ScummVMLanguage);
+
   result.StartFullscreen:=StartFullscreenCheckBox.Checked;
 
   If SavePathDefaultRadioButton.Checked then result.ScummVMSavePath:='' else result.ScummVMSavePath:=Trim(SavePathEdit.Text);

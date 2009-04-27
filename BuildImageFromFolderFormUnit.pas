@@ -41,7 +41,7 @@ implementation
 
 Uses VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgSetupUnit,
      CreateISOImageFormUnit, GameDBUnit, DOSBoxUnit, PrgConsts, CreateImageUnit,
-     HelpConsts;
+     HelpConsts, IconLoaderUnit;
 
 {$R *.dfm}
 
@@ -63,6 +63,8 @@ begin
   HelpButton.Caption:=LanguageSetup.Help;
   SaveDialog.Title:=LanguageSetup.ImageFromFolderSaveDialogTitle;
   SaveDialog.Filter:=LanguageSetup.ImageFromFolderSaveDialogFilter;
+  UserIconLoader.DialogImage(DI_SelectFolder,FolderButton);
+  UserIconLoader.DialogImage(DI_SelectFile,FileNameButton);
 end;
 
 procedure TBuildImageFromFolderForm.ButtonWork(Sender: TObject);

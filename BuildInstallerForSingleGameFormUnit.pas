@@ -37,7 +37,7 @@ Function BuildInstallerForSingleGame(const AOwner : TComponent; const AGame : TG
 implementation
 
 uses Registry, ShellAPI, VistaToolsUnit, LanguageSetupUnit, PrgSetupUnit,
-     CommonTools, PrgConsts, BuildInstallerFormUnit, HelpConsts;
+     CommonTools, PrgConsts, BuildInstallerFormUnit, HelpConsts, IconLoaderUnit;
 
 {$R *.dfm}
 
@@ -57,11 +57,13 @@ begin
   InstTypeRadioGroup.Items[1]:=LanguageSetup.BuildInstallerInstTypeFullInstaller;
   SaveDialog.Title:=LanguageSetup.BuildInstallerDestFileTitle;
   SaveDialog.Filter:=LanguageSetup.BuildInstallerDestFileFilter;
+  UserIconLoader.DialogImage(DI_SelectFile,DestFileButton);
 end;
 
 procedure TBuildInstallerForSingleGameForm.FormShow(Sender: TObject);
 begin
   Caption:=Caption+' ['+Game.Name+']';
+  DestFileEdit.Text:=ExtractFileName(ChangeFileExt(Game.SetupFile,''));
 end;
 
 procedure TBuildInstallerForSingleGameForm.DestFileButtonClick(Sender: TObject);
@@ -75,7 +77,7 @@ end;
 
 function TBuildInstallerForSingleGameForm.BuildNSIScript: Boolean;
 Var NSIFileName : String;
-    St,GenreList : TStringList;
+    St : TStringList;
     I,J : Integer;
     S : String;
 begin
@@ -96,7 +98,7 @@ begin
   St:=TStringList.Create;
   try
     St.Add('OutFile "'+ExtractFileName(DestFileEdit.Text)+'"');
-    St.Add('!include "D-Fend Reloaded DataInstaller.nsi"');
+    St.Add('!include ".\'+SettingsFolder+'\'+NSIInstallerHelpFile+'"');
 
     if not AddGameToNSIScript(St,Game) then exit;
 

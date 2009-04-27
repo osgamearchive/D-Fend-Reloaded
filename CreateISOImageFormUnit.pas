@@ -42,7 +42,7 @@ Function ShowWriteIMGImageDialog(const AOwner : TComponent; const ImageFileName 
 implementation
 
 uses ShellAPI, VistaToolsUnit, LanguageSetupUnit, PrgSetupUnit, CommonTools,
-     DriveReadFormUnit, ReadDriveUnit, HelpConsts;
+     DriveReadFormUnit, ReadDriveUnit, HelpConsts, IconLoaderUnit;
 
 {$R *.dfm}
 
@@ -57,6 +57,7 @@ begin
   FileNameEdit.EditLabel.Caption:=LanguageSetup.ReadImageFileName;
   FileNameButton.Hint:=LanguageSetup.ChooseFile;
   InfoLabel.Caption:=LanguageSetup.ReadImageInfo;
+  UserIconLoader.DialogImage(DI_SelectFile,FileNameButton);
 
   FloppyMode:=False;
   WriteMode:=False;
@@ -64,7 +65,7 @@ end;
 
 procedure TCreateISOImageForm.FormShow(Sender: TObject);
 Var C : Char;
-    I,J : Cardinal;
+    J : Cardinal;
 begin
   If FloppyMode then begin
     If WriteMode then begin
@@ -91,7 +92,6 @@ begin
     SaveDialog.DefaultExt:='iso';
   end;
 
-  I:=0;
   For C:='A' to 'Z' do begin
     J:=GetDriveType(PChar(C+':\'));
     If FloppyMode then begin

@@ -29,16 +29,19 @@ type
     Destructor Destroy; override;
     Function GetName : String;
     Procedure InitGUIAndLoadSetup(InitData : TInitData);
+    Procedure BeforeChangeLanguage;
     Procedure LoadLanguage;
     Procedure DOSBoxDirChanged;
     Procedure ShowFrame(const AdvencedMode : Boolean);
+    procedure HideFrame;
     Procedure RestoreDefaults;
     Procedure SaveSetup;
   end;
 
 implementation
 
-uses Math, LanguageSetupUnit, VistaToolsUnit, PrgSetupUnit, CommonTools, HelpConsts;
+uses Math, LanguageSetupUnit, VistaToolsUnit, PrgSetupUnit, CommonTools,
+     HelpConsts, IconLoaderUnit;
 
 {$R *.dfm}
 
@@ -61,9 +64,14 @@ begin
   GameDB:=InitData.GameDB;
 
   NoFlicker(DefaultValueComboBox);
-  NoFlicker(DefaultValueComboBox);
+
+  UserIconLoader.DialogImage(DI_ResetDefault,DefaultValueSpeedButton);
 
   LastIndex:=-1;
+end;
+
+procedure TSetupFrameDefaultValues.BeforeChangeLanguage;
+begin
 end;
 
 procedure TSetupFrameDefaultValues.LoadLanguage;
@@ -121,6 +129,10 @@ begin
   DefaultValueComboBox.Items.AddObject(LanguageSetup.ProfileEditorScummVMMusicDriver,ValueToList(GameDB.ConfOpt.ScummVMMusicDriver,';,'));
   DefaultValueComboBox.Items.AddObject(LanguageSetup.GameVGAChipset,ValueToList(GameDB.ConfOpt.VGAChipsets,';,'));
   DefaultValueComboBox.Items.AddObject(LanguageSetup.GameVideoRam,ValueToList(GameDB.ConfOpt.VGAVideoRAM,';,'));
+  DefaultValueComboBox.Items.AddObject('ScummVM '+LanguageSetup.ProfileEditorScummVMRenderMode,ValueToList(GameDB.ConfOpt.ScummVMRenderMode,';,'));
+  DefaultValueComboBox.Items.AddObject('ScummVM '+LanguageSetup.ProfileEditorScummVMPlatform,ValueToList(GameDB.ConfOpt.ScummVMPlatform,';,'));
+  DefaultValueComboBox.Items.AddObject(LanguageSetup.ProfileEditorScummVMLanguageLong,ValueToList(GameDB.ConfOpt.ScummVMLanguages,';,'));
+  DefaultValueComboBox.Items.AddObject(LanguageSetup.GameCPUType,ValueToList(GameDB.ConfOpt.CPUType,';,'));
 
   SetLength(DefaultValueLists,DefaultValueComboBox.Items.Count);
   For J:=0 to length(DefaultValueLists)-1 do DefaultValueLists[J]:=TStringList(DefaultValueComboBox.Items.Objects[J]);
@@ -136,6 +148,10 @@ begin
 end;
 
 procedure TSetupFrameDefaultValues.ShowFrame(const AdvencedMode: Boolean);
+begin
+end;
+
+procedure TSetupFrameDefaultValues.HideFrame;
 begin
 end;
 
@@ -186,6 +202,10 @@ begin
   GameDB.ConfOpt.ScummVMMusicDriver:=ListToValue(TStringList(DefaultValueComboBox.Items.Objects[35]),',');
   GameDB.ConfOpt.VGAChipsets:=ListToValue(TStringList(DefaultValueComboBox.Items.Objects[36]),',');
   GameDB.ConfOpt.VGAVideoRAM:=ListToValue(TStringList(DefaultValueComboBox.Items.Objects[37]),',');
+  GameDB.ConfOpt.ScummVMRenderMode:=ListToValue(TStringList(DefaultValueComboBox.Items.Objects[38]),',');
+  GameDB.ConfOpt.ScummVMPlatform:=ListToValue(TStringList(DefaultValueComboBox.Items.Objects[39]),',');
+  GameDB.ConfOpt.ScummVMLanguages:=ListToValue(TStringList(DefaultValueComboBox.Items.Objects[40]),',');
+  GameDB.ConfOpt.CPUType:=ListToValue(TStringList(DefaultValueComboBox.Items.Objects[41]),',');
 end;
 
 procedure TSetupFrameDefaultValues.DefaultValueComboBoxChange(Sender: TObject);
@@ -267,6 +287,10 @@ begin
   Work(35,DefaultValuesScummVMMusicDriver);
   Work(36,DefaultValuesVGAChipsets);
   Work(37,DefaultValuesVGAVideoRAM);
+  Work(38,DefaultValuesScummVMRenderMode);
+  Work(39,DefaultValuesScummVMPlatform);
+  Work(40,DefaultValuesScummVMLanguages);
+  Work(41,DefaultValuesCPUType);
 
   DefaultValueComboBox.ItemIndex:=I; DefaultValueComboBoxChange(Sender);
 end;

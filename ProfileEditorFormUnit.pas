@@ -128,6 +128,11 @@ type
     SearchGameButton: TToolButton;
     SearchPopupMenu: TPopupMenu;
     HelpButton: TBitBtn;
+    ImageListM: TImageList;
+    PopupMenu: TPopupMenu;
+    PopupAdd: TMenuItem;
+    PopupEdit: TMenuItem;
+    PopupDelete: TMenuItem;
     procedure OKButtonClick(Sender: TObject);
     procedure ButtonWork(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -206,7 +211,6 @@ end;
 procedure TProfileEditorForm.InitGUI;
 Var St : TStringList;
     I : Integer;
-    L : TListColumn;
     S : String;
 begin
   DoubleBuffered:=True;
@@ -289,7 +293,7 @@ begin
       Strings.Delete(0);
       Strings.Add(LanguageSetup.GameGenre+'=');
       ItemProps[Strings.Count-1].EditStyle:=esPickList;
-      St:=GameDB.GetGenreList; try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
+      St:=ExtGenreList(GetCustomGenreName(GameDB.GetGenreList)); try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
       Strings.Add(LanguageSetup.GameDeveloper+'=');
       ItemProps[Strings.Count-1].EditStyle:=esPickList;
       St:=GameDB.GetDeveloperList; try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
@@ -301,7 +305,7 @@ begin
       St:=GameDB.GetYearList; try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
       Strings.Add(LanguageSetup.GameLanguage+'=');
       ItemProps[Strings.Count-1].EditStyle:=esPickList;
-      St:=GameDB.GetLanguageList; try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
+      St:=ExtLanguageList(GetCustomLanguageName(GameDB.GetLanguageList)); try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
       Strings.Add(LanguageSetup.GameWWW+'=');
       Strings.Add(LanguageSetup.GameDataDir+'=');
       ItemProps[Strings.Count-1].EditStyle:=esEllipsis;
@@ -496,12 +500,15 @@ begin
   MountingDelButton.Caption:=LanguageSetup.ProfileEditorMountingDel;
   MountingDeleteAllButton.Caption:=LanguageSetup.ProfileEditorMountingDelAll;
   MountingAutoCreateButton.Caption:=LanguageSetup.ProfileEditorMountingAutoCreate;
-  L:=MountingListView.Columns.Add; L.Width:=-2; L.Caption:=LanguageSetup.ProfileEditorMountingFolderImage;
-  L:=MountingListView.Columns.Add; L.Width:=-2; L.Caption:=LanguageSetup.ProfileEditorMountingAs;
-  L:=MountingListView.Columns.Add; L.Width:=-2; L.Caption:=LanguageSetup.ProfileEditorMountingLetter;
-  L:=MountingListView.Columns.Add; L.Width:=-2; L.Caption:=LanguageSetup.ProfileEditorMountingLabel;
-  L:=MountingListView.Columns.Add; L.Width:=-2; L.Caption:=LanguageSetup.ProfileEditorMountingIOControl;
+  InitMountingListView(MountingListView);
   AutoMountCheckBox.Caption:=LanguageSetup.ProfileEditorMountingAutoMountCDs;
+  PopupAdd.Caption:=LanguageSetup.ProfileEditorMountingAdd;
+  PopupEdit.Caption:=LanguageSetup.ProfileEditorMountingEdit;
+  PopupDelete.Caption:=LanguageSetup.ProfileEditorMountingDel;
+  PopupEdit.ShortCut:=ShortCut(VK_Return,[]);
+  UserIconLoader.DialogImage(DI_Add,ImageListM,0);
+  UserIconLoader.DialogImage(DI_Edit,ImageListM,1);
+  UserIconLoader.DialogImage(DI_Delete,ImageListM,2);
 
   { Sound Sheet }
 
@@ -732,7 +739,37 @@ begin
 
   InitGUI;
 
-  LoadUserIcons(ImageList,'ClassicProfileEditor');
+  UserIconLoader.DirectLoad(ImageList,'ClassicProfileEditor');
+  UserIconLoader.DialogImage(DI_Screenshot,GenerateScreenshotFolderNameButton);
+  UserIconLoader.DialogImage(DI_Add,ExtraFilesAddButton);
+  UserIconLoader.DialogImage(DI_Edit,ExtraFilesEditButton);
+  UserIconLoader.DialogImage(DI_Delete,ExtraFilesDelButton);
+  UserIconLoader.DialogImage(DI_Add,ExtraDirsAddButton);
+  UserIconLoader.DialogImage(DI_Edit,ExtraDirsEditButton);
+  UserIconLoader.DialogImage(DI_Delete,ExtraDirsDelButton);
+  UserIconLoader.DialogImage(DI_SelectFolder,GenerateGameDataFolderNameButton);
+  UserIconLoader.DialogImage(DI_Internet,ImageList,14);
+  UserIconLoader.DialogImage(DI_Edit,ImageList,15);
+  UserIconLoader.DialogImage(DI_Add,MountingAddButton);
+  UserIconLoader.DialogImage(DI_Edit,MountingEditButton);
+  UserIconLoader.DialogImage(DI_Delete,MountingDelButton);
+  UserIconLoader.DialogImage(DI_Wizard,MountingAutoCreateButton);
+  UserIconLoader.DialogImage(DI_Clear,AutoexecClearButton);
+  UserIconLoader.DialogImage(DI_Load,AutoexecLoadButton);
+  UserIconLoader.DialogImage(DI_Save,AutoexecSaveButton);
+  UserIconLoader.DialogImage(DI_Clear,FinalizationClearButton);
+  UserIconLoader.DialogImage(DI_Load,FinalizationLoadButton);
+  UserIconLoader.DialogImage(DI_Save,FinalizationSaveButton);
+  UserIconLoader.DialogImage(DI_SelectFile,AutoexecBootFloppyImageButton);
+  UserIconLoader.DialogImage(DI_Add,AutoexecBootFloppyImageAddButton);
+  UserIconLoader.DialogImage(DI_Delete,AutoexecBootFloppyImageDelButton);
+  UserIconLoader.DialogImage(DI_Clear,CustomSetsClearButton);
+  UserIconLoader.DialogImage(DI_Load,CustomSetsLoadButton);
+  UserIconLoader.DialogImage(DI_Save,CustomSetsSaveButton);
+  UserIconLoader.DialogImage(DI_Add,CustomSetsEnvAdd);
+  UserIconLoader.DialogImage(DI_Delete,CustomSetsEnvDel);
+  UserIconLoader.DialogImage(DI_Previous,PreviousButton);
+  UserIconLoader.DialogImage(DI_Next,NextButton);
 
   If (Game=nil) and (LoadTemplate<>nil) then begin
     Game:=LoadTemplate;
@@ -770,7 +807,7 @@ begin
       ValueFromIndex[6]:=RemoveUnderline(LanguageSetup.No);
       ValueFromIndex[8]:=RemoveUnderline(LanguageSetup.No);
       ValueFromIndex[9]:='64';
-      ValueFromIndex[10]:=MakeRelPath(IncludeTrailingPathDelimiter(PrgDataDir+CaptureSubDir),PrgSetup.BaseDir);
+      ValueFromIndex[10]:=IncludeTrailingPathDelimiter(PrgSetup.CaptureDir);
     end;
   end else begin
     IconName:=Game.Icon;
@@ -820,7 +857,7 @@ begin
 
       If Game.LoadFix then ValueFromIndex[8]:=RemoveUnderline(LanguageSetup.Yes) else ValueFromIndex[8]:=RemoveUnderline(LanguageSetup.No);
       ValueFromIndex[9]:=IntToStr(Game.LoadFixMemory);
-      If Game.CaptureFolder<>'' then ValueFromIndex[10]:=Game.CaptureFolder else ValueFromIndex[10]:=MakeRelPath(IncludeTrailingPathDelimiter(PrgDataDir+CaptureSubDir),PrgSetup.BaseDir);
+      If Game.CaptureFolder<>'' then ValueFromIndex[10]:=Game.CaptureFolder else ValueFromIndex[10]:=IncludeTrailingPathDelimiter(PrgSetup.CaptureDir);
     end;
     St:=ValueToList(Game.ExtraFiles); try ExtraFilesListBox.Items.AddStrings(St); finally St.Free; end;
     If ExtraFilesListBox.Items.Count>0 then ExtraFilesListBox.ItemIndex:=0;
@@ -837,11 +874,11 @@ begin
       GameInfoValueListEditor.Strings.ValueFromIndex[6]:=RemoveUnderline(LanguageSetup.No);
     end else begin
       with GameInfoValueListEditor.Strings do begin
-        If Game.Genre<>'' then ValueFromIndex[0]:=Game.Genre;
+        If Game.Genre<>'' then ValueFromIndex[0]:=GetCustomGenreName(Game.Genre);
         If Game.Developer<>'' then ValueFromIndex[1]:=Game.Developer;
         If Game.Publisher<>'' then ValueFromIndex[2]:=Game.Publisher;
         If Game.Year<>'' then ValueFromIndex[3]:=Game.Year;
-        If Game.Language<>'' then ValueFromIndex[4]:=Game.Language;
+        If Game.Language<>'' then ValueFromIndex[4]:=GetCustomLanguageName(Game.Language);
         If Game.WWW<>'' then ValueFromIndex[5]:=Game.WWW;
         If Game.DataDir<>'' then ValueFromIndex[6]:=Game.DataDir;
         If Game.Favorite then ValueFromIndex[7]:=RemoveUnderline(LanguageSetup.Yes) else ValueFromIndex[7]:=RemoveUnderline(LanguageSetup.No);
@@ -1208,53 +1245,8 @@ begin
 end;
 
 procedure TProfileEditorForm.LoadMountingList;
-Var I : Integer;
-    St : TStringList;
-    L : TListItem;
-    S : String;
-    B : Boolean;
 begin
-  MountingListView.Items.BeginUpdate;
-  try
-    MountingListView.Items.Clear;
-    For I:=0 to Mounting.Count-1 do begin
-      St:=ValueToList(Mounting[I]);
-      try
-        L:=MountingListView.Items.Add;
-        S:=Trim(St[0]);
-        If (St.Count>1) and ((Trim(ExtUpperCase(St[1]))='PHYSFS') or (Trim(ExtUpperCase(St[1]))='ZIP')) then begin
-          If Pos('$',S)<>0 then S:=Copy(S,Pos('$',S)+1,MaxInt)+' (+ '+Copy(S,1,Pos('$',S)-1)+')';
-        end else begin
-          If Pos('$',S)<>0 then S:=Copy(S,1,Pos('$',S)-1)+' (+'+LanguageSetup.More+')';
-        end;
-        L.Caption:=S;
-        If St.Count>1 then begin
-          S:=Trim(ExtUpperCase(St[1])); B:=False;
-          If (not B) and (S='DRIVE') then begin L.SubItems.Add(LanguageSetup.ProfileEditorMountingDriveTypeDRIVE); B:=True; end;
-          If (not B) and (S='CDROM') then begin L.SubItems.Add(LanguageSetup.ProfileEditorMountingDriveTypeCDROM); B:=True; end;
-          If (not B) and (S='CDROMIMAGE') then begin L.SubItems.Add(LanguageSetup.ProfileEditorMountingDriveTypeCDROMIMAGE); B:=True; end;
-          If (not B) and (S='FLOPPY') then begin L.SubItems.Add(LanguageSetup.ProfileEditorMountingDriveTypeFLOPPY); B:=True; end;
-          If (not B) and (S='FLOPPYIMAGE') then begin L.SubItems.Add(LanguageSetup.ProfileEditorMountingDriveTypeFLOPPYIMAGE); B:=True; end;
-          If (not B) and (S='IMAGE') then begin L.SubItems.Add(LanguageSetup.ProfileEditorMountingDriveTypeIMAGE); B:=True; end;
-          If (not B) and (S='PHYSFS') then begin L.SubItems.Add(LanguageSetup.ProfileEditorMountingDriveTypePHYSFS); B:=True; end;
-          If (not B) and (S='ZIP') then begin L.SubItems.Add(LanguageSetup.ProfileEditorMountingDriveTypeZIP); B:=True; end;
-          If not B then L.SubItems.Add(St[1]);
-        end else begin
-          L.SubItems.Add('');
-        end;
-        If St.Count>2 then L.SubItems.Add(St[2]) else L.SubItems.Add('');
-        If St.Count>4 then L.SubItems.Add(St[4]) else L.SubItems.Add('');
-        If St.Count>3 then begin
-          If Trim(ExtUpperCase(St[3]))='TRUE' then L.SubItems.Add(RemoveUnderline(LanguageSetup.Yes)) else L.SubItems.Add(RemoveUnderline(LanguageSetup.No));
-        end else L.SubItems.Add(RemoveUnderline(LanguageSetup.No));
-      finally
-        St.Free;
-      end;
-    end;
-    If MountingListView.Items.Count>0 then MountingListView.ItemIndex:=0;
-  finally
-    MountingListView.Items.EndUpdate;
-  end;
+  LoadMountingListView(MountingListView,Mounting);
 end;
 
 function TProfileEditorForm.CheckProfile: Boolean;
@@ -1500,11 +1492,11 @@ begin
 
   If not HideGameInfoPage then begin
     with GameInfoValueListEditor.Strings do begin
-      Game.Genre:=ValueFromIndex[0];
+      Game.Genre:=GetEnglishGenreName(ValueFromIndex[0]);
       Game.Developer:=ValueFromIndex[1];
       Game.Publisher:=ValueFromIndex[2];
       Game.Year:=ValueFromIndex[3];
-      Game.Language:=ValueFromIndex[4];
+      Game.Language:=GetEnglishLanguageName(ValueFromIndex[4]);
       Game.WWW:=ValueFromIndex[5];
       Game.DataDir:=ValueFromIndex[6];
       Game.Favorite:=(ValueFromIndex[7]=RemoveUnderline(LanguageSetup.Yes));
@@ -1727,7 +1719,7 @@ begin
           OpenDialog.InitialDir:=S;
           If not OpenDialog.Execute then exit;
           S:=OpenDialog.FileName;
-          ExtraFilesListBox.Items.Add(MakeRelPath(S,PrgSetup.BaseDir));
+          ExtraFilesListBox.Items.Add(MakeRelPath(S,PrgSetup.BaseDir,True));
           ExtraFilesListBox.ItemIndex:=ExtraFilesListBox.Items.count-1;
           ExtraFilesListBoxClick(Sender);
         end;
@@ -1752,14 +1744,14 @@ begin
     2 : begin
           If Trim(PrgSetup.GameDir)='' then S:=PrgSetup.BaseDir else S:=PrgSetup.GameDir;
           if not SelectDirectory(Handle,LanguageSetup.ChooseFolder,S) then exit;
-          ExtraDirsListBox.Items.Add(MakeRelPath(S,PrgSetup.BaseDir));
+          ExtraDirsListBox.Items.Add(MakeRelPath(S,PrgSetup.BaseDir,True));
           ExtraDirsListBox.ItemIndex:=ExtraDirsListBox.Items.count-1;
           ExtraDirsListBoxClick(Sender);
         end;
     3 : If ExtraDirsListBox.ItemIndex>=0 then begin
           S:=MakeAbsPath(ExtraDirsListBox.Items[ExtraDirsListBox.ItemIndex],PrgSetup.BaseDir);
           if not SelectDirectory(Handle,LanguageSetup.ChooseFolder,S) then exit;
-          ExtraDirsListBox.Items[ExtraDirsListBox.ItemIndex]:=MakeRelPath(S,PrgSetup.BaseDir);
+          ExtraDirsListBox.Items[ExtraDirsListBox.ItemIndex]:=MakeRelPath(S,PrgSetup.BaseDir,True);
         end;
     4 : begin
           I:=ExtraDirsListBox.ItemIndex;
@@ -1816,12 +1808,19 @@ begin
             end;
           end;
           If Mounting.Count<10 then
-            Mounting.Insert(0,MakeRelPath(PrgSetup.GameDir,PrgSetup.BaseDir)+';Drive;C;false;');
+            Mounting.Insert(0,MakeRelPath(PrgSetup.GameDir,PrgSetup.BaseDir,True)+';Drive;C;false;');
           LoadMountingList;
         end;
     {GenerateScreenshotFolderName}
     9 : with ProfileSettingsValueListEditor.Strings do begin
-          ValueFromIndex[10]:='.\'+CaptureSubDir+'\'+MakeFileSysOKFolderName(ValueFromIndex[0])+'\';
+          If (Trim(ValueFromIndex[10])<>'') and DirectoryExists(MakeAbsPath(ValueFromIndex[10],PrgSetup.BaseDir)) then exit;
+          S:=IncludeTrailingPathDelimiter(PrgSetup.CaptureDir)+MakeFileSysOKFolderName(ValueFromIndex[0])+'\';
+          I:=0;
+          while DirectoryExists(MakeAbsPath(S,PrgSetup.BaseDir)) do begin
+            inc(I);
+            S:=IncludeTrailingPathDelimiter(PrgSetup.CaptureDir)+MakeFileSysOKFolderName(ValueFromIndex[0])+IntToStr(I)+'\';
+          end;
+          ValueFromIndex[0]:=S;
         end;
     {Autoexec}
     10 : AutoexecMemo.Lines.Clear;
@@ -1940,7 +1939,7 @@ begin
     19 : begin
            If PrgSetup.DataDir='' then S:=PrgSetup.BaseDir else S:=PrgSetup.DataDir;
            S:=IncludeTrailingPathDelimiter(S)+MakeFileSysOKFolderName(ProfileSettingsValueListEditor.Strings.ValueFromIndex[0])+'\';
-           T:=MakeRelPath(S,PrgSetup.BaseDir);
+           T:=MakeRelPath(S,PrgSetup.BaseDir,True);
            If T<>'' then GameInfoValueListEditor.Strings.ValueFromIndex[6]:=T;
            If DirectoryExists(S) then exit;
            If MessageDlg(Format(LanguageSetup.MessageConfirmationCreateDir,[S]),mtConfirmation,[mbYes,mbNo],0)<>mrYes then exit;
@@ -2046,10 +2045,10 @@ begin
    11 : begin
           S:=PrgSetup.BaseDir;
           If Trim(ProfileSettingsValueListEditor.Strings.ValueFromIndex[8])=''
-            then S:=PrgSetup.BaseDir+CaptureSubDir+'\'
+            then S:=MakeAbsPath(PrgSetup.CaptureDir,PrgSetup.BaseDir)
             else S:=MakeAbsPath(IncludeTrailingPathDelimiter(ProfileSettingsValueListEditor.Strings.ValueFromIndex[8]),S);
           if not SelectDirectory(Handle,LanguageSetup.ChooseFolder,S) then exit;
-          S:=MakeRelPath(S,PrgSetup.BaseDir);
+          S:=MakeRelPath(S,PrgSetup.BaseDir,True);
           If S='' then exit;
           ProfileSettingsValueListEditor.Strings.ValueFromIndex[8]:=IncludeTrailingPathDelimiter(S);
         end;
@@ -2103,7 +2102,7 @@ begin
           If Trim(GameInfoValueListEditor.Strings.ValueFromIndex[6])<>'' then
             S:=MakeAbsPath(GameInfoValueListEditor.Strings.ValueFromIndex[6],S);
           if not SelectDirectory(Handle,LanguageSetup.ChooseFolder,S) then exit;
-          S:=MakeRelPath(S,PrgSetup.BaseDir);
+          S:=MakeRelPath(S,PrgSetup.BaseDir,True);
           If S='' then exit;
           GameInfoValueListEditor.Strings.ValueFromIndex[6]:=S;
         end;
@@ -2121,7 +2120,7 @@ begin
     If (S='') or (ExtUpperCase(S)='DEFAULT') then S:=PrgSetup.DOSBoxSettings[0].DosBoxDir;
     S:=MakeAbsPath(S,PrgSetup.BaseDir);
     if not SelectDirectory(Handle,LanguageSetup.ChooseFolder,S) then exit;
-    S:=MakeRelPath(S,PrgSetup.BaseDir);
+    S:=MakeRelPath(S,PrgSetup.BaseDir,True);
     If S='' then exit;
     GeneralValueListEditor.Strings.ValueFromIndex[15+ShiftNr]:=IncludeTrailingPathDelimiter(S);
   end;
@@ -2133,9 +2132,9 @@ begin
     DosBoxTxtOpenDialog.Filter:=LanguageSetup.SetupFormDosBoxMapperFileFilter;
     If Trim(S)=''
       then DosBoxTxtOpenDialog.InitialDir:=PrgDataDir
-      else DosBoxTxtOpenDialog.InitialDir:=ExtractFilePath(MakeAbsPath(S,PrgDataDir));
+      else DosBoxTxtOpenDialog.InitialDir:=ExtractFilePath(MakeAbsPath(S,PrgSetup.BaseDir));
     if not DosBoxTxtOpenDialog.Execute then exit;
-    S:=MakeRelPath(DosBoxTxtOpenDialog.FileName,PrgDataDir);
+    S:=MakeRelPath(DosBoxTxtOpenDialog.FileName,PrgSetup.BaseDir);
     If S='' then exit;
     GeneralValueListEditor.Strings.ValueFromIndex[16+ShiftNr]:=S;
   end;

@@ -50,7 +50,7 @@ DataDir=
 Favorite=0
 Name=F15 Strike Eagle
 Icon=
-Genre=Flugsimulator
+Genre=Flightsimulation
 Developer=MicroProse Software
 Publisher=MicroProse Software
 Year=1985
@@ -223,4 +223,7 @@ config=
 [ExtraCommands]
 BeforeExecution=
 AfterExecution=
+BeforeExecution.Wait=1
+BeforeExecution.Minimized=0
+AfterExecution.Minimized=0
 

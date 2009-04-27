@@ -107,11 +107,11 @@ of dividing program files and data files.)
 
 <p>
 All user files (programm configuration, game program files, manuals, captured files, etc.) should be stored in this
-directory and its subdirectores. The files stored directly in this directory are D-Fend Reloaded configuration files.
-The games files are stored in the subdirectories of the data directory:
+directory and its subdirectores. The games files are stored in the subdirectories of the data directory:
 </p></div>
 
 <ul class="big">
+  <li><b>Settings:</b> This folder is used by D-Fend Reloaded to store its configuration files.</li>
   <li><b>VirtualHD:</b> This folder will be mounted as drive "<tt>C:</tt>" inside DOSBox (as long as you do not change
   this behavior for a profile). If you place your games in subdirectories of this folder you will be able to access them
   inside DOSBox without having to setup anything special in D-Fend Reloaded. Additionally you cannot damage your Windows
@@ -139,7 +139,18 @@ The games files are stored in the subdirectories of the data directory:
 <a onclick="Work('AddingProfiles')" name="AddingProfiles" href="#"><h2>&raquo; Adding new profiles</h2></a>
 
 <div id="AddingProfiles"><p>
-The easiest way of adding profiles is via the <a href="ProfilesWizard.html">profile adding wizard</a> ("Add with wizard..."
+The absolute easiest way of adding games to the list (if the game is stored as a <tt>zip</tt> file) is draging the
+<tt>zip</tt> file to the D-Fend Reloaded program window. D-Fend Reloaded will copy the game files to a new created
+subdirectory of the games folder and will try to automatically setup the new game via an auto setup template. If
+there is no auto setup template matching to the new game, D-Fend Reloaded will aplly the default template to the
+new profile. In most cases this will result in a correctly working new profile. But this way of adding new games
+does not allow the user to influence the process of profile creation. (Of couse you can edit the new profile later
+like any profile via the profile editor.)</p>
+<p>
+
+<p>
+The easiest way of adding profiles while letting user influence the process 
+is via the <a href="ProfilesWizard.html">profile adding wizard</a> ("Add with wizard..."
 in the "Profile" menu or <span class="key">F3</span>-key). The profile wizard will only ask you the really nessessary
 things: The name for the new profile, the <tt>exe</tt> file to execute inside DOSBox and some game settings.
 D-Fend Reloaded already knows over 350 games (the auto setup templates). If you add a known game it will offer you

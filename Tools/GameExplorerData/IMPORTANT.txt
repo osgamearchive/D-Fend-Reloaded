@@ -1,0 +1,2 @@
+After compiling the dll open it in ResHacker and replace the default icon ICON/1 with icon_1.ico.
+Otherwise the games explorer will use this Delphi default icon and ignore the DFR icons.

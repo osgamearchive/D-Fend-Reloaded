@@ -139,7 +139,7 @@ Type TFileTypeInfo=record
   Options : TFileTypeOptionsSet;
 end;
 
-const FileTypes : Array[0..49] of TFileTypeInfo=
+const FileTypes : Array[0..51] of TFileTypeInfo=
   ((Ext: '.EXE'; NameID: NR_QuickStarterColumnsTypeDOS; ImageIndex: 9; OpenType: otDOSBox; Options: [ftCanMakeProfileOf,ftDOSExe, ftRunWithParameters]),
    (Ext: '.EXE'; NameID: NR_QuickStarterColumnsTypeWindows; ImageIndex: 10; OpenType: otOpen; Options: [ftCanMakeProfileOf,ftWindowsExe, ftRunWithParameters]),
    (Ext: '.COM'; NameID: NR_QuickStarterColumnsTypeDOS; ImageIndex: 9; OpenType: otDOSBox; Options: [ftCanMakeProfileOf, ftRunWithParameters]),
@@ -164,6 +164,8 @@ const FileTypes : Array[0..49] of TFileTypeInfo=
    (Ext: '.WAV'; NameID: NR_QuickStarterColumnsTypeSound; ImageIndex: 12; OpenType: otSoundPlayer; Options: []),
    (Ext: '.MP3'; NameID: NR_QuickStarterColumnsTypeSound; ImageIndex: 12; OpenType: otSoundPlayer; Options: []),
    (Ext: '.OGG'; NameID: NR_QuickStarterColumnsTypeSound; ImageIndex: 12; OpenType: otSoundPlayer; Options: []),
+   (Ext: '.MID'; NameID: NR_QuickStarterColumnsTypeSound; ImageIndex: 12; OpenType: otSoundPlayer; Options: []),
+   (Ext: '.MIDI'; NameID: NR_QuickStarterColumnsTypeSound; ImageIndex: 12; OpenType: otSoundPlayer; Options: []),
 
    (Ext: '.AVI'; NameID: NR_QuickStarterColumnsTypeVideo; ImageIndex: 19; OpenType: otVideoPlayer; Options: []),
    (Ext: '.MPG'; NameID: NR_QuickStarterColumnsTypeVideo; ImageIndex: 19; OpenType: otVideoPlayer; Options: []),
@@ -271,7 +273,7 @@ begin
 
   LoadLanguage;
 
-  LoadUserIcons(ImageList,'QuickStart');
+  UserIconLoader.RegisterImageList(ImageList,'QuickStart');
 
   LoadTemplateList;
   BuildTree;
@@ -297,6 +299,8 @@ end;
 
 procedure TQuickStartForm.FormDestroy(Sender: TObject);
 begin
+  UserIconLoader.UnRegisterImageList(ImageList);
+
   PrgSetup.QuickStarterMaximized:=(WindowState=wsMaximized);
   PrgSetup.QuickStarterLeft:=Left;
   PrgSetup.QuickStarterTop:=Top;
@@ -485,7 +489,7 @@ Var N,SelNode,BackupSelNode : TTreeNode;
     C : Char;
 begin
   GameDir:=MakeAbsPath(PrgSetup.GameDir,PrgSetup.BaseDir);
-  CaptureDir:=PrgDataDir+CaptureSubDir;
+  CaptureDir:=MakeAbsPath(PrgSetup.CaptureDir,PrgDataDir);
   DataDir:=MakeAbsPath(PrgSetup.DataDir,PrgSetup.BaseDir);
 
   DisableGUI;
@@ -1143,7 +1147,7 @@ begin
           MessageDlg(Format(LanguageSetup.MessageCouldNotCreateDir,[S]),mtError,[mbOK],0);
           exit;
         end;
-        If not CopyFiles(FileName,S) then begin
+        If not CopyFiles(FileName,S,True) then begin
           MessageDlg(Format(LanguageSetup.MessageCouldNotCopyFiles,[FileName,S]),mtError,[mbOK],0);
           exit;
         end;
@@ -1184,7 +1188,7 @@ begin
           MessageDlg(Format(LanguageSetup.MessageCouldNotCreateDir,[S]),mtError,[mbOK],0);
           exit;
         end;
-        If not CopyFiles(FileName,S) then begin
+        If not CopyFiles(FileName,S,True) then begin
           MessageDlg(Format(LanguageSetup.MessageCouldNotCopyFiles,[FileName,S]),mtError,[mbOK],0);
           exit;
         end;

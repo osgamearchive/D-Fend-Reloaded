@@ -224,7 +224,7 @@ object SetupFrameZipPrgs: TSetupFrameZipPrgs
   object AutoSetupButton: TBitBtn
     Left = 16
     Top = 318
-    Width = 177
+    Width = 209
     Height = 25
     Caption = 'Set default values for'
     TabOrder = 6

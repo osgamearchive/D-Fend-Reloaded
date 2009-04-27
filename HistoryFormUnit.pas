@@ -64,8 +64,6 @@ begin
   LoadHistoryStatistics(ListView2);
 
   List1CompareMode:=0; List2CompareMode:=0;
-
-  TabSheet2.TabVisible:=PrgSetup.ActivateIncompleteFeatures;
 end;
 
 procedure THistoryForm.ClearButtonClick(Sender: TObject);

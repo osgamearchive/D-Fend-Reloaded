@@ -141,6 +141,20 @@ object SetupFrameDOSBoxForm: TSetupFrameDOSBoxForm
     Visible = False
     OnClick = WarningButtonClick
   end
+  object DOSBoxKeyboardLayoutLabel: TLabel
+    Left = 216
+    Top = 52
+    Width = 143
+    Height = 13
+    Caption = 'DOSBoxKeyboardLayoutLabel'
+  end
+  object DOSBoxCodepageLabel: TLabel
+    Left = 416
+    Top = 52
+    Width = 113
+    Height = 13
+    Caption = 'DOSBoxCodepageLabel'
+  end
   object DosBoxMapperEdit: TLabeledEdit
     Left = 14
     Top = 114
@@ -150,7 +164,7 @@ object SetupFrameDOSBoxForm: TSetupFrameDOSBoxForm
     EditLabel.Width = 90
     EditLabel.Height = 13
     EditLabel.Caption = 'DosBoxMapperEdit'
-    TabOrder = 2
+    TabOrder = 4
   end
   object HideDosBoxConsoleCheckBox: TCheckBox
     Left = 14
@@ -159,7 +173,7 @@ object SetupFrameDOSBoxForm: TSetupFrameDOSBoxForm
     Height = 17
     Anchors = [akLeft, akTop, akRight]
     Caption = 'DosBox-Console ausblenden'
-    TabOrder = 4
+    TabOrder = 6
   end
   object CenterDOSBoxCheckBox: TCheckBox
     Left = 14
@@ -168,7 +182,7 @@ object SetupFrameDOSBoxForm: TSetupFrameDOSBoxForm
     Height = 17
     Anchors = [akLeft, akTop, akRight]
     Caption = 'CenterDOSBoxCheckBox'
-    TabOrder = 5
+    TabOrder = 7
   end
   object SDLVideoDriverComboBox: TComboBox
     Left = 14
@@ -178,7 +192,7 @@ object SetupFrameDOSBoxForm: TSetupFrameDOSBoxForm
     Style = csDropDownList
     ItemHeight = 13
     ItemIndex = 0
-    TabOrder = 8
+    TabOrder = 10
     Text = 'Direct X'
     Items.Strings = (
       'Direct X'
@@ -191,7 +205,7 @@ object SetupFrameDOSBoxForm: TSetupFrameDOSBoxForm
     Height = 17
     Anchors = [akLeft, akTop, akRight]
     Caption = 'Disable screensaver when DOSBox is running'
-    TabOrder = 6
+    TabOrder = 8
   end
   object CommandLineEdit: TLabeledEdit
     Left = 14
@@ -202,14 +216,14 @@ object SetupFrameDOSBoxForm: TSetupFrameDOSBoxForm
     EditLabel.Width = 84
     EditLabel.Height = 13
     EditLabel.Caption = 'CommandLineEdit'
-    TabOrder = 3
+    TabOrder = 5
   end
   object OKButton: TBitBtn
     Left = 8
     Top = 414
     Width = 97
     Height = 27
-    TabOrder = 9
+    TabOrder = 11
     OnClick = OKButtonClick
     Kind = bkOK
   end
@@ -218,7 +232,7 @@ object SetupFrameDOSBoxForm: TSetupFrameDOSBoxForm
     Top = 414
     Width = 97
     Height = 27
-    TabOrder = 10
+    TabOrder = 12
     Kind = bkCancel
   end
   object RestoreDefaultValuesButton: TBitBtn
@@ -227,7 +241,7 @@ object SetupFrameDOSBoxForm: TSetupFrameDOSBoxForm
     Width = 202
     Height = 28
     Caption = 'Vorgabewerte wiederherstellen'
-    TabOrder = 11
+    TabOrder = 13
     OnClick = RestoreDefaultValuesButtonClick
     Glyph.Data = {
       DE010000424DDE01000000000000760000002800000024000000120000000100
@@ -276,11 +290,29 @@ object SetupFrameDOSBoxForm: TSetupFrameDOSBoxForm
     Height = 17
     Anchors = [akLeft, akTop, akRight]
     Caption = 'Wait on error'
-    TabOrder = 7
+    TabOrder = 9
+  end
+  object DOSBoxKeyboardLayoutComboBox: TComboBox
+    Left = 216
+    Top = 67
+    Width = 169
+    Height = 21
+    Style = csDropDownList
+    ItemHeight = 13
+    TabOrder = 2
+  end
+  object DOSBoxCodepageComboBox: TComboBox
+    Left = 416
+    Top = 67
+    Width = 169
+    Height = 21
+    Style = csDropDownList
+    ItemHeight = 13
+    TabOrder = 3
   end
   object DosBoxTxtOpenDialog: TOpenDialog
     DefaultExt = 'txt'
-    Left = 288
-    Top = 71
+    Left = 768
+    Top = 63
   end
 end

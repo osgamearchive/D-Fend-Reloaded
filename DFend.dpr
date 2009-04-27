@@ -21,7 +21,6 @@ uses
   TemplateFormUnit in 'TemplateFormUnit.pas' {TemplateForm},
   UninstallFormUnit in 'UninstallFormUnit.pas' {UninstallForm},
   UninstallSelectFormUnit in 'UninstallSelectFormUnit.pas' {UninstallSelectForm},
-  pngimage in 'pngimage\pngimage.pas',
   ViewImageFormUnit in 'ViewImageFormUnit.pas' {ViewImageForm},
   CreateConfFormUnit in 'CreateConfFormUnit.pas' {CreateConfForm},
   TemplateSelectProfileFormUnit in 'TemplateSelectProfileFormUnit.pas' {TemplateSelectProfileForm},
@@ -35,7 +34,6 @@ uses
   ProgressFormUnit in 'ProgressFormUnit.pas' {ProgressForm},
   ResHookUnit in 'ResHookUnit.pas',
   SerialEditFormUnit in 'SerialEditFormUnit.pas' {SerialEditForm},
-  ChangeProfilesFormUnit in 'ChangeProfilesFormUnit.pas' {ChangeProfilesForm},
   BuildInstallerForSingleGameFormUnit in 'BuildInstallerForSingleGameFormUnit.pas' {BuildInstallerForSingleGameForm},
   UserInfoFormUnit in 'UserInfoFormUnit.pas' {UserInfoForm},
   ModernProfileEditorFormUnit in 'ModernProfileEditorFormUnit.pas' {ModernProfileEditorForm},
@@ -163,7 +161,20 @@ uses
   RunPrgManagerUnit in 'RunPrgManagerUnit.pas',
   ModernProfileEditorHelperProgramsFrameUnit in 'ModernProfileEditorHelperProgramsFrameUnit.pas' {ModernProfileEditorHelperProgramsFrame: TFrame},
   SetupFrameWindowsGamesUnit in 'SetupFrameWindowsGamesUnit.pas' {SetupFrameWindowsGames: TFrame},
-  SetupFrameZipPrgsUnit in 'SetupFrameZipPrgsUnit.pas' {SetupFrameZipPrgs: TFrame};
+  SetupFrameZipPrgsUnit in 'SetupFrameZipPrgsUnit.pas' {SetupFrameZipPrgs: TFrame},
+  ScanGamesFolderFormUnit in 'ScanGamesFolderFormUnit.pas' {ScanGamesFolderForm},
+  SetupFrameCustomLanguageStringsUnit in 'SetupFrameCustomLanguageStringsUnit.pas' {SetupFrameCustomLanguageStrings: TFrame},
+  SelectFileToStartFormUnit in 'SelectFileToStartFormUnit.pas' {SelectFileToStartForm},
+  SelectCDDriveToMountFormUnit in 'SelectCDDriveToMountFormUnit.pas' {SelectCDDriveToMountForm},
+  SelectCDDriveToMountByDataFormUnit in 'SelectCDDriveToMountByDataFormUnit.pas' {SelectCDDriveToMountByDataForm},
+  ModernProfileEditorScummVMHardwareFrameUnit in 'ModernProfileEditorScummVMHardwareFrameUnit.pas' {ModernProfileEditorScummVMHardwareFrame: TFrame},
+  pngimage in 'Components\pngimage\pngimage.pas',
+  CreateShortcutsFormUnit in 'CreateShortcutsFormUnit.pas' {CreateShortcutsForm},
+  SetupFrameGameListIconModeAppearanceUnit in 'SetupFrameGameListIconModeAppearanceUnit.pas' {SetupFrameGameListIconModeAppearance: TFrame},
+  EditMultipleProfilesFormUnit in 'EditMultipleProfilesFormUnit.pas' {EditMultipleProfilesForm},
+  ImportSelectTemplateFormUnit in 'ImportSelectTemplateFormUnit.pas' {ImportSelectTemplateForm},
+  Resample in 'Resample.pas',
+  ImageStretch in 'ImageStretch.pas';
 
 {$R *.res}
 

@@ -40,7 +40,7 @@ Function ExportXMLFiles(const AOwner : TComponent; const AGameDB : TGameDB) : Bo
 implementation
 
 uses ShlObj, VistaToolsUnit, LanguageSetupUnit, GameDBToolsUnit, CommonTools,
-     SimpleXMLUnit;
+     SimpleXMLUnit, IconLoaderUnit;
 
 {$R *.dfm}
 
@@ -63,6 +63,7 @@ begin
 
   //SaveDialog.Caption:=LanguageSetup.
   //SaveDialog.Filter:=LanguageSetup.
+  UserIconLoader.DialogImage(DI_SelectFile,SelectFileButton);
 end;
 
 procedure TCreateXMLForm.FormShow(Sender: TObject);

@@ -94,4 +94,20 @@ object WizardBaseFrame: TWizardBaseFrame
       3333333773FFFF77333333333FBFBF3333333333377777333333}
     NumGlyphs = 2
   end
+  object WizardModeRadioGroup: TRadioGroup
+    Left = 8
+    Top = 248
+    Width = 571
+    Height = 89
+    Anchors = [akLeft, akTop, akRight]
+    Caption = 'Wizard mode'
+    ItemIndex = 1
+    Items.Strings = (
+      'Always setup game automatically'
+      
+        'Only setup game automatically if matching auto setup template ex' +
+        'ists'
+      'Always show all setup pages of this wizard')
+    TabOrder = 3
+  end
 end

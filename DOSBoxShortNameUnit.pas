@@ -183,8 +183,8 @@ begin
   ErrorMessage:='';
   case ConvertResult of
     tcrErrParentNotFound          : ErrorMessage:=Format(LanguageSetup.MessageShortNameErrorParentNotFound,[RootPath]);
-    tcrErrDelimiterInFileName     : ErrorMessage:=Format(LanguageSetup.MessageShortNameErrorDelimiterInFileName,[RootPath]);
-    tcrErrFileNotFound            : ErrorMessage:=Format(LanguageSetup.MessageShortNameErrorFileNotFound,[LongName,ShortName]);
+    tcrErrDelimiterInFileName     : ErrorMessage:=Format(LanguageSetup.MessageShortNameErrorDelimiterInFileName,[LongName]);
+    tcrErrFileNotFound            : ErrorMessage:=Format(LanguageSetup.MessageShortNameErrorFileNotFound,[LongName,RootPath]);
     tcrWarnInvalidChars           : ErrorMessage:=Format(LanguageSetup.MessageShortNameWarningInvalidChars,[LongName]);
     tcrWarnSystemShort            : ErrorMessage:=Format(LanguageSetup.MessageShortNameWarningSystemShort,[LongName]);
     tcrWarnSystemShortAlreadyUsed : ErrorMessage:=Format(LanguageSetup.MessageShortNameWarningSystemShortAlreadyUsed,[LongName]);

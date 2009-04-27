@@ -6,6 +6,8 @@ uses Classes, Menus;
 Type TLinkFile=class
   private
     FFileNameOnly : String;
+    FAllowLinesAndSubs : Boolean;
+    FHelpID : Integer;
     FData : TStringList;
     FChanged : Boolean;
     Procedure DataChanged(Sender : TObject);
@@ -15,11 +17,13 @@ Type TLinkFile=class
     Procedure LoadData;
     Procedure SaveData;
     function GetData: TStrings;
+    Procedure CreateAndAddUserMenuItems(const Owner : TComponent; const Tag : Integer; const OnClick : TNotifyEvent);
+    Procedure CreateAndAddEditMenuItem(const Owner : TComponent; const EditTag : Integer; const OnClick : TNotifyEvent; const EditImage : Integer);
   public
-    Constructor Create(const AFileNameOnly : String);
+    Constructor Create(const AFileNameOnly : String; const AAllowLinesAndSubs : Boolean; const AHelpID : Integer);
     Destructor Destroy; override;
-    Procedure AddLinksToMenu(const Menu : TMenuItem; const Tag,EditTag : Integer; const OnClick : TNotifyEvent; const EditImage : Integer); overload;
-    Procedure AddLinksToMenu(const Menu : TPopupMenu; const Tag,EditTag : Integer; const OnClick : TNotifyEvent; const EditImage : Integer); overload;
+    Procedure AddLinksToMenu(const Menu : TMenuItem; const Tag, EditTag : Integer; const OnClick : TNotifyEvent; const EditImage : Integer); overload;
+    Procedure AddLinksToMenu(const Menu : TPopupMenu; const Tag, EditTag : Integer; const OnClick : TNotifyEvent; const EditImage : Integer); overload;
     Procedure MoveToTop(const AName : String);
     Function EditFile(const AllowLines : Boolean) : Boolean;
     Function IndexOf(const AName : String) : Integer;
@@ -28,21 +32,25 @@ Type TLinkFile=class
     property Link[I : Integer] : String read GetLink;
     property Changed : Boolean read FChanged;
     property Data : TStrings read GetData;
+    property AllowLinesAndSubs : Boolean read FAllowLinesAndSubs write FAllowLinesAndSubs;
+    property HelpIP : Integer read FHelpID write FHelpID;
 end;
 
 Procedure OpenLink(const Link, GameNamePlaceHolder, RealGameName : String);
 
 implementation
 
-uses Windows, SysUtils, Forms, ShellAPI, PrgSetupUnit, CommonTools,
-     LanguageSetupUnit, LinkFileEditFormUnit;
+uses Windows, SysUtils, Forms, ShellAPI, Math, PrgSetupUnit, CommonTools,
+     LanguageSetupUnit, LinkFileEditFormUnit, PrgConsts;
 
 { TLinkFile }
 
-constructor TLinkFile.Create(const AFileNameOnly: String);
+constructor TLinkFile.Create(const AFileNameOnly: String; const AAllowLinesAndSubs : Boolean; const AHelpID : Integer);
 begin
   inherited Create;
   FFileNameOnly:=AFileNameOnly;
+  FAllowLinesAndSubs:=AAllowLinesAndSubs;
+  FHelpID:=AHelpID;
   FData:=TStringList.Create;
   FData.OnChange:=DataChanged;
   LoadData;
@@ -61,10 +69,12 @@ Var S : String;
     FSt : TStringList;
     I : Integer;
 begin
-  If FileExists(PrgDataDir+FFileNameOnly) then S:=PrgDataDir+FFileNameOnly else begin
-    If not FileExists(PrgDir+FFileNameOnly) then exit;
-    S:=PrgDir+FFileNameOnly;
-  end;
+  S:='';
+  If FileExists(PrgDataDir+SettingsFolder+'\'+FFileNameOnly) then S:=PrgDataDir+SettingsFolder+'\'+FFileNameOnly;
+  If (S='') and FileExists(PrgDataDir+FFileNameOnly) then S:=PrgDataDir+FFileNameOnly;
+  If (S='') and FileExists(PrgDir+FFileNameOnly) then S:=PrgDir+FFileNameOnly;
+  If (S='') and FileExists(PrgDir+BinFolder+'\'+FFileNameOnly) then S:=PrgDir+BinFolder+'\'+FFileNameOnly;
+  If S='' then exit;
 
   FSt:=TStringList.Create;
   try
@@ -88,7 +98,7 @@ begin
   FSt:=TStringList.Create;
   try
     For I:=0 to FData.Count-1 do If Trim(FData[I])='' then FSt.Add('---') else FSt.Add(FData[I]);
-    try FSt.SaveToFile(PrgDataDir+FFileNameOnly); except end;
+    try FSt.SaveToFile(PrgDataDir+SettingsFolder+'\'+FFileNameOnly); except end;
   finally
     FSt.Free;
   end;
@@ -130,66 +140,87 @@ begin
   result:=Trim(Copy(S,Pos(';',S)+1,MaxInt));
 end;
 
-procedure TLinkFile.AddLinksToMenu(const Menu: TMenuItem; const Tag, EditTag: Integer; const OnClick: TNotifyEvent; const EditImage: Integer);
+Function GetLevel(const S : String) : Integer;
 Var I : Integer;
-    M : TMenuItem;
 begin
-  While Menu.Count>0 do Menu.Items[0].Free;
+  result:=0;
+  For I:=1 to length(S) do If S[I]='=' then inc(result) else exit;
+end;
+
+Procedure TLinkFile.CreateAndAddUserMenuItems(const Owner : TComponent; const Tag : Integer; const OnClick : TNotifyEvent);
+Var I,L : Integer;
+    Last,M : TMenuItem;
+    Level : Array of TMenuItem;
+begin
+  SetLength(Level,0); Last:=nil;
 
   For I:=0 to FData.Count-1 do begin
-    M:=TMenuItem.Create(Menu.Owner);
-    If Name[I]='' then begin
+    If ((Trim(Name[I])='') or (Trim(Name[I])='-')) and FAllowLinesAndSubs then begin
+      If I=FData.Count-1 then continue;
+      SetLength(Level,Min(GetLevel(Name[I+1]),length(Level)));
+      M:=TMenuItem.Create(Owner.Owner);
       M.Caption:='-';
-    end else begin
-      M.Caption:=Name[I];
-      M.Hint:=Link[I];
-      M.Tag:=Tag;
-      M.OnClick:=OnClick;
+      If length(Level)=0 then begin
+        If Owner is TMenuItem then (Owner as TMenuItem).Add(M) else (Owner as TPopupMenu).Items.Add(M);
+      end else begin
+        Level[length(Level)-1].OnClick:=nil;
+        Level[length(Level)-1].Add(M);
+      end;
+      continue;
     end;
-    Menu.Add(M);
+
+    If (Trim(Name[I])='') or (Trim(Name[I])='-') then continue;
+
+    M:=TMenuItem.Create(Owner.Owner);
+
+    If (Last<>nil) and FAllowLinesAndSubs then begin
+      L:=Min(GetLevel(Name[I]),length(Level)+1);
+      If L=length(Level)+1 then begin SetLength(Level,L); Level[L-1]:=Last; end else SetLength(Level,L);
+    end;
+
+    M.Caption:=Copy(Name[I],GetLevel(Name[I])+1,MaxInt);
+    M.Hint:=Link[I];
+    M.Tag:=Tag;
+    M.OnClick:=OnClick;
+
+    If length(Level)=0 then begin
+      If Owner is TMenuItem then (Owner as TMenuItem).Add(M) else (Owner as TPopupMenu).Items.Add(M);
+    end else begin
+      Level[length(Level)-1].OnClick:=nil;
+      Level[length(Level)-1].Add(M);
+    end;
+
+    Last:=M;
   end;
+end;
 
-  M:=TMenuItem.Create(Menu.Owner);
+Procedure TLinkFile.CreateAndAddEditMenuItem(const Owner : TComponent; const EditTag : Integer; const OnClick : TNotifyEvent; const EditImage : Integer);
+Var M : TMenuItem;
+begin
+  M:=TMenuItem.Create(Owner.Owner);
   M.Caption:='-';
-  Menu.Add(M);
+  If Owner is TMenuItem then (Owner as TMenuItem).Add(M) else (Owner as TPopupMenu).Items.Add(M);
 
-  M:=TMenuItem.Create(Menu.Owner);
+  M:=TMenuItem.Create(Owner.Owner);
   M.Caption:=LanguageSetup.MenuProfileSearchGameEditLinks;
   M.Tag:=EditTag;
   M.OnClick:=OnClick;
   M.ImageIndex:=EditImage;
-  Menu.Add(M);
+  If Owner is TMenuItem then (Owner as TMenuItem).Add(M) else (Owner as TPopupMenu).Items.Add(M);
+end;
+
+procedure TLinkFile.AddLinksToMenu(const Menu: TMenuItem; const Tag, EditTag: Integer; const OnClick: TNotifyEvent; const EditImage: Integer);
+begin
+  While Menu.Count>0 do Menu.Items[0].Free;
+  CreateAndAddUserMenuItems(Menu,Tag,OnClick);
+  CreateAndAddEditMenuItem(Menu,EditTag,OnClick,EditImage);
 end;
 
 procedure TLinkFile.AddLinksToMenu(const Menu: TPopupMenu; const Tag, EditTag: Integer; const OnClick: TNotifyEvent; const EditImage: Integer);
-Var I : Integer;
-    M : TMenuItem;
 begin
   While Menu.Items.Count>0 do Menu.Items[0].Free;
-
-  For I:=0 to FData.Count-1 do begin
-    M:=TMenuItem.Create(Menu.Owner);
-    If Name[I]='' then begin
-      M.Caption:='-';
-    end else begin
-      M.Caption:=Name[I];
-      M.Hint:=Link[I];
-      M.Tag:=Tag;
-      M.OnClick:=OnClick;
-    end;
-    Menu.Items.Add(M);
-  end;
-
-  M:=TMenuItem.Create(Menu.Owner);
-  M.Caption:='-';
-  Menu.Items.Add(M);
-
-  M:=TMenuItem.Create(Menu.Owner);
-  M.Caption:=LanguageSetup.MenuProfileSearchGameEditLinks;
-  M.Tag:=EditTag;
-  M.OnClick:=OnClick;
-  M.ImageIndex:=EditImage;
-  Menu.Items.Add(M);
+  CreateAndAddUserMenuItems(Menu,Tag,OnClick);
+  CreateAndAddEditMenuItem(Menu,EditTag,OnClick,EditImage);
 end;
 
 function TLinkFile.IndexOf(const AName: String): Integer;
@@ -209,7 +240,7 @@ end;
 
 function TLinkFile.EditFile(const AllowLines : Boolean): Boolean;
 begin
-  result:=ShowLinkFileEditDialog(Application.MainForm,FData,AllowLines);
+  result:=ShowLinkFileEditDialog(Application.MainForm,FData,AllowLines,FHelpID);
   If result then SaveData;
 end;
 

@@ -15,6 +15,8 @@ type
     GameDirButton: TSpeedButton;
     BaseDirButton: TSpeedButton;
     InfoLabel: TLabel;
+    CaptureDirEdit: TLabeledEdit;
+    CaptureDirButton: TSpeedButton;
     procedure ButtonWork(Sender: TObject);
     procedure BaseDirEditChange(Sender: TObject);
   private
@@ -24,16 +26,19 @@ type
     { Public-Deklarationen }
     Function GetName : String;  
     Procedure InitGUIAndLoadSetup(InitData : TInitData);
+    Procedure BeforeChangeLanguage;
     Procedure LoadLanguage;
     Procedure DOSBoxDirChanged;
     Procedure ShowFrame(const AdvencedMode : Boolean);
+    procedure HideFrame;
     Procedure RestoreDefaults;
     Procedure SaveSetup;
   end;
 
 implementation
 
-uses LanguageSetupUnit, VistaToolsUnit, PrgSetupUnit, CommonTools, HelpConsts;
+uses LanguageSetupUnit, VistaToolsUnit, PrgSetupUnit, CommonTools, HelpConsts,
+     IconLoaderUnit;
 
 {$R *.dfm}
 
@@ -49,14 +54,25 @@ begin
   NoFlicker(BaseDirEdit);
   NoFlicker(GameDirEdit);
   NoFlicker(DataDirEdit);
+  NoFlicker(CaptureDirEdit);
 
   PBaseDir:=InitData.PBaseDir;
 
   BaseDirEdit.Text:=PrgSetup.BaseDir;
   GameDirEdit.Text:=PrgSetup.GameDir;
   DataDirEdit.Text:=PrgSetup.DataDir;
+  CaptureDirEdit.Text:=MakeAbsPath(PrgSetup.CaptureDir,PrgSetup.BaseDir);
+
+  UserIconLoader.DialogImage(DI_SelectFolder,BaseDirButton);
+  UserIconLoader.DialogImage(DI_SelectFolder,GameDirButton);
+  UserIconLoader.DialogImage(DI_SelectFolder,DataDirButton);
+  UserIconLoader.DialogImage(DI_SelectFolder,CaptureDirButton);
 
   HelpContext:=ID_FileOptionsGeneral;
+end;
+
+procedure TSetupFrameDirectories.BeforeChangeLanguage;
+begin
 end;
 
 procedure TSetupFrameDirectories.LoadLanguage;
@@ -67,6 +83,8 @@ begin
   GameDirButton.Hint:=LanguageSetup.ChooseFolder;
   DataDirEdit.EditLabel.Caption:=LanguageSetup.SetupFormDataDir;
   DataDirButton.Hint:=LanguageSetup.ChooseFolder;
+  CaptureDirEdit.EditLabel.Caption:=LanguageSetup.SetupFormCaptureDir;
+  CaptureDirButton.Hint:=LanguageSetup.ChooseFolder;
   InfoLabel.Caption:=LanguageSetup.SetupFormDirectoriesInfo;
 end;
 
@@ -76,6 +94,12 @@ end;
 
 procedure TSetupFrameDirectories.ShowFrame(const AdvencedMode: Boolean);
 begin
+  CaptureDirEdit.Visible:=PrgSetup.ActivateIncompleteFeatures;
+  CaptureDirButton.Visible:=PrgSetup.ActivateIncompleteFeatures;
+end;
+
+procedure TSetupFrameDirectories.HideFrame;
+begin
 end;
 
 procedure TSetupFrameDirectories.RestoreDefaults;
@@ -83,6 +107,7 @@ begin
   BaseDirEdit.Text:=PrgDataDir;
   GameDirEdit.Text:=PrgDataDir+'VirtualHD\';
   DataDirEdit.Text:=PrgDataDir+'GameData\';
+  DataDirEdit.Text:=PrgDataDir+'Capture\';
 end;
 
 procedure TSetupFrameDirectories.SaveSetup;
@@ -90,6 +115,7 @@ begin
   PrgSetup.BaseDir:=BaseDirEdit.Text;
   PrgSetup.GameDir:=GameDirEdit.Text;
   PrgSetup.DataDir:=DataDirEdit.Text;
+  PrgSetup.CaptureDir:=MakeRelPath(CaptureDirEdit.Text,PrgSetup.BaseDir);
 end;
 
 procedure TSetupFrameDirectories.BaseDirEditChange(Sender: TObject);
@@ -112,6 +138,10 @@ begin
     2 : begin
           S:=DataDirEdit.Text; If S='' then S:=BaseDirEdit.Text;
           if SelectDirectory(Handle,LanguageSetup.SetupFormDataDir,S) then DataDirEdit.Text:=IncludeTrailingPathDelimiter(S);
+        end;
+    3 : begin
+          S:=CaptureDirEdit.Text; If S='' then S:=BaseDirEdit.Text;
+          if SelectDirectory(Handle,LanguageSetup.SetupFormCaptureDirSelect,S) then CaptureDirEdit.Text:=IncludeTrailingPathDelimiter(S);
         end;
   end;
 end;

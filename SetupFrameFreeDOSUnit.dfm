@@ -10,7 +10,7 @@ object SetupFrameFreeDOS: TSetupFrameFreeDOS
   object PathFREEDOSButton: TSpeedButton
     Tag = 6
     Left = 594
-    Top = 26
+    Top = 31
     Width = 23
     Height = 22
     Anchors = [akTop, akRight]

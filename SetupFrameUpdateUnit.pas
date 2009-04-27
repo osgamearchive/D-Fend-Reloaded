@@ -20,9 +20,11 @@ type
     { Public-Deklarationen }
     Function GetName : String;
     Procedure InitGUIAndLoadSetup(InitData : TInitData);
+    Procedure BeforeChangeLanguage;
     Procedure LoadLanguage;
     Procedure DOSBoxDirChanged;
     Procedure ShowFrame(const AdvencedMode : Boolean);
+    procedure HideFrame;
     Procedure RestoreDefaults;
     Procedure SaveSetup;
   end;
@@ -52,6 +54,10 @@ begin
   UpdateCheckBox.Checked:=PrgSetup.VersionSpecificUpdateCheck;
 end;
 
+procedure TSetupFrameUpdate.BeforeChangeLanguage;
+begin
+end;
+
 procedure TSetupFrameUpdate.LoadLanguage;
 begin
   Update0RadioButton.Caption:=LanguageSetup.SetupFormUpdate0;
@@ -69,6 +75,10 @@ begin
 end;
 
 procedure TSetupFrameUpdate.ShowFrame(const AdvencedMode: Boolean);
+begin
+end;
+
+procedure TSetupFrameUpdate.HideFrame;
 begin
 end;
 

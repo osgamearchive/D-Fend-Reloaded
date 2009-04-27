@@ -6,13 +6,13 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, ComCtrls, StdCtrls, Buttons, ExtCtrls, ImgList, GameDBUnit, LinkFileUnit;
 
-Type TTextEvent=Procedure(Sender : TObject; const ProfileName, ProfileExe, ProfileSetup, ProfileScummVMGameName, ProfileScummVMPath : String) of object;
+Type TTextEvent=Procedure(Sender : TObject; const ProfileName, ProfileExe, ProfileSetup, ProfileScummVMGameName, ProfileScummVMPath, ProfileDOSBoxInstallation : String) of object;
 
 Type TModernProfileEditorInitData=record
   OnProfileNameChange : TTextEvent;
   GameDB: TGameDB;
   EditingTemplate : Boolean;
-  CurrentProfileName, CurrentProfileExe, CurrentProfileSetup, CurrentScummVMGameName, CurrentScummVMPath : PString;
+  CurrentProfileName, CurrentProfileExe, CurrentProfileSetup, CurrentScummVMGameName, CurrentScummVMPath, CurrentDOSBoxInstallation : PString;
   SearchLinkFile : TLinkFile;
 end;
 
@@ -56,13 +56,13 @@ type
     procedure ShowConfButtonClick(Sender: TObject);
   private
     { Private-Deklarationen }
-    ProfileName, ProfileExe, ProfileSetup, ProfileScummVMGameName, ProfileScummVMPath : String;
+    ProfileName, ProfileExe, ProfileSetup, ProfileScummVMGameName, ProfileScummVMPath, ProfileDOSBoxInstallation : String;
     FrameList : Array of TFrameRecord;
     BaseFrame, StartFrame : TFrame;
     ScummVM, WindowsMode : Boolean;
     Procedure InitGUI;
     Procedure LoadData;
-    Procedure SetProfileNameEvent(Sender : TObject; const AProfileName, AProfileExe, AProfileSetup, AProfileScummVMGameName, AProfileScummVMPath : String);
+    Procedure SetProfileNameEvent(Sender : TObject; const AProfileName, AProfileExe, AProfileSetup, AProfileScummVMGameName, AProfileScummVMPath, AProfileDOSBoxInstallation : String);
     Function AddTreeNode(const ParentTreeNode : TTreeNode; const F : TFrame; const I : IModernProfileEditorFrame; const Name : String; const PageCode : Integer; const ImageIndex : Integer) : TTreeNode;
   public
     { Public-Deklarationen }
@@ -89,7 +89,7 @@ Function EditGameProfilInt(const AOwner : TComponent; const AGameDB : TGameDB; v
 
 implementation
 
-uses VistaToolsUnit, LanguageSetupUnit, ModernProfileEditorBaseFrameUnit,
+uses Math, VistaToolsUnit, LanguageSetupUnit, ModernProfileEditorBaseFrameUnit,
      ModernProfileEditorGameInfoFrameUnit, ModernProfileEditorDirectoryFrameUnit,
      ModernProfileEditorDOSBoxFrameUnit, ModernProfileEditorHardwareFrameUnit,
      ModernProfileEditorCPUFrameUnit, ModernProfileEditorMemoryFrameUnit,
@@ -103,7 +103,7 @@ uses VistaToolsUnit, LanguageSetupUnit, ModernProfileEditorBaseFrameUnit,
      ModernProfileEditorStartFrameUnit, ModernProfileEditorScummVMGraphicsFrameUnit,
      ModernProfileEditorScummVMFrameUnit, ModernProfileEditorScummVMSoundFrameUnit,
      ModernProfileEditorPrinterFrameUnit, ModernProfileEditorScummVMGameFrameUnit,
-     ModernProfileEditorHelperProgramsFrameUnit,
+     ModernProfileEditorHelperProgramsFrameUnit, ModernProfileEditorScummVMHardwareFrameUnit,
      IconLoaderUnit, GameDBToolsUnit, PrgSetupUnit, CommonTools, DOSBoxUnit, HelpConsts;
 
 {$R *.dfm}
@@ -144,6 +144,7 @@ begin
   InitData.CurrentProfileSetup:=@ProfileSetup;
   InitData.CurrentScummVMGameName:=@ProfileScummVMGameName;
   InitData.CurrentScummVMPath:=@ProfileScummVMPath;
+  InitData.CurrentDOSBoxInstallation:=@ProfileDOSBoxInstallation;
   InitData.SearchLinkFile:=SearchLinkFile;
   InitData.EditingTemplate:=EditingTemplate;
   I.InitGUI(InitData);
@@ -151,7 +152,7 @@ end;
 
 procedure TModernProfileEditorForm.InitGUI;
 Var F : TFrame;
-    N,N2,N3 : TTreeNode;
+    N,N2 : TTreeNode;
     S : String;
 begin
   DoubleBuffered:=True;
@@ -174,6 +175,10 @@ begin
   PreviousButton.Caption:=RemoveUnderline(LanguageSetup.OK)+' && '+LanguageSetup.Previous;
   NextButton.Caption:=RemoveUnderline(LanguageSetup.OK)+' && '+LanguageSetup.Next;
 
+  UserIconLoader.DialogImage(DI_Previous,PreviousButton);
+  UserIconLoader.DialogImage(DI_Next,NextButton);
+  UserIconLoader.DialogImage(DI_ViewFile,ShowConfButton);
+
   ScummVM:=ScummVMMode(Game) or ScummVMMode(LoadTemplate);
   WindowsMode:=WindowsExeMode(Game) or WindowsExeMode(LoadTemplate);
 
@@ -189,12 +194,11 @@ begin
     If not HideGameInfoPage then begin F:=TModernProfileEditorGameInfoFrame.Create(self); AddTreeNode(N,F,TModernProfileEditorGameInfoFrame(F),LanguageSetup.ProfileEditorGameInfoSheet,1,1); end;
     F:=TModernProfileEditorDirectoryFrame.Create(self); AddTreeNode(N,F,TModernProfileEditorDirectoryFrame(F),LanguageSetup.ProfileEditorGameDirectorySheet,0,8);
 
-    If PrgSetup.ActivateIncompleteFeatures then begin
-      F:=TModernProfileEditorHelperProgramsFrame.Create(self); AddTreeNode(N,F,TModernProfileEditorHelperProgramsFrame(F),LanguageSetup.ProfileEditorHelperProgramsSheet,0,0);
-    end;
+    F:=TModernProfileEditorHelperProgramsFrame.Create(self); AddTreeNode(N,F,TModernProfileEditorHelperProgramsFrame(F),LanguageSetup.ProfileEditorHelperProgramsSheet,0,0);
     F:=TModernProfileEditorScummVMFrame.Create(self); N:=AddTreeNode(nil,F,TModernProfileEditorScummVMFrame(F),LanguageSetup.ProfileEditorScummVMSheet,2,23);
+
     F:=TModernProfileEditorScummVMGameFrame.Create(self); AddTreeNode(N,F,TModernProfileEditorScummVMGameFrame(F),LanguageSetup.ProfileEditorScummVMGameSheet,6,23);
-    F:=TModernProfileEditorHardwareFrame.Create(self); N:=AddTreeNode(nil,F,TModernProfileEditorHardwareFrame(F),LanguageSetup.ProfileEditorHardwareSheet,3,3);
+    F:=TModernProfileEditorScummVMHardwareFrame.Create(self); N:=AddTreeNode(nil,F,TModernProfileEditorScummVMHardwareFrame(F),LanguageSetup.ProfileEditorHardwareSheet,3,3);
     F:=TModernProfileEditorScummVMGraphicsFrame.Create(self); AddTreeNode(N,F,TModernProfileEditorScummVMGraphicsFrame(F),LanguageSetup.ProfileEditorGraphicsSheet,4,11);
     F:=TModernProfileEditorScummVMSoundFrame.Create(self); AddTreeNode(N,F,TModernProfileEditorScummVMSoundFrame(F),LanguageSetup.ProfileEditorSoundSheet,5,5);
   end else begin
@@ -204,18 +208,14 @@ begin
       BaseFrame:=F;
       If not HideGameInfoPage then begin F:=TModernProfileEditorGameInfoFrame.Create(self); AddTreeNode(N,F,TModernProfileEditorGameInfoFrame(F),LanguageSetup.ProfileEditorGameInfoSheet,1,1); end;
       F:=TModernProfileEditorDirectoryFrame.Create(self); AddTreeNode(N,F,TModernProfileEditorDirectoryFrame(F),LanguageSetup.ProfileEditorGameDirectorySheet,0,8);
-      If PrgSetup.ActivateIncompleteFeatures then begin
-        F:=TModernProfileEditorHelperProgramsFrame.Create(self); AddTreeNode(N,F,TModernProfileEditorHelperProgramsFrame(F),LanguageSetup.ProfileEditorHelperProgramsSheet,0,0);
-      end;
+      F:=TModernProfileEditorHelperProgramsFrame.Create(self); AddTreeNode(N,F,TModernProfileEditorHelperProgramsFrame(F),LanguageSetup.ProfileEditorHelperProgramsSheet,0,0);
     end else begin
       {DOSBox mode}
       F:=TModernProfileEditorBaseFrame.Create(self); N:=AddTreeNode(nil,F,TModernProfileEditorBaseFrame(F),LanguageSetup.ProfileEditorProfileSettingsSheet,0,0);
       BaseFrame:=F;
       If not HideGameInfoPage then begin F:=TModernProfileEditorGameInfoFrame.Create(self); AddTreeNode(N,F,TModernProfileEditorGameInfoFrame(F),LanguageSetup.ProfileEditorGameInfoSheet,1,1); end;
       F:=TModernProfileEditorDirectoryFrame.Create(self); AddTreeNode(N,F,TModernProfileEditorDirectoryFrame(F),LanguageSetup.ProfileEditorGameDirectorySheet,0,8);
-      If PrgSetup.ActivateIncompleteFeatures then begin
-        F:=TModernProfileEditorHelperProgramsFrame.Create(self); AddTreeNode(N,F,TModernProfileEditorHelperProgramsFrame(F),LanguageSetup.ProfileEditorHelperProgramsSheet,0,0);
-      end;
+      F:=TModernProfileEditorHelperProgramsFrame.Create(self); AddTreeNode(N,F,TModernProfileEditorHelperProgramsFrame(F),LanguageSetup.ProfileEditorHelperProgramsSheet,0,0);
       F:=TModernProfileEditorDOSBoxFrame.Create(self); AddTreeNode(nil,F,TModernProfileEditorDOSBoxFrame(F),LanguageSetup.ProfileEditorGeneralSheet,2,2);
       F:=TModernProfileEditorHardwareFrame.Create(self); N:=AddTreeNode(nil,F,TModernProfileEditorHardwareFrame(F),LanguageSetup.ProfileEditorHardwareSheet,3,3);
       F:=TModernProfileEditorCPUFrame.Create(self); AddTreeNode(N,F,TModernProfileEditorCPUFrame(F),LanguageSetup.ProfileEditorCPUSheet,3,9);
@@ -251,6 +251,10 @@ begin
     Tree.Selected:=Tree.Items[0];
     Tree.Selected.MakeVisible;
   end;
+
+  {Fix height for smaller screens}
+  Height:=Min(Height,Screen.WorkAreaHeight);
+  If Top+Height>Screen.WorkAreaHeight then Top:=Screen.WorkAreaHeight-Height;
 end;
 
 procedure TModernProfileEditorForm.FormShow(Sender: TObject);
@@ -258,7 +262,7 @@ Var I : Integer;
 begin
   InitGUI;
 
-  LoadUserIcons(ImageList,'ModernProfileEditor');
+  UserIconLoader.DirectLoad(ImageList,'ModernProfileEditor');
 
   If (Game=nil) and (LoadTemplate<>nil) then begin
     Game:=LoadTemplate;
@@ -268,6 +272,7 @@ begin
     ProfileSetup:='';
     ProfileScummVMGameName:='';
     ProfileScummVMPath:='';
+    ProfileDOSBoxInstallation:='';
   end else begin
     LoadData;
     ProfileEditorOpenCheck(Game);
@@ -276,15 +281,16 @@ begin
     ProfileSetup:=Game.SetupExe;
     ProfileScummVMGameName:=Game.ScummVMGame;
     ProfileScummVMPath:=Game.ScummVMSavePath;
+    ProfileDOSBoxInstallation:=Game.CustomDOSBoxDir;
   end;
 
   If Trim(NewExeFileName)<>'' then begin
     TModernProfileEditorBaseFrame(BaseFrame).GameExeEdit.Text:=NewExeFileName;
   end;
 
-  SetProfileNameEvent(self,ProfileName,ProfileExe,ProfileSetup,ProfileScummVMGameName,ProfileScummVMPath);
+  SetProfileNameEvent(self,ProfileName,ProfileExe,ProfileSetup,ProfileScummVMGameName,ProfileScummVMPath,ProfileDOSBoxInstallation);
 
-    If RestoreLastPosition then begin
+  If RestoreLastPosition then begin
     If LastPageExt>=0 then begin
       For I:=0 to length(FrameList)-1 do if FrameList[I].ExtPageCode=LastPageExt then begin
         Tree.Selected:=FrameList[I].TreeNode;
@@ -322,7 +328,7 @@ begin
   For I:=0 to Tree.Items.Count-1 do FrameList[Integer(Tree.Items[I].Data)].IFrame.SetGame(Game,LoadTemplate<>nil);
 end;
 
-procedure TModernProfileEditorForm.SetProfileNameEvent(Sender: TObject; const AProfileName, AProfileExe, AProfileSetup, AProfileScummVMGameName, AProfileScummVMPath : String);
+procedure TModernProfileEditorForm.SetProfileNameEvent(Sender: TObject; const AProfileName, AProfileExe, AProfileSetup, AProfileScummVMGameName, AProfileScummVMPath, AProfileDOSBoxInstallation : String);
 Var S : String;
 begin
   ProfileName:=AProfileName;
@@ -330,6 +336,8 @@ begin
   ProfileSetup:=AProfileSetup;
   ProfileScummVMGameName:=AProfileScummVMGameName;
   ProfileScummVMPath:=AProfileScummVMPath;
+  ProfileDOSBoxInstallation:=AProfileDOSBoxInstallation;
+
   If Trim(ProfileName)='' then begin
     If EditingTemplate and HideGameInfoPage then begin
       If ScummVMMode(Game)
@@ -373,7 +381,7 @@ begin
   end;
 
   If not ScummVM then begin
-    If (not EditingTemplate) and (LoadTemplate<>nil) and (Trim(TModernProfileEditorBaseFrame(BaseFrame).GameExeEdit.Text)='') and ((not WindowsMode) or TModernProfileEditorStartFrame(StartFrame).AutoexecBootNormal.Checked) then begin
+    If (not EditingTemplate) and (LoadTemplate<>nil) and (Trim(TModernProfileEditorBaseFrame(BaseFrame).GameExeEdit.Text)='') and (WindowsMode or (not TModernProfileEditorStartFrame(StartFrame).AutoexecBootNormal.Checked)) then begin
       If MessageDlg(LanguageSetup.MessageNoGameFileNameWarning,mtConfirmation,[mbYes,mbNo],0)<>mrYes then begin
         Tree.Selected:=Tree.Items[0];
         ModalResult:=mrNone;
@@ -457,7 +465,7 @@ begin
   If (not WindowsMode) and (not ScummVM) then begin
     St:=TStringList.Create;
     try
-      BuildAutoexec(Game,False,St,True,-1,False);
+      BuildAutoexec(Game,False,St,True,-1,False,False);
     finally
       St.Free;
     end;

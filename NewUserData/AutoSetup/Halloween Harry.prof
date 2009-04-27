@@ -34,12 +34,23 @@ ProfileMode=DOSBox
 ExtraDirs=
 ExtraFiles=
 DataDir=
+ScreenshotListScreenshot=
+ExtraExe0=
+ExtraExe1=
+ExtraExe2=
+ExtraExe3=
+ExtraExe4=
+ExtraExe5=
+ExtraExe6=
+ExtraExe7=
+ExtraExe8=
+ExtraExe9=
 
 [ExtraInfo]
 Favorite=0
 Name=Halloween Harry
 Icon=
-Genre=Jump'n'Run
+Genre=Plattform
 Developer=SubZero Software and Interactive Binary Illusions
 Publisher=Apogee Software
 Year=1993
@@ -59,6 +70,7 @@ windowresolution=original
 fullresolution=original
 priority=higher,normal
 mapperfile=default
+DOSBoxlanguage=default
 
 [dos]
 Force2ButtonMouseMode=0
@@ -157,6 +169,18 @@ GamePath=
 Filter=2x
 Language=en
 MusicDriver=auto
+ConfirmExit=0
+AltIntro=0
+MusicMute=0
+ObjectLabels=0
+ReverseStereo=0
+SFXMute=0
+CDROM=0
+JoystickNum=0
+GFXDetails=3
+Walkspeed=2
+GameZipFile=
+Savepath=
 
 [dosbox]
 memsize=32
@@ -180,4 +204,26 @@ serial4=disabled
 mpu401=intelligent
 device=default
 config=
+
+[glide]
+glide=0
+
+[printer]
+printer=0
+multipage=0
+dpi=360
+width=85
+height=110
+printoutput=ps
+
+[ExtraCommands]
+BeforeExecution.Wait=1
+BeforeExecution.Minimized=0
+AfterExecution.Minimized=0
+BeforeExecution=
+AfterExecution=
+
+[vga]
+videoram=2048
+svgachipset=3s
 

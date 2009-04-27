@@ -42,17 +42,19 @@ type
     { Public-Deklarationen }
     Function GetName : String;
     Procedure InitGUIAndLoadSetup(InitData : TInitData);
+    Procedure BeforeChangeLanguage;
     Procedure LoadLanguage;
     Procedure DOSBoxDirChanged;
     Procedure ShowFrame(const AdvencedMode : Boolean);
+    procedure HideFrame;
     Procedure RestoreDefaults;
     Procedure SaveSetup;
   end;
 
 implementation
 
-uses ShlObj, LanguageSetupUnit, VistaToolsUnit, PrgSetupUnit, HelpConsts,
-     CommonTools, ZipInfoFormUnit, Math;
+uses ShlObj, Math, LanguageSetupUnit, VistaToolsUnit, PrgSetupUnit, HelpConsts,
+     CommonTools, ZipInfoFormUnit, IconLoaderUnit;
 
 {$R *.dfm}
 
@@ -60,10 +62,12 @@ Type TPackerDefaultValue=record
   Name, Extensions, CommandExtract, CommandCreate, CommandUpdate  : String;
 end;
 
-const PackerDefaultValuesCount=1;
+const PackerDefaultValuesCount=3;
 
 Var PackerDefaultValues : Array[0..PackerDefaultValuesCount-1] of TPackerDefaultValue =(
-  (Name: '7z'; Extensions: 'GZIP;BZIP2;TAR'; CommandExtract: 'e "%1" -o"%2" -y'; CommandCreate: 'a "%1" "%2*.*" -r'; CommandUpdate: 'u "%1" "%2*.*" -r')
+  (Name: '7z'; Extensions: 'GZIP;BZIP2;TAR'; CommandExtract: 'e "%1" -o"%2" -y'; CommandCreate: 'a "%1" "%2*.*" -r'; CommandUpdate: 'u "%1" "%2*.*" -r'),
+  (Name: 'rar'; Extensions: 'RAR'; CommandExtract: 'x "%1" "%2" -y -c-'; CommandCreate: 'a -y -r0 -ep1 "%1" "%2*.*"'; CommandUpdate: 'u -y -r0 -ep1 "%1" "%2*.*"'),
+  (Name: 'winrar'; Extensions: 'RAR'; CommandExtract: 'x "%1" "%2" -y -c-'; CommandCreate: 'a -y -r0 -ep1 "%1" "%2*.*"'; CommandUpdate: 'u -y -r0 -ep1 "%1" "%2*.*"')
 );
 
 { TSetupFrameZipPrgs }
@@ -94,9 +98,20 @@ begin
     Packers[I].UpdateFile:=PrgSetup.PackerSettings[I].UpdateFile;
   end;
 
+  UserIconLoader.DialogImage(DI_Add,AddButton);
+  UserIconLoader.DialogImage(DI_Delete,DeleteButton);
+  UserIconLoader.DialogImage(DI_Up,UpButton);
+  UserIconLoader.DialogImage(DI_Down,DownButton);
+  UserIconLoader.DialogImage(DI_SelectFile,FilenameButton);
+  UserIconLoader.DialogImage(DI_ResetDefault,AutoSetupButton);
+
   LastIndex:=-1;
   JustChanging:=False;
   For I:=0 to length(Packers)-1 do SelectComboBox.Items.Add(Packers[I].Name);
+end;
+
+procedure TSetupFrameZipPrgs.BeforeChangeLanguage;
+begin
 end;
 
 procedure TSetupFrameZipPrgs.LoadLanguage;
@@ -118,16 +133,19 @@ Var I,J : Integer;
 begin
   Case (Sender as TComponent).Tag of
     0 : begin {Add}
+          SelectComboBoxChange(Sender);
           I:=length(Packers); SetLength(Packers,I+1);
           with Packers[I] do begin Name:='-'; FileName:=''; Extensions:=''; ExtractFile:=''; CreateFile:=''; UpdateFile:=''; end;
           SelectComboBox.Items.Add('-');
           SelectComboBox.ItemIndex:=SelectComboBox.Items.Count-1;
+          LastIndex:=-1;
           SelectComboBoxChange(Sender);
         end;
     1 : begin {Delete}
           I:=SelectComboBox.ItemIndex;
           If I<0 then exit;
           SelectComboBox.ItemIndex:=-1;
+          LastIndex:=-1;
           SelectComboBoxChange(Sender);
 
           For J:=I+1 to length(Packers)-1 do Packers[J-1]:=Packers[J];
@@ -148,6 +166,7 @@ begin
           P:=Packers[I]; Packers[I]:=Packers[I-1]; Packers[I-1]:=P;
 
           SelectComboBox.ItemIndex:=I-1;
+          LastIndex:=I-1;
           SelectComboBoxChange(Sender);
         end;
     3 : begin {Down}
@@ -160,6 +179,7 @@ begin
           P:=Packers[I]; Packers[I]:=Packers[I+1]; Packers[I+1]:=P;
 
           SelectComboBox.ItemIndex:=I+1;
+          LastIndex:=I+1;
           SelectComboBoxChange(Sender);
         end;  
   end;
@@ -173,6 +193,10 @@ procedure TSetupFrameZipPrgs.ShowFrame(const AdvencedMode: Boolean);
 begin
   If SelectComboBox.Items.Count>0 then SelectComboBox.ItemIndex:=0;
   SelectComboBoxChange(self);
+end;
+
+procedure TSetupFrameZipPrgs.HideFrame;
+begin
 end;
 
 procedure TSetupFrameZipPrgs.RestoreDefaults;
@@ -206,7 +230,7 @@ begin
   JustChanging:=True;
   try
     If LastIndex>=0 then begin
-      Packers[LastIndex].Name:=SelectComboBox.Text;
+      Packers[LastIndex].Name:=SelectComboBox.Items[LastIndex];
       Packers[LastIndex].FileName:=FilenameEdit.Text;
       Packers[LastIndex].Extensions:=CheckExtensionsList(ExtensionsEdit.Text);
       Packers[LastIndex].ExtractFile:=CommandExtractEdit.Text;
@@ -250,6 +274,7 @@ end;
 
 procedure TSetupFrameZipPrgs.FilenameButtonClick(Sender: TObject);
 Var S : String;
+    DoAutoSetup : Boolean;
 begin
   S:=Trim(FilenameEdit.Text); If S<>'' then S:=ExtractFilePath(S);
   If S='' then S:=GetSpecialFolder(Application.MainForm.Handle,CSIDL_PROGRAM_FILES);
@@ -257,8 +282,11 @@ begin
   PrgOpenDialog.Filter:=LanguageSetup.SetupFormExeFilter;
   If S<>'' then PrgOpenDialog.InitialDir:=S;
   If PrgOpenDialog.Execute then begin
+    DoAutoSetup:=(Trim(FilenameEdit.Text)='');
     FilenameEdit.Text:=PrgOpenDialog.FileName;
     FilenameEditChange(Sender);
+    SelectComboBoxChange(Sender);
+    If DoAutoSetup then AutoSetupButtonClick(Sender);
   end;
 end;
 
@@ -270,6 +298,8 @@ begin
     then SelectComboBox.Items[I]:='-'
     else SelectComboBox.Items[I]:=ChangeFileExt(ExtractFileName(FilenameEdit.Text),'');
   SelectComboBox.ItemIndex:=I;
+
+  SelectComboBoxChange(Sender);
 end;
 
 procedure TSetupFrameZipPrgs.AutoSetupButtonClick(Sender: TObject);

@@ -25,6 +25,7 @@ type
     FolderInfoButton: TSpeedButton;
     DataFolderShowButton: TBitBtn;
     FolderInfoButton2: TSpeedButton;
+    DataFolderAutomaticCheckBox: TCheckBox;
     procedure ButtonWork(Sender: TObject);
     procedure FolderInfoButtonClick(Sender: TObject);
     procedure DataFolderShowButtonClick(Sender: TObject);
@@ -38,7 +39,8 @@ type
 
 implementation
 
-uses ShellAPI, ShlObj, VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgSetupUnit;
+uses ShellAPI, ShlObj, VistaToolsUnit, LanguageSetupUnit, CommonTools,
+     PrgSetupUnit, IconLoaderUnit;
 
 {$R *.dfm}
 
@@ -59,6 +61,7 @@ begin
   GamesFolderEdit.EditLabel.Caption:=LanguageSetup.WizardFormGamesFolder;
   GamesFolderButton.Caption:=LanguageSetup.WizardFormExplorer;
   DataFolderShowButton.Caption:=LanguageSetup.WizardFormDataFolderButton;
+  DataFolderAutomaticCheckBox.Caption:=LanguageSetup.WizardFormDataFolderCheckbox;
   BaseInfoLabel3.Caption:=LanguageSetup.WizardFormInfoLabel3;
   DataFolderEdit.EditLabel.Caption:=LanguageSetup.WizardFormDataFolder;
   DataFolderButton.Hint:=LanguageSetup.ChooseFolder;
@@ -67,6 +70,15 @@ begin
 
   GamesFolderEdit.Text:=PrgSetup.GameDir;
   BaseDataFolderEdit.Text:=PrgSetup.DataDir;
+
+  UserIconLoader.DialogImage(DI_SelectFile,ProgramButton);
+  UserIconLoader.DialogImage(DI_SelectFile,SetupButton);
+  UserIconLoader.DialogImage(DI_SelectFolder,GamesFolderButton);
+  UserIconLoader.DialogImage(DI_Help,FolderInfoButton);
+  UserIconLoader.DialogImage(DI_SelectFolder,DataFolderButton);
+  UserIconLoader.DialogImage(DI_SelectFolder,BaseDataFolderButton);
+  UserIconLoader.DialogImage(DI_Help,FolderInfoButton2);
+  UserIconLoader.DialogImage(DI_Down,DataFolderShowButton);
 
   GamesFolderEdit.Color:=Color;
   BaseDataFolderEdit.Color:=Color;
@@ -139,17 +151,34 @@ begin
             then S:=PrgSetup.DataDir
             else S:=MakeAbsPath(DataFolderEdit.Text,PrgSetup.BaseDir);
           if not SelectDirectory(Handle,LanguageSetup.ChooseFolder,S) then exit;
-          S:=MakeRelPath(S,PrgSetup.BaseDir);
+          S:=MakeRelPath(S,PrgSetup.BaseDir,True);
           DataFolderEdit.Text:=S;
         end;
   end;
 end;
 
 procedure TWizardPrgFileFrame.WriteDataToGame(const Game: TGame);
+Var I : Integer;
+    S,T : String;
 begin
   Game.GameExe:=ProgramEdit.Text;
   Game.SetupExe:=SetupEdit.Text;
-  Game.DataDir:=DataFolderEdit.Text;
+  If DataFolderButton.Visible then begin
+    Game.DataDir:=DataFolderEdit.Text;
+  end else begin
+    If DataFolderAutomaticCheckBox.Checked then begin
+      If PrgSetup.DataDir='' then T:=PrgSetup.BaseDir else T:=PrgSetup.DataDir;
+      S:=IncludeTrailingPathDelimiter(T)+MakeFileSysOKFolderName(Game.Name)+'\';
+      I:=0;
+      While DirectoryExists(MakeAbsPath(S,PrgSetup.BaseDir)) do begin
+        inc(I);
+        S:=IncludeTrailingPathDelimiter(T)+MakeFileSysOKFolderName(Game.Name)+IntToStr(I)+'\';
+      end;
+      Game.DataDir:=S;
+    end else begin
+      Game.DataDir:='';
+    end;
+  end;
 end;
 
 procedure TWizardPrgFileFrame.FolderInfoButtonClick(Sender: TObject);
@@ -163,6 +192,7 @@ end;
 procedure TWizardPrgFileFrame.DataFolderShowButtonClick(Sender: TObject);
 begin
   DataFolderShowButton.Visible:=False;
+  DataFolderAutomaticCheckBox.Visible:=False;
 
   BaseInfoLabel3.Visible:=True;
   BaseDataFolderEdit.Visible:=True;

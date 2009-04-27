@@ -23,6 +23,11 @@ type
     RenderModesCheckBox: TCheckBox;
     VideoModesCheckBox: TCheckBox;
     MIDICheckBox: TCheckBox;
+    SecureModeCheckBox: TCheckBox;
+    MoreIOCTLSettingsCheckBox: TCheckBox;
+    CPUGroupBox: TGroupBox;
+    CPUTypeCheckBox: TCheckBox;
+    PixelShaderCheckBox: TCheckBox;
     procedure DefaultValueChanged(Sender: TObject);
   private
     { Private-Deklarationen }
@@ -34,9 +39,11 @@ type
     { Public-Deklarationen }
     Function GetName : String;
     Procedure InitGUIAndLoadSetup(InitData : TInitData);
+    Procedure BeforeChangeLanguage;
     Procedure LoadLanguage;
     Procedure DOSBoxDirChanged;
     Procedure ShowFrame(const AdvencedMode : Boolean);
+    procedure HideFrame;
     Procedure RestoreDefaults;
     Procedure SaveSetup;
   end;
@@ -62,19 +69,26 @@ begin
   NoFlicker(MountDialogGroupBox);
   NoFlicker(MultiFloppyImageCheckBox);
   NoFlicker(PhysFSCheckBox);
+  NoFlicker(SecureModeCheckBox);
+  NoFlicker(MoreIOCTLSettingsCheckBox);
   NoFlicker(GraphicsGroupBox);
   NoFlicker(ExtendedTextModeCheckBox);
   NoFlicker(GlideEmulationCheckBox);
   NoFlicker(VGAChipsetCheckBox);
   NoFlicker(RenderModesCheckBox);
   NoFlicker(VideoModesCheckBox);
+  NoFlicker(PixelShaderCheckBox);
   NoFlicker(SoundGroupBox);
   NoFlicker(MIDICheckBox);
   NoFlicker(PrinterGroupBox);
   NoFlicker(PrinterCheckBox);
+  NoFlicker(CPUGroupBox);
+  NoFlicker(CPUTypeCheckBox);
 
   MultiFloppyImageCheckBox.Checked:=PrgSetup.AllowMultiFloppyImagesMount;
   PhysFSCheckBox.Checked:=PrgSetup.AllowPhysFSUsage;
+  SecureModeCheckBox.Checked:=PrgSetup.AllowSecureMode;
+  MoreIOCTLSettingsCheckBox.Checked:=PrgSetup.AllowMoreIOCTLSettings;
   ExtendedTextModeCheckBox.Checked:=PrgSetup.AllowTextModeLineChange;
   GlideEmulationCheckBox.Checked:=PrgSetup.AllowGlideSettings;
   VGAChipsetCheckBox.Checked:=PrgSetup.AllowVGAChipsetSettings;
@@ -92,10 +106,13 @@ begin
   If (I=1) or (I=2) then VideoModesCheckBox.State:=cbGrayed else VideoModesCheckBox.Checked:=(I=3);
   ValueChanged[1]:=False;
 
+  PixelShaderCheckBox.Checked:=PrgSetup.AllowPixelShader;
+
   MIDICheckBox.Checked:=DefaultValueOnList(GameDB.ConfOpt.MIDIDevice,'mt32');
   ValueChanged[2]:=False;
 
   PrinterCheckBox.Checked:=PrgSetup.AllowPrinterSettings;
+  CPUTypeCheckBox.Checked:=PrgSetup.AllowCPUType;
 end;
 
 procedure TSetupFrameDOSBoxExt.DefaultValueChanged(Sender: TObject);
@@ -119,22 +136,31 @@ begin
   end;
 end;
 
+procedure TSetupFrameDOSBoxExt.BeforeChangeLanguage;
+begin
+end;
+
 procedure TSetupFrameDOSBoxExt.LoadLanguage;
 begin
   WarningLabel.Caption:=LanguageSetup.SetupFormDosBoxCVSWarning;
   MountDialogGroupBox.Caption:=LanguageSetup.SetupFormDosBoxCVSMountGroup;
   MultiFloppyImageCheckBox.Caption:=LanguageSetup.SetupFormDosBoxCVSMultipleFloppyImages;
   PhysFSCheckBox.Caption:=LanguageSetup.SetupFormDosBoxCVSPhysFS;
+  SecureModeCheckBox.Caption:=LanguageSetup.SetupFormDosBoxCVSSecureMode;
+  MoreIOCTLSettingsCheckBox.Caption:=LanguageSetup.SetupFormDosBoxCVSMoreIOCTLSettings;
   GraphicsGroupBox.Caption:=LanguageSetup.SetupFormDosBoxCVSGraphicsGroup;
   ExtendedTextModeCheckBox.Caption:=LanguageSetup.SetupFormDosBoxCVSExtendedTextMode;
   GlideEmulationCheckBox.Caption:=LanguageSetup.SetupFormDosBoxCVSGlideEmulation;
   VGAChipsetCheckBox.Caption:=LanguageSetup.SetupFormDosBoxCVSVGAChipset;
   RenderModesCheckBox.Caption:=LanguageSetup.SetupFormDosBoxCVSRenderModes;
   VideoModesCheckBox.Caption:=LanguageSetup.SetupFormDosBoxCVSVideoModes;
+  PixelShaderCheckBox.Caption:=LanguageSetup.SetupFormDosBoxCVSPixelShader;
   SoundGroupBox.Caption:=LanguageSetup.SetupFormDosBoxCVSSoundGroup;
   MIDICheckBox.Caption:=LanguageSetup.SetupFormDosBoxCVSMidiModes;
   PrinterGroupBox.Caption:=LanguageSetup.SetupFormDosBoxCVSPrinterGroup;
   PrinterCheckBox.Caption:=LanguageSetup.SetupFormDosBoxCVSPrinter;
+  CPUGroupBox.Caption:=LanguageSetup.SetupFormDosBoxCVSCPUGroup;
+  CPUTypeCheckBox.Caption:=LanguageSetup.SetupFormDosBoxCVSCPU;
 
   HelpContext:=ID_FileOptionsDOSBoxCVSFeatures;
 end;
@@ -147,14 +173,22 @@ procedure TSetupFrameDOSBoxExt.ShowFrame(const AdvencedMode: Boolean);
 begin
 end;
 
+procedure TSetupFrameDOSBoxExt.HideFrame;
+begin
+end;
+
 procedure TSetupFrameDOSBoxExt.RestoreDefaults;
 begin
   MultiFloppyImageCheckBox.Checked:=False;
   PhysFSCheckBox.Checked:=False;
+  SecureModeCheckBox.Checked:=False;
+  MoreIOCTLSettingsCheckBox.Checked:=False;
   ExtendedTextModeCheckBox.Checked:=False;
   GlideEmulationCheckBox.Checked:=False;
   VGAChipsetCheckBox.Checked:=False;
+  PixelShaderCheckBox.Checked:=False;
   PrinterCheckBox.Checked:=False;
+  CPUTypeCheckBox.Checked:=False;
 end;
 
 function TSetupFrameDOSBoxExt.DefaultValueChange(const OldList, Value: String; const SetIt: Boolean): String;
@@ -185,6 +219,8 @@ procedure TSetupFrameDOSBoxExt.SaveSetup;
 begin
   PrgSetup.AllowMultiFloppyImagesMount:=MultiFloppyImageCheckBox.Checked;
   PrgSetup.AllowPhysFSUsage:=PhysFSCheckBox.Checked;
+  PrgSetup.AllowSecureMode:=SecureModeCheckBox.Checked;
+  PrgSetup.AllowMoreIOCTLSettings:=MoreIOCTLSettingsCheckBox.Checked;
   PrgSetup.AllowTextModeLineChange:=ExtendedTextModeCheckBox.Checked;
   PrgSetup.AllowGlideSettings:=GlideEmulationCheckBox.Checked;
   PrgSetup.AllowVGAChipsetSettings:=VGAChipsetCheckBox.Checked;
@@ -200,11 +236,14 @@ begin
     GameDB.ConfOpt.Video:=DefaultValueChange(GameDB.ConfOpt.Video,'demovga',VideoModesCheckBox.Checked);
   end;
 
+  PrgSetup.AllowPixelShader:=PixelShaderCheckBox.Checked;
+
   If ValueChanged[2] then begin
     GameDB.ConfOpt.MIDIDevice:=DefaultValueChange(GameDB.ConfOpt.MIDIDevice,'mt32',MIDICheckBox.Checked);
   end;
 
   PrgSetup.AllowPrinterSettings:=PrinterCheckBox.Checked;
+  PrgSetup.AllowCPUType:=CPUTypeCheckBox.Checked;
 end;
 
 end.

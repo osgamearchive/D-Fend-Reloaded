@@ -16,17 +16,17 @@ object SetupFrameGamesListAppearance: TSetupFrameGamesListAppearance
     Anchors = [akTop, akRight]
     Glyph.Data = {
       76010000424D7601000000000000760000002800000020000000100000000100
-      04000000000000010000130B0000130B00001000000000000000000000000000
+      04000000000000010000120B0000120B00001000000000000000000000000000
       800000800000008080008000000080008000808000007F7F7F00BFBFBF000000
-      FF0000FF000000FFFF00FF000000FF00FF00FFFF0000FFFFFF0033333333B333
-      333B33FF33337F3333F73BB3777BB7777BB3377FFFF77FFFF77333B000000000
-      0B3333777777777777333330FFFFFFFF07333337F33333337F333330FFFFFFFF
-      07333337F3FF3FFF7F333330F00F000F07333337F77377737F333330FFFFFFFF
-      07333FF7F3FFFF3F7FFFBBB0F0000F0F0BB37777F7777373777F3BB0FFFFFFFF
-      0BBB3777F3FF3FFF77773330F00F000003333337F773777773333330FFFF0FF0
-      33333337F3FF7F37F3333330F08F0F0B33333337F7737F77FF333330FFFF003B
-      B3333337FFFF77377FF333B000000333BB33337777777F3377FF3BB3333BB333
-      3BB33773333773333773B333333B3333333B7333333733333337}
+      FF0000FF000000FFFF00FF000000FF00FF00FFFF0000FFFFFF00555555555555
+      555555FFFFFFFFFF55555000000000055555577777777775FFFF00B8B8B8B8B0
+      0000775F5555555777770B0B8B8B8B8B0FF07F75F555555575F70FB0B8B8B8B8
+      B0F07F575FFFFFFFF7F70BFB0000000000F07F557777777777570FBFBF0FFFFF
+      FFF07F55557F5FFFFFF70BFBFB0F000000F07F55557F777777570FBFBF0FFFFF
+      FFF075F5557F5FFFFFF750FBFB0F000000F0575FFF7F777777575700000FFFFF
+      FFF05577777F5FF55FF75555550F00FF00005555557F775577775555550FFFFF
+      0F055555557F55557F755555550FFFFF00555555557FFFFF7755555555000000
+      0555555555777777755555555555555555555555555555555555}
     NumGlyphs = 2
     ParentShowHint = False
     ShowHint = True
@@ -34,14 +34,14 @@ object SetupFrameGamesListAppearance: TSetupFrameGamesListAppearance
   end
   object GamesListFontSizeLabel: TLabel
     Left = 16
-    Top = 104
+    Top = 96
     Width = 59
     Height = 13
     Caption = 'Schriftgr'#246#223'e'
   end
   object GamesListFontColorLabel: TLabel
     Left = 140
-    Top = 104
+    Top = 96
     Width = 61
     Height = 13
     Caption = 'Schriftfarbe:'
@@ -93,7 +93,7 @@ object SetupFrameGamesListAppearance: TSetupFrameGamesListAppearance
   end
   object GamesListFontSizeEdit: TSpinEdit
     Left = 16
-    Top = 120
+    Top = 110
     Width = 59
     Height = 22
     MaxValue = 48
@@ -103,7 +103,7 @@ object SetupFrameGamesListAppearance: TSetupFrameGamesListAppearance
   end
   object GamesListFontColorBox: TColorBox
     Left = 140
-    Top = 120
+    Top = 110
     Width = 130
     Height = 22
     ItemHeight = 16
@@ -111,18 +111,18 @@ object SetupFrameGamesListAppearance: TSetupFrameGamesListAppearance
   end
   object NotSetGroupBox: TGroupBox
     Left = 16
-    Top = 156
+    Top = 140
     Width = 551
-    Height = 60
+    Height = 52
     Anchors = [akLeft, akTop, akRight]
     Caption = 'Anzeige f'#252'r "Nicht definiert"'
     TabOrder = 7
     DesignSize = (
       551
-      60)
+      52)
     object NotSetRadioButton1: TRadioButton
       Left = 16
-      Top = 26
+      Top = 18
       Width = 130
       Height = 17
       Caption = '"Nicht definiert"'
@@ -132,7 +132,7 @@ object SetupFrameGamesListAppearance: TSetupFrameGamesListAppearance
     end
     object NotSetRadioButton2: TRadioButton
       Left = 152
-      Top = 26
+      Top = 18
       Width = 49
       Height = 17
       Caption = '"-"'
@@ -140,14 +140,14 @@ object SetupFrameGamesListAppearance: TSetupFrameGamesListAppearance
     end
     object NotSetRadioButton3: TRadioButton
       Left = 240
-      Top = 26
+      Top = 18
       Width = 25
       Height = 17
       TabOrder = 2
     end
     object NotSetEdit: TEdit
       Left = 267
-      Top = 26
+      Top = 18
       Width = 270
       Height = 21
       Anchors = [akLeft, akTop, akRight]
@@ -157,15 +157,15 @@ object SetupFrameGamesListAppearance: TSetupFrameGamesListAppearance
   end
   object FavoriteGroupBox: TGroupBox
     Left = 16
-    Top = 222
+    Top = 198
     Width = 551
-    Height = 59
+    Height = 45
     Anchors = [akLeft, akTop, akRight]
     Caption = 'Darstellung der Favoriten'
     TabOrder = 8
     object CheckBoxBold: TCheckBox
       Left = 16
-      Top = 25
+      Top = 17
       Width = 97
       Height = 17
       Caption = 'Fett'
@@ -173,7 +173,7 @@ object SetupFrameGamesListAppearance: TSetupFrameGamesListAppearance
     end
     object CheckBoxItalic: TCheckBox
       Left = 135
-      Top = 24
+      Top = 16
       Width = 97
       Height = 17
       Caption = 'Kursiv'
@@ -181,31 +181,30 @@ object SetupFrameGamesListAppearance: TSetupFrameGamesListAppearance
     end
     object CheckBoxUnderline: TCheckBox
       Left = 267
-      Top = 24
+      Top = 16
       Width = 134
       Height = 17
       Caption = 'Unterstrichen'
       TabOrder = 2
     end
   end
-  object GridLinesCheckBox: TCheckBox
-    Left = 16
-    Top = 296
-    Width = 551
-    Height = 17
-    Anchors = [akLeft, akTop, akRight]
-    Caption = 'Gitterlinien im Ansichtsmodus "Details" anzeigen'
-    TabOrder = 9
-  end
   object WindowsExeIconsCheckBox: TCheckBox
     Left = 16
-    Top = 319
+    Top = 263
     Width = 551
     Height = 17
     Anchors = [akLeft, akTop, akRight]
     Caption = 'Bei Windows-Profilen Icon aus Programmdatei verwenden'
+    TabOrder = 9
+  end
+  object ShowTooltipsCheckBox: TCheckBox
+    Left = 16
+    Top = 285
+    Width = 551
+    Height = 17
+    Anchors = [akLeft, akTop, akRight]
+    Caption = 'Tooltips anzeigen'
     TabOrder = 10
-    Visible = False
   end
   object ImageOpenDialog: TOpenDialog
     DefaultExt = 'jpeg'

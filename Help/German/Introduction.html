@@ -127,13 +127,13 @@ sich an die Vista-Vorgaben zur Trennung von Programmdateien und Datendateien h&a
 
 <p>
 Alle vom Benutzer angelegten Dateien (Programm-Konfigurationen, Spieledateien, Handb&uuml;cher, aufgezeichnete
-Screenshots usw.) sollten in diesem Verzeichnis und seinen Unterverzeichnissen abgelegt werden. Die Dateien,
-die direkt in diesem Verzeichnis liegen (also nicht in einem seiner Unterverzeichnisse) sind im Wesentlichen
-D-Fend Reloaded Konfigurationsdateien. Die Spieledateien und Daten werden sollten in den folgenden
-Unterverzeichnissen des Datenverzeichnisses abgelegt werden:
+Screenshots usw.) sollten in diesem Verzeichnis und seinen Unterverzeichnissen abgelegt werden. 
+Die Spieledateien und Daten werden sollten in den folgenden Unterverzeichnissen des Datenverzeichnisses
+abgelegt werden:
 </p></div>
 
 <ul class="big">
+  <li><b>Settings:</b> In diesem Verzeichnis legt D-Fend Reloaded seine Konfigurationsdateien ab.</li>
   <li><b>VirtualHD:</b> Dieses Verzeichnis wird in DOSBox normalerweise als Laufwerk "<tt>C:</tt>" eingebunden
   (so lange Sie diese Standardeinstellung in den Profilen nicht &auml;ndern). wenn Sie die Spieledateien in 
   Unterverzeichnissen dieses Ordners ablegen, k&ouml;nnen Sie direkt in DOSBox darauf zugreifen, ohne irgendetwas
@@ -167,11 +167,21 @@ Unterverzeichnissen des Datenverzeichnisses abgelegt werden:
 <a onclick="Work('AddingProfiles')" name="AddingProfiles" href="#"><h2>&raquo; Hinzuf&uuml;gen von Profilen</h2></a>
 
 <div id="AddingProfiles"><p>
-Der einfachste Weg zum Hinzuf&uuml;gen von Profilen f&uuml;r Spiele besteht in der Verwendung des
+Der allereinfachste Weg zum Hinzufügen von Spielen besteht darin (sofern das Spiel in Form einer
+<tt>zip</tt>-Datei vorliegt), die <tt>zip</tt>-Datei auf das D-Fend Reloaded Programmfenster zu ziehen.
+D-Fend Reloaded kopiert die Dateien dann in einen neuen Unterordner das <tt>VirtualHD</tt>-Verzeichnisses
+und versucht das Spiel mit Hilfe der AutoSetup-Vorlagen automatisch zu konfigurieren. Gibt es keine passende
+AutoSetup-Vorlage für das Spiel, so verwendet D-Fend Reloaded die Standardvorlage für das neue Profil.
+In den meisten Fällen führt diese Methode ohne jegliche Rückfragen zu einem korrekt konfigurierten neuen Profil.
+Allerdings besteht bei der Verwendung dieser Methode auch keine Eingriffsmöglichkeit bei der Erstellung des
+Profils. (Selbstverständlich kann das neu erstellte Profil wie jedes andere Profil auf über den Profileditor
+bearbeitet werden.)</p>
+<p>
+Der einfachste Weg mit Benutzereingriffsmöglichkeiten zum Hinzuf&uuml;gen von Profilen f&uuml;r Spiele besteht in der Verwendung des
 <a href="ProfilesWizard.html">Assistenten</a> ("Hinzuf&uuml;gen mit Assistent..." im "Profil"-Men&uuml; oder
 <span class="key">F3</span>-Taste). Der Profil-Assistent fragt nur die f&uuml;r die Konfiguration wirklich notwendigen
 Dinge vom Benutzer ab: Der Name des neuen Profiles, die in DOSBox zu startende <tt>exe</tt> und einige einfache
-Einstellungen dazu. D-Fend Reloaded kennt im Auslieferungszustand bereits &uuml;ber 350 Spiele (in Form von sogenannten
+Einstellungen dazu. D-Fend Reloaded kennt im Auslieferungszustand bereits &uuml;ber 400 Spiele (in Form von sogenannten
 Autosetup-Vorlagen). Wenn Sie ein Spiel zu Ihrer Datenbank hinzuf&uuml;gen wollen, f&uuml;r dass es bereits eine
 Autosetup-Vorlage gibt, so bietet Ihnen D-Fend Reloaded an, das Spiel vollst&auml;ndig automatisch zu konfigurieren.
 Wenn Sie ein Spiel hinzuf&uuml;gen wollen, f&uuml;r dass es keine Autosetup-Vorlage gibt, so m&uuml;ssen Sie dennoch

@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, ImgList, ComCtrls, ToolWin, MPlayer, ExtCtrls, Menus, StdCtrls,
+  Dialogs, ImgList, ComCtrls, ToolWin, ExtCtrls, Menus, StdCtrls,
   Buttons;
 
 type
@@ -74,7 +74,7 @@ Procedure PlayVideoDialog(const AOwner : TComponent; const AFileName : String; c
 implementation
 
 uses ShellAPI, Math, MediaInterface, VistaToolsUnit, LanguageSetupUnit,
-     CommonTools, PrgSetupUnit;
+     CommonTools, PrgSetupUnit, PrgConsts, IconLoaderUnit;
 
 {$R *.dfm}
 
@@ -97,6 +97,12 @@ begin
   ZoomButton.Hint:=LanguageSetup.ViewImageFormZoomButtonHint;
   InfoLabel.Caption:=LanguageSetup.CaptureVideosInstallCodecInfo;
   InstallButton.Caption:=LanguageSetup.CaptureVideosInstallCodec;
+
+  UserIconLoader.DialogImage(DI_Save,ImageList,0);
+  UserIconLoader.DialogImage(DI_Previous,ImageList,1);
+  UserIconLoader.DialogImage(DI_Next,ImageList,2);
+  UserIconLoader.DialogImage(DI_Run,ImageList,3);
+  UserIconLoader.DialogImage(DI_Zoom,ImageList,4);
 
   CoolBar.Font.Size:=PrgSetup.ToolbarFontSize;
 
@@ -334,12 +340,16 @@ end;
 
 procedure TPlayVideoForm.InstallButtonClick(Sender: TObject);
 begin
-  If not FileExists(PrgDir+'InstallVideoCodec.exe') then begin
-    MessageDlg(Format(LanguageSetup.MessageFileNotFound,[PrgDir+'InstallVideoCodec.exe']),mtError,[mbOK],0);
+  If (not FileExists(PrgDir+'InstallVideoCodec.exe')) and (not FileExists(PrgDir+BinFolder+'\'+'InstallVideoCodec.exe')) then begin
+    MessageDlg(Format(LanguageSetup.MessageFileNotFound,[PrgDir+BinFolder+'\'+'InstallVideoCodec.exe']),mtError,[mbOK],0);
     exit;
   end;
 
-  ShellExecute(Handle,'open',PChar(PrgDir+'InstallVideoCodec.exe'),PChar(ExcludeTrailingPathDelimiter(PrgSetup.DOSBoxSettings[0].DosBoxDir)),PChar(PrgDir),SW_SHOW);
+  If FileExists(PrgDir+'InstallVideoCodec.exe') then begin
+    ShellExecute(Handle,'open',PChar(PrgDir+'InstallVideoCodec.exe'),PChar(ExcludeTrailingPathDelimiter(PrgSetup.DOSBoxSettings[0].DosBoxDir)),PChar(PrgDir),SW_SHOW);
+  end else begin
+    ShellExecute(Handle,'open',PChar(PrgDir+BinFolder+'\'+'InstallVideoCodec.exe'),PChar(ExcludeTrailingPathDelimiter(PrgSetup.DOSBoxSettings[0].DosBoxDir)),PChar(PrgDir),SW_SHOW);
+  end;
 
   Close;
 end;

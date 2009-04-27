@@ -45,7 +45,8 @@ type
 
 implementation
 
-uses VistaToolsUnit, LanguageSetupUnit, CommonTools, ClassExtensions;
+uses VistaToolsUnit, LanguageSetupUnit, CommonTools, ClassExtensions,
+     IconLoaderUnit;
 
 {$R *.dfm}
 
@@ -67,7 +68,7 @@ begin
     Strings.Delete(0);
     Strings.Add(LanguageSetup.GameGenre+'=');
     ItemProps[Strings.Count-1].EditStyle:=esPickList;
-    St:=AGameDB.GetGenreList; try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
+    St:=ExtGenreList(GetCustomGenreName(AGameDB.GetGenreList)); try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
     Strings.Add(LanguageSetup.GameDeveloper+'=');
     ItemProps[Strings.Count-1].EditStyle:=esPickList;
     St:=AGameDB.GetDeveloperList; try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
@@ -79,7 +80,7 @@ begin
     St:=AGameDB.GetYearList; try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
     Strings.Add(LanguageSetup.GameLanguage+'=');
     ItemProps[Strings.Count-1].EditStyle:=esPickList;
-    St:=AGameDB.GetLanguageList; try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
+    St:=ExtLanguageList(GetCustomLanguageName(AGameDB.GetLanguageList)); try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
     Strings.Add(LanguageSetup.GameWWW+'=');
   end;
   FavouriteCheckBox.Caption:=LanguageSetup.GameFavorite;
@@ -104,6 +105,11 @@ begin
 
   LinkFile:=ALinkFile;
   LoadLinks;
+
+  UserIconLoader.DialogImage(DI_Add,AddButton);
+  UserIconLoader.DialogImage(DI_Delete,DelButton);
+  UserIconLoader.DialogImage(DI_Internet,ImageList,0);
+  UserIconLoader.DialogImage(DI_Edit,ImageList,1);
 
   GameDB:=AGameDB;
 end;
@@ -137,11 +143,11 @@ begin
   If Template<>nil then begin
 
     with GameInfoValueListEditor.Strings do begin
-      If Trim(Template.Genre)<>'' then ValueFromIndex[0]:=Template.Genre;
+      If Trim(Template.Genre)<>'' then ValueFromIndex[0]:=GetCustomGenreName(Template.Genre);
       If Trim(Template.Developer)<>'' then ValueFromIndex[1]:=Template.Developer;
       If Trim(Template.Publisher)<>'' then ValueFromIndex[2]:=Template.Publisher;
       If Trim(Template.Year)<>'' then ValueFromIndex[3]:=Template.Year;
-      If Trim(Template.Language)<>'' then ValueFromIndex[4]:=Template.Language;
+      If Trim(Template.Language)<>'' then ValueFromIndex[4]:=GetCustomLanguageName(Template.Language);
       If Trim(Template.WWW)<>'' then ValueFromIndex[5]:=Template.WWW;
     end;
 
@@ -240,11 +246,11 @@ begin
   Game.Name:=BaseName.Text;
 
   with GameInfoValueListEditor.Strings do begin
-    Game.Genre:=ValueFromIndex[0];
+    Game.Genre:=GetEnglishGenreName(ValueFromIndex[0]);
     Game.Developer:=ValueFromIndex[1];
     Game.Publisher:=ValueFromIndex[2];
     Game.Year:=ValueFromIndex[3];
-    Game.Language:=ValueFromIndex[4];
+    Game.Language:=GetEnglishLanguageName(ValueFromIndex[4]);
     Game.WWW:=ValueFromIndex[5];
   end;
   Game.Favorite:=FavouriteCheckBox.Checked;

@@ -64,9 +64,11 @@ Function AddToZipFile(const AOwner : TComponent; const AZipFile, ADestFolder : S
 Function CheckExtensionsList(Extensions : String) : String;
 Function ExtensionInList(Extension, List : String) : Boolean;
 
+Function ProcessFileNameFilter(Filter, ArchiveFiles : String) : String;
+
 implementation
 
-uses Math, LanguageSetupUnit, PrgSetupUnit, CommonTools, DOSBoxUnit;
+uses Math, LanguageSetupUnit, PrgSetupUnit, CommonTools, DOSBoxUnit, PrgConsts;
 
 {$R *.dfm}
 
@@ -93,9 +95,12 @@ begin
       If (FDeleteMode<>dmNoNoWarning) and (FDeleteMode<>dmFilesNoWarning) and (FDeleteMode<>dmFolderNoWarning) then begin
         If MessageDlg(Format(LanguageSetup.ZipFormOverwriteWarning,[ZipFile]),mtWarning,[mbYes,mbNo],0)<>mrYes then exit;
       end;
-      If not ExtDeleteFile(ZipFile,ftZipOperation) then begin MessageDlg(Format(LanguageSetup.MessageCouldNotDeleteFile,[ZipFile]),mtError,[mbOK],0); exit; end;
+      If not ExtDeleteFileWithPause(ZipFile,ftZipOperation) then begin MessageDlg(Format(LanguageSetup.MessageCouldNotDeleteFile,[ZipFile]),mtError,[mbOK],0); exit; end;
     end;
   end;
+
+  InfoLabel.Caption:='';
+  Refresh;
 
   If Mode=zmExtract then begin
     If not ForceDirectories(Folder) then begin MessageDlg(Format(LanguageSetup.MessageCouldNotCreateDir,[Folder]),mtError,[mbOK],0); exit; end;
@@ -138,7 +143,6 @@ begin
       exit;
     end;
 
-
     Handled:=False; Ok:=False;
     For I:=0 to PrgSetup.PackerSettingsCount-1 do If ExtensionInList(Ext,PrgSetup.PackerSettings[I].FileExtensions) then begin
       Handled:=True;
@@ -164,10 +168,20 @@ begin
 end;
 
 Function TZipInfoForm.ZipWork : Boolean;
+Var S : String;
 begin
   result:=True;
 
-  Zip:=TZipMaster.Create(self);
+  If FileExists(PrgDir+DelZipDll_Name) then begin
+    Zip:=TZipMaster.Create(self);
+  end else begin
+    S:=GetCurrentDir;
+    SetCurrentDir(PrgDir+BinFolder);
+    Zip:=TZipMaster.Create(self);
+    Zip.Dll_Load:=True;
+    SetCurrentDir(S);
+  end;
+
   try
     Zip.OnPasswordError:=ZipPassword;
     Zip.OnProgressDetails:=ZipProgress;
@@ -272,11 +286,20 @@ begin
 end;
 
 function TZipInfoForm.SevenZipWork: Boolean;
+Var S : String;
 begin
   result:=True;
   SevenZipLastError:=0;
 
-  SevenZip:=TSevenZip.Create(self);
+  If FileExists(PrgDir+'7za.dll') then begin
+    SevenZip:=TSevenZip.Create(self);
+  end else begin
+    S:=GetCurrentDir;
+    SetCurrentDir(PrgDir+BinFolder);
+    SevenZip:=TSevenZip.Create(self);
+    SetCurrentDir(S);
+  end;
+  
   try
     SevenZip.SZFileName:=ZipFile;
     SevenZip.OnPreProgress:=SevenZipPreProgress;
@@ -415,10 +438,13 @@ begin
     exit;
   end;
 
+  InfoLabel.Caption:=Caption;
+  Paint;
+
   try
     While not (WaitForSingleObject(ProcessInformation.hProcess,0)=WAIT_OBJECT_0) do begin
-      Sleep(100);
       Application.ProcessMessages;
+      Sleep(100);
     end;
   finally
     CloseHandle(ProcessInformation.hThread);
@@ -429,7 +455,6 @@ end;
 Function TZipInfoForm.DeleteFolder(Folder : String; const ThisIsMainFolder : Boolean) : Boolean;
 Var Rec : TSearchRec;
     I : Integer;
-    S : String;
 begin
   result:=False;
   Folder:=IncludeTrailingPathDelimiter(Folder);
@@ -437,11 +462,7 @@ begin
 
   If not DirectoryExists(Folder) then begin result:=True; exit; end;
 
-  S:=ShortName(PrgSetup.BaseDir);
-  If PrgSetup.DeleteOnlyInBaseDir and (ExtUpperCase(Copy(ShortName(Folder),1,length(S)))<>ExtUpperCase(S)) then begin
-    MessageDlg(Format(LanguageSetup.MessageDeleteErrorProtection,[Folder]),mtError,[mbOk],0);
-    exit;
-  end;
+  If not BaseDirSecuriryCheck(Folder) then exit;
 
   I:=FindFirst(Folder+'*.*',faAnyFile,Rec);
   try
@@ -568,6 +589,37 @@ begin
     end;
     If Trim(ExtUpperCase(S))=Extension then begin result:=True; exit; end;
   until I=0;
+end;
+
+Function ProcessFileNameFilter(Filter, ArchiveFiles : String) : String;
+Var I,J : Integer;
+    St : TStringList;
+    S,T,U : String;
+begin
+  result:=Filter;
+
+  I:=Pos('%s',Filter); If I=0 then exit;
+  S:=Copy(Filter,I+2,MaxInt); I:=Pos('%s',S); If I=0 then exit;
+  S:=Copy(S,I+2,MaxInt); I:=Pos('%s',S); If I=0 then exit;
+
+  St:=TStringList.Create;
+  try
+    For I:=0 to PrgSetup.PackerSettingsCount-1 do begin
+      S:=Trim(PrgSetup.PackerSettings[I].FileExtensions);
+      while S<>'' do begin
+        J:=Pos(';',S);
+        If J>0 then begin T:=Copy(S,1,J-1); S:=Copy(S,J+1,MaxInt); end else begin T:=S; S:=''; end;
+        T:=ExtUpperCase(T);
+        If St.IndexOf(T)<0 then St.Add(T);
+      end;
+    end;
+    S:=''; For I:=0 to St.Count-1 do S:=S+', *.'+ExtLowerCase(St[I]);
+    U:=''; For I:=0 to St.Count-1 do U:=U+';*.'+ExtLowerCase(St[I]);
+    T:=''; For I:=0 to St.Count-1 do T:=T+Format(ArchiveFiles,[ExtLowerCase(St[I])])+' (*.'+ExtLowerCase(St[I])+')|*.'+ExtLowerCase(St[I])+'|';
+    result:=Format(Filter,[S,U,T]);
+  finally
+    St.Free;
+  end;
 end;
 
 end.

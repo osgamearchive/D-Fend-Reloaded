@@ -14,6 +14,13 @@ object ModernProfileEditorScummVMGraphicsFrame: TModernProfileEditorScummVMGraph
     Height = 13
     Caption = 'FilterLabel'
   end
+  object RenderModeLabel: TLabel
+    Left = 24
+    Top = 69
+    Width = 86
+    Height = 13
+    Caption = 'RenderModeLabel'
+  end
   object FilterComboBox: TComboBox
     Left = 24
     Top = 32
@@ -26,20 +33,30 @@ object ModernProfileEditorScummVMGraphicsFrame: TModernProfileEditorScummVMGraph
   end
   object StartFullscreenCheckBox: TCheckBox
     Left = 24
-    Top = 72
+    Top = 136
     Width = 561
     Height = 17
     Anchors = [akLeft, akTop, akRight]
     Caption = 'StartFullscreenCheckBox'
-    TabOrder = 1
+    TabOrder = 2
   end
   object KeepAspectRatioCheckBox: TCheckBox
     Left = 24
-    Top = 104
+    Top = 168
     Width = 561
     Height = 17
     Anchors = [akLeft, akTop, akRight]
     Caption = 'KeepAspectRatioCheckBox'
-    TabOrder = 2
+    TabOrder = 3
+  end
+  object RenderModeComboBox: TComboBox
+    Left = 24
+    Top = 88
+    Width = 561
+    Height = 21
+    Style = csDropDownList
+    Anchors = [akLeft, akTop, akRight]
+    ItemHeight = 13
+    TabOrder = 1
   end
 end

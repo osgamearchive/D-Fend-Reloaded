@@ -22,16 +22,19 @@ type
     { Public-Deklarationen }
     Function GetName : String;
     Procedure InitGUIAndLoadSetup(InitData : TInitData);
+    Procedure BeforeChangeLanguage;
     Procedure LoadLanguage;
     Procedure DOSBoxDirChanged;
     Procedure ShowFrame(const AdvencedMode : Boolean);
+    procedure HideFrame;
     Procedure RestoreDefaults;
     Procedure SaveSetup;
   end;
 
 implementation
 
-uses ShellAPI, LanguageSetupUnit, VistaToolsUnit, PrgSetupUnit, CommonTools, HelpConsts;
+uses ShellAPI, LanguageSetupUnit, VistaToolsUnit, PrgSetupUnit, CommonTools,
+     HelpConsts, IconLoaderUnit;
 
 {$R *.dfm}
 
@@ -51,6 +54,10 @@ begin
   PathFREEDOSEdit.Text:=PrgSetup.PathToFREEDOS;
 end;
 
+procedure TSetupFrameFreeDOS.BeforeChangeLanguage;
+begin
+end;
+
 procedure TSetupFrameFreeDOS.LoadLanguage;
 begin
   PathFREEDOSEdit.EditLabel.Caption:=LanguageSetup.SetupFormDosBoxFREEDOSPath;
@@ -61,6 +68,8 @@ begin
   with FreeDOSDownloadURL.Font do begin Color:=clBlue; Style:=[fsUnderline]; end;
   FreeDOSDownloadURL.Cursor:=crHandPoint;
 
+  UserIconLoader.DialogImage(DI_SelectFolder,PathFREEDOSButton);
+
   HelpContext:=ID_FileOptionsFreeDOS;
 end;
 
@@ -69,6 +78,10 @@ begin
 end;
 
 procedure TSetupFrameFreeDOS.ShowFrame(const AdvencedMode: Boolean);
+begin
+end;
+
+procedure TSetupFrameFreeDOS.HideFrame;
 begin
 end;
 
@@ -88,7 +101,7 @@ begin
   If Trim(S)='' then S:=IncludeTrailingPathDelimiter(PBaseDir^);
   S:=MakeAbsPath(S,IncludeTrailingPathDelimiter(PBaseDir^));
   if SelectDirectory(Handle,LanguageSetup.SetupFormFreeDOSDir,S) then begin
-    PathFREEDOSEdit.Text:=MakeRelPath(S,IncludeTrailingPathDelimiter(PBaseDir^));
+    PathFREEDOSEdit.Text:=MakeRelPath(S,IncludeTrailingPathDelimiter(PBaseDir^),True);
   end;
 end;
 

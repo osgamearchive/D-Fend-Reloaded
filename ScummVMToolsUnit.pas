@@ -1,7 +1,7 @@
 unit ScummVMToolsUnit;
 interface
 
-uses Classes;
+uses Classes, PrgSetupUnit; {need to init PrgSetupUnit before init of this unit}
 
 Type TScummVMGamesList=class
   private
@@ -28,8 +28,8 @@ Var ScummVMGamesList : TScummVMGamesList;
 
 implementation
 
-uses Windows, SysUtils, Dialogs, IniFiles, PrgSetupUnit, PrgConsts,
-     LanguageSetupUnit, CommonTools;
+uses Windows, SysUtils, Dialogs, IniFiles, PrgConsts, LanguageSetupUnit,
+     CommonTools;
 
 { TScummVMGamesList }
 
@@ -55,7 +55,7 @@ procedure TScummVMGamesList.LoadConfig;
 Var Ini : TIniFile;
     I : Integer;
 begin
-  Ini:=TIniFile.Create(PrgDataDir+ScummVMConfOptFile);
+  Ini:=TIniFile.Create(PrgDataDir+SettingsFolder+'\'+ScummVMConfOptFile);
   try
     Ini.ReadSections(FName);
     For I:=0 to FName.Count-1 do FLongName.Add(Ini.ReadString(FName[I],'Description',''));
@@ -69,11 +69,11 @@ Var Ini : TIniFile;
     I : Integer;
 begin
   If FName.Count=0 then begin
-    ExtDeleteFile(PrgDataDir+ScummVMConfOptFile,ftProfile);
+    ExtDeleteFile(PrgDataDir+SettingsFolder+'\'+ScummVMConfOptFile,ftProfile);
     exit;
   end;
 
-  Ini:=TIniFile.Create(PrgDataDir+ScummVMConfOptFile);
+  Ini:=TIniFile.Create(PrgDataDir+SettingsFolder+'\'+ScummVMConfOptFile);
   try
     For I:=0 to FName.Count-1 do Ini.WriteString(FName[I],'Description',FLongName[I]);
   finally
@@ -154,8 +154,4 @@ begin
   If I>=0 then result:=FName[I];
 end;
 
-initialization
-  ScummVMGamesList:=TScummVMGamesList.Create;
-finalization
-  ScummVMGamesList.Free;
 end.

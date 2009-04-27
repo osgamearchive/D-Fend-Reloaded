@@ -18,9 +18,11 @@ type
     { Public-Deklarationen }
     Function GetName : String;
     Procedure InitGUIAndLoadSetup(InitData : TInitData);
+    Procedure BeforeChangeLanguage;
     Procedure LoadLanguage;
     Procedure DOSBoxDirChanged;
     Procedure ShowFrame(const AdvencedMode : Boolean);
+    procedure HideFrame;
     Procedure RestoreDefaults;
     Procedure SaveSetup;
   end;
@@ -49,6 +51,10 @@ begin
   MinimizeDFendCheckBoxClick(self);
 end;
 
+procedure TSetupFrameWindowsGames.BeforeChangeLanguage;
+begin
+end;
+
 procedure TSetupFrameWindowsGames.LoadLanguage;
 begin
   MinimizeDFendCheckBox.Caption:=LanguageSetup.SetupFormWindowsMinimizeDFendWindowsGame;
@@ -68,6 +74,10 @@ begin
 end;
 
 procedure TSetupFrameWindowsGames.ShowFrame(const AdvencedMode: Boolean);
+begin
+end;
+
+procedure TSetupFrameWindowsGames.HideFrame;
 begin
 end;
 

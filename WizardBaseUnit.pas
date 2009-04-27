@@ -14,23 +14,31 @@ type
     EmulationTypeRadioGroup: TRadioGroup;
     ListScummGamesButton: TBitBtn;
     ShowInfoButton: TBitBtn;
+    WizardModeRadioGroup: TRadioGroup;
     procedure ButtonWork(Sender: TObject);
   private
     { Private-Deklarationen }
   public
     { Public-Deklarationen }
+    Destructor Destroy; override;
     Procedure Init(const GameDB : TGameDB);
     Procedure WriteDataToGame(const Game : TGame);
   end;
 
 implementation
 
-uses VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgConsts, PrgSetupUnit,
-     ListScummVMGamesFormUnit, TextViewerFormUnit;
+uses Math, VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgConsts,
+     PrgSetupUnit, ListScummVMGamesFormUnit, TextViewerFormUnit, IconLoaderUnit;
 
 {$R *.dfm}
 
 { TWizardBaseFrame }
+
+Destructor TWizardBaseFrame.Destroy;
+begin
+  PrgSetup.LastWizardMode:=WizardModeRadioGroup.ItemIndex;
+  inherited Destroy;
+end;
 
 procedure TWizardBaseFrame.Init(const GameDB : TGameDB);
 begin
@@ -44,18 +52,35 @@ begin
   EmulationTypeRadioGroup.Items[2]:=LanguageSetup.WizardFormEmulationTypeWindows;
   ListScummGamesButton.Caption:=LanguageSetup.WizardFormEmulationTypeListScummVMGames;
   ShowInfoButton.Caption:=LanguageSetup.WizardFormMainInfo;
+  WizardModeRadioGroup.Caption:=LanguageSetup.WizardFormWizardMode;
+  WizardModeRadioGroup.Items[0]:=LanguageSetup.WizardFormWizardModeAlwaysAutomatically;
+  WizardModeRadioGroup.Items[1]:=LanguageSetup.WizardFormWizardModeAutomaticallyIfAutoSetupTemplateExists;
+  WizardModeRadioGroup.Items[2]:=LanguageSetup.WizardFormWizardModeAlwaysAllPages;
 
   If Trim(PrgSetup.ScummVMPath)='' then EmulationTypeRadioGroup.Items.Delete(1);
   ListScummGamesButton.Visible:=(Trim(PrgSetup.ScummVMPath)<>'');
   If not ListScummGamesButton.Visible then begin
     ShowInfoButton.Top:=ListScummGamesButton.Top;
   end;
+
+  WizardModeRadioGroup.ItemIndex:=Max(0,Min(2,PrgSetup.LastWizardMode));
+
+  UserIconLoader.DialogImage(DI_Table,ListScummGamesButton);
+  UserIconLoader.DialogImage(DI_Help,ShowInfoButton);
 end;
 
 procedure TWizardBaseFrame.WriteDataToGame(const Game: TGame);
+Var S : String;
+    I : Integer;
 begin
   If EmulationTypeRadioGroup.ItemIndex=0 then begin
-    Game.CaptureFolder:='.\'+CaptureSubDir+'\'+MakeFileSysOKFolderName(Game.Name);
+    S:=IncludeTrailingPathDelimiter(PrgSetup.CaptureDir)+MakeFileSysOKFolderName(Game.Name)+'\';
+    I:=0;
+    While DirectoryExists(MakeAbsPath(S,PrgSetup.BaseDir)) do begin
+      Inc(I);
+      S:=IncludeTrailingPathDelimiter(PrgSetup.CaptureDir)+MakeFileSysOKFolderName(Game.Name)+IntToStr(I)+'\';
+    end;
+    Game.CaptureFolder:=S;
     CreateDir(MakeAbsPath(Game.CaptureFolder,PrgSetup.BaseDir));
   end;
 end;

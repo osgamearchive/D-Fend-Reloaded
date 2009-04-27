@@ -1,183 +1,83 @@
 ; NSI SCRIPT FOR D-FEND RELOADED
 ; ============================================================
 
+!include VersionSettings.nsi
+!insertmacro VersionData
+!define INST_FILENAME "Setup.exe"
+
+!include CommonTools.nsi
 
 
-; Include used librarys
+
+; Register custom page definitions for different languages
 ; ============================================================
 
-!include "MUI.nsh"
-!include "Sections.nsh"
-!include "WinMessages.nsh"
-
-
-
-; Define program name and version
-; ============================================================
-
-!define VER_MAYOR 0
-!define VER_MINOR1 6
-!define VER_MINOR2 1
-
-!define PrgName "D-Fend Reloaded ${VER_MAYOR}.${VER_MINOR1}.${VER_MINOR2}"
-OutFile "D-Fend-Reloaded-${VER_MAYOR}.${VER_MINOR1}.${VER_MINOR2}-Setup.exe"
-
-VIAddVersionKey "ProductName" "D-Fend Reloaded"
-VIAddVersionKey "ProductVersion" "${VER_MAYOR}.${VER_MINOR1}.${VER_MINOR2}"
-VIAddVersionKey "Comments" "${PrgName} is a Frontend for DOSBox"
-VIAddVersionKey "CompanyName" "Written by Alexander Herzog"
-VIAddVersionKey "LegalCopyright" "Licensed under the GPL v3"
-VIAddVersionKey "FileDescription" "Installer for ${PrgName}"
-VIAddVersionKey "FileVersion" "${VER_MAYOR}.${VER_MINOR1}.${VER_MINOR2}"
-VIProductVersion "${VER_MAYOR}.${VER_MINOR1}.${VER_MINOR2}.0"
-
-
-
-
-; Initial settings
-; ============================================================
-
-!packhdr "$%TEMP%\exehead.tmp" 'upx.exe "$%TEMP%\exehead.tmp"'
-
-Name "${PrgName}"
-BrandingText "${PrgName}"
-
-RequestExecutionLevel user
-XPStyle on
-InstallDir "$PROGRAMFILES\D-Fend Reloaded\"
-InstallDirRegKey HKLM "Software\D-Fend Reloaded" "ProgramFolder"
-SetCompressor /solid lzma
 !insertmacro MUI_RESERVEFILE_INSTALLOPTIONS
-!insertmacro MUI_RESERVEFILE_LANGDLL
+ReserveFile "Languages\ioFileDanish.ini"
+ReserveFile "Languages\ioFileDutch.ini"
+ReserveFile "Languages\ioFileEnglish.ini"
+ReserveFile "Languages\ioFileFrench.ini"
+ReserveFile "Languages\ioFileGerman.ini"
+ReserveFile "Languages\ioFileItalian.ini"
+ReserveFile "Languages\ioFilePolish.ini"
+ReserveFile "Languages\ioFileRussian.ini"
+ReserveFile "Languages\ioFileSimplified_Chinese.ini"
+ReserveFile "Languages\ioFileSpanish.ini"
+ReserveFile "Languages\ioFileTraditional_Chinese.ini"
 
-
-
-; Register custom page definitions and license for different languages here
-; ============================================================
-
-ReserveFile "ioFileDanish.ini"
-ReserveFile "ioFileEnglish.ini"
-ReserveFile "ioFileFrench.ini"
-ReserveFile "ioFileGerman.ini"
-ReserveFile "ioFilePolish.ini"
-ReserveFile "ioFileRussian.ini"
-ReserveFile "ioFileSimplified_Chinese.ini"
-ReserveFile "ioFileSpanish.ini"
-ReserveFile "ioFileTraditional_Chinese.ini"
+ReserveFile "Languages\ioFile2Danish.ini"
+ReserveFile "Languages\ioFile2Dutch.ini"
+ReserveFile "Languages\ioFile2English.ini"
+ReserveFile "Languages\ioFile2French.ini"
+ReserveFile "Languages\ioFile2German.ini"
+ReserveFile "Languages\ioFile2Italian.ini"
+ReserveFile "Languages\ioFile2Polish.ini"
+ReserveFile "Languages\ioFile2Russian.ini"
+ReserveFile "Languages\ioFile2Simplified_Chinese.ini"
+ReserveFile "Languages\ioFile2Spanish.ini"
+ReserveFile "Languages\ioFile2Traditional_Chinese.ini"
 
 
 
 ; Settings for the modern user interface (MUI)
 ; ============================================================
 
-!define MUI_ICON "${NSISDIR}\Contrib\Graphics\Icons\orange-install.ico"
-!define MUI_UNICON "${NSISDIR}\Contrib\Graphics\Icons\orange-uninstall.ico"
-!define MUI_HEADERIMAGE
-!define MUI_HEADERIMAGE_BITMAP "${NSISDIR}\Contrib\Graphics\Header\win.bmp"
-!define MUI_HEADERIMAGE_UNBITMAP "1035.bmp"
-!define MUI_WELCOMEFINISHPAGE_BITMAP "13b.bmp"
-!define MUI_UNWELCOMEFINISHPAGE_BITMAP "27.bmp"
+Var FastInstallationMode
 
-!define MUI_ABORTWARNING
-!define MUI_WELCOMEPAGE_TITLE_3LINES
-!define MUI_WELCOMEPAGE_TEXT "$(LANGNAME_WelcomeText)"
-!define MUI_LICENSEPAGE_HEADER_TEXT "$(LANGNAME_LICENSE_TITLE)"
-!define MUI_LICENSEPAGE_HEADER_SUBTEXT "$(LANGNAME_LICENSE_SUBTITLE)"
-!define MUI_LICENSEPAGE_TEXT_TOP "$(LANGNAME_LICENSE_TOP)"
-!define MUI_LICENSEPAGE_TEXT_BOTTOM "$(LANGNAME_LICENSE_BOTTOM)"
-!define MUI_LICENSEPAGE_BUTTON "$(LANGNAME_Next) >"
-!define MUI_COMPONENTSPAGE_SMALLDESC
-!define MUI_FINISHPAGE_TITLE_3LINES
-!define MUI_FINISHPAGE_RUN
-!define MUI_FINISHPAGE_RUN_FUNCTION ExecAppFile
-!define MUI_FINISHPAGE_RUN_TEXT "$(LANGNAME_RunDFend)"
-!define MUI_UNABORTWARNING
-!define MUI_UNWELCOMEPAGE_TITLE_3LINES
-!define MUI_UNFINISHPAGE_TITLE_3LINES
-
-Function ExecAppFile
-  ; Execute DFend as normal user (unelevated), otherwise data package installers can't close DFend
-  UAC::Exec '' '"$INSTDIR\DFend.exe"' '' ''
+Function AbortIfFastMode
+  IntCmp $FastInstallationMode 1 AbortPage ShowPage
+  AbortPage:
+  Abort
+  ShowPage:
 FunctionEnd
 
-!define MUI_LANGDLL_REGISTRY_ROOT "HKLM" 
-!define MUI_LANGDLL_REGISTRY_KEY "Software\D-Fend Reloaded" 
-!define MUI_LANGDLL_REGISTRY_VALUENAME "Installer Language"
-
 !insertmacro MUI_PAGE_WELCOME
-!insertmacro MUI_PAGE_LICENSE $(LANGNAME_License)
-Page custom InstallType
+; !insertmacro MUI_PAGE_LICENSE $(LANGNAME_License)
+Page custom InstallMode
+Page custom InstallType 
+!define MUI_PAGE_CUSTOMFUNCTION_PRE AbortIfFastMode
 !insertmacro MUI_PAGE_COMPONENTS
+!define MUI_PAGE_CUSTOMFUNCTION_PRE AbortIfFastMode
 !insertmacro MUI_PAGE_DIRECTORY
 !insertmacro MUI_PAGE_INSTFILES
 !insertmacro MUI_PAGE_FINISH
 
-!insertmacro MUI_UNPAGE_WELCOME
-!insertmacro MUI_UNPAGE_CONFIRM
-!insertmacro MUI_UNPAGE_INSTFILES
-!insertmacro MUI_UNPAGE_FINISH
-
-
-
-; Global variables
-; ============================================================
-
-Var InstallDataType
-Var DataInstDir
-Var AdminOK
-
-
-
-; Main settings for different languages
-; ============================================================
-
-!insertmacro MUI_LANGUAGE "English"
-
-!insertmacro MUI_LANGUAGE "Danish"
-!insertmacro MUI_LANGUAGE "French"
-!insertmacro MUI_LANGUAGE "German"
-!insertmacro MUI_LANGUAGE "Polish"
-!insertmacro MUI_LANGUAGE "Russian"
-!insertmacro MUI_LANGUAGE "SimpChinese"
-!insertmacro MUI_LANGUAGE "Spanish"
-!insertmacro MUI_LANGUAGE "TradChinese"
-
-!include "D-Fend-Reloaded-Setup-Lang-Danish.nsi"
-!include "D-Fend-Reloaded-Setup-Lang-English.nsi"
-!include "D-Fend-Reloaded-Setup-Lang-French.nsi"
-!include "D-Fend-Reloaded-Setup-Lang-German.nsi"
-!include "D-Fend-Reloaded-Setup-Lang-Polish.nsi"
-!include "D-Fend-Reloaded-Setup-Lang-Russian.nsi"
-!include "D-Fend-Reloaded-Setup-Lang-Simplified_Chinese.nsi"
-!include "D-Fend-Reloaded-Setup-Lang-Spanish.nsi"
-!include "D-Fend-Reloaded-Setup-Lang-Traditional_Chinese.nsi"
-
-
-
-; Pack program file
-; ============================================================
-
-!system '"upx.exe" "..\DFend.exe"'
+!insertmacro UninstallerPages
+!insertmacro LanguageSetup
 
 
 
 ; Definition of install sections
 ; ============================================================
 
-Section "-CloseDFend"
-  SectionIn RO
-
-  Push $0
-  FindWindow $0 'TDFendReloadedMainform' ''
-  IntCmp $0 0 DoneCloseDFend
-  SendMessage $0 ${WM_CLOSE} 0 0 /TIMEOUT=${TO_MS}
-  Sleep 2000
-  DoneCloseDFend:
-  Pop $0
-SectionEnd
+!insertmacro CommonSections
 
 Section "$(LANGNAME_DFendReloaded)" ID_DFend
   SectionIn RO
+  SetDetailsPrint both
+  
+  ; Installation type
+  ; ($InstallDataType=0 <=> Prg dir mode, $InstallDataType=1 <=> User dir mode; in user dir mode $DataInstDir will contain the data directory otherwise $INSTDIR)
   
   IntCmp $InstallDataType 1 UserDataDir
   strcpy $DataInstDir $INSTDIR
@@ -186,33 +86,37 @@ Section "$(LANGNAME_DFendReloaded)" ID_DFend
   strcpy $DataInstDir "$PROFILE\D-Fend Reloaded"
   StartInstall:
   
+  ; Store installation folder in registry if not portable installation
+  
   IntCmp $InstallDataType 2 NoRegistryWhenUSBStickInstall
   WriteRegStr HKLM "Software\D-Fend Reloaded" "ProgramFolder" "$INSTDIR"
   WriteRegStr HKLM "Software\D-Fend Reloaded" "DataFolder" "$DataInstDir"
   NoRegistryWhenUSBStickInstall:
+  
+  ; Install main files
 
   SetOutPath "$INSTDIR"
-  File "..\DFend.exe"  
-  File "..\mkdosfs.exe"  
-  File "..\oggenc2.exe"
-  File "..\License.txt"
-  File "..\LicenseComponents.txt"
-  File "..\Links.txt"
-  File "..\SearchLinks.txt"
-  File "..\ChangeLog.txt"
+  File "..\DFend.exe"
   File "..\Readme_OperationMode.txt"
-  File "..\D-Fend Reloaded DataInstaller.nsi"
-  File "..\UpdateCheck\UpdateCheck.exe"
-  File "..\SetInstLang\SetInstallerLanguage.exe"  
-  File "..\7za.dll"
-  File "..\DelZip179.dll"
-  File "..\mediaplr.dll"
-  File "..\InstallVideoCodec.exe"
   
-  SetOutPath "$DataInstDir"
-  File "..\D-Fend Reloaded DataInstaller.nsi"
-  File "..\Icons.ini"
-  
+  SetOutPath "$INSTDIR\Bin"
+  File "..\Bin\mkdosfs.exe"  
+  File "..\Bin\oggenc2.exe"
+  File "..\Bin\License.txt"
+  File "..\Bin\LicenseComponents.txt"
+  File "..\Bin\Links.txt"
+  File "..\Bin\SearchLinks.txt"
+  File "..\Bin\ChangeLog.txt"
+  File "..\Bin\D-Fend Reloaded DataInstaller.nsi"
+  File "..\Bin\UpdateCheck.exe"
+  File "..\Bin\SetInstallerLanguage.exe"  
+  File "..\Bin\7za.dll"
+  File "..\Bin\DelZip179.dll"
+  File "..\Bin\mediaplr.dll"
+  File "..\Bin\InstallVideoCodec.exe"
+  IntCmp $InstallDataType 2 +2
+  File "..\Bin\DFendGameExplorerData.dll"
+
   CreateDirectory "$DataInstDir\Confs"
   
   CreateDirectory "$DataInstDir\GameData"
@@ -220,6 +124,32 @@ Section "$(LANGNAME_DFendReloaded)" ID_DFend
   SetOutPath "$INSTDIR\Lang"
   File "..\Lang\*.ini"
   File "..\Lang\*.chm"
+
+  SetOutPath "$INSTDIR\IconSets"
+  File /r "..\IconSets\*.*"
+
+  ; Remove files in $INSTDIR for which the new position is $INSTDIR\Bin
+  
+  Delete "$INSTDIR\oggenc2.exe"
+  Delete "$INSTDIR\LicenseComponents.txt"
+  Delete "$INSTDIR\License.txt"
+  IntCmp $InstallDataType 0 KeepSettingsFilesIfPrgDirIsUserDir  
+  Delete "$INSTDIR\Links.txt"
+  Delete "$INSTDIR\SearchLinks.txt"
+  KeepSettingsFilesIfPrgDirIsUserDir:
+  Delete "$INSTDIR\ChangeLog.txt"
+  Delete "$INSTDIR\D-Fend Reloaded DataInstaller.nsi"
+  Delete "$INSTDIR\SetInstallerLanguage.exe"
+  Delete "$INSTDIR\UpdateCheck.exe"
+  Delete "$INSTDIR\7za.dll"
+  Delete "$INSTDIR\DelZip179.dll"
+  Delete "$INSTDIR\InstallVideoCodec.exe"
+  Delete "$INSTDIR\mkdosfs.exe"
+  Delete "$INSTDIR\mediaplr.dll"
+  
+  SetDetailsPrint none
+  
+  ; Install templates  
   
   IntCmp $InstallDataType 1 WriteNewUserDir
   
@@ -234,6 +164,9 @@ Section "$(LANGNAME_DFendReloaded)" ID_DFend
 
     SetOutPath "$DataInstDir\IconLibrary"
     File "..\NewUserData\IconLibrary\*.*"
+	
+    SetOutPath "$DataInstDir\Settings"
+    File "..\NewUserData\Icons.ini"
   
   Goto TemplateWritingFinish
   WriteNewUserDir:  
@@ -249,11 +182,20 @@ Section "$(LANGNAME_DFendReloaded)" ID_DFend
 
     SetOutPath "$INSTDIR\NewUserData\IconLibrary"
     File "..\NewUserData\IconLibrary\*.*"
-  
+	
+    SetOutPath "$INSTDIR\NewUserData"
+    File "..\NewUserData\Icons.ini"
+
   TemplateWritingFinish:
+  
+  SetDetailsPrint both
+  
+  ; Create "VirtualHD" folder in data dir
   
   CreateDirectory "$DataInstDir\VirtualHD"
 
+  ; Write installation mode to DFend.dat
+  
   ClearErrors
   FileOpen $0 $INSTDIR\DFend.dat w
   IfErrors InstTypeEnd
@@ -270,17 +212,19 @@ Section "$(LANGNAME_DFendReloaded)" ID_DFend
   FileClose $0
   InstTypeEnd:
   
+  ; Create uninstaller and start menu entries
+  
   IntCmp $InstallDataType 2 NoDFendStartMenuLinks
   SetOutPath "$INSTDIR"
   WriteUninstaller "Uninstall.exe"
   
+  SetShellVarContext all
   CreateDirectory "$SMPROGRAMS\D-Fend Reloaded"
   CreateShortCut "$SMPROGRAMS\D-Fend Reloaded\$(LANGNAME_DFendReloaded).lnk" "$INSTDIR\DFend.exe"
   CreateShortCut "$SMPROGRAMS\D-Fend Reloaded\$(LANGNAME_Uninstall).lnk" "$INSTDIR\Uninstall.exe"
   CreateShortCut "$SMPROGRAMS\D-Fend Reloaded\$(LANGNAME_GamesFolder).lnk" "$DataInstDir\VirtualHD"
   CreateShortCut "$SMPROGRAMS\D-Fend Reloaded\$(LANGNAME_GameDataFolder).lnk" "$DataInstDir\GameData"
   
-  IntCmp $InstallDataType 2 NoDFendStartMenuLinks
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\D-Fend Reloaded" "DisplayName" "${PrgName} ($(LANGNAME_Deinstall))"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\D-Fend Reloaded" "UninstallString" '"$INSTDIR\Uninstall.exe"'  
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\D-Fend Reloaded" "InstallLocation" "$INSTDIR"
@@ -289,6 +233,19 @@ Section "$(LANGNAME_DFendReloaded)" ID_DFend
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\D-Fend Reloaded" "DisplayVersion" "${VER_MAYOR}.${VER_MINOR1}.${VER_MINOR2}"
   WriteRegDWord HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\D-Fend Reloaded" "NoModify" 1
   WriteRegDWord HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\D-Fend Reloaded" "NoRepair" 1
+  
+  ; Add/Update to Vista games explorer
+  IfFileExists "$LOCALAPPDATA\Microsoft\Windows\GameExplorer\*.*" 0 NoDFendStartMenuLinks
+  ClearErrors
+  ReadRegStr $GEGUID HKLM "Software\D-Fend Reloaded" "GameExplorerGUID"  
+  IfErrors 0 NoNewGEGUIDNeeded
+  ${GameExplorer_GenerateGUID}
+  Pop $GEGUID
+  WriteRegStr HKLM "Software\D-Fend Reloaded" "GameExplorerGUID" "$GEGUID"
+  NoNewGEGUIDNeeded:
+  ClearErrors
+  ${GameExplorer_AddGame} all $INSTDIR\Bin\DFendGameExplorerData.dll $INSTDIR $INSTDIR\DFend.exe $GEGUID
+
   NoDFendStartMenuLinks:
 SectionEnd
 
@@ -297,7 +254,9 @@ SectionEnd
 SectionGroup "$(LANGNAME_DOSBox)" ID_DosBox
   
 Section "$(LANGNAME_ProgramFiles)" ID_DosBoxProgramFiles
+  SetDetailsPrint both
   SetOutPath "$INSTDIR\DOSBox"
+  SetDetailsPrint none
   File "..\DOSBox\README.txt"
   File "..\DOSBox\COPYING.txt"
   File "..\DOSBox\THANKS.txt"
@@ -317,6 +276,7 @@ Section "$(LANGNAME_ProgramFiles)" ID_DosBoxProgramFiles
   CreateDirectory "$INSTDIR\DOSBox\capture"
   
   IntCmp $InstallDataType 2 NoDosBoxStartMenuLinks
+  SetShellVarContext all
   CreateDirectory "$SMPROGRAMS\D-Fend Reloaded\DOSBox"
   CreateDirectory "$SMPROGRAMS\D-Fend Reloaded\DOSBox\Video"
   CreateShortCut "$SMPROGRAMS\D-Fend Reloaded\DOSBox\DOSBox.lnk" "$INSTDIR\DOSBox\DOSBox.exe" "-conf $\"$INSTDIR\DosBox\dosbox.conf$\"" "$INSTDIR\DosBox\DOSBox.exe" 0
@@ -339,11 +299,14 @@ Section "$(LANGNAME_ProgramFiles)" ID_DosBoxProgramFiles
 SectionEnd
 
 Section "$(LANGNAME_LanguageFiles)" ID_DosBoxLanguageFiles
+  SetDetailsPrint both
   SetOutPath "$INSTDIR\DOSBox"
+  SetDetailsPrint none
   File "..\DosBoxLang\*.*"
 SectionEnd
 
 Section "$(LANGNAME_VideoCodec)" ID_DosBoxVideoCodec
+  SetDetailsPrint both
   ClearErrors
   ReadRegStr $R0 HKLM "SOFTWARE\Microsoft\Windows NT\CurrentVersion" CurrentVersion
   IfErrors we_9x2 we_nt2
@@ -362,7 +325,8 @@ SectionGroupEnd
 SectionGroup "$(LANGNAME_Tools)" ID_Tools
 
 Section "$(LANGNAME_FreeDosTools)" ID_FreeDosTools
-
+  SetDetailsPrint both
+  
   IntCmp $InstallDataType 1 FreeDOSToNewUserDir
     SetOutPath "$DataInstDir\VirtualHD\FREEDOS"
   Goto FreeDOSWritingStart
@@ -370,11 +334,13 @@ Section "$(LANGNAME_FreeDosTools)" ID_FreeDosTools
     SetOutPath "$INSTDIR\NewUserData\FREEDOS"
   FreeDOSWritingStart:
   
+  SetDetailsPrint none
   File /r "..\NewUserData\FREEDOS\*.*"
 SectionEnd
 
 Section "$(LANGNAME_Doszip)" ID_Doszip
-
+  SetDetailsPrint both
+  
   IntCmp $InstallDataType 1 DoszipToNewUserDir
     SetOutPath "$DataInstDir\VirtualHD\DOSZIP"
   Goto DoszipWritingStart
@@ -382,6 +348,7 @@ Section "$(LANGNAME_Doszip)" ID_Doszip
     SetOutPath "$INSTDIR\NewUserData\DOSZIP"
   DoszipWritingStart:
   
+  SetDetailsPrint none
   File /r "..\NewUserData\DOSZIP\*.*"
 SectionEnd
 
@@ -390,31 +357,9 @@ SectionGroupEnd
 
 
 Section "$(LANGNAME_DesktopShortcut)" ID_DesktopShortcut
+  SetDetailsPrint both
+  SetShellVarContext all
   CreateShortCut "$DESKTOP\$(LANGNAME_DFendReloaded).lnk" "$INSTDIR\DFend.exe" 
-SectionEnd
-
-
-
-Section "Uninstall"
-  ClearErrors
-  FileOpen $0 $INSTDIR\DFend.dat r
-  IfErrors UninstallUserDataEnd
-  FileRead $0 $1
-  FileClose $0
-  StrCmp $1 "USERDIRMODE" AskForUserDataDel
-  Goto UninstallUserDataEnd
-  AskForUserDataDel:
-  ReadRegStr $DataInstDir HKLM "Software\D-Fend Reloaded" "DataFolder"
-  StrCmp $DataInstDir "" UninstallUserDataEnd
-  MessageBox MB_YESNO "$(LANGNAME_ConfirmDelUserData)" IDYES DelUserData IDNO UninstallUserDataEnd
-  DelUserData:  
-  RmDir /r $DataInstDir  
-  UninstallUserDataEnd:
-
-  RmDir /r $INSTDIR
-  RmDir /r "$SMPROGRAMS\D-Fend Reloaded"
-  Delete "$DESKTOP\D-Fend Reloaded.lnk"
-  DeleteRegKey HKLM "${MUI_LANGDLL_REGISTRY_KEY}"
 SectionEnd
 
 
@@ -422,79 +367,76 @@ SectionEnd
 ; Definition of NSIS functions
 ; ============================================================
 
-Function .onInit  
-  UAC_Elevate:
-  UAC::RunElevated 
-  StrCmp 1223 $0 UAC_ElevationAborted
-  StrCmp 0 $0 0 UAC_Err
-  StrCmp 1 $1 0 UAC_Success
-  Quit
-  UAC_Err:
-  Abort
-  UAC_Success:
-  StrCmp 1 $3 UAC_OK
-  StrCmp 3 $1 0 UAC_ElevationAborted
-  UAC_ElevationAborted:
-  IntOp $AdminOK 0 + 0
-  Goto SelLang
-  UAC_OK:
-  IntOp $AdminOK 1 + 0
-  Goto SelLang
+!macro ExtractInstallOptionFiles
+  !insertmacro MUI_INSTALLOPTIONS_EXTRACT_AS "Languages\ioFileDanish.ini" "ioFileDanish.ini"
+  !insertmacro MUI_INSTALLOPTIONS_EXTRACT_AS "Languages\ioFileDutch.ini" "ioFileDutch.ini"
+  !insertmacro MUI_INSTALLOPTIONS_EXTRACT_AS "Languages\ioFileEnglish.ini" "ioFileEnglish.ini"
+  !insertmacro MUI_INSTALLOPTIONS_EXTRACT_AS "Languages\ioFileFrench.ini" "ioFileFrench.ini"
+  !insertmacro MUI_INSTALLOPTIONS_EXTRACT_AS "Languages\ioFileGerman.ini" "ioFileGerman.ini"
+  !insertmacro MUI_INSTALLOPTIONS_EXTRACT_AS "Languages\ioFileItalian.ini" "ioFileItalian.ini"
+  !insertmacro MUI_INSTALLOPTIONS_EXTRACT_AS "Languages\ioFilePolish.ini" "ioFilePolish.ini"
+  !insertmacro MUI_INSTALLOPTIONS_EXTRACT_AS "Languages\ioFileRussian.ini" "ioFileRussian.ini"
+  !insertmacro MUI_INSTALLOPTIONS_EXTRACT_AS "Languages\ioFileSimplified_Chinese.ini" "ioFileSimplified_Chinese.ini"
+  !insertmacro MUI_INSTALLOPTIONS_EXTRACT_AS "Languages\ioFileSpanish.ini" "ioFileSpanish.ini"
+  !insertmacro MUI_INSTALLOPTIONS_EXTRACT_AS "Languages\ioFileTraditional_Chinese.ini" "ioFileTraditional_Chinese.ini"
   
-  SelLang:
-  !define MUI_LANGDLL_ALLLANGUAGES
-  !insertmacro MUI_LANGDLL_DISPLAY
-  !insertmacro MUI_INSTALLOPTIONS_EXTRACT "ioFileDanish.ini"
-  !insertmacro MUI_INSTALLOPTIONS_EXTRACT "ioFileEnglish.ini"
-  !insertmacro MUI_INSTALLOPTIONS_EXTRACT "ioFileFrench.ini"
-  !insertmacro MUI_INSTALLOPTIONS_EXTRACT "ioFileGerman.ini"
-  !insertmacro MUI_INSTALLOPTIONS_EXTRACT "ioFilePolish.ini"
-  !insertmacro MUI_INSTALLOPTIONS_EXTRACT "ioFileRussian.ini"
-  !insertmacro MUI_INSTALLOPTIONS_EXTRACT "ioFileSimplified_Chinese.ini"
-  !insertmacro MUI_INSTALLOPTIONS_EXTRACT "ioFileSpanish.ini"
-  !insertmacro MUI_INSTALLOPTIONS_EXTRACT "ioFileTraditional_Chinese.ini"
+  !insertmacro MUI_INSTALLOPTIONS_EXTRACT_AS "Languages\ioFile2Danish.ini" "ioFile2Danish.ini"
+  !insertmacro MUI_INSTALLOPTIONS_EXTRACT_AS "Languages\ioFile2Dutch.ini" "ioFile2Dutch.ini"
+  !insertmacro MUI_INSTALLOPTIONS_EXTRACT_AS "Languages\ioFile2English.ini" "ioFile2English.ini"
+  !insertmacro MUI_INSTALLOPTIONS_EXTRACT_AS "Languages\ioFile2French.ini" "ioFile2French.ini"
+  !insertmacro MUI_INSTALLOPTIONS_EXTRACT_AS "Languages\ioFile2German.ini" "ioFile2German.ini"
+  !insertmacro MUI_INSTALLOPTIONS_EXTRACT_AS "Languages\ioFile2Italian.ini" "ioFile2Italian.ini"
+  !insertmacro MUI_INSTALLOPTIONS_EXTRACT_AS "Languages\ioFile2Polish.ini" "ioFile2Polish.ini"
+  !insertmacro MUI_INSTALLOPTIONS_EXTRACT_AS "Languages\ioFile2Russian.ini" "ioFile2Russian.ini"
+  !insertmacro MUI_INSTALLOPTIONS_EXTRACT_AS "Languages\ioFile2Simplified_Chinese.ini" "ioFile2Simplified_Chinese.ini"
+  !insertmacro MUI_INSTALLOPTIONS_EXTRACT_AS "Languages\ioFile2Spanish.ini" "ioFile2Spanish.ini"
+  !insertmacro MUI_INSTALLOPTIONS_EXTRACT_AS "Languages\ioFile2Traditional_Chinese.ini" "ioFile2Traditional_Chinese.ini"
+!macroend
 
-  IntCmp $AdminOK 1 InitReturn
-  MessageBox MB_YESNO "$(LANGNAME_NeedAdminRights)" IDYES UAC_Elevate IDNO InitReturn
+!insertmacro CommonUACCode
 
-  InitReturn:
-  ; MessageBox MB_OK "This is a beta version of D-Fend Reloaded 0.6 ! The final version of D-Fend Reloaded 0.6 has not yet been released. This version is for testing only."
-  ; MessageBox MB_OK "This is not D-Fend Reloaded 0.6.0 ! This is the release candiate 2 of version 0.6.0 ! This means this version is very close to the final release 0.6.0 but there might be some unfixed bugs etc. Please do not use this version unless you want to do beta testing. The final release of 0.6.0 will be released very soon."
-FunctionEnd  
+Var FONT
 
-Function un.onInit  
-  UAC::RunElevated 
-  StrCmp 1223 $0 UAC_UnErr
-  StrCmp 0 $0 0 UAC_UnErr
-  StrCmp 1 $1 0 UAC_UnSuccess
-  Quit
-  UAC_UnErr:
-  Abort
-  UAC_UnSuccess:
-  StrCmp 1 $3 UAC_UnOK
-  StrCmp 3 $1 0 UAC_UnErr
-  UAC_UnOK:
+!macro ActivateSection SectionID
+  SectionGetFlags ${SectionID} $R0
+  IntOp $R0 $R0 | 0x00000001
+  SectionSetFlags ${SectionID} $R0
+!macroend
 
-  !insertmacro MUI_UNGETLANGUAGE
-FunctionEnd
+Function InstallMode
+  IntOp $FastInstallationMode 0 + 0
+  IntCmp $AdminOK 0 InstallModePageFinish
+  
+  !insertmacro MUI_HEADER_TEXT $(PAGE2_TITLE) $(PAGE2_SUBTITLE)
+  !insertmacro MUI_INSTALLOPTIONS_INITDIALOG  "$(LANGNAME_ioFile2)"  
+  
+  !insertmacro MUI_INSTALLOPTIONS_READ $9 "$(LANGNAME_ioFile2)" "Field 1" "HWND"
+  CreateFont $FONT "$(^Font)" "$(^FontSize)" "600"
+  SendMessage $9 ${WM_SETFONT} $FONT 0
 
-Function .OnInstFailed
-    UAC::Unload
-FunctionEnd
+  !insertmacro MUI_INSTALLOPTIONS_SHOW
 
-Function .OnInstSuccess
-    UAC::Unload
-FunctionEnd
-
-Function un.OnUnInstFailed
-    UAC::Unload
-FunctionEnd
-
-Function un.OnUnInstSuccess
-    UAC::Unload
+  !insertmacro MUI_INSTALLOPTIONS_READ $9 "$(LANGNAME_ioFile2)" "Field 1" "State"
+  IntCmp $9 1 FastMode
+  Goto InstallModePageFinish
+  FastMode:  
+  !insertmacro ActivateSection ${ID_DosBox}
+  !insertmacro ActivateSection ${ID_DosBoxProgramFiles}
+  !insertmacro ActivateSection ${ID_DosBoxLanguageFiles}
+  !insertmacro ActivateSection ${ID_DosBoxVideoCodec}
+  !insertmacro ActivateSection ${ID_Tools}
+  !insertmacro ActivateSection ${ID_FreeDosTools}
+  !insertmacro ActivateSection ${ID_Doszip}
+  !insertmacro ActivateSection ${ID_DesktopShortcut}
+  StrCpy $INSTDIR "$PROGRAMFILES\D-Fend Reloaded\"
+  IntOp $InstallDataType 1 + 0
+  IntOp $FastInstallationMode 1 + 0
+  InstallModePageFinish:
 FunctionEnd
 
 Function InstallType
+  IntCmp $FastInstallationMode 1 EndSel
+
   !insertmacro MUI_HEADER_TEXT $(PAGE_TITLE) $(PAGE_SUBTITLE)
   
   IntCmp $AdminOK 1 NoInstallrestrictions 
@@ -504,7 +446,12 @@ Function InstallType
   !insertmacro MUI_INSTALLOPTIONS_WRITE "$(LANGNAME_ioFile)" "Field 5" "State" "1"
   NoInstallrestrictions:
   
-  !insertmacro MUI_INSTALLOPTIONS_DISPLAY "$(LANGNAME_ioFile)"
+  !insertmacro MUI_INSTALLOPTIONS_INITDIALOG  "$(LANGNAME_ioFile)"  
+  
+  !insertmacro MUI_INSTALLOPTIONS_READ $9 "$(LANGNAME_ioFile)" "Field 3" "HWND"
+  CreateFont $FONT "$(^Font)" "$(^FontSize)" "600"
+  SendMessage $9 ${WM_SETFONT} $FONT 0  
+  
   !insertmacro MUI_INSTALLOPTIONS_SHOW
 
   !insertmacro MUI_INSTALLOPTIONS_READ $9 "$(LANGNAME_ioFile)" "Field 1" "State"
@@ -526,7 +473,9 @@ Function InstallType
   
   SectionGetFlags ${ID_DosBoxVideoCodec} $R0
   IntOp $R0 $R0 & 0xFFFFFFFE
-  SectionSetFlags ${ID_DosBoxVideoCodec} $R0      
+  SectionSetFlags ${ID_DosBoxVideoCodec} $R0
+
+  StrCpy $INSTDIR "$DESKTOP\D-Fend Reloaded\"
   
   EndSel:
 FunctionEnd
@@ -578,3 +527,4 @@ FunctionEnd
   !insertmacro MUI_DESCRIPTION_TEXT ${ID_Doszip} $(DESC_Doszip)
   !insertmacro MUI_DESCRIPTION_TEXT ${ID_DesktopShortcut} $(DESC_DesktopShortcut)
 !insertmacro MUI_FUNCTION_DESCRIPTION_END
+

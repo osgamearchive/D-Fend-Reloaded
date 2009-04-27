@@ -4,8 +4,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, 
-  Dialogs, Buttons, StdCtrls, Grids, ComCtrls, GameDBUnit, ModernProfileEditorFormUnit,
-  ExtCtrls;
+  Dialogs, Buttons, StdCtrls, Grids, ComCtrls, ExtCtrls, GameDBUnit,
+  ModernProfileEditorFormUnit;
 
 type
   TModernProfileEditorStartFrame = class(TFrame, IModernProfileEditorFrame)
@@ -50,7 +50,8 @@ type
 
 implementation
 
-uses VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgSetupUnit, HelpConsts;
+uses VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgSetupUnit, HelpConsts,
+     IconLoaderUnit;
 
 {$R *.dfm}
 
@@ -93,6 +94,16 @@ begin
   AutoexecBootFloppyImageButton.Hint:=LanguageSetup.ChooseFile;
   AutoexecBootFloppyImageAddButton.Hint:=LanguageSetup.ProfileMountingAddImage;
   AutoexecBootFloppyImageDelButton.Hint:=LanguageSetup.ProfileMountingDelImage;
+
+  UserIconLoader.DialogImage(DI_Clear,AutoexecClearButton);
+  UserIconLoader.DialogImage(DI_Load,AutoexecLoadButton);
+  UserIconLoader.DialogImage(DI_Save,AutoexecSaveButton);
+  UserIconLoader.DialogImage(DI_Clear,FinalizationClearButton);
+  UserIconLoader.DialogImage(DI_Load,FinalizationLoadButton);
+  UserIconLoader.DialogImage(DI_Save,FinalizationSaveButton);
+  UserIconLoader.DialogImage(DI_SelectFile,AutoexecBootFloppyImageButton);
+  UserIconLoader.DialogImage(DI_Add,AutoexecBootFloppyImageAddButton);
+  UserIconLoader.DialogImage(DI_Delete,AutoexecBootFloppyImageDelButton);
 
   AutoexecBootFloppyImageTab.ColWidths[0]:=AutoexecBootFloppyImageTab.ClientWidth-25;
 

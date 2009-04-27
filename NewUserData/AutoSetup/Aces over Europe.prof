@@ -50,7 +50,7 @@ DataDir=
 Favorite=0
 Name=Aces over Europe
 Icon=
-Genre=Flight simulator
+Genre=Flightsimulation
 Developer=Dynamix
 Publisher=Sierra On-Line
 Year=1993
@@ -223,4 +223,7 @@ config=
 [ExtraCommands]
 BeforeExecution=
 AfterExecution=
+BeforeExecution.Wait=1
+BeforeExecution.Minimized=0
+AfterExecution.Minimized=0
 

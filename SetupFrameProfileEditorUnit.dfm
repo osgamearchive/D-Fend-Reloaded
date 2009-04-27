@@ -2,11 +2,11 @@ object SetupFrameProfileEditor: TSetupFrameProfileEditor
   Left = 0
   Top = 0
   Width = 542
-  Height = 258
+  Height = 283
   TabOrder = 0
   DesignSize = (
     542
-    258)
+    283)
   object ReopenLastActiveProfileSheetCheckBox: TCheckBox
     Left = 16
     Top = 24
@@ -38,7 +38,7 @@ object SetupFrameProfileEditor: TSetupFrameProfileEditor
   end
   object AutoSetScreenshotFolderRadioGroup: TRadioGroup
     Left = 16
-    Top = 136
+    Top = 120
     Width = 520
     Height = 65
     Anchors = [akLeft, akTop, akRight]
@@ -52,5 +52,15 @@ object SetupFrameProfileEditor: TSetupFrameProfileEditor
         'Beim Hinzuf'#252'gen '#252'ber den Assistenten und '#252'ber den modernen Profi' +
         'leditor')
     TabOrder = 3
+  end
+  object RenameProfFilesCheckBox: TCheckBox
+    Left = 16
+    Top = 208
+    Width = 520
+    Height = 17
+    Anchors = [akLeft, akTop, akRight]
+    Caption = 'Profildateinamen immer gem'#228#223' dem Profilnamen umbenennen'
+    TabOrder = 4
+    Visible = False
   end
 end

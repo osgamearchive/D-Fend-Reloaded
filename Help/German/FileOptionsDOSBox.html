@@ -107,7 +107,21 @@ Die folgenden Einstellungen sind nur sichtbar, wenn unten rechts im Programmeins
     verf&uuml;gbaren <tt>*.lng</tt>-Dateien an. Um neue Sprachdateien zu dieser Auswahlliste hinzuzuf&uuml;gen,
     m&uuml;ssen Sie nur die (neu heruntergeladene) Sprachdatei in das DOSBox-Programmverzeichnis kopieren;
     beim n&auml;chsten &Ouml;ffnen dieses Dialogs wird sie dann in dieser Liste angezeigt.
-  </li>  
+  </li>
+  <li>
+    <b>Tastaturbelegung</b><br />
+	In dieser Box können Sie die standardmäßig mit dieser DOSBox-Version zu verwendende Tastaturbelegung
+    auswählen. Ist hier "default" gewählt, so wird die Standard-Tastaturbelegung der gewählten Programmsprache
+    verwendet, bzw. die Tastaturbelegung des zu startenden Profils, wenn in dem Profil explizit eine
+	Tastaturbelegung definiert ist.
+  </li>
+  <li>
+    <b>Zeichensatz (Codepage)</b><br />
+	In dieser Box können Sie die standardmäßig mit dieser DOSBox-Version zu verwendende Codepage
+    auswählen. Ist hier "default" gewählt, so wird die Standard-Codepage der gewählten Programmsprache
+    verwendet, bzw. die Codepage des zu startenden Profils, wenn in dem Profil explizit eine
+	Codepage definiert ist.
+  </li>
   <li>
     <b>Tastaturzuordnungsdatei</b> (Keymapping-Datei)<br />
     In dieser Tastaturzuordnungsdatei werden &Auml;nderungen an der Vorgabe-Tastenzuordnen,
@@ -159,6 +173,15 @@ Die folgenden Einstellungen sind nur sichtbar, wenn unten rechts im Programmeins
     SDL stellt die Grafik-Basis von DOSBox dar.
     <br />(Vorgabewert f&uuml;r diese Option: "DirectX")
   </li>
+  <li>
+    <b>Warnungen bei Fehlern beim Erzeugen der DOSBox-Pfadnamen anzeigen</b><br />
+	DOSBox verwendet eine andere Methode als Windows zur Erzeugung kurzer Pfadnamen aus langen
+	Pfadnamen. Daher können lange Pfadnamen zur Verwendung innerhalb von DOSBox (z.B. in "cd"-Befehlen)
+	nicht einfach mit Hilfe der Windows-API-Funktion in kurze 8.3-Namen umgeformt werden, sondern müssen
+	gemäß dem DOSBox-Algorithmus abgekürzt werden. Tritt bei dieser Übersetzung eines langen Pfadnamen
+	ein Fehler auf, so erscheint eine Warnmeldung, wenn diese Option aktiviert ist.
+    <br />(Vorgabewert f&uuml;r diese Option: ein)
+  </li>  
 </ul>
  
 <p>&nbsp;</p>

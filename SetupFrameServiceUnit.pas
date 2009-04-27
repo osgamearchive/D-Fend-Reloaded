@@ -21,16 +21,19 @@ type
     { Public-Deklarationen }
     Function GetName : String;
     Procedure InitGUIAndLoadSetup(InitData : TInitData);
+    Procedure BeforeChangeLanguage;
     Procedure LoadLanguage;
     Procedure DOSBoxDirChanged;
     Procedure ShowFrame(const AdvencedMode : Boolean);
+    procedure HideFrame;
     Procedure RestoreDefaults;
     Procedure SaveSetup;
   end;
 
 implementation
 
-uses LanguageSetupUnit, VistaToolsUnit, GameDBToolsUnit, PrgConsts, HelpConsts;
+uses LanguageSetupUnit, VistaToolsUnit, GameDBToolsUnit, PrgConsts, HelpConsts,
+     IconLoaderUnit;
 
 {$R *.dfm}
 
@@ -49,6 +52,16 @@ begin
   NoFlicker(Service2Button);
   NoFlicker(Service3Button);
   NoFlicker(Service4Button);
+
+  UserIconLoader.DialogImage(DI_ResetDefault,Service3Button);
+  UserIconLoader.DialogImage(DI_ResetDefault,Service4Button);
+  UserIconLoader.DialogImage(DI_Clear,Service1Button);
+  UserIconLoader.DialogImage(DI_Folders,Service2Button);
+  UserIconLoader.DialogImage(DI_Calculator,Service5Button);
+end;
+
+procedure TSetupFrameService.BeforeChangeLanguage;
+begin
 end;
 
 procedure TSetupFrameService.LoadLanguage;
@@ -71,6 +84,10 @@ begin
   Service1Button.Visible:=AdvencedMode;
   Service2Button.Visible:=AdvencedMode;
   Service5Button.Visible:=AdvencedMode;
+end;
+
+procedure TSetupFrameService.HideFrame;
+begin
 end;
 
 procedure TSetupFrameService.RestoreDefaults;

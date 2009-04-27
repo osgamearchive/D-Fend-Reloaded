@@ -46,7 +46,8 @@ type
 
 implementation
 
-uses LanguageSetupUnit, VistaToolsUnit, CommonTools, HelpConsts, ClassExtensions;
+uses LanguageSetupUnit, VistaToolsUnit, CommonTools, HelpConsts,
+     ClassExtensions, IconLoaderUnit;
 
 {$R *.dfm}
 
@@ -67,7 +68,7 @@ begin
     Strings.Delete(0);
     Strings.Add(LanguageSetup.GameGenre+'=');
     ItemProps[Strings.Count-1].EditStyle:=esPickList;
-    St:=InitData.GameDB.GetGenreList; try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
+    St:=ExtGenreList(GetCustomGenreName(InitData.GameDB.GetGenreList)); try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
     Strings.Add(LanguageSetup.GameDeveloper+'=');
     ItemProps[Strings.Count-1].EditStyle:=esPickList;
     St:=InitData.GameDB.GetDeveloperList; try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
@@ -79,7 +80,7 @@ begin
     St:=InitData.GameDB.GetYearList; try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
     Strings.Add(LanguageSetup.GameLanguage+'=');
     ItemProps[Strings.Count-1].EditStyle:=esPickList;
-    St:=InitData.GameDB.GetLanguageList; try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
+    St:=ExtLanguageList(GetCustomLanguageName(InitData.GameDB.GetLanguageList)); try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
     Strings.Add(LanguageSetup.GameWWW+'=');
   end;
   FavouriteCheckBox.Caption:=LanguageSetup.GameFavorite;
@@ -98,6 +99,11 @@ begin
   DelButton.Hint:=RemoveUnderline(LanguageSetup.Del);
 
   NotesLabel.Caption:=LanguageSetup.GameNotes+':';
+
+  UserIconLoader.DialogImage(DI_Internet,ImageList,0);
+  UserIconLoader.DialogImage(DI_Edit,ImageList,1);
+  UserIconLoader.DialogImage(DI_Add,AddButton);
+  UserIconLoader.DialogImage(DI_Delete,DelButton);
 
   PProfileName:=InitData.CurrentProfileName;
   LinkFile:=InitData.SearchLinkFile;
@@ -138,11 +144,11 @@ begin
   end;
 
   with GameInfoValueListEditor.Strings do begin
-    If Game.Genre<>'' then ValueFromIndex[0]:=Game.Genre;
+    If Game.Genre<>'' then ValueFromIndex[0]:=GetCustomGenreName(Game.Genre);
     If Game.Developer<>'' then ValueFromIndex[1]:=Game.Developer;
     If Game.Publisher<>'' then ValueFromIndex[2]:=Game.Publisher;
     If Game.Year<>'' then ValueFromIndex[3]:=Game.Year;
-    If Game.Language<>'' then ValueFromIndex[4]:=Game.Language;
+    If Game.Language<>'' then ValueFromIndex[4]:=GetCustomLanguageName(Game.Language);
     If Game.WWW<>'' then ValueFromIndex[5]:=Game.WWW;
   end;
   FavouriteCheckBox.Checked:=Game.Favorite;
@@ -184,11 +190,11 @@ Var St : TStringList;
     S,T : String;
 begin
   with GameInfoValueListEditor.Strings do begin
-    Game.Genre:=ValueFromIndex[0];
+    Game.Genre:=GetEnglishGenreName(ValueFromIndex[0]);
     Game.Developer:=ValueFromIndex[1];
     Game.Publisher:=ValueFromIndex[2];
     Game.Year:=ValueFromIndex[3];
-    Game.Language:=ValueFromIndex[4];
+    Game.Language:=GetEnglishLanguageName(ValueFromIndex[4]);
     Game.WWW:=ValueFromIndex[5];
   end;
   Game.Favorite:=FavouriteCheckBox.Checked;
@@ -216,7 +222,8 @@ end;
 procedure TModernProfileEditorGameInfoFrame.AddButtonClick(Sender: TObject);
 Var M : TMenuItem;
     St : TStringList;
-    I : Integer;
+    S : String;
+    I,J : Integer;
     P : TPoint;
 begin
   If (Sender as TComponent).Tag>0 then begin
@@ -237,14 +244,29 @@ begin
 
   St:=GameDB.GetUserKeys;
   try
-    AddUserDataPopupMenu.Items.Clear;
-    M:=TMenuItem.Create(AddUserDataPopupMenu); M.Caption:=LanguageSetup.AddNewEmptyLine; M.Tag:=1; M.OnClick:=AddButtonClick;
-    AddUserDataPopupMenu.Items.Add(M);
-    M:=TMenuItem.Create(AddUserDataPopupMenu); M.Caption:='-';
-    AddUserDataPopupMenu.Items.Add(M);
-    For I:=0 to St.Count-1 do begin
-      M:=TMenuItem.Create(AddUserDataPopupMenu); M.Caption:=St[I]; M.Tag:=2; M.OnClick:=AddButtonClick;
+    I:=0;
+    While I<St.Count do begin
+      S:=Trim(ExtUpperCase(St[I]));
+      For J:=1 to Tab.RowCount-1 do If Trim(ExtUpperCase(Tab.Cells[0,J]))=S then begin St.Delete(I); dec(I); break; end;
+      inc(I);
+    end;
+    If St.Count=0 then begin
+      Tab.RowCount:=Tab.RowCount+1;
+      Tab.RowHeights[Tab.RowCount-1]:=GameInfoValueListEditor.RowHeights[0];
+      Tab.Row:=Tab.RowCount-1;
+      Tab.Col:=0;
+      Tab.SetFocus;
+      exit;
+    end else begin
+      AddUserDataPopupMenu.Items.Clear;
+      M:=TMenuItem.Create(AddUserDataPopupMenu); M.Caption:=LanguageSetup.AddNewEmptyLine; M.Tag:=1; M.OnClick:=AddButtonClick;
       AddUserDataPopupMenu.Items.Add(M);
+      M:=TMenuItem.Create(AddUserDataPopupMenu); M.Caption:='-';
+      AddUserDataPopupMenu.Items.Add(M);
+      For I:=0 to St.Count-1 do begin
+        M:=TMenuItem.Create(AddUserDataPopupMenu); M.Caption:=St[I]; M.Tag:=2; M.OnClick:=AddButtonClick;
+        AddUserDataPopupMenu.Items.Add(M);
+      end;
     end;
   finally
     St.Free;

@@ -82,22 +82,22 @@ object ViewImageForm: TViewImageForm
         ImageIndex = 5
         OnClick = ButtonWork
       end
-      object ToolButton2: TToolButton
+      object CopyButton: TToolButton
+        Tag = 1
         Left = 190
+        Top = 0
+        AutoSize = True
+        Caption = 'CopyButton'
+        ImageIndex = 0
+        OnClick = ButtonWork
+      end
+      object ToolButton2: TToolButton
+        Left = 278
         Top = 0
         Width = 8
         Caption = 'ToolButton2'
         ImageIndex = 1
         Style = tbsSeparator
-      end
-      object CopyButton: TToolButton
-        Tag = 1
-        Left = 198
-        Top = 0
-        AutoSize = True
-        Caption = 'CopyButton'
-        ImageIndex = 1
-        OnClick = ButtonWork
       end
       object SaveButton: TToolButton
         Tag = 2
@@ -159,6 +159,7 @@ object ViewImageForm: TViewImageForm
       item
         Width = 50
       end>
+    OnMouseDown = StatusBarMouseDown
   end
   object ImageList: TImageList
     Left = 520
@@ -504,5 +505,12 @@ object ViewImageForm: TViewImageForm
       Caption = '400%'
       OnClick = ButtonWork
     end
+  end
+  object Timer: TTimer
+    Enabled = False
+    Interval = 500
+    OnTimer = TimerTimer
+    Left = 584
+    Top = 8
   end
 end

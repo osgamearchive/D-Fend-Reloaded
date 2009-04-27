@@ -158,6 +158,7 @@ begin
     St:=TStringList.Create;
     try
       St2:=BuildConfFile(Game,False,False);
+      if St2=nil then exit;
       try
         try
           St2.SaveToFile(ConfFile);

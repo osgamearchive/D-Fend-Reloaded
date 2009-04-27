@@ -57,7 +57,7 @@ type
 implementation
 
 uses Math, LanguageSetupUnit, VistaToolsUnit, PrgSetupUnit, CommonTools,
-     PrgConsts, GameDBToolsUnit, HelpConsts;
+     PrgConsts, GameDBToolsUnit, HelpConsts, IconLoaderUnit;
 
 {$R *.dfm}
 
@@ -75,22 +75,32 @@ begin
   ScreenshotFolderEdit.EditLabel.Caption:=LanguageSetup.ProfileEditorCaptureFolder;
   ScreenshotFolderEditButton.Hint:=LanguageSetup.ChooseFile;
   GenerateScreenshotFolderNameButton.Caption:=LanguageSetup.ProfileEditorGenerateScreenshotFolderName;
+  UserIconLoader.DialogImage(DI_SelectFolder,ScreenshotFolderEditButton);
+  UserIconLoader.DialogImage(DI_Screenshot,GenerateScreenshotFolderNameButton);
 
   DataFolderEdit.EditLabel.Caption:=LanguageSetup.GameDataDir;
   DataFolderEditButton.Hint:=LanguageSetup.ChooseFile;
   DataFolderInfoLabel.Caption:=LanguageSetup.GameDataDirEditInfo;
   GenerateGameDataFolderNameButton.Caption:=LanguageSetup.ProfileEditorGenerateGameDataFolder;
+  UserIconLoader.DialogImage(DI_SelectFolder,DataFolderEditButton);
+  UserIconLoader.DialogImage(DI_SelectFile,GenerateGameDataFolderNameButton);
 
   ExtraFilesLabel.Caption:=LanguageSetup.ProfileEditorExtraFiles;
   ExtraFilesAddButton.Hint:=RemoveUnderline(LanguageSetup.Add);
   ExtraFilesEditButton.Hint:=RemoveUnderline(LanguageSetup.Edit);
   ExtraFilesDelButton.Hint:=RemoveUnderline(LanguageSetup.Del);
+  UserIconLoader.DialogImage(DI_Add,ExtraFilesAddButton);
+  UserIconLoader.DialogImage(DI_Edit,ExtraFilesEditButton);
+  UserIconLoader.DialogImage(DI_Delete,ExtraFilesDelButton);
 
   ExtraDirsLabel.Caption:=LanguageSetup.ProfileEditorExtraDirs;
   ExtraDirsAddButton.Hint:=RemoveUnderline(LanguageSetup.Add);
   ExtraDirsEditButton.Hint:=RemoveUnderline(LanguageSetup.Edit);
   ExtraDirsDelButton.Hint:=RemoveUnderline(LanguageSetup.Del);
   ExtraDirsInfoLabel.Caption:=LanguageSetup.ProfileEditorExtraDirsEditInfo;
+  UserIconLoader.DialogImage(DI_Add,ExtraDirsAddButton);
+  UserIconLoader.DialogImage(DI_Edit,ExtraDirsEditButton);
+  UserIconLoader.DialogImage(DI_Delete,ExtraDirsDelButton);
 
   OpenDialog.Title:=LanguageSetup.ProfileEditorExtraFilesCaption;
   OpenDialog.Filter:=LanguageSetup.ProfileEditorExtraFilesFilter;
@@ -105,7 +115,7 @@ Var St : TStringList;
 begin
   If Trim(Game.CaptureFolder)<>''
     then ScreenshotFolderEdit.Text:=Game.CaptureFolder
-    else ScreenshotFolderEdit.Text:=MakeRelPath(IncludeTrailingPathDelimiter(PrgDataDir+CaptureSubDir),PrgSetup.BaseDir);
+    else ScreenshotFolderEdit.Text:=IncludeTrailingPathDelimiter(PrgSetup.CaptureDir);
   If LoadFromTemplate and PrgSetup.AlwaysSetScreenshotFolderAutomatically then Timer.Enabled:=True;
 
   FLastCurrentProfileName:=FCurrentProfileName^;
@@ -146,11 +156,11 @@ begin
 
   S:=Trim(ExtUpperCase(ScreenshotFolderEdit.Text));
 
-  DefaultFolder:=Trim(ExtUpperCase(MakeRelPath(IncludeTrailingPathDelimiter(PrgDataDir+CaptureSubDir),PrgSetup.BaseDir)));
-  OldFolder:=Trim(ExtUpperCase('.\'+CaptureSubDir+'\'+MakeFileSysOKFolderName(FLastCurrentProfileName)+'\'));
+  DefaultFolder:=Trim(ExtUpperCase(IncludeTrailingPathDelimiter(PrgSetup.CaptureDir)));
+  OldFolder:=Trim(ExtUpperCase(IncludeTrailingPathDelimiter(PrgSetup.CaptureDir)+MakeFileSysOKFolderName(FLastCurrentProfileName)+'\'));
 
   If (S=DefaultFolder) or (S=OldFolder) then begin
-    ScreenshotFolderEdit.Text:='.\'+CaptureSubDir+'\'+MakeFileSysOKFolderName(FCurrentProfileName^)+'\';
+    ScreenshotFolderEdit.Text:=IncludeTrailingPathDelimiter(PrgSetup.CaptureDir)+MakeFileSysOKFolderName(FCurrentProfileName^)+'\';
     FLastCurrentProfileName:=FCurrentProfileName^;
   end else begin
     Timer.Enabled:=False;
@@ -221,10 +231,10 @@ begin
     0 : begin
           S:=PrgSetup.BaseDir;
           If Trim(ScreenshotFolderEdit.Text)=''
-            then S:=PrgSetup.BaseDir+CaptureSubDir+'\'
+            then S:=MakeAbsPath(PrgSetup.CaptureDir,PrgSetup.BaseDir)
             else S:=MakeAbsPath(IncludeTrailingPathDelimiter(ScreenshotFolderEdit.Text),S);
           if not SelectDirectory(Handle,LanguageSetup.ChooseFolder,S) then exit;
-          S:=MakeRelPath(S,PrgSetup.BaseDir);
+          S:=MakeRelPath(S,PrgSetup.BaseDir,True);
           If S='' then exit;
           ScreenshotFolderEdit.Text:=IncludeTrailingPathDelimiter(S);
         end;
@@ -233,7 +243,7 @@ begin
           If Trim(DataFolderEdit.Text)<>'' then
             S:=MakeAbsPath(DataFolderEdit.Text,S);
           if not SelectDirectory(Handle,LanguageSetup.ChooseFolder,S) then exit;
-          S:=MakeRelPath(S,PrgSetup.BaseDir);
+          S:=MakeRelPath(S,PrgSetup.BaseDir,True);
           If S='' then exit;
           DataFolderEdit.Text:=S;
         end;
@@ -263,14 +273,14 @@ begin
     5 : begin
           If Trim(PrgSetup.GameDir)='' then S:=PrgSetup.BaseDir else S:=PrgSetup.GameDir;
           if not SelectDirectory(Handle,LanguageSetup.ChooseFolder,S) then exit;
-          ExtraDirsListBox.Items.Add(MakeRelPath(S,PrgSetup.BaseDir));
+          ExtraDirsListBox.Items.Add(MakeRelPath(S,PrgSetup.BaseDir,True));
           ExtraDirsListBox.ItemIndex:=ExtraDirsListBox.Items.count-1;
           ExtraDirsListBoxClick(Sender);
         end;
     6 : If ExtraDirsListBox.ItemIndex>=0 then begin
           S:=MakeAbsPath(ExtraDirsListBox.Items[ExtraDirsListBox.ItemIndex],PrgSetup.BaseDir);
           if not SelectDirectory(Handle,LanguageSetup.ChooseFolder,S) then exit;
-          ExtraDirsListBox.Items[ExtraDirsListBox.ItemIndex]:=MakeRelPath(S,PrgSetup.BaseDir);
+          ExtraDirsListBox.Items[ExtraDirsListBox.ItemIndex]:=MakeRelPath(S,PrgSetup.BaseDir,True);
         end;
     7 : begin
           I:=ExtraDirsListBox.ItemIndex;
@@ -283,18 +293,38 @@ begin
 end;
 
 procedure TModernProfileEditorDirectoryFrame.GenerateScreenshotFolderNameButtonClick(Sender: TObject);
+Var I : Integer;
+    S : String;
 begin
-  ScreenshotFolderEdit.Text:='.\'+CaptureSubDir+'\'+MakeFileSysOKFolderName(FCurrentProfileName^)+'\';
+  If (Trim(ScreenshotFolderEdit.Text)<>'') and DirectoryExists(MakeAbsPath(ScreenshotFolderEdit.Text,PrgSetup.BaseDir)) then exit;
+
+  S:=IncludeTrailingPathDelimiter(PrgSetup.CaptureDir)+MakeFileSysOKFolderName(FCurrentProfileName^)+'\';
+  I:=0;
+  while DirectoryExists(MakeAbsPath(S,PrgSetup.BaseDir)) do begin
+    inc(I);
+    S:=IncludeTrailingPathDelimiter(PrgSetup.CaptureDir)+MakeFileSysOKFolderName(FCurrentProfileName^)+IntToStr(I)+'\';
+  end;
+  ScreenshotFolderEdit.Text:=S;
 end;
 
 procedure TModernProfileEditorDirectoryFrame.GenerateGameDataFolderNameButtonClick(Sender: TObject);
 Var S,T : String;
+    I : Integer;
 begin
+  If (Trim(DataFolderEdit.Text)<>'') and DirectoryExists(MakeAbsPath(DataFolderEdit.Text,PrgSetup.BaseDir)) then exit;
+
   If PrgSetup.DataDir='' then S:=PrgSetup.BaseDir else S:=PrgSetup.DataDir;
-  S:=IncludeTrailingPathDelimiter(S)+MakeFileSysOKFolderName(FCurrentProfileName^)+'\';
-  T:=MakeRelPath(S,PrgSetup.BaseDir);
-  If T<>'' then DataFolderEdit.Text:=T;
-  If DirectoryExists(S) then exit;
+
+  T:=MakeRelPath(IncludeTrailingPathDelimiter(S)+MakeFileSysOKFolderName(FCurrentProfileName^)+'\',PrgSetup.BaseDir,True);
+
+  I:=0;
+  while DirectoryExists(MakeAbsPath(T,PrgSetup.BaseDir)) do begin
+    inc(I);
+    T:=MakeRelPath(IncludeTrailingPathDelimiter(S)+MakeFileSysOKFolderName(FCurrentProfileName^)+IntToStr(I)+'\',PrgSetup.BaseDir,True);
+  end;
+  DataFolderEdit.Text:=T;
+
+  S:=MakeAbsPath(T,PrgSetup.BaseDir);
   If MessageDlg(Format(LanguageSetup.MessageConfirmationCreateDir,[S]),mtConfirmation,[mbYes,mbNo],0)<>mrYes then exit;
   ForceDirectories(S);
 end;

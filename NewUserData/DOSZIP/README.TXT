@@ -1,20 +1,16 @@
 README.TXT--
-Copyright 1997 Hjort Nidudsson. All Rights Reserved.
+Copyright 2009 Hjort Nidudsson.
 
 DOSZIP COMMANDER
-Version 1.0
+Version 1.31
 
-	The Doszip Commander is a Norton Commander clone written in
-	Borland C/C++ 3.1. It was compiled in order to supplement the old
-	Commanders limitation on long filename support.
+Welcome to Doszip Commander Version 1.31!
+=========================================
 
-	It is used on Windows95/98/XP, and the milage of use is limited
-	to these systems.
+	Topics covered in this file include:
+	------------------------------------
 
-	The date format is (Norwegian) dd.mm.yyyy.
-
-
-	<> File List
+	<> Files that come with Doszip Commander
 	<> Memory Requirements
 	<> Command Line
 	<> Compressed File Support
@@ -27,13 +23,14 @@ Version 1.0
 	<> Creating a user defined tools menu
 	<> Shortkey Table
 	<> Compiling
+	<> Additional Resources
 
 
-Doszip Commander 1.0 File List
-==============================
+Doszip Commander File List
+==========================
 
 	DZ.EXE      		DZ Loader
-	DZ.ICO      		Icon File for DZ 1.0
+	DZ.ICO      		Icon File for DZ.EXE
 	TVIEW.EXE		Text Viewer
 	DZMAIN.EXE  		DZ Main Shell
 	README.TXT     		*this file
@@ -52,8 +49,11 @@ Doszip Commander 1.0 File List
 	The version of the source code and binary files is the date
 	and time in the .ZIP file (1:00 == v1.00)
 
+	The date format is (Norwegian) dd.mm.yyyy
+
 	The .ZIP files are DZBIN???.ZIP - Program files
 			   DZSRC???.ZIP - Source code
+
 
 Memory Requirements
 ===================
@@ -64,10 +64,11 @@ Memory Requirements
 	The [Panel Filter] of each panel controles the global memory usage
 	in the [Read count] section. The default count is 3000.
 
-	Doszip Commander 1.0 comes with two additional memory configurations
+	The Doszip Commander comes with two additional memory configurations
 	that can be selected from the command line. Each memory configuration
 	limits the number of files that can be stored in each Commander File
 	Panel. The command line syntax of these memory configurations are:
+
 
 Command Line
 ============
@@ -142,6 +143,7 @@ Compressed File Support
 	8: Character that must precede the target directory.
 	9: Character that must precede the response filename.
 
+
 Viewer Support
 ==============
 
@@ -215,6 +217,7 @@ Extension and Filename Support
 	ext=echo 	foo.ext:  	echo foo.ext
 	foo=echo !.!	foo:  		echo foo
 
+
 Doszip Commander Environment Variables
 ======================================
 
@@ -244,10 +247,14 @@ Doszip Commander Environment Variables
 
 	DZ /CC:\DOSZIP
 
+
 Windows 95/98/XP Compatibility
 ==============================
 
 	Doszip uses the 'Windows95 LONG FILENAME' functions if avalible.
+
+	Doszip uses the 'WINOLDAP' functions if avalible. This enables
+	clipboard functions to Copy and Paste text from Windows.
 
 	To use graphical colors in XP demands a mode-change in order to
 	set the colors. This is Not done by the program. The -xp switch
@@ -336,7 +343,7 @@ Shortkey Table
 	F12             Toggle Horizontal
 	Esc		Clear command line
 
-	AltLeft		Activate Menus
+	Alt-[afesthb]	Activate Menus
 	Ctrl		Activate Ctrl-Statusline
 	Ctrl-Alt	Activate Quick Search
 
@@ -354,31 +361,28 @@ Shortkey Table
 	Alt-X		Quit
 
 	Ctrl-[0..9]	Load Directory defined in section [Directory]
+	Ctrl-Tab	File search
 
 	Ctrl-F1		Toggle Panel-A
 	Ctrl-F2		Toggle Panel-B
 	Ctrl-F3		View file --> DZ.INI
 	Ctrl-F4		Edit file --> DZ.INI
-	Ctrl-F5		Sort: Name
-	Ctrl-F6               Type
-	Ctrl-F7               Date
-	Ctrl-F8               Size
+	Ctrl-F5	(N)	Sort current panel by Name
+	Ctrl-F6 (E)	Sort current panel by Type
+	Ctrl-F7 (D)	Sort current panel by Date
+	Ctrl-F8 (Z)	Sort current panel by Size
 	Ctrl-F9		Configuration
 
+	Ctrl-A		Screen Options
+	Ctrl-F		Confirmation
+	Ctrl-P		Panel Options
+	Ctrl-S		File search
+	Ctrl-B		User Screen
 	Ctrl-O		Toggle Panels on/off
 	Ctrl-L		Toggle Long filenames in current Panel
 	Ctrl-T		Toggle Show Detail in current Panel
 	Ctrl-V		Toggle Show Hidden in current Panel
 	Ctrl-M		Toggle Ministatus in current Panel
-
-	Ctrl-N		Sort current panel by Name
-	Ctrl-E		Sort current panel by Type
-	Ctrl-D		Sort current panel by Date
-	Ctrl-S		Sort current panel by Size
-
-	Ctrl-A		Screen Options
-	Ctrl-F		Confirmation
-	Ctrl-P		Panel Options
 
 	Ctrl-C		Compare Directories
 	Ctrl-R		Reread current Panel
@@ -388,15 +392,31 @@ Shortkey Table
 	Ctrl-PgUp	Enter Updir
 	Ctrl-Up		doskey: roll up one
 	Ctrl-Down	doskey: roll down one
-			- if panels off: UP/DOWN
+			- if panels off: Up/Down
+
+	Ctrl-G		Activates the Calendar (Mouse-click upper right)
+	- Navigate:	Home, Up, Down, Left, Right,
+			PgUp, PgDn, Ctrl-PgUp, Ctrl-PgDn
 
 	Shift-F2	Copy file (- to a new name in current directory)
 	Shift-F3	View file --> DZ.INI
 	Shift-F4	Edit file --> DZ.INI
+	Shift-F10       Activate the last menu you used with the last
+			item you selected highlighted
 
 	Keypad+		Select files
 	Keypad-		Deselect files
 	Keypad*		Invert
+
+	Edit text
+	---------
+
+	Shift-Del	Cut
+	Shift-Ins	Paste
+	Ctrl-Ins	Copy
+	Ctrl-Left	Goto previous word
+	Ctrl-Right	Goto next word
+
 
 Compiling
 =========
@@ -409,3 +429,14 @@ Compiling
 	dz-dir-->\INC		Library header files
 		 \LIB		Library files are created here
 		 \SRC		The source files are contained here
+
+Additional Resources
+====================
+
+	For more information about DOSZIP, visit the
+	Web site at: http://sourceforge.net/projects/doszip/
+
+	Jan/14/2009
+
+	Hjort Nidudsson		nidud@users.sourceforge.net
+	Robert Riebisch		bttr@users.sourceforge.net

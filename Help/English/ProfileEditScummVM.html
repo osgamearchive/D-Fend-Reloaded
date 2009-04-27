@@ -32,7 +32,13 @@ page some settings may be disabled.
   <li>
     <b>Language</b><br />
     If the game is multilingual you can choose the game language you want to use
-    from this dropdown box.
+    from this dropdown box. If you choose "default" no language information will
+	be given to ScummVM. (This option will be visible in the dropdown list if
+	there are no language data for the chosen game in the D-Fend Reloaded ScummVM
+	games languages list.) By choosing "user defined" you can enter any language
+	even so it is not on the list of supported languages. You can also edit the
+	list of supported language directly on the <a href="FileOptionsDefaultValues.html">default values</a>
+    page of the <a href="FileOptions.html">program options</a> dialog.
   </li>
   <li>
     <b>Autosave interval</b><br />
@@ -60,15 +66,17 @@ page some settings may be disabled.
     also use any other path for storing the saved games.
   </li>
   <li>
-    <b>CD drive for playing audio (for games using CD audio)</b><br />
-    In this box you can define which CD drive should be used for playing
-    music from in the game. The number of the first CD drive is 0.
+    <b>Extra path for additional game data files</b><br />
+	In this directory you can store additionally game data files.
+	(Please see the ScummVM documentation to see for which versions of which
+	games this extra directory is supported.)
   </li>
-  <li>
-    <b>Use Joystick number</b><br />
-    If the game supports joysticks for input you can choose from this
-    edit field which joystick ScummVM should use for user input. The
-    number of the first joystick conntected to the system is 0.
+   <li>
+    <b>Custom settings</b><br />
+    The lines entered in this edit field are added to the DOSBox configuration
+    file when running DOSBox. You can overwrite all other settings by writing
+    something in this box. Also settings perhaps offered by some newer DOSBox
+    versions can be used by writing the configuration lines to this field.
   </li>
 </ul>
 

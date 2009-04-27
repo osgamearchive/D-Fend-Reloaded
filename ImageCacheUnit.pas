@@ -57,15 +57,20 @@ end;
 
 function TImageData.LoadIcon(const AFileName: String): Boolean;
 Var FileInfo: SHFILEINFO;
+    I : Integer;
 begin
   result:=False;
   If not FileExists(AFileName) then exit;
   FIcon:=TIcon.Create;
   try
     If ExtUpperCase(ExtractFileExt(AFileName))='.EXE' then begin
-      If SHGetFileInfo(PChar(AFileName), 0, FileInfo, SizeOf(FileInfo), SHGFI_ICON)<>0 then FIcon.Handle:=FileInfo.hIcon;
+      If SHGetFileInfo(PChar(AFileName), 0, FileInfo, SizeOf(FileInfo), SHGFI_ICON or SHGFI_LARGEICON)<>0 then FIcon.Handle:=FileInfo.hIcon;
     end else begin
-      FIcon.LoadFromFile(AFileName);
+      I:=16;
+      while I<=256 do begin
+        FIcon.Handle:=LoadImage(0,PChar(AFileName),IMAGE_ICON,I,I,LR_LOADFROMFILE);
+        I:=I*2;
+      end;
     end;
   except
     FreeAndNil(FIcon);

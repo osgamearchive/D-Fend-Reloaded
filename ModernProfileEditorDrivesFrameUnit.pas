@@ -4,7 +4,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, 
-  Dialogs, StdCtrls, Buttons, ComCtrls, GameDBUnit, ModernProfileEditorFormUnit;
+  Dialogs, StdCtrls, Buttons, ComCtrls, GameDBUnit, ModernProfileEditorFormUnit,
+  Menus, ImgList;
 
 type
   TModernProfileEditorDrivesFrame = class(TFrame, IModernProfileEditorFrame)
@@ -15,6 +16,12 @@ type
     MountingDelButton: TBitBtn;
     MountingDeleteAllButton: TBitBtn;
     MountingAutoCreateButton: TBitBtn;
+    SecureModeCheckBox: TCheckBox;
+    PopupMenu: TPopupMenu;
+    PopupAdd: TMenuItem;
+    PopupEdit: TMenuItem;
+    PopupDelete: TMenuItem;
+    ImageList: TImageList;
     procedure ButtonWork(Sender: TObject);
     procedure MountingListViewDblClick(Sender: TObject);
     procedure MountingListViewKeyDown(Sender: TObject; var Key: Word;
@@ -40,14 +47,13 @@ type
 implementation
 
 uses Math, VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgSetupUnit,
-     ProfileMountEditorFormUnit, HelpConsts;
+     ProfileMountEditorFormUnit, HelpConsts, GameDBToolsUnit, IconLoaderUnit;
 
 {$R *.dfm}
 
 { TModernProfileEditorDrivesFrame }
 
 procedure TModernProfileEditorDrivesFrame.InitGUI(const InitData : TModernProfileEditorInitData);
-Var L : TListColumn;
 begin
   NoFlicker(MountingListView);
   NoFlicker(MountingAddButton);
@@ -56,18 +62,28 @@ begin
   NoFlicker(MountingDeleteAllButton);
   NoFlicker(MountingAutoCreateButton);
   NoFlicker(AutoMountCheckBox);
+  NoFlicker(SecureModeCheckBox);
 
   MountingAddButton.Caption:=LanguageSetup.ProfileEditorMountingAdd;
   MountingEditButton.Caption:=LanguageSetup.ProfileEditorMountingEdit;
   MountingDelButton.Caption:=LanguageSetup.ProfileEditorMountingDel;
   MountingDeleteAllButton.Caption:=LanguageSetup.ProfileEditorMountingDelAll;
   MountingAutoCreateButton.Caption:=LanguageSetup.ProfileEditorMountingAutoCreate;
-  L:=MountingListView.Columns.Add; L.Width:=-2; L.Caption:=LanguageSetup.ProfileEditorMountingFolderImage;
-  L:=MountingListView.Columns.Add; L.Width:=-2; L.Caption:=LanguageSetup.ProfileEditorMountingAs;
-  L:=MountingListView.Columns.Add; L.Width:=-2; L.Caption:=LanguageSetup.ProfileEditorMountingLetter;
-  L:=MountingListView.Columns.Add; L.Width:=-2; L.Caption:=LanguageSetup.ProfileEditorMountingLabel;
-  L:=MountingListView.Columns.Add; L.Width:=-2; L.Caption:=LanguageSetup.ProfileEditorMountingIOControl;
+  InitMountingListView(MountingListView);
   AutoMountCheckBox.Caption:=LanguageSetup.ProfileEditorMountingAutoMountCDs;
+  SecureModeCheckBox.Caption:=LanguageSetup.ProfileEditorMountingSecureMode;
+  UserIconLoader.DialogImage(DI_Add,MountingAddButton);
+  UserIconLoader.DialogImage(DI_Edit,MountingEditButton);
+  UserIconLoader.DialogImage(DI_Delete,MountingDelButton);
+  UserIconLoader.DialogImage(DI_Wizard,MountingAutoCreateButton);
+
+  PopupAdd.Caption:=LanguageSetup.ProfileEditorMountingAdd;
+  PopupEdit.Caption:=LanguageSetup.ProfileEditorMountingEdit;
+  PopupDelete.Caption:=LanguageSetup.ProfileEditorMountingDel;
+  PopupEdit.ShortCut:=ShortCut(VK_Return,[]);
+  UserIconLoader.DialogImage(DI_Add,ImageList,0);
+  UserIconLoader.DialogImage(DI_Edit,ImageList,1);
+  UserIconLoader.DialogImage(DI_Delete,ImageList,2);
 
   ProfileExe:=InitData.CurrentProfileExe;
   ProfileSetup:=InitData.CurrentProfileSetup;
@@ -84,60 +100,17 @@ begin
     If Game.NrOfMounts>=I+1 then Mounting.Add(Game.Mount[I]) else break;
   LoadMountingList;
   AutoMountCheckBox.Checked:=Game.AutoMountCDs;
+  SecureModeCheckBox.Checked:=Game.SecureMode;
 end;
 
 procedure TModernProfileEditorDrivesFrame.ShowFrame;
 begin
+  SecureModeCheckBox.Visible:=PrgSetup.AllowSecureMode;
 end;
 
 procedure TModernProfileEditorDrivesFrame.LoadMountingList;
-Var I : Integer;
-    St : TStringList;
-    L : TListItem;
-    S : String;
-    B : Boolean;
 begin
-  MountingListView.Items.BeginUpdate;
-  try
-    MountingListView.Items.Clear;
-    For I:=0 to Mounting.Count-1 do begin
-      St:=ValueToList(Mounting[I]);
-      try
-        L:=MountingListView.Items.Add;
-        S:=Trim(St[0]);
-        If (St.Count>1) and ((Trim(ExtUpperCase(St[1]))='PHYSFS') or (Trim(ExtUpperCase(St[1]))='ZIP')) then begin
-          If Pos('$',S)<>0 then S:=Copy(S,Pos('$',S)+1,MaxInt)+' (+ '+Copy(S,1,Pos('$',S)-1)+')';
-        end else begin
-          If Pos('$',S)<>0 then S:=Copy(S,1,Pos('$',S)-1)+' (+'+LanguageSetup.More+')';
-        end;
-        L.Caption:=S;
-        If St.Count>1 then begin
-          S:=Trim(ExtUpperCase(St[1])); B:=False;
-          If (not B) and (S='DRIVE') then begin L.SubItems.Add(LanguageSetup.ProfileEditorMountingDriveTypeDRIVE); B:=True; end;
-          If (not B) and (S='CDROM') then begin L.SubItems.Add(LanguageSetup.ProfileEditorMountingDriveTypeCDROM); B:=True; end;
-          If (not B) and (S='CDROMIMAGE') then begin L.SubItems.Add(LanguageSetup.ProfileEditorMountingDriveTypeCDROMIMAGE); B:=True; end;
-          If (not B) and (S='FLOPPY') then begin L.SubItems.Add(LanguageSetup.ProfileEditorMountingDriveTypeFLOPPY); B:=True; end;
-          If (not B) and (S='FLOPPYIMAGE') then begin L.SubItems.Add(LanguageSetup.ProfileEditorMountingDriveTypeFLOPPYIMAGE); B:=True; end;
-          If (not B) and (S='IMAGE') then begin L.SubItems.Add(LanguageSetup.ProfileEditorMountingDriveTypeIMAGE); B:=True; end;
-          If (not B) and (S='PHYSFS') then begin L.SubItems.Add(LanguageSetup.ProfileEditorMountingDriveTypePHYSFS); B:=True; end;
-          If (not B) and (S='ZIP') then begin L.SubItems.Add(LanguageSetup.ProfileEditorMountingDriveTypeZIP); B:=True; end;
-          If not B then L.SubItems.Add(St[1]);
-        end else begin
-          L.SubItems.Add('');
-        end;
-        If St.Count>2 then L.SubItems.Add(St[2]) else L.SubItems.Add('');
-        If St.Count>4 then L.SubItems.Add(St[4]) else L.SubItems.Add('');
-        If St.Count>3 then begin
-          If Trim(ExtUpperCase(St[3]))='TRUE' then L.SubItems.Add(RemoveUnderline(LanguageSetup.Yes)) else L.SubItems.Add(RemoveUnderline(LanguageSetup.No));
-        end else L.SubItems.Add(RemoveUnderline(LanguageSetup.No));
-      finally
-        St.Free;
-      end;
-    end;
-    If MountingListView.Items.Count>0 then MountingListView.ItemIndex:=0;
-  finally
-    MountingListView.Items.EndUpdate;
-  end;
+  LoadMountingListView(MountingListView,Mounting);
 end;
 
 function TModernProfileEditorDrivesFrame.NextFreeDriveLetter: Char;
@@ -212,10 +185,9 @@ begin
 end;
 
 procedure TModernProfileEditorDrivesFrame.ButtonWork(Sender: TObject);
-Var S,T : String;
+Var S : String;
     I : Integer;
     St : TStringList;
-    B : Boolean;
 begin
   Case (Sender as TComponent).Tag of
     0 : If Mounting.Count<10 then begin
@@ -257,7 +229,7 @@ begin
             end;
           end;
           {Add VirtualHD dir}
-          If Mounting.Count<10 then Mounting.Insert(0,MakeRelPath(PrgSetup.GameDir,PrgSetup.BaseDir)+';Drive;C;false;');
+          If Mounting.Count<10 then Mounting.Insert(0,MakeRelPath(PrgSetup.GameDir,PrgSetup.BaseDir,True)+';Drive;C;false;');
           {Add game dir if needed}
           If (Mounting.Count<10) and (Trim(ProfileExe^)<>'') and (not CanReachFile(ProfileExe^)) and (ExtUpperCase(Copy(ProfileExe^,1,7))<>'DOSBOX:') then begin
             S:=IncludeTrailingPathDelimiter(MakeRelPath(ExtractFilePath(ProfileExe^),PrgSetup.BaseDir));
@@ -301,6 +273,7 @@ begin
   For I:=0 to 9 do
     If Mounting.Count>I then Game.Mount[I]:=Mounting[I] else Game.Mount[I]:='';
   Game.AutoMountCDs:=AutoMountCheckBox.Checked;
+  Game.SecureMode:=SecureModeCheckBox.Checked;
 end;
 
 Destructor TModernProfileEditorDrivesFrame.Destroy;

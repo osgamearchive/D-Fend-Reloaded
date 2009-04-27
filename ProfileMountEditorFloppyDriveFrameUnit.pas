@@ -23,11 +23,12 @@ type
     Function Init(const AInfoData : TInfoData) : Boolean;
     Function Done : String;
     Function GetName : String;
+    Procedure ShowFrame;
   end;
 
 implementation
 
-uses LanguageSetupUnit, CommonTools, PrgSetupUnit;
+uses LanguageSetupUnit, CommonTools, PrgSetupUnit, IconLoaderUnit;
 
 {$R *.dfm}
 
@@ -55,6 +56,8 @@ begin
     FloppyDriveLetterComboBox.Items.EndUpdate;
   end;
 
+  UserIconLoader.DialogImage(DI_SelectFolder,FloppyButton);
+
   St:=ValueToList(InfoData.Data);
   try
     S:=Trim(ExtUpperCase(St[1]));
@@ -79,6 +82,10 @@ begin
   FloppyDriveLetterComboBoxChange(self);
 end;
 
+procedure TProfileMountEditorFloppyDriveFrame.ShowFrame;
+begin
+end;
+
 function TProfileMountEditorFloppyDriveFrame.Done: String;
 begin
   {RealFolder;FLOPPY;Letter;False;;}
@@ -96,7 +103,7 @@ begin
   If Trim(FloppyEdit.Text)='' then S:=InfoData.DefaultInitialDir else S:=FloppyEdit.Text;
   S:=MakeAbsPath(S,PrgSetup.BaseDir);
   if not SelectDirectory(Handle,LanguageSetup.ProfileMountingFolder,S) then exit;
-  FloppyEdit.Text:=MakeRelPath(S,PrgSetup.BaseDir);
+  FloppyEdit.Text:=MakeRelPath(S,PrgSetup.BaseDir,True);
 end;
 
 procedure TProfileMountEditorFloppyDriveFrame.FloppyDriveLetterComboBoxChange(Sender: TObject);

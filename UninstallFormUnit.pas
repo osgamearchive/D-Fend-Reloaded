@@ -38,8 +38,6 @@ var
 
 Function UninstallGame(const AOwner : TComponent; const AGameDB : TGameDB; const AGame : TGame) : Boolean;
 
-Function DeleteSingleFile(const FileName: String; var ContinueNext : Boolean; const FileType : TDeleteFileType; const DeletePrgSetupRecord : String ='') : Boolean;
-Function DeleteDir(const Dir: String; var ContinueNext : Boolean; const DeletePrgSetupRecord : String ='') : Boolean;
 Function UsedByOtherGame(const GameDB : TGameDB; const Game : TGame; Dir: String): Boolean;
 Function IconUsedByOtherGame(const GameDB : TGameDB; const Game : TGame; Icon: String): Boolean;
 Function ExtraFileUsedByOtherGame(const GameDB : TGameDB; const Game : TGame; ExtraFile: String): Boolean;
@@ -188,9 +186,13 @@ begin
 
   For I:=1 to ListBox.Count-1 do If ListBox.Checked[I] then begin
     If Integer(DirList.Objects[I])<>0 then begin
-      If (not DeleteSingleFile(DirList[I],ContinueNext,ftUninstall)) and (not ContinueNext) then exit;
+      If BaseDirSecuriryCheck(ExtractFilePath(DirList[I])) then begin
+        If (not ExtDeleteFile(DirList[I],ftUninstall,True,ContinueNext)) and (not ContinueNext) then exit;
+      end;
     end else begin
-      If (not DeleteDir(DirList[I],ContinueNext)) and (not ContinueNext) then exit;
+      If BaseDirSecuriryCheck(DirList[I]) then begin
+        If (not ExtDeleteFolder(DirList[I],ftUninstall,True,ContinueNext)) and (not ContinueNext) then exit;
+      end;
     end;
   end;
 
@@ -232,87 +234,6 @@ begin
   finally
     UninstallForm.Free;
   end;
-end;
-
-Function DeleteSingleFile(const FileName: String; var ContinueNext : Boolean; const FileType : TDeleteFileType; const DeletePrgSetupRecord : String ='') : Boolean;
-begin
-  result:=False;
-  repeat
-    if not ExtDeleteFile(FileName,FileType,DeletePrgSetupRecord) then begin
-      Case MessageDlg(Format(LanguageSetup.MessageCouldNotDeleteFile,[FileName])+#13+#13+SysErrorMessage(GetLastError),mtError,[mbAbort,mbRetry,mbIgnore],0) of
-        mrIgnore : begin ContinueNext:=True; exit; end;
-        mrRetry : ;
-        else exit;
-      End;
-    end else begin
-      break;
-    end;
-  until False;
-  result:=True;
-end;
-
-Function DeleteDir(const Dir: String; var ContinueNext : Boolean; const DeletePrgSetupRecord : String ='') : Boolean;
-Var Rec : TSearchRec;
-    I : Integer;
-    S : String;
-begin
-  If DeletePrgSetupRecord='' then begin
-    S:=Copy(PrgSetup.DeleteToRecycleBin,1,7);
-    S:=S+Copy('1011110',length(S)+1,MaxInt);
-  end else begin
-    S:=DeletePrgSetupRecord;
-  end;
-
-  result:=False;
-  ContinueNext:=False;
-
-  If not DirectoryExists(Dir) then begin result:=True; exit; end;
-
-  If PrgSetup.DeleteOnlyInBaseDir and (ExtUpperCase(Copy(Dir,1,length(PrgSetup.BaseDir)))<>ExtUpperCase(PrgSetup.BaseDir)) then begin
-    MessageDlg(Format(LanguageSetup.MessageDeleteErrorProtection,[Dir]),mtError,[mbOk],0);
-    exit;
-  end;
-
-  If Pos('..',Dir)<>0 then begin
-    MessageDlg(Format(LanguageSetup.MessageDeleteErrorDotDotInPath,[Dir]),mtError,[mbOk],0);
-    exit;
-  end;
-
-  If S[Integer(ftUninstall)+1]='1' then begin
-    result:=DeleteFileToRecycleBin(Dir);
-    exit;
-  end;
-
-  I:=FindFirst(Dir+'*.*',faAnyFile,Rec);
-  try
-    while I=0 do begin
-      if (Rec.Attr and faDirectory)=faDirectory then begin
-        If Rec.Name[1]<>'.' then begin
-          if not DeleteDir(Dir+Rec.Name+'\',ContinueNext,S) then exit;
-        end;
-      end else begin
-        if not DeleteSingleFile(Dir+Rec.Name,ContinueNext,ftUninstall,S) then exit;
-      end;
-      I:=FindNext(Rec);
-    end;
-  finally
-    FindClose(Rec);
-  end;
-
-  repeat
-    if not ExtDeleteFolder(Dir,ftUninstall) then begin
-      Case MessageDlg(Format(LanguageSetup.MessageCouldNotDeleteDir,[Dir])+#13+#13+SysErrorMessage(GetLastError),mtError,[mbAbort,mbRetry,mbIgnore],0) of
-        mrIgnore : begin ContinueNext:=True; exit; end;
-        mrRetry : ;
-        else exit;
-      End;
-    end else begin
-      break;
-    end;
-  until False;
-
-  result:=True;
-  ContinueNext:=True;
 end;
 
 Function UsedByOtherGame(const GameDB : TGameDB; const Game : TGame; Dir: String): Boolean;
@@ -410,6 +331,59 @@ begin
   result:=False;
 end;
 
+Function FolderInNormalList(const Game : TGame; const FolderName : String) : Boolean;
+Var S,T : String;
+    St : TStringList;
+    I : Integer;
+begin
+  result:=False;
+
+  T:=ExtUpperCase(IncludeTrailingPathDelimiter(FolderName));
+
+  S:=Trim(Game.GameExe);
+  If (S<>'') and (ExtUpperCase(Copy(S,1,7))<>'DOSBOX:') then begin
+    S:=ExtUpperCase(IncludeTrailingPathDelimiter(ExtractFilePath(MakeAbsPath(S,PrgSetup.BaseDir))));
+    If S=Copy(T,1,length(S)) then begin result:=True; exit; end;
+  end;
+
+  S:=Trim(Game.SetupExe);
+  If (S<>'') and (ExtUpperCase(Copy(S,1,7))<>'DOSBOX:') then begin
+    S:=ExtUpperCase(IncludeTrailingPathDelimiter(ExtractFilePath(MakeAbsPath(S,PrgSetup.BaseDir))));
+    If S=Copy(T,1,length(S)) then begin result:=True; exit; end;
+  end;
+
+  S:=Trim(Game.ExtraDirs);
+  If S='' then exit;
+  St:=ValueToList(S);
+  try
+    For I:=0 to St.Count-1 do begin
+      S:=ExtUpperCase(IncludeTrailingPathDelimiter(MakeAbsPath(St[I],PrgSetup.BaseDir)));
+      If S=Copy(T,1,length(S)) then begin result:=True; exit; end;
+    end;
+  finally
+    St.Free;
+  end;
+end;
+
+Function FileInNormalList(const Game : TGame; const FileName : String) : Boolean;
+Var S : String;
+    St : TStringList;
+    I : Integer;
+begin
+  result:=FolderInNormalList(Game,ExtractFilePath(FileName));
+  if result then exit;
+
+  S:=Trim(Game.ExtraFiles);
+  If S='' then exit;
+  St:=ValueToList(S);
+  try
+    S:=ExtUpperCase(FileName);
+    For I:=0 to St.Count-1 do If ExtUpperCase(MakeAbsPath(St[I],PrgSetup.BaseDir))=S then begin result:=True; exit; end;
+  finally
+    St.Free;
+  end;
+end;
+
 Procedure FileAndFoldersFromDrives(const Game : TGame; var Files, Folders : TStringList);
 Var I,J : Integer;
     S,T : String;
@@ -437,22 +411,22 @@ begin
         {Image files}
         For J:=0 to St2.Count-1 do begin
           T:=MakeAbsPath(St2[J],PrgSetup.BaseDir);
-          If FileExists(T) then Files.Add(T);
+          If FileExists(T) and (not FileInNormalList(Game,T)) then Files.Add(T);
         end;
       end;
 
       If (S='PHYSFS') and (St2.Count=2) then begin
         {RealFolder$ZipFile in St2}
         T:=MakeAbsPath(IncludeTrailingPathDelimiter(St2[0]),PrgSetup.BaseDir);
-        If DirectoryExists(T) then Folders.Add(T);
+        If DirectoryExists(T) and (not FolderInNormalList(Game,T)) then Folders.Add(T);
         T:=MakeAbsPath(St2[1],PrgSetup.BaseDir);
-        If FileExists(T) then Files.Add(T);
+        If FileExists(T) and (not FileInNormalList(Game,T)) then Files.Add(T);
       end;
 
       If (S='ZIP') and (St2.Count=2) then begin
         {RealFolder$ZipFile in St2, only add ZipFile}
         T:=MakeAbsPath(St2[1],PrgSetup.BaseDir);
-        If FileExists(T) then Files.Add(T);
+        If FileExists(T) and (not FileInNormalList(Game,T)) then Files.Add(T);
       end;
     finally
       St.Free;

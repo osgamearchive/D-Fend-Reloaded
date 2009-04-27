@@ -1,6 +1,8 @@
 unit DosBoxUnit;
 interface
 
+{DEFINE ShowSelectDialogEvenIfOnlyOneCDDrive}
+
 uses Classes, GameDBUnit;
 
 Procedure RunGame(const Game : TGame; const RunSetup : Boolean = False; const DosBoxCommandLine : String ='');
@@ -9,7 +11,7 @@ Procedure RunCommand(const Game : TGame; const Command : String; const DisableFu
 Procedure RunWithCommandline(const Game : TGame; const CommandLine : String; const DisableFullscreen : Boolean = False);
 
 Function BuildConfFile(const Game : TGame; const RunSetup : Boolean; const WarnIfNotReachable : Boolean; const RunExtraFile : Integer = -1) : TStringList;
-Function BuildAutoexec(const Game : TGame; const RunSetup : Boolean; const St : TStringList; const WarnIfNotReachable : Boolean; const RunExtraFile : Integer; const WarnIfWindowsExe : Boolean) : Boolean;
+Function BuildAutoexec(const Game : TGame; const RunSetup : Boolean; const St : TStringList; const WarnIfNotReachable : Boolean; const RunExtraFile : Integer; const WarnIfWindowsExe, SelectCD : Boolean) : Boolean;
 
 Function IsWindowsExe(const FileName : String) : Boolean;
 Function IsDOSExe(const FileName : String) : Boolean;
@@ -25,7 +27,8 @@ implementation
 uses Windows, SysUtils, ShellAPI, Forms, Dialogs, Math,
      CommonTools, PrgSetupUnit, PrgConsts, LanguageSetupUnit, GameDBToolsUnit,
      ZipManagerUnit, ScreensaverControlUnit, FullscreenInfoFormUnit,
-     DOSBoxCountUnit, DOSBoxShortNameUnit, RunPrgManagerUnit;
+     DOSBoxCountUnit, DOSBoxShortNameUnit, RunPrgManagerUnit,
+     SelectCDDriveToMountFormUnit, SelectCDDriveToMountByDataFormUnit;
 
 Function BoolToStr(const B : Boolean) : String;
 begin
@@ -104,7 +107,7 @@ begin
     I:=Pos('\',Part);
     If I=0 then begin S:=Part; Part:=''; end else begin S:=Copy(Part,1,I-1); Part:=Copy(Part,I+1,MaxInt); end;
     S:=LongPath(Root,S);
-    result:=result+'\'+DOSBoxShortName(Root,S);
+    result:=result+'\'+DOSBoxShortName(MakeAbsPath(Root,PrgSetup.BaseDir),S);
     Root:=Root+S+'\';
   end;
 
@@ -131,8 +134,76 @@ begin
     'mount -u '+TempDrive;
 end;
 
+Function GetCDDrives : String;
+Var C : Char;
+begin
+  result:='';
+  For C:='A' to 'Z' do if GetDriveType(PChar(C+':\'))=DRIVE_CDROM then result:=result+C;
+end;
 
-Function BuildMountData(const ProfString : String; var FreeDriveLetters : String) : String;
+Function SpecialCDDriveMounting(var Folder : String; const DriveLetter : String; const ProfileName : String; const SelectCD : Boolean; var SpecialMountedCDDrives : String) : Boolean;
+Var S,T,U,Drives : String;
+    I : Integer;
+begin
+  result:=True;
+  S:=Trim(ExtUpperCase(Folder));
+
+  {ASK /  NUMBER:x /  LABEL:x / FILE:x / FOLDER:x}
+
+  If S='ASK' then begin
+    Drives:=GetCDDrives;
+    If length(Drives)=0 then begin
+      If SelectCD then begin
+        MessageDlg(Format(LanguageSetup.MessageNoCDDrive,[DriveLetter]),mtError,[mbOK],0);
+        result:=False;
+      end;
+      Folder:=''; exit;
+    end;
+    If {$IFNDEF ShowSelectDialogEvenIfOnlyOneCDDrive} (length(Drives)=1) or {$ENDIF} (not SelectCD) then begin Folder:=Drives[1]+':\'; SpecialMountedCDDrives:=SpecialMountedCDDrives+Drives[1]; exit; end;
+    result:=ShowSelectCDDriveToMountDialog(Application.MainForm,Drives,DriveLetter,ProfileName,Folder);
+    if result then SpecialMountedCDDrives:=SpecialMountedCDDrives+Folder[1];
+    exit;
+  end;
+
+  If Pos(':',S)=0 then exit;
+  T:=Copy(S,Pos(':',S)+1,MaxInt);
+  S:=Copy(S,1,Pos(':',S)-1);
+
+  Drives:=GetCDDrives;
+  If length(Drives)=0 then begin
+    If SelectCD then begin
+      MessageDlg(Format(LanguageSetup.MessageNoCDDrive,[DriveLetter]),mtError,[mbOK],0);
+      result:=False;
+    end;
+    Folder:=''; exit;
+  end;
+
+  If S='NUMBER' then begin
+    If not TryStrToInt(T,I) then I:=1;
+    I:=Max(1,Min(length(Drives),I));
+    SpecialMountedCDDrives:=SpecialMountedCDDrives+Drives[I];
+    Folder:=Drives[I]+':\'; exit;
+  end;
+  If SelectCD then begin
+    If S='LABEL' then begin
+      result:=ShowSelectCDDriveToMountByDataDialog(Application.MainForm,mbLabel,T,DriveLetter,ProfileName,U);
+      If result then begin Folder:=U+':\'; SpecialMountedCDDrives:=SpecialMountedCDDrives+U; end else Folder:='';
+      exit;
+    end;
+    If S='FILE' then begin
+      result:=ShowSelectCDDriveToMountByDataDialog(Application.MainForm,mbFile,T,DriveLetter,ProfileName,U);
+      If result then begin Folder:=U+':\'; SpecialMountedCDDrives:=SpecialMountedCDDrives+U; end else Folder:='';
+      exit;
+    end;
+    If S='FOLDER' then begin
+      result:=ShowSelectCDDriveToMountByDataDialog(Application.MainForm,mbFolder,T,DriveLetter,ProfileName,U);
+      If result then begin Folder:=U+':\'; SpecialMountedCDDrives:=SpecialMountedCDDrives+U; end else Folder:='';
+      exit;
+    end;
+  end;
+end;
+
+Function BuildMountData(const ProfString : String; var FreeDriveLetters : String; const ProfileName : String; const SelectCD : Boolean; var OK : Boolean; var SpecialMountedCDDrives : String) : String;
 Procedure MarkDriveUsed(S : String);
 begin
   S:=Trim(ExtUpperCase(S)); If length(S)<>1 then exit;
@@ -143,25 +214,30 @@ Var St,St2 : TStringList;
     S,T,U : String;
     I : Integer;
 begin
-  result:='';
+  result:=''; OK:=True;
 
   St:=ValueToList(ProfString);
   St2:=TStringList.Create;
   try
+    If St.Count<3 then exit;
+
     S:=Trim(St[0]);
+    T:=Trim(ExtUpperCase(St[1]));
     I:=Pos('$',S);
     While I>0 do begin St2.Add(Trim(Copy(S,1,I-1))); S:=Trim(Copy(S,I+1,MaxInt)); I:=Pos('$',S); end;
     St2.Add(S);
-    For I:=0 to St2.Count-1 do St2[I]:=MakeAbsPath(St2[I],PrgSetup.BaseDir);
+    For I:=0 to St2.Count-1 do begin
+      S:=Trim(ExtUpperCase(St2[I]));
+      If (T='CDROM') and ((S='ASK') or (Copy(S,1,7)='NUMBER:') or (Copy(S,1,6)='LABEL:') or (Copy(S,1,5)='FILE:') or (Copy(S,1,7)='FOLDER:')) then continue;
+      St2[I]:=MakeAbsPath(St2[I],PrgSetup.BaseDir);
+    end;
     S:=St2[0];
 
     {general: RealFolder;Type;Letter;IO;Label;FreeSpace}
-    If St.Count<3 then exit;
     If St.Count=3 then St.Add('false');
     If St.Count=4 then St.Add('');
     If St.Count=5 then St.Add('');
 
-    T:=Trim(ExtUpperCase(St[1]));
 
     If T='DRIVE' then begin
       {RealFolder;DRIVE;Letter;False;;FreeSpace}
@@ -177,11 +253,19 @@ begin
     end;
 
     If T='CDROM' then begin
-      {RealFolder;CDROM;Letter;IO;Label;}
+      {RealFolder;CDROM;Letter;IO;Label; (ASK /  NUMBER:x /  LABEL:x / FILE:x / FOLDER:x)}
+      if not SpecialCDDriveMounting(S,St[2],ProfileName,SelectCD,SpecialMountedCDDrives) then begin OK:=False; exit; end;
       MarkDriveUsed(St[2]);
       result:='mount '+St[2]+' "'+UnmapDrive(ShortName(S),ptMount)+'" -t cdrom';
       If Trim(UpperCase(St[3]))='TRUE' then result:=result+' -IOCTL';
       If Trim(UpperCase(St[3]))='NOIOCTL' then result:=result+' -NOIOCTL';
+      If PrgSetup.AllowMoreIOCTLSettings then begin
+        If Trim(UpperCase(St[3]))='DX' then result:=result+' -IOCTL_DX';
+        If Trim(UpperCase(St[3]))='DIO' then result:=result+' -IOCTL_DIO';
+        If Trim(UpperCase(St[3]))='MCI' then result:=result+' -IOCTL_MCI';
+      end else begin
+        If (Trim(UpperCase(St[3]))='DX') or (Trim(UpperCase(St[3]))='DIO') or (Trim(UpperCase(St[3]))='MCI') then result:=result+' -IOCTL';
+      end;
       If St[4]<>'' then result:=result+' -label '+St[4];
     end;
 
@@ -355,7 +439,6 @@ Var Prefix,S,T,UsePath,Mount,Unmount : String;
     I : Integer;
     St2 : TStringList;
     NoFreeDOS : Boolean;
-    TempDrive : Char;
     Path, Drive, RootPath : String;
 begin
   result:=True;
@@ -429,6 +512,8 @@ begin
 
   If UseLoadFix then Prefix:='loadfix -'+IntToStr(LoadFixMemory)+' ' else Prefix:='';
 
+  If PrgSetup.AllowSecureMode and Game.SecureMode then St.Add('Z:\config.com -securemode > nul');
+
   If ExtUpperCase(ExtractFileExt(ProgramFile))='.BAS' then begin
     {Run via QBasic}
     if not MountQBasic(St,Game,FreeDriveLetters,S) then begin
@@ -443,8 +528,12 @@ begin
     If (not UseLoadFix) and (not Use4DOS) and (not UseDOS32A) and (Trim(ExtUpperCase(ExtractFileExt(ProgramFile)))='.BAT') then Prefix:='call ';
 
     If (T<>'') and (Trim(ProgramParameters)<>'') then T:=' '+ProgramParameters else T:='';
-    S:=MakeDOSBoxPath(ExtractFileName(ProgramFile),ExtractFilePath(ProgramFile));
-    If (S<>'') and (S[1]='\') then S:=Copy(S,2,MaxInt);
+    If Copy(Trim(ExtUpperCase(ProgramFile)),1,7)='DOSBOX:' then begin
+      S:=ExtractFileName(ProgramFile);
+    end else begin
+      S:=MakeDOSBoxPath(ExtractFileName(ProgramFile),ExtractFilePath(ProgramFile));
+      If (S<>'') and (S[1]='\') then S:=Copy(S,2,MaxInt);
+    end;
     T:=S+T;
 
     If UseDOS32A and (not NoFreeDOS) then begin
@@ -508,15 +597,18 @@ begin
   end;
 end;
 
-Procedure AutoMountCDs(const St : TStringList; const Game : TGame; var FreeDriveLetters : String);
-Var AlreadyMounted,S : String;
+Procedure AutoMountCDs(const St : TStringList; const Game : TGame; var FreeDriveLetters, SpecialMountedCDDrives : String);
+Var AlreadyMounted,S,T : String;
     I : Integer;
     C,D : Char;
     St2 : TStringList;
     lpSectorsPerCluster,lpBytesPerSector,lpNumberOfFreeClusters,lpTotalNumberOfClusters : Cardinal;
+    OK : Boolean;
 begin
+  {SpecialMountedCDDrives <- mounted by ASK, NUMBER, LABEL, FOLDER or FILE (not detectable my scanning the mount list)}
+  AlreadyMounted:=SpecialMountedCDDrives;
+
   {Check which CD drives are mounted regularly}
-  AlreadyMounted:='';
   For I:=0 to Game.NrOfMounts do begin
     S:=Game.Mount[I];
     St2:=ValueToList(S);
@@ -547,17 +639,20 @@ begin
       If S='' then For D:='A' to Chr(ord(C)-1) do If Pos(D,FreeDriveLetters)>0 then begin S:=D; break; end;
     end;
     S:=C+':\;CDROM;'+S+';TRUE;;';
-    St.Add(BuildMountData(S,FreeDriveLetters));
+    St.Add(BuildMountData(S,FreeDriveLetters,'',True,OK,T)); {"''", "OK" and "T" can be ignored; only for user interactive mounting}
   end;
 end;
 
-Function BuildAutoexec(const Game : TGame; const RunSetup : Boolean; const St : TStringList; const WarnIfNotReachable : Boolean; const RunExtraFile : Integer; const WarnIfWindowsExe : Boolean) : Boolean;
+Function BuildAutoexec(const Game : TGame; const RunSetup : Boolean; const St : TStringList; const WarnIfNotReachable : Boolean; const RunExtraFile : Integer; const WarnIfWindowsExe, SelectCD : Boolean) : Boolean;
   Procedure SetVolume(const Channel : String; const Left,Right : Integer);
   begin If (Left<>100) or (Right<>100) then St.Add('mixer '+Channel+' '+IntToStr(Left)+':'+IntToStr(Right)+' /NOSHOW'); end;
 Var S,T,NumCommands,MouseCommands,UsePath,Mount,UnMount : String;
     I : Integer;
     FreeDriveLetters : String;
     St2 : TStringList;
+    DOSBoxNr : Integer;
+    OK : Boolean;
+    SpecialMountedCDDrives : String;
 begin
   result:=True;
 
@@ -577,16 +672,24 @@ begin
   { Keyboard layout }
 
   T:=Trim(ExtUpperCase(Game.KeyboardLayout));
-  If (T='') or (T='DEFAULT') then T:=LanguageSetup.GameKeyboardLayoutDefault;
+  If (T='') or (T='DEFAULT') then begin
+    DOSBoxNr:=Max(0,GetDOSBoxNr(Game));
+    T:=Trim(ExtUpperCase(PrgSetup.DOSBoxSettings[DOSBoxNr].KeyboardLayout));
+    If (T='') or (T='DEFAULT') then T:=LanguageSetup.GameKeyboardLayoutDefault;
+  end;
   If Pos('(',T)>0 then begin
     S:=Copy(T,Pos('(',T)+1,MaxInt);
     If Pos(')',S)>0 then begin S:=Trim(Copy(S,1,Pos(')',S)-1)); If S<>'' then T:=S; end;
   end;
 
   S:=Trim(ExtUpperCase(Game.Codepage));
-  If (S='') or (S='DEFAULT') then S:=LanguageSetup.GameKeyboardCodepageDefault;
+  If (S='') or (S='DEFAULT') then begin
+    DOSBoxNr:=Max(0,GetDOSBoxNr(Game));
+    S:=Trim(ExtUpperCase(PrgSetup.DOSBoxSettings[DOSBoxNr].Codepage));
+    If (S='') or (S='DEFAULT') then S:=LanguageSetup.GameKeyboardCodepageDefault;
+  end;
 
-  St.Add('keyb '+T+' '+S+' > nul');
+  St.Add('keyb '+T+' '+S{+' > nul'}); {no "> nul" to display possible error message if layout and codepage do not match}
 
   { Reported DOS version }
 
@@ -607,8 +710,10 @@ begin
 
   { Text mode lines }
 
-  If Game.TextModeLines=28 then St.Add('Z:\28.COM');
-  If Game.TextModeLines=50 then St.Add('Z:\50.COM');
+  If PrgSetup.AllowTextModeLineChange then begin
+    If Game.TextModeLines=28 then St.Add('Z:\28.COM');
+    If Game.TextModeLines=50 then St.Add('Z:\50.COM');
+  end;
 
   { IPX connect }
 
@@ -619,10 +724,17 @@ begin
   { Mounting }
 
   FreeDriveLetters:='---DEFGHIJKLMNOPQRSTUVWXY-';
+  SpecialMountedCDDrives:=''; {CD drives mounted by ASK, NUMBER, LABEL, FOLDER or FILE -> for AutoMountCDs to avoid double mounting}
   if not Game.AutoexecOverrideMount then begin
-    For I:=0 to 9 do
-      If Game.NrOfMounts>=I+1 then MultiLineAdd(St,BuildMountData(Game.Mount[I],FreeDriveLetters)) else break;
-    If Game.AutoMountCDs then AutoMountCDs(St,Game,FreeDriveLetters);
+    For I:=0 to 9 do begin
+      If Game.NrOfMounts>=I+1 then begin
+        MultiLineAdd(St,BuildMountData(Game.Mount[I],FreeDriveLetters,Game.CacheName,SelectCD,OK,SpecialMountedCDDrives));
+        If not OK then begin result:=False; exit; end;
+      end else begin
+        break;
+      end;
+    end;
+    If Game.AutoMountCDs then AutoMountCDs(St,Game,FreeDriveLetters,SpecialMountedCDDrives);
   end;
 
   { Setting num, caps and scroll lock and CuteMouse }
@@ -666,15 +778,17 @@ begin
       BuildFloppyBoot(St,S,FreeDriveLetters);
     end;
   end else begin
-    If not Game.AutoexecOverridegamestart then begin
+    If Game.AutoexecOverridegamestart then begin
+      If PrgSetup.AllowSecureMode and Game.SecureMode then St.Add('Z:\config.com -securemode > nul');
+    end else begin
       If RunExtraFile>=0 then begin
-        S:=Trim(Game.ExtraPrgFile[RunExtraFile]);
-        I:=Pos(';',S);
-        If (S='') or (I=0) then begin
+        T:=Trim(Game.ExtraPrgFile[RunExtraFile]);
+        I:=Pos(';',T);
+        If (T='') or (I=0) then begin
           result:=BuildRunCommands(St,Game.GameExe,Game.GameParameters,Game.LoadFix,Game.LoadFixMemory,Game.Use4DOS,Game.UseDOS32A,Game,FreeDriveLetters,WarnIfNotReachable,WarnIfWindowsExe);
         end else begin
-          S:=Copy(S,I+1,MaxInt);
-          result:=BuildRunCommands(St,S,'',Game.LoadFix,Game.LoadFixMemory,Game.Use4DOS,False,Game,FreeDriveLetters,WarnIfNotReachable,WarnIfWindowsExe);
+          T:=Copy(T,I+1,MaxInt);
+          result:=BuildRunCommands(St,T,'',Game.LoadFix,Game.LoadFixMemory,Game.Use4DOS,False,Game,FreeDriveLetters,WarnIfNotReachable,WarnIfWindowsExe);
         end;
       end else begin
         If RunSetup then begin
@@ -706,6 +820,35 @@ begin
   end;
 end;
 
+Function GetPixelShader(const Game : TGame) : String;
+Var S,Dir : String;
+    I : Integer;
+    Rec : TSearchRec;
+begin
+  result:='none';
+
+  Dir:='';
+  S:=Trim(ExtUpperCase(Game.CustomDOSBoxDir));
+  If (S='') or (S='DEFAULT') then begin
+    Dir:=PrgSetup.DOSBoxSettings[0].DosBoxDir;
+  end else begin
+    For I:=1 to PrgSetup.DOSBoxSettingsCount-1 do If Trim(ExtUpperCase(PrgSetup.DOSBoxSettings[I].Name))=S then begin Dir:=PrgSetup.DOSBoxSettings[I].DosBoxDir; break; end;
+  end;
+  If Dir='' then Dir:=Game.CustomDOSBoxDir;
+  Dir:=IncludeTrailingPathDelimiter(MakeAbsPath(Dir,PrgSetup.BaseDir));
+
+  S:=Trim(ExtUpperCase(Game.PixelShader));
+  I:=FindFirst(Dir+'Shaders\*.fx',faAnyFile,Rec);
+  try
+    While I=0 do begin
+      If S=Trim(ExtUpperCase(ChangeFileExt(Rec.Name,''))) then begin result:=Game.PixelShader; exit; end;
+      I:=FindNext(Rec);
+    end;
+  finally
+    FindClose(rec);
+  end;
+end;
+
 Function BuildConfFile(const Game : TGame; const RunSetup : Boolean; const WarnIfNotReachable : Boolean; const RunExtraFile : Integer) : TStringList;
 Var St : TStringList;
     S,T : String;
@@ -729,6 +872,9 @@ begin
   S:=Trim(Game.CustomKeyMappingFile);
   If (S='') or (ExtUpperCase(S)='DEFAULT') then S:=PrgSetup.DOSBoxSettings[DOSBoxNr].DosBoxMapperFile;
   result.Add('mapperfile='+UnmapDrive(MakeAbsPath(S,PrgDataDir),ptMapper));
+  If PrgSetup.AllowPixelShader then begin
+    result.Add('pixelshader='+GetPixelShader(Game));
+  end;
 
   result.Add('');
   result.Add('[dosbox]');
@@ -770,6 +916,9 @@ begin
   result.Add('');
   result.Add('[cpu]');
   result.Add('core='+Game.Core);
+  If PrgSetup.AllowCPUType then begin
+    If Trim(Game.CPUType)<>'' then result.Add('cputype='+Game.CPUType);
+  end;
   result.Add('cycles='+Game.Cycles);
   result.Add('cycleup='+IntToStr(Game.CyclesUp));
   result.Add('cycledown='+IntToStr(Game.CyclesDown));
@@ -829,13 +978,11 @@ begin
     S:=Copy(T,Pos('(',T)+1,MaxInt);
     If Pos(')',S)>0 then begin S:=Trim(Copy(S,1,Pos(')',S)-1)); If S<>'' then T:=S; end;
   end;
-  result.Add('keyboardlayout='+T);
+  result.Add('keyboardlayout='+T); {setting keyboard layout here and via keyb command in autoexec; if keyb in autoexec fails due to wrong codepade, keyboard layout will be right anyway}  
 
   {keyboardlayout can't handle layout+codepage -> moved to autoexec as keyb command
-
   S:=Trim(ExtUpperCase(Game.Codepage));
   If (S='') or (S='DEFAULT') then S:=LanguageSetup.GameKeyboardCodepageDefault;
-
   result.Add('keyboardlayout='+T+' '+S);}
 
   result.Add('');
@@ -875,10 +1022,14 @@ begin
     result.Add('multipage='+BoolToStr(Game.PrinterMultiPage));
   end;
 
-  BuildAutoexec(Game,RunSetup,result,WarnIfNotReachable,RunExtraFile,True);
+  if not BuildAutoexec(Game,RunSetup,result,WarnIfNotReachable,RunExtraFile,True,True) then begin result.Free; result:=nil; exit; end;
 
   St:=StringToStringList(Game.CustomSettings);
-  try result.AddStrings(St); finally St.Free; end;
+  try
+    if result<>nil then result.AddStrings(St);
+  finally
+    St.Free;
+  end;
 end;
 
 Procedure FindAlternativeDOSBoxFile(var PrgFile : String);
@@ -1016,25 +1167,21 @@ Var St : TStringList;
     DOSBoxNr : Integer;
     AlreadyMinimized : Boolean;
 begin
+  AlreadyMinimized:=False;
+
   If not RunCheck(Game,RunSetup,RunExtraFile) then exit;
 
   DOSBoxNr:=GetDOSBoxNr(Game);
 
-  If PrgSetup.MinimizeOnDosBoxStart then begin
-    AlreadyMinimized:=(Application.MainForm.WindowState=wsMinimized);
-    Application.Minimize;
-  end else begin
-    AlreadyMinimized:=False;
-  end;
-
   try
     If Trim(Game.CaptureFolder)='' then begin
-      Game.CaptureFolder:=MakeRelPath(IncludeTrailingPathDelimiter(PrgDataDir+CaptureSubDir),PrgSetup.BaseDir);
+      Game.CaptureFolder:=MakeAbsPath(PrgSetup.CaptureDir,PrgSetup.BaseDir);
       Game.StoreAllValues;
     end;
     ForceDirectories(MakeAbsPath(Game.CaptureFolder,PrgSetup.BaseDir));
 
     St:=BuildConfFile(Game,RunSetup,True,RunExtraFile);
+    If St=nil then exit;
 
     try
       try
@@ -1052,6 +1199,12 @@ begin
       If Error then exit;
 
       RunPrgManager.RunBeforeExecutionCommand(Game);
+
+      If PrgSetup.MinimizeOnDosBoxStart then begin
+        AlreadyMinimized:=(Application.MainForm.WindowState=wsMinimized);
+        Application.Minimize;
+      end;
+
       DOSBoxHandle:=RunDosBox(T,Max(0,DOSBoxNr),TempDir+DosBoxConfFileName,Game.StartFullscreen,DosBoxCommandLine);
 
       try

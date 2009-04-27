@@ -110,7 +110,7 @@ begin
       C:=0; S:=ExtUpperCase(St2[I]);
       For J:=0 to GameDB.Count-1 do If ExtUpperCase(GameDB[J].CacheGenre)=S then inc(C);
       St.Add('  '
-      +St2[I]+': '+IntToStr(C));
+      +GetCustomGenreName(St2[I])+': '+IntToStr(C));
     end;
   finally
     St2.Free;

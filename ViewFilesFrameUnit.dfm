@@ -622,5 +622,13 @@ object ViewFilesFrame: TViewFilesFrame
       ImageIndex = 3
       OnClick = MenuWork
     end
+    object N1: TMenuItem
+      Caption = '-'
+    end
+    object ListUseInScreenshotList: TMenuItem
+      Tag = 35
+      Caption = 'In der Screenshot-Listenanscht verwenden'
+      OnClick = MenuWork
+    end
   end
 end

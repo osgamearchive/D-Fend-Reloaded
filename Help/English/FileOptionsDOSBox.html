@@ -75,6 +75,13 @@ The following settings will only be visible if the advanced setup mode is select
     for mounting folders short.
     <br />(Default value for this option: on)
   </li>
+  <li>
+    <b>Show warning messages on DOSBox path name translation errors</b><br />
+    Because DOSBox uses a different algorithm to make short path names than Windows,
+	long path names need to be translated to the DOSBox version (for example for use in "cd" commands).
+	If this option is activated you will get a warning message if this translation process fails.
+    <br />(Default value for this option: on)
+  </li>
 </ul>
 
 <h2>"More settings for this DOSBox installation" dialog</h2>
@@ -94,7 +101,21 @@ The following settings will only be visible if the advanced setup mode is select
     D-Fend Reloaded will list all available <tt>*.lng</tt> files from your DOSBox directory.
     To add a new (downloaded) DOSBox language just copy the <tt>*.lng</tt> file to your
     DOSBox directory and reopen the program options dialog.
-  </li>  
+  </li>
+  <li>
+    <b>Keyboard layout</b><br />
+	From this dropdown box you can select the keyboard layout you want to use in DOSBox.
+	If you choose "default", the default keyboard layout from your language file will be
+	used. (Or the keyboard layout from the started profile if you have selected a custom
+	keyboard layout in the profile.)
+  </li>
+  <li>
+    <b>Codepage</b><br />
+	From this dropdown box you can select the codepage you want to use in DOSBox.
+	If you choose "default", the codepage layout from your language file will be
+	used. (Or the codepage from the started profile if you have selected a custom
+	codepage in the profile.)
+  </li>
   <li>
     <b>Keymapper config file</b><br />
     In the keymapper configuration file changes to the default keyboard setup

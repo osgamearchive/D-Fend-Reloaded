@@ -50,7 +50,7 @@ DataDir=
 Favorite=0
 Name=Quake Mission Pack II - Dissolution of Eternity
 Icon=
-Genre=First person shooter
+Genre=First Person
 Developer=Rogue Entertainment
 Publisher=id Software
 Year=1997
@@ -223,4 +223,7 @@ config=
 [ExtraCommands]
 BeforeExecution=
 AfterExecution=
+BeforeExecution.Wait=1
+BeforeExecution.Minimized=0
+AfterExecution.Minimized=0
 

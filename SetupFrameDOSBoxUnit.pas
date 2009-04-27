@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, 
-  Dialogs, StdCtrls, ExtCtrls, Buttons, SetupFormUnit, PrgSetupUnit;
+  Dialogs, StdCtrls, ExtCtrls, Buttons, SetupFormUnit, PrgSetupUnit, GameDBUnit;
 
 type
   TSetupFrameDOSBox = class(TFrame, ISetupFrame)
@@ -42,13 +42,16 @@ type
     PDosBoxDir, PDOSBoxLang : PString;
     DosBoxDirChange : TSimpleEvent;
     LastIndex : Integer;
+    GameDB : TGameDB;
   public
     { Public-Deklarationen }
     Function GetName : String;
     Procedure InitGUIAndLoadSetup(InitData : TInitData);
+    Procedure BeforeChangeLanguage;
     Procedure LoadLanguage;
     Procedure DOSBoxDirChanged;
     Procedure ShowFrame(const AdvencedMode : Boolean);
+    procedure HideFrame;
     Procedure RestoreDefaults;
     Procedure SaveSetup;
   end;
@@ -56,7 +59,7 @@ type
 implementation
 
 uses ShellAPI, ShlObj, Math, LanguageSetupUnit, VistaToolsUnit, CommonTools,
-     SetupDosBoxFormUnit, SetupFrameDOSBoxFormUnit, HelpConsts;
+     SetupDosBoxFormUnit, SetupFrameDOSBoxFormUnit, HelpConsts, IconLoaderUnit;
 
 {$R *.dfm}
 
@@ -73,6 +76,7 @@ begin
   PDosBoxDir:=InitData.PDosBoxDir;
   PDOSBoxLang:=InitData.PDOSBoxLang;
   DosBoxDirChange:=InitData.DosBoxDirChangeNotify;
+  GameDB:=InitData.GameDB;
 
   NoFlicker(DOSBoxInstallationComboBox);
   NoFlicker(DosBoxDirEdit);
@@ -82,8 +86,6 @@ begin
   NoFlicker(RestoreWindowCheckBox);
   NoFlicker(UseShortPathNamesCheckBox);
   NoFlicker(ShortNameWarningsCheckBox);
-
-  ShortNameWarningsCheckBox.Visible:=PrgSetup.ActivateIncompleteFeatures;
 
   SetLength(DOSBoxData,PrgSetup.DOSBoxSettingsCount);
   For I:=0 to length(DOSBoxData)-1 do begin
@@ -103,7 +105,19 @@ begin
   ShortNameWarningsCheckBox.Checked:=PrgSetup.ShowShortNameWarnings;
   MinimizeDFendCheckBoxClick(self);
 
+  UserIconLoader.DialogImage(DI_Edit,DOSBoxEditButton);
+  UserIconLoader.DialogImage(DI_Add,DOSBoxAddButton);
+  UserIconLoader.DialogImage(DI_Delete,DOSBoxDeleteButton);
+  UserIconLoader.DialogImage(DI_Up,DOSBoxUpButton);
+  UserIconLoader.DialogImage(DI_Down,DOSBoxDownButton);
+  UserIconLoader.DialogImage(DI_SelectFolder,DosBoxButton);
+  UserIconLoader.DialogImage(DI_FindFile,FindDosBoxButton);
+
   HelpContext:=ID_FileOptionsDOSBox;
+end;
+
+procedure TSetupFrameDOSBox.BeforeChangeLanguage;
+begin
 end;
 
 procedure TSetupFrameDOSBox.LoadLanguage;
@@ -156,7 +170,9 @@ begin
     DOSBoxDownloadURLInfo.Top:=GlobalGroupBox.Top+GlobalGroupBox.Height+10;
     PortableModeInfoButton.Left:=MoreSettingsButton.Left+MoreSettingsButton.Width+10;
   end else begin
-    DOSBoxDownloadURLInfo.Top:=GlobalGroupBox.Top;
+    If OperationMode=omPortable
+      then DOSBoxDownloadURLInfo.Top:=GlobalGroupBox.Top
+      else DOSBoxDownloadURLInfo.Top:=MoreSettingsButton.Top;
     PortableModeInfoButton.Left:=MoreSettingsButton.Left;
   end;
   DOSBoxDownloadURL.Top:=DOSBoxDownloadURLInfo.Top+19;
@@ -166,13 +182,16 @@ begin
   DosBoxDirEditChange(self);
 end;
 
+procedure TSetupFrameDOSBox.HideFrame;
+begin
+end;
+
 procedure TSetupFrameDOSBox.RestoreDefaults;
 begin
   MinimizeDFendCheckBox.Checked:=False;
   RestoreWindowCheckBox.Checked:=False;
   UseShortPathNamesCheckBox.Checked:=True;
-  //... ShortNameWarningsCheckBox.Checked:=True;
-  ShortNameWarningsCheckBox.Checked:=False;
+  ShortNameWarningsCheckBox.Checked:=True;
   MinimizeDFendCheckBoxClick(self);
 end;
 
@@ -293,7 +312,7 @@ begin
     7 : If DOSBoxInstallationComboBox.ItemIndex>=0 then begin
           If DOSBoxInstallationComboBox.ItemIndex=0 then DOSBoxData[0].DosBoxLanguage:=PDOSBoxLang^;
           DOSBoxData[DOSBoxInstallationComboBox.ItemIndex].DosBoxDir:=IncludeTrailingPathDelimiter(DosBoxDirEdit.Text);
-          ShowSetupFrameDOSBoxDialog(self,DOSBoxData[DOSBoxInstallationComboBox.ItemIndex],DOSBoxInstallationComboBox.ItemIndex=0);
+          ShowSetupFrameDOSBoxDialog(self,DOSBoxData[DOSBoxInstallationComboBox.ItemIndex],DOSBoxInstallationComboBox.ItemIndex=0,GameDB);
           DosBoxDirEdit.Text:=DOSBoxData[DOSBoxInstallationComboBox.ItemIndex].DosBoxDir;
           If DOSBoxInstallationComboBox.ItemIndex=0 then PDOSBoxLang^:=DOSBoxData[0].DosBoxLanguage;
         end;

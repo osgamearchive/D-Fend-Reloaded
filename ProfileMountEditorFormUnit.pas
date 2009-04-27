@@ -17,6 +17,7 @@ Type TProfileMountEditorFrame=interface
   Function Init(const AInfoData : TInfoData) : Boolean;
   Function Done : String;
   Function GetName : String;
+  Procedure ShowFrame;
 end;
 
 Type TFrameInfoRec=record
@@ -70,7 +71,6 @@ uses LanguageSetupUnit, VistaToolsUnit, CommonTools, PrgSetupUnit,
 {$R *.dfm}
 
 procedure TProfileMountEditorForm.FormCreate(Sender: TObject);
-Var C : Char;
 begin
   DoubleBuffered:=True;
   SetVistaFonts(self);
@@ -173,6 +173,7 @@ begin
 
   If TypeComboBox.ItemIndex>=0 then begin
     FrameInfoRec[TypeComboBox.ItemIndex].Frame.Visible:=True;
+    FrameInfoRec[TypeComboBox.ItemIndex].FrameI.ShowFrame;
   end;
 end;
 

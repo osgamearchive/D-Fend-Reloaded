@@ -12,15 +12,18 @@ type
     ProfileEditorDFendRadioButton: TRadioButton;
     ProfileEditorModernRadioButton: TRadioButton;
     AutoSetScreenshotFolderRadioGroup: TRadioGroup;
+    RenameProfFilesCheckBox: TCheckBox;
   private
     { Private-Deklarationen }
   public
     { Public-Deklarationen }
     Function GetName : String;
     Procedure InitGUIAndLoadSetup(InitData : TInitData);
+    Procedure BeforeChangeLanguage;
     Procedure LoadLanguage;
     Procedure DOSBoxDirChanged;
     Procedure ShowFrame(const AdvencedMode : Boolean);
+    procedure HideFrame;
     Procedure RestoreDefaults;
     Procedure SaveSetup;
   end;
@@ -44,11 +47,17 @@ begin
   NoFlicker(ProfileEditorDFendRadioButton);
   NoFlicker(ProfileEditorModernRadioButton);
   NoFlicker(AutoSetScreenshotFolderRadioGroup);
+  NoFlicker(RenameProfFilesCheckBox);
 
   ReopenLastActiveProfileSheetCheckBox.Checked:=PrgSetup.ReopenLastProfileEditorTab;
   ProfileEditorDFendRadioButton.Checked:=PrgSetup.DFendStyleProfileEditor;
   ProfileEditorModernRadioButton.Checked:=not PrgSetup.DFendStyleProfileEditor;
   If PrgSetup.AlwaysSetScreenshotFolderAutomatically then AutoSetScreenshotFolderRadioGroup.ItemIndex:=1 else AutoSetScreenshotFolderRadioGroup.ItemIndex:=0;
+  RenameProfFilesCheckBox.Checked:=PrgSetup.RenameProfFileOnRenamingProfile;
+end;
+
+procedure TSetupFrameProfileEditor.BeforeChangeLanguage;
+begin
 end;
 
 procedure TSetupFrameProfileEditor.LoadLanguage;
@@ -59,6 +68,7 @@ begin
   AutoSetScreenshotFolderRadioGroup.Caption:=LanguageSetup.SetupFormProfileEditorAutoSetScreenshotFolder;
   AutoSetScreenshotFolderRadioGroup.Items[0]:=LanguageSetup.SetupFormProfileEditorAutoSetScreenshotFolderOnlyWizard;
   AutoSetScreenshotFolderRadioGroup.Items[1]:=LanguageSetup.SetupFormProfileEditorAutoSetScreenshotFolderAlways;
+  RenameProfFilesCheckBox.Caption:=LanguageSetup.SetupFormProfileEditorRenameProfFilesOnRenamingProfile;
 
   HelpContext:=ID_FileOptionsProfileEditor;
 end;
@@ -69,6 +79,11 @@ end;
 
 procedure TSetupFrameProfileEditor.ShowFrame(const AdvencedMode: Boolean);
 begin
+  RenameProfFilesCheckBox.Visible:=PrgSetup.ActivateIncompleteFeatures;
+end;
+
+procedure TSetupFrameProfileEditor.HideFrame;
+begin
 end;
 
 procedure TSetupFrameProfileEditor.RestoreDefaults;
@@ -76,6 +91,7 @@ begin
   ReopenLastActiveProfileSheetCheckBox.Checked:=False;
   ProfileEditorModernRadioButton.Checked:=True;
   AutoSetScreenshotFolderRadioGroup.ItemIndex:=1;
+  RenameProfFilesCheckBox.Checked:=False;
 end;
 
 procedure TSetupFrameProfileEditor.SaveSetup;
@@ -83,6 +99,7 @@ begin
   PrgSetup.ReopenLastProfileEditorTab:=ReopenLastActiveProfileSheetCheckBox.Checked;
   PrgSetup.DFendStyleProfileEditor:=ProfileEditorDFendRadioButton.Checked;
   PrgSetup.AlwaysSetScreenshotFolderAutomatically:=(AutoSetScreenshotFolderRadioGroup.ItemIndex=1);
+  PrgSetup.RenameProfFileOnRenamingProfile:=RenameProfFilesCheckBox.Checked;
 end;
 
 end.

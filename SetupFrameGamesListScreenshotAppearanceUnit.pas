@@ -31,16 +31,19 @@ type
     { Public-Deklarationen }
     Function GetName : String;
     Procedure InitGUIAndLoadSetup(InitData : TInitData);
+    Procedure BeforeChangeLanguage;
     Procedure LoadLanguage;
     Procedure DOSBoxDirChanged;
     Procedure ShowFrame(const AdvencedMode : Boolean);
+    procedure HideFrame;
     Procedure RestoreDefaults;
     Procedure SaveSetup;
   end;
 
 implementation
 
-uses Math, LanguageSetupUnit, VistaToolsUnit, PrgSetupUnit, CommonTools, HelpConsts;
+uses Math, LanguageSetupUnit, VistaToolsUnit, PrgSetupUnit, CommonTools,
+     HelpConsts, IconLoaderUnit;
 
 {$R *.dfm}
 
@@ -80,6 +83,12 @@ begin
   end;
   ScreenshotsListFontSizeEdit.Value:=PrgSetup.ScreenshotsListViewFontSize;
   ScreenshotPreviewEdit.Value:=Max(ScreenshotPreviewEdit.MinValue,Min(ScreenshotPreviewEdit.MaxValue,PrgSetup.ScreenshotPreviewSize));
+
+  UserIconLoader.DialogImage(DI_SelectFile,ScreenshotsListBackgroundButton);
+end;
+
+procedure TSetupFrameGamesListScreenshotAppearance.BeforeChangeLanguage;
+begin
 end;
 
 procedure TSetupFrameGamesListScreenshotAppearance.LoadLanguage;
@@ -109,6 +118,10 @@ begin
 end;
 
 procedure TSetupFrameGamesListScreenshotAppearance.ShowFrame(const AdvencedMode: Boolean);
+begin
+end;
+
+procedure TSetupFrameGamesListScreenshotAppearance.HideFrame;
 begin
 end;
 

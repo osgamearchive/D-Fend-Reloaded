@@ -56,7 +56,7 @@ type
 implementation
 
 uses VistaToolsUnit, LanguageSetupUnit, PrgSetupUnit, PrgConsts, HashCalc,
-     CommonTools, WizardFormUnit, OperationModeInfoFormUnit;
+     CommonTools, WizardFormUnit, OperationModeInfoFormUnit, IconLoaderUnit;
 
 {$R *.dfm}
 
@@ -120,6 +120,12 @@ begin
 
   OKButton.Caption:=LanguageSetup.OK;
   OperationModeInfoButton.Caption:=LanguageSetup.WizardFormOperationModeInfo;
+
+  UserIconLoader.DialogImage(DI_Help,HelpButton);
+  UserIconLoader.DialogImage(DI_Help,SpeedButton1);
+  UserIconLoader.DialogImage(DI_Help,SpeedButton2);
+  UserIconLoader.DialogImage(DI_Help,SpeedButton3);
+  UserIconLoader.DialogImage(DI_Help,SpeedButton4);
 end;
 
 procedure TWizardTemplateFrame.Done;
@@ -204,7 +210,7 @@ begin
       end else begin
         S:=Trim(St[0]);
       end;
-      S:=MakeRelPath(S,PrgSetup.BaseDir);
+      S:=MakeRelPath(S,PrgSetup.BaseDir,True);
       If Copy(S,2,3)=':\' then begin result:=False; exit; end;
     finally
       St.Free;

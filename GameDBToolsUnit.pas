@@ -7,28 +7,38 @@ uses Classes, ComCtrls, Controls, Menus, CheckLst, GameDBUnit, LinkFileUnit;
 
 { Load Data to GUI }
 
-Type TSortListBy=(slbName, slbSetup, slbGenre, slbDeveloper, slbPublisher, slbYear, slbLanguage, slbComment);
+Type TSortListBy=(slbName=1, slbSetup=2, slbGenre=3, slbDeveloper=4, slbPublisher=5, slbYear=6, slbLanguage=7, slbComment=8);
 
 Procedure InitTreeViewForGamesList(const ATreeView : TTreeView; const GameDB : TGameDB);
 Procedure InitListViewForGamesList(const AListView : TListView; const ShowExtraInfo : Boolean);
 
-Procedure AddGameToList(const AListView : TListView; var ItemsUsed : Integer; const AListViewImageList, AListViewIconImageList, AImageList : TImageList; const Game : TGame; const ShowExtraInfo : Boolean; const O,V,T : String; const ScreenshotViewMode, ScummVMTemplate : Boolean); overload;
+Procedure AddGameToList(const AListView : TListView; var ItemsUsed : Integer; const AListViewImageList, AListViewIconImageList, AImageList : TImageList; const Game : TGame; const ShowExtraInfo : Boolean; const O,V : String; const VUserSt : TStringList; const T : String; const ScreenshotViewMode, ScummVMTemplate : Boolean); overload;
 Procedure AddGameToList(const AListView : TListView; var ItemsUsed : Integer; const AListViewImageList, AListViewIconImageList, AImageList : TImageList; const Game : TGame; const ShowExtraInfo, ScreenshotViewMode, ScummVMTemplate : Boolean); overload;
 Procedure AddGamesToList(const AListView : TListView; const AListViewImageList, AListViewIconImageList, AImageList : TImageList; const GameDB : TGameDB; const Group, SubGroup, SearchString : String; const ShowExtraInfo : Boolean; const SortBy : TSortListBy; const ReverseOrder, HideScummVMProfiles, ScreenshotViewMode : Boolean); overload;
 Procedure AddGamesToList(const AListView : TListView; const AListViewImageList, AListViewIconImageList, AImageList : TImageList; const GameDB : TGameDB; const Game : TGame; const Group, SubGroup, SearchString : String; const ShowExtraInfo : Boolean; const SortBy : TSortListBy; const ReverseOrder, HideScummVMProfiles, ScreenshotViewMode : Boolean); overload;
+Procedure GamesListSaveColWidths(const AListView : TListView);
+Procedure GamesListLoadColWidths(const AListView : TListView);
+Function GamesListSaveColWidthsToString(const AListView : TListView) : String;
+Procedure GamesListLoadColWidthsFromString(const AListView : TListView; const Data : String);
 
 Procedure AddScreenshotsToList(const AListView : TListView; const AImageList : TImageList; Dir : String);
 Procedure AddSoundsToList(const AListView : TListView; Dir : String; ImageListIndex : Integer);
 Procedure AddVideosToList(const AListView : TListView; Dir : String; ImageListIndex : Integer);
 
-Procedure GetColOrderAndVisible(var O,V : String);
+Procedure GetColOrderAndVisible(var O,V,VUser : String);
+Function GetUserCols : String;
 Procedure SetSortTypeByListViewCol(const ColumnIndex : Integer; var ListSort : TSortListBy; var ListSortReverse : Boolean);
+
+Procedure InitMountingListView(const MountingListView : TListView);
+Procedure LoadMountingListView(const MountingListView : TListView; const Mounting : TStringList);
 
 { Selection lists }
 
 Procedure BuildCheckList(const CheckListBox : TCheckListBox; const GameDB : TGameDB; const WithDefaultProfile, HideScummVMAndWindowsProfiles : Boolean; const HideWindowsProfiles : Boolean = False);
 Procedure BuildSelectPopupMenu(const Popup : TPopupMenu; const GameDB : TGameDB; const OnClick : TNotifyEvent; const WithDefaultProfile : Boolean; const HideWindowsProfiles : Boolean = False);
 Procedure SelectGamesByPopupMenu(const Sender : TObject; const CheckListBox : TCheckListBox);
+
+Function GetUserDataList(const GameDB : TGameDB) : TStringList;
 
 { Upgrade from D-Fend / First-run init / Repair }
 
@@ -37,7 +47,9 @@ Procedure ReplaceAbsoluteDirs(const GameDB : TGameDB);
 Function BuildDefaultDosProfile(const GameDB : TGameDB; const CopyFiles : Boolean = True) : TGame;
 Procedure BuildDefaultProfile;
 Procedure ReBuildTemplates;
-Function CopyFiles(Source, Dest : String) : Boolean;
+Function CopyFiles(Source, Dest : String; const OverwriteExistingFiles : Boolean) : Boolean;
+Procedure UpdateUserDataFolderAfterUpgrade;
+Procedure UpdateSettingsFilesLocation;
 
 { Extras }
 
@@ -97,7 +109,7 @@ uses Windows, SysUtils, Forms, Dialogs, Graphics, ShellAPI, Math, IniFiles,
      PNGImage, JPEG, GIFImage, CommonTools, LanguageSetupUnit, PrgConsts,
      PrgSetupUnit, ProfileEditorFormUnit, ModernProfileEditorFormUnit, HashCalc,
      SmallWaitFormUnit, ChecksumFormUnit, ProgressFormUnit, ImageCacheUnit,
-     DosBoxUnit, ScummVMUnit;
+     DosBoxUnit, ScummVMUnit, ImageStretch;
 
 Procedure AddTypeSelector(const ATreeView : TTreeView; const Name : String; const St : TStringList);
 Var N,N2 : TTreeNode;
@@ -153,11 +165,11 @@ begin
       N.ImageIndex:=9;
       N.SelectedIndex:=9;
 
-      AddTypeSelector(ATreeView,LanguageSetup.GameGenre,GameDB.GetGenreList);
+      AddTypeSelector(ATreeView,LanguageSetup.GameGenre,GetCustomGenreName(GameDB.GetGenreList));
       AddTypeSelector(ATreeView,LanguageSetup.GameDeveloper,GameDB.GetDeveloperList);
       AddTypeSelector(ATreeView,LanguageSetup.GamePublisher,GameDB.GetPublisherList);
       AddTypeSelector(ATreeView,LanguageSetup.GameYear,GameDB.GetYearList);
-      AddTypeSelector(ATreeView,LanguageSetup.GameLanguage,GameDB.GetLanguageList);
+      AddTypeSelector(ATreeView,LanguageSetup.GameLanguage,GetCustomLanguageName(GameDB.GetLanguageList));
       UserGroups:=StringToStringList(PrgSetup.UserGroups);
       try
         For I:=0 to UserGroups.Count-1 do
@@ -190,17 +202,36 @@ begin
   end;
 end;
 
-Procedure GetColOrderAndVisible(var O,V : String);
+Procedure GetColOrderAndVisible(var O,V,VUser : String);
+Var I,UserCount : Integer;
+    S : String;
 begin
   V:=PrgSetup.ColVisible;
+
+  I:=Pos(';',V);
+  If I>0 then begin VUser:=Trim(Copy(V,I+1,MaxInt)); V:=Trim(Copy(V,1,I-1)); end else VUser:='';
   while length(V)<7 do V:=V+'1';
   If Length(V)>7 then V:=Copy(V,1,7);
-  PrgSetup.ColVisible:=V;
+  If VUser<>'' then PrgSetup.ColVisible:=V+';'+VUser else PrgSetup.ColVisible:=V;
 
   O:=PrgSetup.ColOrder;
-  while length(O)<7 do O:=O+'1';
-  If Length(O)>7 then O:=Copy(O,1,7);
+  UserCount:=0; S:=VUser;
+  While S<>'' do begin
+    inc(UserCount);
+    I:=Pos(';',S); If I=0 then break;
+    S:=Trim(Copy(S,I+1,MaxInt));
+  end;
+  while length(O)<7+UserCount do If length(O)<9
+    then O:=O+chr(length(O)+Ord('1'))
+    else O:=O+chr(length(O)-9+Ord('A'));
+  If Length(O)>7+UserCount then O:=Copy(O,1,7+UserCount);
   PrgSetup.ColOrder:=O;
+end;
+
+Function GetUserCols : String;
+Var O,V : String;
+begin
+  GetColOrderAndVisible(O,V,result);
 end;
 
 Procedure SetSortTypeByListViewCol(const ColumnIndex : Integer; var ListSort : TSortListBy; var ListSortReverse : Boolean);
@@ -208,33 +239,123 @@ Procedure SetListSort(const L : TSortListBy);
 begin
   If ListSort=L then ListSortReverse:=not ListSortReverse else begin ListSort:=L; ListSortReverse:=False; end;
 end;
-Var O,V : String;
+Var O,V,VUser : String;
     I,Nr,C : Integer;
+    VUserSt : TStringList;
 begin
-  GetColOrderAndVisible(O,V);
-
-  If ColumnIndex=0 then SetListSort(slbName) else begin
-    If not PrgSetup.ShowExtraInfo then SetListSort(slbSetup) else begin
-      C:=0;
-      For I:=0 to 6 do begin
-        try Nr:=StrToInt(O[I+1]); except Nr:=-1; end;
-        If (Nr<1) or (Nr>7) then continue;
-        If V[Nr]='0' then continue;
-        inc(C);
-        If C=ColumnIndex then begin
-          Case Nr-1 of
-            0 : SetListSort(slbSetup);
-            1 : SetListSort(slbGenre);
-            2 : SetListSort(slbDeveloper);
-            3 : SetListSort(slbPublisher);
-            4 : SetListSort(slbYear);
-            5 : SetListSort(slbLanguage);
-            6 : SetListSort(slbComment);
+  GetColOrderAndVisible(O,V,VUser);
+  VUserSt:=ValueToList(VUser);
+  try
+    If ColumnIndex=0 then SetListSort(slbName) else begin
+      If not PrgSetup.ShowExtraInfo then SetListSort(slbSetup) else begin
+        C:=0;
+        For I:=0 to length(O)-1 do begin
+          Nr:=-1;
+          Case O[I+1] of
+            '1'..'9' : Nr:=StrToInt(O[I+1]);
+            'A'..'Z' : Nr:=Ord(O[I+1])-Ord('A')+10;
+            'a'..'z' : Nr:=Ord(O[I+1])-Ord('a')+10;
           end;
-          break;
+          If Nr<1 then continue;
+          If Nr<=7 then begin
+            If V[Nr]='0' then continue;
+          end else begin
+            If Nr-7>VUserSt.Count then continue;
+          end;
+          inc(C);
+          If C=ColumnIndex then begin
+            Case Nr-1 of
+              0 : SetListSort(slbSetup);
+              1 : SetListSort(slbGenre);
+              2 : SetListSort(slbDeveloper);
+              3 : SetListSort(slbPublisher);
+              4 : SetListSort(slbYear);
+              5 : SetListSort(slbLanguage);
+              6 : SetListSort(slbComment);
+              else SetListSort(TSortListBy((Nr-8+10)));
+            end;
+            break;
+          end;
         end;
       end;
     end;
+  finally
+    VUserSt.Free;
+  end;
+end;
+
+Procedure InitMountingListView(const MountingListView : TListView);
+Var L : TListColumn;
+begin
+  L:=MountingListView.Columns.Add; L.Width:=-2; L.Caption:=LanguageSetup.ProfileEditorMountingFolderImage;
+  L:=MountingListView.Columns.Add; L.Width:=-2; L.Caption:=LanguageSetup.ProfileEditorMountingAs;
+  L:=MountingListView.Columns.Add; L.Width:=-2; L.Caption:=LanguageSetup.ProfileEditorMountingLetter;
+  L:=MountingListView.Columns.Add; L.Width:=-2; L.Caption:=LanguageSetup.ProfileEditorMountingLabel;
+  L:=MountingListView.Columns.Add; L.Width:=-2; L.Caption:=LanguageSetup.ProfileEditorMountingIOControl;
+end;
+
+Procedure LoadMountingListView(const MountingListView : TListView; const Mounting : TStringList);
+Var I : Integer;
+    St : TStringList;
+    L : TListItem;
+    S,T,U : String;
+    B : Boolean;
+begin
+  MountingListView.Items.BeginUpdate;
+  try
+    MountingListView.Items.Clear;
+    For I:=0 to Mounting.Count-1 do begin
+      St:=ValueToList(Mounting[I]);
+      try
+        L:=MountingListView.Items.Add;
+
+        S:=Trim(St[0]);
+        If St.Count>1 then begin
+          T:=Trim(ExtUpperCase(St[1]));
+          If Pos('$',S)<>0 then begin
+            If (T='PHYSFS') or (T='ZIP')
+              then S:=Copy(S,Pos('$',S)+1,MaxInt)+' (+ '+Copy(S,1,Pos('$',S)-1)+')'
+              else S:=Copy(S,1,Pos('$',S)-1)+' (+'+LanguageSetup.More+')';
+          end;
+          If (T='CDROM') and (S='ASK') then S:=LanguageSetup.ProfileMountingCDDriveTypeAskShort;
+          If (T='CDROM') and (Pos(':',S)<>0) then begin
+            U:=Trim(Copy(S,1,Pos(':',S)-1));
+            If U='NUMBER' then S:=Format(LanguageSetup.ProfileMountingCDDriveTypeNumberShort,[Copy(S,Pos(':',S)+1,MaxInt)]);
+            If U='LABEL' then S:=Format(LanguageSetup.ProfileMountingCDDriveTypeLabelShort,[Copy(S,Pos(':',S)+1,MaxInt)]);
+            If U='FILE' then S:=Format(LanguageSetup.ProfileMountingCDDriveTypeFileShort,[Copy(S,Pos(':',S)+1,MaxInt)]);
+            If U='FOLDER' then S:=Format(LanguageSetup.ProfileMountingCDDriveTypeFolderShort,[Copy(S,Pos(':',S)+1,MaxInt)]);
+          end;
+        end;
+        L.Caption:=S;
+
+        If St.Count>1 then begin
+          S:=Trim(ExtUpperCase(St[1])); B:=False;
+          If (not B) and (S='DRIVE') then begin L.SubItems.Add(LanguageSetup.ProfileEditorMountingDriveTypeDRIVE); B:=True; end;
+          If (not B) and (S='CDROM') then begin L.SubItems.Add(LanguageSetup.ProfileEditorMountingDriveTypeCDROM); B:=True; end;
+          If (not B) and (S='CDROMIMAGE') then begin L.SubItems.Add(LanguageSetup.ProfileEditorMountingDriveTypeCDROMIMAGE); B:=True; end;
+          If (not B) and (S='FLOPPY') then begin L.SubItems.Add(LanguageSetup.ProfileEditorMountingDriveTypeFLOPPY); B:=True; end;
+          If (not B) and (S='FLOPPYIMAGE') then begin L.SubItems.Add(LanguageSetup.ProfileEditorMountingDriveTypeFLOPPYIMAGE); B:=True; end;
+          If (not B) and (S='IMAGE') then begin L.SubItems.Add(LanguageSetup.ProfileEditorMountingDriveTypeIMAGE); B:=True; end;
+          If (not B) and (S='PHYSFS') then begin L.SubItems.Add(LanguageSetup.ProfileEditorMountingDriveTypePHYSFS); B:=True; end;
+          If (not B) and (S='ZIP') then begin L.SubItems.Add(LanguageSetup.ProfileEditorMountingDriveTypeZIP); B:=True; end;
+          If not B then L.SubItems.Add(St[1]);
+        end else begin
+          L.SubItems.Add('');
+        end;
+
+        If St.Count>2 then L.SubItems.Add(St[2]) else L.SubItems.Add('');
+        If St.Count>4 then L.SubItems.Add(St[4]) else L.SubItems.Add('');
+        If St.Count>3 then begin
+          If Trim(ExtUpperCase(St[3]))='TRUE' then L.SubItems.Add(RemoveUnderline(LanguageSetup.Yes)) else L.SubItems.Add(RemoveUnderline(LanguageSetup.No));
+        end else L.SubItems.Add(RemoveUnderline(LanguageSetup.No));
+
+      finally
+        St.Free;
+      end;
+    end;
+    If MountingListView.Items.Count>0 then MountingListView.ItemIndex:=0;
+  finally
+    MountingListView.Items.EndUpdate;
   end;
 end;
 
@@ -310,7 +431,7 @@ begin
 
   { Add normal meta data submenus }
 
-  St:=GameDB.GetGenreList(WithDefaultProfile,HideWindowsProfiles);
+  St:=GetCustomGenreName(GameDB.GetGenreList(WithDefaultProfile,HideWindowsProfiles));
   try BuildSelectPopupSubMenu(Popup,LanguageSetup.GameGenre,MenuSelect,MenuUnselect,0,OnClick,St); finally St.Free; end;
 
   St:=GameDB.GetDeveloperList(WithDefaultProfile,HideWindowsProfiles);
@@ -322,7 +443,7 @@ begin
   St:=GameDB.GetYearList(WithDefaultProfile,HideWindowsProfiles);
   try BuildSelectPopupSubMenu(Popup,LanguageSetup.GameYear,MenuSelect,MenuUnselect,3,OnClick,St); finally St.Free; end;
 
-  St:=GameDB.GetLanguageList(WithDefaultProfile,HideWindowsProfiles);
+  St:=GetCustomLanguageName(GameDB.GetLanguageList(WithDefaultProfile,HideWindowsProfiles));
   try BuildSelectPopupSubMenu(Popup,LanguageSetup.GameLanguage,MenuSelect,MenuUnselect,4,OnClick,St); finally St.Free; end;
 
   St:=TStringList.Create;
@@ -429,11 +550,11 @@ begin
       If not UserDataContainValue(G.UserInfo,CategoryName,CategoryValue) then continue;
     end else begin
       Case Category of
-        0 : S:=G.CacheGenre;
+        0 : S:=GetCustomGenreName(G.CacheGenre);
         1 : S:=G.CacheDeveloper;
         2 : S:=G.CachePublisher;
         3 : S:=G.CacheYear;
-        4 : S:=G.CacheLanguage;
+        4 : S:=GetCustomLanguageName(G.CacheLanguage);
         5 : begin
               S:='DOSBox';
               If ScummVMMode(G) then S:='ScummVM';
@@ -447,60 +568,106 @@ begin
   end;
 end;
 
+Function GetUserDataList(const GameDB : TGameDB) : TStringList;
+Var UserData : Array of TUserDataRecord;
+    I,J,K,Nr : Integer;
+    St : TStringList;
+    S,T,SUpper : String;
+begin
+  SetLength(UserData,0);
+  For I:=0 to GameDB.Count-1 do begin
+    St:=StringToStringList(GameDB[I].UserInfo);
+    try
+      For J:=0 to St.Count-1 do begin
+        S:=Trim(St[J]);
+        If (S='') or (Pos('=',S)=0) then continue;
+        T:=Trim(Copy(S,Pos('=',S)+1,MaxInt));
+        S:=Trim(Copy(S,1,Pos('=',S)-1));
+        If (S='') or (T='') then continue;
+        SUpper:=ExtUpperCase(S);
+        Nr:=-1;
+        For K:=0 to length(UserData)-1 do If UserData[K].NameUpper=SUpper then begin Nr:=K; break; end;
+        If Nr<0 then begin
+          Nr:=length(UserData); SetLength(UserData,Nr+1);
+          UserData[Nr].Name:=S; UserData[Nr].NameUpper:=SUpper;
+        end;
+      end;
+    finally
+      St.Free;
+    end;
+  end;
+  result:=TStringList.Create;
+  For I:=0 to length(UserData)-1 do result.Add(UserData[I].Name);
+end;
+
 Procedure InitListViewForGamesList(const AListView : TListView; const ShowExtraInfo : Boolean);
 Var C : TListColumn;
     I,Nr : Integer;
-    V,O : String;
+    V,O,VUser : String;
+    VUserSt : TStringList;
 begin
   AListView.ReadOnly:=True;
 
-  GetColOrderAndVisible(O,V);
-
-  AListView.Columns.BeginUpdate;
-  AListView.Items.BeginUpdate;
+  GetColOrderAndVisible(O,V,VUser);
+  VUserSt:=ValueToList(VUser);
   try
-    AListView.Items.Clear;
-    AListView.Columns.Clear;
-
-    C:=AListView.Columns.Add;
-    C.Caption:=LanguageSetup.GameName;
-    C.Width:=-1;
-
-    If not ShowExtraInfo then begin
-      C:=AListView.Columns.Add;
-      C.Caption:=LanguageSetup.GameSetup;
-      C.Width:=-2;
-      exit;
-    end;
-
-    For I:=0 to 6 do begin
-      try Nr:=StrToInt(O[I+1]); except Nr:=-1; end;
-      If (Nr<1) or (Nr>7) then continue;
-      If V[Nr]='0' then continue;
+    AListView.Columns.BeginUpdate;
+    AListView.Items.BeginUpdate;
+    try
+      AListView.Items.Clear;
+      AListView.Columns.Clear;
 
       C:=AListView.Columns.Add;
-      Case Nr-1 of
-        0 : C.Caption:=LanguageSetup.GameSetup;
-        1 : C.Caption:=LanguageSetup.GameGenre;
-        2 : C.Caption:=LanguageSetup.GameDeveloper;
-        3 : C.Caption:=LanguageSetup.GamePublisher;
-        4 : C.Caption:=LanguageSetup.GameYear;
-        5 : C.Caption:=LanguageSetup.GameLanguage;
-        6 : C.Caption:=LanguageSetup.GameNotes;
+      C.Caption:=LanguageSetup.GameName;
+      C.Width:=-1;
+
+      If not ShowExtraInfo then begin
+        C:=AListView.Columns.Add;
+        C.Caption:=LanguageSetup.GameSetup;
+        C.Width:=-2;
+        exit;
       end;
-      If Nr-1=0 then C.Width:=-2 else C.Width:=-1;
+
+      For I:=0 to length(O)-1 do begin
+        Nr:=-1;
+        Case O[I+1] of
+          '1'..'9' : Nr:=StrToInt(O[I+1]);
+          'A'..'Z' : Nr:=Ord(O[I+1])-Ord('A')+10;
+          'a'..'z' : Nr:=Ord(O[I+1])-Ord('a')+10;
+        end;
+        If Nr<1 then continue;
+        If Nr<=7 then begin
+          If V[Nr]='0' then continue;
+        end else begin
+          If Nr-7>VUserSt.Count then continue;
+        end;
+
+        C:=AListView.Columns.Add;
+        Case Nr-1 of
+          0 : C.Caption:=GetCustomGenreName(LanguageSetup.GameSetup);
+          1 : C.Caption:=LanguageSetup.GameGenre;
+          2 : C.Caption:=LanguageSetup.GameDeveloper;
+          3 : C.Caption:=LanguageSetup.GamePublisher;
+          4 : C.Caption:=LanguageSetup.GameYear;
+          5 : C.Caption:=GetCustomLanguageName(LanguageSetup.GameLanguage);
+          6 : C.Caption:=LanguageSetup.GameNotes;
+          else C.Caption:=VUserSt[Nr-8];
+        end;
+        If Nr-1=0 then C.Width:=-2 else C.Width:=-1;
+      end;
+    finally
+      AListView.Columns.EndUpdate;
+      AListView.Items.EndUpdate;
     end;
   finally
-    AListView.Columns.EndUpdate;
-    AListView.Items.EndUpdate;
+    VUserSt.Free;
   end;
 end;
 
-Procedure ScaleGraphicToImageList(const Graphic : TGraphic; const ImageList : TImageList; const IsIcon : Boolean = False);
+Procedure ScaleGraphicToImageList(const Graphic : TGraphic; const ImageList : TImageList);
 Var B,B2 : TBitmap;
     D1,D2 : Double;
     W,H : Integer;
-    G : TGraphic;
 begin
   B:=TBitmap.Create;
   try
@@ -510,20 +677,15 @@ begin
 
     B2:=nil;
     try
-      If IsIcon then begin
-        B2:=TBitmap.Create;
-        B2.Width:=Graphic.Width;
-        B2.Height:=Graphic.Height;
-        B2.Canvas.Draw(0,0,Graphic);
-        G:=B2;
-      end else begin
-        G:=Graphic;
-      end;
+      B2:=TBitmap.Create;
+      B2.Width:=Graphic.Width;
+      B2.Height:=Graphic.Height;
+      B2.Canvas.Draw(0,0,Graphic);
 
       B.Width:=ImageList.Width; B.Height:=ImageList.Height;
-      D1:=G.Width/G.Height; D2:=B.Width/B.Height;
+      D1:=B2.Width/B2.Height; D2:=B.Width/B.Height;
       If D1>=D2 then begin W:=B.Width; H:=Round(W/D1); end else begin H:=B.Height; W:=Round(H*D1); end;
-      B.Canvas.StretchDraw(Rect((B.Width-W) div 2,(B.Height-H) div 2,B.Width-1-((B.Width-W) div 2),B.Height-1-((B.Height-H) div 2)),G);
+      ScaleImage(B2,B,W,H);
       ImageList.Add(B,nil);
     finally
       If B2<>nil then B2.Free;
@@ -549,7 +711,11 @@ begin
 
   B:=False;
   If Trim(Game.ScreenshotListScreenshot)<>'' then begin
-    T:=IncludeTrailingPathDelimiter(S)+Trim(Game.ScreenshotListScreenshot);
+    If Pos('\',Game.ScreenshotListScreenshot)<>0 then begin
+      T:=MakeAbsPath(Game.ScreenshotListScreenshot,PrgSetup.BaseDir);
+    end else begin
+      T:=IncludeTrailingPathDelimiter(S)+Trim(Game.ScreenshotListScreenshot);
+    end;
     B:=FileExists(T);
   end;
 
@@ -584,7 +750,31 @@ begin
   If result then ScaleGraphicToImageList(P.Graphic,ImageList2);
 end;
 
-Procedure AddGameToList(const AListView : TListView; var ItemsUsed : Integer; const AListViewImageList, AListViewIconImageList, AImageList : TImageList; const Game : TGame; const ShowExtraInfo : Boolean; const O,V,T : String; const ScreenshotViewMode, ScummVMTemplate : Boolean);
+Function UserInfoGetValue(const UserInfo, Key : String) : String;
+Var I,J : Integer;
+    St : TStringList;
+    S,KeyUpper : String;
+begin
+ result:='';
+ KeyUpper:=ExtUpperCase(Key);
+
+  St:=StringToStringList(UserInfo);
+  try
+    For I:=0 to St.Count-1 do begin
+      S:=Trim(ExtUpperCase(St[I]));
+      J:=Pos('=',S);
+      If J=0 then continue;
+      If Trim(Copy(S,1,J-1))=KeyUpper then begin
+        result:=Trim(Copy(Trim(St[I]),J+1,MaxInt));
+        exit;
+      end;
+    end;
+  finally
+    St.Free;
+  end;
+end;
+
+Procedure AddGameToList(const AListView : TListView; var ItemsUsed : Integer; const AListViewImageList, AListViewIconImageList, AImageList : TImageList; const Game : TGame; const ShowExtraInfo : Boolean; const O,V : String; const VUserSt : TStringList; const T : String; const ScreenshotViewMode, ScummVMTemplate : Boolean);
 Var IconNr,I,J,Nr : Integer;
     B : Boolean;
     S : String;
@@ -602,15 +792,22 @@ begin
 
   If not B then begin
     If Trim(Game.Icon)<>'' then S:=MakeAbsIconName(Game.Icon) else S:='';
-    If (S='') and WindowsExeMode(Game) and PrgSetup.UseWindowsExeIcons then S:=MakeAbsIconName(MakeAbsPath(Game.GameExe,PrgSetup.BaseDir));
+    If (S='') and WindowsExeMode(Game) and PrgSetup.UseWindowsExeIcons then
+      S:=MakeAbsIconName(MakeAbsPath(Game.GameExe,PrgSetup.BaseDir));
     If S<>'' then Icon:=IconCache.GetIcon(S) else Icon:=nil;
     B:=(Icon<>nil);
 
     If B then begin
       AListViewImageList.AddIcon(Icon);
-      If ScreenshotViewMode
-        then ScaleGraphicToImageList(Icon,AListViewIconImageList,True)
-        else AListViewIconImageList.AddIcon(Icon);
+      If ScreenshotViewMode then begin
+        ScaleGraphicToImageList(Icon,AListViewIconImageList);
+      end else begin
+        If Icon.Width>=AListViewIconImageList.Width then begin
+          AListViewIconImageList.AddIcon(Icon);
+        end else begin
+          ScaleGraphicToImageList(Icon,AListViewIconImageList);
+        end;
+      end;
     end;
     If B then IconNr:=AListViewIconImageList.Count-1;
   end;
@@ -619,7 +816,7 @@ begin
     then L:=AListView.Items.Add
     else L:=AListView.Items[ItemsUsed];
   inc(ItemsUsed);
-    
+
   If (Game.CacheName='') and (not Game.OwnINI) then begin
     If ScummVMTemplate
       then L.Caption:=LanguageSetup.TemplateFormDefaultScummVM
@@ -636,24 +833,33 @@ begin
     try
       SubItems.Capacity:=Max(SubItems.Capacity,10);
       If ShowExtraInfo then begin
-        For I:=0 to 6 do begin
-          try Nr:=StrToInt(O[I+1]); except Nr:=-1; end;
-          If (Nr<1) or (Nr>7) then continue;
-          If V[Nr]='0' then continue;
-
+        For I:=0 to length(O)-1 do begin
+          Nr:=-1;
+          Case O[I+1] of
+            '1'..'9' : Nr:=StrToInt(O[I+1]);
+            'A'..'Z' : Nr:=Ord(O[I+1])-Ord('A')+10;
+            'a'..'z' : Nr:=Ord(O[I+1])-Ord('a')+10;
+          end;
+          If Nr<1 then continue;
+          If Nr<=7 then begin
+            If V[Nr]='0' then continue;
+          end else begin
+            If Nr-7>VUserSt.Count then continue;
+          end;
           Case Nr-1 of
             0 : If Trim(Game.SetupExe)<>'' then S:=LanguageSetupFastYes else S:=LanguageSetupFastNo;
-            1 : begin S:=Game.CacheGenre; If Trim(S)='' then S:=T; end;
+            1 : begin S:=GetCustomGenreName(Game.CacheGenre); If Trim(S)='' then S:=T; end;
             2 : begin S:=Game.CacheDeveloper; If Trim(S)='' then S:=T; end;
             3 : begin S:=Game.CachePublisher; If Trim(S)='' then S:=T; end;
             4 : begin S:=Game.CacheYear; If Trim(S)='' then S:=T; end;
-            5 : begin S:=Game.CacheLanguage; If Trim(S)='' then S:=T; end;
+            5 : begin S:=GetCustomLanguageName(Game.CacheLanguage); If Trim(S)='' then S:=T; end;
             6 : begin
                   St:=StringToStringList(Game.Notes); S:=St.Text; St.Free;
                   For J:=1 to length(S) do if (S[J]=#10) or (S[J]=#13) then S[J]:=' ';
                   If length(S)>100 then S:=Copy(S,1,100)+'...';
                   If Trim(S)='' then S:=T;
                 end;
+            else S:=UserInfoGetValue(Game.UserInfo,VUserSt[Nr-8]);
           end;
           If SubUsed<SubCount then SubItems[SubUsed]:=S else SubItems.Add(S);
           inc(SubUsed);
@@ -676,11 +882,17 @@ begin
 end;
 
 Procedure AddGameToList(const AListView : TListView; var ItemsUsed : Integer; const AListViewImageList, AListViewIconImageList, AImageList : TImageList; const Game : TGame; const ShowExtraInfo, ScreenshotViewMode, ScummVMTemplate : Boolean);
-Var O,V,T : String;
+Var O,V,VUser,T : String;
+    VUserSt : TStringList;
 begin
-  GetColOrderAndVisible(O,V);
-  If Trim(PrgSetup.ValueForNotSet)='' then T:=LanguageSetup.NotSet else T:=Trim(PrgSetup.ValueForNotSet);
-  AddGameToList(AListView,ItemsUsed,AListViewImageList,AListViewIconImageList,AImageList,Game,ShowExtraInfo,O,V,T,ScreenshotViewMode,ScummVMTemplate);
+  GetColOrderAndVisible(O,V,VUser);
+  VUserSt:=ValueToList(VUser);
+  try
+    If Trim(PrgSetup.ValueForNotSet)='' then T:=LanguageSetup.NotSet else T:=Trim(PrgSetup.ValueForNotSet);
+    AddGameToList(AListView,ItemsUsed,AListViewImageList,AListViewIconImageList,AImageList,Game,ShowExtraInfo,O,V,VUserSt,T,ScreenshotViewMode,ScummVMTemplate);
+  finally
+    VUserSt.Free;
+  end;
 end;
 
 Procedure AddGamesToList(const AListView : TListView; const AListViewImageList, AListViewIconImageList, AImageList : TImageList; const GameDB : TGameDB; const Group, SubGroup, SearchString : String; const ShowExtraInfo : Boolean; const SortBy : TSortListBy; const ReverseOrder, HideScummVMProfiles, ScreenshotViewMode : Boolean);
@@ -696,16 +908,25 @@ Var I,J,K,Nr,ItemsUsed : Integer;
     List : TList;
     St,St2 : TStringList;
     S,T : String;
-    O,V : String;
+    O,V,VUser : String;
     EmType1,EmType2, EmType3 : String;
     Bitmap : TBitmap;
+    VUserSt : TStringList;
     {$IFDEF LargeListTest}Ca : Cardinal;{$ENDIF}
 begin
   {$IFDEF LargeListTest}Ca:=GetTickCount;{$ENDIF}
 
   {Prepare ListView}
   AListViewImageList.Clear;
-  AListViewImageList.AddImage(AImageList,0);
+
+  Bitmap:=TBitmap.Create;
+  try
+    AImageList.GetBitmap(0,Bitmap);
+    ScaleGraphicToImageList(Bitmap,AListViewImageList);
+  finally
+    Bitmap.Free;
+  end;
+
   AListViewIconImageList.Clear;
   If ScreenshotViewMode then begin
     Bitmap:=TBitmap.Create;
@@ -713,10 +934,16 @@ begin
       AImageList.GetBitmap(0,Bitmap);
       ScaleGraphicToImageList(Bitmap,AListViewIconImageList);
     finally
-      Bitmap.Free;  
+      Bitmap.Free;
     end;
   end else begin
-    AListViewIconImageList.AddImage(AImageList,0);
+    Bitmap:=TBitmap.Create;
+    try
+      AImageList.GetBitmap(0,Bitmap);
+      ScaleGraphicToImageList(Bitmap,AListViewIconImageList);
+    finally
+      Bitmap.Free;
+    end;
   end;
   SetLength(C,AListView.Columns.Count);
   AListView.Columns.BeginUpdate;
@@ -757,11 +984,11 @@ begin
         If HideScummVMProfiles and (ScummVMMode(GameDB[I]) or WindowsExeMode(GameDB[I])) then continue;
         B:=False;
         Case Nr of
-          0 : B:=(GameDB[I].CacheGenreUpper=SubGroupUpper);
+          0 : B:=(ExtUpperCase(GetCustomGenreName(GameDB[I].CacheGenre))=SubGroupUpper);
           1 : B:=(GameDB[I].CacheDeveloperUpper=SubGroupUpper);
           2 : B:=(GameDB[I].CachePublisherUpper=SubGroupUpper);
           3 : B:=(GameDB[I].CacheYearUpper=SubGroupUpper);
-          4 : B:=(GameDB[I].CacheLanguageUpper=SubGroupUpper);
+          4 : B:=(ExtUpperCase(GetCustomLanguageName(GameDB[I].CacheLanguage))=SubGroupUpper);
           5 : begin
                 If (SubGroupUpper=EmType1) then B:=DOSBoxMode(GameDB[I]);
                 If (SubGroupUpper=EmType2) then B:=ScummVMMode(GameDB[I]);
@@ -791,43 +1018,53 @@ begin
       List.Add(Game); {ScummVM default template}
     end;
 
-    {Sort games}
     St:=TStringList.Create;
     try
-      For I:=0 to List.Count-1 do Case SortBy of
-        slbName : St.AddObject(TGame(List[I]).CacheName,TGame(List[I]));
-        slbSetup : If Trim(TGame(List[I]).SetupExe)<>''
-                     then St.AddObject(RemoveUnderline(LanguageSetup.Yes),TGame(List[I]))
-                     else St.AddObject(RemoveUnderline(LanguageSetup.No),TGame(List[I]));
-        slbGenre : St.AddObject(TGame(List[I]).CacheGenre,TGame(List[I]));
-        slbDeveloper : St.AddObject(TGame(List[I]).CacheDeveloper,TGame(List[I]));
-        slbPublisher : St.AddObject(TGame(List[I]).CachePublisher,TGame(List[I]));
-        slbYear : St.AddObject(TGame(List[I]).CacheYear,TGame(List[I]));
-        slbLanguage : St.AddObject(TGame(List[I]).CacheLanguage,TGame(List[I]));
-        slbComment : St.AddObject(TGame(List[I]).Notes,TGame(List[I]));
-      End;
-      St.Sort;
-
-      {Add games to List}
-      ItemsUsed:=0;
-      GetColOrderAndVisible(O,V);
-      If Trim(PrgSetup.ValueForNotSet)='' then T:=LanguageSetup.NotSet else T:=Trim(PrgSetup.ValueForNotSet);
-      AListView.Items.BeginUpdate;
+      {Sort games}
+      GetColOrderAndVisible(O,V,VUser);
+      VUserSt:=ValueToList(VUser);
       try
-        FirstDefaultTemplate:=True;
-        If ReverseOrder then begin
-          For I:=St.Count-1 downto 0 do begin
-            AddGameToList(AListView,ItemsUsed,AListViewImageList,AListViewIconImageList,AImageList,TGame(St.Objects[I]),ShowExtraInfo,O,V,T,ScreenshotViewMode,FirstDefaultTemplate);
-            If (TGame(St.Objects[I]).CacheName='') and (not TGame(St.Objects[I]).OwnINI) then FirstDefaultTemplate:=False;
-          end;
-        end else begin
-          For I:=0 to St.Count-1 do begin
-            AddGameToList(AListView,ItemsUsed,AListViewImageList,AListViewIconImageList,AImageList,TGame(St.Objects[I]),ShowExtraInfo,O,V,T,ScreenshotViewMode, not FirstDefaultTemplate);
-            If (TGame(St.Objects[I]).CacheName='') and (not TGame(St.Objects[I]).OwnINI) then FirstDefaultTemplate:=False;
+        For I:=0 to List.Count-1 do begin
+          Case SortBy of
+            slbName : St.AddObject(TGame(List[I]).CacheName,TGame(List[I]));
+            slbSetup : If Trim(TGame(List[I]).SetupExe)<>''
+                         then St.AddObject(RemoveUnderline(LanguageSetup.Yes),TGame(List[I]))
+                         else St.AddObject(RemoveUnderline(LanguageSetup.No),TGame(List[I]));
+            slbGenre : St.AddObject(GetCustomGenreName(TGame(List[I]).CacheGenre),TGame(List[I]));
+            slbDeveloper : St.AddObject(TGame(List[I]).CacheDeveloper,TGame(List[I]));
+            slbPublisher : St.AddObject(TGame(List[I]).CachePublisher,TGame(List[I]));
+            slbYear : St.AddObject(TGame(List[I]).CacheYear,TGame(List[I]));
+            slbLanguage : St.AddObject(GetCustomLanguageName(TGame(List[I]).CacheLanguage),TGame(List[I]));
+            slbComment : St.AddObject(TGame(List[I]).Notes,TGame(List[I]));
+          End;
+          If Integer(SortBy)>=10 then begin
+            St.AddObject(UserInfoGetValue(TGame(List[I]).UserInfo,VUserSt[Min(VUserSt.Count-1,Integer(SortBy)-10)]),TGame(List[I]));
           end;
         end;
+        St.Sort;
+
+        {Add games to List}
+        ItemsUsed:=0;
+        If Trim(PrgSetup.ValueForNotSet)='' then T:=LanguageSetup.NotSet else T:=Trim(PrgSetup.ValueForNotSet);
+        AListView.Items.BeginUpdate;
+        try
+          FirstDefaultTemplate:=True;
+          If ReverseOrder then begin
+            For I:=St.Count-1 downto 0 do begin
+              AddGameToList(AListView,ItemsUsed,AListViewImageList,AListViewIconImageList,AImageList,TGame(St.Objects[I]),ShowExtraInfo,O,V,VUserSt,T,ScreenshotViewMode,FirstDefaultTemplate);
+              If (TGame(St.Objects[I]).CacheName='') and (not TGame(St.Objects[I]).OwnINI) then FirstDefaultTemplate:=False;
+            end;
+          end else begin
+            For I:=0 to St.Count-1 do begin
+              AddGameToList(AListView,ItemsUsed,AListViewImageList,AListViewIconImageList,AImageList,TGame(St.Objects[I]),ShowExtraInfo,O,V,VUserSt,T,ScreenshotViewMode, not FirstDefaultTemplate);
+              If (TGame(St.Objects[I]).CacheName='') and (not TGame(St.Objects[I]).OwnINI) then FirstDefaultTemplate:=False;
+            end;
+          end;
+        finally
+          AListView.Items.EndUpdate;
+        end;
       finally
-        AListView.Items.EndUpdate;
+        VUserSt.Free;
       end;
 
       while ItemsUsed<AListView.Items.Count do AListView.Items.Delete(AListView.Items.Count-1);
@@ -848,6 +1085,122 @@ begin
   {$IFDEF LargeListTest}Application.MainForm.Caption:=IntToStr(GetTickCount-Ca);{$ENDIF}
 end;
 
+Function GamesListSaveColWidthsToString(const AListView : TListView) : String;
+Var O,V,VUser : String;
+    St,VUserSt : TStringList;
+    I,Nr,C : Integer;
+begin
+  GetColOrderAndVisible(O,V,VUser);
+  VUserSt:=ValueToList(VUser);
+  try
+    If PrgSetup.ShowExtraInfo then begin
+      St:=ValueToList(PrgSetup.ColumnWidths);
+      try
+        while St.Count<8 do St.Add('-1');
+        For I:=7 to St.Count-1 do St[I]:='-1';
+        St[0]:=IntToStr(AListView.Column[0].Width);
+        C:=0;
+        For I:=0 to length(O)-1 do begin
+          Nr:=-1;
+          Case O[I+1] of
+            '1'..'9' : Nr:=StrToInt(O[I+1]);
+            'A'..'Z' : Nr:=Ord(O[I+1])-Ord('A')+10;
+            'a'..'z' : Nr:=Ord(O[I+1])-Ord('a')+10;
+          end;
+          If Nr<1 then continue;
+          If Nr<=7 then begin
+            If V[Nr]='0' then continue;
+          end else begin
+            If Nr-7>VUserSt.Count then continue;
+          end;
+          inc(C);
+          If AListView.Columns.Count>C then begin
+            While St.Count<Nr+1 do St.Add('-1');
+            St[Nr]:=IntToStr(AListView.Column[C].Width);
+          end;
+        end;
+        result:=ListToValue(St);
+      finally
+        St.Free;
+      end;
+    end else begin
+      St:=TStringList.Create;
+      try
+        St.Add(IntToStr(AListView.Column[0].Width));
+        St.Add(IntToStr(AListView.Column[1].Width));
+        result:=ListToValue(St);
+      finally
+        St.Free;
+      end;
+    end;
+  finally
+    VUserSt.Free;
+  end;
+end;
+
+Procedure GamesListLoadColWidthsFromString(const AListView : TListView; const Data : String);
+Var O,V,VUser : String;
+    St,VUserSt : TStringList;
+    I,Nr,C,W : Integer;
+begin
+  GetColOrderAndVisible(O,V,VUser);
+  VUserSt:=ValueToList(VUser);
+  try
+    If PrgSetup.ShowExtraInfo then begin
+      St:=ValueToList(Data);
+      try
+        while St.Count<8+VUserSt.Count do St.Add('');
+        If TryStrToInt(St[0],W) and (W>=-2) and (W<1000) then AListView.Column[0].Width:=W;
+        C:=0;
+        For I:=0 to length(O)-1 do begin
+          Nr:=-1;
+          Case O[I+1] of
+            '1'..'9' : Nr:=StrToInt(O[I+1]);
+            'A'..'Z' : Nr:=Ord(O[I+1])-Ord('A')+10;
+            'a'..'z' : Nr:=Ord(O[I+1])-Ord('a')+10;
+          end;
+          If Nr<1 then continue;
+          If Nr<=7 then begin
+            If V[Nr]='0' then continue;
+          end else begin
+            If Nr-7>VUserSt.Count then continue;
+          end;
+          inc(C);
+          If Nr<St.Count then begin
+            If TryStrToInt(St[Nr],W) and (W>=-2) and (W<1000) then AListView.Column[C].Width:=W;
+          end;
+        end;
+      finally
+        St.Free;
+      end;
+    end else begin
+      St:=ValueToList(Data);
+      try
+        while St.Count<2 do St.Add('');
+        If TryStrToInt(St[0],W) and (W>=-2) and (W<1000) then AListView.Column[0].Width:=W;
+        If TryStrToInt(St[1],W) and (W>=-2) and (W<1000) then AListView.Column[1].Width:=W;
+      finally
+        St.Free;
+      end;
+    end;
+  finally
+    VUserSt.Free;
+  end;
+end;
+
+Procedure GamesListSaveColWidths(const AListView : TListView);
+begin
+  If PrgSetup.ShowExtraInfo
+    then PrgSetup.ColumnWidths:=GamesListSaveColWidthsToString(AListView)
+    else PrgSetup.ColumnWidthsNoExtraInfoMode:=GamesListSaveColWidthsToString(AListView);
+end;
+
+Procedure GamesListLoadColWidths(const AListView : TListView);
+begin
+  If PrgSetup.ShowExtraInfo
+    then GamesListLoadColWidthsFromString(AListView,PrgSetup.ColumnWidths)
+    else GamesListLoadColWidthsFromString(AListView,PrgSetup.ColumnWidthsNoExtraInfoMode)
+end;
 
 Procedure AddScreenshotsToList(const AListView : TListView; const AImageList : TImageList; Dir : String);
 Procedure CalcWH(const OldW, OldH, MaxW, MaxH : Integer; var NewW, NewH : Integer);
@@ -897,20 +1250,16 @@ begin
           B:=TBitmap.Create;
           try
             try
-              B.Assign(P);
+              {not working well: B.Assign(P);}
+              B.Width:=P.Width;
+              B.Height:=P.Height;
+              P.Draw(B.Canvas,Rect(0,0,B.Width-1,B.Height-1));
+
               B2:=TBitmap.Create;
               try
                 B2.SetSize(AImageList.Width,AImageList.Height);
                 CalcWH(B.Width,B.Height,AImageList.Width,AImageList.Height,NewW,NewH);
-                B2.Canvas.StretchDraw(
-                  Rect(
-                    (AImageList.Width-NewW) div 2,
-                    (AImageList.Height-NewH) div 2,
-                    AImageList.Width-1-((AImageList.Width-NewW) div 2),
-                    AImageList.Height-1-((AImageList.Height-NewH) div 2)
-                  ),
-                  B
-                );
+                ScaleImage(B,B2,NewW,NewH);
                 AImageList.AddMasked(B2,clNone);
               finally
                 B2.Free;
@@ -949,15 +1298,7 @@ begin
               try
                 B2.SetSize(AImageList.Width,AImageList.Height);
                 CalcWH(B.Width,B.Height,AImageList.Width,AImageList.Height,NewW,NewH);
-                B2.Canvas.StretchDraw(
-                  Rect(
-                    (AImageList.Width-NewW) div 2,
-                    (AImageList.Height-NewH) div 2,
-                    AImageList.Width-1-((AImageList.Width-NewW) div 2),
-                    AImageList.Height-1-((AImageList.Height-NewH) div 2)
-                  ),
-                  B
-                );
+                ScaleImage(B,B2,NewW,NewH);
                 AImageList.AddMasked(B2,clNone);
               finally
                 B2.Free;
@@ -996,15 +1337,7 @@ begin
               try
                 B2.SetSize(AImageList.Width,AImageList.Height);
                 CalcWH(B.Width,B.Height,AImageList.Width,AImageList.Height,NewW,NewH);
-                B2.Canvas.StretchDraw(
-                  Rect(
-                    (AImageList.Width-NewW) div 2,
-                    (AImageList.Height-NewH) div 2,
-                    AImageList.Width-1-((AImageList.Width-NewW) div 2),
-                    AImageList.Height-1-((AImageList.Height-NewH) div 2)
-                  ),
-                  B
-                );
+                ScaleImage(B,B2,NewW,NewH);
                 AImageList.AddMasked(B2,clNone);
               finally
                 B2.Free;
@@ -1043,15 +1376,7 @@ begin
               try
                 B2.SetSize(AImageList.Width,AImageList.Height);
                 CalcWH(B.Width,B.Height,AImageList.Width,AImageList.Height,NewW,NewH);
-                B2.Canvas.StretchDraw(
-                  Rect(
-                    (AImageList.Width-NewW) div 2,
-                    (AImageList.Height-NewH) div 2,
-                    AImageList.Width-1-((AImageList.Width-NewW) div 2),
-                    AImageList.Height-1-((AImageList.Height-NewH) div 2)
-                  ),
-                  B
-                );
+                ScaleImage(B,B2,NewW,NewH);
                 AImageList.AddMasked(B2,clNone);
               finally
                 B2.Free;
@@ -1087,15 +1412,7 @@ begin
             try
               B2.SetSize(AImageList.Width,AImageList.Height);
                 CalcWH(B.Width,B.Height,AImageList.Width,AImageList.Height,NewW,NewH);
-                B2.Canvas.StretchDraw(
-                  Rect(
-                    (AImageList.Width-NewW) div 2,
-                    (AImageList.Height-NewH) div 2,
-                    AImageList.Width-1-((AImageList.Width-NewW) div 2),
-                    AImageList.Height-1-((AImageList.Height-NewH) div 2)
-                  ),
-                  B
-                );
+                ScaleImage(B,B2,NewW,NewH);
               AImageList.AddMasked(B2,clNone);
             except OK:=False; end;
           finally
@@ -1121,47 +1438,31 @@ begin
 end;
 
 Procedure AddSoundsToList(const AListView : TListView; Dir : String; ImageListIndex : Integer);
+Procedure FindAndAddFiles(const Ext : String);
 Var I : Integer;
     Rec : TSearchRec;
     L : TListItem;
 begin
+  I:=FindFirst(Dir+'*.'+Ext,faAnyFile,Rec);
+  try
+    while I=0 do begin
+      L:=AListView.Items.Add;
+      L.Caption:=Rec.Name;
+      L.ImageIndex:=ImageListIndex;
+      I:=FindNext(Rec);
+    end;
+  finally
+    FindClose(Rec);
+  end;
+end;
+begin
   Dir:=IncludeTrailingPathDelimiter(Dir);
 
-  I:=FindFirst(Dir+'*.wav',faAnyFile,Rec);
-  try
-    while I=0 do begin
-      L:=AListView.Items.Add;
-      L.Caption:=Rec.Name;
-      L.ImageIndex:=ImageListIndex;
-      I:=FindNext(Rec);
-    end;
-  finally
-    FindClose(Rec);
-  end;
-
-  I:=FindFirst(Dir+'*.mp3',faAnyFile,Rec);
-  try
-    while I=0 do begin
-      L:=AListView.Items.Add;
-      L.Caption:=Rec.Name;
-      L.ImageIndex:=ImageListIndex;
-      I:=FindNext(Rec);
-    end;
-  finally
-    FindClose(Rec);
-  end;
-
-  I:=FindFirst(Dir+'*.ogg',faAnyFile,Rec);
-  try
-    while I=0 do begin
-      L:=AListView.Items.Add;
-      L.Caption:=Rec.Name;
-      L.ImageIndex:=ImageListIndex;
-      I:=FindNext(Rec);
-    end;
-  finally
-    FindClose(Rec);
-  end;
+  FindAndAddFiles('wav');
+  FindAndAddFiles('mp3');
+  FindAndAddFiles('ogg');
+  FindAndAddFiles('mid');
+  FindAndAddFiles('midi');
 
   AListView.SortType:=stNone;
   AListView.SortType:=stText;
@@ -1248,7 +1549,6 @@ begin
   DeleteFiles(PrgDataDir+GameListSubDir,'*.conf');
   DeleteFiles(PrgDataDir+GameListSubDir,'tempprof.*');
   ExtDeleteFile(PrgDataDir+'Developers.dat',ftProfile);
-  ExtDeleteFile(PrgDataDir+'dfend.ini',ftProfile);
   ExtDeleteFile(PrgDataDir+'Genres.dat',ftProfile);
   ExtDeleteFile(PrgDataDir+'Profiles.dat',ftProfile);
   ExtDeleteFile(PrgDataDir+'Publisher.dat',ftProfile);
@@ -1275,8 +1575,8 @@ begin
 
     G.GameExe:=RemoveBackslash(MakeRelPath(G.GameExe,PrgSetup.BaseDir));
     G.SetupExe:=RemoveBackslash(MakeRelPath(G.SetupExe,PrgSetup.BaseDir));
-    G.CaptureFolder:=RemoveBackslash(MakeRelPath(G.CaptureFolder,PrgSetup.BaseDir));
-    G.DataDir:=RemoveBackslash(MakeRelPath(G.DataDir,PrgSetup.BaseDir));
+    G.CaptureFolder:=RemoveBackslash(MakeRelPath(G.CaptureFolder,PrgSetup.BaseDir,True));
+    G.DataDir:=RemoveBackslash(MakeRelPath(G.DataDir,PrgSetup.BaseDir,True));
 
     St:=ValueToList(G.ExtraFiles);
     try
@@ -1288,7 +1588,7 @@ begin
 
     St:=ValueToList(G.ExtraDirs);
     try
-      For J:=0 to St.Count-1 do G.ExtraDirs:=RemoveBackslash(MakeRelPath(St[J],PrgSetup.BaseDir));
+      For J:=0 to St.Count-1 do G.ExtraDirs:=RemoveBackslash(MakeRelPath(St[J],PrgSetup.BaseDir,True));
       G.ExtraDirs:=StringListToString(St);
     finally
       St.Free;
@@ -1300,11 +1600,11 @@ begin
         S:=Trim(St[0]); T:='';
         K:=Pos('$',S);
         while K>0 do begin
-          T:=T+RemoveBackslash(MakeRelPath(Trim(Copy(S,1,K-1)),PrgSetup.BaseDir))+'$';
+          T:=T+RemoveBackslash(MakeRelPath(Trim(Copy(S,1,K-1)),PrgSetup.BaseDir,True))+'$';
           S:=Trim(Copy(S,K+1,MaxInt));
           K:=Pos('$',S);
         end;
-        T:=T+RemoveBackslash(MakeRelPath(Trim(S),PrgSetup.BaseDir));
+        T:=T+RemoveBackslash(MakeRelPath(Trim(S),PrgSetup.BaseDir,True));
         St[0]:=T;
         G.Mount[J]:=ListToValue(St);
       finally
@@ -1317,7 +1617,7 @@ begin
   end;
 end;
 
-Function CopyFiles(Source, Dest : String) : Boolean;
+Function CopyFiles(Source, Dest : String; const OverwriteExistingFiles : Boolean) : Boolean;
 Var I : Integer;
     Rec : TSearchRec;
 begin
@@ -1332,13 +1632,18 @@ begin
     while I=0 do begin
       If (Rec.Attr and faDirectory)<>0 then begin
         If (Rec.Name<>'.') and (Rec.Name<>'..') then begin
-          If not CopyFiles(Source+Rec.Name,Dest+Rec.Name) then exit;
+          If not CopyFiles(Source+Rec.Name,Dest+Rec.Name,OverwriteExistingFiles) then exit;
         end;
       end else begin
         Application.ProcessMessages;
-        if not CopyFile(PChar(Source+Rec.Name),PChar(Dest+Rec.Name),False) then exit;
+        If OverwriteExistingFiles then begin
+          if not CopyFile(PChar(Source+Rec.Name),PChar(Dest+Rec.Name),False) then exit;
+        end else begin
+          If not FileExists(Dest+Rec.Name) then begin
+            if not CopyFile(PChar(Source+Rec.Name),PChar(Dest+Rec.Name),False) then exit;
+          end;
+        end;
       end;
-
       I:=FindNext(Rec);
     end;
   finally
@@ -1346,6 +1651,67 @@ begin
   end;
 
   result:=True;
+end;
+
+Procedure UpdateUserDataFolderAfterUpgrade;
+Var Source : String;
+begin
+  {Copy new and changed NewUserData files to DataDir}
+  If PrgDataDir=PrgDir then exit;
+
+  {Update installer package base script}
+  If FileExists(PrgDir+NSIInstallerHelpFile) then begin
+    CopyFile(PChar(PrgDir+NSIInstallerHelpFile),PChar(PrgDataDir+SettingsFolder+'\'+NSIInstallerHelpFile),False); {False = overwrite existing file}
+  end else begin
+    If FileExists(PrgDir+BinFolder+'\'+NSIInstallerHelpFile) then begin
+      CopyFile(PChar(PrgDir+BinFolder+'\'+NSIInstallerHelpFile),PChar(PrgDataDir+SettingsFolder+'\'+NSIInstallerHelpFile),False); {False = overwrite existing file}
+    end;
+  end;
+
+  {Copy Icons.ini to settings folder}
+  If FileExists(PrgDir+NewUserDataSubDir+'\'+IconsConfFile) then begin
+    If FileExists(PrgDataDir+SettingsFolder+'\'+IconsConfFile) then begin
+      If FileExists(PrgDataDir+SettingsFolder+'\'+ChangeFileExt(IconsConfFile,'.old')) then DeleteFile(PrgDataDir+SettingsFolder+'\'+ChangeFileExt(IconsConfFile,'.old'));
+      RenameFile(PrgDataDir+SettingsFolder+'\'+IconsConfFile,PrgDataDir+SettingsFolder+'\'+ChangeFileExt(IconsConfFile,'.old'));
+    end;
+    CopyFile(PChar(PrgDir+NewUserDataSubDir+'\'+IconsConfFile),PChar(PrgDataDir+SettingsFolder+'\'+IconsConfFile),True);
+  end;
+
+  {Add new auto setup templates}
+  CopyFiles(PrgDir+NewUserDataSubDir+'\'+AutoSetupSubDir,PrgDataDir+AutoSetupSubDir,False); {False = do not overwrite existing file}
+
+  {Update DozZip}
+  Source:=PrgDir+NewUserDataSubDir+'\DOSZIP\';
+  If DirectoryExists(Source) then CopyFiles(Source,IncludeTrailingPathDelimiter(PrgSetup.GameDir)+'DOSZIP\',True);
+end;
+
+Procedure MoveDataFile(const FileName : String);
+begin
+  If not FileExists(PrgDataDir+FileName) then exit;
+
+  If FileExists(PrgDataDir+SettingsFolder+'\'+FileName) then begin
+    {File in new position already exists -> new version of DFR has already used -> delete old file}
+    {Ext}DeleteFile(PrgDataDir+FileName{,ftProfile}); {Can't use ExtDelete because ExtDelete querys string from PrgSetup which is not loaded by this time}
+  end else begin
+    {Move data  file to new position}
+    If CopyFile(PChar(PrgDataDir+FileName),PChar(PrgDataDir+SettingsFolder+'\'+FileName),True) then
+      {Ext}DeleteFile(PrgDataDir+FileName{,ftProfile}); {Can't use ExtDelete because ExtDelete querys string from PrgSetup which is not loaded by this time}
+  end;
+end;
+
+Procedure UpdateSettingsFilesLocation;
+begin
+  {Move configuration files to SettingsFolder}
+  ForceDirectories(PrgDataDir+SettingsFolder);
+
+  MoveDataFile(ConfOptFile);
+  MoveDataFile(ScummVMConfOptFile);
+  MoveDataFile(HistoryFileName);
+  MoveDataFile(IconsConfFile);
+  MoveDataFile(MainSetupFile);
+  MoveDataFile('Links.txt');
+  MoveDataFile('SearchLinks.txt');
+  MoveDataFile(NSIInstallerHelpFile);
 end;
 
 Function RestoreFREEDOSFolder : Boolean;
@@ -1358,14 +1724,14 @@ begin
   Source2:=PrgDir+NewUserDataSubDir+'\DOSZIP';
   Dest1:=IncludeTrailingPathDelimiter(PrgSetup.GameDir)+'FREEDOS';
   Dest2:=IncludeTrailingPathDelimiter(PrgSetup.GameDir)+'DOSZIP';
-  B1:=DirectoryExists(Source1) and not DirectoryExists(Dest1);
-  B2:=DirectoryExists(Source2) and not DirectoryExists(Dest2);
+  B1:=DirectoryExists(Source1){ and not DirectoryExists(Dest1) - always copy, overwrite/update dest files};
+  B2:=DirectoryExists(Source2){ and not DirectoryExists(Dest2) - always copy, overwrite/update dest files};
 
   If B1 or B2 then begin
     LoadAndShowSmallWaitForm(LanguageSetup.SetupFormService3WaitInfo);
     try
-      If B1 then result:=CopyFiles(Source1,Dest1);
-      If B2 then result:=CopyFiles(Source2,Dest2);
+      If B1 then result:=CopyFiles(Source1,Dest1,True);
+      If B2 then result:=CopyFiles(Source2,Dest2,True);
     finally
       FreeSmallWaitForm;
     end;
@@ -1422,11 +1788,11 @@ begin
     St.Free;
   end;
   result.NrOfMounts:=1;
-  result.Mount0:=MakeRelPath(PrgSetup.GameDir,PrgSetup.BaseDir)+';Drive;C;false;';
+  result.Mount0:=MakeRelPath(PrgSetup.GameDir,PrgSetup.BaseDir,True)+';Drive;C;false;';
   result.CloseDosBoxAfterGameExit:=False;
   result.Environment:='PATH[61]Z:\[13]';
   result.StartFullscreen:=False;
-  result.CaptureFolder:='.\'+CaptureSubDir+'\'+DosBoxDOSProfile;
+  result.CaptureFolder:=IncludeTrailingPathDelimiter(PrgSetup.CaptureDir)+DosBoxDOSProfile;
   result.Genre:='Program';
   result.WWW:='http:/'+'/www.dosbox.com';
   result.Name:=DosBoxDOSProfile;
@@ -1447,9 +1813,25 @@ begin
       CopyFile(PChar(PrgDir+NewUserDataSubDir+'\'+IconsSubDir+'\'+'DOSBox.ico'),PChar(PrgDataDir+IconsSubDir+'\DOSBox.ico'),False);
     end;
     If FileExists(PrgDir+NewUserDataSubDir+'\'+CaptureSubDir+'\DOSBox DOS\dosbox_000.png') then begin
-      ForceDirectories(PrgDataDir+CaptureSubDir+'\DOSBox DOS');
-      CopyFile(PChar(PrgDir+NewUserDataSubDir+'\'+CaptureSubDir+'\DOSBox DOS\dosbox_000.png'),PChar(PrgDataDir+CaptureSubDir+'\DOSBox DOS\dosbox_000.png'),False);
+      ForceDirectories(MakeAbsPath(PrgSetup.CaptureDir,PrgSetup.BaseDir)+'DOSBox DOS');
+      CopyFile(PChar(PrgDir+NewUserDataSubDir+'\'+CaptureSubDir+'\DOSBox DOS\dosbox_000.png'),PChar(MakeAbsPath(PrgSetup.CaptureDir,PrgSetup.BaseDir)+'DOSBox DOS\dosbox_000.png'),False);
     end;
+  end;
+
+  If FileExists(PrgDir+NSIInstallerHelpFile) then begin
+    CopyFile(PChar(PrgDir+NSIInstallerHelpFile),PChar(PrgDataDir+SettingsFolder+'\'+NSIInstallerHelpFile),False);
+  end else begin
+    If FileExists(PrgDir+BinFolder+'\'+NSIInstallerHelpFile) then begin
+      CopyFile(PChar(PrgDir+BinFolder+'\'+NSIInstallerHelpFile),PChar(PrgDataDir+SettingsFolder+'\'+NSIInstallerHelpFile),False);
+    end;
+  end;
+
+  If FileExists(PrgDir+NewUserDataSubDir+'\'+IconsConfFile) then begin
+    If FileExists(PrgDataDir+SettingsFolder+'\'+IconsConfFile) then begin
+      If FileExists(PrgDataDir+SettingsFolder+'\'+ChangeFileExt(IconsConfFile,'.old')) then DeleteFile(PrgDataDir+SettingsFolder+'\'+ChangeFileExt(IconsConfFile,'.old'));
+      RenameFile(PrgDataDir+SettingsFolder+'\'+IconsConfFile,PrgDataDir+SettingsFolder+'\'+ChangeFileExt(IconsConfFile,'.old'));
+    end;
+    CopyFile(PChar(PrgDir+NewUserDataSubDir+'\'+IconsConfFile),PChar(PrgDataDir+SettingsFolder+'\'+IconsConfFile),True);
   end;
 
   If CopyFiles then RestoreFREEDOSFolder;
@@ -1462,7 +1844,7 @@ begin
   try
     DefaultGame.ResetToDefault;
     DefaultGame.NrOfMounts:=1;
-    DefaultGame.Mount0:=MakeRelPath(PrgSetup.GameDir,PrgSetup.BaseDir)+';Drive;C;false;';
+    DefaultGame.Mount0:=MakeRelPath(PrgSetup.GameDir,PrgSetup.BaseDir,True)+';Drive;C;false;';
     DefaultGame.Environment:='PATH[61]Z:\[13]';
   finally
     DefaultGame.Free;
@@ -1537,11 +1919,11 @@ begin
       If I<>0 then St.Add('');
 
       St.Add(Name);
-      St.Add(S1+' : '+Genre);
+      St.Add(S1+' : '+GetCustomGenreName(Genre));
       St.Add(S2+' : '+Developer);
       St.Add(S3+' : '+Publisher);
       St.Add(S4+' : '+Year);
-      St.Add(S5+' : '+Language);
+      St.Add(S5+' : '+GetCustomLanguageName(Language));
       St.Add(S6+' : '+WWW);
       If UserInfo<>'' then begin
         St2:=StringToStringList(UserInfo);
@@ -1593,7 +1975,7 @@ begin
     L:=GameDB.GetSortedGamesList;
     try
       For I:=0 to L.Count-1 do with TGame(L[I]) do begin
-        S:=Format('"%s";"%s";"%s";"%s";"%s";"%s";"%s"',[Name,Genre,Developer,Publisher,Year,Language,WWW]);
+        S:=Format('"%s";"%s";"%s";"%s";"%s";"%s";"%s"',[Name,GetCustomGenreName(Genre),Developer,Publisher,Year,GetCustomLanguageName(Language),WWW]);
         St2:=StringToStringList(UserInfo);
         try
           For J:=0 to UserList.Count-1 do begin
@@ -1620,35 +2002,31 @@ begin
 end;
 
 Function EncodeHTMLSymbols(const S : String) : String;
-Var B : Boolean;
-    I : Integer;
-Procedure Replace(const C : Char; const T : String); begin I:=Pos(C,result); If I=0 then exit; result:=Copy(result,1,I-1)+T+Copy(result,I+1,MaxInt); B:=False; end;
+Procedure Replace(const C : Char; const T : String);
+Var I,J : Integer;
+begin
+  I:=Pos(C,result);
+  while I>0 do begin J:=I+1; result:=Copy(result,1,I-1)+T+Copy(result,I+1,MaxInt); I:=Pos(C,Copy(result,J,MaxInt))-(J-1); end;
+end;
+Var I : Integer;
+    St : TStringList;
+    A,B : String;
 begin
   result:=S;
-  repeat
-    B:=True;
-    I:=Pos('&',result);
-    If I<>0 then begin
-      B:=False;
-      B:=B or (Copy(result,I,5)='&amp;');
-      B:=B or (Copy(result,I,6)='&Auml;');
-      B:=B or (Copy(result,I,6)='&Ouml;');
-      B:=B or (Copy(result,I,6)='&Uuml;');
-      B:=B or (Copy(result,I,6)='&auml;');
-      B:=B or (Copy(result,I,6)='&ouml;');
-      B:=B or (Copy(result,I,6)='&uuml;');
-      B:=B or (Copy(result,I,7)='&szlig;');
-      If not B then result:=Copy(result,1,I-1)+'&amp;'+Copy(result,I+1,MaxInt);
-    end;
+  Replace('&','&amp;'); {must be the first, otherweise "ä" -> "&auml;" -> "&amp;auml;" will happen}
 
-    Replace('Ä','&Auml;');
-    Replace('Ö','&Ouml;');
-    Replace('Ü','&Uuml;');
-    Replace('ä','&auml;');
-    Replace('ö','&ouml;');
-    Replace('ü','&uuml;');
-    Replace('ß','&szlig;');
-  until B;
+  St:=ValueToList(LanguageSetup.CharsetHTMLTranslate,',');
+  try
+    If St.Count mod 2=1 then St.Add(St[St.Count-1]);
+    For I:=0 to (St.Count div 2)-1 do begin
+      A:=St[2*I]; If length(A)=0 then continue;
+      B:=St[2*I+1]; If (B<>'') and (B[length(B)]<>';') then B:=B+';';
+      If (A[1]='&') or (ExtUpperCase(B)='&AMP;') then continue;
+      Replace(A[1],B);
+    end;
+  finally
+    St.Free;
+  end;
 end;
 
 Procedure ExportGamesListHTMLFile(const GameDB : TGameDB; const St : TStringList);
@@ -1677,32 +2055,40 @@ begin
     St.Add('<html>');
     St.Add('  <head>');
     St.Add('    <title>D-Fend Reloaded</title>');
-    St.Add('    <meta http-equiv="content-type" content="text/html; charset=iso-8859-1">');
+    St.Add('    <meta http-equiv="content-type" content="text/html; charset='+LanguageSetup.CharsetHTMLCharset+'">');
     St.Add('    <meta name="description" content="D-Fend Reloaded games list">');
     St.Add('    <meta name="DC.creator" content="D-Fend Reloaded '+GetNormalFileVersionAsString+'">');
+    St.Add('    <style type="text/css">');
+    St.Add('    <!--');
+    St.Add('      body {font-family: Arial, Helvetica, sans-serif;}');
+    St.Add('      table {border-collapse: collapse;}');
+    St.Add('      td,th {border: solid 1px black; padding: 2px 4px 2px 4px;}');
+    St.Add('    -->');
+    St.Add('    </style>');
     St.Add('  </head>');
     St.Add('  <body>');
+    St.Add('    <h1>'+EncodeHTMLSymbols(LanguageSetup.MenuFileExportGamesListHTMLTitle)+'</h1>');
     St.Add('    <table>');
     St.Add('      <tr>');
-    St.Add(Format('        <th>%s</th>',[LanguageSetup.GameName]));
-    St.Add(Format('        <th>%s</th>',[LanguageSetup.GameGenre]));
-    St.Add(Format('        <th>%s</th>',[LanguageSetup.GameDeveloper]));
-    St.Add(Format('        <th>%s</th>',[LanguageSetup.GamePublisher]));
-    St.Add(Format('        <th>%s</th>',[LanguageSetup.GameYear]));
-    St.Add(Format('        <th>%s</th>',[LanguageSetup.GameLanguage]));
-    St.Add(Format('        <th>%s</th>',[LanguageSetup.GameWWW]));
-    For I:=0 to UserList.Count-1 do St.Add(Format('        <th>%s</th>',[UserList[I]]));
+    St.Add(Format('        <th>%s</th>',[EncodeHTMLSymbols(LanguageSetup.GameName)]));
+    St.Add(Format('        <th>%s</th>',[EncodeHTMLSymbols(LanguageSetup.GameGenre)]));
+    St.Add(Format('        <th>%s</th>',[EncodeHTMLSymbols(LanguageSetup.GameDeveloper)]));
+    St.Add(Format('        <th>%s</th>',[EncodeHTMLSymbols(LanguageSetup.GamePublisher)]));
+    St.Add(Format('        <th>%s</th>',[EncodeHTMLSymbols(LanguageSetup.GameYear)]));
+    St.Add(Format('        <th>%s</th>',[EncodeHTMLSymbols(LanguageSetup.GameLanguage)]));
+    St.Add(Format('        <th>%s</th>',[EncodeHTMLSymbols(LanguageSetup.GameWWW)]));
+    For I:=0 to UserList.Count-1 do St.Add(Format('        <th>%s</th>',[EncodeHTMLSymbols(UserList[I])]));
     St.Add('      </tr>');
     L:=GameDB.GetSortedGamesList;
     try
       For I:=0 to L.Count-1 do with TGame(L[I]) do begin
         St.Add('      <tr>');
         St.Add(Format('        <td>%s</td>',[EncodeHTMLSymbols(Name)]));
-        St.Add(Format('        <td>%s</td>',[EncodeHTMLSymbols(Genre)]));
+        St.Add(Format('        <td>%s</td>',[EncodeHTMLSymbols(GetCustomGenreName(Genre))]));
         St.Add(Format('        <td>%s</td>',[EncodeHTMLSymbols(Developer)]));
         St.Add(Format('        <td>%s</td>',[EncodeHTMLSymbols(Publisher)]));
         St.Add(Format('        <td>%s</td>',[EncodeHTMLSymbols(Year)]));
-        St.Add(Format('        <td>%s</td>',[EncodeHTMLSymbols(Language)]));
+        St.Add(Format('        <td>%s</td>',[EncodeHTMLSymbols(GetCustomLanguageName(Language))]));
         If Trim(WWW)<>''
           then St.Add(Format('        <td><a href="%s">%s</a></td>',[WWW,WWW]))
           else St.Add('        <td></td>');
@@ -1784,15 +2170,15 @@ begin
   If Trim(GameName)='' then exit;
 
   try
-    AssignFile(F,PrgDataDir+HistoryFileName);
-    If FileExists(PrgDataDir+HistoryFileName) then Append(F) else Rewrite(F);
+    AssignFile(F,PrgDataDir+SettingsFolder+'\'+HistoryFileName);
+    If FileExists(PrgDataDir+SettingsFolder+'\'+HistoryFileName) then Append(F) else Rewrite(F);
     try
       writeln(F,GameName+';'+DateToStr(Now)+';'+TimeToStr(Now));
     finally
       CloseFile(F);
     end;
   except
-    MessageDlg(Format(LanguageSetup.MessageCouldNotSaveFile,[PrgDataDir+HistoryFileName]),mtError,[mbOK],0);
+    MessageDlg(Format(LanguageSetup.MessageCouldNotSaveFile,[PrgDataDir+SettingsFolder+'\'+HistoryFileName]),mtError,[mbOK],0);
   end;
 end;
 
@@ -1814,15 +2200,15 @@ begin
   SetLength(StatisticData,0);
   result:=False;
 
-  if not FileExists(PrgDataDir+HistoryFileName) then exit;
+  if not FileExists(PrgDataDir+SettingsFolder+'\'+HistoryFileName) then exit;
 
   RawList:=TStringList.Create;
   Games:=TStringList.Create;
 
   try
-    RawList.LoadFromFile(PrgDataDir+HistoryFileName);
+    RawList.LoadFromFile(PrgDataDir+SettingsFolder+'\'+HistoryFileName);
   except
-    MessageDlg(Format(LanguageSetup.MessageCouldNotOpenFile,[PrgDataDir+HistoryFileName]),mtError,[mbOK],0);
+    MessageDlg(Format(LanguageSetup.MessageCouldNotOpenFile,[PrgDataDir+SettingsFolder+'\'+HistoryFileName]),mtError,[mbOK],0);
     FreeAndNil(RawList);
     FreeAndNil(Games);
     SetLength(StatisticData,0);
@@ -1881,11 +2267,9 @@ begin
     C:=AListView.Columns.Add;
     C.Caption:=LanguageSetup.HistoryTime;
     C.Width:=-2;
-    If PrgSetup.ActivateIncompleteFeatures then begin
-      C:=AListView.Columns.Add;
-      C.Caption:=LanguageSetup.HistoryStarts;
-      C.Width:=-2;
-    end;
+    C:=AListView.Columns.Add;
+    C.Caption:=LanguageSetup.HistoryStarts;
+    C.Width:=-2;
 
     if not LoadStatisticData(RawList,Games) then exit;
     try
@@ -1901,10 +2285,8 @@ begin
           L.SubItems.Add(Line[1]);
           If Line.Count<3 then continue;
           L.SubItems.Add(Line[2]);
-          If PrgSetup.ActivateIncompleteFeatures then begin
-            J:=Games.IndexOf(Line[0]);
-            If J>=0 then L.SubItems.Add(IntToStr(StatisticData[J].Count)) else L.SubItems.Add('-');
-          end;
+          J:=Games.IndexOf(Line[0]);
+          If J>=0 then L.SubItems.Add(IntToStr(StatisticData[J].Count)) else L.SubItems.Add('-');
         finally
           Line.Free;
         end;
@@ -1961,9 +2343,9 @@ end;
 
 Procedure ClearHistory;
 begin
-  if not FileExists(PrgDataDir+HistoryFileName) then exit;
-  if not ExtDeleteFile(PrgDataDir+HistoryFileName,ftProfile) then
-    MessageDlg(Format(LanguageSetup.MessageCouldNotDeleteFile,[PrgDataDir+HistoryFileName]),mtError,[mbOK],0);
+  if not FileExists(PrgDataDir+SettingsFolder+'\'+HistoryFileName) then exit;
+  if not ExtDeleteFile(PrgDataDir+SettingsFolder+'\'+HistoryFileName,ftProfile) then
+    MessageDlg(Format(LanguageSetup.MessageCouldNotDeleteFile,[PrgDataDir+SettingsFolder+'\'+HistoryFileName]),mtError,[mbOK],0);
 end;
 
 Function StrToBool(S : String) : Boolean;
@@ -1976,7 +2358,7 @@ Procedure AddDrive(const Game : TGame; const RealFolder, Letter, FreeSpace : Str
 Var S : String;
 begin
   {RealFolder;DRIVE;Letter;False;;FreeSpace}
-  S:=MakeRelPath(RealFolder,PrgSetup.BaseDir)+';Drive;'+Letter+';;'+FreeSpace;
+  S:=MakeRelPath(RealFolder,PrgSetup.BaseDir,True)+';Drive;'+Letter+';;'+FreeSpace;
 
   Game.Mount[Game.NrOfMounts]:=S;
   Game.NrOfMounts:=Game.NrOfMounts+1;
@@ -2111,7 +2493,7 @@ begin
 
     AGame.VideoCard:=Ini.ReadString('dosbox','machine','vga');
     AGame.Memory:=INI.ReadInteger('dosbox','memsize',16);
-    AGame.CaptureFolder:=MakeRelPath(INI.ReadString('dosbox','captures','.\'+CaptureSubDir+'\'),PrgSetup.BaseDir);
+    AGame.CaptureFolder:=MakeRelPath(INI.ReadString('dosbox','captures',IncludeTrailingPathDelimiter(PrgSetup.CaptureDir)),PrgSetup.BaseDir,True);
 
     AGame.FrameSkip:=INI.ReadInteger('render','frameskip',0);
     AGame.AspectCorrection:=StrToBool(INI.ReadString('render','aspect','false'));
@@ -2180,7 +2562,7 @@ end;
 
 Function ImportConfFile(const AGameDB : TGameDB; const AFileName : String) : TGame;
 begin
-  result:=AGameDB[AGameDB.Add(ChangeFileExt(ExtractFileName(AGameDB.ProfFileName(ExtractFileName(AFileName))),''))];
+  result:=AGameDB[AGameDB.Add(ChangeFileExt(ExtractFileName(AGameDB.ProfFileName(ExtractFileName(AFileName),True)),''))];
   ImportConfFileData(result,AFileName);
 end;
 
@@ -2495,6 +2877,7 @@ begin
     S:=TempDir+ChangeFileExt(ExtractFileName(Game.SetupFile),'.conf');
     T:='DOSBox';
     St:=BuildConfFile(Game,False,False);
+    If St=nil then exit;
   end;
     try
       St.Insert(0,'# This '+T+' configuration file was automatically created by D-Fend Reloaded.');

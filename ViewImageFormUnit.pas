@@ -36,6 +36,7 @@ type
     ZoomMenuItem10: TMenuItem;
     ZoomMenuItem11: TMenuItem;
     ZoomMenuItem12: TMenuItem;
+    Timer: TTimer;
     procedure FormCreate(Sender: TObject);
     procedure ButtonWork(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -45,8 +46,13 @@ type
       WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
     procedure FormResize(Sender: TObject);
     procedure ZoomPopupMenuPopup(Sender: TObject);
+    procedure StatusBarMouseDown(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: Integer);
+    procedure TimerTimer(Sender: TObject);
   private
     { Private-Deklarationen }
+    IntPicture : TPicture;
+    IntBitmap100 : TBitmap;
     Procedure CenterWindow;
     Procedure LoadImage(const MoveWindow : Boolean);
     Procedure Zoom(const ZoomDirection : Integer);
@@ -64,9 +70,11 @@ Procedure ShowImageDialog(const AOwner : TComponent; const AImageFile : String; 
 implementation
 
 uses Math, ClipBrd, VistaToolsUnit, LanguageSetupUnit, PNGImage, CommonTools,
-     WallpaperStyleFormUnit, PrgSetupUnit;
+     WallpaperStyleFormUnit, PrgSetupUnit, IconLoaderUnit, ImageStretch;
 
 {$R *.dfm}
+
+{ TViewImageForm }
 
 procedure TViewImageForm.CenterWindow;
 Var P : TForm;
@@ -116,17 +124,27 @@ end;
 procedure TViewImageForm.FormShow(Sender: TObject);
 begin
   LoadImage(True);
+
+  UserIconLoader.DialogImage(DI_CopyToClipboard,ImageList,0);
+  UserIconLoader.DialogImage(DI_Save,ImageList,1);
+  UserIconLoader.DialogImage(DI_Clear,ImageList,2);
+  UserIconLoader.DialogImage(DI_BackgroundImage,ImageList,3);
+  UserIconLoader.DialogImage(DI_Previous,ImageList,4);
+  UserIconLoader.DialogImage(DI_Next,ImageList,5);
+  UserIconLoader.DialogImage(DI_Zoom,ImageList,6);
 end;
 
 procedure TViewImageForm.LoadImage(const MoveWindow: Boolean);
-Var P : TPicture;
-    W,H : Integer;
+Var W,H : Integer;
 begin
+  If IntPicture<>nil then FreeAndNil(IntPicture);
+  If IntBitmap100<>nil then FreeAndNil(IntBitmap100);
+
   PreviousButton.Enabled:=(PrevImages.Count>0);
   NextButton.Enabled:=(NextImages.Count>0);
 
-  P:=LoadImageFromFile(ImageFile);
-  try Image.Picture.Assign(P); finally P.Free; end;
+  IntPicture:=LoadImageFromFile(ImageFile);
+  Image.Picture.Assign(IntPicture);
   Caption:=LanguageSetup.ViewImageForm+' ['+MakeRelPath(ImageFile,PrgSetup.BaseDir)+']';
 
   W:=Image.Picture.Width; H:=Image.Picture.Height;
@@ -137,14 +155,23 @@ begin
   If MoveWindow or (Left+Width>=Screen.WorkAreaWidth-10) or (Top+Height>=Screen.WorkAreaHeight-10) then CenterWindow;
 
   FormResize(self);
+  TimerTimer(self);
+end;
+
+procedure TViewImageForm.StatusBarMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+Var P : TPoint;
+begin
+  If X>StatusBar.Panels[0].Width+StatusBar.Panels[1].Width then exit;
+  P:=StatusBar.ClientToScreen(Point(X,Y));
+  ZoomPopupMenu.Popup(P.X+5,P.Y+5);
 end;
 
 procedure TViewImageForm.Zoom(const ZoomDirection: Integer);
 Var I,J : Integer;
     F : Double;
 begin
-  I:=Round(Image.ClientWidth/Image.Picture.Width*100);
-  J:=Round(Image.ClientHeight/Image.Picture.Height*100);
+  I:=Round(Image.ClientWidth/IntPicture.Width*100);
+  J:=Round(Image.ClientHeight/IntPicture.Height*100);
 
   I:=Round(Min(I,J)/25)*25;
   If ZoomDirection=0 then I:=100 else begin
@@ -152,26 +179,27 @@ begin
   end;
 
   F:=I/100;
-  ClientHeight:=Min(Max(100,Round(F*Image.Picture.Height)+(ClientHeight-Image.Height)),Screen.WorkAreaHeight-10);
-  ClientWidth:=Min(Max(850,Round(F*Image.Picture.Width)),Screen.WorkAreaWidth-10);
+  ClientHeight:=Min(Max(100,Round(F*IntPicture.Height)+(ClientHeight-Image.Height)),Screen.WorkAreaHeight-10);
+  ClientWidth:=Min(Max(850,Round(F*IntPicture.Width)),Screen.WorkAreaWidth-10);
   CenterWindow;
 end;
 
 procedure TViewImageForm.ZoomPopupMenuPopup(Sender: TObject);
-Var I,J : Integer;
+Var I,J,Z,M : Integer;
     S : String;
 begin
-  I:=Round(Image.ClientWidth/Image.Picture.Width*100);
-  J:=Round(Image.ClientHeight/Image.Picture.Height*100);
-  J:=Round(Min(I,J)/25)*25;
+  I:=Round(Image.ClientWidth/IntPicture.Width*100);
+  J:=Round(Image.ClientHeight/IntPicture.Height*100);
+  Z:=Min(I,J);
 
   For I:=0 to ZoomPopupMenu.Items.Count-1 do begin
     ZoomPopupMenu.Items[I].ShortCut:=0;
     S:=RemoveUnderline(ZoomPopupMenu.Items[I].Caption);
-    ZoomPopupMenu.Items[I].Enabled:=(S<>IntToStr(J)+'%');
-    If S=IntToStr(J-25)+'%' then ZoomPopupMenu.Items[I].ShortCut:=ShortCut(VK_OEM_MINUS,[]);
-    If S=IntToStr(J+25)+'%' then ZoomPopupMenu.Items[I].ShortCut:=ShortCut(VK_OEM_PLUS,[]);
-    If S='100%' then ZoomPopupMenu.Items[I].ShortCut:=ShortCut(ord('0'),[]);
+    M:=StrToInt(Copy(S,1,length(S)-1));
+    ZoomPopupMenu.Items[I].Enabled:=(M<>Z);
+    If (M<Z) and (M+25>=Z) then ZoomPopupMenu.Items[I].ShortCut:=ShortCut(VK_OEM_MINUS,[]);
+    If (M>Z) and (M-25<=Z) then ZoomPopupMenu.Items[I].ShortCut:=ShortCut(VK_OEM_PLUS,[]);
+    If M=100 then ZoomPopupMenu.Items[I].ShortCut:=ShortCut(ord('0'),[]);
   end;
 end;
 
@@ -181,7 +209,7 @@ Var WPStype : TWallpaperStyle;
     F : Double;
 begin
   Case (Sender as TComponent).Tag of
-    1 : Clipboard.Assign(Image.Picture);
+    1 : Clipboard.Assign(IntPicture);
     2 : begin
           SaveDialog.FileName:='';
           SaveDialog.Title:=LanguageSetup.ViewImageFormSaveTitle;
@@ -216,9 +244,10 @@ begin
           If WindowState=wsMaximized then WindowState:=wsNormal;
           S:=RemoveUnderline((Sender as TMenuItem).Caption);
           F:=StrToInt(Copy(S,1,length(S)-1))/100;
-          ClientHeight:=Min(Max(100,Round(F*Image.Picture.Height)+(ClientHeight-Image.Height)),Screen.WorkAreaHeight-10);
-          ClientWidth:=Min(Max(850,Round(F*Image.Picture.Width)),Screen.WorkAreaWidth-10);
+          ClientHeight:=Min(Max(100,Round(F*IntPicture.Height)+(ClientHeight-Image.Height)),Screen.WorkAreaHeight-10);
+          ClientWidth:=Min(Max(850,Round(F*IntPicture.Width)),Screen.WorkAreaWidth-10);
           CenterWindow;
+          TimerTimer(self);
         end;
   end;
 end;
@@ -227,6 +256,8 @@ procedure TViewImageForm.FormDestroy(Sender: TObject);
 begin
   PrevImages.Free;
   NextImages.Free;
+  If IntPicture<>nil then FreeAndNil(IntPicture);
+  If IntBitmap100<>nil then FreeAndNil(IntBitmap100);
 end;
 
 procedure TViewImageForm.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -250,18 +281,43 @@ begin
   end;
 end;
 
-procedure TViewImageForm.FormResize(Sender: TObject);
-Var I,J : Integer;
+procedure TViewImageForm.TimerTimer(Sender: TObject);
+Var D : Double;
+    B : TBitmap;
 begin
+  Timer.Enabled:=False;
+  If (IntPicture=nil) or (IntPicture.Width=0) then exit;
+
+  D:=Min(Image.ClientWidth/IntPicture.Width,Image.ClientHeight/IntPicture.Height);
+
+  If (D<1) or (IntBitmap100=nil) then begin
+    B:=ScaleImage(IntPicture,D);
+    Image.Picture.Bitmap.Assign(B);
+    If D=1 then begin
+      If IntBitmap100<>nil then FreeAndNil(IntBitmap100);
+      IntBitmap100:=B;
+    end else begin
+      B.Free;
+    end;
+    exit;
+  end;
+
+  If Assigned(IntBitmap100) then
+    Image.Picture.Bitmap.Assign(IntBitmap100);
+end;
+
+procedure TViewImageForm.FormResize(Sender: TObject);
+Var D : Double;
+begin
+  If IntPicture=nil then exit;
+
   StatusBar.Panels[0].Text:=IntToStr(Image.Picture.Width)+'x'+IntToStr(Image.Picture.Height);
-
-  I:=Round(Image.ClientWidth/Image.Picture.Width*100);
-  J:=Round(Image.ClientHeight/Image.Picture.Height*100);
-  I:=Min(I,J);
-
-  StatusBar.Panels[1].Text:=IntToStr(I)+'%';
-
+  D:=Min(Image.ClientWidth/IntPicture.Width,Image.ClientHeight/IntPicture.Height);
+  StatusBar.Panels[1].Text:=IntToStr(Round(D*100))+'%';
   StatusBar.Panels[2].Text:=ImageFile;
+
+  Timer.Enabled:=False;
+  Timer.Enabled:=True;
 end;
 
 { global }

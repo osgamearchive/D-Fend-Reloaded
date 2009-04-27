@@ -30,7 +30,8 @@ type
 
 implementation
 
-uses VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgSetupUnit, HelpConsts;
+uses VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgSetupUnit, HelpConsts,
+     IconLoaderUnit;
 
 {$R *.dfm}
 
@@ -60,6 +61,8 @@ begin
   CustomSetsValueListEditor.TitleCaptions.Add(LanguageSetup.Value);
   CustomSetsEnvAdd.Caption:=LanguageSetup.Add;
   CustomSetsEnvDel.Caption:=LanguageSetup.Del;
+  UserIconLoader.DialogImage(DI_Add,CustomSetsEnvAdd);
+  UserIconLoader.DialogImage(DI_Delete,CustomSetsEnvDel);
 
   HelpContext:=ID_ProfileEditDOSEnvironment;
 end;

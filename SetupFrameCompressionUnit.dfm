@@ -15,7 +15,6 @@ object SetupFrameCompression: TSetupFrameCompression
     Anchors = [akLeft, akTop, akRight]
     AutoSize = False
     Caption = 'InfoLabel'
-    Visible = False
     WordWrap = True
   end
   object CompressRadioGroup: TRadioGroup

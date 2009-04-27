@@ -138,18 +138,18 @@ begin
   If JustChanging then exit;
   JustChanging:=True;
   try
-    SoundVolumeMasterLeftTrackBar.Position:=100-SoundVolumeMasterLeftEdit.Value;
-    SoundVolumeMasterRightTrackBar.Position:=100-SoundVolumeMasterRightEdit.Value;
-    SoundVolumeDisneyLeftTrackBar.Position:=100-SoundVolumeDisneyLeftEdit.Value;
-    SoundVolumeDisneyRightTrackBar.Position:=100-SoundVolumeDisneyRightEdit.Value;
-    SoundVolumeSpeakerLeftTrackBar.Position:=100-SoundVolumeSpeakerLeftEdit.Value;
-    SoundVolumeSpeakerRightTrackBar.Position:=100-SoundVolumeSpeakerRightEdit.Value;
-    SoundVolumeGUSLeftTrackBar.Position:=100-SoundVolumeGUSLeftEdit.Value;
-    SoundVolumeGUSRightTrackBar.Position:=100-SoundVolumeGUSRightEdit.Value;
-    SoundVolumeSBLeftTrackBar.Position:=100-SoundVolumeSBLeftEdit.Value;
-    SoundVolumeSBRightTrackBar.Position:=100-SoundVolumeSBRightEdit.Value;
-    SoundVolumeFMLeftTrackBar.Position:=100-SoundVolumeFMLeftEdit.Value;
-    SoundVolumeFMRightTrackBar.Position:=100-SoundVolumeFMRightEdit.Value;
+    SoundVolumeMasterLeftTrackBar.Position:=SoundVolumeMasterLeftTrackBar.Max-SoundVolumeMasterLeftEdit.Value;
+    SoundVolumeMasterRightTrackBar.Position:=SoundVolumeMasterRightTrackBar.Max-SoundVolumeMasterRightEdit.Value;
+    SoundVolumeDisneyLeftTrackBar.Position:=SoundVolumeDisneyLeftTrackBar.Max-SoundVolumeDisneyLeftEdit.Value;
+    SoundVolumeDisneyRightTrackBar.Position:=SoundVolumeDisneyRightTrackBar.Max-SoundVolumeDisneyRightEdit.Value;
+    SoundVolumeSpeakerLeftTrackBar.Position:=SoundVolumeSpeakerLeftTrackBar.Max-SoundVolumeSpeakerLeftEdit.Value;
+    SoundVolumeSpeakerRightTrackBar.Position:=SoundVolumeSpeakerRightTrackBar.Max-SoundVolumeSpeakerRightEdit.Value;
+    SoundVolumeGUSLeftTrackBar.Position:=SoundVolumeGUSLeftTrackBar.Max-SoundVolumeGUSLeftEdit.Value;
+    SoundVolumeGUSRightTrackBar.Position:=SoundVolumeGUSRightTrackBar.Max-SoundVolumeGUSRightEdit.Value;
+    SoundVolumeSBLeftTrackBar.Position:=SoundVolumeSBLeftTrackBar.Max-SoundVolumeSBLeftEdit.Value;
+    SoundVolumeSBRightTrackBar.Position:=SoundVolumeSBRightTrackBar.Max-SoundVolumeSBRightEdit.Value;
+    SoundVolumeFMLeftTrackBar.Position:=SoundVolumeFMLeftTrackBar.Max-SoundVolumeFMLeftEdit.Value;
+    SoundVolumeFMRightTrackBar.Position:=SoundVolumeFMRightTrackBar.Max-SoundVolumeFMRightEdit.Value;
   finally
     JustChanging:=False;
   end;
@@ -160,18 +160,18 @@ begin
   If JustChanging then exit;
   JustChanging:=True;
   try
-    SoundVolumeMasterLeftEdit.Value:=100-SoundVolumeMasterLeftTrackBar.Position;
-    SoundVolumeMasterRightEdit.Value:=100-SoundVolumeMasterRightTrackBar.Position;
-    SoundVolumeDisneyLeftEdit.Value:=100-SoundVolumeDisneyLeftTrackBar.Position;
-    SoundVolumeDisneyRightEdit.Value:=100-SoundVolumeDisneyRightTrackBar.Position;
-    SoundVolumeSpeakerLeftEdit.Value:=100-SoundVolumeSpeakerLeftTrackBar.Position;
-    SoundVolumeSpeakerRightEdit.Value:=100-SoundVolumeSpeakerRightTrackBar.Position;
-    SoundVolumeGUSLeftEdit.Value:=100-SoundVolumeGUSLeftTrackBar.Position;
-    SoundVolumeGUSRightEdit.Value:=100-SoundVolumeGUSRightTrackBar.Position;
-    SoundVolumeSBLeftEdit.Value:=100-SoundVolumeSBLeftTrackBar.Position;
-    SoundVolumeSBRightEdit.Value:=100-SoundVolumeSBRightTrackBar.Position;
-    SoundVolumeFMLeftEdit.Value:=100-SoundVolumeFMLeftTrackBar.Position;
-    SoundVolumeFMRightEdit.Value:=100-SoundVolumeFMRightTrackBar.Position;
+    SoundVolumeMasterLeftEdit.Value:=SoundVolumeMasterLeftTrackBar.Max-SoundVolumeMasterLeftTrackBar.Position;
+    SoundVolumeMasterRightEdit.Value:=SoundVolumeMasterRightTrackBar.Max-SoundVolumeMasterRightTrackBar.Position;
+    SoundVolumeDisneyLeftEdit.Value:=SoundVolumeDisneyLeftTrackBar.Max-SoundVolumeDisneyLeftTrackBar.Position;
+    SoundVolumeDisneyRightEdit.Value:=SoundVolumeDisneyRightTrackBar.Max-SoundVolumeDisneyRightTrackBar.Position;
+    SoundVolumeSpeakerLeftEdit.Value:=SoundVolumeSpeakerLeftTrackBar.Max-SoundVolumeSpeakerLeftTrackBar.Position;
+    SoundVolumeSpeakerRightEdit.Value:=SoundVolumeSpeakerRightTrackBar.Max-SoundVolumeSpeakerRightTrackBar.Position;
+    SoundVolumeGUSLeftEdit.Value:=SoundVolumeGUSLeftTrackBar.Max-SoundVolumeGUSLeftTrackBar.Position;
+    SoundVolumeGUSRightEdit.Value:=SoundVolumeGUSRightTrackBar.Max-SoundVolumeGUSRightTrackBar.Position;
+    SoundVolumeSBLeftEdit.Value:=SoundVolumeSBLeftTrackBar.Max-SoundVolumeSBLeftTrackBar.Position;
+    SoundVolumeSBRightEdit.Value:=SoundVolumeSBRightTrackBar.Max-SoundVolumeSBRightTrackBar.Position;
+    SoundVolumeFMLeftEdit.Value:=SoundVolumeFMLeftTrackBar.Max-SoundVolumeFMLeftTrackBar.Position;
+    SoundVolumeFMRightEdit.Value:=SoundVolumeFMRightTrackBar.Max-SoundVolumeFMRightTrackBar.Position;
   finally
     JustChanging:=False;
   end;

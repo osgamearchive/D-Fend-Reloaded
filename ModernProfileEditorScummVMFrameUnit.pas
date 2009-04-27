@@ -4,7 +4,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, 
-  Dialogs, StdCtrls, Spin, Buttons, GameDBUnit, ModernProfileEditorFormUnit;
+  Dialogs, StdCtrls, Spin, Buttons, GameDBUnit, ModernProfileEditorFormUnit,
+  ComCtrls;
 
 type
   TModernProfileEditorScummVMFrame = class(TFrame, IModernProfileEditorFrame)
@@ -21,19 +22,28 @@ type
     SavePathEditButton: TSpeedButton;
     SavePathEdit: TEdit;
     ConfirmExitCheckBox: TCheckBox;
-    CDGroupBox: TGroupBox;
-    CDRadioButton1: TRadioButton;
-    CDRadioButton2: TRadioButton;
-    CDEdit: TSpinEdit;
-    JoystickLabel: TLabel;
-    JoystickEdit: TSpinEdit;
+    CustomSetsLabel: TLabel;
+    CustomSetsMemo: TRichEdit;
+    CustomSetsClearButton: TBitBtn;
+    CustomSetsLoadButton: TBitBtn;
+    CustomSetsSaveButton: TBitBtn;
+    OpenDialog: TOpenDialog;
+    SaveDialog: TSaveDialog;
+    ExtraDirCheckBox: TCheckBox;
+    ExtraDirEdit: TEdit;
+    ExtraDirButton: TSpeedButton;
+    CustomLanguageEdit: TEdit;
     procedure SavePathEditButtonClick(Sender: TObject);
     procedure SavePathEditChange(Sender: TObject);
-    procedure CDEditChange(Sender: TObject);
+    procedure ButtonWork(Sender: TObject);
+    procedure ExtraDirEditChange(Sender: TObject);
+    procedure ExtraDirButtonClick(Sender: TObject);
+    procedure LanguageComboBoxChange(Sender: TObject);
   private
     { Private-Deklarationen }
     LastGameName, SaveLang : String;
     CurrentGameName, CurrentScummVMPath : PString;
+    ConfOpt : TConfOpt;
   public
     { Public-Deklarationen }
     Procedure InitGUI(const InitData : TModernProfileEditorInitData);
@@ -45,7 +55,8 @@ type
 
 implementation
 
-uses Math, VistaToolsUnit, LanguageSetupUnit, CommonTools, HelpConsts, PrgSetupUnit;
+uses Math, VistaToolsUnit, LanguageSetupUnit, CommonTools, HelpConsts,
+     PrgSetupUnit, PrgConsts, IconLoaderUnit;
 
 {$R *.dfm}
 
@@ -63,10 +74,12 @@ begin
   NoFlicker(SavePathDefaultRadioButton);
   NoFlicker(SavePathCustomRadioButton);
   NoFlicker(SavePathEdit);
-  NoFlicker(CDGroupBox);
-  NoFlicker(CDRadioButton1);
-  NoFlicker(CDRadioButton2);
-  NoFlicker(JoystickEdit);
+  NoFlicker(ExtraDirCheckBox);
+  NoFlicker(ExtraDirEdit);
+  {NoFlicker(CustomSetsMemo); - will hide text in Memo}
+  NoFlicker(CustomSetsClearButton);
+  NoFlicker(CustomSetsLoadButton);
+  NoFlicker(CustomSetsSaveButton);
 
   LanguageLabel.Caption:=LanguageSetup.ProfileEditorScummVMLanguage;
   AutosaveLabel.Caption:=LanguageSetup.ProfileEditorScummVMAutosave;
@@ -77,33 +90,28 @@ begin
   SavePathDefaultRadioButton.Caption:=LanguageSetup.ProfileEditorScummVMSavePathGameDir+' ('+LanguageSetup.Default+')';
   SavePathCustomRadioButton.Caption:=LanguageSetup.ProfileEditorScummVMSavePathCustom;
   SavePathEditButton.Hint:=LanguageSetup.ChooseFolder;
-  CDGroupBox.Caption:=LanguageSetup.ProfileEditorScummVMCDAudioDrive;
-  CDRadioButton1.Caption:=LanguageSetup.ProfileEditorScummVMCDAudioOff;
-  CDRadioButton2.Caption:=LanguageSetup.ProfileEditorScummVMCDAudioNr;
-  JoystickLabel.Caption:=LanguageSetup.ProfileEditorScummVMJoystick;
+  ExtraDirCheckBox.Caption:=LanguageSetup.ProfileEditorScummVMExtraPath;
+  ExtraDirButton.Hint:=LanguageSetup.ChooseFolder;
+  CustomSetsLabel.Caption:=LanguageSetup.ProfileEditorCustomSetsSheet;
+  CustomSetsMemo.Font.Name:='Courier New';
+  CustomSetsClearButton.Caption:=LanguageSetup.Del;
+  CustomSetsLoadButton.Caption:=LanguageSetup.Load;
+  CustomSetsSaveButton.Caption:=LanguageSetup.Save;
+  UserIconLoader.DialogImage(DI_SelectFolder,SavePathEditButton);
+  UserIconLoader.DialogImage(DI_SelectFolder,ExtraDirButton);
+  UserIconLoader.DialogImage(DI_Clear,CustomSetsClearButton);
+  UserIconLoader.DialogImage(DI_Load,CustomSetsLoadButton);
+  UserIconLoader.DialogImage(DI_Save,CustomSetsSaveButton);
 
   CurrentGameName:=InitData.CurrentScummVMGameName;
   CurrentScummVMPath:=InitData.CurrentScummVMPath;
+  ConfOpt:=InitData.GameDB.ConfOpt;
 
   HelpContext:=ID_ProfileEditScummVM;
 end;
 
-Type TLangRec=record
-  Game, Lang : String;
-end;
-
-const LangData : Array[0..7] of TLangRec=(
-  (Game: 'maniac'; Lang: 'en,de,fr,it,es'),
-  (Game: 'zak'; Lang: 'en,de,fr,it,es'),
-  (Game: 'dig'; Lang: 'jp, zh,kr'),
-  (Game: 'comi'; Lang: 'en,de,fr,it,pt,es,jp,zh,kr'),
-  (Game: 'sky'; Lang: 'gb,en,de,fr,it,pt,es,se'),
-  (Game: 'sword1'; Lang: 'en,de,fr,it,es,pt,cz'),
-  (Game: 'simon1'; Lang: 'en,de,fr,it,es,hb,pl,ru'),
-  (Game: 'simon2'; Lang: 'en,de,fr,it,es,hb,pl,ru')
-);
-
 procedure TModernProfileEditorScummVMFrame.SetGame(const Game: TGame; const LoadFromTemplate: Boolean);
+Var St : TStringList;
 begin
   AutosaveEdit.Value:=Min(86400,Max(1,Game.ScummVMAutosave));
   TalkSpeedEdit.Value:=Min(1000,Max(1,Game.ScummVMTalkSpeed));
@@ -113,44 +121,79 @@ begin
   SavePathEdit.Text:=Game.ScummVMSavePath;
   SavePathEditChange(self);
 
-  CDEdit.Value:=Min(3,Max(0,Game.ScummVMCDROM));
-  CDRadioButton1.Checked:=(Game.ScummVMCDROM=-1);
-  CDRadioButton2.Checked:=(Game.ScummVMCDROM>=0);
-
-  JoystickEdit.Value:=Min(3,Max(0,Game.ScummVMJoystickNum));
+  ExtraDirEdit.Text:=Game.ScummVMExtraPath;
+  ExtraDirEditChange(self);
 
   SaveLang:=Game.ScummVMLanguage;
+
+  St:=StringToStringList(Game.CustomSettings);
+  try
+    CustomSetsMemo.Lines.Assign(St);
+  finally
+    St.Free;
+  end;
 end;
 
 procedure TModernProfileEditorScummVMFrame.ShowFrame;
-Var S : String;
-    I : Integer;
-    St : TStringList;
+Var Save,S : String;
+    I,J : Integer;
+    St,St2 : TStringList;
 begin
   If LastGameName=CurrentGameName^ then exit;
   LastGameName:=CurrentGameName^;
 
-  If LanguageComboBox.ItemIndex>=0 then S:=LanguageComboBox.Text else S:=SaveLang;
+  If LanguageComboBox.ItemIndex>=0 then begin
+    Save:=Trim(ExtUpperCase(LanguageComboBox.Text));
+    If Save=Trim(ExtUpperCase(LanguageSetup.Custom)) then Save:=Trim(ExtUpperCase(CustomLanguageEdit.Text));
+    If Save=Trim(ExtUpperCase(LanguageSetup.Default)) then Save:='';
+  end else begin
+    Save:=Trim(ExtUpperCase(SaveLang));
+  end;
+
   LanguageComboBox.Items.BeginUpdate;
   try
     LanguageComboBox.Items.Clear;
-    For I:=Low(LangData) to High(LangData) do If LangData[I].Game=LastGameName then begin
-      St:=ValueToList(LangData[I].Lang,','); try LanguageComboBox.Items.AddStrings(St); finally St.Free; end;
-      break;
+
+    St:=ValueToList(ConfOpt.ScummVMLanguages,';,');
+    try
+      S:=Trim(ExtUpperCase(LastGameName));
+      For I:=0 to St.Count-1 do begin
+        J:=Pos(':',St[I]);
+        If J=0 then continue;
+        If Trim(ExtUpperCase(Copy(St[I],1,J-1)))=S then begin
+          St2:=ValueToList(Copy(St[I],J+1,MaxInt),'-');
+          try
+            LanguageComboBox.Items.AddStrings(St2);
+          finally
+            St2.Free;
+          end;
+          break;
+        end;
+      end;
+    finally
+      St.Free;
     end;
+
+    If LanguageComboBox.Items.Count=0 then LanguageComboBox.Items.Add(LanguageSetup.Default);
+
+    LanguageComboBox.Items.Add(LanguageSetup.Custom);
   finally
     LanguageComboBox.Items.EndUpdate;
   end;
 
-  LanguageComboBox.Enabled:=(LanguageComboBox.Items.Count>0);
-  LanguageLabel.Enabled:=(LanguageComboBox.Items.Count>0);
-
-  If LanguageComboBox.Items.Count>0 then begin
-    If S='' then LanguageComboBox.ItemIndex:=0 else begin
-      I:=LanguageComboBox.Items.IndexOf(S);
-      If I>=0 then LanguageComboBox.ItemIndex:=I;
+  If Save='' then LanguageComboBox.ItemIndex:=0 else begin
+    I:=-1;
+    For J:=0 to LanguageComboBox.Items.Count-1 do If Trim(ExtUpperCase(LanguageComboBox.Items[J]))=Save then begin I:=J; break; end;
+    If I>=0 then begin
+      LanguageComboBox.ItemIndex:=I;
+      CustomLanguageEdit.Text:='';
+    end else begin
+      LanguageComboBox.ItemIndex:=LanguageComboBox.Items.Count-1;
+      CustomLanguageEdit.Text:=ExtLowerCase(Save);
     end;
   end;
+
+  LanguageComboBoxChange(self);
 end;
 
 function TModernProfileEditorScummVMFrame.CheckValue: Boolean;
@@ -160,14 +203,27 @@ end;
 
 procedure TModernProfileEditorScummVMFrame.GetGame(const Game: TGame);
 begin
-  If LanguageComboBox.ItemIndex>=0 then Game.ScummVMLanguage:=LanguageComboBox.Text else Game.ScummVMLanguage:='';
+  If LanguageComboBox.ItemIndex>=0 then begin
+    Game.ScummVMLanguage:=Trim(ExtUpperCase(LanguageComboBox.Text));
+    If Game.ScummVMLanguage=Trim(ExtUpperCase(LanguageSetup.Custom)) then Game.ScummVMLanguage:=Trim(ExtUpperCase(CustomLanguageEdit.Text));
+    If Game.ScummVMLanguage=Trim(ExtUpperCase(LanguageSetup.Default)) then Game.ScummVMLanguage:='';
+  end else begin
+    Game.ScummVMLanguage:=Trim(ExtUpperCase(SaveLang));
+  end;
+  Game.ScummVMLanguage:=ExtLowerCase(Game.ScummVMLanguage);
+
   Game.ScummVMAutosave:=AutosaveEdit.Value;
   Game.ScummVMTalkSpeed:=TalkSpeedEdit.Value;
   Game.ScummVMSubtitles:=SubtitlesCheckBox.Checked;
   Game.ScummVMConfirmExit:=ConfirmExitCheckBox.Checked;
   If SavePathDefaultRadioButton.Checked then Game.ScummVMSavePath:='' else Game.ScummVMSavePath:=Trim(SavePathEdit.Text);
-  If CDRadioButton2.Checked then Game.ScummVMCDROM:=CDEdit.Value else Game.ScummVMCDROM:=-1;
-  Game.ScummVMJoystickNum:=JoystickEdit.Value;
+  If ExtraDirCheckBox.Checked then Game.ScummVMExtraPath:=Trim(ExtraDirEdit.Text) else Game.ScummVMExtraPath:=''; 
+  Game.CustomSettings:=StringListToString(CustomSetsMemo.Lines);
+end;
+
+procedure TModernProfileEditorScummVMFrame.LanguageComboBoxChange(Sender: TObject);
+begin
+  CustomLanguageEdit.Visible:=(LanguageComboBox.ItemIndex=LanguageComboBox.Items.Count-1);
 end;
 
 procedure TModernProfileEditorScummVMFrame.SavePathEditChange(Sender: TObject);
@@ -184,13 +240,60 @@ begin
   If S='' then S:=PrgSetup.GameDir;
   S:=MakeAbsPath(S,PrgSetup.BaseDir);
   if not SelectDirectory(Handle,LanguageSetup.ChooseFolder,S) then exit;
-  SavePathEdit.Text:=S;
+  SavePathEdit.Text:=MakeRelPath(S,PrgSetup.BaseDir,True);
   SavePathEditChange(Sender);
 end;
 
-procedure TModernProfileEditorScummVMFrame.CDEditChange(Sender: TObject);
+procedure TModernProfileEditorScummVMFrame.ExtraDirEditChange(Sender: TObject);
 begin
-  CDRadioButton2.Checked:=True;
+  ExtraDirCheckBox.Checked:=(Trim(ExtraDirEdit.Text)<>'');
+end;
+
+procedure TModernProfileEditorScummVMFrame.ExtraDirButtonClick(Sender: TObject);
+Var S : String;
+begin
+  S:=Trim(ExtraDirEdit.Text);
+  If S='' then S:=Trim(CurrentScummVMPath^);
+  If S='' then S:=PrgSetup.GameDir;
+  S:=MakeAbsPath(S,PrgSetup.BaseDir);
+  if not SelectDirectory(Handle,LanguageSetup.ChooseFolder,S) then exit;
+  ExtraDirEdit.Text:=MakeRelPath(S,PrgSetup.BaseDir,True);
+  ExtraDirEditChange(Sender);
+end;
+
+procedure TModernProfileEditorScummVMFrame.ButtonWork(Sender: TObject);
+begin
+  Case (Sender as TComponent).Tag of
+    0 : CustomSetsMemo.Lines.Clear;
+    1 : begin
+          ForceDirectories(PrgDataDir+CustomConfigsSubDir);
+
+          OpenDialog.DefaultExt:='txt';
+          OpenDialog.Filter:=LanguageSetup.ProfileEditorCustomSetsFilter;
+          OpenDialog.Title:=LanguageSetup.ProfileEditorCustomSetsLoadTitle;
+          OpenDialog.InitialDir:=PrgDataDir+CustomConfigsSubDir;
+          if not OpenDialog.Execute then exit;
+          try
+            CustomSetsMemo.Lines.LoadFromFile(OpenDialog.FileName);
+          except
+            MessageDlg(Format(LanguageSetup.MessageCouldNotOpenFile,[OpenDialog.FileName]),mtError,[mbOK],0);
+          end;
+        end;
+    2 : begin
+          ForceDirectories(PrgDataDir+CustomConfigsSubDir);
+
+          SaveDialog.DefaultExt:='txt';
+          SaveDialog.Filter:=LanguageSetup.ProfileEditorCustomSetsFilter;
+          SaveDialog.Title:=LanguageSetup.ProfileEditorCustomSetsSaveTitle;
+          SaveDialog.InitialDir:=PrgDataDir+CustomConfigsSubDir;
+          if not SaveDialog.Execute then exit;
+          try
+            CustomSetsMemo.Lines.SaveToFile(SaveDialog.FileName);
+          except
+            MessageDlg(Format(LanguageSetup.MessageCouldNotSaveFile,[SaveDialog.FileName]),mtError,[mbOK],0);
+          end;
+        end;
+  end;
 end;
 
 end.

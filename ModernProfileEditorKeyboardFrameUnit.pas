@@ -38,7 +38,8 @@ type
 
 implementation
 
-uses LanguageSetupUnit, VistaToolsUnit, CommonTools, PrgSetupUnit, HelpConsts;
+uses LanguageSetupUnit, VistaToolsUnit, CommonTools, PrgSetupUnit, HelpConsts,
+     IconLoaderUnit;
 
 {$R *.dfm}
 
@@ -91,6 +92,7 @@ begin
   DefaultKeyMapperFileRadioButton.Caption:=LanguageSetup.GameKeyMapperDefault;
   CustomKeyMapperFileRadioButton.Caption:=LanguageSetup.GameKeyMapperCustom;
   CustomKeyMapperButton.Hint:=LanguageSetup.ChooseFile;
+  UserIconLoader.DialogImage(DI_SelectFile,CustomKeyMapperButton);
 
   HelpContext:=ID_ProfileEditKeyboard;
 end;
@@ -190,9 +192,9 @@ begin
   DosBoxTxtOpenDialog.Filter:=LanguageSetup.SetupFormDosBoxMapperFileFilter;
   If Trim(CustomKeyMapperEdit.Text)=''
     then DosBoxTxtOpenDialog.InitialDir:=PrgDataDir
-    else DosBoxTxtOpenDialog.InitialDir:=ExtractFilePath(MakeAbsPath(CustomKeyMapperEdit.Text,PrgDataDir));
+    else DosBoxTxtOpenDialog.InitialDir:=ExtractFilePath(MakeAbsPath(CustomKeyMapperEdit.Text,PrgSetup.BaseDir));
   if not DosBoxTxtOpenDialog.Execute then exit;
-  CustomKeyMapperEdit.Text:=MakeRelPath(DosBoxTxtOpenDialog.FileName,PrgDataDir);
+  CustomKeyMapperEdit.Text:=MakeRelPath(DosBoxTxtOpenDialog.FileName,PrgSetup.BaseDir);
 end;
 
 procedure TModernProfileEditorKeyboardFrame.CustomKeyMapperEditChange(Sender: TObject);

@@ -35,11 +35,13 @@ type
     Function Init(const AInfoData : TInfoData) : Boolean;
     Function Done : String;
     Function GetName : String;
+    Procedure ShowFrame;
   end;
 
 implementation
 
-uses LanguageSetupUnit, CommonTools, PrgSetupUnit, PrgConsts;
+uses LanguageSetupUnit, CommonTools, PrgSetupUnit, PrgConsts, ZipInfoFormUnit,
+     IconLoaderUnit;
 
 {$R *.dfm}
 
@@ -47,7 +49,7 @@ uses LanguageSetupUnit, CommonTools, PrgSetupUnit, PrgConsts;
 
 function TProfileMountEditorZipFrame.Init(const AInfoData: TInfoData): Boolean;
 Var C : Char;
-    St,St2 : TStringList;
+    St : TStringList;
     S,T : String;
     I : Integer;
 begin
@@ -78,6 +80,10 @@ begin
   RepackTypeComboBox.ItemIndex:=0;  
 
   InfoLabel.Caption:=LanguageSetup.ProfileMountingZipInfo;
+
+  UserIconLoader.DialogImage(DI_SelectFolder,ZipFolderButton);
+  UserIconLoader.DialogImage(DI_Create,ZipFolderCreateButton);
+  UserIconLoader.DialogImage(DI_SelectFile,ZipFileButton);
 
   St:=ValueToList(InfoData.Data);
   try
@@ -115,6 +121,10 @@ begin
   ZipFolderFreeSpaceTrackBarChange(self);
 end;
 
+procedure TProfileMountEditorZipFrame.ShowFrame;
+begin
+end;
+
 function TProfileMountEditorZipFrame.Done: String;
 Var S,T : String;
     B : Boolean;
@@ -127,8 +137,8 @@ begin
 
   B:=True;
 
-  S:=IncludeTrailingPathDelimiter(Trim(ExtUpperCase(MakeRelPath(ZipFolderEdit.Text,PrgSetup.BaseDir))));
-  T:=IncludeTrailingPathDelimiter(Trim(ExtUpperCase(MakeRelPath(PrgSetup.GameDir,PrgSetup.BaseDir))));
+  S:=IncludeTrailingPathDelimiter(Trim(ExtUpperCase(MakeRelPath(ZipFolderEdit.Text,PrgSetup.BaseDir,True))));
+  T:=IncludeTrailingPathDelimiter(Trim(ExtUpperCase(MakeRelPath(PrgSetup.GameDir,PrgSetup.BaseDir,True))));
   If Copy(S,1,2)='.\' then S:=Trim(Copy(S,3,MaxInt));
   If Copy(T,1,2)='.\' then T:=Trim(Copy(T,3,MaxInt));
 
@@ -159,7 +169,7 @@ begin
   If Trim(ZipFolderEdit.Text)='' then S:=InfoData.DefaultInitialDir else S:=ZipFolderEdit.Text;
   S:=MakeAbsPath(S,PrgSetup.BaseDir);
   if not SelectDirectory(Handle,LanguageSetup.ProfileMountingFolder,S) then exit;
-  ZipFolderEdit.Text:=MakeRelPath(S,PrgSetup.BaseDir);
+  ZipFolderEdit.Text:=MakeRelPath(S,PrgSetup.BaseDir,True);
 end;
 
 procedure TProfileMountEditorZipFrame.ZipFolderDriveLetterComboBoxChange(Sender: TObject);
@@ -180,7 +190,7 @@ begin
   OpenDialog.DefaultExt:='zip';
   OpenDialog.InitialDir:=ExtractFilePath(S);
   OpenDialog.Title:=LanguageSetup.ProfileMountingZipFile;
-  OpenDialog.Filter:=LanguageSetup.ProfileMountingZipFileFilter2;
+  OpenDialog.Filter:=ProcessFileNameFilter(LanguageSetup.ProfileMountingZipFileFilter2,LanguageSetup.ProfileMountingZipFileFilter2ArchiveFiles);
   if not OpenDialog.Execute then exit;
   ZipFileEdit.Text:=MakeRelPath(OpenDialog.FileName,PrgSetup.BaseDir);
 end;
@@ -202,7 +212,7 @@ begin
     MessageDlg(Format(LanguageSetup.MessageCouldNotCreateDir,[S]),mtError,[mbOK],0);
   end;
 
-  ZipFolderEdit.Text:=MakeRelPath(S,PrgSetup.BaseDir);
+  ZipFolderEdit.Text:=MakeRelPath(S,PrgSetup.BaseDir,True);
 end;
 
 end.

@@ -22,7 +22,9 @@ Menu: &nbsp; <b>Profile</b> | <b>Add with wizard</b>
 
 <p>
 The profile wizard offers you a very easy way of adding new profiles to
-D-Fend Reloaded. The profile wizard consists of 5 pages:
+D-Fend Reloaded. The profile wizard consists of five pages. D-Fend Reloaded
+will show two to all five pages depending on the already known and still needed
+information on the game.
 </p>
 
 <h2>Page 1: Type of the profile</h2>
@@ -34,6 +36,18 @@ You can add <b>a DOSBox based profile, a ScummVM profile or a profile for a Wind
 ScummVM in the <a href="FileOptionsScummVM.html">program options dialog</a>.)
 You can run nearly all DOS games by using DOSBox. ScummVM is only used
 for the old Scumm adventures.
+</p>
+
+<p>
+Additionally you can setup how many things the wizard should ask you. If you keep
+the default setting "Only setup game automatically if matching auto setup template exists",
+the wizard will already close after the first two pages if the new game has beend indentified
+via an auto setup template, because in this case the new profile can be created completely
+automatically with no need of any user interaction. Alternatively you can setup that the
+wizard should always show all pages or that the wizard should always close after the
+first two pages. (If there is no matching auto setup template and if the wizard should
+always close after the first two pages, D-Fend Reloaded will try to configurate the game
+via the default template.)
 </p>
 
 <h2>Page 2: Program files (for a new DOSBox profile)</h2>
@@ -56,10 +70,13 @@ setup the default games folder offerend on this page on the
 </p>
 
 <p>
-By pressing the <b>Setup additonal files</b> you can extended the dialog
+By pressing the <b>Setup additonal files manually</b> you can extended the dialog
 to show you an input line for defining an additional folder for manuals etc.
 The content of this folder will be shown on the bottom of the main window
 when single clicking on the profile in the games list later.
+Alternatively you can check <b>Setup additional files directory automatically</b>
+option to let D-Fend Reloaded automatically create an data folder based on the name
+of the new profile.
 </p>
 
 <h2>Page 2: Program files (for a new ScummVM profile)</h2>

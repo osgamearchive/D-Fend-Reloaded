@@ -20,6 +20,7 @@ type
     TreeViewGroupsInfoLabel: TLabel;
     UserKeysList: TBitBtn;
     PopupMenu: TPopupMenu;
+    ReselectFilterCheckBox: TCheckBox;
     procedure TreeViewBackgroundColorBoxChange(Sender: TObject);
     procedure UserKeysListClick(Sender: TObject);
   private
@@ -29,9 +30,11 @@ type
     { Public-Deklarationen }
     Function GetName : String;
     Procedure InitGUIAndLoadSetup(InitData : TInitData);
+    Procedure BeforeChangeLanguage;
     Procedure LoadLanguage;
     Procedure DOSBoxDirChanged;
     Procedure ShowFrame(const AdvencedMode : Boolean);
+    procedure HideFrame;
     Procedure RestoreDefaults;
     Procedure SaveSetup;
   end;
@@ -56,12 +59,15 @@ Var S : String;
     I : Integer;
     M : TMenuItem;
 begin
+  NoFlicker(ReselectFilterCheckBox);
   NoFlicker(TreeViewBackgroundRadioButton1);
   NoFlicker(TreeViewBackgroundRadioButton2);
   NoFlicker(TreeViewBackgroundColorBox);
   NoFlicker(TreeViewFontSizeEdit);
   NoFlicker(TreeViewFontColorBox);
   NoFlicker(TreeViewGroupsEdit);
+
+  ReselectFilterCheckBox.Checked:=PrgSetup.RestoreFilter;
 
   S:=Trim(PrgSetup.GamesTreeViewBackground);
   If S='' then TreeViewBackgroundRadioButton1.Checked:=True else begin
@@ -92,9 +98,15 @@ begin
   end;
 end;
 
+procedure TSetupFrameGamesListTreeAppearance.BeforeChangeLanguage;
+begin
+end;
+
 procedure TSetupFrameGamesListTreeAppearance.LoadLanguage;
 Var GermanColorNames : Boolean;
 begin
+  ReselectFilterCheckBox.Caption:=LanguageSetup.SetupFormStartRestoreFilter;
+
   GermanColorNames:=(ExtUpperCase(ExtractFileName(LanguageSetup.SetupFile))='DEUTSCH.INI') or (ExtUpperCase(ExtractFileName(LanguageSetup.SetupFile))='GERMAN.INI');
 
   TreeViewBackgroundRadioButton1.Caption:=LanguageSetup.SetupFormBackgroundColorDefault;
@@ -122,8 +134,13 @@ procedure TSetupFrameGamesListTreeAppearance.ShowFrame(const AdvencedMode: Boole
 begin
 end;
 
+procedure TSetupFrameGamesListTreeAppearance.HideFrame;
+begin
+end;
+
 procedure TSetupFrameGamesListTreeAppearance.RestoreDefaults;
 begin
+  ReselectFilterCheckBox.Checked:=True;
   TreeViewBackgroundColorBox.Selected:=clBlack;
   TreeViewBackgroundRadioButton1.Checked:=True;
   TreeViewFontSizeEdit.Value:=9;
@@ -133,6 +150,7 @@ end;
 
 procedure TSetupFrameGamesListTreeAppearance.SaveSetup;
 begin
+  PrgSetup.RestoreFilter:=ReselectFilterCheckBox.Checked;
   If TreeViewBackgroundRadioButton1.Checked then PrgSetup.GamesTreeViewBackground:='';
   If TreeViewBackgroundRadioButton2.Checked then PrgSetup.GamesTreeViewBackground:=ColorToString(TreeViewBackgroundColorBox.Selected);
   PrgSetup.GamesTreeViewFontSize:=TreeViewFontSizeEdit.Value;

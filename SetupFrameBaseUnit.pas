@@ -16,9 +16,11 @@ type
     { Public-Deklarationen }
     Function GetName : String;
     Procedure InitGUIAndLoadSetup(InitData : TInitData);
+    Procedure BeforeChangeLanguage;
     Procedure LoadLanguage;
     Procedure DOSBoxDirChanged;
     Procedure ShowFrame(const AdvencedMode : Boolean);
+    Procedure HideFrame;
     Procedure RestoreDefaults;
     Procedure SaveSetup;
   end;
@@ -47,6 +49,10 @@ begin
   HelpContext:=ID_FileOptionsGeneral;
 end;
 
+procedure TSetupFrameBase.BeforeChangeLanguage;
+begin
+end;
+
 procedure TSetupFrameBase.LoadLanguage;
 begin
   MinimizeToTrayCheckBox.Caption:=LanguageSetup.SetupFormMinimizeToTray;
@@ -60,6 +66,10 @@ end;
 procedure TSetupFrameBase.ShowFrame(const AdvencedMode: Boolean);
 begin
   StartWithWindowsCheckBox.Visible:=AdvencedMode;
+end;
+
+procedure TSetupFrameBase.HideFrame;
+begin
 end;
 
 procedure TSetupFrameBase.RestoreDefaults;

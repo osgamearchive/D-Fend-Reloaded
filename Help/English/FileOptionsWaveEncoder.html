@@ -30,18 +30,26 @@ it can not be bundled with D-Fend Reloaded.
 
 <p>
 On this page you can define where the encoders are located and which command line
-parameters they need. In the command line parameters you can insert two "<tt>%s</tt>".
-The first stand for the input file and the second one for the output file.
+parameters they need. In the command line parameters you can insert the two placeholders
+"<tt>%1</tt>" and "<tt>%2</tt>". The "<tt>%1</tt>" placeholder will be replaced by the
+path and name of the input file and the "<tt>%2</tt>" placeholder will be replaced by
+the path and name of the output file.
 </p>
 
 <p>
 The default command line parameters for the mp3 encoder (lame) are:<br />
-<tt>-h -V 0 "%s" "%s"</tt>
+<tt>-h -V 0 "%1" "%2"</tt>
 </p>
 
 <p>
 The default command line parameters for the mp3 encoder (oggenc2) are:<br />
-<tt>"%s" --output="%s" --quality=10</tt>
+<tt>"%1" --output="%2" --quality=10</tt>
+</p>
+
+<p>
+The place holder <tt>%1</tt> will be replaced by the name of the input file (including the complete path
+to the file) and the place holder <tt>%2</tt> will be replaced by then name of the output file
+(also including the complete path to the file).
 </p>
  
 <p>&nbsp;</p>

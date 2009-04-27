@@ -89,6 +89,8 @@ Var S,T : String;
     Handle : THandle;
     AlreadyMinimized : Boolean;
 begin
+  AlreadyMinimized:=False;
+
   If RunSetup then begin
     S:=Trim(Game.SetupExe);
     T:=Game.SetupParameters;
@@ -101,15 +103,14 @@ begin
   if not RunCheck(Game,RunSetup) then exit;
   AddToHistory(Game.Name);
 
-  If PrgSetup.MinimizeOnWindowsGameStart then begin
-    AlreadyMinimized:=(Application.MainForm.WindowState=wsMinimized);
-    Application.Minimize;
-  end else begin
-    AlreadyMinimized:=False;
-  end;
-
   try
     RunPrgManager.RunBeforeExecutionCommand(Game);
+
+    If PrgSetup.MinimizeOnWindowsGameStart then begin
+      AlreadyMinimized:=(Application.MainForm.WindowState=wsMinimized);
+      Application.Minimize;
+    end;
+
     Handle:=RunFile(S,T);
     try
       RunPrgManager.AddCommand(Game,Handle);
@@ -130,6 +131,8 @@ Var S,T : String;
     Handle : THandle;
     AlreadyMinimized : Boolean;
 begin
+  AlreadyMinimized:=False;
+
   S:=Trim(Game.ExtraPrgFile[Nr]); I:=Pos(';',S);
   If (S='') or (I=0) then begin
     S:=Trim(Game.GameExe); T:=Game.GameParameters;
@@ -142,15 +145,14 @@ begin
   if not RunCheck(Game,False,Nr) then exit;
   AddToHistory(Game.Name);
 
-  If PrgSetup.MinimizeOnWindowsGameStart then begin
-    AlreadyMinimized:=(Application.MainForm.WindowState=wsMinimized);
-    Application.Minimize;
-  end else begin
-    AlreadyMinimized:=False;
-  end;
-
   try
     RunPrgManager.RunBeforeExecutionCommand(Game);
+
+    If PrgSetup.MinimizeOnWindowsGameStart then begin
+      AlreadyMinimized:=(Application.MainForm.WindowState=wsMinimized);
+      Application.Minimize;
+    end;
+
     Handle:=RunFile(S,T);
     try
       RunPrgManager.AddCommand(Game,Handle);

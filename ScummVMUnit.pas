@@ -73,7 +73,7 @@ end;
 Function BuildScummVMIniFile(const Game : TGame) : TStringList;
 Var S : String;
     Ini : TIniFile;
-    St1, St2 : TStringList;
+    St1,St2,St3 : TStringList;
 begin
   result:=TStringList.Create;
 
@@ -89,13 +89,13 @@ begin
     If Trim(Game.ScummVMPath)='' then S:='' else S:=IncludeTrailingPathDelimiter(MakeAbsPath(Game.ScummVMPath,PrgSetup.BaseDir));
     St2.Add('path='+S);
 
-    If Trim(Game.ScummVMSavePath)<>'' then S:=IncludeTrailingPathDelimiter(MakeAbsPath(Game.ScummVMPath,PrgSetup.BaseDir)) else begin
+    If Trim(Game.ScummVMSavePath)<>'' then S:=IncludeTrailingPathDelimiter(MakeAbsPath(Game.ScummVMSavePath,PrgSetup.BaseDir)) else begin
       If Trim(Game.ScummVMPath)='' then S:='' else S:=IncludeTrailingPathDelimiter(MakeAbsPath(Game.ScummVMPath,PrgSetup.BaseDir));
     end;
     St2.Add('savepath='+S);
 
     St2.Add('autosave_period='+IntToStr(Game.ScummVMAutosave));
-    St2.Add('language='+Game.ScummVMLanguage);
+    If Trim(Game.ScummVMLanguage)<>'' then St2.Add('language='+Game.ScummVMLanguage);
     St2.Add('music_volume='+IntToStr(Game.ScummVMMusicVolume));
     St2.Add('speech_volume='+IntToStr(Game.ScummVMSpeechVolume));
     St2.Add('sfx_volume='+IntToStr(Game.ScummVMSFXVolume));
@@ -112,6 +112,7 @@ begin
     If Game.ScummVMSubtitles then St2.Add('subtitles=true') else St2.Add('subtitles=false');
     St2.Add('cdrom='+IntToStr(Game.ScummVMCDROM));
     St2.Add('joystick_num='+IntToStr(Game.ScummVMJoystickNum));
+    If Trim(Game.ScummVMExtraPath)<>'' then St2.Add('extrapath='+MakeAbsPath(Game.ScummVMExtraPath,PrgSetup.BaseDir));
 
     S:=Trim(LowerCase(Game.ScummVMGame));
 
@@ -146,9 +147,9 @@ begin
 
         St1.Add('gui_theme='+Ini.ReadString('scummvm','gui_theme',''));
 
-        S:=Ini.ReadString('scummvm','extra_path','');
+        S:=Ini.ReadString('scummvm','extrapath','');
         If S='' then S:=IncludeTrailingPathDelimiter(PrgSetup.ScummVMPath);
-        St1.Add('extra_path='+S);
+        St1.Add('extrapath='+S);
 
         AddKeysFromDefaultScummVMIni(St1,St2,Ini,Game.ScummVMGame);
       finally
@@ -161,14 +162,24 @@ begin
     result.AddStrings(St1);
     result.Add('');
     result.AddStrings(St2);
+
+    result.Add('');
+    If Trim(Game.CustomSettings)<>'' then begin
+      St3:=StringToStringList(Game.CustomSettings);
+      try
+        result.AddStrings(St3);
+      finally
+        St3.Free;
+      end;
+    end;
   finally
     St1.Free;
     St2.Free;
   end;
 end;
 
-Function RunScummVM(const INIFile, GameName : String; const FullScreen : Boolean; const ScreenshotDir : String) : THandle;
-Var PrgFile, Params : String;
+Function RunScummVM(const INIFile, GameName : String; const FullScreen : Boolean; const ScreenshotDir, RenderMode, DataPlatform : String) : THandle;
+Var PrgFile, Params, RenderModeParam, PlatformParam : String;
     StartupInfo : TStartupInfo;
     ProcessInformation : TProcessInformation;
     Waited : Boolean;
@@ -182,7 +193,15 @@ begin
     exit;
   end;
 
-  Params:='--config="'+INIFile+'" '+GameName;
+  RenderModeParam:='';
+  If (Trim(RenderMode)<>'') and (Trim(ExtUpperCase(RenderMode))<>'DEFAULT') then
+    RenderModeParam:='--render-mode='+RenderMode+' ';
+
+  PlatformParam:='';
+  If (Trim(DataPlatform)<>'') and (Trim(ExtUpperCase(DataPlatform))<>'AUTO') then
+    PlatformParam:='--platform='+DataPlatform+' ';
+
+  Params:='--config="'+INIFile+'" '+RenderModeParam+PlatformParam+GameName;
 
   with StartupInfo do begin
     cb:=SizeOf(TStartupInfo);
@@ -252,21 +271,16 @@ end;
 
 Procedure RunScummVMGame(const Game : TGame);
 Var St : TStringList;
-    S, SavePath : String;
+    S : String;
     ZipRecNr : Integer;
     Error : Boolean;
     ScummVMHandle : THandle;
     AlreadyMinimized : Boolean;
 begin
+  AlreadyMinimized:=False;
+
   ZipRecNr:=ZipManager.AddGame(Game,Error);
   If Error then exit;
-
-  If PrgSetup.MinimizeOnScummVMStart then begin
-    AlreadyMinimized:=(Application.MainForm.WindowState=wsMinimized);
-    Application.Minimize;
-  end else begin
-    AlreadyMinimized:=False;
-  end;
 
   try
     St:=BuildScummVMIniFile(Game);
@@ -287,7 +301,13 @@ begin
       end;
 
       RunPrgManager.RunBeforeExecutionCommand(Game);
-      ScummVMHandle:=RunScummVM(TempDir+ScummVMConfFileName,Game.ScummVMGame,Game.StartFullscreen,S);
+
+      If PrgSetup.MinimizeOnScummVMStart then begin
+        AlreadyMinimized:=(Application.MainForm.WindowState=wsMinimized);
+        Application.Minimize;
+      end;
+
+      ScummVMHandle:=RunScummVM(TempDir+ScummVMConfFileName,Game.ScummVMGame,Game.StartFullscreen,S,Game.ScummVMRenderMode,Game.ScummVMPlatform);
       try
         If ZipRecNr>=0 then ZipManager.ActivateRepackCheck(ZipRecNr,ScummVMHandle);
         RunPrgManager.AddCommand(Game,ScummVMHandle);

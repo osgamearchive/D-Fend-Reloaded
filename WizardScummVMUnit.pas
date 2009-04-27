@@ -23,6 +23,7 @@ type
     DataFolderButton: TSpeedButton;
     GameNameComboBox: TComboBox;
     GameNameLabel: TLabel;
+    DataFolderAutomaticCheckBox: TCheckBox;
     procedure FolderInfoButtonClick(Sender: TObject);
     procedure DataFolderShowButtonClick(Sender: TObject);
     procedure ButtonWork(Sender: TObject);
@@ -39,7 +40,7 @@ type
 implementation
 
 uses ShellAPI, VistaToolsUnit, LanguageSetupUnit, PrgSetupUnit, ScummVMToolsUnit,
-     CommonTools;
+     CommonTools, IconLoaderUnit;
 
 {$R *.dfm}
 
@@ -60,6 +61,7 @@ begin
   GameNameLabel.Caption:=LanguageSetup.ProfileEditorScummVMGame;
   DataFolderShowButton.Caption:=LanguageSetup.WizardFormDataFolderButton;
   BaseInfoLabel3.Caption:=LanguageSetup.WizardFormInfoLabel3;
+  DataFolderAutomaticCheckBox.Caption:=LanguageSetup.WizardFormDataFolderCheckbox;
   DataFolderEdit.EditLabel.Caption:=LanguageSetup.WizardFormDataFolder;
   DataFolderButton.Hint:=LanguageSetup.ChooseFolder;
   BaseDataFolderEdit.EditLabel.Caption:=LanguageSetup.WizardFormBaseDataFolder;
@@ -67,6 +69,13 @@ begin
 
   GamesFolderEdit.Text:=PrgSetup.GameDir;
   BaseDataFolderEdit.Text:=PrgSetup.DataDir;
+
+  UserIconLoader.DialogImage(DI_SelectFolder,ProgramButton);
+  UserIconLoader.DialogImage(DI_SelectFolder,GamesFolderButton);
+  UserIconLoader.DialogImage(DI_Help,FolderInfoButton);
+  UserIconLoader.DialogImage(DI_SelectFolder,DataFolderButton);
+  UserIconLoader.DialogImage(DI_SelectFolder,BaseDataFolderButton);
+  UserIconLoader.DialogImage(DI_Down,DataFolderShowButton);
 
   GamesFolderEdit.Color:=Color;
   BaseDataFolderEdit.Color:=Color;
@@ -92,7 +101,7 @@ begin
             then S:=PrgSetup.GameDir
             else S:=MakeAbsPath(ProgramEdit.Text,PrgSetup.BaseDir);
           if not SelectDirectory(Handle,LanguageSetup.ChooseFolder,S) then exit;
-          S:=MakeRelPath(S,PrgSetup.BaseDir);
+          S:=MakeRelPath(S,PrgSetup.BaseDir,True);
           ProgramEdit.Text:=S;
         end;
     2 : ShellExecute(Handle,'explore',PChar(BaseDataFolderEdit.Text),nil,PChar(BaseDataFolderEdit.Text),SW_SHOW);
@@ -101,19 +110,36 @@ begin
             then S:=PrgSetup.DataDir
             else S:=MakeAbsPath(DataFolderEdit.Text,PrgSetup.BaseDir);
           if not SelectDirectory(Handle,LanguageSetup.ChooseFolder,S) then exit;
-          S:=MakeRelPath(S,PrgSetup.BaseDir);
+          S:=MakeRelPath(S,PrgSetup.BaseDir,True);
           DataFolderEdit.Text:=S;
         end;
   end;
 end;
 
 procedure TWizardScummVMFrame.WriteDataToGame(const Game: TGame);
+Var S,T : String;
+    I : Integer;
 begin
   Game.ScummVMPath:=ProgramEdit.Text;
   If GameNameComboBox.ItemIndex>=0
     then Game.ScummVMGame:=ScummVMGamesList.NameFromDescription(GameNameComboBox.Text)
     else Game.ScummVMGame:='';
-  Game.DataDir:=DataFolderEdit.Text;
+  If DataFolderButton.Visible then begin
+    Game.DataDir:=DataFolderEdit.Text;
+  end else begin
+    If DataFolderAutomaticCheckBox.Checked then begin
+      If PrgSetup.DataDir='' then T:=PrgSetup.BaseDir else T:=PrgSetup.DataDir;
+      S:=IncludeTrailingPathDelimiter(T)+MakeFileSysOKFolderName(Game.Name)+'\';
+      I:=0;
+      While DirectoryExists(MakeAbsPath(S,PrgSetup.BaseDir)) do begin
+        inc(I);
+        S:=IncludeTrailingPathDelimiter(T)+MakeFileSysOKFolderName(Game.Name)+IntToStr(I)+'\';
+      end;
+      Game.DataDir:=S;
+    end else begin
+      Game.DataDir:='';
+    end;
+  end;
 end;
 
 procedure TWizardScummVMFrame.FolderInfoButtonClick(Sender: TObject);
@@ -131,6 +157,7 @@ end;
 procedure TWizardScummVMFrame.DataFolderShowButtonClick(Sender: TObject);
 begin
   DataFolderShowButton.Visible:=False;
+  DataFolderAutomaticCheckBox.Visible:=False;
 
   BaseInfoLabel3.Visible:=True;
   BaseDataFolderEdit.Visible:=True;

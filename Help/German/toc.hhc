@@ -43,7 +43,7 @@
 					<param name="Local" value="FileImportProf.html">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
-					<param name="Name" value="Zip-Datei importieren">
+					<param name="Name" value="Archivdatei importieren">
 					<param name="Local" value="FileImportZip.html">
 					</OBJECT>
 			</UL>
@@ -64,8 +64,12 @@
 					<param name="Local" value="FileExportProf.html">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
-					<param name="Name" value="Zip-Datei erstellen">
+					<param name="Name" value="Archivdatei erstellen">
 					<param name="Local" value="FileExportZip.html">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="Installer-Paket erstellen">
+					<param name="Local" value="FileExportInstaller.html">
 					</OBJECT>
 			</UL>
 			<LI> <OBJECT type="text/sitemap">
@@ -104,30 +108,36 @@
 						<param name="Name" value="Sprache">
 						<param name="Local" value="FileOptionsLanguage.html">
 						</OBJECT>
+					<UL>
+						<LI> <OBJECT type="text/sitemap">
+							<param name="Name" value="Übersetzungen für Genres und Namen von Sprachen">
+							<param name="Local" value="FileOptionsGamesListTranslations.html">
+							</OBJECT>
+					</UL>
 					<LI> <OBJECT type="text/sitemap">
 						<param name="Name" value="Symbolleiste">
 						<param name="Local" value="FileOptionsToolbar.html">
 						</OBJECT>
 					<LI> <OBJECT type="text/sitemap">
-						<param name="Name" value="Spalten in der Spieleliste">
-						<param name="Local" value="FileOptionsColumnsInTheGamesList.html">
+						<param name="Name" value="Baumstruktur">
+						<param name="Local" value="FileOptionsAppearanceTree.html">
 						</OBJECT>
 					<LI> <OBJECT type="text/sitemap">
-						<param name="Name" value="Aussehen der Spieleliste">
+						<param name="Name" value="Spieleliste">
 						<param name="Local" value="FileOptionsAppearanceList.html">
 						</OBJECT>
 					<UL>
+						<LI> <OBJECT type="text/sitemap">
+							<param name="Name" value="Spalten in der Spieleliste">
+							<param name="Local" value="FileOptionsColumnsInTheGamesList.html">
+							</OBJECT>
 						<LI> <OBJECT type="text/sitemap">
 							<param name="Name" value="Liste im Screenshots-Modus">
 							<param name="Local" value="FileOptionsListInScreenshotMode.html">
 							</OBJECT>
 					</UL>
 					<LI> <OBJECT type="text/sitemap">
-						<param name="Name" value="Aussehen der Baumstruktur">
-						<param name="Local" value="FileOptionsAppearanceTree.html">
-						</OBJECT>
-					<LI> <OBJECT type="text/sitemap">
-						<param name="Name" value="Aussehen der Screenshot- Sound- und Video-Vorschau">
+						<param name="Name" value="Medienvorschau">
 						<param name="Local" value="FileOptionsAppearanceScreenshots.html">
 						</OBJECT>
 				</UL>
@@ -172,12 +182,20 @@
 						<param name="Local" value="FileOptionsWaveEncoder.html">
 						</OBJECT>
 					<LI> <OBJECT type="text/sitemap">
+						<param name="Name" value="Packprogramme">
+						<param name="Local" value="FileOptionsZipPackers.html">
+						</OBJECT>
+					<LI> <OBJECT type="text/sitemap">
 						<param name="Name" value="Texteditor">
 						<param name="Local" value="FileOptionsTextEditor.html">
 						</OBJECT>
 					<LI> <OBJECT type="text/sitemap">
 						<param name="Name" value="Medienbetrachter">
 						<param name="Local" value="FileOptionsMediaViewers.html">
+						</OBJECT>
+					<LI> <OBJECT type="text/sitemap">
+						<param name="Name" value="Windows-Spiele">
+						<param name="Local" value="FileOptionsWindowsGames.html">
 						</OBJECT>
 				</UL>
 				<LI> <OBJECT type="text/sitemap">
@@ -304,6 +322,10 @@
 							<param name="Name" value="Verzeichnisse">
 							<param name="Local" value="ProfileEditProgramDirectories.html">
 							</OBJECT>
+						<LI> <OBJECT type="text/sitemap">
+							<param name="Name" value="Hilfsprogramme">
+							<param name="Local" value="ProfileEditHelperPrograms.html">
+							</OBJECT>
 					</UL>
 					<LI> <OBJECT type="text/sitemap">
 						<param name="Name" value="DOSBox-Einstellungen">
@@ -320,7 +342,8 @@
 							</OBJECT>						
 					</UL>
 					<LI> <OBJECT type="text/sitemap">
-						<param name="Name" value="Hardware">						
+						<param name="Name" value="Hardware">
+						<param name="Local" value="ProfileEditHardware.html">
 						</OBJECT>
 					<UL>
 						<LI> <OBJECT type="text/sitemap">
@@ -339,6 +362,12 @@
 							<param name="Name" value="Tastatur">
 							<param name="Local" value="ProfileEditKeyboard.html">
 							</OBJECT>
+						<UL>
+							<LI> <OBJECT type="text/sitemap">
+								<param name="Name" value="Liste der möglichen Tastaturbelegung und Codepage Kombinationen">
+								<param name="Local" value="ProfileEditKeyboardList.html">
+								</OBJECT>
+						</UL>
 						<LI> <OBJECT type="text/sitemap">
 							<param name="Name" value="Maus">
 							<param name="Local" value="ProfileEditMouse.html">
@@ -412,7 +441,7 @@
 				<param name="Local" value="ProfileMakeInstallerPackage.html">
 				</OBJECT>
 			<LI> <OBJECT type="text/sitemap">
-				<param name="Name" value="Zip-Archiv erstellen">
+				<param name="Name" value="Archivdatei-Paket erstellen">
 				<param name="Local" value="ProfileMakeZipPackage.html">
 				</OBJECT>
 			<LI> <OBJECT type="text/sitemap">
@@ -506,6 +535,10 @@
 			  	</OBJECT>
       </UL>      
 			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="Spieleverzeichnis nach neuen Spielen durchsuchen">
+				<param name="Local" value="ExtrasScanGamesFolder.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
 				<param name="Name" value="Mehrere Profile gleichzeitig bearbeiten">
 				<param name="Local" value="ExtrasEditMultipleProfiles.html">
 				</OBJECT>
@@ -522,7 +555,7 @@
 				<param name="Local" value="ExtrasBuildInstallers.html">
 				</OBJECT>
 			<LI> <OBJECT type="text/sitemap">
-				<param name="Name" value="Zip-Pakete für mehrere Spiele erstellen">
+				<param name="Name" value="Archivdatei-Pakete für mehrere Spiele erstellen">
 				<param name="Local" value="ExtrasBuildZipPackages.html">
 				</OBJECT>
 			<LI> <OBJECT type="text/sitemap">
@@ -545,6 +578,10 @@
 			<LI> <OBJECT type="text/sitemap">
 				<param name="Name" value="Übersetzen Sie das Programm in andere Sprachen">
 				<param name="Local" value="HelpLanguageEditor.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="Alte Spiele">
+				<param name="Local" value="HelpOldGames.html">
 				</OBJECT>
 			<LI> <OBJECT type="text/sitemap">
 				<param name="Name" value="Statistik">
@@ -605,30 +642,36 @@
 					<param name="Name" value="Sprache">
 					<param name="Local" value="FileOptionsLanguage.html">
 					</OBJECT>
+				<UL>
+					<LI> <OBJECT type="text/sitemap">
+						<param name="Name" value="Übersetzungen für Genres und Namen von Sprachen">
+						<param name="Local" value="FileOptionsGamesListTranslations.html">
+						</OBJECT>
+				</UL>
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="Symbolleiste">
 					<param name="Local" value="FileOptionsToolbar.html">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
-					<param name="Name" value="Spalten in der Spieleliste">
-					<param name="Local" value="FileOptionsColumnsInTheGamesList.html">
+					<param name="Name" value="Baumstruktur">
+					<param name="Local" value="FileOptionsAppearanceTree.html">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
-					<param name="Name" value="Aussehen der Spieleliste">
+					<param name="Name" value="Spieleliste">
 					<param name="Local" value="FileOptionsAppearanceList.html">
 					</OBJECT>
 				<UL>
+					<LI> <OBJECT type="text/sitemap">
+						<param name="Name" value="Spalten in der Spieleliste">
+						<param name="Local" value="FileOptionsColumnsInTheGamesList.html">
+						</OBJECT>
 					<LI> <OBJECT type="text/sitemap">
 						<param name="Name" value="Liste im Screenshots-Modus">
 						<param name="Local" value="FileOptionsListInScreenshotMode.html">
 						</OBJECT>
 				</UL>
 				<LI> <OBJECT type="text/sitemap">
-					<param name="Name" value="Aussehen der Baumstruktur">
-					<param name="Local" value="FileOptionsAppearanceTree.html">
-					</OBJECT>
-				<LI> <OBJECT type="text/sitemap">
-					<param name="Name" value="Aussehen der Screenshot- Sound- und Video-Vorschau">
+					<param name="Name" value="Medienvorschau">
 					<param name="Local" value="FileOptionsAppearanceScreenshots.html">
 					</OBJECT>
 			</UL>
@@ -673,6 +716,10 @@
 					<param name="Local" value="FileOptionsWaveEncoder.html">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="Packprogramme">
+					<param name="Local" value="FileOptionsZipPackers.html">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="Texteditor">
 					<param name="Local" value="FileOptionsTextEditor.html">
 					</OBJECT>
@@ -680,6 +727,10 @@
 					<param name="Name" value="Medienbetrachter">
 					<param name="Local" value="FileOptionsMediaViewers.html">
 					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="Windows-Spiele">
+					<param name="Local" value="FileOptionsWindowsGames.html">
+					</OBJECT>					
 			</UL>
 			<LI> <OBJECT type="text/sitemap">
 				<param name="Name" value="Service">
@@ -714,6 +765,10 @@
 							<param name="Name" value="Verzeichnisse">
 							<param name="Local" value="ProfileEditProgramDirectories.html">
 							</OBJECT>
+						<LI> <OBJECT type="text/sitemap">
+							<param name="Name" value="Hilfsprogramme">
+							<param name="Local" value="ProfileEditHelperPrograms.html">
+							</OBJECT>
 					</UL>
 					<LI> <OBJECT type="text/sitemap">
 						<param name="Name" value="DOSBox-Einstellungen">
@@ -730,7 +785,8 @@
 							</OBJECT>						
 					</UL>
 					<LI> <OBJECT type="text/sitemap">
-						<param name="Name" value="Hardware">						
+						<param name="Name" value="Hardware">
+						<param name="Local" value="ProfileEditHardware.html">
 						</OBJECT>
 					<UL>
 						<LI> <OBJECT type="text/sitemap">
@@ -749,6 +805,12 @@
 							<param name="Name" value="Tastatur">
 							<param name="Local" value="ProfileEditKeyboard.html">
 							</OBJECT>
+						<UL>
+							<LI> <OBJECT type="text/sitemap">
+								<param name="Name" value="Liste der möglichen Tastaturbelegung und Codepage Kombinationen">
+								<param name="Local" value="ProfileEditKeyboardList.html">
+								</OBJECT>
+						</UL>
 						<LI> <OBJECT type="text/sitemap">
 							<param name="Name" value="Maus">
 							<param name="Local" value="ProfileEditMouse.html">
@@ -862,6 +924,10 @@
  			<param name="Name" value="Imagedatei von Ordnerinhalt erstellen">
   		<param name="Local" value="ExtrasImagesCreateFromFolder.html">
   	</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Spieleverzeichnis nach neuen Spielen durchsuchen">
+			<param name="Local" value="ExtrasScanGamesFolder.html">
+			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="Mehrere Profile gleichzeitig bearbeiten">
 			<param name="Local" value="ExtrasEditMultipleProfiles.html">

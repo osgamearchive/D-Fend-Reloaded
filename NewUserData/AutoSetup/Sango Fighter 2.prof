@@ -50,7 +50,7 @@ DataDir=
 Favorite=0
 Name=Sango Fighter 2
 Icon=
-Genre=Action
+Genre=Arcade
 Developer=Panda Entertainment Technology
 Publisher=Panda Entertainment Technology
 Year=1995
@@ -223,4 +223,7 @@ config=
 [ExtraCommands]
 BeforeExecution=
 AfterExecution=
+BeforeExecution.Wait=1
+BeforeExecution.Minimized=0
+AfterExecution.Minimized=0
 

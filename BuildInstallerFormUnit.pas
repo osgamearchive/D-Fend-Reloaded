@@ -92,7 +92,8 @@ function BuildEXEInstaller(const Handle : THandle; const FileName : String) : Bo
 implementation
 
 uses Registry, ShellAPI, VistaToolsUnit, LanguageSetupUnit, PrgSetupUnit,
-     CommonTools, PrgConsts, GameDBToolsUnit, UninstallFormUnit, HelpConsts;
+     CommonTools, PrgConsts, GameDBToolsUnit, UninstallFormUnit, HelpConsts,
+     IconLoaderUnit;
 
 {$R *.dfm}
 
@@ -119,6 +120,7 @@ begin
   InstTypeRadioGroup.Caption:=LanguageSetup.BuildInstallerInstType;
   InstTypeRadioGroup.Items[0]:=LanguageSetup.BuildInstallerInstTypeScriptOnly;
   InstTypeRadioGroup.Items[1]:=LanguageSetup.BuildInstallerInstTypeFullInstaller;
+  UserIconLoader.DialogImage(DI_SelectFile,DestFileButton);
 
   { AutoSetup templates }
 
@@ -136,6 +138,7 @@ begin
   InstTypeRadioGroup2.Caption:=LanguageSetup.BuildInstallerInstType;
   InstTypeRadioGroup2.Items[0]:=LanguageSetup.BuildInstallerInstTypeScriptOnly;
   InstTypeRadioGroup2.Items[1]:=LanguageSetup.BuildInstallerInstTypeFullInstaller;
+  UserIconLoader.DialogImage(DI_SelectFile,DestFileButton2);
 
   { AutoSetup templates }
 
@@ -153,6 +156,7 @@ begin
   InstTypeRadioGroup3.Caption:=LanguageSetup.BuildInstallerInstType;
   InstTypeRadioGroup3.Items[0]:=LanguageSetup.BuildInstallerInstTypeScriptOnly;
   InstTypeRadioGroup3.Items[1]:=LanguageSetup.BuildInstallerInstTypeFullInstaller;
+  UserIconLoader.DialogImage(DI_SelectFile,DestFileButton3);
 
   { Dialog }
 
@@ -273,7 +277,7 @@ begin
   St:=TStringList.Create;
   try
     St.Add('OutFile "'+ExtractFileName(DestFileEdit.Text)+'"');
-    St.Add('!include "D-Fend Reloaded DataInstaller.nsi"');
+    St.Add('!include ".\'+SettingsFolder+'\'+NSIInstallerHelpFile+'"');
 
     if GroupGamesCheckBox.Checked then begin
       GenreList:=TStringList.Create;
@@ -324,7 +328,7 @@ begin
   St:=TStringList.Create;
   try
     St.Add('OutFile "'+ExtractFileName(DestFileEdit2.Text)+'"');
-    St.Add('!include "D-Fend Reloaded DataInstaller.nsi"');
+    St.Add('!include ".\'+SettingsFolder+'\'+NSIInstallerHelpFile+'"');
 
     if GroupGamesCheckBox2.Checked then begin
       GenreList:=TStringList.Create;
@@ -375,7 +379,7 @@ begin
   St:=TStringList.Create;
   try
     St.Add('OutFile "'+ExtractFileName(DestFileEdit3.Text)+'"');
-    St.Add('!include "D-Fend Reloaded DataInstaller.nsi"');
+    St.Add('!include ".\'+SettingsFolder+'\'+NSIInstallerHelpFile+'"');
 
     if GroupGamesCheckBox3.Checked then begin
       GenreList:=TStringList.Create;
@@ -743,8 +747,15 @@ begin
   end;
 
   {Copy D-Fend Reloaded DataInstaller.nsi to PrgDataDir if missing}
-  If (PrgDir<>PrgDataDir) and (not FileExists(PrgDataDir+NSIInstallerHelpFile)) and FileExists(PrgDir+NSIInstallerHelpFile) then
-    CopyFile(PChar(PrgDir+NSIInstallerHelpFile),PChar(PrgDataDir+NSIInstallerHelpFile),False);
+  If not FileExists(PrgDataDir+SettingsFolder+'\'+NSIInstallerHelpFile) then begin
+    If FileExists(PrgDir+NSIInstallerHelpFile) then begin
+      CopyFile(PChar(PrgDir+NSIInstallerHelpFile),PChar(PrgDataDir+SettingsFolder+'\'+NSIInstallerHelpFile),False);
+    end else begin
+      If FileExists(PrgDir+BinFolder+'\'+NSIInstallerHelpFile) then begin
+        CopyFile(PChar(PrgDir+BinFolder+'\'+NSIInstallerHelpFile),PChar(PrgDataDir+SettingsFolder+'\'+NSIInstallerHelpFile),False);
+      end;
+    end;
+  end;
 
   {Execute NSIS}
   ShellExecute(Handle,'open',PChar(IncludeTrailingPathDelimiter(S)+'makensisw.exe'),PChar('"'+ChangeFileExt(Trim(FileName),'.nsi')+'"'),nil,SW_SHOW);

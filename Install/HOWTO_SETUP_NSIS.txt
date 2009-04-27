@@ -1,1 +1,0 @@
-Copy the UAC.dll form Save\NSIS Plugins\UAC.zip\Release to the NSIS plusins folder !

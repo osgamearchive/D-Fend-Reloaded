@@ -70,7 +70,7 @@ Function ShowFirstRunWizardDialog(const AOwner : TComponent; var SearchForUpdate
 implementation
 
 uses Math, IniFiles, Registry, VistaToolsUnit, LanguageSetupUnit, PrgSetupUnit,
-     CommonTools, PrgConsts, HelpConsts;
+     CommonTools, PrgConsts, HelpConsts, IconLoaderUnit;
 
 {$R *.dfm}
 
@@ -83,6 +83,10 @@ begin
   DOSBoxLanguageTopInfoLabel.Font.Style:=[fsBold];
   GameDirTopInfoLabel.Font.Style:=[fsBold];
   UpdateTopInfoLabel.Font.Style:=[fsBold];
+
+  UserIconLoader.LoadIcons;
+  UserIconLoader.DialogImage(DI_Previous,BackButton);
+  UserIconLoader.DialogImage(DI_Next,NextButton);
 
   DosBoxLang:=TStringList.Create;
   InitGUI;

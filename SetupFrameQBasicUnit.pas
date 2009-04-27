@@ -23,9 +23,11 @@ type
     { Public-Deklarationen }
     Function GetName : String;
     Procedure InitGUIAndLoadSetup(InitData : TInitData);
+    Procedure BeforeChangeLanguage;
     Procedure LoadLanguage;
     Procedure DOSBoxDirChanged;
     Procedure ShowFrame(const AdvencedMode : Boolean);
+    procedure HideFrame;
     Procedure RestoreDefaults;
     Procedure SaveSetup;
   end;
@@ -33,7 +35,7 @@ type
 implementation
 
 uses ShellAPI, ShlObj, LanguageSetupUnit, VistaToolsUnit, PrgSetupUnit,
-     CommonTools, SetupDosBoxFormUnit, HelpConsts;
+     CommonTools, SetupDosBoxFormUnit, HelpConsts, IconLoaderUnit;
 
 {$R *.dfm}
 
@@ -53,6 +55,10 @@ begin
   QBasicParamEdit.Text:=PrgSetup.QBasicParam;
 end;
 
+procedure TSetupFrameQBasic.BeforeChangeLanguage;
+begin
+end;
+
 procedure TSetupFrameQBasic.LoadLanguage;
 begin
   QBasicEdit.EditLabel.Caption:=LanguageSetup.SetupFormQBasicFile;
@@ -64,6 +70,9 @@ begin
   with QBasicDownloadURL.Font do begin Color:=clBlue; Style:=[fsUnderline]; end;
   QBasicDownloadURL.Cursor:=crHandPoint;
 
+  UserIconLoader.DialogImage(DI_SelectFile,QBasicButton);
+  UserIconLoader.DialogImage(DI_FindFile,FindQBasicButton);
+
   HelpContext:=ID_FileOptionsQBasic;
 end;
 
@@ -72,6 +81,10 @@ begin
 end;
 
 procedure TSetupFrameQBasic.ShowFrame(const AdvencedMode: Boolean);
+begin
+end;
+
+procedure TSetupFrameQBasic.HideFrame;
 begin
 end;
 

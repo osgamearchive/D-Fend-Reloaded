@@ -8,6 +8,7 @@ const DosBoxFileName='DOSBOX.EXE';
       ConfOptFile='ConfOpt.dat';
       ScummVMConfOptFile='ScummVM.dat';
       HistoryFileName='History.dat';
+      IconsConfFile='Icons.ini';
       DosBoxDOSProfile='DOSBox DOS';
 
       GameListSubDir='Confs';
@@ -19,7 +20,11 @@ const DosBoxFileName='DOSBOX.EXE';
       AutoSetupSubDir='AutoSetup';
       NewUserDataSubDir='NewUserData';
       PhysFSDefaultWriteDir='PhysWrite';
-      ZipTempDir='ZipTemp';
+      ZipTempDir='ZipTemp'; {Subdir of BaseDataDir; ment as base directory for extracting zip file for mounting}
+      TempSubFolder='D-Fend Reloaded zip package'; {Subdir fo TempDir; ment for internal use when building/extracting zip packages}
+      BinFolder='Bin';
+      SettingsFolder='Settings';
+      IconSetsFolder='IconSets';
 
       NSIInstallerHelpFile='D-Fend Reloaded DataInstaller.nsi';
 

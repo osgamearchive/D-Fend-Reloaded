@@ -28,9 +28,11 @@ type
     { Public-Deklarationen }
     Function GetName : String;
     Procedure InitGUIAndLoadSetup(InitData : TInitData);
+    Procedure BeforeChangeLanguage;
     Procedure LoadLanguage;
     Procedure DOSBoxDirChanged;
     Procedure ShowFrame(const AdvencedMode : Boolean);
+    procedure HideFrame;
     Procedure RestoreDefaults;
     Procedure SaveSetup;
   end;
@@ -39,7 +41,7 @@ implementation
 
 uses ShellAPI, ShlObj, LanguageSetupUnit, VistaToolsUnit, PrgSetupUnit,
      CommonTools, ScummVMToolsUnit, SetupDosBoxFormUnit,
-     ListScummVMGamesFormUnit, HelpConsts;
+     ListScummVMGamesFormUnit, HelpConsts, IconLoaderUnit;
 
 {$R *.dfm}
 
@@ -52,8 +54,6 @@ end;
 
 procedure TSetupFrameScummVM.InitGUIAndLoadSetup(InitData: TInitData);
 begin
-  If PrgSetup.ActivateIncompleteFeatures then RestoreWindowCheckBox.Visible:=True;
-
   NoFlicker(ScummVMDirEdit);
   NoFlicker(ScummVMReadList);
   NoFlicker(MinimizeDFendScummVMCheckBox);
@@ -67,7 +67,16 @@ begin
   CenterScummVMCheckBox.Checked:=PrgSetup.CenterScummVMWindow;
   HideConsoleCheckBox.Checked:=PrgSetup.HideScummVMConsole;
 
+  UserIconLoader.DialogImage(DI_SelectFile,ScummVMButton);
+  UserIconLoader.DialogImage(DI_FindFile,FindScummVMButton);
+  UserIconLoader.DialogImage(DI_ScummVM,ScummVMReadList);
+  UserIconLoader.DialogImage(DI_Table,ScummVMShowListButton);
+
   MinimizeDFendScummVMCheckBoxClick(self);
+end;
+
+procedure TSetupFrameScummVM.BeforeChangeLanguage;
+begin
 end;
 
 procedure TSetupFrameScummVM.LoadLanguage;
@@ -101,8 +110,21 @@ end;
 procedure TSetupFrameScummVM.ShowFrame(const AdvencedMode: Boolean);
 begin                                                
   MinimizeDFendScummVMCheckBox.Visible:=AdvencedMode;
+  RestoreWindowCheckBox.Visible:=AdvencedMode;
   CenterScummVMCheckBox.Visible:=AdvencedMode;
   HideConsoleCheckBox.Visible:=AdvencedMode;
+
+  If AdvencedMode then begin
+    ScummVMDownloadURLInfo.Top:=HideConsoleCheckBox.Top+HideConsoleCheckBox.Height+18;
+  end else begin
+    ScummVMDownloadURLInfo.Top:=MinimizeDFendScummVMCheckBox.Top;
+  end;
+  ScummVMDownloadURL.Top:=ScummVMDownloadURLInfo.Top+19;
+
+end;
+
+procedure TSetupFrameScummVM.HideFrame;
+begin
 end;
 
 procedure TSetupFrameScummVM.RestoreDefaults;

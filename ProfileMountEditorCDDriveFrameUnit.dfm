@@ -57,10 +57,25 @@ object ProfileMountEditorCDDriveFrame: TProfileMountEditorCDDriveFrame
     Visible = False
     WordWrap = True
   end
-  object CDROMEdit: TLabeledEdit
+  object CDDriveNumberLabel: TLabel
+    Left = 472
+    Top = 16
+    Width = 101
+    Height = 13
+    Caption = 'CDDriveNumberLabel'
+    Visible = False
+  end
+  object CDMountTypeLabel: TLabel
     Left = 16
+    Top = 16
+    Width = 113
+    Height = 13
+    Caption = 'CD drive mounting type'
+  end
+  object CDROMEdit: TLabeledEdit
+    Left = 264
     Top = 32
-    Width = 649
+    Width = 401
     Height = 21
     Anchors = [akLeft, akTop, akRight]
     EditLabel.Width = 223
@@ -87,13 +102,7 @@ object ProfileMountEditorCDDriveFrame: TProfileMountEditorCDDriveFrame
     Style = csDropDownList
     Anchors = [akLeft, akTop, akRight]
     ItemHeight = 13
-    ItemIndex = 0
     TabOrder = 2
-    Text = 'Normal CDROM access via MSCDEX'
-    Items.Strings = (
-      'Normal CDROM access via MSCDEX'
-      'Low-level CDROM access and MSCDEX'
-      'Low-level SDL-support and MSCDEX')
   end
   object CDROMDriveLetterComboBox: TComboBox
     Left = 16
@@ -104,5 +113,38 @@ object ProfileMountEditorCDDriveFrame: TProfileMountEditorCDDriveFrame
     ItemHeight = 13
     TabOrder = 3
     OnChange = CDROMDriveLetterComboBoxChange
+  end
+  object CDMountTypeComboBox: TComboBox
+    Left = 16
+    Top = 32
+    Width = 242
+    Height = 21
+    Style = csDropDownList
+    ItemHeight = 13
+    TabOrder = 4
+    OnChange = CDMountTypeComboBoxChange
+  end
+  object CDDriveNumberEdit: TSpinEdit
+    Left = 264
+    Top = 32
+    Width = 65
+    Height = 22
+    MaxValue = 10
+    MinValue = 1
+    TabOrder = 5
+    Value = 1
+    Visible = False
+  end
+  object CDLabelEdit: TLabeledEdit
+    Left = 264
+    Top = 32
+    Width = 401
+    Height = 21
+    Anchors = [akLeft, akTop, akRight]
+    EditLabel.Width = 57
+    EditLabel.Height = 13
+    EditLabel.Caption = 'CDLabelEdit'
+    TabOrder = 6
+    Visible = False
   end
 end

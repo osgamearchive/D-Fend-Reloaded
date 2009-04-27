@@ -134,7 +134,7 @@ implementation
 uses VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgConsts,
      ProfileEditorFormUnit, PrgSetupUnit, TemplateSelectProfileFormUnit,
      ModernProfileEditorFormUnit, SelectProfilesFormUnit,
-     ChangeProfilesFormUnit, HelpConsts;
+     EditMultipleProfilesFormUnit, HelpConsts, IconLoaderUnit;
 
 {$R *.dfm}
 
@@ -247,6 +247,14 @@ begin
   PrgSetup.UpdateFile;
   DefaultTemplate:=TGame.Create(PrgSetup);
   If DefaultTemplate.Name<>'' then DefaultTemplate.Name:='';
+
+  UserIconLoader.DialogImage(DI_ImageFloppy,ImageList,0);
+  UserIconLoader.DialogImage(DI_CloseWindow,ImageList,1);
+  UserIconLoader.DialogImage(DI_UseTemplate,ImageList,2);
+  UserIconLoader.DialogImage(DI_Add,ImageList,3);
+  UserIconLoader.DialogImage(DI_Edit,ImageList,4);
+  UserIconLoader.DialogImage(DI_Clear,ImageList,5);
+  UserIconLoader.DialogImage(DI_Help,ImageList,6);
 
   InitListViewForGamesList(ListView,True);
   InitListViewForGamesList(ListView2,True);
@@ -676,7 +684,7 @@ begin
         end;
    16 : begin
           {Template: Multi edit}
-          ShowChangeProfilesDialog(self,TemplateDB,True);
+          ShowEditMultipleProfilesDialog(self,TemplateDB,True);
           If ListView.Selected=nil then begin G:=nil; GName:=''; end else begin
             G:=TGame(ListView.Selected.Data);
             If G=DefaultTemplate then begin G:=nil; GName:=ListView.Selected.Caption; end else GName:='';
@@ -686,7 +694,7 @@ begin
         end;
    17 : begin
           {AutoSetup: Multi edit}
-          ShowChangeProfilesDialog(self,AutoSetupDB,True);
+          ShowEditMultipleProfilesDialog(self,AutoSetupDB,True);
           If ListView2.Selected=nil then G:=nil else G:=TGame(ListView2.Selected.Data);
           LoadList2;
           SelectGame2(G);

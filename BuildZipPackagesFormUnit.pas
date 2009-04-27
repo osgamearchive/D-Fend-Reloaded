@@ -41,7 +41,7 @@ Function ShowBuildZipPackagesDialog(const AOwner : TComponent; const AGameDB : T
 implementation
 
 uses ShlObj, LanguageSetupUnit, VistaToolsUnit, CommonTools, GameDBToolsUnit,
-     PrgSetupUnit, ZipPackageUnit, HelpConsts;
+     PrgSetupUnit, ZipPackageUnit, HelpConsts, IconLoaderUnit;
 
 {$R *.dfm}
 
@@ -61,6 +61,7 @@ begin
   SelectAllButton.Caption:=LanguageSetup.All;
   SelectNoneButton.Caption:=LanguageSetup.None;
   SelectGenreButton.Caption:=LanguageSetup.GameBy;
+  UserIconLoader.DialogImage(DI_SelectFolder,DestFolderButton);
 end;
 
 procedure TBuildZipPackagesForm.FormShow(Sender: TObject);
@@ -94,7 +95,7 @@ Var S : String;
 begin
   S:=MakeAbsPath(DestFolderEdit.Text,PrgSetup.BaseDir);
   If not SelectDirectory(Handle,LanguageSetup.ChooseFolder,S) then exit;
-  DestFolderEdit.Text:=MakeRelPath(S,PrgSetup.BaseDir);
+  DestFolderEdit.Text:=MakeRelPath(S,PrgSetup.BaseDir,True);
 end;
 
 procedure TBuildZipPackagesForm.OKButtonClick(Sender: TObject);

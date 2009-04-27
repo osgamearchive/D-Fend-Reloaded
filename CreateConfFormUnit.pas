@@ -44,7 +44,8 @@ Function ExportProfFiles(const AOwner : TComponent; const AGameDB : TGameDB) : B
 implementation
 
 uses ShlObj, VistaToolsUnit, LanguageSetupUnit, DosBoxUnit, CommonTools,
-     PrgSetupUnit, GameDBToolsUnit, ScummVMUnit, HelpConsts, TemplateFormUnit;
+     PrgSetupUnit, GameDBToolsUnit, ScummVMUnit, HelpConsts, TemplateFormUnit,
+     IconLoaderUnit ;
 
 {$R *.dfm}
 
@@ -64,6 +65,7 @@ begin
   SelectNoneButton.Caption:=LanguageSetup.None;
   SelectGenreButton.Caption:=LanguageSetup.GameBy;
   ExportAutoSetupTemplatesCheckBox.Caption:=LanguageSetup.CreateConfFormAutoSetup;
+  UserIconLoader.DialogImage(DI_SelectFolder,SelectFolderButton);
 
   ProfFileMode:=False;
 end;
@@ -72,7 +74,7 @@ procedure TCreateConfForm.FormShow(Sender: TObject);
 begin
   If ProfFileMode then begin
     Caption:=LanguageSetup.CreateConfFormProfMode;
-    ExportAutoSetupTemplatesCheckBox.Visible:=PrgSetup.ActivateIncompleteFeatures;
+    ExportAutoSetupTemplatesCheckBox.Visible:=True;
   end;
 
   BuildCheckList(ListBox,GameDB,True,False,True);
@@ -153,6 +155,7 @@ begin
       end else begin
         S:=Dir+ChangeFileExt(ExtractFileName(G.SetupFile),'.conf');
         St:=BuildConfFile(G,False,False);
+        If St=nil then continue;
       end;
       try
         try St.SaveToFile(S); except

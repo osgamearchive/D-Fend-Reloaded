@@ -48,7 +48,7 @@ object ModernProfileEditorStartFrame: TModernProfileEditorStartFrame
   object AutoexecBootFloppyImageAddButton: TSpeedButton
     Tag = 4
     Left = 485
-    Top = 419
+    Top = 417
     Width = 23
     Height = 22
     Anchors = [akRight, akBottom]
@@ -69,8 +69,6 @@ object ModernProfileEditorStartFrame: TModernProfileEditorStartFrame
     ParentShowHint = False
     ShowHint = True
     OnClick = ButtonWork
-    ExplicitLeft = 510
-    ExplicitTop = 428
   end
   object AutoexecBootFloppyImageDelButton: TSpeedButton
     Tag = 5
@@ -280,10 +278,6 @@ object ModernProfileEditorStartFrame: TModernProfileEditorStartFrame
     object AutoexecSheet2: TTabSheet
       Caption = 'Abschluss'
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object Panel12: TPanel
         Left = 0
         Top = 192

@@ -35,6 +35,8 @@ type
   private
     { Private-Deklarationen }
     DosBoxLang : TStringList;
+    ProfileName,ProfileExe,ProfileSetup,ProfileDOSBoxInstallation : PString;
+    FOnProfileNameChange : TTextEvent;
     Procedure UpdateLanguageList;
     Procedure SelectInLanguageList(const LangName : String);
   public
@@ -51,7 +53,7 @@ type
 implementation
 
 uses Math, VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgSetupUnit,
-     PrgConsts, HelpConsts;
+     PrgConsts, HelpConsts, IconLoaderUnit;
 
 {$R *.dfm}
 
@@ -113,12 +115,22 @@ begin
   CustomSetsClearButton.Caption:=LanguageSetup.Del;
   CustomSetsLoadButton.Caption:=LanguageSetup.Load;
   CustomSetsSaveButton.Caption:=LanguageSetup.Save;
+  UserIconLoader.DialogImage(DI_SelectFolder,CustomDOSBoxInstallationButton);
+  UserIconLoader.DialogImage(DI_Clear,CustomSetsClearButton);
+  UserIconLoader.DialogImage(DI_Load,CustomSetsLoadButton);
+  UserIconLoader.DialogImage(DI_Save,CustomSetsSaveButton);
 
   For I:=0 to PrgSetup.DOSBoxSettingsCount-1 do begin
     If I=0 then S:=LanguageSetup.Default else S:=PrgSetup.DOSBoxSettings[I].Name;
-    DOSBoxInstallationComboBox.Items.Add(S+' ('+MakeRelPath(PrgSetup.DOSBoxSettings[I].DosBoxDir,PrgSetup.BaseDir)+')');
+    DOSBoxInstallationComboBox.Items.Add(S+' ('+MakeRelPath(PrgSetup.DOSBoxSettings[I].DosBoxDir,PrgSetup.BaseDir,True)+')');
   end;
   DOSBoxInstallationComboBox.ItemIndex:=0;
+
+  ProfileName:=InitData.CurrentProfileName;
+  ProfileExe:=InitData.CurrentProfileExe;
+  ProfileSetup:=InitData.CurrentProfileSetup;
+  ProfileDOSBoxInstallation:=InitData.CurrentDOSBoxInstallation;
+  FOnProfileNameChange:=InitData.OnProfileNameChange;
 
   HelpContext:=ID_ProfileEditDOSBox;
 end;
@@ -207,8 +219,10 @@ Var Save,DosBoxDir : String;
 begin
   If DefaultDOSBoxInstallationRadioButton.Checked then begin
     DosBoxDir:=IncludeTrailingPathDelimiter(PrgSetup.DOSBoxSettings[DOSBoxInstallationComboBox.ItemIndex].DosBoxDir);
+    FOnProfileNameChange(self,ProfileName^,ProfileExe^,ProfileSetup^,'','',PrgSetup.DOSBoxSettings[DOSBoxInstallationComboBox.ItemIndex].Name);
   end else begin
     DosBoxDir:=IncludeTrailingPathDelimiter(CustomDOSBoxInstallationEdit.Text);
+    FOnProfileNameChange(self,ProfileName^,ProfileExe^,ProfileSetup^,'','',CustomDOSBoxInstallationEdit.Text);
   end;
 
   If UserLanguageComboBox.ItemIndex>=0 then Save:=UserLanguageComboBox.Items[UserLanguageComboBox.ItemIndex] else Save:='';
@@ -273,7 +287,7 @@ begin
   If S='' then S:=PrgSetup.DOSBoxSettings[0].DosBoxDir;
   S:=MakeAbsPath(S,PrgSetup.BaseDir);
   if not SelectDirectory(Handle,LanguageSetup.ChooseFolder,S) then exit;
-  S:=MakeRelPath(S,PrgSetup.BaseDir);
+  S:=MakeRelPath(S,PrgSetup.BaseDir,True);
   If S='' then exit;
   CustomDOSBoxInstallationEdit.Text:=IncludeTrailingPathDelimiter(S);
 end;

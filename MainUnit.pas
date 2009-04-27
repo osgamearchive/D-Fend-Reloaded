@@ -9,51 +9,24 @@ uses
   HelpTools;
 
 {
-0.7:
-- Changelog: Statistic functions in history dialog, Profile editor: Run program before/after main program, Setup dialog: Use program icon for Windows profiles if no icon is defined, Setup dialog: Restore program window after ScummVM quits, Setup dialog: Minimize/restore program window when Windows game is started/quits, Creating auto setup templates via the export menu, Warning messages, external zip support
-- Change default value for WindowsExeIcons (SetupFrameGamesListAppearanceUnit and PrgSetupUnit) / Remove ActivateIncompleteFeatures
-- Help pages for ModernProfileEditorHelperProgramsFrameUnit, SetupFrameWindowsGamesUnit, (only update) CreateConfFormUnit, (only update) SetupFrameDOSBoxUnit, SetupFrameZipPrgs
-- Support external zip packers: Zip file select dialogs
-- Wave encoder: %s -> %1, %2 (auto change old settings, update help)
-- more scummVM special settings for some games
-- ScummVM:
-  - Add 'do not use' to joystick selector like in CD-ROM selector
-  - render_mode - for games that has different graphic resources. And add value list to defaults editor.
-  - platform - if scumm can not recognize it by game data.
-  - gameid and description - set it from gameid in profile and profile name
-  - soundfont - (any file) presently it is used only for fluidsynt as midi_gain (not available under windows). But maybe in future version we will have it.
-  - language - move hardcoded values to default list. And may be add checkbox for use any language from full list (to support future fan/official translations)
-  - extrapath - allow game to specify folder with its own extra data (and don't write empty value, [scummvm] section should have default).
-- Auto search for cd-roms (change profile to CD drive with mounted CD, or ask user)
-- CD mount based on drive label or certain file location
-- Wizard:
-  - Option to scan VirtualHD for new games and automatically add them
-  - "I'm happy" mode: Just filename, all others things automatically
-- Importing of zip files without prof file (expand, then I'm happy installation)
-- Default DOSBox keyboard layout/code page in setup dialog
-- Move config files in own subfolder (update Introduction.html)
-- More CVS settings (CPU type, 0x0, pixelshader, securemode etc.)
-- Solve possible directory collisions when importing packages / transfering profiles
-- Make "Genre" and "Language" fields in game information translateable
-- More default settings for packers
-- Use one imagelist for all icons (change icons.ini)
-- Chinese and Danish translation for D-Fend Reloaded DataInstaller.nsi
-
-Update homepage:
-- Add www.classicdosgames.com/publisher/epic.html#Overkill (?)
-- Add demo "Unreal" (making "demo"-package ?)
-- Example games as zip archives
-- Autodetect language
+Homepage:
+- More demos in demo package
 
 0.8:
-- Importing of link lists (for "Search for games" and "Old games" in help menu)
+- Help: GUI for setting default capture directory, icon size, icon sets and renaming prof files, Multiple shortcuts dialog
+- Option for "DOSBOX:" path names for extra program files to run
+- More files (with checksums) per template for identifying games
+- Scan folder: Option: Profil name from game file / folder name, better results table
+- Wizard and zip import: Better way of manual auto setup template selection
+- Next DOSBox version
+- Better image scaling algorithm
+- http://www.kegel.com/nansi/
 - Direct downloading & installation of zip packages (?)
 - Making bootable hard disk images
 }
 
 type
   TDFendReloadedMainForm = class(TForm)
-    XPManifest: TXPManifest;
     TreeView: TTreeView;
     Splitter: TSplitter;
     ImageList: TImageList;
@@ -321,6 +294,14 @@ type
     MenuViewsQuickStarter: TMenuItem;
     N18: TMenuItem;
     ScreenshotPopupOpenExternal: TMenuItem;
+    MenuExtrasScanGamesFolder: TMenuItem;
+    MenuExtrasCreateShortcuts: TMenuItem;
+    XPManifest: TXPManifest;
+    MenuFileCreateInstaller: TMenuItem;
+    N11: TMenuItem;
+    ToolbarPopupMenu: TPopupMenu;
+    ToolbarPopupSetupButtons: TMenuItem;
+    ToolbarPopupSetupIconSet: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure TreeViewChange(Sender: TObject; Node: TTreeNode);
@@ -368,6 +349,7 @@ type
     procedure CapturePageControlChange(Sender: TObject);
     procedure MainDragDrop(Sender, Source: TObject; X, Y: Integer);
     procedure CaptureDragDrop(Sender, Source: TObject; X, Y: Integer);
+    procedure ToolbarPopupClick(Sender: TObject);
   private
     { Private-Deklarationen }
     hScreenshotsChangeNotification, hConfsChangeNotification : THandle;
@@ -383,10 +365,11 @@ type
     ViewFilesFrame : TViewFilesFrame;
     SearchLinkFile, HelpMenuLinkFile : TLinkFile;
     HTMLhelpRouter : THTMLhelpRouter;
+    Procedure AfterSetupDialog(ColWidths, UserCols : String);
     Procedure StartCaptureChangeNotify;
     Procedure StopCaptureChangeNotify;
     Procedure LoadMenuLanguage;
-    Procedure InitGUI;
+    Procedure InitGUI(const FirstInit : Boolean);
     Procedure InitViewStyle;
     Procedure SelectGame(const AGame : TGame);
     Procedure LoadAbandonLinks;
@@ -414,6 +397,8 @@ type
     Procedure ZipInfoNotify(Sender : TObject);
     Procedure AddProfileFromQuickStarter(Sender : TObject; const FileName : String; const WindowsProfile, UseWizard : Boolean; const TemplateNr : Integer);
     Procedure QuickStarterCloseNotify(Sender : TObject);
+    Procedure DisplayResolutionChange(var Msg : TMessage); message WM_DISPLAYCHANGE;
+    Procedure UpdateGamesListByViewFilesFrame(Sender : TObject);
   public
     { Public-Deklarationen }
     GameDB : TGameDB;
@@ -430,18 +415,20 @@ uses ShellAPI, ShlObj, ClipBrd, Math, PNGImage, CommonTools, LanguageSetupUnit,
      HistoryFormUnit, TemplateFormUnit, UninstallFormUnit, ViewImageFormUnit,
      UninstallSelectFormUnit, CreateConfFormUnit, WizardFormUnit,
      CreateShortcutFormUnit, CreateImageUnit, InfoFormUnit, TransferFormUnit,
-     BuildInstallerFormUnit, ResHookUnit, ChangeProfilesFormUnit,
-     BuildInstallerForSingleGameFormUnit, ModernProfileEditorFormUnit,
-     ListViewImageUnit, StatisticsFormUnit, CacheChooseFormUnit, IconLoaderUnit,
-     LanguageEditorStartFormUnit, LanguageEditorFormUnit, PlaySoundFormUnit,
-     WallpaperStyleFormUnit, CreateISOImageFormUnit, CreateXMLFormUnit,
-     ExpandImageFormUnit, FirstRunWizardFormUnit, CommonComponents,
-     BuildImageFromFolderFormUnit, MiniRunFormUnit, ScummVMUnit,
-     ListScummVMGamesFormUnit, DragNDropErrorFormUnit, SimpleXMLUnit,
-     OperationModeInfoFormUnit, ZipManagerUnit, ZipWaitInfoFormUnit,
-     CopyProfileFormUnit, PlayVideoFormUnit, ImageCacheUnit, ZipPackageUnit,
-     WindowsProfileUnit, HelpConsts, BuildZipPackagesFormUnit, DOSBoxCountUnit,
-     QuickStartFormUnit, ClassExtensions;
+     BuildInstallerFormUnit, ResHookUnit, BuildInstallerForSingleGameFormUnit,
+     ModernProfileEditorFormUnit, ListViewImageUnit, StatisticsFormUnit,
+     CacheChooseFormUnit, IconLoaderUnit, LanguageEditorStartFormUnit,
+     LanguageEditorFormUnit, PlaySoundFormUnit, WallpaperStyleFormUnit,
+     CreateISOImageFormUnit, CreateXMLFormUnit, ExpandImageFormUnit,
+     FirstRunWizardFormUnit, CommonComponents, BuildImageFromFolderFormUnit,
+     MiniRunFormUnit, ScummVMUnit, ListScummVMGamesFormUnit,
+     DragNDropErrorFormUnit, SimpleXMLUnit, OperationModeInfoFormUnit,
+     ZipManagerUnit, ZipWaitInfoFormUnit, CopyProfileFormUnit,
+     PlayVideoFormUnit, ImageCacheUnit, ZipPackageUnit, WindowsProfileUnit,
+     HelpConsts, BuildZipPackagesFormUnit, DOSBoxCountUnit, QuickStartFormUnit,
+     ClassExtensions, SetupFrameWaveEncoderUnit, ZipInfoFormUnit,
+     ScanGamesFolderFormUnit, MediaInterface, ScummVMToolsUnit,
+     CreateShortcutsFormUnit, EditMultipleProfilesFormUnit;
 
 {$R *.dfm}
 
@@ -453,8 +440,8 @@ procedure TDFendReloadedMainForm.FormCreate(Sender: TObject);
 Var S : String;
     B : Boolean;
 begin
-  {Caption:=Caption+' (RELEASE CANDIDATE 2 OF VERSION 0.6.0)';}
-  {Caption:=Caption+' THIS IS A TEST VERSION ! NOT FOR REGULAR USE ! (Beta 2 of version 0.6.0)';}
+  {Caption:=Caption+' (RELEASE CANDIDATE 2 OF VERSION 0.7)';}
+  {Caption:=Caption+' THIS IS A TEST VERSION ! NOT FOR REGULAR USE ! (Beta 2 of version 0.7.0)';}
 
   Height:=790;
   Width:=Min(Width,790);
@@ -471,27 +458,35 @@ begin
 
   ZipManager.OnInfoBarNotify:=ZipInfoNotify;
 
-  try ForceDirectories(PrgDataDir+CaptureSubDir); except end;
+  try ForceDirectories(MakeAbsPath(PrgSetup.CaptureDir,PrgSetup.BaseDir)); except end;
   StartCaptureChangeNotify;
 
   GameDB:=TGameDB.Create(PrgDataDir+GameListSubDir);
+  ScummVMGamesList:=TScummVMGamesList.Create;
 
-  HelpMenuLinkFile:=TLinkFile.Create('Links.txt');
-  SearchLinkFile:=TLinkFile.Create('SearchLinks.txt');
+  HelpMenuLinkFile:=TLinkFile.Create('Links.txt',True,ID_HelpOldGames);
+  SearchLinkFile:=TLinkFile.Create('SearchLinks.txt',False,ID_ProfileSearchGame);
 
   ViewFilesFrame:=TViewFilesFrame.Create(self);
   ViewFilesFrame.Parent:=DataFilesTab;
+  ViewFilesFrame.OnUpdateGamesList:=UpdateGamesListByViewFilesFrame;
 
   LoadMenuLanguage;
-  InitGUI;
+  InitGUI(True);
   UpdateAddFromTemplateMenu;
 
   If PrgSetup.FirstRun then begin
-    {If IsWindowsVista then PrgSetup.DOSBoxSettings[0].SDLVideodriver:='WinDIB';}
     if SearchDosBox(self,S) then PrgSetup.DOSBoxSettings[0].DosBoxDir:=S;
     ShowFirstRunWizardDialog(self,B);
-    If B and FileExists(PrgDir+'UpdateCheck.exe') then RunUpdateCheck(True);
+    If B and (FileExists(PrgDir+'UpdateCheck.exe') or FileExists(PrgDir+BinFolder+'\'+'UpdateCheck.exe')) then RunUpdateCheck(True);
   end;
+
+  if not InitMediaPlayerLibrary(PrgDir+BinFolder) then begin
+    MessageDlg(Format(LanguageSetup.MessageCouldNotFindFile,[PrgDir+BinFolder+'\'+mplayer]),mtError,[mbOK],0);
+    halt;
+  end;
+
+  If PrgSetup.ActivateIncompleteFeatures then ToolBar.PopupMenu:=ToolbarPopupMenu;
 end;
 
 procedure TDFendReloadedMainForm.FormShow(Sender: TObject);
@@ -520,10 +515,13 @@ begin
   LoadAbandonLinks;
   LoadSearchLinks;
 
+  UserIconLoader.RegisterImageList(ImageList,'Main');
+
   If PrgSetup.FirstRun then begin
     BuildDefaultProfile;
     G:=BuildDefaultDosProfile(GameDB);
     ReBuildTemplates;
+    FastSearchAllTools;
     LoadLanguage(PrgSetup.Language);
     LoadMenuLanguage;
     LoadGUISetup(False);
@@ -532,9 +530,9 @@ begin
   end else begin
     If PrgSetup.DFendVersion<>GetNormalFileVersionAsString then begin
       PrgSetup.DFendVersion:=GetNormalFileVersionAsString;
-      G:=BuildDefaultDosProfile(GameDB);
+      UpdateUserDataFolderAfterUpgrade;
+      FastSearchAllTools;
       LoadGUISetup(False);
-      SelectGame(G);
     end else begin
       LoadGUISetup(True);
     end;
@@ -547,15 +545,16 @@ begin
     3 : RunUpdateCheck(True);
   end;
 
-  LoadUserIcons(ImageList,'Main');
-
   ViewFilesFrame.Init;
+
+  TempZipFilesStartCleanUp;
 
   PostMessage(Handle,WM_USER+1,0,0);
 end;
 
 procedure TDFendReloadedMainForm.FormDestroy(Sender: TObject);
 Var I : Integer;
+    S1, S2 : String;
 begin
   try
     try
@@ -565,6 +564,7 @@ begin
     end;
   except end;
 
+  GamesListSaveColWidths(ListView);
   StopCaptureChangeNotify;
   PrgSetup.MainMaximized:=(WindowState=wsMaximized);
   PrgSetup.MainLeft:=Left;
@@ -574,7 +574,18 @@ begin
   PrgSetup.TreeWidth:=TreeView.Width;
   PrgSetup.ScreenshotHeight:=CapturePageControl.Height;
 
+  If TreeView.Selected=nil then begin S1:=''; S2:=''; end else begin
+    If TreeView.Selected.Parent=nil then begin
+      S1:=TreeView.Selected.Text; S2:='';
+    end else begin
+      S1:=TreeView.Selected.Parent.Text; S2:=TreeView.Selected.Text;
+    end;
+  end;
+  PrgSetup.FilterMain:=S1;
+  PrgSetup.FilterSub:=S2;
+
   GameDB.Free;
+  ScummVMGamesList.Free;
 
   HelpMenuLinkFile.Free;
   SearchLinkFile.Free;
@@ -599,6 +610,7 @@ begin
   MenuFileCreateConf.Caption:=LanguageSetup.MenuFileCreateConf;
   MenuFileCreateProf.Caption:=LanguageSetup.MenuFileCreateProf;
   MenuFileCreateZIP.Caption:=LanguageSetup.MenuFileCreateZIP;
+  MenuFileCreateInstaller.Caption:=LanguageSetup.MenuFileCreateInstaller;
   MenuFileSetup.Caption:=LanguageSetup.MenuFileSetup;
   MenuFileQuit.Caption:=LanguageSetup.MenuFileQuit;
   MenuView.Caption:=LanguageSetup.MenuView;
@@ -659,10 +671,13 @@ begin
   MenuExtrasCreateISOImage.Caption:=LanguageSetup.MenuExtrasCreateISOImageFile;
   MenuExtrasExtractImage.Caption:=LanguageSetup.MenuExtrasExtractImage;
   MenuExtrasImageFromFolder.Caption:=LanguageSetup.MenuExtrasImageFromFolder;
+  MenuExtrasScanGamesFolder.Caption:=LanguageSetup.MenuExtrasScanGamesFolder;
   MenuExtrasTransferProfiles.Caption:=LanguageSetup.MenuExtrasTransferProfiles;
   MenuExtrasBuildInstaller.Caption:=LanguageSetup.MenuExtrasBuildInstaller;
   MenuExtrasBuildZipPackages.Caption:=LanguageSetup.MenuExtrasBuildZipPackages;
   MenuExtrasChangeProfiles.Caption:=LanguageSetup.MenuExtrasChangeProfiles;
+  MenuExtrasCreateShortcuts.Caption:=LanguageSetup.MenuExtrasCreateShortcuts;
+  MenuExtrasCreateShortcuts.Visible:=PrgSetup.ActivateIncompleteFeatures;
   MenuExtrasCheckProfiles.Caption:=LanguageSetup.MenuExtrasCheckProfiles;
   MenuHelp.Caption:=LanguageSetup.MenuHelp;
   MenuHelpDosBox.Caption:=LanguageSetup.MenuHelpDosBox;
@@ -797,6 +812,8 @@ begin
   TrayIconPopupClose.Caption:=LanguageSetup.TrayPopupClose;
 
   TreeViewPopupEditUserFilters.Caption:=LanguageSetup.TreeViewPopupUserDefinedCategories;
+  ToolbarPopupSetupButtons.Caption:=LanguageSetup.ToolbarPopupSetupButtons;
+  ToolbarPopupSetupIconSet.Caption:=LanguageSetup.ToolbarPopupSetupIconSet;
 
   ScreenshotImageList.Height:=Max(20,Min(500,PrgSetup.ScreenshotPreviewSize));
   ScreenshotImageList.Width:=ScreenshotImageList.Height*16 div 10;
@@ -859,7 +876,10 @@ begin
   If Assigned(QuickStartForm) then QuickStartForm.LoadLanguage;
 end;
 
-procedure TDFendReloadedMainForm.InitGUI;
+procedure TDFendReloadedMainForm.InitGUI(const FirstInit : Boolean);
+Var I,J : Integer;
+    TN : TTreeNode;
+    S : String;
 begin
   DoubleBuffered:=True;
   SearchEdit.DoubleBuffered:=True;
@@ -883,11 +903,31 @@ begin
   VideoPopupOpen.ShortCut:=ShortCut(VK_Return,[]);
   VideoPopupOpenExternal.ShortCut:=ShortCut(VK_Return,[ssShift]);
 
+  If not FirstInit then S:=GamesListSaveColWidthsToString(ListView) else S:='';
   InitListViewForGamesList(ListView,PrgSetup.ShowExtraInfo);
   InitTreeViewForGamesList(TreeView,GameDB);
+  If FirstInit then begin
+    If PrgSetup.StoreColumnWidths then GamesListLoadColWidths(ListView)
+  end else begin
+    GamesListLoadColWidthsFromString(ListView,S);
+  end;
+
+  If PrgSetup.RestoreFilter and (Trim(PrgSetup.FilterMain)<>'') then begin
+    TN:=nil;
+    For I:=0 to TreeView.Items.Count-1 do If ExtUpperCase(TreeView.Items[I].Text)=ExtUpperCase(Trim(PrgSetup.FilterMain)) then begin
+      TN:=TreeView.Items[I];
+      If Trim(PrgSetup.FilterMain)<>'' then For J:=0 to TN.Count-1 do If ExtUpperCase(TN.Item[J].Text)=ExtUpperCase(Trim(PrgSetup.FilterSub)) then begin
+        TN:=TN.Item[J]; break;
+      end;
+      break;
+    end;
+    If TN<>nil then TreeView.Selected:=TN;
+  end;
 
   Case PrgSetup.StartWindowSize of
-    0 : {nothing};
+    0 : begin
+          {nothing};
+        end;
     1 : begin
           If PrgSetup.MainMaximized then begin
             {Maximize in OnShow};
@@ -896,7 +936,9 @@ begin
             If (PrgSetup.MainTop>=0) and (PrgSetup.MainTop<9*Screen.Height div 10) then Top:=PrgSetup.MainTop;
             If (PrgSetup.MainWidth>=0) and (Left+PrgSetup.MainWidth<=Screen.Width) then Width:=PrgSetup.MainWidth;
             If (PrgSetup.MainHeight>=0) and (Top+PrgSetup.MainHeight<=Screen.Height) then Height:=PrgSetup.MainHeight;
+            Menu:=nil;
             Position:=poDesigned;
+            Menu:=MainMenu;
           end;
           If (PrgSetup.TreeWidth>=0) and (PrgSetup.TreeWidth<9*ClientWidth div 10) then TreeView.Width:=PrgSetup.TreeWidth;
           If (PrgSetup.ScreenshotHeight>=0) and (PrgSetup.ScreenshotHeight<9*ClientHeight div 10) then CapturePageControl.Height:=PrgSetup.ScreenshotHeight;
@@ -1048,6 +1090,9 @@ begin
   Case PrgSetup.StartWindowSize of
     0 : begin
           {nothing}
+          {Fix height for smaller screens}
+          Height:=Min(Height,Screen.WorkAreaHeight);
+          If Top+Height>Screen.WorkAreaHeight then Top:=Screen.WorkAreaHeight-Height;
           {To fix misaligend ListView when stating maximized}
           If WindowState=wsMaximized then begin
             WindowState:=wsNormal;
@@ -1058,6 +1103,9 @@ begin
           WindowState:=wsMaximized;
         end else begin
           {Done in InitGUI};
+          {Fix height for smaller screens}
+          Height:=Min(Height,Screen.WorkAreaHeight);
+          If Top+Height>Screen.WorkAreaHeight then Top:=Screen.WorkAreaHeight-Height;
         end;
     2 : If PrgSetup.MinimizeToTray then begin
           WindowState:=wsMinimized;
@@ -1112,6 +1160,7 @@ begin
     CloseOK:=True;
     If ScummVMMode(GameDB[I]) then begin
       RunScummVMGame(GameDB[I]);
+      CloseOK:=(ZipManager.Count=0);
     end else begin
       If WindowsExeMode(GameDB[I]) then begin
         RunWindowsGame(GameDB[I]);
@@ -1130,7 +1179,7 @@ end;
 procedure TDFendReloadedMainForm.StartCaptureChangeNotify;
 begin
   hScreenshotsChangeNotification:=FindFirstChangeNotification(
-    PChar(PrgDataDir+CaptureSubDir),
+    PChar(MakeAbsPath(PrgSetup.CaptureDir,PrgSetup.BaseDir)),
     True,
     FILE_NOTIFY_CHANGE_FILE_NAME or FILE_NOTIFY_CHANGE_DIR_NAME or FILE_NOTIFY_CHANGE_ATTRIBUTES or FILE_NOTIFY_CHANGE_SIZE or FILE_NOTIFY_CHANGE_LAST_WRITE or FILE_NOTIFY_CHANGE_SECURITY
   );
@@ -1180,7 +1229,6 @@ Var G : TGame;
 begin
   If ListView.LargeImages=nil then IL1:=ListviewIconImageList else IL1:=ListView.LargeImages as TImageList;
   If ListView.SmallImages=nil then IL2:=ListviewImageList else IL2:=ListView.SmallImages as TImageList;
-
 
   ListView.Items.BeginUpdate;
   try
@@ -1245,11 +1293,11 @@ begin
   G:=TGame(Item.Data); If G=nil then exit;
   InfoTip:=G.CacheName;
 
-  If G.Genre<>'' then InfoTip:=InfoTip+#13+LanguageSetup.GameGenre+': '+G.CacheGenre;
+  If G.Genre<>'' then InfoTip:=InfoTip+#13+LanguageSetup.GameGenre+': '+GetCustomGenreName(G.CacheGenre);
   If G.Developer<>'' then InfoTip:=InfoTip+#13+LanguageSetup.GameDeveloper+': '+G.CacheDeveloper;
   If G.Publisher<>'' then InfoTip:=InfoTip+#13+LanguageSetup.GamePublisher+': '+G.CachePublisher;
   If G.Year<>'' then InfoTip:=InfoTip+#13+LanguageSetup.GameYear+': '+G.CacheYear;
-  If G.Language<>'' then InfoTip:=InfoTip+#13+LanguageSetup.GameLanguage+': '+G.CacheLanguage;
+  If G.Language<>'' then InfoTip:=InfoTip+#13+LanguageSetup.GameLanguage+': '+GetCustomLanguageName(G.CacheLanguage);
   If G.WWW<>'' then InfoTip:=InfoTip+#13+LanguageSetup.GameWWW+': '+G.WWW;
 
   St:=StringToStringList(G.UserInfo);
@@ -1304,6 +1352,7 @@ begin
   MenuProfileMakeInstaller.Enabled:=B and (not B3);
   MenuProfileMakeZipArchive.Enabled:=B and (not B3);
   MenuFileCreateZIP.Enabled:=B and (not B3);
+  MenuFileCreateInstaller.Enabled:=B and (not B3);
   If not B then begin
     MenuProfileViewConfFile.Visible:=True;
     MenuProfileViewConfFile.Enabled:=False;
@@ -1314,10 +1363,17 @@ begin
     MenuProfileViewIniFile.Visible:=B2;
     MenuProfileViewIniFile.Enabled:=B2;
   end;
-  MenuProfileOpenFolder.Enabled:=B and (Trim(TGame(Item.Data).GameExe)<>'');
+  MenuProfileOpenFolder.Enabled:=B and ((Trim(TGame(Item.Data).GameExe)<>'') or (B2 and (Trim(TGame(Item.Data).ScummVMPath)<>'')));
   MenuProfileOpenCaptureFolder.Enabled:=CaptureFolder;
   MenuProfileOpenDataFolder.Enabled:=B and (Trim(TGame(Item.Data).DataDir)<>'');
   MenuProfileMarkAsFavorite.Enabled:=B;
+  If B then begin
+    If TGame(Item.Data).Favorite
+      then MenuProfileMarkAsFavorite.Caption:=LanguageSetup.MenuProfileUnMarkAsFavorite
+      else MenuProfileMarkAsFavorite.Caption:=LanguageSetup.MenuProfileMarkAsFavorite;
+  end else begin
+    MenuProfileMarkAsFavorite.Caption:=LanguageSetup.MenuProfileMarkAsFavorite;
+  end;
   MenuProfileWWW.Enabled:=B and (Trim(TGame(Item.Data).WWW)<>'');
   MenuProfileCreateShortcut.Enabled:=B;
   MenuProfileSearchGame.Enabled:=B;
@@ -1340,11 +1396,18 @@ begin
     PopupViewINIFile.Visible:=B2;
     PopupViewINIFile.Enabled:=B2;
   end;
-  PopupOpenFolder.Enabled:=B and (Trim(TGame(Item.Data).GameExe)<>'');
+  PopupOpenFolder.Enabled:=B and ((Trim(TGame(Item.Data).GameExe)<>'') or (B2 and (Trim(TGame(Item.Data).ScummVMPath)<>'')));
   PopupOpenCaptureFolder.Enabled:=CaptureFolder;
   PopupOpenDataFolder.Enabled:=B and (Trim(TGame(Item.Data).DataDir)<>'');
   PopupWWW.Enabled:=B and (Trim(TGame(Item.Data).WWW)<>'');
   PopupMarkAsFavorite.Enabled:=B;
+  If B then begin
+    If TGame(Item.Data).Favorite
+      then PopupMarkAsFavorite.Caption:=LanguageSetup.MenuProfileUnMarkAsFavorite
+      else PopupMarkAsFavorite.Caption:=LanguageSetup.MenuProfileMarkAsFavorite;
+  end else begin
+    PopupMarkAsFavorite.Caption:=LanguageSetup.MenuProfileMarkAsFavorite;
+  end;
   PopupCreateShortcut.Enabled:=B;
   PopupSearchGame.Enabled:=B;
 
@@ -1612,6 +1675,11 @@ begin
   If Assigned(QuickStartForm) then QuickStartForm.LoadTemplateList;
 end;
 
+procedure TDFendReloadedMainForm.UpdateGamesListByViewFilesFrame(Sender: TObject);
+begin
+  TreeViewChange(Sender,TreeView.Selected);
+end;
+
 Procedure TDFendReloadedMainForm.LoadListViewGUISetup(const ListView : TListView; const Background, FontColor : String; const FontSize : Integer);
 Var S : String;
 begin
@@ -1702,17 +1770,25 @@ begin
 end;
 
 Procedure TDFendReloadedMainForm.LoadGUISetup(const PrgStart : Boolean);
+Var S : String;
 begin
+  UserIconLoader.IconSet:=PrgSetup.IconSet;
+  ViewFilesFrame.LoadLanguage; {to update icons right after program start}
+
   ListviewScreenshotImageList.Width:=PrgSetup.ScreenshotListViewWidth;
   ListviewScreenshotImageList.Height:=PrgSetup.ScreenshotListViewHeight;
+  ListviewIconImageList.Height:=PrgSetup.IconSize;
+  ListviewIconImageList.Width:=PrgSetup.IconSize;
 
   ListView.GridLines:=PrgSetup.GridLinesInGamesList;
 
   If not PrgStart then begin
     ListView.Items.BeginUpdate;
     try
+      S:=GamesListSaveColWidthsToString(ListView);
       ListView.Items.Clear;
       InitListViewForGamesList(ListView,PrgSetup.ShowExtraInfo);
+      GamesListLoadColWidthsFromString(ListView,S);
       InitTreeViewForGamesList(TreeView,GameDB);
       if not PrgStart then TreeViewChange(self,TreeView.Selected);
     finally
@@ -1738,7 +1814,10 @@ begin
   ButtonDelete.Visible:=PrgSetup.ShowToolbarButtonDelete;
 
   SearchEdit.Visible:=PrgSetup.ShowSearchBox;
+  MenuViewsShowExtraInfo.Checked:=PrgSetup.ShowExtraInfo;
   MenuViewsShowSearchBox.Checked:=PrgSetup.ShowSearchBox;
+  MenuViewsShowTooltips.Checked:=PrgSetup.ShowTooltips;
+  ListView.ShowHint:=PrgSetup.ShowTooltips;
 
   TreeView.OnChange:=TreeViewChange;
 
@@ -1805,13 +1884,40 @@ begin
    SelectGame(G);
 end;
 
+Procedure TDFendReloadedMainForm.AfterSetupDialog(ColWidths, UserCols : String);
+Var G : TGame;
+    St,St1,St2 : TStringList;
+    I : Integer;
+begin
+   G:=nil;
+   If ListView.Selected<>nil then G:=TGame(ListView.Selected.Data);
+   LoadLanguage(PrgSetup.Language);
+   If Assigned(QuickStartForm) then QuickStartForm.BuildTree;
+   LoadMenuLanguage;
+   If SearchEdit.Font.Color=clGray then begin
+     SearchEdit.OnChange:=nil;
+     SearchEdit.Text:=LanguageSetup.Search;
+     SearchEdit.OnChange:=SearchEditChange;
+   end;
+   LoadGUISetup(False);
+   St1:=ValueToList(UserCols); St2:=ValueToList(GetUserCols); St:=ValueToList(ColWidths);
+   try
+     For I:=0 to Min(St1.Count,St2.Count)-1 do If ExtUpperCase(St1[I])<>ExtUpperCase(St2[I]) then St[8+I]:='-1';
+     ColWidths:=ListToValue(St);
+   finally
+     St.Free; St1.Free; St2.Free;
+   end;
+   GamesListLoadColWidthsFromString(ListView,ColWidths);
+   SelectGame(G);
+end;
+
 procedure TDFendReloadedMainForm.MenuWork(Sender: TObject);
 Var G,DefaultGame : TGame;
     S,T : String;
     L : TList;
     I : Integer;
     P : TPoint;
-    St : TStringList;
+    St,St1,St2 : TStringList;
     B,C : Boolean;
 begin
   StopCaptureChangeNotify;
@@ -1848,19 +1954,11 @@ begin
       1003 : ExportConfFiles(self,GameDB);
       1004 : ExportProfFiles(self,GameDB);
       1005 : ExportXMLFiles(self,GameDB);
-      1006 : if ShowSetupDialog(self,GameDB) then begin
-               G:=nil;
-               If ListView.Selected<>nil then G:=TGame(ListView.Selected.Data);
-               LoadLanguage(PrgSetup.Language);
-               If Assigned(QuickStartForm) then QuickStartForm.BuildTree;
-               LoadMenuLanguage;
-               If SearchEdit.Font.Color=clGray then begin
-                 SearchEdit.OnChange:=nil;
-                 SearchEdit.Text:=LanguageSetup.Search;
-                 SearchEdit.OnChange:=SearchEditChange;
-               end;
-               LoadGUISetup(False);
-               SelectGame(G);
+      1006 : begin
+               S:=GamesListSaveColWidthsToString(ListView);
+               T:=GetUserCols;
+               if not ShowSetupDialog(self,GameDB) then exit;
+               AfterSetupDialog(S,T);
              end;
       1007 : Close;
       1008 : begin
@@ -1871,7 +1969,7 @@ begin
                  OpenDialog.Filter:=LanguageSetup.MenuFileImportProfFilter;
                  If not OpenDialog.Execute then exit;
                  For I:=0 to OpenDialog.Files.Count-1 do begin
-                   S:=GameDB.ProfFileName(ExtractFileName(OpenDialog.Files[I]));
+                   S:=GameDB.ProfFileName(ExtractFileName(OpenDialog.Files[I]),True);
                    if not CopyFile(PChar(OpenDialog.Files[I]),PChar(S),True) then begin
                      MessageDlg(Format(LanguageSetup.MessageCouldNotCopyFile,[OpenDialog.Files[I],S]),mtError,[mbOK],0);
                      continue;
@@ -1905,7 +2003,7 @@ begin
                try
                  OpenDialog.DefaultExt:='zip';
                  OpenDialog.Title:=LanguageSetup.ProfileMountingZipFileGeneral;
-                 OpenDialog.Filter:=LanguageSetup.ProfileMountingZipFileFilter2;
+                 OpenDialog.Filter:=ProcessFileNameFilter(LanguageSetup.ProfileMountingZipFileFilter2,LanguageSetup.ProfileMountingZipFileFilter2ArchiveFiles);
                  If not OpenDialog.Execute then exit;
                  For I:=0 to OpenDialog.Files.Count-1 do begin
                    G:=ImportZipPackage(self,OpenDialog.Files[I],GameDB);
@@ -1950,7 +2048,9 @@ begin
       2004 : begin
                PrgSetup.ShowExtraInfo:=not PrgSetup.ShowExtraInfo;
                MenuViewsShowExtraInfo.Checked:=PrgSetup.ShowExtraInfo;
+               S:=GamesListSaveColWidthsToString(ListView);
                InitListViewForGamesList(ListView,PrgSetup.ShowExtraInfo);
+               GamesListLoadColWidthsFromString(ListView,S);
                TreeViewChange(Sender,TreeView.Selected);
              end;
       2005 : begin
@@ -2081,7 +2181,7 @@ begin
                G:=GameDB[GameDB.Add(S)];
                G.AssignFrom(TGame(ListView.Selected.Data));
                G.Name:=S;
-               If B then G.CaptureFolder:='.\'+CaptureSubDir+'\'+MakeFileSysOKFolderName(S)+'\';
+               If B then G.CaptureFolder:=IncludeTrailingPathDelimiter(PrgSetup.CaptureDir)+MakeFileSysOKFolderName(S)+'\';
                If C then G.DataDir:='';
                G.LoadCache;
                InitTreeViewForGamesList(TreeView,GameDB);
@@ -2114,7 +2214,10 @@ begin
                TreeViewChange(Sender,TreeView.Selected);
              end;
       4007 : If (ListView.Selected<>nil) and (ListView.Selected.Data<>nil) then begin
-               S:=ExtractFilePath(MakeAbsPath(TGame(ListView.Selected.Data).GameExe,PrgSetup.BaseDir));
+               S:=''; G:=TGame(ListView.Selected.Data);
+               If DOSBoxMode(G) then S:=ExtractFilePath(MakeAbsPath(G.GameExe,PrgSetup.BaseDir));
+               If ScummVMMode(G) then S:=MakeAbsPath(G.ScummVMPath,PrgSetup.BaseDir);
+               If WindowsExeMode(G) then S:=ExtractFilePath(MakeAbsPath(G.GameExe,PrgSetup.BaseDir));
                ShellExecute(Handle,'open',PChar(S),nil,PChar(S),SW_SHOW);
              end;
       4008 : If (ListView.Selected<>nil) and (ListView.Selected.Data<>nil) then begin
@@ -2165,9 +2268,9 @@ begin
                  MessageDlg(LanguageSetup.MessageNoGameSelected,mtError,[mbOK],0); exit;
                end;
                SaveDialog.DefaultExt:='zip';
-               SaveDialog.FileName:='';
+               SaveDialog.FileName:=ExtractFileName(ChangeFileExt(TGame(ListView.Selected.Data).SetupFile,''));
                SaveDialog.Title:=LanguageSetup.ProfileMountingZipFileGeneral;
-               SaveDialog.Filter:=LanguageSetup.ProfileMountingZipFileFilter2;
+               SaveDialog.Filter:=ProcessFileNameFilter(LanguageSetup.ProfileMountingZipFileFilter2,LanguageSetup.ProfileMountingZipFileFilter2ArchiveFiles);
                If not SaveDialog.Execute then exit;
                BuildZipPackage(self,TGame(ListView.Selected.Data),SaveDialog.Filename);
              end;
@@ -2207,7 +2310,7 @@ begin
       5009 : BuildInstaller(self,GameDB);
       5010 : begin
                If (ListView.Selected=nil) or (ListView.Selected.Data=nil) then G:=nil else G:=TGame(ListView.Selected.Data);
-               If not ShowChangeProfilesDialog(self,GameDB) then exit;
+               If not ShowEditMultipleProfilesDialog(self,GameDB) then exit;
                InitTreeViewForGamesList(TreeView,GameDB);
                TreeViewChange(Sender,TreeView.Selected);
                SelectGame(G);
@@ -2230,6 +2333,11 @@ begin
                end;
              end;
       5017 : ShowBuildZipPackagesDialog(self,GameDB);
+      5018 : If ShowScanGamesFolderDialog(self,GameDB) then begin
+               InitTreeViewForGamesList(TreeView,GameDB);
+               TreeViewChange(Sender,TreeView.Selected);
+             end;
+      5019 : ShowCreateShortcutsDialog(self,GameDB);
       {Help}
       6001 : ShellExecute(Handle,'open',PChar('http:/'+'/www.dosbox.com/wiki/'),nil,nil,SW_SHOW);
       6002 : ShellExecute(Handle,'open',PChar('http:/'+'/www.dosbox.com/wiki/Special_Keys'),nil,nil,SW_SHOW);
@@ -2259,13 +2367,13 @@ begin
       6008 : ShellExecute(Handle,'open',PChar(LanguageSetup.MenuHelpHomepageURL),nil,nil,SW_SHOW);
       6009 : {ShellExecute(Handle,'open',PChar('http:/'+'/vogons.zetafleet.com/viewtopic.php?t=17415'),nil,nil,SW_SHOW);}
              Application.HelpCommand(HELP_CONTEXT,ID_HelpForum);
-      6010 : If FileExists(PrgDir+'UpdateCheck.exe')
+      6010 : If FileExists(PrgDir+'UpdateCheck.exe') or FileExists(PrgDir+BinFolder+'\'+'UpdateCheck.exe')
                then RunUpdateCheck(False)
                else ShellExecute(Handle,'open',PChar(LanguageSetup.MenuHelpUpdatesURL),nil,nil,SW_SHOW);
       6011 : Application.HelpCommand(HELP_CONTEXT,ID_FAQs);
-      6012 : If FileExists(PrgDataDir+'Icons.ini')
-               then OpenFileInEditor(PrgDataDir+'Icons.ini')
-               else MessageDlg(Format(LanguageSetup.MessageCouldNotFindFile,[PrgDataDir+'Icons.ini']),mtError,[mbOK],0);
+      6012 : If FileExists(PrgDataDir+SettingsFolder+'\'+IconsConfFile)
+               then OpenFileInEditor(PrgDataDir+SettingsFolder+'\'+IconsConfFile)
+               else MessageDlg(Format(LanguageSetup.MessageCouldNotFindFile,[PrgDataDir+SettingsFolder+'\'+IconsConfFile]),mtError,[mbOK],0);
       6013 : begin
                if not ShowLanguageEditorStartDialog(self,S) then exit;
                ShowLanguageEditorDialog(self,S);
@@ -2298,7 +2406,7 @@ begin
       6026 : Application.HelpCommand(HELP_CONTEXT,ID_Introduction);
       6027 : Application.HelpCommand(HELP_CONTEXT,ID_Introduction2);
       6101 : OpenFileInEditor(PrgSetup.DOSBoxSettings[0].DosBoxDir+RemoveUnderline((Sender as TMenuItem).Caption));
-      6102 : begin
+      6102 : If Trim((Sender as TMenuItem).Hint)<>'' then begin
                If not OldGamesMenuUsed then begin
                  MessageDlg(LanguageSetup.MenuHelpAbandonwareInfo,mtInformation,[mbOK],0);
                  OldGamesMenuUsed:=True;
@@ -2362,7 +2470,13 @@ begin
     St.Free;
   end;
 
-  ShellExecute(Handle,'open',PChar(PrgDir+'UpdateCheck.exe'),PChar(FileName),PChar(PrgDir),SW_SHOW);
+  If FileExists(PrgDir+'UpdateCheck.exe') then begin
+    ShellExecute(Handle,'open',PChar(PrgDir+'UpdateCheck.exe'),PChar(FileName),PChar(PrgDir),SW_SHOW);
+  end else begin
+    If FileExists(PrgDir+BinFolder+'\'+'UpdateCheck.exe') then begin
+      ShellExecute(Handle,'open',PChar(PrgDir+BinFolder+'\'+'UpdateCheck.exe'),PChar(FileName),PChar(PrgDir),SW_SHOW);
+    end;
+  end;
 
   If DeleteOnExit.IndexOf(FileName)<0 then DeleteOnExit.Add(FileName);
 
@@ -2682,6 +2796,7 @@ begin
             SaveDialog.Filter:=LanguageSetup.SoundCaptureSaveWAVFilter;
             If T='MP3' then SaveDialog.Filter:=LanguageSetup.SoundCaptureSaveMP3Filter;
             If T='OGG' then SaveDialog.Filter:=LanguageSetup.SoundCaptureSaveOGGFilter;
+            If (T='MID') or (T='MIDI') then SaveDialog.Filter:=LanguageSetup.SoundCaptureSaveMIDFilter;
             If not SaveDialog.Execute then exit;
             T:=SaveDialog.FileName;
             If not CopyFile(PChar(S),PChar(T),True) then MessageDlg(Format(LanguageSetup.MessageCouldNotCopyFile,[S,T]),mtError,[mbOK],0);
@@ -2702,7 +2817,7 @@ begin
             SaveDialog.Filter:=LanguageSetup.SoundCaptureSaveMP3Filter;
             If not SaveDialog.Execute then exit;
             T:=SaveDialog.FileName;
-            ShellExecute(Handle,'open',PChar(PrgSetup.WaveEncMp3),PChar(Format(PrgSetup.WaveEncMp3Parameters,[S,T])),nil,SW_SHOW);
+            ShellExecute(Handle,'open',PChar(PrgSetup.WaveEncMp3),PChar(ProcessEncoderParameters(PrgSetup.WaveEncMp3Parameters,S,T)),nil,SW_SHOW);
           finally
             SaveDialog.Free;
           end;
@@ -2720,7 +2835,7 @@ begin
             SaveDialog.Filter:=LanguageSetup.SoundCaptureSaveOGGFilter;
             If not SaveDialog.Execute then exit;
             T:=SaveDialog.FileName;
-            ShellExecute(Handle,'open',PChar(PrgSetup.WaveEncOgg),PChar(Format(PrgSetup.WaveEncOggParameters,[S,T])),nil,SW_SHOW);
+            ShellExecute(Handle,'open',PChar(PrgSetup.WaveEncOgg),PChar(ProcessEncoderParameters(PrgSetup.WaveEncOggParameters,S,T)),nil,SW_SHOW);
           finally
             SaveDialog.Free;
           end;
@@ -2768,7 +2883,7 @@ begin
           S:=IncludeTrailingPathDelimiter(S);
           For I:=0 to SoundListView.Items.Count-1 do If ExtUpperCase(ExtractFileExt(SoundListView.Items[I].Caption))='.WAV' then begin
             T:=SoundListView.Items[I].Caption;
-            ShellExecute(Handle,'open',PChar(PrgSetup.WaveEncMp3),PChar(Format(PrgSetup.WaveEncMp3Parameters,[S+T,S+ChangeFileExt(T,'.mp3')])),nil,SW_SHOW);
+            ShellExecute(Handle,'open',PChar(PrgSetup.WaveEncMp3),PChar(ProcessEncoderParameters(PrgSetup.WaveEncMp3Parameters,S+T,S+ChangeFileExt(T,'.mp3'))),nil,SW_SHOW);
           end;
         end;
    10 : begin
@@ -2778,7 +2893,7 @@ begin
           S:=IncludeTrailingPathDelimiter(S);
           For I:=0 to SoundListView.Items.Count-1 do If ExtUpperCase(ExtractFileExt(SoundListView.Items[I].Caption))='.WAV' then begin
             T:=SoundListView.Items[I].Caption;
-            ShellExecute(Handle,'open',PChar(PrgSetup.WaveEncOgg),PChar(Format(PrgSetup.WaveEncOggParameters,[S+T,S+ChangeFileExt(T,'.ogg')])),nil,SW_SHOW);
+            ShellExecute(Handle,'open',PChar(PrgSetup.WaveEncOgg),PChar(ProcessEncoderParameters(PrgSetup.WaveEncOggParameters,S+T,S+ChangeFileExt(T,'.ogg'))),nil,SW_SHOW);
           end;
         end;
    11 : If SoundListView.Selected<>nil then begin
@@ -2920,17 +3035,24 @@ begin
 end;
 
 procedure TDFendReloadedMainForm.TreeViewPopupEditUserFiltersClick(Sender: TObject);
+Var S,T : String;
 begin
-  if ShowTreeListSetupDialog(self,GameDB) then begin
-     LoadLanguage(PrgSetup.Language);
-     LoadMenuLanguage;
-     If SearchEdit.Font.Color=clGray then begin
-       SearchEdit.OnChange:=nil;
-       SearchEdit.Text:=LanguageSetup.Search;
-       SearchEdit.OnChange:=SearchEditChange;
-     end;
-     LoadGUISetup(False);
-   end;
+  S:=GamesListSaveColWidthsToString(ListView);
+  T:=GetUserCols;
+  if not ShowTreeListSetupDialog(self,GameDB) then exit;
+  AfterSetupDialog(S,T);
+end;
+
+procedure TDFendReloadedMainForm.ToolbarPopupClick(Sender: TObject);
+Var S,T : String;
+begin
+  S:=GamesListSaveColWidthsToString(ListView);
+  T:=GetUserCols;
+  Case (Sender as TComponent).Tag of
+    0 : if not ShowToolbarSetupDialog(self,GameDB) then exit;
+    1 : if not ShowIconSetSetupDialog(self,GameDB) then exit;
+  End;
+  AfterSetupDialog(S,T);
 end;
 
 procedure TDFendReloadedMainForm.IdleAddonTimerTimer(Sender: TObject);
@@ -2999,7 +3121,8 @@ end;
 
 procedure TDFendReloadedMainForm.FormResize(Sender: TObject);
 begin
-  If WindowState=wsMinimized then exit;
+  If (WindowState=wsMinimized) or (WindowState=wsMaximized) then exit;
+  If (BoundsRect.Left<0) and (BoundsRect.Top<0) and (BoundsRect.Right>=Screen.WorkAreaWidth-2) and (BoundsRect.Bottom>=Screen.WorkAreaHeight-2) then exit;
 
   SaveBoundsRect:=BoundsRect;
   SaveMaximizedState:=(WindowState=wsMaximized);
@@ -3029,7 +3152,8 @@ begin
   end;
   ForceForegroundWindow(Application.Handle);
   Application.BringToFront;
-  if not SaveMaximizedState then BoundsRect:=SaveBoundsRect;
+  if (not SaveMaximizedState) and (WindowState<>wsMaximized)
+  then BoundsRect:=SaveBoundsRect;
 end;
 
 procedure TDFendReloadedMainForm.TrayIconDblClick(Sender: TObject);
@@ -3130,7 +3254,7 @@ begin
         ErrorCode:=Format(LanguageSetup.MessageCouldNotCreateDir,[S]);
         exit;
       end;
-      If not CopyFiles(FileName,S) then
+      If not CopyFiles(FileName,S,True) then
         ErrorCode:=Format(LanguageSetup.MessageCouldNotCopyFiles,[FileName,S]);
       exit;
     end;
@@ -3146,7 +3270,7 @@ begin
   end;
 
   If FileExt='.PROF' then begin
-    S:=GameDB.ProfFileName(ExtractFileName(FileName));
+    S:=GameDB.ProfFileName(ExtractFileName(FileName),True);
     if not CopyFile(PChar(FileName),PChar(S),True) then begin
       ErrorCode:=Format(LanguageSetup.MessageCouldNotCopyFile,[FileName,S]);
       exit;
@@ -3177,7 +3301,7 @@ begin
     end;
   end;
 
-  If (FileExt='.WAV') or (FileExt='.MP3') or (FileExt='.OGG') then begin
+  If (FileExt='.WAV') or (FileExt='.MP3') or (FileExt='.OGG') or (FileExt='.MID') or (FileExt='.MIDI') then begin
     If G<>nil then begin
       S:=Trim(G.CaptureFolder);
       If S<>'' then S:=MakeAbsPath(S,PrgSetup.BaseDir);
@@ -3342,6 +3466,12 @@ end;
 Procedure TDFendReloadedMainForm.QuickStarterCloseNotify(Sender : TObject);
 begin
   MenuViewsQuickStarter.Checked:=False;
+end;
+
+procedure TDFendReloadedMainForm.DisplayResolutionChange(var Msg: TMessage);
+begin
+  If Msg.WParam<=8 then exit;
+  ListViewSelectItem(self,ListView.Selected,ListView.Selected<>nil);
 end;
 
 end.

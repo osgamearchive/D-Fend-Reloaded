@@ -29,16 +29,19 @@ type
     { Public-Deklarationen }
     Function GetName : String;
     Procedure InitGUIAndLoadSetup(InitData : TInitData);
+    Procedure BeforeChangeLanguage;
     Procedure LoadLanguage;
     Procedure DOSBoxDirChanged;
     Procedure ShowFrame(const AdvencedMode : Boolean);
+    procedure HideFrame;
     Procedure RestoreDefaults;
     Procedure SaveSetup;
   end;
 
 implementation
 
-uses Math, LanguageSetupUnit, VistaToolsUnit, PrgSetupUnit, CommonTools, HelpConsts;
+uses Math, LanguageSetupUnit, VistaToolsUnit, PrgSetupUnit, CommonTools,
+     HelpConsts, IconLoaderUnit;
 
 {$R *.dfm}
 
@@ -77,6 +80,12 @@ begin
   ToolbarImageCheckBox.Checked:=Trim(PrgSetup.ToolbarBackground)<>'';
   ToolbarImageEdit.Text:=PrgSetup.ToolbarBackground;
   ToolbarFontSizeEdit.Value:=PrgSetup.ToolbarFontSize;
+
+  UserIconLoader.DialogImage(DI_SelectFile,ToolbarImageButton);
+end;
+
+procedure TSetupFrameToolbar.BeforeChangeLanguage;
+begin
 end;
 
 procedure TSetupFrameToolbar.LoadLanguage;
@@ -111,6 +120,10 @@ begin
 end;
 
 procedure TSetupFrameToolbar.ShowFrame(const AdvencedMode: Boolean);
+begin
+end;
+
+procedure TSetupFrameToolbar.HideFrame;
 begin
 end;
 

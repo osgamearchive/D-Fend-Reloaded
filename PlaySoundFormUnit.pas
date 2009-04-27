@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, MPlayer, StdCtrls, ExtCtrls, ImgList, ComCtrls, ToolWin, Menus;
+  Dialogs, StdCtrls, ExtCtrls, ImgList, ComCtrls, ToolWin, Menus;
 
 type
   TPlaySoundForm = class(TForm)
@@ -52,7 +52,7 @@ Procedure PlaySoundDialog(const AOwner : TComponent; const AFileName : String; c
 implementation
 
 uses ShellAPI, MediaInterface, VistaToolsUnit, LanguageSetupUnit, CommonTools,
-     PrgSetupUnit;
+     PrgSetupUnit, SetupFrameWaveEncoderUnit, IconLoaderUnit;
 
 {$R *.dfm}
 
@@ -72,6 +72,11 @@ begin
   MenuSave.Caption:=LanguageSetup.ScreenshotPopupSave;
   MenuSaveMp3.Caption:=LanguageSetup.SoundsPopupSaveMp3;
   MenuSaveOgg.Caption:=LanguageSetup.SoundsPopupSaveOgg;
+
+  UserIconLoader.DialogImage(DI_Save,ImageList,0);
+  UserIconLoader.DialogImage(DI_Previous,ImageList,1);
+  UserIconLoader.DialogImage(DI_Next,ImageList,2);
+  UserIconLoader.DialogImage(DI_Run,ImageList,3);
 
   CoolBar.Font.Size:=PrgSetup.ToolbarFontSize;
 
@@ -200,6 +205,7 @@ begin
           SaveDialog.Filter:=LanguageSetup.SoundCaptureSaveWAVFilter;
           If S='MP3' then SaveDialog.Filter:=LanguageSetup.SoundCaptureSaveMP3Filter;
           If S='OGG' then SaveDialog.Filter:=LanguageSetup.SoundCaptureSaveOGGFilter;
+          If (S='MID') or (S='MIDI') then SaveDialog.Filter:=LanguageSetup.SoundCaptureSaveMIDFilter;
           If not SaveDialog.Execute then exit;
           S:=SaveDialog.FileName;
           If not CopyFile(PChar(FileName),PChar(S),True) then MessageDlg(Format(LanguageSetup.MessageCouldNotCopyFile,[FileName,S]),mtError,[mbOK],0);
@@ -210,7 +216,7 @@ begin
           SaveDialog.Filter:=LanguageSetup.SoundCaptureSaveMP3Filter;
           If not SaveDialog.Execute then exit;
           S:=SaveDialog.FileName;
-          ShellExecute(Handle,'open',PChar(PrgSetup.WaveEncMp3),PChar(Format(PrgSetup.WaveEncMp3Parameters,[FileName,S])),nil,SW_SHOW);
+          ShellExecute(Handle,'open',PChar(PrgSetup.WaveEncMp3),PChar(ProcessEncoderParameters(PrgSetup.WaveEncMp3Parameters,FileName,S)),nil,SW_SHOW);
         end;
     5 : begin
           SaveDialog.DefaultExt:='ogg';
@@ -218,7 +224,7 @@ begin
           SaveDialog.Filter:=LanguageSetup.SoundCaptureSaveOGGFilter;
           If not SaveDialog.Execute then exit;
           S:=SaveDialog.FileName;
-          ShellExecute(Handle,'open',PChar(PrgSetup.WaveEncOgg),PChar(Format(PrgSetup.WaveEncOggParameters,[FileName,S])),nil,SW_SHOW);
+          ShellExecute(Handle,'open',PChar(PrgSetup.WaveEncOgg),PChar(ProcessEncoderParameters(PrgSetup.WaveEncOggParameters,FileName,S)),nil,SW_SHOW);
         end;
     6 : if MediaStreamAvailable then begin
           If MediaStreamPlayed and (getMediaStreamPos<>getMediaStreamDuration) then pauseMediaStream else begin
@@ -237,7 +243,7 @@ begin
   If OpenMediaFile(PrgSetup.SoundPlayer,AFileName) then exit;
 
   S:=ExtUpperCase(ExtractFileExt(AFileName));
-  If (S<>'.WAV') and (S<>'.MP3') and (S<>'.OGG') then exit;
+  If (S<>'.WAV') and (S<>'.MP3') and (S<>'.OGG') and (S<>'.MID') and (S<>'.MIDI') then exit;
   PlaySoundForm:=TPlaySoundForm.Create(AOwner);
   try
     PlaySoundForm.FileName:=AFileName;

@@ -50,7 +50,7 @@ DataDir=
 Favorite=0
 Name=Wolfenstein 3D - Spear of Destiny Add-on II
 Icon=
-Genre=First person shooter
+Genre=First Person
 Developer=id Software
 Publisher=FormGen
 Year=1992
@@ -223,4 +223,7 @@ config=
 [ExtraCommands]
 BeforeExecution=
 AfterExecution=
+BeforeExecution.Wait=1
+BeforeExecution.Minimized=0
+AfterExecution.Minimized=0
 

@@ -18,7 +18,7 @@ object ModernProfileEditorKeyboardFrame: TModernProfileEditorKeyboardFrame
     Left = 24
     Top = 102
     Width = 601
-    Height = 43
+    Height = 51
     Anchors = [akLeft, akTop, akRight]
     AutoSize = False
     Caption = 'KeyboardLayoutInfoLabel'

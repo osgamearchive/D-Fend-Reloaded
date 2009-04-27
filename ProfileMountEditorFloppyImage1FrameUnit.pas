@@ -31,12 +31,13 @@ type
     Function Init(const AInfoData : TInfoData) : Boolean;
     Function Done : String;
     Function GetName : String;
+    Procedure ShowFrame;
   end;
 
 implementation
 
 uses LanguageSetupUnit, CommonTools, PrgSetupUnit, CreateISOImageFormUnit,
-     CreateImageUnit;
+     CreateImageUnit, IconLoaderUnit;
 
 {$R *.dfm}
 
@@ -71,6 +72,9 @@ begin
   FloppyPopupCreateImage.Caption:=LanguageSetup.ProfileMountingFloppyImageCreate;
   FloppyPopupReadImage.Caption:=LanguageSetup.ProfileMountingFloppyImageRead;
 
+  UserIconLoader.DialogImage(DI_SelectFile,FloppyImageButton);
+  UserIconLoader.DialogImage(DI_ImageFloppy,FloppyImageCreateButton);
+
   St:=ValueToList(InfoData.Data);
   try
     S:=Trim(ExtUpperCase(St[1]));
@@ -93,6 +97,10 @@ begin
   end;
 
   FloppyImageDriveLetterComboBoxChange(self);
+end;
+
+procedure TProfileMountEditorFloppyImage1Frame.ShowFrame;
+begin
 end;
 
 function TProfileMountEditorFloppyImage1Frame.Done: String;

@@ -15,6 +15,7 @@ omPortable=like omPrgDir, but DosBoxDir, BaseDir, GameDir and DataDir are stored
 
 Type TDOSBoxData=record
   Name, DosBoxDir, DosBoxMapperFile, DosBoxLanguage, SDLVideodriver, CommandLineParameters : String;
+  KeyboardLayout, Codepage : String;
   HideDosBoxConsole, CenterDOSBoxWindow, DisableScreensaver, WaitOnError : Boolean;
 end;
 
@@ -23,6 +24,7 @@ Type TDOSBoxSetting=class
     FPrgSetup : TBasePrgSetup;
     FNr : Integer;
     FName, FDosBoxDir, FDosBoxMapperFile, FDosBoxLanguage, FSDLVideodriver, FCommandLineParameters : String;
+    FKeyboardLayout, FCodepage : String;
     FHideDosBoxConsole, FCenterDOSBoxWindow, FDisableScreensaver, FWaitOnError : Boolean;
     Procedure ReadSettings;
     Procedure WriteSettings;
@@ -39,6 +41,9 @@ Type TDOSBoxSetting=class
     property DosBoxLanguage : String read FDosBoxLanguage write FDosBoxLanguage;
     property SDLVideodriver : String read FSDLVideodriver write FSDLVideodriver;
     property CommandLineParameters : String read FCommandLineParameters write FCommandLineParameters;
+
+    property KeyboardLayout : String read FKeyboardLayout write FKeyboardLayout;
+    property Codepage : String read FCodepage write FCodepage;
 
     property HideDosBoxConsole : Boolean read FHideDosBoxConsole write FHideDosBoxConsole;
     property CenterDOSBoxWindow : Boolean read FCenterDOSBoxWindow write FCenterDOSBoxWindow;
@@ -128,6 +133,12 @@ Type TPrgSetup=class(TBasePrgSetup)
     property SoundPlayer : String index 31 read GetString write SetString;
     property VideoPlayer : String index 32 read GetString write SetString;
     property DeleteToRecycleBin : String index 33 read GetString write SetString;
+    property FilterMain : String index 34 read GetString write SetString;
+    property FilterSub : String index 35 read GetString write SetString;
+    property ColumnWidths : String index 36 read GetString write SetString;
+    property ColumnWidthsNoExtraInfoMode : String index 37 read GetString write SetString;
+    property CaptureDir : String index 38 read GetString write SetString;
+    property IconSet : String index 39 read GetString write SetString;
 
     property LinuxRemap[DriveLetter : Char]  : String read GetDriveLetter write SetDriveLetter;
 
@@ -191,7 +202,15 @@ Type TPrgSetup=class(TBasePrgSetup)
     property UseWindowsExeIcons : Boolean index 57 read GetBoolean write SetBoolean;
     property MinimizeOnWindowsGameStart : Boolean index 58 read GetBoolean write SetBoolean;
     property RestoreWhenWindowsGameCloses : Boolean index 59 read GetBoolean write SetBoolean;
-    property ActivateIncompleteFeatures : Boolean index 60 read GetBoolean write SetBoolean;
+    property RestoreFilter : Boolean index 60 read GetBoolean write SetBoolean;
+    property AllowSecureMode : Boolean index 61 read GetBoolean write SetBoolean;
+    property AllowMoreIOCTLSettings : Boolean index 62 read GetBoolean write SetBoolean;
+    property AllowCPUType : Boolean index 63 read GetBoolean write SetBoolean;
+    property AllowPixelShader : Boolean index 64 read GetBoolean write SetBoolean;
+    property StoreColumnWidths : Boolean index 65 read GetBoolean write SetBoolean;
+    property ActivateIncompleteFeatures : Boolean index 66 read GetBoolean write SetBoolean;
+    property RenameProfFileOnRenamingProfile : Boolean index 67 read GetBoolean write SetBoolean;
+    property ScanFolderAllGames : Boolean index 68 read GetBoolean write SetBoolean;
 
     property MainLeft : Integer index 0 read GetInteger write SetInteger;
     property MainTop : Integer index 1 read GetInteger write SetInteger;
@@ -217,6 +236,9 @@ Type TPrgSetup=class(TBasePrgSetup)
     property QuickStarterHeight : Integer index 21 read GetInteger write SetInteger;
     property ScreenshotListUseFirstScreenshotNr : Integer index 22 read GetInteger write SetInteger;
     property DOSBoxShortFileNameAlgorithm : Integer index 23 read GetInteger write SetInteger;
+    property LastWizardMode : Integer index 24 read GetInteger write SetInteger;
+    property IconSize : Integer index 25 read GetInteger write SetInteger;
+    property ImageFilter : Integer index 26 read GetInteger write SetInteger;
 
     property DOSBoxSettingsCount : Integer index 0 read GetListCount;
     property DOSBoxSettings[I : Integer] : TDOSBoxSetting read GetDOSBoxSettings;
@@ -237,7 +259,7 @@ Procedure InitDOSBoxData(var DOSBoxData : TDOSBoxData);
 
 implementation
 
-uses ShlObj, SysUtils, Forms, CommonTools, PrgConsts;
+uses ShlObj, SysUtils, Forms, CommonTools, PrgConsts, GameDBToolsUnit;
 
 { TDOSBoxSetting }
 
@@ -270,6 +292,9 @@ begin
   FSDLVideodriver:=FPrgSetup.MemIni.ReadString(Section,'SDLVideodriver','DirectX');
   FCommandLineParameters:=FPrgSetup.MemIni.ReadString(Section,'CommandLineParameters','');
 
+  FKeyboardLayout:=FPrgSetup.MemIni.ReadString(Section,'KeyboardLayout','');
+  FCodepage:=FPrgSetup.MemIni.ReadString(Section,'Codepage','');
+
   FHideDosBoxConsole:=FPrgSetup.MemIni.ReadBool(Section,'Hideconsole',True);
   FCenterDOSBoxWindow:=FPrgSetup.MemIni.ReadBool(Section,'CenterDOSBoxWindow',False);
   FDisableScreensaver:=FPrgSetup.MemIni.ReadBool(Section,'DisableScreensaver',False);
@@ -289,6 +314,9 @@ begin
   FPrgSetup.MemIni.WriteString(Section,'SDLVideodriver',FSDLVideodriver);
   FPrgSetup.MemIni.WriteString(Section,'CommandLineParameters',FCommandLineParameters);
 
+  FPrgSetup.MemIni.WriteString(Section,'KeyboardLayout',FKeyboardLayout);
+  FPrgSetup.MemIni.WriteString(Section,'Codepage',Codepage);
+
   FPrgSetup.MemIni.WriteBool(Section,'Hideconsole',FHideDosBoxConsole);
   FPrgSetup.MemIni.WriteBool(Section,'CenterDOSBoxWindow',FCenterDOSBoxWindow);
   FPrgSetup.MemIni.WriteBool(Section,'DisableScreensaver',FDisableScreensaver);
@@ -300,8 +328,8 @@ end;
 procedure TDOSBoxSetting.InitDirs;
 begin
   If OperationMode=omPortable then begin
-    FDosBoxDir:=MakeAbsPath(FDosBoxDir,PrgDir);
-    FDosBoxLanguage:=MakeAbsPath(FDosBoxLanguage,PrgDir);
+    FDosBoxDir:=MakeExtAbsPath(FDosBoxDir,PrgDir);
+    FDosBoxLanguage:=MakeExtAbsPath(FDosBoxLanguage,PrgDir);
     If (not FileExists(FDosBoxLanguage)) and FileExists(IncludeTrailingPathDelimiter(FDosBoxDir)+ExtractFileName(FDosBoxLanguage)) then
       FDosBoxLanguage:=IncludeTrailingPathDelimiter(FDosBoxDir)+ExtractFileName(FDosBoxLanguage);
   end;
@@ -310,8 +338,8 @@ end;
 procedure TDOSBoxSetting.DoneDirs;
 begin
   If OperationMode=omPortable then begin
-    DosBoxDir:=MakeRelPath(DosBoxDir,PrgDir);
-    DosBoxLanguage:=MakeRelPath(DosBoxLanguage,PrgDir);
+    DosBoxDir:=MakeExtRelPath(DosBoxDir,PrgDir);
+    DosBoxLanguage:=MakeExtRelPath(DosBoxLanguage,PrgDir);
   end;
 end;
 
@@ -364,7 +392,7 @@ end;
 constructor TPrgSetup.Create(const SetupFile : String);
 begin
   If SetupFile=''
-    then inherited Create(PrgDataDir+MainSetupFile)
+    then inherited Create(PrgDataDir+SettingsFolder+'\'+MainSetupFile)
     else inherited Create(SetupFile);
 
   ReadSettings;
@@ -453,8 +481,8 @@ begin
   AddStringRec(16,'ProgramSets','UserGroups','');
   AddStringRec(17,'ProgramSets','WaveEncMp3','');
   AddStringRec(18,'ProgramSets','WaveEncOgg','');
-  AddStringRec(19,'ProgramSets','WaveEncMp3Parameters','-h -V 0 "%s" "%s"');
-  AddStringRec(20,'ProgramSets','WaveEncOggParameters','"%s" --output="%s" --quality=10');
+  AddStringRec(19,'ProgramSets','WaveEncMp3Parameters','-h -V 0 "%1" "%2"');
+  AddStringRec(20,'ProgramSets','WaveEncOggParameters','"%1" --output="%2" --quality=10');
   AddStringRec(21,'ProgramSets','ValueForNotSet','');
   AddStringRec(22,'ProgramSets','ScummVMPath','');
   AddStringRec(23,'ProgramSets','ProgramVersion','');
@@ -468,6 +496,12 @@ begin
   AddStringRec(31,'ProgramSets','SoundPlayer','');
   AddStringRec(32,'ProgramSets','VideoPlayer','');
   AddStringRec(33,'ProgramSets','DeleteToRecycleBin','1011110');
+  AddStringRec(34,'ProgramSets','FilterMain','');
+  AddStringRec(35,'ProgramSets','FilterSub','');
+  AddStringRec(36,'ProgramSets','ColWidths','');
+  AddStringRec(37,'ProgramSets','ColumnWidthsNoExtraInfoMode','');
+  AddStringRec(38,'ProgramSets','CaptureDefaultPath','.\'+CaptureSubDir+'\');
+  AddStringRec(39,'ProgramSets','IconSet','Modern');
 
   For I:=0 to 25 do AddStringRec(1000+I,'WineSupport',chr(ord('A')+I),'');
 
@@ -526,12 +560,20 @@ begin
   AddBooleanRec(52,'ProgramSets','AutoFixLineWrap',False);
   AddBooleanRec(53,'ProgramSets','CenterScummVMWindow',False);
   AddBooleanRec(54,'ProgramSets','HideScummVMConsole',False);
-  AddBooleanRec(55,'ProgramSets','ShowShortNameWarnings',False); //... Change default value to "true" in 0.7.0 (= when GUI is ready)
+  AddBooleanRec(55,'ProgramSets','ShowShortNameWarnings',True);
   AddBooleanRec(56,'ProgramSets','RestoreWhenScummVMCloses',False);
-  AddBooleanRec(57,'ProgramSets','UseWindowsExeIcons',False); //... Change default value to "true" in 0.7.0 (= when GUI is ready)
+  AddBooleanRec(57,'ProgramSets','UseWindowsExeIcons',True);
   AddBooleanRec(58,'ProgramSets','MinimizeOnWindowsGameStart',False);
   AddBooleanRec(59,'ProgramSets','RestoreWhenWindowsGameCloses',False);
-  AddBooleanRec(60,'ProgramSets','ActivateIncompleteFeatures',False);
+  AddBooleanRec(60,'ProgramSets','RestoreFilter',True);
+  AddBooleanRec(61,'ProgramSets','AllowSecureMode',False);
+  AddBooleanRec(62,'ProgramSets','AllowMoreIOCTLSettings',False);
+  AddBooleanRec(63,'ProgramSets','AllowCPUType',False);
+  AddBooleanRec(64,'ProgramSets','AllowPixelShader',False);
+  AddBooleanRec(65,'ProgramSets','StoreColWidths',False);
+  AddBooleanRec(66,'ProgramSets','ActivateIncompleteFeatures',False);
+  AddBooleanRec(67,'ProgramSets','RenameProfFileOnRenamingProfile',False);
+  AddBooleanRec(68,'ProgramSets','ScanFolderAllGames',False);
 
   AddIntegerRec(0,'ProgramSets','MainLeft',-1);
   AddIntegerRec(1,'ProgramSets','MainTop',-1);
@@ -557,6 +599,9 @@ begin
   AddIntegerRec(21,'ProgramSets','QuickStarterHeight',-1);
   AddIntegerRec(22,'ProgramSets','ScreenshotsGamesList.UseScreenshotNr',1);
   AddIntegerRec(23,'ProgramSets','DOSBoxShortFileNameAlgorithm',3);
+  AddIntegerRec(24,'ProgramSets','LastWizardMode',1);
+  AddIntegerRec(25,'ProgramSets','IconSize',32);
+  AddIntegerRec(26,'ProgramSets','ImageFilter',0);
 end;
 
 Procedure TPrgSetup.InitDirs;
@@ -564,30 +609,37 @@ begin
   If BaseDir='' then BaseDir:=PrgDataDir;
   If GameDir='' then GameDir:=BaseDir+'VirtualHD\';
   If DataDir='' then DataDir:=BaseDir+'GameData\';
+  If CaptureDir='' then CaptureDir:=BaseDir+CaptureSubDir+'\';
 
   If OperationMode=omPortable then begin
-    BaseDir:=MakeAbsPath(BaseDir,PrgDir);
-    GameDir:=MakeAbsPath(GameDir,PrgDir);
-    DataDir:=MakeAbsPath(DataDir,PrgDir);
-    ScummVMPath:=MakeAbsPath(ScummVMPath,PrgDir);
-    QBasic:=MakeAbsPath(QBasic,PrgDir);
-    WaveEncOgg:=MakeAbsPath(WaveEncOgg,PrgDir);
-    WaveEncMp3:=MakeAbsPath(WaveEncMp3,PrgDir);
+    BaseDir:=MakeExtAbsPath(BaseDir,PrgDir);
+    GameDir:=MakeExtAbsPath(GameDir,PrgDir);
+    DataDir:=MakeExtAbsPath(DataDir,PrgDir);
+    CaptureDir:=MakeExtAbsPath(CaptureDir,PrgDir);
+    ScummVMPath:=MakeExtAbsPath(ScummVMPath,PrgDir);
+    QBasic:=MakeExtAbsPath(QBasic,PrgDir);
+    WaveEncOgg:=MakeExtAbsPath(WaveEncOgg,PrgDir);
+    WaveEncMp3:=MakeExtAbsPath(WaveEncMp3,PrgDir);
   end;
 
-  If (not FileExists(WaveEncOgg)) and FileExists(PrgDir+OggEncPrgFile) then WaveEncOgg:=PrgDir+OggEncPrgFile;
+  If not FileExists(WaveEncOgg) then begin
+    If FileExists(PrgDir+OggEncPrgFile) then WaveEncOgg:=PrgDir+OggEncPrgFile else begin
+      If FileExists(PrgDir+BinFolder+'\'+OggEncPrgFile) then WaveEncOgg:=PrgDir+BinFolder+'\'+OggEncPrgFile;
+    end;
+  end;
 end;
 
 procedure TPrgSetup.DoneDirs;
 begin
   If OperationMode=omPortable then begin
-    BaseDir:=MakeRelPath(BaseDir,PrgDir);
-    GameDir:=MakeRelPath(GameDir,PrgDir);
-    DataDir:=MakeRelPath(DataDir,PrgDir);
-    ScummVMPath:=MakeRelPath(ScummVMPath,PrgDir);
-    QBasic:=MakeRelPath(QBasic,PrgDir);
-    WaveEncOgg:=MakeRelPath(WaveEncOgg,PrgDir);
-    WaveEncMp3:=MakeRelPath(WaveEncMp3,PrgDir);
+    BaseDir:=MakeExtRelPath(BaseDir,PrgDir);
+    GameDir:=MakeExtRelPath(GameDir,PrgDir);
+    DataDir:=MakeExtRelPath(DataDir,PrgDir);
+    CaptureDir:=MakeExtRelPath(CaptureDir,PrgDir);
+    ScummVMPath:=MakeExtRelPath(ScummVMPath,PrgDir);
+    QBasic:=MakeExtRelPath(QBasic,PrgDir);
+    WaveEncOgg:=MakeExtRelPath(WaveEncOgg,PrgDir);
+    WaveEncMp3:=MakeExtRelPath(WaveEncMp3,PrgDir);
   end;
 end;
 
@@ -726,6 +778,8 @@ begin
   DOSBoxData.DosBoxLanguage:=DOSBoxSetting.DosBoxLanguage;
   DOSBoxData.SDLVideodriver:=DOSBoxSetting.SDLVideodriver;
   DOSBoxData.CommandLineParameters:=DOSBoxSetting.CommandLineParameters;
+  DOSBoxData.KeyboardLayout:=DOSBoxSetting.KeyboardLayout;
+  DOSBoxData.Codepage:=DOSBoxSetting.Codepage;
   DOSBoxData.HideDosBoxConsole:=DOSBoxSetting.HideDosBoxConsole;
   DOSBoxData.CenterDOSBoxWindow:=DOSBoxSetting.CenterDOSBoxWindow;
   DOSBoxData.DisableScreensaver:=DOSBoxSetting.DisableScreensaver;
@@ -740,6 +794,8 @@ begin
   DOSBoxSetting.DosBoxLanguage:=DOSBoxData.DosBoxLanguage;
   DOSBoxSetting.SDLVideodriver:=DOSBoxData.SDLVideodriver;
   DOSBoxSetting.CommandLineParameters:=DOSBoxData.CommandLineParameters;
+  DOSBoxSetting.KeyboardLayout:=DOSBoxData.KeyboardLayout;
+  DOSBoxSetting.Codepage:=DOSBoxData.Codepage;
   DOSBoxSetting.HideDosBoxConsole:=DOSBoxData.HideDosBoxConsole;
   DOSBoxSetting.CenterDOSBoxWindow:=DOSBoxData.CenterDOSBoxWindow;
   DOSBoxSetting.DisableScreensaver:=DOSBoxData.DisableScreensaver;
@@ -755,6 +811,8 @@ begin
     DosBoxLanguage:='';
     SDLVideodriver:='DirectX';
     CommandLineParameters:='';
+    KeyboardLayout:='';
+    Codepage:='';
     HideDosBoxConsole:=True;
     CenterDOSBoxWindow:=False;
     DisableScreensaver:=False;
@@ -764,7 +822,9 @@ end;
 
 initialization
   ReadOperationMode;
+  UpdateSettingsFilesLocation;
   PrgSetup:=TPrgSetup.Create;
 finalization
   PrgSetup.Free;
+  PrgSetup:=nil;
 end.

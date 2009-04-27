@@ -26,11 +26,12 @@ type
     Function Init(const AInfoData : TInfoData) : Boolean;
     Function Done : String;
     Function GetName : String;
+    Procedure ShowFrame;
   end;
 
 implementation
 
-uses LanguageSetupUnit, CommonTools, PrgSetupUnit;
+uses LanguageSetupUnit, CommonTools, PrgSetupUnit, IconLoaderUnit;
 
 {$R *.dfm}
 
@@ -57,6 +58,8 @@ begin
   finally
     FolderDriveLetterComboBox.Items.EndUpdate;
   end;
+
+  UserIconLoader.DialogImage(DI_SelectFolder,FolderButton);
 
   St:=ValueToList(InfoData.Data);
   try
@@ -87,6 +90,10 @@ begin
   FolderFreeSpaceTrackBarChange(self);
 end;
 
+procedure TProfileMountEditorDriveFrame.ShowFrame;
+begin
+end;
+
 Function TProfileMountEditorDriveFrame.Done : String;
 Var S : String;
 begin
@@ -112,7 +119,7 @@ begin
   If Trim(FolderEdit.Text)='' then S:=InfoData.DefaultInitialDir else S:=FolderEdit.Text;
   S:=MakeAbsPath(S,PrgSetup.BaseDir);
   if not SelectDirectory(Handle,LanguageSetup.ProfileMountingFolder,S) then exit;
-  FolderEdit.Text:=MakeRelPath(S,PrgSetup.BaseDir);
+  FolderEdit.Text:=MakeRelPath(S,PrgSetup.BaseDir,True);
 end;
 
 procedure TProfileMountEditorDriveFrame.FolderDriveLetterComboBoxChange(Sender: TObject);

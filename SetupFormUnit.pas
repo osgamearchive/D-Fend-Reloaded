@@ -10,7 +10,7 @@ Type TSimpleEvent=Procedure of object;
      TOpenLanguageEditorEvent=Procedure(const Mode : Integer) of object;
 
 Type TInitData=record
-  LanguageChangeNotify, DosBoxDirChangeNotify : TSimpleEvent;
+  BeforeLanguageChangeNotify, LanguageChangeNotify, DosBoxDirChangeNotify : TSimpleEvent;
   PDosBoxDir, PBaseDir, PDOSBoxLang : PString;
   GameDB : TGameDB;
   OpenLanguageEditorEvent : TOpenLanguageEditorEvent;
@@ -19,9 +19,11 @@ end;
 Type ISetupFrame=interface
   Function GetName : String;
   Procedure InitGUIAndLoadSetup(InitData : TInitData);
+  Procedure BeforeChangeLanguage;
   Procedure LoadLanguage;
   Procedure DOSBoxDirChanged;
   Procedure ShowFrame(const AdvencedMode : Boolean);
+  Procedure HideFrame;
   Procedure RestoreDefaults;
   Procedure SaveSetup;
 end;
@@ -35,7 +37,7 @@ Type TFrameRecord=record
   IsEmpty : Boolean;
 end;
 
-Type TOpenMode=(omNormal, omLanguage, omTreeList);
+Type TOpenMode=(omNormal, omLanguage, omTreeList, omToolbar, omIconSet);
 
 type
   TSetupForm = class(TForm)
@@ -66,10 +68,11 @@ type
     Frames : Array of TFrameRecord;
     VisibleFrame : Integer;
     SetAdvanced : Boolean;
-    LanguageFrame, TreeListFrame : TFrame;
+    LanguageFrame, TreeListFrame, ToolbarFrame, IconSetFrame : TFrame;
     InternalDOSBoxDir, InternalDOSBoxLang, InternalBaseDir : String;
     Procedure InitFramesList;
     Procedure AddTreeNode(const ParentFrame, NewFrame : TFrame; NewFrameInterface : ISetupFrame; const AdvencedModeOnly : Boolean; const ImageIndex : Integer; const IsEmpty : Boolean = False);
+    Procedure BeforeChangeLanguage;
     Procedure LoadLanguage;
     Procedure DOSBoxDirChanged;
     Procedure OpenLanguageEditor(const Mode : Integer);
@@ -87,10 +90,12 @@ var
 
 Function ShowSetupDialog(const AOwner : TComponent; const AGameDB : TGameDB; const OpenLanguageTab : Boolean = False) : Boolean;
 Function ShowTreeListSetupDialog(const AOwner : TComponent; const AGameDB : TGameDB) : Boolean;
+Function ShowToolbarSetupDialog(const AOwner : TComponent; const AGameDB : TGameDB) : Boolean;
+Function ShowIconSetSetupDialog(const AOwner : TComponent; const AGameDB : TGameDB) : Boolean;
 
 implementation
 
-uses VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgSetupUnit,
+uses Math, VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgSetupUnit,
      IconLoaderUnit, LanguageEditorFormUnit, LanguageEditorStartFormUnit,
      HelpConsts, SetupFrameBaseUnit, SetupFrameDirectoriesUnit,
      SetupFrameSurfaceUnit, SetupFrameLanguageUnit, SetupFrameToolbarUnit,
@@ -102,7 +107,8 @@ uses VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgSetupUnit,
      SetupFrameWaveEncoderUnit, SetupFrameSecurityUnit, SetupFrameServiceUnit,
      SetupFrameUpdateUnit, SetupFrameWineUnit, SetupFrameCompressionUnit,
      SetupFrameGamesListScreenshotModeAppearanceUnit, SetupFrameEditorUnit,
-     SetupFrameViewerUnit, SetupFrameWindowsGamesUnit, SetupFrameZipPrgsUnit;
+     SetupFrameViewerUnit, SetupFrameWindowsGamesUnit, SetupFrameZipPrgsUnit,
+     SetupFrameCustomLanguageStringsUnit, SetupFrameGameListIconModeAppearanceUnit;
 
 {$R *.dfm}
 
@@ -126,7 +132,6 @@ end;
 
 procedure TSetupForm.FormShow(Sender: TObject);
 begin
-  SetAdvanced:=(OpenMode=omTreeList);
   ModeLabel.Visible:=not SetAdvanced;
   ModeComboBox.Visible:=not SetAdvanced;
   If not SetAdvanced then begin
@@ -137,13 +142,16 @@ begin
   InternalDOSBoxLang:=PrgSetup.DOSBoxSettings[0].DosBoxLanguage;
   InternalBaseDir:=PrgSetup.BaseDir;
 
-  LoadUserIcons(ImageList,'SetupForm');
+  UserIconLoader.DirectLoad(ImageList,'SetupForm');
+  UserIconLoader.DialogImage(DI_ResetDefault,RestoreDefaultValuesButton);
   InitFramesList;
   LoadLanguage;
 
   Case OpenMode of
     omLanguage : Tree.Selected:=FindNodeFromFrame(LanguageFrame);
     omTreeList : Tree.Selected:=FindNodeFromFrame(TreeListFrame);
+    omToolbar : Tree.Selected:=FindNodeFromFrame(ToolbarFrame);
+    omIconSet : Tree.Selected:=FindNodeFromFrame(IconSetFrame);
     else         Tree.Selected:=Tree.Items[0];
   end;
   If Tree.Selected<>nil then Tree.Selected.MakeVisible;
@@ -153,6 +161,7 @@ Procedure TSetupForm.AddTreeNode(const ParentFrame, NewFrame : TFrame; NewFrameI
 Var C : Integer;
     InitData : TInitData;
 begin
+  InitData.BeforeLanguageChangeNotify:=BeforeChangeLanguage;
   InitData.LanguageChangeNotify:=LoadLanguage;
   InitData.DosBoxDirChangeNotify:=DOSBoxDirChanged;
   InitData.OpenLanguageEditorEvent:=OpenLanguageEditor;
@@ -183,16 +192,20 @@ begin
   F:=TSetupFrameDirectories.Create(self); AddTreeNode(Root,F,TSetupFrameDirectories(F),False,1);
   F:=TSetupFrameSecurity.Create(self); AddTreeNode(Root,F,TSetupFrameSecurity(F),True,5);
   F:=TSetupFrameCompression.Create(self); AddTreeNode(Root,F,TSetupFrameCompression(F),True,16);
-  F:=TSetupFrameWine.Create(self); AddTreeNode(Root,F,TSetupFrameWine(F),True,0);
+  F:=TSetupFrameWine.Create(self); AddTreeNode(Root,F,TSetupFrameWine(F),True,19);
 
-  F:=TSetupFrameSurface.Create(self); AddTreeNode(nil,F,TSetupFrameSurface(F),False,12); Root:=F;
-  F:=TSetupFrameLanguage.Create(self); AddTreeNode(Root,F,TSetupFrameLanguage(F),False,2,True); LanguageFrame:=F;
-  F:=TSetupFrameToolbar.Create(self); AddTreeNode(Root,F,TSetupFrameToolbar(F),True,13);
-  F:=TSetupFrameGamesListColumns.Create(self); AddTreeNode(Root,F,TSetupFrameGamesListColumns(F),True,3);
+  F:=TSetupFrameSurface.Create(self); AddTreeNode(nil,F,TSetupFrameSurface(F),False,12); Root:=F; IconSetFrame:=F;
+  F:=TSetupFrameLanguage.Create(self); AddTreeNode(Root,F,TSetupFrameLanguage(F),False,2,True); LanguageFrame:=F; Root2:=F;
+  F:=TSetupFrameCustomLanguageStrings.Create(self); AddTreeNode(Root2,F,TSetupFrameCustomLanguageStrings(F),True,3,False);
+  F:=TSetupFrameToolbar.Create(self); AddTreeNode(Root,F,TSetupFrameToolbar(F),True,13); ToolbarFrame:=F;
+  F:=TSetupFrameGamesListTreeAppearance.Create(self); AddTreeNode(Root,F,TSetupFrameGamesListTreeAppearance(F),True,22); TreeListFrame:=F;
   F:=TSetupFrameGamesListAppearance.Create(self); AddTreeNode(Root,F,TSetupFrameGamesListAppearance(F),True,3); Root2:=F;
-  F:=TSetupFrameGamesListScreenshotModeAppearance.Create(self); AddTreeNode(Root2,F,TSetupFrameGamesListScreenshotModeAppearance(F),True,3);
-  F:=TSetupFrameGamesListTreeAppearance.Create(self); AddTreeNode(Root,F,TSetupFrameGamesListTreeAppearance(F),True,3); TreeListFrame:=F;
-  F:=TSetupFrameGamesListScreenshotAppearance.Create(self); AddTreeNode(Root,F,TSetupFrameGamesListScreenshotAppearance(F),True,3);
+  F:=TSetupFrameGamesListColumns.Create(self); AddTreeNode(Root2,F,TSetupFrameGamesListColumns(F),True,3);
+  F:=TSetupFrameGamesListScreenshotModeAppearance.Create(self); AddTreeNode(Root2,F,TSetupFrameGamesListScreenshotModeAppearance(F),True,20);
+  If PrgSetup.ActivateIncompleteFeatures then begin
+    F:=TSetupFrameGameListIconModeAppearance.Create(self); AddTreeNode(Root2,F,TSetupFrameGameListIconModeAppearance(F),True,21);
+  end;
+  F:=TSetupFrameGamesListScreenshotAppearance.Create(self); AddTreeNode(Root,F,TSetupFrameGamesListScreenshotAppearance(F),True,18);
 
   F:=TSetupFrameProfileEditor.Create(self); AddTreeNode(nil,F,TSetupFrameProfileEditor(F),True,8); Root:=F;
   F:=TSetupFrameDefaultValues.Create(self); AddTreeNode(Root,F,TSetupFrameDefaultValues(F),True,6);
@@ -204,17 +217,19 @@ begin
   F:=TSetupFrameScummVM.Create(self); AddTreeNode(Root,F,TSetupFrameScummVM(F),False,10);
   F:=TSetupFrameQBasic.Create(self); AddTreeNode(Root,F,TSetupFrameQBasic(F),False,11);
   F:=TSetupFrameWaveEncoder.Create(self); AddTreeNode(Root,F,TSetupFrameWaveEncoder(F),False,9,False);
-  If PrgSetup.ActivateIncompleteFeatures then begin
-    F:=TSetupFrameZipPrgs.Create(self); AddTreeNode(Root,F,TSetupFrameZipPrgs(F),True,16,False);
-  end;
+  F:=TSetupFrameZipPrgs.Create(self); AddTreeNode(Root,F,TSetupFrameZipPrgs(F),True,16,False);
   F:=TSetupFrameEditor.Create(self); AddTreeNode(Root,F,TSetupFrameEditor(F),True,17,False);
   F:=TSetupFrameViewer.Create(self); AddTreeNode(Root,F,TSetupFrameViewer(F),True,18,False);
-  If PrgSetup.ActivateIncompleteFeatures then begin
-    F:=TSetupFrameWindowsGames.Create(self); AddTreeNode(Root,F,TSetupFrameWindowsGames(F),True,8,False);
-  end;
+  F:=TSetupFrameWindowsGames.Create(self); AddTreeNode(Root,F,TSetupFrameWindowsGames(F),True,8,False);
 
   F:=TSetupFrameService.Create(self); AddTreeNode(nil,F,TSetupFrameService(F),False,7,True); Root:=F;
   F:=TSetupFrameUpdate.Create(self); AddTreeNode(Root,F,TSetupFrameUpdate(F),False,14);
+end;
+
+Procedure TSetupForm.BeforeChangeLanguage;
+Var I : Integer;
+begin
+  For I:=0 to length(Frames)-1 do Frames[I].IFrame.BeforeChangeLanguage;
 end;
 
 procedure TSetupForm.LoadLanguage;
@@ -229,9 +244,10 @@ begin
   RestoreDefaultValuesButton.Caption:=LanguageSetup.SetupFormDefaultValueReset;
   ModeLabel.Caption:=LanguageSetup.SetupFormMode;
   I:=ModeComboBox.ItemIndex;
+  While ModeComboBox.Items.Count<2 do ModeComboBox.Items.Add('');
   ModeComboBox.Items[0]:=LanguageSetup.SetupFormModeEasy;
   ModeComboBox.Items[1]:=LanguageSetup.SetupFormModeAdvanced;
-  ModeComboBox.ItemIndex:=I;
+  ModeComboBox.ItemIndex:=Max(0,Min(1,I));
 
   ModeComboBoxChange(self);
 
@@ -287,7 +303,7 @@ begin
       If I=LastFrame then LastNode:=Node;
     end;
 
-    Tree.FullExpand;
+    For I:=0 to Tree.Items.Count-1 do If Tree.Items[I].Parent=nil then Tree.Items[I].Expand(False);
 
     If LastNode=nil then LastNode:=Tree.Items[0];
     Tree.Selected:=LastNode;
@@ -302,7 +318,10 @@ procedure TSetupForm.TreeChange(Sender: TObject; Node: TTreeNode);
 begin
   If (Tree.Selected<>nil) and (Integer(Tree.Selected.Data)=VisibleFrame) then exit;
 
-  If VisibleFrame>=0 then Frames[VisibleFrame].Frame.Visible:=False;
+  If VisibleFrame>=0 then begin
+    Frames[VisibleFrame].IFrame.HideFrame;
+    Frames[VisibleFrame].Frame.Visible:=False;
+  end;
 
   If Tree.Selected=nil then VisibleFrame:=-1 else VisibleFrame:=Integer(Tree.Selected.Data);
 
@@ -377,6 +396,7 @@ end;
 procedure TSetupForm.OKButtonClick(Sender: TObject);
 Var I : Integer;
 begin
+  If VisibleFrame>=0 then Frames[VisibleFrame].IFrame.HideFrame;
   If not SetAdvanced then PrgSetup.EasySetupMode:=(ModeComboBox.ItemIndex=0);
   For I:=0 to length(Frames)-1 do Frames[I].IFrame.SaveSetup;
 end;
@@ -412,12 +432,13 @@ begin
   end;
 end;
 
-Function ShowSetupDialog(const AOwner : TComponent; const AGameDB : TGameDB; const OpenLanguageTab : Boolean) : Boolean;
+Function ShowSetupDialogSpecial(const AOwner : TComponent; const AGameDB : TGameDB; const OpenMode : TOpenMode) : Boolean;
 begin
   SetupForm:=TSetupForm.Create(AOwner);
   try
     SetupForm.GameDB:=AGameDB;
-    If OpenLanguageTab then SetupForm.OpenMode:=omLanguage;
+    If OpenMode<>omNormal then SetupForm.OpenMode:=OpenMode;
+    If (OpenMode<>omNormal) and (OpenMode<>omLanguage) and (OpenMode<>omIconSet) then SetupForm.SetAdvanced:=True;
     result:=(SetupForm.ShowModal=mrOK);
     if not result then LoadLanguage(PrgSetup.Language);
     If result and (SetupForm.LanguageEditorMode>0) then OpenLanguageEditor(AOwner,SetupForm.LanguageEditorMode);
@@ -426,19 +447,26 @@ begin
   end;
 end;
 
+Function ShowSetupDialog(const AOwner : TComponent; const AGameDB : TGameDB; const OpenLanguageTab : Boolean) : Boolean;
+begin
+  If OpenLanguageTab
+    then result:=ShowSetupDialogSpecial(AOwner,AGameDB,omLanguage)
+    else result:=ShowSetupDialogSpecial(AOwner,AGameDB,omNormal);
+end;
+
 Function ShowTreeListSetupDialog(const AOwner : TComponent; const AGameDB : TGameDB) : Boolean;
 begin
-  SetupForm:=TSetupForm.Create(AOwner);
-  try
-    SetupForm.GameDB:=AGameDB;
-    SetupForm.OpenMode:=omTreeList;
-    SetupForm.SetAdvanced:=True;
-    result:=(SetupForm.ShowModal=mrOK);
-    if not result then LoadLanguage(PrgSetup.Language);
-    If result and (SetupForm.LanguageEditorMode>0) then OpenLanguageEditor(AOwner,SetupForm.LanguageEditorMode);
-  finally
-    SetupForm.Free;
-  end;
+  result:=ShowSetupDialogSpecial(AOwner,AGameDB,omTreeList);
+end;
+
+Function ShowToolbarSetupDialog(const AOwner : TComponent; const AGameDB : TGameDB) : Boolean;
+begin
+  result:=ShowSetupDialogSpecial(AOwner,AGameDB,omToolbar);
+end;
+
+Function ShowIconSetSetupDialog(const AOwner : TComponent; const AGameDB : TGameDB) : Boolean;
+begin
+  result:=ShowSetupDialogSpecial(AOwner,AGameDB,omIconSet);
 end;
 
 end.

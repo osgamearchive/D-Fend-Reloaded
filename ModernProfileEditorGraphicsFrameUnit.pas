@@ -32,8 +32,13 @@ type
     VideoRamComboBox: TComboBox;
     VGASettingsLabel: TLabel;
     FullscreenInfoLabel: TLabel;
+    PixelShaderComboBox: TComboBox;
+    PixelShaderLabel: TLabel;
   private
     { Private-Deklarationen }
+    ProfileDOSBoxInstallation : PString;
+    LastPixelShader : String;
+    Function GetDOSBoxDir : String;
   public
     { Public-Deklarationen }
     Procedure InitGUI(const InitData : TModernProfileEditorInitData);
@@ -62,6 +67,7 @@ begin
   NoFlicker(GlideEmulationCheckBox);
   NoFlicker(RenderComboBox);
   NoFlicker(VideoCardComboBox);
+  NoFlicker(PixelShaderComboBox);
   NoFlicker(VGASettingsGroupBox);
   NoFlicker(VGAChipsetComboBox);
   NoFlicker(VideoRamComboBox);
@@ -91,8 +97,10 @@ begin
   ScaleLabel.Caption:=LanguageSetup.GameScale;
   St:=ValueToList(InitData.GameDB.ConfOpt.Scale,';,'); try ScaleComboBox.Items.AddStrings(St); finally St.Free; end;
   FrameSkipLabel.Caption:=LanguageSetup.GameFrameskip;
-
   TextModeLinesRadioGroup.Caption:=LanguageSetup.GameTextModeLines;
+  PixelShaderLabel.Caption:=LanguageSetup.GamePixelShader;
+
+  ProfileDOSBoxInstallation:=InitData.CurrentDOSBoxInstallation;
 
   HelpContext:=ID_ProfileEditGraphics;
 end;
@@ -130,6 +138,9 @@ begin
   For I:=0 to VideoCardComboBox.Items.Count-1 do If Trim(ExtUpperCase(VideoCardComboBox.Items[I]))=S then begin
     VideoCardComboBox.ItemIndex:=I; break;
   end;
+
+  LastPixelShader:=Game.PixelShader;
+  PixelShaderComboBox.Items.Clear;
 
   VGASettingsGroupBox.Visible:=PrgSetup.AllowVGAChipsetSettings;
   If PrgSetup.AllowVGAChipsetSettings then begin
@@ -169,8 +180,51 @@ begin
   end;
 end;
 
-procedure TModernProfileEditorGraphicsFrame.ShowFrame;
+function TModernProfileEditorGraphicsFrame.GetDOSBoxDir: String;
+Var S : String;
+    I : Integer;
 begin
+  result:='';
+
+  S:=Trim(ExtUpperCase(ProfileDOSBoxInstallation^));
+  If (S='') or (S='DEFAULT') then begin
+    result:=PrgSetup.DOSBoxSettings[0].DosBoxDir;
+  end else begin
+    For I:=1 to PrgSetup.DOSBoxSettingsCount-1 do If Trim(ExtUpperCase(PrgSetup.DOSBoxSettings[I].Name))=S then begin result:=PrgSetup.DOSBoxSettings[I].DosBoxDir; break; end;
+  end;
+
+  If result='' then result:=ProfileDOSBoxInstallation^;
+
+  result:=IncludeTrailingPathDelimiter(MakeAbsPath(result,PrgSetup.BaseDir));
+end;
+
+procedure TModernProfileEditorGraphicsFrame.ShowFrame;
+Var Rec : TSearchRec;
+    I : Integer;
+    S : String;
+begin
+  PixelShaderLabel.Visible:=PrgSetup.AllowPixelShader;
+  PixelShaderComboBox.Visible:=PrgSetup.AllowPixelShader;
+
+  If PixelShaderComboBox.Items.Count>0 then LastPixelShader:=PixelShaderComboBox.Text;
+  PixelShaderComboBox.Items.Clear;
+  PixelShaderComboBox.Items.Add('none');
+
+  I:=FindFirst(GetDOSBoxDir+'Shaders\*.fx',faAnyFile,Rec);
+  try
+    While I=0 do begin
+      PixelShaderComboBox.Items.Add(ChangeFileExt(Rec.Name,''));
+      I:=FindNext(Rec);
+    end;
+  finally
+    FindClose(rec);
+  end;
+
+  PixelShaderComboBox.ItemIndex:=0;
+  S:=Trim(ExtUpperCase(LastPixelShader));
+  For I:=0 to PixelShaderComboBox.Items.Count-1 do If Trim(ExtUpperCase(PixelShaderComboBox.Items[I]))=S then begin
+    PixelShaderComboBox.ItemIndex:=I; break;
+  end;
 end;
 
 function TModernProfileEditorGraphicsFrame.CheckValue: Boolean;
@@ -191,6 +245,8 @@ begin
 
   Game.Render:=RenderComboBox.Text;
   Game.VideoCard:=VideoCardComboBox.Text;
+
+  Game.PixelShader:=PixelShaderComboBox.Text;
 
   If PrgSetup.AllowVGAChipsetSettings then begin
     Game.VGAChipset:=VGAChipsetComboBox.Text;

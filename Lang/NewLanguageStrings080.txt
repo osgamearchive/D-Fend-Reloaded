@@ -1,0 +1,38 @@
+[CharsetSettings]
+HTMLCharset=iso-8859-1
+
+[Menu]
+File.Import.Zip.Caption=Import archive file
+File.Export.CreateInstaller=&Create installer package...
+Extras.CreateShortcuts=Create shortcuts for multiple games...
+ToolbarPopup.SetupButtons=Setup toolbar buttons...
+ToolbarPopup.SetupIconSet=Setup icon set...
+
+[SetupForm]
+CaptureDir=Default base folder for capture directories
+CaptureDir.Select=Select capture folder
+IconSets=Icon sets:
+IconSets.Preview=Preview:
+IconSets.Author=Author:
+ProfileEditorRenameProfFilesOnRenamingProfile=Rename profile file when renaming the profile automatically
+CHANGED: GamesListGUI.ListAppearance=Games list
+CHANGED: GamesListGUI.TreeAppearance=Tree structure
+CHANGED: GamesListGUI.ScreenshotListAppearance=Media preview
+GameListIconMode=List in icons mode
+GameListIconMode.IconSize=Icon size to use
+
+[GameSetup]
+Cycles.Auto=Auto
+Cycles.Max=Max
+
+[CreateShortcuts]
+Caption=Create shortcuts
+Info=Select games to create shortcuts for
+InfoWine=Folder to create link files in
+UseProfileIcons=Use icons from profiles
+
+[SelectAutoSetupTemplate]
+Caption=Select auto setup template to use
+WhileImportingZip=There are multiple matching auto setup templates for the game. Please select which template should be used when adding this game.
+WhileScanningFolder=There are multiple matching auto setup templates for the game located in %s. Please select which template should be used when adding this game.
+

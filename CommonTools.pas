@@ -20,8 +20,10 @@ Function FindStringInFile(const FileName, SearchString : String) : Boolean;
 Function PrgDir : String;
 Function TempDir : String;
 
-Function MakeRelPath(Path, Rel : String) : String;
+Function MakeRelPath(Path, Rel : String; const NoEmptyRelPath : Boolean =False) : String;
 Function MakeAbsPath(Path, Rel : String) : string;
+Function MakeExtRelPath(Path, Rel : String) : String;
+Function MakeExtAbsPath(Path, Rel : String) : string;
 Function MakeFileSysOKFolderName(const AName : String) : String;
 Function MakeAbsIconName(const Icon : String) : String;
 
@@ -75,10 +77,20 @@ Function OpenMediaFile(const SetupString, FileName : String) : Boolean; {true=re
 
 Function FileSizeToStr(const Size : Int64) : String;
 
+Function BaseDirSecuriryCheck(const DirToDelete : String) : Boolean;
+
 Type TDeleteFileType=(ftQuickStart=0,ftTemp=1,ftProfile=2,ftUninstall=3,ftDataViewer=4,ftMediaViewer=5,ftZipOperation=6);
-Function ExtDeleteFile(const FileName : String; const FileType : TDeleteFileType; const DeletePrgSetupRecord : String ='') : Boolean;
-Function ExtDeleteFolder(const Folder : String; const FolderType : TDeleteFileType; const DeletePrgSetupRecord : String ='') : Boolean;
-Function DeleteFileToRecycleBin(const FileName : String) : Boolean;
+Function ExtDeleteFile(const FileName : String; const FileType : TDeleteFileType; const AllowContinueNext : Boolean; var ContinueNext : Boolean; const DeletePrgSetupRecord : String ='') : Boolean; overload;
+Function ExtDeleteFile(const FileName : String; const FileType : TDeleteFileType; const DeletePrgSetupRecord : String ='') : Boolean; overload;
+Function ExtDeleteFileWithPause(const FileName : String; const FileType : TDeleteFileType; const AllowContinueNext : Boolean; var ContinueNext : Boolean; const DeletePrgSetupRecord : String) : Boolean; overload;
+Function ExtDeleteFileWithPause(const FileName : String; const FileType : TDeleteFileType; const DeletePrgSetupRecord : String ='') : Boolean; overload;
+Function ExtDeleteFolder(const Folder : String; const FolderType : TDeleteFileType; const AllowContinueNext : Boolean; var ContinueNext : Boolean; const DeletePrgSetupRecord : String ='') : Boolean; overload;
+Function ExtDeleteFolder(const Folder : String; const FolderType : TDeleteFileType; const DeletePrgSetupRecord : String ='') : Boolean; overload;
+Function ExtDeleteFolderNoWarning(const Folder : String; const FolderType : TDeleteFileType) : Boolean;
+Function DeleteFileToRecycleBin(const FileName : String; const AllowContinueNext : Boolean; var ContinueNext : Boolean) : Boolean; overload;
+Function DeleteFileToRecycleBin(const FileName : String) : Boolean; overload;
+Function DeleteFileToRecycleBinWithPause(const FileName : String; const AllowContinueNext : Boolean; var ContinueNext : Boolean) : Boolean;
+Function DeleteFileToRecycleBinNoWarning(const FileName : String) : Boolean;
 
 Function ForceForegroundWindow(Wnd:HWND):Boolean;
 
@@ -237,7 +249,7 @@ begin
     else SetLength(result,StrLen(PChar(result)));
 end;
 
-Function MakeRelPath(Path, Rel : String) : String;
+Function MakeRelPath(Path, Rel : String; const NoEmptyRelPath : Boolean) : String;
 Var FileName : String;
 begin
   If (ExtUpperCase(Copy(Trim(Path),1,7))='DOSBOX:') or (Trim(Path)='') then begin result:=Path; exit; end;
@@ -262,6 +274,8 @@ begin
   end;
   If Path='.\' then Path:='';
   result:=Path+FileName;
+
+  if NoEmptyRelPath and (result='') then result:='.\';
 end;
 
 Function MakeAbsPath(Path, Rel : String) : string;
@@ -275,6 +289,83 @@ begin
 
   Path:=Trim(Path);
   If Copy(Path,1,2)='.\' then Path:=Trim(Copy(Path,3,MaxInt));
+
+  result:=Rel+Path;
+end;
+
+Function MakeExtRelPath(Path, Rel : String) : String;
+Var FileName,S,T,ShortPath : String;
+    C : Integer;
+begin
+  If (ExtUpperCase(Copy(Trim(Path),1,7))='DOSBOX:') or (Trim(Path)='') then begin result:=Path; exit; end;
+
+  Rel:=Trim(Rel); if Rel='' then begin result:=Path; exit; end;
+  Rel:=IncludeTrailingPathDelimiter(Rel);
+
+  If DirectoryExists(Path) then begin
+    FileName:='';
+    Path:=IncludeTrailingPathDelimiter(Path);
+  end else begin
+    FileName:=ExtractFileName(Path);
+    Path:=IncludeTrailingPathDelimiter(ExtractFilePath(Path));
+  end;
+
+  If (length(Path)>=length(Rel)) and (ExtUpperCase(Copy(Path,1,length(Rel)))=ExtUpperCase(Rel)) then begin
+    Path:='.\'+Copy(Path,length(Rel)+1,MaxInt);
+  end else begin
+    Rel:=IncludeTrailingPathDelimiter(ShortName(Rel));
+    If (length(Path)>=length(Rel)) and (ExtUpperCase(Copy(Path,1,length(Rel)))=ExtUpperCase(Rel)) then
+      Path:='.\'+Copy(Path,length(Rel)+1,MaxInt);
+  end;
+
+  If Copy(Path,1,2)<>'.\' then begin
+    C:=0;
+    S:=ShortName(Rel);
+    ShortPath:=ShortName(Path);
+    repeat
+      If S<>'' then SetLength(S,length(S)-1);
+      While (S<>'') and (S[length(S)]<>'\') do SetLength(S,length(S)-1);
+      If S='' then break;
+      inc(C);
+      If (length(ShortPath)>=length(S)) and (ExtUpperCase(Copy(ShortPath,1,length(S)))=ExtUpperCase(S)) then begin
+        T:=''; while C>0 do begin T:=T+'..\'; dec(C); end;
+        Path:=T+Copy(ShortPath,length(S)+1,MaxInt);
+        break;
+      end;
+    until False;
+  end;
+
+  If Path='.\' then Path:='';
+  result:=Path+FileName;
+end;
+
+Function MakeExtAbsPath(Path, Rel : String) : string;
+begin
+  If (ExtUpperCase(Copy(Trim(Path),1,7))='DOSBOX:') or (Trim(Path)='') then begin result:=Path; exit; end;
+
+  Rel:=Trim(Rel); if Rel='' then begin result:=Path; exit; end;
+  Rel:=IncludeTrailingPathDelimiter(Rel);
+
+  If (length(Path)>=2) and (Path[2]=':') then begin result:=Path; exit; end;
+
+  Path:=Trim(Path);
+
+  If Copy(Path,1,2)='.\' then begin
+    Path:=Trim(Copy(Path,3,MaxInt));
+    result:=Rel+Path;
+    exit;
+  end;
+
+  If Copy(Path,1,3)='..\' then begin
+    while Copy(Path,1,3)='..\' do begin
+      If Rel='' then break;
+      SetLength(Rel,length(Rel)-1);
+      While (Rel<>'') and (Rel[length(Rel)]<>'\') do SetLength(Rel,length(Rel)-1);
+      Path:=Copy(Path,4,MaxInt);
+    end;
+    result:=Rel+Path;
+    exit;
+  end;
 
   result:=Rel+Path;
 end;
@@ -1074,7 +1165,7 @@ Type TCharsetNameRecord=record
   Nr : Integer;
 end;
 
-const  CharsetNamesList : Array[0..16] of TCharsetNameRecord=(
+const  CharsetNamesList : Array[0..17] of TCharsetNameRecord=(
   (Name: 'ANSI_CHARSET'; Nr: 0),
   (Name: 'DEFAULT_CHARSET'; Nr: 1),
   (Name: 'SYMBOL_CHARSET'; Nr: 2),
@@ -1089,6 +1180,7 @@ const  CharsetNamesList : Array[0..16] of TCharsetNameRecord=(
   (Name: 'GREEK_CHARSET'; Nr: 161),
   (Name: 'TURKISH_CHARSET'; Nr: 162),
   (Name: 'VIETNAMESE_CHARSET'; Nr: 163),
+  (Name: 'BALTIC_CHARSET'; Nr: 186),
   (Name: 'THAI_CHARSET'; Nr: 222),
   (Name: 'EASTEUROPE_CHARSET'; Nr: 238),
   (Name: 'RUSSIAN_CHARSET'; Nr: 204)
@@ -1461,77 +1553,415 @@ begin
   result:=Format('%.1fGB',[Size/1024/1024/1024]);
 end;
 
-Function DeleteFolderInt(const Dir: String) : Boolean;
+Function BaseDirSecuriryCheck(const DirToDelete : String) : Boolean;
+Var S, Folder : String;
+begin
+  result:=True;
+  If not PrgSetup.DeleteOnlyInBaseDir then exit;
+
+  Folder:=IncludeTrailingPathDelimiter(DirToDelete);
+  S:=ShortName(PrgSetup.BaseDir);
+  If ExtUpperCase(Copy(ShortName(Folder),1,length(S)))=ExtUpperCase(S) then exit;
+  MessageDlg(Format(LanguageSetup.MessageDeleteErrorProtection,[Folder]),mtError,[mbOk],0);
+  result:=False;
+end;
+
+Function ExtDeleteFolderOnlyInt(const Dir, DeletePrgSetupRecord : String; const FolderType : TDeleteFileType) : Boolean;
+begin
+  if not DirectoryExists(Dir) then begin result:=True; exit; end;
+
+  If DeletePrgSetupRecord[Integer(FolderType)+1]='1' then begin
+    result:=DeleteFileToRecycleBinNoWarning(IncludeTrailingPathDelimiter(Dir));
+  end else begin
+    result:=RemoveDir(IncludeTrailingPathDelimiter(Dir));
+  end;
+end;
+
+Function DeleteFolderIntNoWarning(const Dir, DeletePrgSetupRecord : String; const FolderType : TDeleteFileType) : Boolean;
 Var Rec : TSearchRec;
     I : Integer;
+    Dirs,Files : TStringList;
+    S : String;
+    FileOp : TSHFileOpStruct;
 begin
+  S:=ExcludeTrailingPathDelimiter(Dir)+#0+#0;
+  with FileOp do begin
+    Wnd:=0;
+    wFunc:=FO_DELETE;
+    pFrom:=PChar(S);
+    pTo:=nil;
+    fFlags:=FOF_NOCONFIRMATION+FOF_NOERRORUI+FOF_SILENT;
+    fAnyOperationsAborted:=False;
+    hNameMappings:=nil;
+    lpszProgressTitle:=nil;
+  end;
+
+  result:=(SHFileOperation(FileOp)=0) and (not FileOp.fAnyOperationsAborted);
+  if result then exit;
+
+  result:=True;
+  If not DirectoryExists(Dir) then exit;
+  If Pos('..',Dir)<>0 then begin result:=False; exit; end;
+
+  Dirs:=TStringList.Create;
+  Files:=TStringList.Create;
+  try
+    I:=FindFirst(Dir+'*.*',faAnyFile,Rec);
+    try
+      while I=0 do begin
+        if (Rec.Attr and faDirectory)=faDirectory then begin
+          If Rec.Name[1]<>'.' then Dirs.Add(Rec.Name);
+        end else begin
+          Files.Add(Rec.Name);
+        end;
+        I:=FindNext(Rec);
+      end;
+    finally
+      FindClose(Rec);
+    end;
+
+    For I:=0 to Files.Count-1 do begin
+      If DeletePrgSetupRecord[Integer(FolderType)+1]='1' then begin
+        if not DeleteFileToRecycleBin(Dir+Files[I]) then result:=False;
+      end else begin
+        If not DeleteFile(Dir+Files[I]) then result:=False;
+      end;
+    end;
+
+    For I:=0 to Dirs.Count-1 do
+      if not DeleteFolderIntNoWarning(Dir+Dirs[I]+'\',DeletePrgSetupRecord,FolderType) then result:=False;
+
+  finally
+    Dirs.Free;
+    Files.Free;
+  end;
+
+  if not ExtDeleteFolderOnlyInt(Dir,DeletePrgSetupRecord,FolderType) then result:=False;
+end;
+
+Function DeleteFolderInt(const Dir, DeletePrgSetupRecord : String; const FolderType : TDeleteFileType; const AllowContinueNext : Boolean; var ContinueNext : Boolean) : Boolean;
+Var Rec : TSearchRec;
+    I : Integer;
+    ErrorIgnored : Boolean;
+    Dirs,Files : TStringList;
+    S : String;
+    FileOp : TSHFileOpStruct;
+begin
+  S:=ExcludeTrailingPathDelimiter(Dir)+#0+#0;
+  with FileOp do begin
+    Wnd:=0;
+    wFunc:=FO_DELETE;
+    pFrom:=PChar(S);
+    pTo:=nil;
+    fFlags:=FOF_NOCONFIRMATION+FOF_NOERRORUI+FOF_SILENT;
+    fAnyOperationsAborted:=False;
+    hNameMappings:=nil;
+    lpszProgressTitle:=nil;
+  end;
+
+  result:=(SHFileOperation(FileOp)=0) and (not FileOp.fAnyOperationsAborted);
+  if result then exit;
+
   result:=False;
+  ContinueNext:=False;
+  ErrorIgnored:=False;
 
   If not DirectoryExists(Dir) then begin result:=True; exit; end;
 
-  If Pos('..',Dir)<>0 then exit;
-
-  I:=FindFirst(Dir+'*.*',faAnyFile,Rec);
-  try
-    while I=0 do begin
-      if (Rec.Attr and faDirectory)=faDirectory then begin
-        If Rec.Name[1]<>'.' then begin
-          if not DeleteFolderInt(Dir+Rec.Name+'\') then exit;
-        end;
-      end else begin
-        if not DeleteFile(Dir+Rec.Name) then exit;
-      end;
-      I:=FindNext(Rec);
-    end;
-  finally
-    FindClose(Rec);
+  If Pos('..',Dir)<>0 then begin
+    MessageDlg(Format(LanguageSetup.MessageDeleteErrorDotDotInPath,[Dir]),mtError,[mbOk],0);
+    exit;
   end;
 
-  if not RemoveDir(Dir) then exit;
+  Dirs:=TStringList.Create;
+  Files:=TStringList.Create;
+  try
+    I:=FindFirst(Dir+'*.*',faAnyFile,Rec);
+    try
+      while I=0 do begin
+        if (Rec.Attr and faDirectory)=faDirectory then begin
+          If Rec.Name[1]<>'.' then Dirs.Add(Rec.Name);
+        end else begin
+          Files.Add(Rec.Name);
+        end;
+        I:=FindNext(Rec);
+      end;
+    finally
+      FindClose(Rec);
+    end;
 
+    For I:=0 to Files.Count-1 do if not ExtDeleteFile(Dir+Files[I],FolderType,AllowContinueNext,ContinueNext,DeletePrgSetupRecord) then begin
+      If ContinueNext then ErrorIgnored:=True else exit;
+    end;
+
+    For I:=0 to Dirs.Count-1 do if not DeleteFolderInt(Dir+Dirs[I]+'\',DeletePrgSetupRecord,FolderType,AllowContinueNext,ContinueNext) then begin
+      If ContinueNext then ErrorIgnored:=True else exit;
+    end;
+
+  finally
+    Dirs.Free;
+    Files.Free;
+  end;
+
+  repeat
+    if not ExtDeleteFolderOnlyInt(Dir,DeletePrgSetupRecord,FolderType) then begin
+      If ErrorIgnored then begin result:=False; ContinueNext:=True; exit; end;
+      If AllowContinueNext then begin
+        Case MessageDlg(Format(LanguageSetup.MessageCouldNotDeleteDir,[Dir])+#13+#13+SysErrorMessage(GetLastError),mtError,[mbAbort,mbRetry,mbIgnore],0) of
+          mrIgnore : begin ContinueNext:=True; exit; end;
+          mrRetry : ;
+          else exit;
+        End;
+      end else begin
+        Case MessageDlg(Format(LanguageSetup.MessageCouldNotDeleteDir,[Dir])+#13+#13+SysErrorMessage(GetLastError),mtError,[mbAbort,mbRetry],0) of
+          mrRetry : ;
+          else exit;
+        End;
+      end;
+    end else begin
+      break;
+    end;
+  until False;
+
+  result:=True;
+  ContinueNext:=True;
+end;
+
+Function ExtDeleteFile(const FileName : String; const FileType : TDeleteFileType; const AllowContinueNext : Boolean; var ContinueNext : Boolean; const DeletePrgSetupRecord : String) : Boolean;
+Var S : String;
+begin
+  if not FileExists(FileName) then begin result:=True; exit; end;
+
+  If DeletePrgSetupRecord='' then begin
+    If not Assigned(PrgSetup) then S:='' else S:=Copy(PrgSetup.DeleteToRecycleBin,1,7);
+  end else begin
+    S:=DeletePrgSetupRecord;
+  end;
+  S:=S+Copy('1011110',length(S)+1,MaxInt);
+
+  If S[Integer(FileType)+1]='1' then begin
+    result:=DeleteFileToRecycleBin(FileName,AllowContinueNext,ContinueNext);
+    exit;
+  end;
+
+  result:=False;
+  repeat
+    If not DeleteFile(FileName) then begin
+      If AllowContinueNext then begin
+        Case MessageDlg(Format(LanguageSetup.MessageCouldNotDeleteFile,[FileName])+#13+#13+SysErrorMessage(GetLastError),mtError,[mbAbort,mbRetry,mbIgnore],0) of
+          mrIgnore : begin ContinueNext:=True; exit; end;
+          mrRetry : ;
+          else exit;
+        End;
+      end else begin
+        Case MessageDlg(Format(LanguageSetup.MessageCouldNotDeleteFile,[FileName])+#13+#13+SysErrorMessage(GetLastError),mtError,[mbAbort,mbRetry],0) of
+          mrRetry : ;
+          else exit;
+        End;
+      end;
+    end else begin
+      break;
+    end;
+  until False;
   result:=True;
 end;
 
-Function ExtDeleteFile(const FileName : String; const FileType : TDeleteFileType; const DeletePrgSetupRecord : String) : Boolean;
-Var S : String;
+Function ExtDeleteFile(const FileName : String; const FileType : TDeleteFileType; const DeletePrgSetupRecord : String ='') : Boolean;
+Var B : Boolean;
 begin
-  If DeletePrgSetupRecord='' then begin
-    S:=Copy(PrgSetup.DeleteToRecycleBin,1,7);
-    S:=S+Copy('1011110',length(S)+1,MaxInt);
-  end else begin
-    S:=DeletePrgSetupRecord;
-  end;
-
-  If S[Integer(FileType)+1]='1'
-    then result:=DeleteFileToRecycleBin(FileName)
-    else result:=DeleteFile(FileName);
+  result:=ExtDeleteFile(FileName,FileType,True,B,DeletePrgSetupRecord);
 end;
 
-Function ExtDeleteFolder(const Folder : String; const FolderType : TDeleteFileType; const DeletePrgSetupRecord : String) : Boolean;
+Function ExtDeleteFileWithPause(const FileName : String; const FileType : TDeleteFileType; const AllowContinueNext : Boolean; var ContinueNext : Boolean; const DeletePrgSetupRecord : String) : Boolean;
 Var S : String;
+    I : Integer;
 begin
+  if not FileExists(FileName) then begin result:=True; exit; end;
+
   If DeletePrgSetupRecord='' then begin
-    S:=Copy(PrgSetup.DeleteToRecycleBin,1,7);
-    S:=S+Copy('1011110',length(S)+1,MaxInt);
+    If not Assigned(PrgSetup) then S:='' else S:=Copy(PrgSetup.DeleteToRecycleBin,1,7);
   end else begin
     S:=DeletePrgSetupRecord;
   end;
-
-  S:=Copy(PrgSetup.DeleteToRecycleBin,1,7);
   S:=S+Copy('1011110',length(S)+1,MaxInt);
+
+  If S[Integer(FileType)+1]='1' then begin
+    result:=DeleteFileToRecycleBinWithPause(FileName,AllowContinueNext,ContinueNext);
+    exit;
+  end;
+
+  result:=False;
+  repeat
+    For I:=0 to 10 do begin
+      If DeleteFile(FileName) then begin result:=True; exit; end;
+      Sleep(100);
+    end;
+    If not DeleteFile(FileName) then begin
+      If AllowContinueNext then begin
+        Case MessageDlg(Format(LanguageSetup.MessageCouldNotDeleteFile,[FileName])+#13+#13+SysErrorMessage(GetLastError),mtError,[mbAbort,mbRetry,mbIgnore],0) of
+          mrIgnore : begin ContinueNext:=True; exit; end;
+          mrRetry : ;
+          else exit;
+        End;
+      end else begin
+        Case MessageDlg(Format(LanguageSetup.MessageCouldNotDeleteFile,[FileName])+#13+#13+SysErrorMessage(GetLastError),mtError,[mbAbort,mbRetry],0) of
+          mrRetry : ;
+          else exit;
+        End;
+      end;
+    end else begin
+      break;
+    end;
+  until False;
+  result:=True;
+end;
+
+Function ExtDeleteFileWithPause(const FileName : String; const FileType : TDeleteFileType; const DeletePrgSetupRecord : String ='') : Boolean;
+Var B : Boolean;
+begin
+  result:=ExtDeleteFileWithPause(FileName,FileType,True,B,DeletePrgSetupRecord);
+end;
+
+Function ExtDeleteFolder(const Folder : String; const FolderType : TDeleteFileType; const AllowContinueNext : Boolean; var ContinueNext : Boolean; const DeletePrgSetupRecord : String ='') : Boolean;
+Var S : String;
+    B : Boolean;
+begin
+  If not DirectoryExists(Folder) then begin result:=True; exit; end;
+
+  If DeletePrgSetupRecord='' then begin
+    If not Assigned(PrgSetup) then S:='' else S:=PrgSetup.DeleteToRecycleBin
+  end else begin
+    S:=DeletePrgSetupRecord;
+  end;
+  S:=Copy(S,1,7); S:=S+Copy('1011110',length(S)+1,MaxInt);
 
   If S[Integer(FolderType)+1]='1' then begin
     result:=DeleteFileToRecycleBin(Folder);
     exit;
   end;
 
-  result:=DeleteFolderInt(Folder);
+  result:=DeleteFolderInt(Folder,S,FolderType,AllowContinueNext,B);
 end;
 
-Function DeleteFileToRecycleBin(const FileName : String) : Boolean;
+Function ExtDeleteFolderNoWarning(const Folder : String; const FolderType : TDeleteFileType) : Boolean;
+Var S : String;
+begin
+  If not DirectoryExists(Folder) then begin result:=True; exit; end;
+
+  If not Assigned(PrgSetup) then S:='' else S:=PrgSetup.DeleteToRecycleBin;
+  S:=Copy(S,1,7); S:=S+Copy('1011110',length(S)+1,MaxInt);
+
+  If S[Integer(FolderType)+1]='1' then begin
+    result:=DeleteFileToRecycleBin(Folder);
+    exit;
+  end;
+
+  result:=DeleteFolderIntNoWarning(Folder,S,FolderType);
+end;
+
+Function ExtDeleteFolder(const Folder : String; const FolderType : TDeleteFileType; const DeletePrgSetupRecord : String) : Boolean;
+Var B : Boolean;
+begin
+  result:=ExtDeleteFolder(Folder,FolderType,True,B,DeletePrgSetupRecord);
+end;
+
+Function DeleteFileToRecycleBin(const FileName : String; const AllowContinueNext : Boolean; var ContinueNext : Boolean) : Boolean;
 Var FileOp : TSHFileOpStruct;
     ExtFileName : String;
 begin
+  if (not FileExists(ExcludeTrailingPathDelimiter(FileName))) and (not DirectoryExists(FileName)) then begin result:=True; exit; end;
+
+  ExtFileName:=ExcludeTrailingPathDelimiter(FileName)+#0+#0;
+  with FileOp do begin
+    Wnd:=0;
+    wFunc:=FO_DELETE;
+    pFrom:=PChar(ExtFileName);
+    pTo:=nil;
+    fFlags:=FOF_NOCONFIRMATION+FOF_NOERRORUI+FOF_SILENT+FOF_ALLOWUNDO;
+    fAnyOperationsAborted:=False;
+    hNameMappings:=nil;
+    lpszProgressTitle:=nil;
+  end;
+
+  result:=False;
+  repeat
+    If (SHFileOperation(FileOp)<>0) or FileOp.fAnyOperationsAborted then begin
+      If AllowContinueNext then begin
+        Case MessageDlg(Format(LanguageSetup.MessageCouldNotDeleteFile,[FileName])+#13+#13+SysErrorMessage(GetLastError),mtError,[mbAbort,mbRetry,mbIgnore],0) of
+          mrIgnore : begin ContinueNext:=True; exit; end;
+          mrRetry : ;
+          else exit;
+        End;
+      end else begin
+        Case MessageDlg(Format(LanguageSetup.MessageCouldNotDeleteFile,[FileName])+#13+#13+SysErrorMessage(GetLastError),mtError,[mbAbort,mbRetry],0) of
+          mrRetry : ;
+          else exit;
+        End;
+      end;
+    end else begin
+      break;
+    end;
+  until False;
+  result:=True;
+end;
+
+Function DeleteFileToRecycleBin(const FileName : String) : Boolean;
+Var B : Boolean;
+begin
+  result:=DeleteFileToRecycleBin(FileName,True,B);
+end;
+
+Function DeleteFileToRecycleBinWithPause(const FileName : String; const AllowContinueNext : Boolean; var ContinueNext : Boolean) : Boolean;
+Var FileOp : TSHFileOpStruct;
+    ExtFileName : String;
+    I : Integer;
+begin
+  if (not FileExists(ExcludeTrailingPathDelimiter(FileName))) and (not DirectoryExists(FileName)) then begin result:=True; exit; end;
+
+  ExtFileName:=ExcludeTrailingPathDelimiter(FileName)+#0+#0;
+  with FileOp do begin
+    Wnd:=0;
+    wFunc:=FO_DELETE;
+    pFrom:=PChar(ExtFileName);
+    pTo:=nil;
+    fFlags:=FOF_NOCONFIRMATION+FOF_NOERRORUI+FOF_SILENT+FOF_ALLOWUNDO;
+    fAnyOperationsAborted:=False;
+    hNameMappings:=nil;
+    lpszProgressTitle:=nil;
+  end;
+
+  result:=False;
+  repeat
+    For I:=0 to 10 do begin
+      If (SHFileOperation(FileOp)=0) and (not FileOp.fAnyOperationsAborted) then begin result:=True; exit; end;
+      Sleep(100);
+    end;
+    If (SHFileOperation(FileOp)<>0) or FileOp.fAnyOperationsAborted then begin
+      If AllowContinueNext then begin
+        Case MessageDlg(Format(LanguageSetup.MessageCouldNotDeleteFile,[FileName])+#13+#13+SysErrorMessage(GetLastError),mtError,[mbAbort,mbRetry,mbIgnore],0) of
+          mrIgnore : begin ContinueNext:=True; exit; end;
+          mrRetry : ;
+          else exit;
+        End;
+      end else begin
+        Case MessageDlg(Format(LanguageSetup.MessageCouldNotDeleteFile,[FileName])+#13+#13+SysErrorMessage(GetLastError),mtError,[mbAbort,mbRetry],0) of
+          mrRetry : ;
+          else exit;
+        End;
+      end;
+    end else begin
+      break;
+    end;
+  until False;
+  result:=True;
+end;
+
+Function DeleteFileToRecycleBinNoWarning(const FileName : String) : Boolean;
+Var FileOp : TSHFileOpStruct;
+    ExtFileName : String;
+begin
+  if (not FileExists(ExcludeTrailingPathDelimiter(FileName))) and (not DirectoryExists(FileName)) then begin result:=True; exit; end;
+
   ExtFileName:=ExcludeTrailingPathDelimiter(FileName)+#0+#0;
   with FileOp do begin
     Wnd:=0;

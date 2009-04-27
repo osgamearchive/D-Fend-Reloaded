@@ -89,7 +89,7 @@ object HistoryForm: THistoryForm
     Width = 554
     Height = 377
     ActivePage = TabSheet1
-    Align = alTop
+    Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 3
     object TabSheet1: TTabSheet
       Caption = 'Verlauf'
@@ -97,8 +97,8 @@ object HistoryForm: THistoryForm
         Left = 0
         Top = 0
         Width = 546
-        Height = 369
-        Align = alTop
+        Height = 349
+        Align = alClient
         BorderStyle = bsNone
         Columns = <>
         ReadOnly = True
@@ -106,6 +106,7 @@ object HistoryForm: THistoryForm
         ViewStyle = vsReport
         OnColumnClick = ListViewColumnClick
         OnCompare = ListViewCompare
+        ExplicitHeight = 369
       end
     end
     object TabSheet2: TTabSheet
@@ -115,8 +116,8 @@ object HistoryForm: THistoryForm
         Left = 0
         Top = 0
         Width = 546
-        Height = 369
-        Align = alTop
+        Height = 349
+        Align = alClient
         BorderStyle = bsNone
         Columns = <>
         ReadOnly = True
@@ -124,6 +125,7 @@ object HistoryForm: THistoryForm
         ViewStyle = vsReport
         OnColumnClick = ListViewColumnClick
         OnCompare = ListViewCompare
+        ExplicitHeight = 369
       end
     end
   end

@@ -36,6 +36,8 @@ Function SearchLame(const AOwner : TComponent) : Boolean;
 Function SearchScummVM(const AOwner : TComponent) : Boolean;
 Function SearchQBasicVM(const AOwner : TComponent) : Boolean;
 
+Procedure FastSearchAllTools;
+
 implementation
 
 uses ShlObj, PrgSetupUnit, LanguageSetupUnit, PrgConsts, CommonTools, VistaToolsUnit;
@@ -146,6 +148,9 @@ begin
   S:=IncludeTrailingPathDelimiter(GetSpecialFolder(Application.Handle,CSIDL_PROGRAM_FILES))+'DOSBox\';
   If FileExists(S+DosBoxFileName) then begin ADOSBoxDir:=S; result:=True; exit; end;
 
+  S:=PrgDir+BinFolder+'\DOSBox\';
+  If FileExists(S+DosBoxFileName) then begin ADOSBoxDir:=S; result:=True; exit; end;
+
   SetupDosBoxForm:=TSetupDosBoxForm.Create(AOwner);
   try
     SetupDosBoxForm.SearchType:=stDOSBox;
@@ -173,6 +178,12 @@ begin
     exit;
   end;
 
+  If FileExists(PrgDir+BinFolder+'\'+OggEncPrgFile) then begin
+    PrgSetup.WaveEncOgg:=PrgDir+BinFolder+'\'+OggEncPrgFile;
+    result:=True;
+    exit;
+  end;
+
   SetupDosBoxForm:=TSetupDosBoxForm.Create(AOwner);
   try
     SetupDosBoxForm.SearchType:=stOggEnc;
@@ -191,6 +202,9 @@ begin
   end;
 
   S:=IncludeTrailingPathDelimiter(GetSpecialFolder(Application.MainForm.Handle,CSIDL_PROGRAM_FILES))+'Lame\'+LamePrgFile;
+  If FileExists(S) then begin PrgSetup.WaveEncMp3:=S; result:=True; exit; end;
+
+  S:=PrgDir+BinFolder+'\';
   If FileExists(S) then begin PrgSetup.WaveEncMp3:=S; result:=True; exit; end;
 
   SetupDosBoxForm:=TSetupDosBoxForm.Create(AOwner);
@@ -233,12 +247,44 @@ begin
   S:=IncludeTrailingPathDelimiter(GetSpecialFolder(Application.MainForm.Handle,CSIDL_PROGRAM_FILES))+'QBasic\';
   If FileExists(S+QBasicPrgFile) then begin PrgSetup.QBasic:=S+QBasicPrgFile; result:=True; exit; end;
 
+  S:=PrgDir+BinFolder+'\';
+  If FileExists(S+QBasicPrgFile) then begin PrgSetup.QBasic:=S+QBasicPrgFile; result:=True; exit; end;
+
   SetupDosBoxForm:=TSetupDosBoxForm.Create(AOwner);
   try
     SetupDosBoxForm.SearchType:=stQBasic;
     result:=(SetupDosBoxForm.ShowModal<>mrAbort);
   finally
     SetupDosBoxForm.Free;
+  end;
+end;
+
+Procedure FastSearchAllTools;
+Var S : String;
+begin
+  If not FileExists(PrgSetup.WaveEncOgg) then begin
+    If FileExists(PrgDir+OggEncPrgFile) then PrgSetup.WaveEncOgg:=PrgDir+OggEncPrgFile else begin
+      If FileExists(PrgDir+BinFolder+'\'+OggEncPrgFile) then PrgSetup.WaveEncOgg:=PrgDir+BinFolder+'\'+OggEncPrgFile;
+    end;
+  end;
+
+  If not FileExists(PrgSetup.WaveEncMp3) then begin
+    S:=IncludeTrailingPathDelimiter(GetSpecialFolder(Application.MainForm.Handle,CSIDL_PROGRAM_FILES))+'Lame\'+LamePrgFile;
+    If FileExists(S) then PrgSetup.WaveEncMp3:=S else begin
+      If FileExists(PrgDir+BinFolder+'\'+LamePrgFile) then PrgSetup.WaveEncMp3:=PrgDir+BinFolder+'\'+LamePrgFile;
+    end;
+  end;
+
+  If not DirectoryExists(PrgSetup.ScummVMPath) then begin
+    S:=IncludeTrailingPathDelimiter(GetSpecialFolder(Application.MainForm.Handle,CSIDL_PROGRAM_FILES))+'ScummVM\';
+    If FileExists(S+ScummPrgFile) then PrgSetup.ScummVMPath:=S;
+  end;
+
+  If not FileExists(PrgSetup.QBasic) then begin
+    S:=IncludeTrailingPathDelimiter(GetSpecialFolder(Application.MainForm.Handle,CSIDL_PROGRAM_FILES))+'QBasic\';
+    If FileExists(S+QBasicPrgFile) then PrgSetup.QBasic:=S+QBasicPrgFile else begin
+      If FileExists(PrgDir+BinFolder+'\'+QBasicPrgFile) then PrgSetup.QBasic:=PrgDir+BinFolder+'\'+QBasicPrgFile;
+    end;
   end;
 end;
 

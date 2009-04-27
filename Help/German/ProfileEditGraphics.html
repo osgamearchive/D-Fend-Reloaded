@@ -23,9 +23,11 @@ Men&uuml;: &nbsp; <b>Profil</b> | <b>Bearbeiten</b> | <b>Grafikkarte</b>
 <h1>Profileditor-Dialogseite "Grafikkarte"</h1>
 
 <p>
-Auf dieser Seite k&ouml;nnen Sie die virtuelle Grafikkarte, die DOSBox dem Spiel
+Auf dieser Seite k&ouml;nnen Sie die virtuelle Grafikkarte, die DOSBox bzw. ScummVM dem Spiel
 zur Verf&uuml;gung stellt, konfigurieren.
 </p>
+
+<h2>Für DOSBox-Profile</h2>
 
 <ul class="big">
   <li>
@@ -96,6 +98,13 @@ zur Verf&uuml;gung stellt, konfigurieren.
     festlegen.
   </li>
   <li>
+    <b>Pixel-Shader <font color="red">(*)</font><b><br />
+	Über diese Asuwahlbox können Sie das zu verwendende Pixel-Shader Programm für DOSBox
+	festlegen. Die hier angezeigten Programme sind <tt>fx</tt>-Dateien im
+	<tt>Shaders</tt>-Unterverzeichnis des DOSBox-Verzeichnisses der gewählten
+	DOSBox-Installation.
+  </li>
+  <li>
     <b>Einstellungen f&uuml;r Grafikkartentyp "VGA" <font color="red">(*)</font></b><br />
     In dieser Box k&ouml;nnen Sie den genauen Typ der emulierten VGA-Karte einstellen
     (d.h. diese Einstellung kommen nur dann zum Tragen, wenn Sie als Grafikkartentyp "vga"
@@ -138,11 +147,42 @@ zur Verf&uuml;gung stellt, konfigurieren.
 
 <p>
 Die mit <font color="red">(*)</font> markierten Optionen sind nur sichtbar, wenn Sie das zugeh&ouml;rige
-DOSBox CVS-Features auf der Dialogseite <a href="FileOptionsDOSBoxCVSFeatures.html">DOSBox CVS-Features</a>
+DOSBox CVS-Feature auf der Dialogseite <a href="FileOptionsDOSBoxCVSFeatures.html">DOSBox CVS-Features</a>
 des <a href="FileOptionsDOSBox.html">Programmeinstellungen</a>-Dialogs aktiviert haben. Die offizelle
 DOSBox 0.72 Version, die mit D-Fend Reloaded ausgeliefert wird, unterst&uuml;tzt diese zus&auml;tzlichen
 Optionen nicht.
 </p>
+
+<h2>Für ScummVM-Profile</h2>
+
+<ul class="big">
+  <li>
+    <b>Filter</b><br />
+	In diesem Feld können Sie auswählen, nach welcher Methode ScummVM die Spielegrafiken auf die
+	physikalische Auflösung des Systems hochskalieren soll.
+  </li>
+  <li>
+    <b>Darstellungsart</b><br />
+	In diesem Feld können Sie die zu verwendende Grafikkartenemulation festlegen. Im Normalfall
+	sollte der Vorgabewert "default" beibehalten werden.
+  </li>
+  <li>
+    <b>Vollbild beim Start</b><br />
+    Wenn diese Option aktiviert ist, startet ScummVM im Vollbildmodus;
+    andernfalls startet es als normales Fenster auf dem Windows Desktop.
+  </li>  
+  <li>
+    <b>Seitenverh&auml;ltnis korrigieren</b><br />
+    Die Verwendung dieser Option ist sinnvoll, wenn Sie ein Spiel mit der Aufl&ouml;sung
+    von 320x200 Pixeln auf einem modernen Bildschirm darstellen woll. Bei einer Verwendung
+    von 320x200 Pixeln wurden fr&uuml;her auf R&ouml;hrenmonitoren nicht quadratische Pixel
+    verwendet; auf heutigen LCD-Monitoren sind die Pixel aber bauartbedingt stets quadratisch,
+    so dass ein 320x200 Pixel Bild verzerrt wirkt. Die Option zu Korrektur des
+    Seitenverh&auml;ltnisses streckt in dem oben beschriebenen Fall das Bild von 320x200
+    auf 320x240 Pixel. In Abh&auml;ngigkeit von dem verwendeten Interpolationsalgorithmus
+    sieht das Bild dann meistens wesentlich besser aus.
+  </li>
+</ul>
 
 <p>&nbsp;</p>
 

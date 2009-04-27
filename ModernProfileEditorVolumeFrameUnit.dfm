@@ -135,7 +135,7 @@ object ModernProfileEditorVolumeFrame: TModernProfileEditorVolumeFrame
     Top = 176
     Width = 49
     Height = 22
-    MaxValue = 100
+    MaxValue = 200
     MinValue = 0
     TabOrder = 1
     Value = 100
@@ -146,7 +146,7 @@ object ModernProfileEditorVolumeFrame: TModernProfileEditorVolumeFrame
     Top = 176
     Width = 49
     Height = 22
-    MaxValue = 100
+    MaxValue = 200
     MinValue = 0
     TabOrder = 3
     Value = 100
@@ -157,7 +157,7 @@ object ModernProfileEditorVolumeFrame: TModernProfileEditorVolumeFrame
     Top = 176
     Width = 49
     Height = 22
-    MaxValue = 100
+    MaxValue = 200
     MinValue = 0
     TabOrder = 5
     Value = 100
@@ -168,7 +168,7 @@ object ModernProfileEditorVolumeFrame: TModernProfileEditorVolumeFrame
     Top = 176
     Width = 49
     Height = 22
-    MaxValue = 100
+    MaxValue = 200
     MinValue = 0
     TabOrder = 7
     Value = 100
@@ -179,7 +179,7 @@ object ModernProfileEditorVolumeFrame: TModernProfileEditorVolumeFrame
     Top = 176
     Width = 49
     Height = 22
-    MaxValue = 100
+    MaxValue = 200
     MinValue = 0
     TabOrder = 9
     Value = 100
@@ -190,7 +190,7 @@ object ModernProfileEditorVolumeFrame: TModernProfileEditorVolumeFrame
     Top = 176
     Width = 49
     Height = 22
-    MaxValue = 100
+    MaxValue = 200
     MinValue = 0
     TabOrder = 11
     Value = 100
@@ -201,7 +201,7 @@ object ModernProfileEditorVolumeFrame: TModernProfileEditorVolumeFrame
     Top = 399
     Width = 49
     Height = 22
-    MaxValue = 100
+    MaxValue = 200
     MinValue = 0
     TabOrder = 13
     Value = 100
@@ -212,7 +212,7 @@ object ModernProfileEditorVolumeFrame: TModernProfileEditorVolumeFrame
     Top = 399
     Width = 49
     Height = 22
-    MaxValue = 100
+    MaxValue = 200
     MinValue = 0
     TabOrder = 15
     Value = 100
@@ -223,7 +223,7 @@ object ModernProfileEditorVolumeFrame: TModernProfileEditorVolumeFrame
     Top = 400
     Width = 49
     Height = 22
-    MaxValue = 100
+    MaxValue = 200
     MinValue = 0
     TabOrder = 17
     Value = 100
@@ -234,7 +234,7 @@ object ModernProfileEditorVolumeFrame: TModernProfileEditorVolumeFrame
     Top = 400
     Width = 49
     Height = 22
-    MaxValue = 100
+    MaxValue = 200
     MinValue = 0
     TabOrder = 19
     Value = 100
@@ -245,7 +245,7 @@ object ModernProfileEditorVolumeFrame: TModernProfileEditorVolumeFrame
     Top = 400
     Width = 49
     Height = 22
-    MaxValue = 100
+    MaxValue = 200
     MinValue = 0
     TabOrder = 21
     Value = 100
@@ -256,7 +256,7 @@ object ModernProfileEditorVolumeFrame: TModernProfileEditorVolumeFrame
     Top = 400
     Width = 49
     Height = 22
-    MaxValue = 100
+    MaxValue = 200
     MinValue = 0
     TabOrder = 23
     Value = 100
@@ -267,7 +267,7 @@ object ModernProfileEditorVolumeFrame: TModernProfileEditorVolumeFrame
     Top = 31
     Width = 45
     Height = 114
-    Max = 100
+    Max = 200
     Orientation = trVertical
     PageSize = 5
     Frequency = 10
@@ -280,7 +280,7 @@ object ModernProfileEditorVolumeFrame: TModernProfileEditorVolumeFrame
     Top = 31
     Width = 45
     Height = 114
-    Max = 100
+    Max = 200
     Orientation = trVertical
     PageSize = 5
     Frequency = 10
@@ -293,7 +293,7 @@ object ModernProfileEditorVolumeFrame: TModernProfileEditorVolumeFrame
     Top = 31
     Width = 45
     Height = 114
-    Max = 100
+    Max = 200
     Orientation = trVertical
     PageSize = 5
     Frequency = 10
@@ -306,7 +306,7 @@ object ModernProfileEditorVolumeFrame: TModernProfileEditorVolumeFrame
     Top = 31
     Width = 45
     Height = 114
-    Max = 100
+    Max = 200
     Orientation = trVertical
     PageSize = 5
     Frequency = 10
@@ -319,7 +319,7 @@ object ModernProfileEditorVolumeFrame: TModernProfileEditorVolumeFrame
     Top = 31
     Width = 45
     Height = 114
-    Max = 100
+    Max = 200
     Orientation = trVertical
     PageSize = 5
     Frequency = 10
@@ -332,7 +332,7 @@ object ModernProfileEditorVolumeFrame: TModernProfileEditorVolumeFrame
     Top = 31
     Width = 45
     Height = 114
-    Max = 100
+    Max = 200
     Orientation = trVertical
     PageSize = 5
     Frequency = 10
@@ -345,7 +345,7 @@ object ModernProfileEditorVolumeFrame: TModernProfileEditorVolumeFrame
     Top = 255
     Width = 45
     Height = 114
-    Max = 100
+    Max = 200
     Orientation = trVertical
     PageSize = 5
     Frequency = 10
@@ -358,7 +358,7 @@ object ModernProfileEditorVolumeFrame: TModernProfileEditorVolumeFrame
     Top = 255
     Width = 45
     Height = 114
-    Max = 100
+    Max = 200
     Orientation = trVertical
     PageSize = 5
     Frequency = 10
@@ -371,7 +371,7 @@ object ModernProfileEditorVolumeFrame: TModernProfileEditorVolumeFrame
     Top = 255
     Width = 45
     Height = 114
-    Max = 100
+    Max = 200
     Orientation = trVertical
     PageSize = 5
     Frequency = 10
@@ -384,7 +384,7 @@ object ModernProfileEditorVolumeFrame: TModernProfileEditorVolumeFrame
     Top = 255
     Width = 45
     Height = 114
-    Max = 100
+    Max = 200
     Orientation = trVertical
     PageSize = 5
     Frequency = 10
@@ -397,7 +397,7 @@ object ModernProfileEditorVolumeFrame: TModernProfileEditorVolumeFrame
     Top = 255
     Width = 45
     Height = 114
-    Max = 100
+    Max = 200
     Orientation = trVertical
     PageSize = 5
     Frequency = 10
@@ -410,7 +410,7 @@ object ModernProfileEditorVolumeFrame: TModernProfileEditorVolumeFrame
     Top = 255
     Width = 45
     Height = 114
-    Max = 100
+    Max = 200
     Orientation = trVertical
     PageSize = 5
     Frequency = 10

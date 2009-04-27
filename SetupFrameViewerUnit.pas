@@ -37,16 +37,19 @@ type
     { Public-Deklarationen }
     Function GetName : String;
     Procedure InitGUIAndLoadSetup(InitData : TInitData);
+    Procedure BeforeChangeLanguage;
     Procedure LoadLanguage;
     Procedure DOSBoxDirChanged;
     Procedure ShowFrame(const AdvencedMode : Boolean);
+    procedure HideFrame;
     Procedure RestoreDefaults;
     Procedure SaveSetup;
   end;
 
 implementation
 
-uses ShlObj, CommonTools, LanguageSetupUnit, VistaToolsUnit, PrgSetupUnit, HelpConsts;
+uses ShlObj, CommonTools, LanguageSetupUnit, VistaToolsUnit, PrgSetupUnit,
+     HelpConsts, IconLoaderUnit;
 
 {$R *.dfm}
 
@@ -99,6 +102,14 @@ begin
       VideosEdit.Text:=PrgSetup.VideoPlayer;
     end;
   end;
+
+  UserIconLoader.DialogImage(DI_SelectFile,ImagesButton);
+  UserIconLoader.DialogImage(DI_SelectFile,SoundsButton);
+  UserIconLoader.DialogImage(DI_SelectFile,VideosButton);
+end;
+
+procedure TSetupFrameViewer.BeforeChangeLanguage;
+begin
 end;
 
 procedure TSetupFrameViewer.LoadLanguage;
@@ -131,6 +142,10 @@ begin
 end;
 
 procedure TSetupFrameViewer.ShowFrame(const AdvencedMode: Boolean);
+begin
+end;
+
+procedure TSetupFrameViewer.HideFrame;
 begin
 end;
 

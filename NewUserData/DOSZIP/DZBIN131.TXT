@@ -1,0 +1,14 @@
+Name                : DOSZIP
+Version             : 1.31
+Filename            : DZBIN131.ZIP
+FileDate            : 18JAN09
+Status              : BETA
+E-Mail              : nidud@users.sourceforge.net
+Homepage            : http://sourceforge.net/projects/doszip/
+File Location       : http://sourceforge.net/projects/doszip/
+
+The version of the source code and binary files is the date
+and time in the .ZIP file (1:00 == v1.00)
+
+The .ZIP files are DZBIN???.ZIP - Program files
+		   DZSRC???.ZIP - Source code

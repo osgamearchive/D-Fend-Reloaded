@@ -438,6 +438,15 @@ begin
     RemoveTrailingDot(Item.ShortName);
 end;
 
+function IsOnlyDots(FileName: String) : Boolean;
+var I: Integer;
+begin
+ Result:=false;
+ if FileName='' then exit;
+ Result:=true;
+ for I:=1 to Length(FileName) do
+    if FileName[I]<>'.' then Result:=false;
+end;
 
 function HasForbiddenChars(FileName : String; UseExtendedAscii:Boolean) : Boolean;
 const AllowedDOSBoxFileNameChars=
@@ -448,10 +457,17 @@ const AllowedDOSBoxFileNameChars=
    '!%{}`~'+
    '_-.&''+^'+
    chr(246)+chr(255)+chr($a0)+chr($e5);
-Var I : Integer;
+Var I, Dot : Integer;
 begin
   Result:=False;
-  For I:=1 to length(FileName) do
+  Dot:=Pos('.',FileName);
+  if not IsOnlyDots(FileName) and
+    (Dot>0) and (Dot<Length(FileName)) and (Pos('.',Copy(FileName,dot+1,MaxInt))>0) then
+  begin
+    Result:=true;
+    exit;
+  end;
+  For I:=1 to Length(FileName) do
   begin
   if (Pos(FileName[I],AllowedDOSBoxFileNameChars)<=0) and
      ((Ord(FileName[I])<$80) or (not UseExtendedAscii))
@@ -490,6 +506,11 @@ begin
             exit;
         end
         else isDir:=true;
+    if IsOnlyDots(LongName) then
+    begin
+      Result:=tcrOk;
+      exit;
+    end;
 
     RealLongName:=WinExpandLongPathName(ParentDir,LongName);
 

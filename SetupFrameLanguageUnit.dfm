@@ -55,7 +55,7 @@ object SetupFrameLanguage: TSetupFrameLanguage
     Width = 169
     Height = 21
     Style = csDropDownList
-    ItemHeight = 13
+    ItemHeight = 0
     TabOrder = 0
     OnChange = LanguageComboBoxChange
   end
@@ -65,7 +65,7 @@ object SetupFrameLanguage: TSetupFrameLanguage
     Width = 169
     Height = 21
     Style = csDropDownList
-    ItemHeight = 13
+    ItemHeight = 0
     ParentShowHint = False
     ShowHint = True
     TabOrder = 1
@@ -96,7 +96,7 @@ object SetupFrameLanguage: TSetupFrameLanguage
     Width = 169
     Height = 21
     Style = csDropDownList
-    ItemHeight = 13
+    ItemHeight = 0
     TabOrder = 4
     OnChange = InstallerLangEditComboBoxChange
   end

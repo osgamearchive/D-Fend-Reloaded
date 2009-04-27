@@ -33,11 +33,13 @@ type
     Function Init(const AInfoData : TInfoData) : Boolean;
     Function Done : String;
     Function GetName : String;
+    Procedure ShowFrame;
   end;
 
 implementation
 
-uses LanguageSetupUnit, CommonTools, PrgSetupUnit, CreateISOImageFormUnit;
+uses LanguageSetupUnit, CommonTools, PrgSetupUnit, CreateISOImageFormUnit,
+     IconLoaderUnit;
 
 {$R *.dfm}
 
@@ -73,6 +75,11 @@ begin
   finally
     CDROMImageDriveLetterComboBox.Items.EndUpdate;
   end;
+
+  UserIconLoader.DialogImage(DI_SelectFile,CDROMImageButton);
+  UserIconLoader.DialogImage(DI_ImageCD,ISOImageCreateButton);
+  UserIconLoader.DialogImage(DI_Add,CDROMImageAddButton);
+  UserIconLoader.DialogImage(DI_Delete,CDROMImageDelButton);
 
   St:=ValueToList(InfoData.Data);
   try
@@ -149,6 +156,10 @@ begin
   if not ShowCreateISOImageDialog(self,S,False) then exit;
   If S='' then exit;
   CDROMImageTab.Cells[0,CDROMImageTab.Row]:=MakeRelPath(S,PrgSetup.BaseDir);
+end;
+
+procedure TProfileMountEditorCDImageFrame.ShowFrame;
+begin
 end;
 
 procedure TProfileMountEditorCDImageFrame.CDROMImageAddButtonClick(Sender: TObject);

@@ -29,7 +29,7 @@ type
     DosBoxLang : TStringList;
     JustLoading : Boolean;
     PDosBoxDir, PDOSBoxLang : PString;
-    LanguageChangeNotify : TSimpleEvent;
+    BeforeLanguageChangeNotify, LanguageChangeNotify : TSimpleEvent;
     OpenLanguageEditor : TOpenLanguageEditorEvent;
     InstallerLang : Integer;
     LangTimerCounter : Integer;
@@ -40,9 +40,11 @@ type
     Destructor Destroy; override;
     Function GetName : String;
     Procedure InitGUIAndLoadSetup(InitData : TInitData);
+    Procedure BeforeChangeLanguage;
     Procedure LoadLanguage;
     Procedure DOSBoxDirChanged;
     Procedure ShowFrame(const AdvencedMode : Boolean);
+    procedure HideFrame;
     Procedure RestoreDefaults;
     Procedure SaveSetup;
   end;
@@ -87,6 +89,7 @@ begin
 
   PDosBoxDir:=InitData.PDosBoxDir;
   PDOSBoxLang:=InitData.PDOSBoxLang;
+  BeforeLanguageChangeNotify:=InitData.BeforeLanguageChangeNotify;
   LanguageChangeNotify:=InitData.LanguageChangeNotify;
   OpenLanguageEditor:=InitData.OpenLanguageEditorEvent;
 
@@ -128,9 +131,17 @@ begin
   I:=Integer(InstallerLangEditComboBox.Items.Objects[InstallerLangEditComboBox.ItemIndex]);
   If (I=InstallerLang) or (I=-1) then exit;
 
-  ShellExecute(Handle,'open',PChar(PrgDir+'SetInstallerLanguage.exe'),PChar(IntToStr(I)),nil,SW_SHOW);
+  If FileExists(PrgDir+'SetInstallerLanguage.exe') then begin
+    ShellExecute(Handle,'open',PChar(PrgDir+'SetInstallerLanguage.exe'),PChar(IntToStr(I)),nil,SW_SHOW);
+  end else begin
+    ShellExecute(Handle,'open',PChar(PrgDir+BinFolder+'\'+'SetInstallerLanguage.exe'),PChar(IntToStr(I)),nil,SW_SHOW);
+  end;
   LangTimerCounter:=10;
   Timer.Enabled:=True;
+end;
+
+procedure TSetupFrameLanguage.BeforeChangeLanguage;
+begin
 end;
 
 procedure TSetupFrameLanguage.LoadLanguage;
@@ -192,6 +203,10 @@ begin
   If I>=0 then DosBoxLangEditComboBox.ItemIndex:=I else DosBoxLangEditComboBox.ItemIndex:=0;
 end;
 
+procedure TSetupFrameLanguage.HideFrame;
+begin
+end;
+
 procedure TSetupFrameLanguage.RestoreDefaults;
 begin
 end;
@@ -224,6 +239,7 @@ procedure TSetupFrameLanguage.LanguageComboBoxChange(Sender: TObject);
 Var S : String;
 begin
   If not JustLoading then begin
+    BeforeLanguageChangeNotify;
     LanguageSetupUnit.LoadLanguage(ShortLanguageName(LanguageComboBox.Text)+'.ini');
     LanguageChangeNotify;
   end;

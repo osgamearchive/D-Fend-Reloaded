@@ -29,22 +29,22 @@ object ModernProfileEditorGraphicsFrame: TModernProfileEditorGraphicsFrame
     Caption = 'RenderLabel'
   end
   object VideoCardLabel: TLabel
-    Left = 24
-    Top = 280
+    Left = 184
+    Top = 224
     Width = 74
     Height = 13
     Caption = 'VideoCardLabel'
   end
   object ScaleLabel: TLabel
     Left = 24
-    Top = 336
+    Top = 280
     Width = 50
     Height = 13
     Caption = 'ScaleLabel'
   end
   object FrameSkipLabel: TLabel
     Left = 408
-    Top = 336
+    Top = 280
     Width = 74
     Height = 13
     Caption = 'FrameSkipLabel'
@@ -58,6 +58,14 @@ object ModernProfileEditorGraphicsFrame: TModernProfileEditorGraphicsFrame
     AutoSize = False
     Caption = 'FullscreenInfoLabel'
     WordWrap = True
+  end
+  object PixelShaderLabel: TLabel
+    Left = 344
+    Top = 224
+    Width = 81
+    Height = 13
+    Caption = 'PixelShaderLabel'
+    Visible = False
   end
   object WindowResolutionComboBox: TComboBox
     Left = 24
@@ -114,8 +122,8 @@ object ModernProfileEditorGraphicsFrame: TModernProfileEditorGraphicsFrame
     TabOrder = 6
   end
   object VideoCardComboBox: TComboBox
-    Left = 24
-    Top = 299
+    Left = 184
+    Top = 243
     Width = 145
     Height = 21
     Style = csDropDownList
@@ -124,7 +132,7 @@ object ModernProfileEditorGraphicsFrame: TModernProfileEditorGraphicsFrame
   end
   object ScaleComboBox: TComboBox
     Left = 24
-    Top = 355
+    Top = 299
     Width = 369
     Height = 21
     Style = csDropDownList
@@ -133,7 +141,7 @@ object ModernProfileEditorGraphicsFrame: TModernProfileEditorGraphicsFrame
   end
   object FrameSkipEdit: TSpinEdit
     Left = 408
-    Top = 355
+    Top = 299
     Width = 60
     Height = 22
     MaxValue = 10
@@ -143,7 +151,7 @@ object ModernProfileEditorGraphicsFrame: TModernProfileEditorGraphicsFrame
   end
   object TextModeLinesRadioGroup: TRadioGroup
     Left = 24
-    Top = 389
+    Top = 333
     Width = 169
     Height = 76
     Caption = 'TextModeLinesRadioGroup'
@@ -166,8 +174,8 @@ object ModernProfileEditorGraphicsFrame: TModernProfileEditorGraphicsFrame
     Visible = False
   end
   object VGASettingsGroupBox: TGroupBox
-    Left = 208
-    Top = 232
+    Left = 207
+    Top = 333
     Width = 417
     Height = 105
     Anchors = [akLeft, akTop, akRight]
@@ -219,5 +227,15 @@ object ModernProfileEditorGraphicsFrame: TModernProfileEditorGraphicsFrame
       ItemHeight = 13
       TabOrder = 1
     end
+  end
+  object PixelShaderComboBox: TComboBox
+    Left = 344
+    Top = 243
+    Width = 145
+    Height = 21
+    Style = csDropDownList
+    ItemHeight = 13
+    TabOrder = 12
+    Visible = False
   end
 end

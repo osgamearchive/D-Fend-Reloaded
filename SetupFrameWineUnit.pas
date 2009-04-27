@@ -24,9 +24,11 @@ type
     { Public-Deklarationen }
     Function GetName : String;  
     Procedure InitGUIAndLoadSetup(InitData : TInitData);
+    Procedure BeforeChangeLanguage;
     Procedure LoadLanguage;
     Procedure DOSBoxDirChanged;
     Procedure ShowFrame(const AdvencedMode : Boolean);
+    procedure HideFrame;
     Procedure RestoreDefaults;
     Procedure SaveSetup;
   end;
@@ -66,6 +68,10 @@ begin
   ShellScriptPreambleEdit.Text:=PrgSetup.LinuxShellScriptPreamble;
 end;
 
+procedure TSetupFrameWine.BeforeChangeLanguage;
+begin
+end;
+
 procedure TSetupFrameWine.LoadLanguage;
 begin
   MainCheckBox.Caption:=LanguageSetup.SetupFormWineEnable;
@@ -91,6 +97,10 @@ begin
 end;
 
 procedure TSetupFrameWine.ShowFrame(const AdvencedMode: Boolean);
+begin
+end;
+
+procedure TSetupFrameWine.HideFrame;
 begin
 end;
 

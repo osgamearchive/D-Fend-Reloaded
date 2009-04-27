@@ -16,6 +16,7 @@
 <h1>Versionsgeschichte</h1>
 
 <p class="small">
+  <a href="#ver070">Version 0.7.0 (28.04.2009)</a><br />
   <a href="#ver061">Version 0.6.1 (31.10.2008)</a><br />
   <a href="#ver060">Version 0.6.0 (20.10.2008)</a><br />
   <a href="#ver050">Version 0.5.0 (22.08.2008)</a><br />
@@ -33,6 +34,65 @@
 <p>
 Die einzelnen Eintr&auml;ge zur Versionsgeschichte liegen leider nur auf englisch vor.
 </p>
+
+<a onclick="Work('ver070')" name="ver070" href="#"><h2>&raquo; Version 0.7.0 (28.04.2009)</h2></a>
+<div id="ver070">
+<ul>
+  <li>Dutch language file (thanks to Tim Molderez)</li>
+  <li>Italian language file (thanks to Filippo Bartoli)</li>
+  <li>Archive files not created by D-Fend Reloaded can now also be imported. (D-Fend Reloaded will try to auto detect and setup the game.)</li>
+  <li>Now the games folder can be scaned for new games (which will be added automatically then).</li>
+  <li>Support for external archiving programs lets D-Fend Reloaded handle other archive formats than zip and 7z.</li>
+  <li>New toolbar icons.</li>
+  <li>Many new options for automatically and manual selection of the right physical CD drive to mount on DOSBox start (for example mount drive by file or folder on CD or ask the user to select a drive).</li>
+  <li>Option to run some other program (for example a hardware setup tool) before and after the main program (DOSBox or ScummVM).</li>
+  <li>The genre and language names in game profiles can now be translated on the fly so profiles created via auto setup templates etc. will always be shown with translated names for the genre and the language of the game.</li>
+  <li>Integration in the Vista Game Explorer.</li>
+  <li>Again some improvements to the long to (DOSBox) short file name converter (thank you to skatz).</li>
+  <li>A new custom settings edit field in the profile editor for ScummVM profiles allows to add any custom configuration settings to the ScummVM ini file when starting a ScummVM profile.</li>
+  <li>Added new functions in ScummVM profile editor: Option to disable joystick support, option to setup an extra path, option to setup render mode, option to setup game platform and option to define custom languages for games (and to setup the default languages list for the games in the setup dialog).</li>
+  <li>Option to setup data folder automatically for new profiles in wizard.</li>
+  <li>Many new functions in the multiple profiles editor.</li>
+  <li>The program file icon of the Windows program file will be used as the default icon on Windows game profiles.</li>
+  <li>The sound previewer and the quick starter now also can playback MIDI files.</li>
+  <li>Now the D-Fend Reloaded main window can (optionally) be restored when ScummVM closes.</li>
+  <li>The D-Fend Reloaded main window can be minimized before a Windows game profile is started and restored when the program quits (both optional).</li>
+  <li>You can define a default keyboard layout and a default codepage per DOSBox installation now.</li>
+  <li>On the first page of the of the wizard now you can choose how many things the wizard should ask you. (In the default configuration the wizard will be much easier to handle if there is a auto setup template for the game.)</li>
+  <li>Now you can add user defined game information as columns to the games list.</li>
+  <li>Auto setup templates from existing profiles can now also be created via the export menu.</li>
+  <li>Now also images from the games data folder can be used in screenshot mode in the games list.</li>
+  <li>The column widths in the games list can be restored to the last state on program start now.</li>
+  <li>The history dialog has been extended with some statistic functions.</li>
+  <li>If the translation of a long path name to a short DOSBox name fails, the program will show a warning message now.</li>
+  <li>Support for the DOSBox CVS build features "securemode", "pixelshader", "cpumode" and the new CD drive accessing modes "ioctl_dx", "ioctl_dio" and "ioctl_mci".</li>
+  <li>Now you can also define submenus in the "Old games" custom menu.</li>
+  <li>The link lists for "Search for game" and "Old games" in the help menu can be imported and exported now.</li>
+  <li>Updated DOSZip from 1.28 to 1.31.</li>
+  <li>Moved most program files to a "Bin" subfolder of the installation directory and moved all configuration files to a "Settings" subfolder of the installation data directory. (This will make the usage of portable installations easier because less files in the main program main directory will make finding the DFend.exe faster.)</li>
+  <li>Now also icons inside program dialogs can be replaced via the Icons.ini file.</li>
+  <li>"Open program folder" now also available for ScummVM and Windows games.</li>
+  <li>[Fix] Starting games via DOSBox failed if the game file uses a long filename and the DOSBox drive was mounted via a relative path name.</li>
+  <li>[Fix] Creation of zip archives could fail if the profile uses a drive image which is located inside the (already included) games folder.</li>
+  <li>[Fix] Creation of installer packages or zip packages will result in to big files if the game to pack uses iso images or zipped drives.</li>
+  <li>[Fix] The selected ScummVM save path was assigned to ScummVM correctly.</li>
+  <li>[Fix] Seleting "French (Canada)" as language results in an English program language.</li>
+  <li>[Fix] When using the option "File path is relative to the DOSBox directory structure" D-Fend Reloaded shows an error message when closing the profile editor and when starting the profile (but then starts the profile correctly).</li>
+  <li>[Fix] Access violation when trying to show the "No file name" warning when adding a Windows game profile and not entering a file name to start.</li>
+  <li>[Fix] If a prof file with the same name already exists in the destination path while transfering profiles the profile file was not copied to the destination correctly. (The algorithm for finding an alternative file name changed the profile filename in a wrong way.)</li>
+  <li>[Fix] The ScummVM games list stored in the ScummVM.dat file was not always read correctly on program start up.</li>
+  <li>[Fix] When using the restore window size on start up function sometings the menu bar gets invisible.</li>
+  <li>[Fix] Uninstaller is not removing uninstall entry from Windows software list.</li>
+  <li>[Fix] In some long to short path name related error messages wrong information have been displayed.</li>
+  <li>[Fix] The option "Close DOSBox when program closes" is not working on running extra program files via the context menu.</li>
+  <li>[Fix] Warning message when running ScummVM based games from zip files via a D-Fend Reloaded desktop shortcut.</li>
+  <li>[Fix] Error message when loading toolbar images not in bmp format via the Icons.ini file.</li>
+  <li>[Fix] Transparency not working in user defined toolbar images.</li>
+  <li>[Fix] Reduced number of colors in screenshot preview for new screenshots after returning from fullscreen DOSBox.</li>
+  <li>[Fix] Reduced number of colors in some png screenshots in the preview area in the main window.</li>
+  <li>[Fix] Spelling bug in installer package nsi script.</li>
+  <li>[Fix] On smaller screen resolutions the D-Fend Reloaded program window could be a bit to high. (The taskbar has not been subtracted from the available desktop height.)</li>
+</ul>
 
 <a onclick="Work('ver061')" name="ver061" href="#"><h2>&raquo; Version 0.6.1 (31.10.2008)</h2></a>
 <div id="ver061">

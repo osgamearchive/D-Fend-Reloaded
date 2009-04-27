@@ -47,6 +47,10 @@ Type TConfOpt=class(TBasePrgSetup)
     property ScummVMMusicDriver : String index 35 read GetString write SetString;
     property VGAChipsets : String index 36 read GetString write SetString;
     property VGAVideoRAM : String index 37 read GetString write SetString;
+    property ScummVMRenderMode : String index 38 read GetString write SetString;
+    property ScummVMPlatform : String index 39 read GetString write SetString;
+    property ScummVMLanguages : String index 40 read GetString write SetString;
+    property CPUType : String index 41 read GetString write SetString;
 end;
 
 const NR_Name=1;
@@ -106,27 +110,29 @@ const NR_Name=1;
       NR_Cycles=406;
       NR_CyclesUp=407;
       NR_CyclesDown=408;
-      NR_FrameSkip=409;
-      NR_VideoCard=410;
-      NR_KeyboardLayout=411;
-      NR_Codepage=412;
-      NR_Serial1=413;
-      NR_Serial2=414;
-      NR_Serial3=415;
-      NR_Serial4=416;
-      NR_IPX=417;
-      NR_IPXType=418;
-      NR_IPXAddress=419;
-      NR_IPXPort=420;
-      NR_Use4DOS=421;
-      NR_UseDOS32A=422;
-      NR_ReportedDOSVersion=423;
-      NR_NumLockStatus=424;
-      NR_CapsLockStatus=425;
-      NR_ScrollLockStatus=426;
-      NR_VGAChipset=427;
-      NR_VideoRam=428;
-      NR_GlideEmulation=429;
+      NR_CPUType=409;
+      NR_FrameSkip=410;
+      NR_VideoCard=411;
+      NR_KeyboardLayout=412;
+      NR_Codepage=413;
+      NR_Serial1=414;
+      NR_Serial2=415;
+      NR_Serial3=416;
+      NR_Serial4=417;
+      NR_IPX=418;
+      NR_IPXType=419;
+      NR_IPXAddress=420;
+      NR_IPXPort=421;
+      NR_Use4DOS=422;
+      NR_UseDOS32A=423;
+      NR_ReportedDOSVersion=424;
+      NR_NumLockStatus=425;
+      NR_CapsLockStatus=426;
+      NR_ScrollLockStatus=427;
+      NR_VGAChipset=428;
+      NR_VideoRam=429;
+      NR_GlideEmulation=430;
+      NR_PixelShader=431;
 
       NR_EnablePrinterEmulation=451;
       NR_PrinterResolution=452;
@@ -147,6 +153,7 @@ const NR_Name=1;
       NR_Mount8=510;
       NR_Mount9=511;
       NR_AutoMountCDs=512;
+      NR_SecureMode=513;
 
       NR_MixerNosound=601;
       NR_MixerRate=602;
@@ -212,32 +219,34 @@ const NR_Name=1;
       NR_ScummVMPath=1402;
       NR_ScummVMZip=1403;
       NR_ScummVMFilter=1404;
-      NR_ScummVMAutosave=1405;
-      NR_ScummVMLanguage=1406;
-      NR_ScummVMMusicVolume=1407;
-      NR_ScummVMSpeechVolume=1408;
-      NR_ScummVMSFXVolume=1409;
-      NR_ScummVMMIDIGain=1410;
-      NR_ScummVMSampleRate=1411;
-      NR_ScummVMMusicDriver=1412;
-      NR_ScummVMNativeMT32=1413;
-      NR_ScummVMEnableGS=1414;
-      NR_ScummVMMultiMIDI=1415;
-      NR_ScummVMTalkSpeed=1416;
-      NR_ScummVMSpeechMute=1417;
-      NR_ScummVMSubtitles=1418;
-      NR_ScummVMSavePath=1419;
-
-      NR_ScummVMConfirmExit=1419;
-      NR_ScummVMCDROM=1420;
-      NR_ScummVMJoystickNum=1421;
-      NR_ScummVMAltIntro=1422;
-      NR_ScummVMGFXDetails=1423;
-      NR_ScummVMMusicMute=1424;
-      NR_ScummVMObjectLabels=1425;
-      NR_ScummVMReverseStereo=1426;
-      NR_ScummVMSFXMute=1427;
-      NR_ScummVMWalkspeed=1428;
+      NR_ScummVMRenderMode=1405;
+      NR_ScummVMAutosave=1406;
+      NR_ScummVMLanguage=1407;
+      NR_ScummVMMusicVolume=1408;
+      NR_ScummVMSpeechVolume=1409;
+      NR_ScummVMSFXVolume=1410;
+      NR_ScummVMMIDIGain=1411;
+      NR_ScummVMSampleRate=1412;
+      NR_ScummVMMusicDriver=1413;
+      NR_ScummVMNativeMT32=1414;
+      NR_ScummVMEnableGS=1415;
+      NR_ScummVMMultiMIDI=1416;
+      NR_ScummVMTalkSpeed=1417;
+      NR_ScummVMSpeechMute=1418;
+      NR_ScummVMSubtitles=1419;
+      NR_ScummVMSavePath=1420;
+      NR_ScummVMConfirmExit=1421;
+      NR_ScummVMCDROM=1422;
+      NR_ScummVMJoystickNum=1423;
+      NR_ScummVMAltIntro=1424;
+      NR_ScummVMGFXDetails=1425;
+      NR_ScummVMMusicMute=1426;
+      NR_ScummVMObjectLabels=1427;
+      NR_ScummVMReverseStereo=1428;
+      NR_ScummVMSFXMute=1429;
+      NR_ScummVMWalkspeed=1430;
+      NR_ScummVMExtraPath=1431;
+      NR_ScummVMPlatform=1432;
 
       NR_CommandBeforeExecution=1450;
       NR_CommandAfterExecution=1451;
@@ -246,13 +255,14 @@ const NR_Name=1;
       NR_CommandAfterExecutionMinimized=1454;
 
 
-const ScummVMSettings : Array[0..28] of Integer =(
-  NR_ScummVMGame, NR_ScummVMPath, NR_ScummVMZip, NR_ScummVMFilter, NR_ScummVMAutosave,
+const ScummVMSettings : Array[0..31] of Integer =(
+  NR_ScummVMGame, NR_ScummVMPath, NR_ScummVMZip, NR_ScummVMFilter, NR_ScummVMRenderMode, NR_ScummVMAutosave,
   NR_ScummVMLanguage, NR_ScummVMMusicVolume, NR_ScummVMSpeechVolume, NR_ScummVMSFXVolume, NR_ScummVMMIDIGain,
   NR_ScummVMSampleRate, NR_ScummVMMusicDriver, NR_ScummVMNativeMT32, NR_ScummVMEnableGS, NR_ScummVMMultiMIDI,
   NR_ScummVMTalkSpeed, NR_ScummVMSpeechMute, NR_ScummVMSubtitles, NR_ScummVMSavePath, NR_ScummVMConfirmExit,
   NR_ScummVMCDROM, NR_ScummVMJoystickNum, NR_ScummVMAltIntro, NR_ScummVMGFXDetails, NR_ScummVMMusicMute,
-  NR_ScummVMObjectLabels, NR_ScummVMReverseStereo, NR_ScummVMSFXMute, NR_ScummVMWalkspeed
+  NR_ScummVMObjectLabels, NR_ScummVMReverseStereo, NR_ScummVMSFXMute, NR_ScummVMWalkspeed, NR_ScummVMExtraPath,
+  NR_ScummVMPlatform
 );
 
 Type TGame=class(TBasePrgSetup)
@@ -338,6 +348,7 @@ Type TGame=class(TBasePrgSetup)
     property Cycles : String index NR_Cycles read GetString write SetString;
     property CyclesUp : Integer index NR_CyclesUp read GetInteger write SetInteger;
     property CyclesDown : Integer index NR_CyclesDown read GetInteger write SetInteger;
+    property CPUType : String index NR_CPUType read GetString write SetString;
     property FrameSkip : Integer index NR_FrameSkip read GetInteger write SetInteger;
     property VideoCard : String index NR_VideoCard read GetString write SetString;
     property KeyboardLayout : String index NR_KeyboardLayout read GetString write SetString;
@@ -359,6 +370,7 @@ Type TGame=class(TBasePrgSetup)
     property VGAChipset : String index NR_VGAChipset read GetString write SetString;
     property VideoRam : Integer index NR_VideoRam read GetInteger write SetInteger;
     property GlideEmulation : Boolean index NR_GlideEmulation read GetBoolean write SetBoolean;
+    property PixelShader : String index NR_PixelShader read GetString write SetString;
 
     property EnablePrinterEmulation : Boolean index NR_EnablePrinterEmulation read GetBoolean write SetBoolean;
     property PrinterResolution : Integer index NR_PrinterResolution read GetInteger write SetInteger;
@@ -379,6 +391,7 @@ Type TGame=class(TBasePrgSetup)
     property Mount8 : String index NR_Mount8 read GetString write SetString;
     property Mount9 : String index NR_Mount9 read GetString write SetString;
     property AutoMountCDs : Boolean index NR_AutoMountCDs read GetBoolean write SetBoolean;
+    property SecureMode : Boolean index NR_SecureMode read GetBoolean write SetBoolean;
     property Mount[I : Integer] : String read GetMount write SetMount;
 
     property MixerNosound : Boolean index NR_MixerNosound read GetBoolean write SetBoolean;
@@ -445,6 +458,7 @@ Type TGame=class(TBasePrgSetup)
     property ScummVMPath : String index NR_ScummVMPath read GetString write SetString;
     property ScummVMZip : String index NR_ScummVMZip read GetString write SetString;
     property ScummVMFilter : String index NR_ScummVMFilter read GetString write SetString;
+    property ScummVMRenderMode : String index NR_ScummVMRenderMode read GetString write SetString;
     property ScummVMAutosave : Integer index NR_ScummVMAutosave read GetInteger write SetInteger;
     property ScummVMLanguage : String index NR_ScummVMLanguage read GetString write SetString;
     property ScummVMMusicVolume : Integer index NR_ScummVMMusicVolume read GetInteger write SetInteger;
@@ -470,6 +484,8 @@ Type TGame=class(TBasePrgSetup)
     property ScummVMReverseStereo : Boolean index NR_ScummVMReverseStereo read GetBoolean write SetBoolean;
     property ScummVMSFXMute : Boolean index NR_ScummVMSFXMute read GetBoolean write SetBoolean;
     property ScummVMWalkspeed : Integer index NR_ScummVMWalkspeed read GetInteger write SetInteger;
+    property ScummVMExtraPath : String index NR_ScummVMExtraPath read GetString write SetString;
+    property ScummVMPlatform : String index NR_ScummVMPlatform read GetString write SetString;
 
     property CommandBeforeExecution : String index NR_CommandBeforeExecution read GetString write SetString;
     property CommandAfterExecution : String index NR_CommandAfterExecution read GetString write SetString;
@@ -487,7 +503,7 @@ Type TGameDB=class
     Procedure LoadList;
     Procedure GameChanged(Sender : TObject);
     Function LoadGameFromFile(const FileName : String) : Boolean;
-    Function MakePROFFileName(const AName, ADir : String) : String;
+    Function MakePROFFileName(const AName, ADir : String; const CheckExistingFiles : Boolean) : String;
     function GetGame(I: Integer): TGame;
     function GetCount: Integer;
     Procedure DeleteOldFiles;
@@ -506,12 +522,13 @@ Type TGameDB=class
     Function GetPublisherList(WithDefaultProfile : Boolean =True; const HideWindowsProfiles : Boolean = False) : TStringList;
     Function GetYearList(WithDefaultProfile : Boolean =True; const HideWindowsProfiles : Boolean = False) : TStringList;
     Function GetLanguageList(WithDefaultProfile : Boolean =True; const HideWindowsProfiles : Boolean = False) : TStringList;
+    Function GetWWWList(WithDefaultProfile : Boolean =True; const HideWindowsProfiles : Boolean = False) : TStringList;
     Function GetKeyValueList(const Key : String; WithDefaultProfile : Boolean =True) : TStringList;
     Function GetUserKeys : TStringList;
     Function GetSortedGamesList : TList;
     Procedure StoreAllValues;
     Procedure LoadCache;
-    Function ProfFileName(const AName : String) : String;
+    Function ProfFileName(const AName : String; const CheckExistingFiles : Boolean) : String;
     property Count : Integer read GetCount;
     property Game[I : Integer] : TGame read GetGame; default;
     property ConfOpt : TConfOpt read FConfOpt;
@@ -520,7 +537,7 @@ end;
 
 Var DefaultValueReaderGame : TGame = nil;
 
-Const DefaultValuesResolution='original,320x200,640x432,640x480,720x480,800x600,1024x768,1152x864,1280x720,1280x768,1280x960,1280x1024,1600x1200,1920x1080,1920x1200';
+Const DefaultValuesResolution='original,320x200,640x432,640x480,720x480,800x600,1024x768,1152x864,1280x720,1280x768,1280x960,1280x1024,1600x1200,1920x1080,1920x1200,0x0';
       DefaultValuesJoysticks='none,auto,2axis,4axis,fcs,ch';
       DefaultValuesScale='No Scaling (none),Nearest neighbor upscaling with factor 2 (normal2x),Nearest neighbor upscaling with factor 3 (normal3x),'+
                          'Advanced upscaling with factor 2 (advmame2x),Advanced upscaling with factor 3 (advmame3x),'+
@@ -575,6 +592,10 @@ Const DefaultValuesResolution='original,320x200,640x432,640x480,720x480,800x600,
                                       'FM-TOWNS YM2612 emulation (only usable in SCUMM FM-TOWNS games) (towns),Windows MIDI (windows)';
       DefaultValuesVGAChipsets='s3,et4000,et4000new,et3000,pvga1a,none';
       DefaultValuesVGAVideoRAM='512,1024,2048,4096,8192';
+      DefaultValuesScummVMRenderMode='default,CGA,EGA,Hercules green (hercGreen),Hercules amber (hercAmber),Amiga';
+      DefaultValuesScummVMPlatform='auto,2gs,3do,acorn,amiga,atari,c64,fmtowns,mac,nes,pc,pce,segacd,windows';
+      DefaultValuesScummVMLanguages='maniac:en-de-fr-it-es,zak:en-de-fr-it-es,dig_jp-zh-kr,comi:en-de-fr-it-pt-es-jp-zh-kr,sky:gb-en-de-fr-it-pt-es-se,sword1:en-de-fr-it-es-pt-cz,simon1:en-de-fr-it-es-hb-pl-ru,simon2:en-de-fr-it-es-hb-pl-ru';
+      DefaultValuesCPUType='auto,386,386_slow,486_slow,pentium_slow,386_prefetch';
 
 implementation
 
@@ -585,7 +606,7 @@ uses Windows, SysUtils, Dialogs, CommonTools, PrgConsts, PrgSetupUnit,
 
 constructor TConfOpt.Create;
 begin
-  inherited Create(PrgDataDir+ConfOptFile);
+  inherited Create(PrgDataDir+SettingsFolder+'\'+ConfOptFile);
 
   AddStringRec(0,'resolution','value',DefaultValuesResolution);
   AddStringRec(1,'joysticks','value',DefaultValuesJoysticks);
@@ -625,7 +646,10 @@ begin
   AddStringRec(35,'ScummVMMusicDriver','value',DefaultValuesScummVMMusicDriver);
   AddStringRec(36,'VGAChipsets','value',DefaultValuesVGAChipsets);
   AddStringRec(37,'VGAVideoRAM','value',DefaultValuesVGAVideoRAM);
-
+  AddStringRec(38,'ScummVMRenderMode','value',DefaultValuesScummVMRenderMode);
+  AddStringRec(39,'ScummVMPlatform','value',DefaultValuesScummVMPlatform);
+  AddStringRec(40,'ScummVMLanguages','value',DefaultValuesScummVMLanguages);
+  AddStringRec(41,'CPUType','value',DefaultValuesCPUType);
 end;
 
 destructor TConfOpt.Destroy;
@@ -675,7 +699,7 @@ begin
   AddStringRec(NR_SetupParameters,'Extra','SetupParameters','');
   AddBooleanRec(NR_LoadFix,'Extra','Loadhigh',False);
   AddIntegerRec(NR_LoadFixMemory,'Extra','LoadFixVal',64);
-  AddStringRec(NR_CaptureFolder,'dosbox','captures','.\'+CaptureSubDir+'\');
+  AddStringRec(NR_CaptureFolder,'dosbox','captures',IncludeTrailingPathDelimiter(PrgSetup.CaptureDir));
   AddStringRec(NR_ExtraDirs,'Extra','ExtraDirs','');
   AddStringRec(NR_ExtraFiles,'Extra','ExtraFiles','');
   AddStringRec(NR_LastModification,'Extra','LastModification','');
@@ -723,6 +747,7 @@ begin
   AddStringRec(NR_Cycles,'cpu','cycles','auto');
   AddIntegerRec(NR_CyclesUp,'cpu','cyclesup',500);
   AddIntegerRec(NR_CyclesDown,'cpu','cyclesdown',20);
+  AddStringRec(NR_CPUType,'cpu','type','auto');
   AddIntegerRec(NR_FrameSkip,'render','frameskip',0);
   AddStringRec(NR_VideoCard,'dosbox','machine','vga');
   AddStringRec(NR_KeyboardLayout,'dos','keyboardlayout','default');
@@ -744,6 +769,7 @@ begin
   AddStringRec(NR_VGAChipset,'vga','svgachipset','3s');
   AddIntegerRec(NR_VideoRam,'vga','videoram',2048);
   AddBooleanRec(NR_GlideEmulation,'glide','glide',False);
+  AddStringRec(NR_PixelShader,'vga','PixelShader','none');
 
   AddBooleanRec(NR_EnablePrinterEmulation,'printer','printer',False);
   AddIntegerRec(NR_PrinterResolution,'printer','dpi',360);
@@ -764,6 +790,7 @@ begin
   AddStringRec(NR_Mount8,'Extra','8','');
   AddStringRec(NR_Mount9,'Extra','9','');
   AddBooleanRec(NR_AutoMountCDs,'Extra','AutoMountCDs',False);
+  AddBooleanRec(NR_SecureMode,'Extra','SecureMode',True);
 
   AddBooleanRec(NR_MixerNosound,'mixer','nosound',false);
   AddIntegerRec(NR_MixerRate,'mixer','rate',22050);
@@ -828,8 +855,9 @@ begin
   AddStringRec(NR_ScummVMPath,'ScummVM','GamePath','');
   AddStringRec(NR_ScummVMZip,'ScummVM','GameZipFile','');
   AddStringRec(NR_ScummVMFilter,'ScummVM','Filter','2x');
+  AddStringRec(NR_ScummVMRenderMode,'ScummVM','RenderMode','');
   AddIntegerRec(NR_ScummVMAutosave,'ScummVM','AutosavePeriod',300);
-  AddStringRec(NR_ScummVMLanguage,'ScummVM','Language','en');
+  AddStringRec(NR_ScummVMLanguage,'ScummVM','Language','');
   AddIntegerRec(NR_ScummVMMusicVolume,'ScummVM','MusicVolume',192);
   AddIntegerRec(NR_ScummVMSpeechVolume,'ScummVM','SpeechVolume',192);
   AddIntegerRec(NR_ScummVMSFXVolume,'ScummVM','SFXVolume',192);
@@ -853,6 +881,8 @@ begin
   AddBooleanRec(NR_ScummVMReverseStereo,'ScummVM','ReverseStereo',False);
   AddBooleanRec(NR_ScummVMSFXMute,'ScummVM','SFXMute',False);
   AddIntegerRec(NR_ScummVMWalkspeed,'ScummVM','Walkspeed',2);
+  AddStringRec(NR_ScummVMExtraPath,'ScummVM','ExtraPath','');
+  AddStringRec(NR_ScummVMPlatform,'ScummVM','Platform','');
 
   AddStringRec(NR_CommandBeforeExecution,'ExtraCommands','BeforeExecution','');
   AddStringRec(NR_CommandAfterExecution,'ExtraCommands','AfterExecution','');
@@ -1037,7 +1067,7 @@ begin
   end;
 end;
 
-function TGameDB.MakePROFFileName(const AName, ADir: String): String;
+function TGameDB.MakePROFFileName(const AName, ADir: String; const CheckExistingFiles : Boolean): String;
 const AllowedChars='ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜabcdefghijklmnopqrstuvwxyzäöüß01234567890-_=.,;!() ';
 Var I : Integer;
 begin
@@ -1045,7 +1075,7 @@ begin
   For I:=1 to length(AName) do if Pos(AName[I],AllowedChars)>0 then result:=result+AName[I];
   if result='' then result:='Game';
 
-  if FileExists(ADir+result+'.prof') then begin
+  if FileExists(ADir+result+'.prof') and CheckExistingFiles then begin
     I:=0;
     repeat inc(I) until not FileExists(ADir+result+IntToStr(I)+'.prof');
     result:=ADir+result+IntToStr(I)+'.prof';
@@ -1054,7 +1084,7 @@ begin
   end;
 end;
 
-Function TGameDB.ProfFileName(const AName : String) : String;
+Function TGameDB.ProfFileName(const AName : String; const CheckExistingFiles : Boolean) : String;
 Var S : String;
 begin
   S:=Trim(ExtUpperCase(AName));
@@ -1063,13 +1093,13 @@ begin
   end else begin
     S:=AName;
   end;
-  result:=MakePROFFileName(Trim(S),FDir);
+  result:=MakePROFFileName(Trim(S),FDir,CheckExistingFiles);
 end;
 
 function TGameDB.Add(const AName: String): Integer;
 Var Game : TGame;
 begin
-  Game:=TGame.Create(MakePROFFileName(AName,FDir));
+  Game:=TGame.Create(MakePROFFileName(AName,FDir,True));
   Game.Name:=AName;
   Game.OnChanged:=GameChanged;
   result:=FGameList.Add(Game);
@@ -1248,6 +1278,30 @@ begin
       If StUpper.IndexOf(S)<0 then begin
         StUpper.Add(S);
         S:=TGame(FGameList[I]).CacheLanguage; If Trim(S)='' then S:=LanguageSetup.NotSet;
+        result.Add(S);
+      end;
+    end;
+  finally
+    StUpper.Free;
+  end;
+  result.Sort;
+end;
+
+Function TGameDB.GetWWWList(WithDefaultProfile : Boolean =True; const HideWindowsProfiles : Boolean = False) : TStringList;
+Var StUpper : TStringList;
+    I : Integer;
+    S : String;
+begin
+  result:=TStringList.Create;
+  StUpper:=TStringList.Create;
+  try
+    For I:=0 to FGameList.Count-1 do If WithDefaultProfile or (TGame(FGameList[I]).Name<>DosBoxDOSProfile) then begin
+      If HideWindowsProfiles and WindowsExeMode(TGame(FGameList[I])) then continue;
+      S:=ExtUpperCase(TGame(FGameList[I]).WWW);
+      If Trim(S)='' then continue;
+      If StUpper.IndexOf(S)<0 then begin
+        StUpper.Add(S);
+        S:=TGame(FGameList[I]).WWW;
         result.Add(S);
       end;
     end;

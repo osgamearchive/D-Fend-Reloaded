@@ -19,6 +19,7 @@ type
     CheckBox5: TCheckBox;
     CheckBox2: TCheckBox;
     HelpButton: TBitBtn;
+    BaseDirEdit: TLabeledEdit;
     procedure FormCreate(Sender: TObject);
     procedure HelpButtonClick(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -87,6 +88,9 @@ begin
 
   PrgDataDirEdit.EditLabel.Caption:=LanguageSetup.OperationModeDataDir;
   PrgDataDirEdit.Text:=PrgDataDir;
+
+  BaseDirEdit.EditLabel.Caption:=LanguageSetup.SetupFormBaseDir;
+  BaseDirEdit.Text:=PrgSetup.BaseDir;
 end;
 
 procedure TOperationModeInfoForm.HelpButtonClick(Sender: TObject);

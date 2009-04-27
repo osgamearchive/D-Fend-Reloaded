@@ -16,9 +16,11 @@ type
     { Public-Deklarationen }
     Function GetName : String;
     Procedure InitGUIAndLoadSetup(InitData : TInitData);
+    Procedure BeforeChangeLanguage;
     Procedure LoadLanguage;
     Procedure DOSBoxDirChanged;
     Procedure ShowFrame(const AdvencedMode : Boolean);
+    procedure HideFrame;
     Procedure RestoreDefaults;
     Procedure SaveSetup;
   end;
@@ -43,6 +45,10 @@ begin
   CompressRadioGroup.ItemIndex:=Max(0,Min(4,PrgSetup.CompressionLevel));
 end;
 
+procedure TSetupFrameCompression.BeforeChangeLanguage;
+begin
+end;
+
 procedure TSetupFrameCompression.LoadLanguage;
 begin
   CompressRadioGroup.Caption:=LanguageSetup.SetupFormCompressionInfo;
@@ -63,7 +69,10 @@ end;
 
 procedure TSetupFrameCompression.ShowFrame(const AdvencedMode: Boolean);
 begin
-  InfoLabel.Visible:=PrgSetup.ActivateIncompleteFeatures;
+end;
+
+procedure TSetupFrameCompression.HideFrame;
+begin
 end;
 
 procedure TSetupFrameCompression.RestoreDefaults;

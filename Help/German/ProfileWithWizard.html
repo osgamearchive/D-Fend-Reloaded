@@ -23,10 +23,12 @@ Men&uuml;: &nbsp; <b>Profil</b> | <b>Hinzuf&uuml;gen mit Assistent</b>
 <p>
 Mit Hilfe des Assistent des Assistenten k&ouml;nnen Sie auf sehr
 einfache Weise neue Profile in D-Fend Reloaded erstellen. Der
-Assistenten-Dialog besteht aus 5 Seiten:
+Assistenten-Dialog besteht aus fünf Seiten, von denen je nach dem,
+welche Informationen D-Fend Reloaded über das Spiel bereits vorliegen,
+zwei bis fünf angezeigt werden:
 </p>
 
-<h2>Seite 1: Name des neuen Profils</h2>
+<h2>Seite 1: Typ des neuen Profils</h2>
 
 <p>
 Auf der ersten Seite m&uuml;ssen Sie lediglich festlegen, ob es sich bei dem
@@ -37,6 +39,18 @@ oder aber um ein Profil f&uuml;r ein Windows-Spiel</b> handeln soll.
 zu Ihrer ScummVM-Installation angegeben haben.) Nahezu alle DOS-Spiele k&ouml;nnen
 in DOSBox ausgef&uuml;hrt werden; ScummVM kann hingegen nur f&uuml;r
 Scumm-Adventures verwendet werden.
+</p>
+
+<p>
+Zusätzlich können Sie einstellen, wie viele Fragen der Assistent Ihnen stellen soll.
+In der Standardeinstellung "<b>Spiel automatisch konfigurieren, wenn eine passende
+AutoSetup-Vorlage existiert</b>", wird der Assistent bereits nach den ersten zwei der fünf
+Seiten geschlossen, wenn das neue Spiel durch eine AutoSetup-Vorlage eindeutig
+identifiziert wurde und keine weiteren Benutzereinstellungen notwendig sind.
+Alternativ kann eingestellt werden, dass entweder immer alle fünf Seiten des Assistenten
+angezeigt werden sollen oder aber, dass der Assistent auch dann bereits nach der zweiten
+Seite geschlossen wird, wenn keine Informationen über das Spiel vorliegen. (In diesem
+Fall wird D-Fend Reloaded versuchen, das Spiel gemäß der Standardvorlage zu konfigurieren.)
 </p>
 
 <h2>Seite 2: Programmdateien (f&uuml;r neue DOSBox-Profile)</h2>
@@ -59,11 +73,14 @@ Dialogseite angebotenen Spieleordner kann auf der
 </p>
 
 <p>
-Wenn Sie auf <b>Zus&auml;tzliche Dateien konfigurieren</b> klicken, wird
+Wenn Sie auf <b>Zus&auml;tzliche Dateien manuell konfigurieren</b> klicken, wird
 der Dialog um ein Eingabefeld erweitert, &uuml;bder dass Sie einen Ordner
 f&uuml;r zus&auml;tzliche Spieledaten wie Handb&uuml;cher usw. konfigurieren
 k&ouml;nnen. Der Inhalt dieses Ordners wird sp&auml;ter unten im D-Fend Reloaded
 Hauptfenster angezeigt, wenn Sie das Profil in der Spieleliste anklicken.
+Alternativ können Sie auch die Option <b>Zusätzliche Datenordner automatisch festlegen</b>
+aktivieren. In diesem Fall legt D-Fend Reloaded automatisch basierend auf dem Namen
+des Profils einen Datenordner an.
 </p>
 
 <h2>Seite 2: Programmdateien (f&uuml;r neue ScummVM-Profile)</h2>
