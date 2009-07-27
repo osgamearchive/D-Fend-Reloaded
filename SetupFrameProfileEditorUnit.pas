@@ -79,7 +79,6 @@ end;
 
 procedure TSetupFrameProfileEditor.ShowFrame(const AdvencedMode: Boolean);
 begin
-  RenameProfFilesCheckBox.Visible:=PrgSetup.ActivateIncompleteFeatures;
 end;
 
 procedure TSetupFrameProfileEditor.HideFrame;

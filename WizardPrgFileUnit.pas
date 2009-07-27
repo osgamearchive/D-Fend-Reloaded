@@ -20,7 +20,6 @@ type
     BaseInfoLabel3: TLabel;
     BaseDataFolderButton: TSpeedButton;
     DataFolderButton: TSpeedButton;
-    OpenDialog: TOpenDialog;
     Bevel: TBevel;
     FolderInfoButton: TSpeedButton;
     DataFolderShowButton: TBitBtn;
@@ -40,7 +39,7 @@ type
 implementation
 
 uses ShellAPI, ShlObj, VistaToolsUnit, LanguageSetupUnit, CommonTools,
-     PrgSetupUnit, IconLoaderUnit;
+     PrgSetupUnit, IconLoaderUnit, GameDBToolsUnit;
 
 {$R *.dfm}
 
@@ -91,59 +90,11 @@ begin
     0 : ShellExecute(Handle,'explore',PChar(GamesFolderEdit.Text),nil,PChar(GamesFolderEdit.Text),SW_SHOW);
     1 : begin
           S:=MakeAbsPath(ProgramEdit.Text,PrgSetup.BaseDir);
-          OpenDialog.DefaultExt:='exe';
-          OpenDialog.Title:=LanguageSetup.ProfileEditorEXEDialog;
-          If (Trim(PrgSetup.QBasic)<>'') and FileExists(Trim(PrgSetup.QBasic))
-            then OpenDialog.Filter:=LanguageSetup.ProfileEditorEXEFilterWithBasic
-            else OpenDialog.Filter:=LanguageSetup.ProfileEditorEXEFilter;
-          If Trim(ProgramEdit.Text)='' then begin
-            If Trim(SetupEdit.Text)='' then begin
-              If GamesFolderEdit.Visible=False {=Windows Mode} then begin
-                OpenDialog.InitialDir:=GetSpecialFolder(Application.MainForm.Handle,CSIDL_PROGRAM_FILES);
-              end else begin
-                If PrgSetup.GameDir=''
-                  then OpenDialog.InitialDir:=PrgSetup.BaseDir
-                  else OpenDialog.InitialDir:=PrgSetup.GameDir;
-              end;
-            end else begin
-              OpenDialog.InitialDir:=ExtractFilePath(MakeAbsPath(SetupEdit.Text,PrgSetup.BaseDir));
-            end;
-          end else begin
-            OpenDialog.InitialDir:=ExtractFilePath(MakeAbsPath(ProgramEdit.Text,PrgSetup.BaseDir));
-          end;
-
-          if not OpenDialog.Execute then exit;
-          S:=MakeRelPath(OpenDialog.FileName,PrgSetup.BaseDir);
-          If S='' then exit;
-          ProgramEdit.Text:=S;
+          If SelectProgramFile(S,ProgramEdit.Text,SetupEdit.Text,GamesFolderEdit.Visible=False,self) then ProgramEdit.Text:=S;
         end;
     2 : begin
           S:=MakeAbsPath(SetupEdit.Text,PrgSetup.BaseDir);
-          OpenDialog.DefaultExt:='exe';
-          OpenDialog.Title:=LanguageSetup.ProfileEditorEXEDialog;
-          If (Trim(PrgSetup.QBasic)<>'') and FileExists(Trim(PrgSetup.QBasic))
-            then OpenDialog.Filter:=LanguageSetup.ProfileEditorEXEFilterWithBasic
-            else OpenDialog.Filter:=LanguageSetup.ProfileEditorEXEFilter;
-          If Trim(SetupEdit.Text)='' then begin
-            If Trim(ProgramEdit.Text)='' then begin
-              If GamesFolderEdit.Visible=False {=Windows Mode} then begin
-                OpenDialog.InitialDir:=GetSpecialFolder(Application.MainForm.Handle,CSIDL_PROGRAM_FILES);
-              end else begin
-                If PrgSetup.GameDir=''
-                  then OpenDialog.InitialDir:=PrgSetup.BaseDir
-                  else OpenDialog.InitialDir:=PrgSetup.GameDir;
-              end;
-            end else begin
-              OpenDialog.InitialDir:=ExtractFilePath(MakeAbsPath(ProgramEdit.Text,PrgSetup.BaseDir));
-            end;
-          end else begin
-            OpenDialog.InitialDir:=ExtractFilePath(MakeAbsPath(SetupEdit.Text,PrgSetup.BaseDir));
-          end;
-
-          if not OpenDialog.Execute then exit;
-          S:=MakeRelPath(OpenDialog.FileName,PrgSetup.BaseDir);
-          If S='' then exit;
-          SetupEdit.Text:=S;
+          If SelectProgramFile(S,SetupEdit.Text,ProgramEdit.Text,GamesFolderEdit.Visible=False,self) then SetupEdit.Text:=S;
         end;
     3 : ShellExecute(Handle,'explore',PChar(BaseDataFolderEdit.Text),nil,PChar(BaseDataFolderEdit.Text),SW_SHOW);
     4 : begin
@@ -164,17 +115,17 @@ begin
   Game.GameExe:=ProgramEdit.Text;
   Game.SetupExe:=SetupEdit.Text;
   If DataFolderButton.Visible then begin
-    Game.DataDir:=DataFolderEdit.Text;
+    Game.DataDir:=MakeRelPath(DataFolderEdit.Text,PrgSetup.BaseDir);
   end else begin
     If DataFolderAutomaticCheckBox.Checked then begin
       If PrgSetup.DataDir='' then T:=PrgSetup.BaseDir else T:=PrgSetup.DataDir;
       S:=IncludeTrailingPathDelimiter(T)+MakeFileSysOKFolderName(Game.Name)+'\';
       I:=0;
-      While DirectoryExists(MakeAbsPath(S,PrgSetup.BaseDir)) do begin
+      While (not PrgSetup.IgnoreDirectoryCollisions) and DirectoryExists(MakeAbsPath(S,PrgSetup.BaseDir)) do begin
         inc(I);
         S:=IncludeTrailingPathDelimiter(T)+MakeFileSysOKFolderName(Game.Name)+IntToStr(I)+'\';
       end;
-      Game.DataDir:=S;
+      Game.DataDir:=MakeRelPath(S,PrgSetup.BaseDir);
     end else begin
       Game.DataDir:='';
     end;

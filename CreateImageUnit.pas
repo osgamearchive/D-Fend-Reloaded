@@ -121,6 +121,9 @@ begin
   UserIconLoader.DialogImage(DI_SelectFile,HDFileButton);
   UserIconLoader.DialogImage(DI_ImageFloppy,ImageList,0);
   UserIconLoader.DialogImage(DI_ImageHD,ImageList,1);
+  UserIconLoader.DialogImage(DI_OK,OKButton);
+  UserIconLoader.DialogImage(DI_Cancel,CancelButton);
+  UserIconLoader.DialogImage(DI_Help,HelpButton);
 
   If DirectoryExists(IncludeTrailingPathDelimiter(MakeAbsPath(PrgSetup.PathToFREEDOS,PrgSetup.BaseDir))) then begin
     FloppyNeedFreeDOSLabel.Font.Color:=clGrayText;

@@ -156,7 +156,7 @@ begin
   UserIconLoader.DialogImage(DI_Video,ImageList,7);
   UserIconLoader.DialogImage(DI_InternetPage,ImageList,8);
   UserIconLoader.DialogImage(DI_Edit,ImageList,9);
-  UserIconLoader.DialogImage(DI_Clear,ImageList,10);
+  UserIconLoader.DialogImage(DI_Delete,ImageList,10);
 
   ToolBar.Font.Size:=PrgSetup.ToolbarFontSize;
 end;
@@ -171,7 +171,7 @@ begin
   If PrgSetup.DataDir='' then S:=PrgSetup.BaseDir else S:=PrgSetup.DataDir;
   T:=IncludeTrailingPathDelimiter(S)+MakeFileSysOKFolderName(Game.Name)+'\';
   I:=0;
-  While DirectoryExists(T) do begin
+  While (not PrgSetup.IgnoreDirectoryCollisions) and DirectoryExists(T) do begin
     inc(I); T:=IncludeTrailingPathDelimiter(S)+MakeFileSysOKFolderName(Game.Name)+IntToStr(I)+'\';
   end;
   result:=MakeRelPath(T,PrgSetup.BaseDir);
@@ -202,7 +202,7 @@ begin
     end;
   end;
   
-  {To fix problems with buttons no hiden the right way when setting game while Frame is invisible}
+  {To fix problems with buttons not hidden the right way when setting game while Frame is invisible}
   ToolBar.Visible:=True;
   Tree.Visible:=True;
   Splitter.Visible:=True;
@@ -287,7 +287,7 @@ end;
 
 procedure TViewFilesFrame.SetupDataDirButtonClick(Sender: TObject);
 begin
-  Game.DataDir:=GetNewDataFolderName;
+  Game.DataDir:=MakeRelPath(GetNewDataFolderName,PrgSetup.BaseDir);
   ForceDirectories(MakeAbsPath(Game.DataDir,PrgSetup.BaseDir));
   SetGame(Game);
 end;

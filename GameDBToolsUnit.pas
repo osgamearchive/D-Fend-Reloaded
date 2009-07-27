@@ -48,7 +48,7 @@ Function BuildDefaultDosProfile(const GameDB : TGameDB; const CopyFiles : Boolea
 Procedure BuildDefaultProfile;
 Procedure ReBuildTemplates;
 Function CopyFiles(Source, Dest : String; const OverwriteExistingFiles : Boolean) : Boolean;
-Procedure UpdateUserDataFolderAfterUpgrade;
+Procedure UpdateUserDataFolderAfterUpgrade(const GameDB : TGameDB);
 Procedure UpdateSettingsFilesLocation;
 
 { Extras }
@@ -81,6 +81,10 @@ Procedure ProfileEditorCloseCheck(const AGame : TGame; const NewGameExe, NewSetu
 Function RunCheck(const AGame : TGame; const RunSetup : Boolean; const RunExtraFile : Integer = -1) : Boolean;
 Procedure CreateCheckSumsForAllGames(const AGameDB : TGameDB);
 
+Type T5StringArray=Array[0..4] of String;
+Function GetAdditionalChecksumData(const AGame : TGame; Path : String; DataNeeded : Integer; var Files, Checksums : T5StringArray) : Integer;
+Procedure AddAdditionalChecksumDataToAutoSetupTemplate(const AGame : TGame);
+
 { Last modification date }
 
 Function GetLastModificationDate(const AGame : TGame) : String;
@@ -103,12 +107,16 @@ Function GetDOSBoxNr(const Game : TGame) : Integer;
 
 Procedure OpenConfigurationFile(const Game : TGame; const DeleteOnExit : TStringList);
 
+{ Program file selection }
+
+Function SelectProgramFile(var FileName : String; const HintFirstFile, HintSecondFile : String; const WindowsMode : Boolean; const Owner : TComponent) : Boolean;
+
 implementation
 
-uses Windows, SysUtils, Forms, Dialogs, Graphics, ShellAPI, Math, IniFiles,
-     PNGImage, JPEG, GIFImage, CommonTools, LanguageSetupUnit, PrgConsts,
+uses Windows, SysUtils, Forms, Dialogs, Graphics, ShellAPI, ShlObj, IniFiles,
+     Math, PNGImage, JPEG, GIFImage, CommonTools, LanguageSetupUnit, PrgConsts,
      PrgSetupUnit, ProfileEditorFormUnit, ModernProfileEditorFormUnit, HashCalc,
-     SmallWaitFormUnit, ChecksumFormUnit, ProgressFormUnit, ImageCacheUnit,
+     SmallWaitFormUnit, ChecksumFormUnit, WaitFormUnit, ImageCacheUnit,
      DosBoxUnit, ScummVMUnit, ImageStretch;
 
 Procedure AddTypeSelector(const ATreeView : TTreeView; const Name : String; const St : TStringList);
@@ -129,6 +137,27 @@ begin
     end
   finally
     St.Free;
+  end;
+end;
+
+Function RemoveDoubleEntrys(const St : TStringList) : TStringList; {return value = St}
+Var I : Integer;
+    Upper : TStringList;
+    S : String;
+begin
+  result:=St;
+
+  Upper:=TStringList.Create;
+  try
+    I:=0;
+    While I<St.Count do begin
+      If Trim(St[I])='' then begin St.Delete(I); continue; end;
+      S:=ExtUpperCase(St[I]);
+      If Upper.IndexOf(S)>=0 then begin St.Delete(I); continue; end;
+      Upper.Add(S); inc(I);
+    end;
+  finally
+    Upper.Free;
   end;
 end;
 
@@ -170,7 +199,7 @@ begin
       AddTypeSelector(ATreeView,LanguageSetup.GamePublisher,GameDB.GetPublisherList);
       AddTypeSelector(ATreeView,LanguageSetup.GameYear,GameDB.GetYearList);
       AddTypeSelector(ATreeView,LanguageSetup.GameLanguage,GetCustomLanguageName(GameDB.GetLanguageList));
-      UserGroups:=StringToStringList(PrgSetup.UserGroups);
+      UserGroups:=RemoveDoubleEntrys(StringToStringList(PrgSetup.UserGroups));
       try
         For I:=0 to UserGroups.Count-1 do
           AddTypeSelector(ATreeView,UserGroups[I],GameDB.GetKeyValueList(UserGroups[I]));
@@ -664,7 +693,7 @@ begin
   end;
 end;
 
-Procedure ScaleGraphicToImageList(const Graphic : TGraphic; const ImageList : TImageList);
+Procedure ScaleGraphicToImageList(const Graphic : TGraphic; const ImageList : TImageList; const UseFiltering : Boolean);
 Var B,B2 : TBitmap;
     D1,D2 : Double;
     W,H : Integer;
@@ -685,7 +714,7 @@ begin
       B.Width:=ImageList.Width; B.Height:=ImageList.Height;
       D1:=B2.Width/B2.Height; D2:=B.Width/B.Height;
       If D1>=D2 then begin W:=B.Width; H:=Round(W/D1); end else begin H:=B.Height; W:=Round(H*D1); end;
-      ScaleImage(B2,B,W,H);
+      ScaleImage(B2,B,W,H,UseFiltering);
       ImageList.Add(B,nil);
     finally
       If B2<>nil then B2.Free;
@@ -747,7 +776,7 @@ begin
 
   P:=PictureCache.GetPicture(T);
   result:=(P<>nil);
-  If result then ScaleGraphicToImageList(P.Graphic,ImageList2);
+  If result then ScaleGraphicToImageList(P.Graphic,ImageList2,True);
 end;
 
 Function UserInfoGetValue(const UserInfo, Key : String) : String;
@@ -800,12 +829,12 @@ begin
     If B then begin
       AListViewImageList.AddIcon(Icon);
       If ScreenshotViewMode then begin
-        ScaleGraphicToImageList(Icon,AListViewIconImageList);
+        ScaleGraphicToImageList(Icon,AListViewIconImageList,True);
       end else begin
         If Icon.Width>=AListViewIconImageList.Width then begin
           AListViewIconImageList.AddIcon(Icon);
         end else begin
-          ScaleGraphicToImageList(Icon,AListViewIconImageList);
+          ScaleGraphicToImageList(Icon,AListViewIconImageList,False);
         end;
       end;
     end;
@@ -912,6 +941,8 @@ Var I,J,K,Nr,ItemsUsed : Integer;
     EmType1,EmType2, EmType3 : String;
     Bitmap : TBitmap;
     VUserSt : TStringList;
+    W : TWinControl;
+    F : TForm;
     {$IFDEF LargeListTest}Ca : Cardinal;{$ENDIF}
 begin
   {$IFDEF LargeListTest}Ca:=GetTickCount;{$ENDIF}
@@ -922,7 +953,7 @@ begin
   Bitmap:=TBitmap.Create;
   try
     AImageList.GetBitmap(0,Bitmap);
-    ScaleGraphicToImageList(Bitmap,AListViewImageList);
+    ScaleGraphicToImageList(Bitmap,AListViewImageList,False);
   finally
     Bitmap.Free;
   end;
@@ -932,7 +963,7 @@ begin
     Bitmap:=TBitmap.Create;
     try
       AImageList.GetBitmap(0,Bitmap);
-      ScaleGraphicToImageList(Bitmap,AListViewIconImageList);
+      ScaleGraphicToImageList(Bitmap,AListViewIconImageList,False);
     finally
       Bitmap.Free;
     end;
@@ -940,7 +971,7 @@ begin
     Bitmap:=TBitmap.Create;
     try
       AImageList.GetBitmap(0,Bitmap);
-      ScaleGraphicToImageList(Bitmap,AListViewIconImageList);
+      ScaleGraphicToImageList(Bitmap,AListViewIconImageList,False);
     finally
       Bitmap.Free;
     end;
@@ -1049,16 +1080,31 @@ begin
         AListView.Items.BeginUpdate;
         try
           FirstDefaultTemplate:=True;
-          If ReverseOrder then begin
-            For I:=St.Count-1 downto 0 do begin
-              AddGameToList(AListView,ItemsUsed,AListViewImageList,AListViewIconImageList,AImageList,TGame(St.Objects[I]),ShowExtraInfo,O,V,VUserSt,T,ScreenshotViewMode,FirstDefaultTemplate);
-              If (TGame(St.Objects[I]).CacheName='') and (not TGame(St.Objects[I]).OwnINI) then FirstDefaultTemplate:=False;
+
+          F:=nil;
+          If St.Count>50 then begin
+            W:=AListView.Parent;
+            While (W<>nil) and (not (W is TForm)) do W:=W.Parent;
+            If W is TForm then F:=W as TForm;
+            If Assigned(F) then F.Enabled:=False;
+          end;
+
+          try
+            If ReverseOrder then begin
+              For I:=St.Count-1 downto 0 do begin
+                If (I mod 20=0) and Assigned(F) then Application.ProcessMessages;
+                AddGameToList(AListView,ItemsUsed,AListViewImageList,AListViewIconImageList,AImageList,TGame(St.Objects[I]),ShowExtraInfo,O,V,VUserSt,T,ScreenshotViewMode,FirstDefaultTemplate);
+                If (TGame(St.Objects[I]).CacheName='') and (not TGame(St.Objects[I]).OwnINI) then FirstDefaultTemplate:=False;
+              end;
+            end else begin
+              For I:=0 to St.Count-1 do begin
+                If (I mod 20=0) and Assigned(F) then Application.ProcessMessages;
+                AddGameToList(AListView,ItemsUsed,AListViewImageList,AListViewIconImageList,AImageList,TGame(St.Objects[I]),ShowExtraInfo,O,V,VUserSt,T,ScreenshotViewMode, not FirstDefaultTemplate);
+                If (TGame(St.Objects[I]).CacheName='') and (not TGame(St.Objects[I]).OwnINI) then FirstDefaultTemplate:=False;
+              end;
             end;
-          end else begin
-            For I:=0 to St.Count-1 do begin
-              AddGameToList(AListView,ItemsUsed,AListViewImageList,AListViewIconImageList,AImageList,TGame(St.Objects[I]),ShowExtraInfo,O,V,VUserSt,T,ScreenshotViewMode, not FirstDefaultTemplate);
-              If (TGame(St.Objects[I]).CacheName='') and (not TGame(St.Objects[I]).OwnINI) then FirstDefaultTemplate:=False;
-            end;
+          finally
+            If Assigned(F) then F.Enabled:=True;
           end;
         finally
           AListView.Items.EndUpdate;
@@ -1653,8 +1699,10 @@ begin
   result:=True;
 end;
 
-Procedure UpdateUserDataFolderAfterUpgrade;
+Procedure UpdateUserDataFolderAfterUpgrade(const GameDB : TGameDB);
 Var Source : String;
+    I : Integer;
+    DB : TGameDB;
 begin
   {Copy new and changed NewUserData files to DataDir}
   If PrgDataDir=PrgDir then exit;
@@ -1683,6 +1731,37 @@ begin
   {Update DozZip}
   Source:=PrgDir+NewUserDataSubDir+'\DOSZIP\';
   If DirectoryExists(Source) then CopyFiles(Source,IncludeTrailingPathDelimiter(PrgSetup.GameDir)+'DOSZIP\',True);
+
+  {Update video card default values}
+  GameDB.ConfOpt.Video:=DefaultValuesVideo;
+  GameDB.ConfOpt.StoreAllValues;
+
+  {Update templates and auto setup template: vga->svga_s3}
+  DB:=TGameDB.Create(PrgDataDir+TemplateSubDir);
+  try
+    For I:=0 to DB.Count-1 do If Trim(ExtUpperCase(DB[I].VideoCard))='VGA' then begin
+      DB[I].VideoCard:='vga_s3'; DB[I].StoreAllValues;
+    end;
+  finally
+    DB.Free;
+  end;
+  DB:=TGameDB.Create(PrgDataDir+AutoSetupSubDir);
+  try
+    For I:=0 to DB.Count-1 do If Trim(ExtUpperCase(DB[I].VideoCard))='VGA' then begin
+      DB[I].VideoCard:='vga_s3'; DB[I].StoreAllValues;
+    end;
+  finally
+    DB.Free;
+  end;
+
+  {Change year from 2007 to 2009 and "multilingual" to "Multilingual" in "DOSBox DOS" profile}
+  I:=GameDB.IndexOf(DosBoxDOSProfile);
+  If (I>0) and (GameDB[I].CacheYear='2007') then begin
+    GameDB[I].Year:='2009'; GameDB[I].StoreAllValues; GameDB[I].LoadCache;
+  end;
+  If (I>0) and (GameDB[I].CacheLanguage='multilingual') then begin
+    GameDB[I].Language:='Multilingual'; GameDB[I].StoreAllValues; GameDB[I].LoadCache;
+  end; 
 end;
 
 Procedure MoveDataFile(const FileName : String);
@@ -1792,15 +1871,15 @@ begin
   result.CloseDosBoxAfterGameExit:=False;
   result.Environment:='PATH[61]Z:\[13]';
   result.StartFullscreen:=False;
-  result.CaptureFolder:=IncludeTrailingPathDelimiter(PrgSetup.CaptureDir)+DosBoxDOSProfile;
+  result.CaptureFolder:=MakeRelPath(IncludeTrailingPathDelimiter(PrgSetup.CaptureDir)+DosBoxDOSProfile,PrgSetup.BaseDir);
   result.Genre:='Program';
   result.WWW:='http:/'+'/www.dosbox.com';
   result.Name:=DosBoxDOSProfile;
   result.Favorite:=True;
   result.Developer:='DOSBox Team';
   result.Publisher:='DOSBox Team';
-  result.Year:='2007';
-  result.Language:='multilingual';
+  result.Year:='2009';
+  result.Language:='Multilingual';
   result.UserInfo:='License=GPL[13]';
   result.Icon:='DOSBox.ico';
 
@@ -2526,10 +2605,8 @@ begin
     AGame.GUS:=StrToBool(INI.ReadString('gus','gus','true'));
     AGame.GUSRate:=Ini.ReadInteger('gus','gusrate',22050);
     AGame.GUSBase:=Ini.ReadInteger('gus','gusbase',240);
-    AGame.GUSIRQ1:=Ini.ReadInteger('gus','irg1',5);
-    AGame.GUSIRQ2:=Ini.ReadInteger('gus','irq2',5);
-    AGame.GUSDMA1:=Ini.ReadInteger('gus','dma1',3);
-    AGame.GUSDMA2:=Ini.ReadInteger('gus','dma2',3);
+    AGame.GUSIRQ:=Ini.ReadInteger('gus','irg1',5);
+    AGame.GUSDMA:=Ini.ReadInteger('gus','dma1',3);
     AGame.GUSUltraDir:=Ini.ReadString('gus','ultradir','C:\ULTRASND');
 
     AGame.MIDIType:=Ini.ReadString('midi','mpu401','intelligent');
@@ -2715,6 +2792,87 @@ begin
   end;
 end;
 
+Function GetAdditionalChecksumData(const AGame : TGame; Path : String; DataNeeded : Integer; var Files, Checksums : T5StringArray) : Integer;
+const GoodFileExt : Array[0..11] of String = ('EXE','COM','DAT','ICO','HLP','DRV','DLL','PAK','PIC','LFL','BIN','OVL');
+Var I,J : Integer;
+    Exe1,Exe2,S : String;
+    Rec : TSearchRec;
+    OK : Boolean;
+begin
+  result:=0;
+  Path:=IncludeTrailingPathDelimiter(Path);
+
+  If Trim(AGame.GameExe)<>'' then Exe1:=Trim(ExtUpperCase(ExtractFileName(MakeAbsPath(AGame.GameExe,PrgSetup.BaseDir)))) else Exe1:='';
+  If Trim(AGame.SetupExe)<>'' then Exe2:=Trim(ExtUpperCase(ExtractFileName(MakeAbsPath(AGame.SetupExe,PrgSetup.BaseDir)))) else Exe2:='';
+
+  I:=FindFirst(Path+'*.*',faAnyFile,Rec);
+  try
+    While (I=0) and (DataNeeded>0) do begin
+      If (Rec.Attr and faDirectory)=0 then begin
+        S:=ExtUpperCase(Rec.Name);
+        If (S<>Exe1) and (S<>Exe2) then begin
+          S:=ExtractFileExt(Rec.Name); If (S<>'') and (S[1]='.') then S:=Copy(S,2,MaxInt);
+          OK:=False;
+          For J:=Low(GoodFileExt) to High(GoodFileExt) do If GoodFileExt[J]=S then begin OK:=True; break; end;
+          If OK then begin
+            Files[result]:=Rec.Name;
+            Checksums[result]:=GetMD5Sum(Path+Rec.Name);
+            inc(result); dec(DataNeeded);
+          end;
+        end;
+      end;
+      I:=FindNext(Rec);
+    end;
+  finally
+    FindClose(Rec);
+  end;
+end;
+
+Procedure AddAdditionalChecksumDataToAutoSetupTemplate(const AGame : TGame);
+Var DataNeeded, DataAvailable,I : Integer;
+    Path : String;
+    Files, Checksums : T5StringArray;
+begin
+  If Trim(AGame.GameExe)='' then exit;
+
+  DataNeeded:=0;
+  If Trim(AGame.AddtionalChecksumFile1Checksum)='' then inc(DataNeeded);
+  If Trim(AGame.AddtionalChecksumFile2Checksum)='' then inc(DataNeeded);
+  If Trim(AGame.AddtionalChecksumFile3Checksum)='' then inc(DataNeeded);
+  If Trim(AGame.AddtionalChecksumFile4Checksum)='' then inc(DataNeeded);
+  If Trim(AGame.AddtionalChecksumFile5Checksum)='' then inc(DataNeeded);
+
+  Path:=IncludeTrailingPathDelimiter(ExtractFilePath(MakeAbsPath(AGame.GameExe,PrgSetup.BaseDir)));
+
+  DataAvailable:=GetAdditionalChecksumData(AGame,Path,DataNeeded,Files,Checksums);
+
+  I:=0;
+  If (Trim(AGame.AddtionalChecksumFile1Checksum)='') and (I<DataAvailable) then begin
+    AGame.AddtionalChecksumFile1:=Files[I];
+    AGame.AddtionalChecksumFile1Checksum:=Checksums[I];
+    inc(I);
+  end;
+  If (Trim(AGame.AddtionalChecksumFile2Checksum)='') and (I<DataAvailable) then begin
+    AGame.AddtionalChecksumFile2:=Files[I];
+    AGame.AddtionalChecksumFile2Checksum:=Checksums[I];
+    inc(I);
+  end;
+  If (Trim(AGame.AddtionalChecksumFile3Checksum)='') and (I<DataAvailable) then begin
+    AGame.AddtionalChecksumFile3:=Files[I];
+    AGame.AddtionalChecksumFile3Checksum:=Checksums[I];
+    inc(I);
+  end;
+  If (Trim(AGame.AddtionalChecksumFile4Checksum)='') and (I<DataAvailable) then begin
+    AGame.AddtionalChecksumFile4:=Files[I];
+    AGame.AddtionalChecksumFile4Checksum:=Checksums[I];
+    inc(I);
+  end;
+  If (Trim(AGame.AddtionalChecksumFile5Checksum)='') and (I<DataAvailable) then begin
+    AGame.AddtionalChecksumFile5:=Files[I];
+    AGame.AddtionalChecksumFile5Checksum:=Checksums[I];
+  end;
+end;
+
 Function GetLastModificationDate(const AGame : TGame) : String;
 Var I : Integer;
     S,T : String;
@@ -2876,7 +3034,7 @@ begin
   end else begin
     S:=TempDir+ChangeFileExt(ExtractFileName(Game.SetupFile),'.conf');
     T:='DOSBox';
-    St:=BuildConfFile(Game,False,False);
+    St:=BuildConfFile(Game,False,False,-1);
     If St=nil then exit;
   end;
     try
@@ -2892,6 +3050,67 @@ begin
     end;
   OpenFileInEditor(S);
   If DeleteOnExit.IndexOf(S)<0 then DeleteOnExit.Add(S);
+end;
+
+Function SelectProgramFile(var FileName : String; const HintFirstFile, HintSecondFile : String; const WindowsMode : Boolean; const Owner : TComponent) : Boolean;
+Var S,S1,S2,S3,T,U : String;
+    OpenDialog : TOpenDialog;
+    St,St2 : TStringList;
+    I,J : Integer;
+begin
+  result:=False;
+  OpenDialog:=TOpenDialog.Create(Owner);
+  try
+    OpenDialog.DefaultExt:='exe';
+    OpenDialog.Title:=LanguageSetup.ProfileEditorEXEDialog;
+    If (Trim(PrgSetup.QBasic)<>'') and FileExists(Trim(PrgSetup.QBasic)) and (not WindowsMode) then S:=LanguageSetup.ProfileEditorEXEFilterWithBasic else S:=LanguageSetup.ProfileEditorEXEFilter;
+
+    S1:=''; S2:=''; S3:='';
+    If not WindowsMode then begin
+      St:=TStringList.Create;
+      try
+        For I:=0 to Min(PrgSetup.UserInterpretersPrograms.Count,PrgSetup.UserInterpretersExtensions.Count)-1 do begin
+          St2:=ValueToList(PrgSetup.UserInterpretersExtensions[I]);
+          try
+            T:=''; U:='';
+            For J:=0 to St2.Count-1 do begin
+              If St.IndexOf(ExtUpperCase(St2[J]))<0 then begin
+                St2.Add(ExtUpperCase(St2[J]));
+                S1:=S1+', *.'+ExtLowerCase(St2[J]);
+                S2:=S2+';*.'+ExtLowerCase(St2[J]);
+              end;
+              If T='' then T:='*.'+ExtLowerCase(St2[J]) else T:=T+', *.'+ExtLowerCase(St2[J]);
+              If U='' then U:='*.'+ExtLowerCase(St2[J]) else U:=U+';*.'+ExtLowerCase(St2[J]);
+            end;
+            S3:=S3+'|'+ChangeFileExt(ExtractFileName(PrgSetup.UserInterpretersPrograms[I]),'')+' ('+T+')|'+U;
+          finally
+            St2.Free;
+          end;
+        end;
+      finally
+        St.Free;
+      end;
+    end;
+    OpenDialog.Filter:=Format(S,[S1,S2,S3]);
+
+    S:='';
+    If FileName<>'' then begin S:=ExtractFilePath(MakeAbsPath(FileName,PrgSetup.BaseDir)); end;
+    If (S='') and (Trim(HintFirstFile)<>'') then S:=ExtractFilePath(MakeAbsPath(HintFirstFile,PrgSetup.BaseDir));
+    If (S='') and (Trim(HintSecondFile)<>'') then S:=ExtractFilePath(MakeAbsPath(HintSecondFile,PrgSetup.BaseDir));
+    If (S='') and WindowsMode then S:=GetSpecialFolder(Application.MainForm.Handle,CSIDL_PROGRAM_FILES);
+    If S='' then S:=PrgSetup.GameDir;
+    If S='' then S:=PrgSetup.BaseDir;
+    OpenDialog.InitialDir:=S;
+
+    if not OpenDialog.Execute then exit;
+
+    S:=MakeRelPath(OpenDialog.FileName,PrgSetup.BaseDir);
+    If S='' then exit;
+    FileName:=S;
+    result:=True;
+  finally
+    OpenDialog.Free;
+  end;
 end;
 
 end.

@@ -36,7 +36,7 @@ object MiniRunForm: TMiniRunForm
     Kind = bkOK
   end
   object CancelButton: TBitBtn
-    Left = 120
+    Left = 111
     Top = 266
     Width = 97
     Height = 25

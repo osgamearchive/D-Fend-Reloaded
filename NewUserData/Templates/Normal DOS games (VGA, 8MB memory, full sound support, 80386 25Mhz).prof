@@ -110,7 +110,7 @@ joysticktype=none
 [dosbox]
 memsize=32
 captures=
-machine=vga
+machine=svga_s3
 
 [cpu]
 core=auto

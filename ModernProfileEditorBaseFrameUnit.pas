@@ -35,6 +35,8 @@ type
     GameZipEdit: TEdit;
     GameZipButton: TSpeedButton;
     GameZipLabel: TLabel;
+    InfoButton1: TSpeedButton;
+    InfoButton2: TSpeedButton;
     procedure IconButtonClick(Sender: TObject);
     procedure ExeSelectButtonClick(Sender: TObject);
     procedure ProfileNameEditChange(Sender: TObject);
@@ -44,6 +46,7 @@ type
     procedure SetupExeEditChange(Sender: TObject);
     procedure GameExeEditChange(Sender: TObject);
     procedure GameZipEditChange(Sender: TObject);
+    procedure GameRelPathButton(Sender: TObject);
   private
     { Private-Deklarationen }
     FOnProfileNameChange : TTextEvent;
@@ -120,6 +123,7 @@ begin
   GameExeEdit.EditLabel.Caption:=LanguageSetup.ProfileEditorGameEXE;
   GameExeButton.Hint:=LanguageSetup.ChooseFile;
   GameRelPathCheckBox.Caption:=LanguageSetup.ProfileEditorRelPath;
+  GameRelPathCheckBox.Hint:=LanguageSetup.ProfileEditorRelPathHint;
   GameParameterEdit.EditLabel.Caption:=LanguageSetup.ProfileEditorGameParameters;
   UserIconLoader.DialogImage(DI_SelectFile,GameExeButton);
 
@@ -127,6 +131,7 @@ begin
   SetupExeEdit.EditLabel.Caption:=LanguageSetup.ProfileEditorSetupEXE;
   SetupExeButton.Hint:=LanguageSetup.ChooseFile;
   SetupRelPathCheckBox.Caption:=LanguageSetup.ProfileEditorRelPath;
+  SetupRelPathCheckBox.Hint:=LanguageSetup.ProfileEditorRelPathHint;
   SetupParameterEdit.EditLabel.Caption:=LanguageSetup.ProfileEditorSetupParameters;
   InfoLabel.Caption:=LanguageSetup.ProfileEditorSetupInfo;
   ExtraExeFilesButton.Caption:=LanguageSetup.ProfileEditorExtraExeFiles;
@@ -147,6 +152,11 @@ begin
   ProfileScummVMGameName:=InitData.CurrentScummVMGameName;
   ProfileScummVMPath:=InitData.CurrentScummVMPath;
   ProfileDOSBoxInstallation:=InitData.CurrentDOSBoxInstallation;
+
+  InfoButton1.Font.Size:=InfoButton1.Font.Size-2;
+  InfoButton2.Font.Size:=InfoButton2.Font.Size-2;
+  InfoButton1.Caption:=LanguageSetup.ProfileEditorRelPathInfo;
+  InfoButton2.Caption:=LanguageSetup.ProfileEditorRelPathInfo;
 
   HelpContext:=ID_ProfileEditProfile;
 end;
@@ -259,6 +269,8 @@ begin
     If WindowsMode then begin
       GameRelPathCheckBox.Visible:=False;
       SetupRelPathCheckBox.Visible:=False;
+      InfoButton1.Visible:=False;
+      InfoButton2.Visible:=False;
     end else begin
       { DOSBox mode }
     end;
@@ -353,6 +365,11 @@ begin
   FOnProfileNameChange(Sender,ProfileName^,S+GameExeEdit.Text,ProfileSetup^,ProfileScummVMGameName^,ProfileScummVMPath^,ProfileDOSBoxInstallation^);
 end;
 
+procedure TModernProfileEditorBaseFrame.GameRelPathButton(Sender: TObject);
+begin
+  MessageDlg(LanguageSetup.ProfileEditorRelPathHint,mtInformation,[mbOK],0);
+end;
+
 procedure TModernProfileEditorBaseFrame.SetupExeEditChange(Sender: TObject);
 Var S : String;
 begin
@@ -410,42 +427,12 @@ Var S : String;
 begin
   Case (Sender as TSpeedButton).Tag of
     0 : begin
-          S:=MakeAbsPath(GameExeEdit.Text,PrgSetup.BaseDir);
-          OpenDialog.DefaultExt:='exe';
-          OpenDialog.Title:=LanguageSetup.ProfileEditorEXEDialog;
-          If (Trim(PrgSetup.QBasic)<>'') and FileExists(Trim(PrgSetup.QBasic)) and (not WindowsMode)
-            then OpenDialog.Filter:=LanguageSetup.ProfileEditorEXEFilterWithBasic
-            else OpenDialog.Filter:=LanguageSetup.ProfileEditorEXEFilter;
-          S:='';
-          If (S='') and (Trim(GameExeEdit.Text)<>'') then S:=ExtractFilePath(MakeAbsPath(GameExeEdit.Text,PrgSetup.BaseDir));
-          If (S='') and (Trim(SetupExeEdit.Text)<>'') then S:=ExtractFilePath(MakeAbsPath(SetupExeEdit.Text,PrgSetup.BaseDir));
-          If (S='') and WindowsMode then S:=GetSpecialFolder(Application.MainForm.Handle,CSIDL_PROGRAM_FILES);
-          If S='' then S:=PrgSetup.GameDir;
-          If S='' then S:=PrgSetup.BaseDir;
-          OpenDialog.InitialDir:=S;
-          if not OpenDialog.Execute then exit;
-          S:=MakeRelPath(OpenDialog.FileName,PrgSetup.BaseDir);
-          If S='' then exit;
-          GameExeEdit.Text:=S;
+          S:=GameExeEdit.Text;
+          if SelectProgramFile(S,GameExeEdit.Text,SetupExeEdit.Text,WindowsMode,self) then GameExeEdit.Text:=S;
         end;
     1 : begin
-          S:=MakeAbsPath(SetupExeEdit.Text,PrgSetup.BaseDir);
-          OpenDialog.DefaultExt:='exe';
-          OpenDialog.Title:=LanguageSetup.ProfileEditorEXEDialog;
-          If (Trim(PrgSetup.QBasic)<>'') and FileExists(Trim(PrgSetup.QBasic)) and (not WindowsMode)
-            then OpenDialog.Filter:=LanguageSetup.ProfileEditorEXEFilterWithBasic
-            else OpenDialog.Filter:=LanguageSetup.ProfileEditorEXEFilter;
-          S:='';
-          If (S='') and (Trim(SetupExeEdit.Text)<>'') then S:=ExtractFilePath(MakeAbsPath(SetupExeEdit.Text,PrgSetup.BaseDir));
-          If (S='') and (Trim(GameExeEdit.Text)<>'') then S:=ExtractFilePath(MakeAbsPath(GameExeEdit.Text,PrgSetup.BaseDir));
-          If (S='') and WindowsMode then S:=GetSpecialFolder(Application.MainForm.Handle,CSIDL_PROGRAM_FILES);
-          If S='' then S:=PrgSetup.GameDir;
-          If S='' then S:=PrgSetup.BaseDir;
-          OpenDialog.InitialDir:=S;
-          if not OpenDialog.Execute then exit;
-          S:=MakeRelPath(OpenDialog.FileName,PrgSetup.BaseDir);
-          If S='' then exit;
-          SetupExeEdit.Text:=S;
+          S:=SetupExeEdit.Text;
+          if SelectProgramFile(S,SetupExeEdit.Text,GameExeEdit.Text,WindowsMode,self) then SetupExeEdit.Text:=S;
         end;
     2 : begin
           If Trim(GameEdit.Text)='' then begin
@@ -474,21 +461,8 @@ begin
 end;
 
 procedure TModernProfileEditorBaseFrame.ExtraExeFilesButtonClick(Sender: TObject);
-Var S : String;
 begin
-  If Trim(SetupExeEdit.Text)='' then begin
-    If Trim(GameExeEdit.Text)='' then begin
-      If PrgSetup.GameDir=''
-        then S:=PrgSetup.BaseDir
-        else S:=PrgSetup.GameDir;
-    end else begin
-      S:=ExtractFilePath(MakeAbsPath(GameExeEdit.Text,PrgSetup.BaseDir));
-    end;
-  end else begin
-    S:=ExtractFilePath(MakeAbsPath(SetupExeEdit.Text,PrgSetup.BaseDir));
-  end;
-
-  ShowExtraExeEditDialog(self,ExtraExeFiles,S);
+  ShowExtraExeEditDialog(self,ExtraExeFiles,WindowsMode,GameExeEdit.Text,SetupExeEdit.Text);
 end;
 
 end.

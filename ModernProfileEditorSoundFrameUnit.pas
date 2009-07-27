@@ -78,6 +78,9 @@ begin
 
   ActivateDisneyCheckBox.Caption:=LanguageSetup.ProfileEditorSoundMiscEnableDisneySoundsSource;
 
+  AddDefaultValueHint(SampleRateComboBox);
+  AddDefaultValueHint(BlockSizeComboBox);
+
   HelpContext:=ID_ProfileEditSound;
 end;
 

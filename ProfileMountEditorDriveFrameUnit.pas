@@ -104,7 +104,7 @@ begin
   If (length(S)=3) and (Copy(S,2,2)=':\') then begin
     If MessageDlg(LanguageSetup.MessageRootDirMountWaring,mtWarning,[mbYes,mbNo],0)<>mrYes then exit;
   end;
-  result:=FolderEdit.Text+';Drive;'+FolderDriveLetterComboBox.Text+';False;;';
+  result:=MakeRelPath(FolderEdit.Text,PrgSetup.BaseDir)+';Drive;'+FolderDriveLetterComboBox.Text+';False;;';
   If FolderFreeSpaceTrackBar.Position<>105 then result:=result+IntToStr(FolderFreeSpaceTrackBar.Position);
 end;
 

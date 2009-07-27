@@ -60,6 +60,7 @@ begin
   UserIconLoader.DialogImage(DI_ImageHD,ImageList,1);
   UserIconLoader.DialogImage(DI_ZipFile,ImageList,2);
   UserIconLoader.DialogImage(DI_SelectFolder,ImageList,3);
+  UserIconLoader.DialogImage(DI_Close,CloseButton);
 
   SaveInfoBarNotify:=nil;
 end;

@@ -41,8 +41,10 @@ type
     Procedure InitSettings;
     procedure CheckBoxClick(Sender: TObject);
     procedure ComboBoxDropDown(Sender: TObject);
+    procedure ComboBoxChange(Sender: TObject);
     Procedure SelectFolderButtonClick(Sender: TObject);
     Procedure AddSetting(const ID : Integer; const Name : String; const Values : TStringList; const Editable : Boolean; const ValueWidth : Integer; const FreeValues : Boolean = False);
+    Procedure AddEditSetting(const ID : Integer; const Name, Default : String; const ValueWidth : Integer);
     Procedure AddYesNoSetting(const ID : Integer; const Name : String);
     Procedure AddSettingWithEdit(const ID : Integer; const Name : String; const Values : TStringList; const Editable : Boolean; const ValueWidth : Integer; const FreeValues : Boolean = False);
     Procedure AddSpinSetting(const ID : Integer; const Name : String; const MinVal, MaxVal : Integer; const ValueWidth : Integer; const DefaultVal : Integer =-1);
@@ -63,13 +65,13 @@ Function ShowEditMultipleProfilesDialog(const AOwner : TComponent; const AGameDB
 implementation
 
 uses Spin, Math, LanguageSetupUnit, VistaToolsUnit, CommonTools, GameDBToolsUnit,
-     PrgSetupUnit, HelpConsts;
+     PrgSetupUnit, HelpConsts, IconLoaderUnit;
 
 {$R *.dfm}
 
 { Tools }
 
-const CheckboxWidth=296;
+const CheckboxWidth=315;
       ValueWidth=105;
       EditWidth=200;
 
@@ -235,6 +237,10 @@ begin
   SelectNoneButton.Caption:=LanguageSetup.None;
   SelectGenreButton.Caption:=LanguageSetup.GameBy;
 
+  UserIconLoader.DialogImage(DI_OK,OKButton);
+  UserIconLoader.DialogImage(DI_Cancel,CancelButton);
+  UserIconLoader.DialogImage(DI_Help,HelpButton);
+
   BuildCheckList(ListBox,GameDB,False,False);
   BuildSelectPopupMenu(PopupMenu,GameDB,SelectButtonClick,False);
 
@@ -301,6 +307,7 @@ begin
       If (not Editable) and (Items.Count>0) then ItemIndex:=0 else ItemIndex:=-1;
       Enabled:=False;
       OnDropDown:=ComboBoxDropDown;
+      OnChange:=ComboBoxChange;
     end;
     NoFlicker(ComboBox);
     SetComboHint(ComboBox);
@@ -314,6 +321,49 @@ begin
   finally
     If FreeValues and Assigned(Values) then Values.Free;
   end;
+end;
+
+Procedure TEditMultipleProfilesForm.AddEditSetting(const ID : Integer; const Name, Default : String; const ValueWidth : Integer);
+Var CheckBox : TCheckBox;
+    Edit : TEdit;
+    I : Integer;
+begin
+  inc(LastY,6);
+
+  CheckBox:=TCheckBox.Create(self);
+  with CheckBox do begin
+    Parent:=ScrollBox;
+    Left:=10;
+    Top:=LastY+2;
+    Width:=CheckboxWidth;
+    Checked:=False;
+    OnClick:=CheckBoxClick;
+  end;
+  CheckBox.Caption:=Name;
+  NoFlicker(CheckBox);
+
+  Edit:=TEdit.Create(self);
+  with Edit do begin
+    Parent:=ScrollBox;
+    Left:=10+CheckboxWidth+2;
+    Top:=LastY;
+    If ValueWidth<0 then begin
+      Width:=ScrollBox.ClientWidth-4-Left;
+      Anchors:=[akLeft,akTop,akRight];
+    end else begin
+      Width:=ValueWidth;
+    end;
+    Text:=Default;
+    Enabled:=False;
+  end;
+  NoFlicker(Edit);
+
+  inc(LastY,Edit.Height);
+
+  I:=length(Settings); SetLength(Settings,I+1);
+  Settings[I].CheckBox:=CheckBox;
+  SetLength(Settings[I].Values,1); Settings[I].Values[0]:=Edit;
+  Settings[I].ID:=ID;
 end;
 
 Procedure TEditMultipleProfilesForm.AddYesNoSetting(const ID : Integer; const Name : String);
@@ -535,6 +585,11 @@ begin
   If Sender is TComboBox then SetComboDropDownDropDownWidth(Sender as TComboBox);
 end;
 
+procedure TEditMultipleProfilesForm.ComboBoxChange(Sender: TObject);
+begin
+  If Sender is TComboBox then SetComboHint(Sender as TComboBox);
+end;
+
 Procedure TEditMultipleProfilesForm.SelectFolderButtonClick(Sender: TObject);
 Var I,Nr : Integer;
     S : String;
@@ -563,6 +618,7 @@ end;
 
 procedure TEditMultipleProfilesForm.InitSettings;
 Var St : TStringList;
+    I : Integer;
 begin
   {Game info}
   AddCaption(LanguageSetup.ProfileEditorGameInfoSheet);
@@ -590,11 +646,20 @@ begin
     St.Add(LanguageSetup.GamePriorityHigher);
     St.Add(LanguageSetup.GamePriorityHighest);
     AddSetting(2001,LanguageSetup.GamePriorityForeground,St,False,ValueWidth);
+    St.Insert(0,LanguageSetup.GamePriorityPause);
     AddSetting(2002,LanguageSetup.GamePriorityBackground,St,False,ValueWidth);
   finally
     St.Free;
   end;
   AddYesNoSetting(2003,LanguageSetup.GameCloseDosBoxAfterGameExit);
+  St:=TStringList.Create;
+  try
+    For I:=0 to PrgSetup.DOSBoxSettingsCount-1 do St.Add(PrgSetup.DOSBoxSettings[I].Name);
+    AddSetting(2004,LanguageSetup.GameDOSBoxVersionDefault,St,False,ValueWidth);
+  finally
+    St.Free;
+  end;
+  AddEditSetting(2005,LanguageSetup.GameDOSBoxVersionCustom,'',-1);
 
   {CPU}
   AddCaption(LanguageSetup.ProfileEditorGeneralSheet+' - '+LanguageSetup.ProfileEditorCPUSheet);
@@ -621,6 +686,18 @@ begin
   AddSetting(5007,LanguageSetup.GameVideoCard,ValueToList(GameDB.ConfOpt.Video,';,'),False,ValueWidth,True);
   AddSetting(5008,LanguageSetup.GameScale,ValueToList(GameDB.ConfOpt.Scale,';,'),False,-1,True);
   AddSpinSetting(5009,LanguageSetup.GameFrameskip,0,10,ValueWidth);
+  If PrgSetup.AllowGlideSettings then begin
+    AddYesNoSetting(5101,LanguageSetup.GameGlideEmulation);
+  end;
+  {If PrgSetup.AllowPixelShader then begin
+  end;}
+  If PrgSetup.AllowVGAChipsetSettings then begin
+    AddSetting(5301,LanguageSetup.GameVGAChipset,ValueToList(GameDB.ConfOpt.VGAChipsets,';,'),False,ValueWidth,True);
+    AddSetting(5301,LanguageSetup.GameVideoRam,ValueToList(GameDB.ConfOpt.VGAVideoRAM,';,'),False,ValueWidth,True);
+  end;
+  If PrgSetup.AllowTextModeLineChange then begin
+    AddSetting(5401,LanguageSetup.GameTextModeLines,ValueToList('25;28;50',';,'),False,ValueWidth,True);
+  end;
 
   {Keyboard}
   AddCaption(LanguageSetup.ProfileEditorGeneralSheet+' - '+LanguageSetup.ProfileEditorKeyboardSheet);
@@ -672,6 +749,33 @@ begin
   AddSetting(8008,LanguageSetup.ProfileEditorSoundMiscTandyRate,ValueToList(GameDB.ConfOpt.TandyRate,';,'),False,ValueWidth,True);
   AddYesNoSetting(8009,LanguageSetup.ProfileEditorSoundMiscEnableDisneySoundsSource);
 
+  {SoundBlaster}
+  AddCaption(LanguageSetup.ProfileEditorGeneralSheet+' - '+LanguageSetup.ProfileEditorSoundSoundBlaster);
+  AddSetting(8101,LanguageSetup.ProfileEditorSoundSBType,ValueToList(GameDB.ConfOpt.Sblaster,';,'),False,ValueWidth,True);
+  AddSetting(8102,LanguageSetup.ProfileEditorSoundSBAddress,ValueToList(GameDB.ConfOpt.SBBase,';,'),False,ValueWidth,True);
+  AddSetting(8103,LanguageSetup.ProfileEditorSoundSBIRQ,ValueToList(GameDB.ConfOpt.IRQ,';,'),False,ValueWidth,True);
+  AddSetting(8104,LanguageSetup.ProfileEditorSoundSBDMA,ValueToList(GameDB.ConfOpt.DMA,';,'),False,ValueWidth,True);
+  AddSetting(8105,LanguageSetup.ProfileEditorSoundSBHDMA,ValueToList(GameDB.ConfOpt.HDMA,';,'),False,ValueWidth,True);
+  AddSetting(8106,LanguageSetup.ProfileEditorSoundSBOplMode,ValueToList(GameDB.ConfOpt.Oplmode,';,'),False,ValueWidth,True);
+  AddSetting(8107,LanguageSetup.GameOplemu,ValueToList(GameDB.ConfOpt.OPLEmu,';,'),False,ValueWidth,True);
+  AddSetting(8108,LanguageSetup.ProfileEditorSoundSBOplRate,ValueToList(GameDB.ConfOpt.OPLRate,';,'),False,ValueWidth,True);
+  AddYesNoSetting(8109,LanguageSetup.ProfileEditorSoundSBUseMixer);
+
+  {GUS}
+  AddCaption(LanguageSetup.ProfileEditorGeneralSheet+' - '+LanguageSetup.ProfileEditorSoundGUS);
+  AddYesNoSetting(8201,LanguageSetup.ProfileEditorSoundGUSEnabled);
+  AddSetting(8202,LanguageSetup.ProfileEditorSoundGUSAddress,ValueToList(GameDB.ConfOpt.GUSBase,';,'),False,ValueWidth,True);
+  AddSetting(8203,LanguageSetup.ProfileEditorSoundGUSRate,ValueToList(GameDB.ConfOpt.GUSRate,';,'),False,ValueWidth,True);
+  AddSetting(8204,LanguageSetup.ProfileEditorSoundGUSIRQ,ValueToList(GameDB.ConfOpt.GUSIRQ,';,'),False,ValueWidth,True);
+  AddSetting(8205,LanguageSetup.ProfileEditorSoundGUSDMA,ValueToList(GameDB.ConfOpt.GUSDma,';,'),False,ValueWidth,True);
+  AddEditSetting(8206,LanguageSetup.ProfileEditorSoundGUSPath,'C:\ULTRASND',-1);
+
+  {MIDI}
+  AddCaption(LanguageSetup.ProfileEditorGeneralSheet+' - '+LanguageSetup.ProfileEditorSoundMIDI);
+  AddSetting(8301,LanguageSetup.ProfileEditorSoundMIDIType,ValueToList(GameDB.ConfOpt.MPU401,';,'),False,ValueWidth,True);
+  AddSetting(8302,LanguageSetup.ProfileEditorSoundMIDIDevice,ValueToList(GameDB.ConfOpt.MIDIDevice,';,'),False,ValueWidth,True);
+  AddEditSetting(8303,LanguageSetup.ProfileEditorSoundMIDIConfigInfo,'',-1);
+
   {Joystick}
   AddCaption(LanguageSetup.ProfileEditorGeneralSheet+' - '+LanguageSetup.GameJoysticks);
   AddSetting(9001,LanguageSetup.ProfileEditorSoundJoystickType,ValueToList(GameDB.ConfOpt.Joysticks,';,'),False,ValueWidth,True);
@@ -683,6 +787,16 @@ begin
   {Mounting}
   AddCaption(LanguageSetup.ProfileEditorGeneralSheet+' - '+LanguageSetup.ProfileEditorMountingSheet);
   AddReplaceMountingSetting(10000,LanguageSetup.ChangeProfilesReplaceFolder,LanguageSetup.ChangeProfilesReplaceFolderFrom,LanguageSetup.ChangeProfilesReplaceFolderTo);
+  AddYesNoSetting(10001,LanguageSetup.ProfileEditorMountingAutoMountCDsShort);
+  AddYesNoSetting(10002,LanguageSetup.ProfileEditorMountingSecureModeShort);
+  St:=TStringList.Create;
+  try
+    St.Add(LanguageSetup.ChangeProfilesMountingChangeSettingsGlobal);
+    St.Add(LanguageSetup.ChangeProfilesMountingChangeSettingsLocal);
+    AddSetting(10003,LanguageSetup.ChangeProfilesMountingChangeSettings,St,False,-1);
+  finally
+    St.Free;
+  end;
 
   {DOS environment}
   AddCaption(LanguageSetup.ProfileEditorGeneralSheet+' - '+LanguageSetup.ProfileEditorDOSEnvironmentSheet);
@@ -718,6 +832,47 @@ begin
   AddYesNoSetting(14006,LanguageSetup.ProfileEditorScummVMSpeechMute);
 end;
 
+Procedure ChangeMountSetting(const G : TGame; const SetDefault : Boolean);
+Var I : Integer;
+    AllGamesDir,GameDir,S : String;
+    St : TStringList;
+begin
+  {Only process if normal start (not booting from image}
+  If Trim(G.AutoexecBootImage)<>'' then exit;
+
+  {Exit if mounting not used}
+  If G.AutoexecOverrideMount then exit;
+
+  AllGamesDir:=IncludeTrailingPathDelimiter(MakeAbsPath(PrgSetup.GameDir,PrgSetup.BaseDir));
+  If (Trim(G.GameExe)='') or (Copy(Trim(ExtUpperCase(G.GameExe)),1,7)='DOSBOX:') then GameDir:='' else GameDir:=IncludeTrailingPathDelimiter(MakeAbsPath(ExtractFilePath(G.GameExe),PrgSetup.BaseDir));
+
+  For I:=0 to 9 do begin
+    St:=ValueToList(G.Mount[I]);
+    try
+      {RealFolder;DRIVE;Letter;False;;FreeSpace}
+      If (St.Count<3) or (Trim(ExtUpperCase(St[1]))<>'DRIVE') or (Trim(ExtUpperCase(St[2]))<>'C')  then continue;
+      S:=IncludeTrailingPathDelimiter(MakeAbsPath(St[0],PrgSetup.BaseDir));
+      If SetDefault then begin
+        If Trim(ExtUpperCase(GameDir))=Trim(ExtUpperCase(S)) then begin
+          St[0]:=MakeRelPath(PrgSetup.GameDir,PrgSetup.BaseDir);
+          G.Mount[I]:=ListToValue(St);
+          G.StoreAllValues;
+          exit;
+        end;
+      end else begin
+        If (Trim(ExtUpperCase(AllGamesDir))=Trim(ExtUpperCase(S))) and (GameDir<>'') then begin
+          St[0]:=MakeRelPath(GameDir,PrgSetup.BaseDir);
+          G.Mount[I]:=ListToValue(St);
+          G.StoreAllValues;
+          exit;
+        end;
+      end;  
+    finally
+      St.Free;
+    end;
+  end;
+end;
+
 procedure TEditMultipleProfilesForm.OKButtonClick(Sender: TObject);
 Var I,J,Nr : Integer;
     G : TGame;
@@ -726,6 +881,7 @@ Var I,J,Nr : Integer;
     S : String;
 Function GetComboIndex : Integer; begin result:=TComboBox(Settings[Nr].Values[0]).ItemIndex; end;
 Function GetComboText : String; begin result:=TComboBox(Settings[Nr].Values[0]).Text; end;
+Function GetEditText : String; begin result:=TEdit(Settings[Nr].Values[0]).Text; end;
 Function GetYesNo : Boolean; begin result:=(TComboBox(Settings[Nr].Values[0]).ItemIndex=1); end;
 Function GetSpinValue : Integer; begin result:=TSpinEdit(Settings[Nr].Values[0]).Value; end;
 begin
@@ -757,6 +913,8 @@ begin
         try While St.Count<2 do St.Add(''); St[1]:=Priority[Max(0,Min(3,GetComboIndex))]; G.Priority:=ListToValue(St,','); finally St.Free; end;
       end;
       Nr:=ValueActive(2003); If Nr>=0 then G.CloseDosBoxAfterGameExit:=GetYesNo;
+      Nr:=ValueActive(2004); If Nr>=0 then G.CustomDOSBoxDir:=GetComboText;
+      Nr:=ValueActive(2005); If Nr>=0 then G.CustomDOSBoxDir:=GetEditText;
 
       {CPU}
       Nr:=ValueActive(3001); If Nr>=0 then G.Core:=GetComboText;
@@ -788,6 +946,18 @@ begin
         end;
       end;
       Nr:=ValueActive(5009); If Nr>=0 then G.FrameSkip:=Max(0,Min(10,GetSpinValue));
+      If PrgSetup.AllowGlideSettings then begin
+        Nr:=ValueActive(5101); If Nr>=0 then G.GlideEmulation:=GetYesNo;
+      end;
+      {If PrgSetup.AllowPixelShader then begin
+      end;}
+      If PrgSetup.AllowVGAChipsetSettings then begin
+        Nr:=ValueActive(5301); If Nr>=0 then G.VGAChipset:=GetComboText;
+        Nr:=ValueActive(5302); If Nr>=0 then begin try J:=StrToInt(GetComboText); except J:=512; end; G.VideoRam:=J; end;
+      end;
+      If PrgSetup.AllowTextModeLineChange then begin
+        Nr:=ValueActive(5401); If Nr>=0 then begin try J:=StrToInt(GetComboText); except J:=25; end; G.TextModeLines:=J; end;
+      end;
 
       {Keyboard}
       Nr:=ValueActive(6001); If Nr>=0 then G.UseScanCodes:=GetYesNo;
@@ -818,28 +988,42 @@ begin
       {Sound}
       Nr:=ValueActive(8001); If Nr>=0 then G.MixerNosound:=not GetYesNo;
 
-      Nr:=ValueActive(8002); If Nr>=0 then begin
-        try J:=Min(65536,Max(1,StrToInt(GetComboText))); except J:=22050; end; G.MixerRate:=J;
-      end;
-      Nr:=ValueActive(8003); If Nr>=0 then begin
-        try J:=Min(65536,Max(1,StrToInt(GetComboText))); except J:=2048; end; G.MixerBlocksize:=J;
-      end;
-      Nr:=ValueActive(8004); If Nr>=0 then begin
-        try J:=Min(65536,Max(1,StrToInt(GetComboText))); except J:=10; end; G.MixerPrebuffer:=J;
-      end;
+      Nr:=ValueActive(8002); If Nr>=0 then begin try J:=Min(65536,Max(1,StrToInt(GetComboText))); except J:=22050; end; G.MixerRate:=J; end;
+      Nr:=ValueActive(8003); If Nr>=0 then begin try J:=Min(65536,Max(1,StrToInt(GetComboText))); except J:=2048; end; G.MixerBlocksize:=J; end;
+      Nr:=ValueActive(8004); If Nr>=0 then begin try J:=Min(65536,Max(1,StrToInt(GetComboText))); except J:=10; end; G.MixerPrebuffer:=J; end;
       Nr:=ValueActive(8005); If Nr>=0 then G.SpeakerPC:=GetYesNo;
-      Nr:=ValueActive(8006); If Nr>=0 then begin
-        try J:=Min(65536,Max(1,StrToInt(GetComboText))); except J:=10; end; G.SpeakerRate:=J;
-      end;
+      Nr:=ValueActive(8006); If Nr>=0 then begin try J:=Min(65536,Max(1,StrToInt(GetComboText))); except J:=10; end; G.SpeakerRate:=J; end;
       Nr:=ValueActive(8007); If Nr>=0 then Case GetComboIndex of
         0 : G.SpeakerTandy:='auto';
         1 : G.SpeakerTandy:='on';
         2 : G.SpeakerTandy:='off';
       end;
-      Nr:=ValueActive(8006); If Nr>=0 then begin
-        try J:=Min(65536,Max(1,StrToInt(GetComboText))); except J:=10; end; G.SpeakerTandyRate:=J;
-      end;
+      Nr:=ValueActive(8006); If Nr>=0 then begin try J:=Min(65536,Max(1,StrToInt(GetComboText))); except J:=10; end; G.SpeakerTandyRate:=J; end;
       Nr:=ValueActive(8009); If Nr>=0 then G.SpeakerDisney:=GetYesNo;
+
+      {SoundBlaster}
+      Nr:=ValueActive(8101); If Nr>=0 then G.SBType:=GetComboText;
+      Nr:=ValueActive(8102); If Nr>=0 then begin try J:=StrToInt(GetComboText); except J:=220; end; G.SBBase:=J; end;
+      Nr:=ValueActive(8103); If Nr>=0 then begin try J:=StrToInt(GetComboText); except J:=7; end; G.SBIRQ:=J; end;
+      Nr:=ValueActive(8104); If Nr>=0 then begin try J:=StrToInt(GetComboText); except J:=1; end; G.SBDMA:=J; end;
+      Nr:=ValueActive(8105); If Nr>=0 then begin try J:=StrToInt(GetComboText); except J:=5; end; G.SBHDMA:=J; end;
+      Nr:=ValueActive(8106); If Nr>=0 then G.SBOplMode:=GetComboText;
+      Nr:=ValueActive(8107); If Nr>=0 then G.SBOplEmu:=GetComboText;
+      Nr:=ValueActive(8108); If Nr>=0 then begin try J:=StrToInt(GetComboText); except J:=22050; end; G.SBOplRate:=J; end;
+      Nr:=ValueActive(8109); If Nr>=0 then G.SBMixer:=GetYesNo;
+
+      {GUS}
+      Nr:=ValueActive(8201); If Nr>=0 then G.GUS:=GetYesNo;
+      Nr:=ValueActive(8202); If Nr>=0 then begin try J:=StrToInt(GetComboText); except J:=240; end; G.GUSBase:=J; end;
+      Nr:=ValueActive(8203); If Nr>=0 then begin try J:=StrToInt(GetComboText); except J:=22050; end; G.GUSRate:=J; end;
+      Nr:=ValueActive(8204); If Nr>=0 then begin try J:=StrToInt(GetComboText); except J:=5; end; G.GUSIRQ:=J; end;
+      Nr:=ValueActive(8205); If Nr>=0 then begin try J:=StrToInt(GetComboText); except J:=1; end; G.GUSDMA:=J; end;
+      Nr:=ValueActive(8206); If Nr>=0 then G.GUSUltraDir:=GetEditText;
+
+      {MIDI}
+      Nr:=ValueActive(8301); If Nr>=0 then G.MIDIType:=GetComboText;
+      Nr:=ValueActive(8302); If Nr>=0 then G.MIDIDevice:=GetComboText;
+      Nr:=ValueActive(8303); If Nr>=0 then G.MIDIConfig:=GetEditText;
 
       {Joystick}
       Nr:=ValueActive(9001); If Nr>=0 then G.JoystickType:=GetComboText;
@@ -849,9 +1033,10 @@ begin
       Nr:=ValueActive(9005); If Nr>=0 then G.JoystickButtonwrap:=GetYesNo;
 
       {Mounting}
-      Nr:=ValueActive(10000); If Nr>=0 then begin
-        ReplaceFolderWork(G,TComboBox(Settings[Nr].Values[0]).Text,TEdit(Settings[Nr].Values[0]).Text);
-      end;
+      Nr:=ValueActive(10000); If Nr>=0 then ReplaceFolderWork(G,TComboBox(Settings[Nr].Values[0]).Text,TEdit(Settings[Nr].Values[0]).Text);
+      Nr:=ValueActive(10001); If Nr>=0 then G.AutoMountCDs:=GetYesNo;
+      Nr:=ValueActive(10002); If Nr>=0 then G.SecureMode:=GetYesNo;
+      Nr:=ValueActive(10003); If Nr>=0 then ChangeMountSetting(G,GetComboIndex=0);
 
       {DOS environment}
       Nr:=ValueActive(11001); If Nr>=0 then G.ReportedDOSVersion:=GetComboText;
@@ -888,7 +1073,7 @@ begin
       Nr:=ValueActive(14003); If Nr>=0 then G.ScummVMSFXVolume:=GetSpinValue;
       Nr:=ValueActive(14004); If Nr>=0 then G.ScummVMMIDIGain:=GetSpinValue;
       Nr:=ValueActive(14005); If Nr>=0 then G.ScummVMSampleRate:=StrToInt(GetComboText);
-       Nr:=ValueActive(14006); If Nr>=0 then G.ScummVMSpeechMute:=GetYesNo;
+      Nr:=ValueActive(14006); If Nr>=0 then G.ScummVMSpeechMute:=GetYesNo;
     end;
   end;
 

@@ -37,6 +37,19 @@ LangString LANGNAME_FreeDosTools ${LANG_RUSSIAN} "Утилиты FreeDOS для использова
 LangString LANGNAME_Doszip ${LANG_RUSSIAN} "Doszip Commander"
 LangString LANGNAME_DesktopShortcut ${LANG_RUSSIAN} "Ярлык на рабочем столе"
 
+LangString LANGNAME_InstallDFendReloaded ${LANG_RUSSIAN} "Установка основных компонентов D-Fend Reloaded"
+LangString LANGNAME_InstallStartMenu ${LANG_RUSSIAN} "Создание ярлыков в меню 'Пуск'"
+LangString LANGNAME_InstallDOSBox ${LANG_RUSSIAN} "Установка DOSBox"
+LangString LANGNAME_InstallDOSBoxLanguage ${LANG_RUSSIAN} "Установка языковых  файлов DOSBox"
+LangString LANGNAME_InstallDOSBoxCodec ${LANG_RUSSIAN} "Установка видеокодека DOSBox"
+LangString LANGNAME_InstallFreeDOS ${LANG_RUSSIAN} "Установка FreeDOS"
+LangString LANGNAME_InstallDOSZip ${LANG_RUSSIAN} "Установка DOSZip Commander"
+LangString LANGNAME_InstallDesktopShortcut ${LANG_RUSSIAN} "Создание ярлыка на рабочем столе"
+
+LangString LANGNAME_UpdateDFendReloaded ${LANG_RUSSIAN} "Обновление основных компонентов D-Fend Reloaded"
+LangString LANGNAME_UpdateUninstaller ${LANG_RUSSIAN} "Обновление программы удаления"
+LangString LANGNAME_UpdateDOSBox ${LANG_RUSSIAN} "Обновление DOSBox"
+
 LangString DESC_DFend ${LANG_RUSSIAN} "D-Fend Reloaded - это пользовательский графический интерфейс для работы с DOS играми."
 LangString DESC_DosBox ${LANG_RUSSIAN} "DOSBox - это эмулятор DOS, используемый D-Fend Reloaded."
 LangString DESC_DosBoxProgramFiles ${LANG_RUSSIAN} "Файлы программы эмулятора DOS."

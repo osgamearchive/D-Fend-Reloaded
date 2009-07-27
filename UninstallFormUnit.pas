@@ -48,7 +48,7 @@ Procedure UnusedFileAndFoldersFromDrives(const GameDB : TGameDB; const Game : TG
 implementation
 
 uses VistaToolsUnit, LanguageSetupUnit, PrgSetupUnit, PrgConsts,
-     GameDBToolsUnit, HelpConsts;
+     GameDBToolsUnit, HelpConsts, IconLoaderUnit;
 
 {$R *.dfm}
 
@@ -65,6 +65,10 @@ begin
   SelectAllButton.Caption:=LanguageSetup.All;
   SelectNoneButton.Caption:=LanguageSetup.None;
 
+  UserIconLoader.DialogImage(DI_OK,OKButton);
+  UserIconLoader.DialogImage(DI_Cancel,CancelButton);
+  UserIconLoader.DialogImage(DI_Help,HelpButton);
+
   DirList:=nil;
 end;
 
@@ -72,7 +76,6 @@ procedure TUninstallForm.FormShow(Sender: TObject);
 Var S : String;
     St, Files, Folders : TStringList;
     I : Integer;
-    B : Boolean;
 begin
   DirList:=TStringList.Create;
 
@@ -251,6 +254,10 @@ begin
 
   result:=True;
 
+  If Trim(PrgSetup.PathToFREEDOS)<>'' then begin
+    If Dir=Trim(ExtUpperCase(MakeAbsPath(IncludeTrailingPathDelimiter(PrgSetup.PathToFREEDOS),PrgSetup.BaseDir))) then exit;
+  end;
+
   For I:=0 to GameDB.Count-1 do begin
     If GameDB[I]=Game then continue;
 
@@ -300,7 +307,6 @@ begin
 end;
 Var I,J : Integer;
     St, Files, Folders : TStringList;
-    S : String;
 begin
   result:=True;
 

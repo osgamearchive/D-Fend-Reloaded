@@ -14,7 +14,7 @@ object SetupFrameService: TSetupFrameService
     Width = 609
     Height = 26
     Anchors = [akLeft, akTop, akRight]
-    Caption = '"DosBox DOS"-Profil wiederherstellen'
+    Caption = 'Restore "DOSBox DOS" profile'
     TabOrder = 0
     WordWrap = True
     OnClick = ButtonWork
@@ -40,7 +40,7 @@ object SetupFrameService: TSetupFrameService
     Width = 609
     Height = 26
     Anchors = [akLeft, akTop, akRight]
-    Caption = 'Standard-Vorgaben wiederherstellen'
+    Caption = 'Restore default templates'
     TabOrder = 1
     WordWrap = True
     OnClick = ButtonWork
@@ -65,7 +65,7 @@ object SetupFrameService: TSetupFrameService
     Width = 609
     Height = 26
     Anchors = [akLeft, akTop, akRight]
-    Caption = 'Alte, nicht mehr genutzte Setup-Dateien von D-Fend v2 l'#246'schen'
+    Caption = 'Delete old unused setup files from D-Fend v2'
     TabOrder = 2
     WordWrap = True
     OnClick = ButtonWork
@@ -91,7 +91,7 @@ object SetupFrameService: TSetupFrameService
     Width = 609
     Height = 26
     Anchors = [akLeft, akTop, akRight]
-    Caption = 'Absolute durch relative Pfade ersetzen'
+    Caption = 'Convert absolute to relative paths'
     TabOrder = 3
     WordWrap = True
     OnClick = ButtonWork
@@ -117,7 +117,7 @@ object SetupFrameService: TSetupFrameService
     Width = 609
     Height = 26
     Anchors = [akLeft, akTop, akRight]
-    Caption = 'Pr'#252'fsummen f'#252'r alle Profile berechnen'
+    Caption = 'Calculate checksums for all profiles'
     TabOrder = 4
     WordWrap = True
     OnClick = ButtonWork
@@ -134,6 +134,32 @@ object SetupFrameService: TSetupFrameService
       0333337F7777777F7F333308000E0E080333337F7FFFFF7F7F33330800000008
       0333337F777777737F333308888888880333337F333333337F33330888888888
       03333373FFFFFFFF733333700000000073333337777777773333}
+    NumGlyphs = 2
+  end
+  object Service6Button: TBitBtn
+    Tag = 5
+    Left = 16
+    Top = 175
+    Width = 609
+    Height = 26
+    Anchors = [akLeft, akTop, akRight]
+    Caption = 'Clear package cache and lists'
+    TabOrder = 5
+    WordWrap = True
+    OnClick = ButtonWork
+    Glyph.Data = {
+      76010000424D7601000000000000760000002800000020000000100000000100
+      04000000000000010000120B0000120B00001000000000000000000000000000
+      800000800000008080008000000080008000808000007F7F7F00BFBFBF000000
+      FF0000FF000000FFFF00FF000000FF00FF00FFFF0000FFFFFF00555555555555
+      55555FFFFFFF5F55FFF5777777757559995777777775755777F7555555555550
+      305555555555FF57F7F555555550055BB0555555555775F777F55555550FB000
+      005555555575577777F5555550FB0BF0F05555555755755757F555550FBFBF0F
+      B05555557F55557557F555550BFBF0FB005555557F55575577F555500FBFBFB0
+      B05555577F555557F7F5550E0BFBFB00B055557575F55577F7F550EEE0BFB0B0
+      B05557FF575F5757F7F5000EEE0BFBF0B055777FF575FFF7F7F50000EEE00000
+      B0557777FF577777F7F500000E055550805577777F7555575755500000555555
+      05555777775555557F5555000555555505555577755555557555}
     NumGlyphs = 2
   end
 end

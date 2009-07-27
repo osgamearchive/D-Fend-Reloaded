@@ -37,6 +37,19 @@ LangString LANGNAME_FreeDosTools ${LANG_SPANISH} "Herramientas de FreeDOS para u
 LangString LANGNAME_Doszip ${LANG_SPANISH} "Doszip Commander"
 LangString LANGNAME_DesktopShortcut ${LANG_SPANISH} "Acceso directo en el escritorio"
 
+LangString LANGNAME_InstallDFendReloaded ${LANG_SPANISH} "Instalando componentes principales de D-Fend Reloaded"
+LangString LANGNAME_InstallStartMenu ${LANG_SPANISH} "Creando enlaces en el menú Inicio"
+LangString LANGNAME_InstallDOSBox ${LANG_SPANISH} "Instalando DOSBox"
+LangString LANGNAME_InstallDOSBoxLanguage ${LANG_SPANISH} "Instalando archivos de idioma de DOSBox"
+LangString LANGNAME_InstallDOSBoxCodec ${LANG_SPANISH} "Instalando códec de vídeo de DOSBox"
+LangString LANGNAME_InstallFreeDOS ${LANG_SPANISH} "Instalando FreeDOS"
+LangString LANGNAME_InstallDOSZip ${LANG_SPANISH} "Instalando DOSZip Commander"
+LangString LANGNAME_InstallDesktopShortcut ${LANG_SPANISH} "Creando un acceso directo en el escritorio"
+
+LangString LANGNAME_UpdateDFendReloaded ${LANG_SPANISH} "Actualizando componentes principales de D-Fend Reloaded"
+LangString LANGNAME_UpdateUninstaller ${LANG_SPANISH} "Actualizando programa de desinstalación"
+LangString LANGNAME_UpdateDOSBox ${LANG_SPANISH} "Actualizando DOSBox"
+
 LangString DESC_DFend ${LANG_SPANISH} "D-Fend Reloaded es una interfaz gráfica para gestionar juegos de MS-DOS."
 LangString DESC_DosBox ${LANG_SPANISH} "DOSBox es el emulador de MS-DOS usado por D-Fend Reloaded."
 LangString DESC_DosBoxProgramFiles ${LANG_SPANISH} "Archivos de programa del emulador de MS-DOS."

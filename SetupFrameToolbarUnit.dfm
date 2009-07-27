@@ -17,7 +17,7 @@ object SetupFrameToolbar: TSetupFrameToolbar
   object ToolbarImageButton: TSpeedButton
     Tag = 9
     Left = 650
-    Top = 198
+    Top = 222
     Width = 23
     Height = 22
     Anchors = [akTop, akRight]
@@ -41,7 +41,7 @@ object SetupFrameToolbar: TSetupFrameToolbar
   end
   object ToolbarFontSizeLabel: TLabel
     Left = 15
-    Top = 237
+    Top = 261
     Width = 59
     Height = 13
     Caption = 'Schriftgr'#246#223'e'
@@ -70,7 +70,7 @@ object SetupFrameToolbar: TSetupFrameToolbar
   end
   object ShowToolbarCheckBox: TCheckBox
     Left = 16
-    Top = 17
+    Top = 16
     Width = 657
     Height = 17
     Caption = 'Symbolleiste anzeigen'
@@ -86,7 +86,7 @@ object SetupFrameToolbar: TSetupFrameToolbar
   end
   object ToolbarImageEdit: TEdit
     Left = 152
-    Top = 199
+    Top = 223
     Width = 492
     Height = 21
     Anchors = [akLeft, akTop, akRight]
@@ -95,7 +95,7 @@ object SetupFrameToolbar: TSetupFrameToolbar
   end
   object ToolbarImageCheckBox: TCheckBox
     Left = 16
-    Top = 203
+    Top = 227
     Width = 130
     Height = 17
     Caption = 'Hintergrundbild'
@@ -103,7 +103,7 @@ object SetupFrameToolbar: TSetupFrameToolbar
   end
   object ToolbarFontSizeEdit: TSpinEdit
     Left = 15
-    Top = 256
+    Top = 280
     Width = 59
     Height = 22
     MaxValue = 48
@@ -115,7 +115,7 @@ object SetupFrameToolbar: TSetupFrameToolbar
     Left = 16
     Top = 66
     Width = 161
-    Height = 119
+    Height = 135
     ItemHeight = 13
     TabOrder = 1
   end

@@ -1,7 +1,7 @@
 [Version]
 Signature="$CHICAGO$"
 Provider=%ZMBV_PUBLISHER%
-Class = MEDIA
+Class=MEDIA
 
 
 [DefaultInstall]
@@ -10,18 +10,14 @@ AddReg=ZMBV.Reg9x
 UpdateInis=ZMBV.INIs
 
 [DefaultInstall.ntx86]
-CheckAdminRights=1
 CopyFiles=ZMBV.Files.Inf,ZMBV.Files.Dll
 AddReg=ZMBV.RegNTx86
 UpdateInis=ZMBV.INIs
-EndPrompt=ZMBV.EndPrompt
 
 [DefaultInstall.ntamd64]
-CheckAdminRights=1
 CopyFiles=ZMBV.Files.Inf,ZMBV.Files.Dll.NTamd64
 AddReg=ZMBV.RegNTamd64
 UpdateInis=ZMBV.INIs
-EndPrompt=ZMBV.EndPrompt
 
 [DefaultUnInstall]
 DelFiles=ZMBV.Files.Dll,ZMBV.Files.Inf,ZMBV.Files.Ini
@@ -100,9 +96,6 @@ system.ini, drivers32,, "VIDC.ZMBV=zmbv.dll"
 
 [ZMBV.INIs.Del]
 system.ini, drivers32, "VIDC.ZMBV=zmbv.dll"
-
-[ZMBV.EndPrompt]
-Prompt = "%CODEC_INSTALLATION_FINISHED%"
 
 [Strings]
 ZMBV_PUBLISHER = "DOSBox Team"

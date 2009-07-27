@@ -54,6 +54,14 @@ object SetupFrameSurface: TSetupFrameSurface
     Height = 20
     Anchors = [akLeft, akBottom]
   end
+  object IconCustomizeLabel: TLabel
+    Left = 312
+    Top = 99
+    Width = 128
+    Height = 13
+    Caption = 'Open icons customizing file'
+    OnClick = IconCustomizeLabelClick
+  end
   object StartSizeComboBox: TComboBox
     Left = 16
     Top = 37
@@ -68,7 +76,8 @@ object SetupFrameSurface: TSetupFrameSurface
       'Vorgabewerte f'#252'r Fenstergr'#246#223'e'
       'Letzte Fenstergr'#246#223'e wiederherstellen'
       'Minimiert starten'
-      'Maximiert starten')
+      'Maximiert starten'
+      'Vollbildmodus ohne Fensterrahmen')
   end
   object IconSetListbox: TCheckListBox
     Left = 16

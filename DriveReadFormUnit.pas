@@ -36,7 +36,7 @@ Function ShowDriveWriteDialog(const AOwner : TComponent; const ADrive : Char; co
 
 implementation
 
-uses VistaToolsUnit, LanguageSetupUnit, CommonTools;
+uses VistaToolsUnit, LanguageSetupUnit, CommonTools, IconLoaderUnit;
 
 {$R *.dfm}
 
@@ -52,6 +52,8 @@ begin
   StatusBar.DoubleBuffered:=True;
 
   AbortButton.Caption:=LanguageSetup.Abort;
+
+  UserIconLoader.DialogImage(DI_Abort,AbortButton);
 end;
 
 procedure TDriveReadForm.FormShow(Sender: TObject);

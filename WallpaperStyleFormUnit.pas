@@ -28,7 +28,7 @@ Function ShowWallpaperStyleDialog(const AOwner : TComponent; var WPStyle : TWall
 
 implementation
 
-uses VistaToolsUnit, LanguageSetupUnit, HelpConsts;
+uses VistaToolsUnit, LanguageSetupUnit, HelpConsts, IconLoaderUnit;
 
 {$R *.dfm}
 
@@ -43,6 +43,9 @@ begin
   StretchRadioButton.Caption:=LanguageSetup.WallpaperStretch;
   OKButton.Caption:=LanguageSetup.OK;
   CancelButton.Caption:=LanguageSetup.Cancel;
+
+  UserIconLoader.DialogImage(DI_OK,OKButton);
+  UserIconLoader.DialogImage(DI_Cancel,CancelButton);
 end;
 
 procedure TWallpaperStyleForm.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);

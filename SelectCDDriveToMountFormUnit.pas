@@ -32,7 +32,7 @@ Function GetDriveLabel(const DriveLetter : String; var DriveLabel : String) : Bo
 
 implementation
 
-uses LanguageSetupUnit, VistaToolsUnit, CommonTools;
+uses LanguageSetupUnit, VistaToolsUnit, CommonTools, IconLoaderUnit;
 
 {$R *.dfm}
 
@@ -51,6 +51,9 @@ begin
 
   OKButton.Caption:=LanguageSetup.OK;
   CancelButton.Caption:=LanguageSetup.Cancel;
+
+  UserIconLoader.DialogImage(DI_OK,OKButton);
+  UserIconLoader.DialogImage(DI_Cancel,CancelButton);
 
   DriveComboBox.Items.Clear;
   For I:=1 to length(AvailableDrives) do begin

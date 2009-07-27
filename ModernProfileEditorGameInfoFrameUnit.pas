@@ -47,7 +47,7 @@ type
 implementation
 
 uses LanguageSetupUnit, VistaToolsUnit, CommonTools, HelpConsts,
-     ClassExtensions, IconLoaderUnit;
+     ClassExtensions, IconLoaderUnit, TextEditPopupUnit;
 
 {$R *.dfm}
 
@@ -60,6 +60,8 @@ begin
   NoFlicker(FavouriteCheckBox);
   NoFlicker(Tab);
   {NoFlicker(NotesMemo); - will hide text in Memo}
+
+  SetRichEditPopup(NotesMemo);
 
   GameInfoValueListEditor.TitleCaptions.Clear;
   GameInfoValueListEditor.TitleCaptions.Add(LanguageSetup.Key);

@@ -142,7 +142,7 @@ begin
   end;
 
   {RealFolder$ZipFile;PHYSFS;Letter;False;;FreeSpace;DeleteMode(no;files;folder)}
-  S:=ZipFolderEdit.Text+'$'+ZipFileEdit.Text+';PhysFS;'+ZipFolderDriveLetterComboBox.Text+';False;';
+  S:=MakeRelPath(ZipFolderEdit.Text,PrgSetup.BaseDir)+'$'+MakeRelPath(ZipFileEdit.Text,PrgSetup.BaseDir)+';PhysFS;'+ZipFolderDriveLetterComboBox.Text+';False;';
   S:=S+';'+IntToStr(ZipFolderFreeSpaceTrackBar.Position);
   If RepackCheckBox.Checked then Case RepackTypeComboBox.ItemIndex of
     0 : S:=S+';no';

@@ -94,8 +94,6 @@ end;
 
 procedure TSetupFrameDirectories.ShowFrame(const AdvencedMode: Boolean);
 begin
-  CaptureDirEdit.Visible:=PrgSetup.ActivateIncompleteFeatures;
-  CaptureDirButton.Visible:=PrgSetup.ActivateIncompleteFeatures;
 end;
 
 procedure TSetupFrameDirectories.HideFrame;

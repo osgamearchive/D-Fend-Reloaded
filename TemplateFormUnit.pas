@@ -83,6 +83,8 @@ type
     MenuHelpHelp: TMenuItem;
     MenuEditCopy: TMenuItem;
     MenuEditCopy2: TMenuItem;
+    N3: TMenuItem;
+    MenuEditCheck: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure ButtonWork(Sender: TObject);
     procedure ListViewKeyDown(Sender: TObject; var Key: Word;
@@ -113,6 +115,7 @@ type
     Procedure LoadList2;
     procedure SelectGame(const AGame: TGame; const AGameName : String);
     procedure SelectGame2(const AGame: TGame);
+    Procedure DoubleChecksumCheck;
   public
     { Public-Deklarationen }
     GameDB : TGameDB;
@@ -134,7 +137,8 @@ implementation
 uses VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgConsts,
      ProfileEditorFormUnit, PrgSetupUnit, TemplateSelectProfileFormUnit,
      ModernProfileEditorFormUnit, SelectProfilesFormUnit,
-     EditMultipleProfilesFormUnit, HelpConsts, IconLoaderUnit;
+     EditMultipleProfilesFormUnit, HelpConsts, IconLoaderUnit, WaitFormUnit,
+     StatisticsFormUnit;
 
 {$R *.dfm}
 
@@ -143,7 +147,7 @@ begin
   SetVistaFonts(self);
   DoubleBuffered:=True;
   Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName);
-  
+
   NoFlicker(PageControl);
   NoFlicker(ToolBar);
   NoFlicker(ListView);
@@ -182,9 +186,9 @@ begin
   MenuEditCopy2.Caption:=LanguageSetup.TemplateFormCopy;
   MenuEditEditMultipleTemplates.Caption:=LanguageSetup.TemplateFormEditMultipleTemplates;
   MenuEditEditMultipleTemplates2.Caption:=LanguageSetup.TemplateFormEditMultipleTemplates;
-
   MenuEditDelete.Caption:=LanguageSetup.Del;
   MenuEditDelete2.Caption:=LanguageSetup.Del;
+  MenuEditCheck.Caption:=LanguageSetup.TemplateFormEditCheckChecksums;
   MenuHelp.Caption:=LanguageSetup.MenuHelp;
   MenuHelpHelp.Caption:=LanguageSetup.Help;
 
@@ -348,6 +352,7 @@ begin
   MenuEditCopy2.Visible:=CoolBar1.Visible;
   MenuEditEditMultipleTemplates2.Visible:=CoolBar1.Visible;
   MenuEditDelete2.Visible:=CoolBar1.Visible;
+  MenuEditCheck.Visible:=CoolBar1.Visible;
 end;
 
 procedure TTemplateForm.ListViewSelectItem(Sender: TObject; Item: TListItem; Selected: Boolean);
@@ -651,6 +656,7 @@ begin
               {Create Checksums if there are none}
               CreateGameCheckSum(TGame(L[I]),False);
               CreateSetupCheckSum(TGame(L[I]),False);
+              AddAdditionalChecksumDataToAutoSetupTemplate(TGame(L[I]));
 
               {Copy to template}
               G:=AutoSetupDB[AutoSetupDB.Add(TGame(L[I]).Name)];
@@ -700,6 +706,10 @@ begin
           SelectGame2(G);
         end;
    18 : Application.HelpCommand(HELP_CONTEXT,ID_ExtrasTemplates);
+   19 : begin
+          {AutoSetup: Check for duplicate checksums}
+          DoubleChecksumCheck;
+        end;
   end;
 end;
 
@@ -744,6 +754,65 @@ begin
     end;
   finally
     TemplateForm.Free;
+  end;
+end;
+
+procedure TTemplateForm.DoubleChecksumCheck;
+Var Checksums, Templates, Empty, NotUnique, St : TStringList;
+    I,J : Integer;
+    S : String;
+    WaitForm : TWaitForm;
+begin
+  Checksums:=TStringList.Create;
+  Templates:=TStringList.Create;
+  Empty:=TStringList.Create;
+  NotUnique:=TStringList.Create;
+  try
+    If AutoSetupDB.Count>50 then WaitForm:=CreateWaitForm(self,LanguageSetup.TemplateFormEditCheckChecksumsCheckingDB,AutoSetupDB.Count) else WaitForm:=nil;
+    try
+      For I:=0 to AutoSetupDB.Count-1 do begin
+        If Assigned(WaitForm) and ((I mod 10)=0) then WaitForm.Step(I);
+        If Trim(AutoSetupDB[I].GameExe)='' then continue;
+        S:=AutoSetupDB[I].GameExeMD5;
+        If S='' then begin Empty.Add(AutoSetupDB[I].CacheName); continue; end;
+        J:=Checksums.IndexOf(S);
+        If J<0 then begin
+          Checksums.Add(S);
+          Templates.Add(AutoSetupDB[I].CacheName);
+        end else begin
+          If Trim(AutoSetupDB[I].AddtionalChecksumFile1Checksum)<>'' then continue;
+          If Trim(AutoSetupDB[I].AddtionalChecksumFile2Checksum)<>'' then continue;
+          If Trim(AutoSetupDB[I].AddtionalChecksumFile3Checksum)<>'' then continue;
+          If Trim(AutoSetupDB[I].AddtionalChecksumFile4Checksum)<>'' then continue;
+          If Trim(AutoSetupDB[I].AddtionalChecksumFile5Checksum)<>'' then continue;
+          NotUnique.Add(AutoSetupDB[I].CacheName+' '+Format(LanguageSetup.TemplateFormEditCheckChecksumsSameChecksum,[Templates[J]]));
+        end;
+      end;
+    finally
+      If Assigned(WaitForm) then FreeAndNil(WaitForm);
+    end;
+    If Empty.Count+NotUnique.Count=0 then begin
+      MessageDlg(LanguageSetup.TemplateFormEditCheckChecksumsMessageOK,mtInformation,[mbOK],0);
+    end else begin
+      St:=TStringList.Create;
+      try
+        If Empty.Count>0 then begin
+          St.Add(LanguageSetup.TemplateFormEditCheckChecksumsHeadingMissingChecksums);
+          St.AddStrings(Empty);
+          St.Add('');
+        end;
+        St.Add(LanguageSetup.TemplateFormEditCheckChecksumsHeadingNonUniqueChecksums);
+        St.AddStrings(NotUnique);
+        ShowInfoTextDialog(self,LanguageSetup.TemplateFormEditCheckChecksumsWarningTitle,St,True);
+      finally
+        St.Free;
+      end;
+    end;
+  finally
+    Checksums.Free;
+    Templates.Free;
+    Empty.Free;
+    NotUnique.Free;
   end;
 end;
 

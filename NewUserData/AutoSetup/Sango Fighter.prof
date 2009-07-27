@@ -45,6 +45,7 @@ ProfileMode=DOSBox
 ExtraDirs=
 ExtraFiles=
 DataDir=
+SecureMode=1
 
 [ExtraInfo]
 Favorite=0
@@ -127,6 +128,8 @@ VolumeSBLeft=100
 VolumeSBRight=100
 VolumeFMLeft=100
 VolumeFMRight=100
+VolumeCDLeft=100
+VolumeCDRight=100
 
 [sblaster]
 mixer=1
@@ -137,6 +140,7 @@ hdma=5
 oplrate=22050
 sbtype=sb16
 oplmode=auto
+oplemu=default
 
 [gus]
 gus=1
@@ -192,22 +196,27 @@ Filter=2x
 Language=en
 MusicDriver=auto
 Savepath=
+RenderMode=
+ExtraPath=
+Platform=
 
 [dosbox]
 memsize=32
 captures=
 DOSBoxDirectory=
-machine=vga
+machine=vga_s3
 
 [cpu]
 cyclesup=500
 cyclesdown=500
 core=auto
 cycles=auto
+type=auto
 
 [vga]
 videoram=2048
 svgachipset=s3
+PixelShader=none
 
 [serial]
 serial1=Dummy
@@ -226,4 +235,16 @@ AfterExecution=
 BeforeExecution.Wait=1
 BeforeExecution.Minimized=0
 AfterExecution.Minimized=0
+
+[ExtraGameIdentify]
+File1.Filename=
+File1.Checksum=
+File2.Filename=
+File2.Checksum=
+File3.Filename=
+File3.Checksum=
+File4.Filename=
+File4.Checksum=
+File5.Filename=
+File5.Checksum=
 

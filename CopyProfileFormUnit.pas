@@ -30,7 +30,7 @@ Function ShowCopyProfileDialog(const AOwner : TComponent; const ADataFolderAvail
 
 implementation
 
-uses VistaToolsUnit, CommonTools, LanguageSetupUnit, HelpConsts;
+uses VistaToolsUnit, CommonTools, LanguageSetupUnit, HelpConsts, IconLoaderUnit;
 
 {$R *.dfm}
 
@@ -46,6 +46,10 @@ begin
   OKButton.Caption:=LanguageSetup.OK;
   CancelButton.Caption:=LanguageSetup.Cancel;
   HelpButton.Caption:=LanguageSetup.Help;
+
+  UserIconLoader.DialogImage(DI_OK,OKButton);
+  UserIconLoader.DialogImage(DI_Cancel,CancelButton);
+  UserIconLoader.DialogImage(DI_Help,HelpButton);
 end;
 
 procedure TCopyProfileForm.HelpButtonClick(Sender: TObject);

@@ -102,6 +102,14 @@ begin
 
   ProfileDOSBoxInstallation:=InitData.CurrentDOSBoxInstallation;
 
+  AddDefaultValueHint(WindowResolutionComboBox);
+  AddDefaultValueHint(FullscreenResolutionComboBox);
+  AddDefaultValueHint(RenderComboBox);
+  AddDefaultValueHint(VideoCardComboBox);
+  AddDefaultValueHint(VGAChipsetComboBox);
+  AddDefaultValueHint(VideoRamComboBox);
+  AddDefaultValueHint(ScaleComboBox);
+
   HelpContext:=ID_ProfileEditGraphics;
 end;
 

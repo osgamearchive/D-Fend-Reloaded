@@ -3,7 +3,7 @@ object TemplateForm: TTemplateForm
   Top = 0
   BorderIcons = [biSystemMenu, biMaximize]
   Caption = 'Vorlagen'
-  ClientHeight = 471
+  ClientHeight = 491
   ClientWidth = 705
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -24,18 +24,23 @@ object TemplateForm: TTemplateForm
     Left = 0
     Top = 52
     Width = 705
-    Height = 400
+    Height = 420
     ActivePage = TemplateTab
     Align = alClient
     TabOrder = 0
     OnChange = PageControlChange
+    ExplicitHeight = 400
     object TemplateTab: TTabSheet
       Caption = 'TemplateTab'
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 372
       object ListView: TListView
         Left = 0
         Top = 0
         Width = 697
-        Height = 372
+        Height = 392
         Align = alClient
         BorderStyle = bsNone
         Columns = <>
@@ -48,6 +53,7 @@ object TemplateForm: TTemplateForm
         OnDblClick = ListViewDblClick
         OnKeyDown = ListViewKeyDown
         OnSelectItem = ListViewSelectItem
+        ExplicitHeight = 372
       end
     end
     object AutoSetupSheet: TTabSheet
@@ -56,12 +62,12 @@ object TemplateForm: TTemplateForm
       ExplicitLeft = 0
       ExplicitTop = 0
       ExplicitWidth = 0
-      ExplicitHeight = 0
+      ExplicitHeight = 372
       object ListView2: TListView
         Left = 0
         Top = 0
         Width = 697
-        Height = 372
+        Height = 392
         Align = alClient
         BorderStyle = bsNone
         Columns = <>
@@ -73,12 +79,13 @@ object TemplateForm: TTemplateForm
         OnDblClick = ListView2DblClick
         OnKeyDown = ListView2KeyDown
         OnSelectItem = ListView2SelectItem
+        ExplicitHeight = 372
       end
     end
   end
   object StatusBar: TStatusBar
     Left = 0
-    Top = 452
+    Top = 472
     Width = 705
     Height = 19
     Panels = <
@@ -91,6 +98,7 @@ object TemplateForm: TTemplateForm
       item
         Width = 50
       end>
+    ExplicitTop = 452
   end
   object CoolBar: TCoolBar
     Left = 0
@@ -800,6 +808,14 @@ object TemplateForm: TTemplateForm
         Caption = 'Delete'
         ImageIndex = 5
         ShortCut = 46
+        OnClick = ButtonWork
+      end
+      object N3: TMenuItem
+        Caption = '-'
+      end
+      object MenuEditCheck: TMenuItem
+        Tag = 19
+        Caption = 'Check for duplicate checksums...'
         OnClick = ButtonWork
       end
     end

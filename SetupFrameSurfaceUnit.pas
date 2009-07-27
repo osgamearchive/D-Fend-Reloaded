@@ -16,8 +16,10 @@ type
     IconSetAuthorNameLabel: TLabel;
     IconSetPreviewLabel: TLabel;
     IconSetImage: TImage;
+    IconCustomizeLabel: TLabel;
     procedure IconSetListboxClick(Sender: TObject);
     procedure IconSetListboxClickCheck(Sender: TObject);
+    procedure IconCustomizeLabelClick(Sender: TObject);
   private
     { Private-Deklarationen }
     ShortName, LongName, Author : TStringList;
@@ -38,7 +40,7 @@ type
 implementation
 
 uses Math, LanguageSetupUnit, VistaToolsUnit, PrgSetupUnit, CommonTools,
-     HelpConsts, IconLoaderUnit;
+     HelpConsts, IconLoaderUnit, PrgConsts;
 
 {$R *.dfm}
 
@@ -64,7 +66,7 @@ begin
   NoFlicker(StartSizeComboBox);
   NoFlicker(IconSetListbox);
 
-  StartSizeComboBox.ItemIndex:=Max(0,Min(3,PrgSetup.StartWindowSize));
+  StartSizeComboBox.ItemIndex:=Max(0,Min(StartSizeComboBox.Items.Count-1,PrgSetup.StartWindowSize));
 
   ShortName:=TStringList.Create;
   LongName:=TStringList.Create;
@@ -77,6 +79,9 @@ begin
     IconSetListbox.Checked[I]:=True; IconSetListbox.ItemIndex:=I; break;
   end;
   IconSetListboxClick(self);
+
+  with IconCustomizeLabel.Font do begin Color:=clBlue; Style:=[fsUnderline]; end;
+  IconCustomizeLabel.Cursor:=crHandPoint;
 end;
 
 procedure TSetupFrameSurface.BeforeChangeLanguage;
@@ -92,11 +97,14 @@ begin
   StartSizeComboBox.Items[1]:=LanguageSetup.SetupFormStartSizeLast;
   StartSizeComboBox.Items[2]:=LanguageSetup.SetupFormStartSizeMinimized;
   StartSizeComboBox.Items[3]:=LanguageSetup.SetupFormStartSizeMaximized;
+  StartSizeComboBox.Items[4]:=LanguageSetup.SetupFormStartSizeFullscreen;
   StartSizeComboBox.ItemIndex:=I;
   
   IconSetLabel.Caption:=LanguageSetup.SetupFormIconSet;
   IconSetPreviewLabel.Caption:=LanguageSetup.SetupFormIconSetPreview;
   IconSetAuthorLabel.Caption:=LanguageSetup.SetupFormIconSetAuthor;
+
+  IconCustomizeLabel.Caption:=LanguageSetup.SetupFormIconSetCustomize;
 
   HelpContext:=ID_FileOptionsUserInterface;
 end;
@@ -107,12 +115,6 @@ end;
 
 procedure TSetupFrameSurface.ShowFrame(const AdvencedMode: Boolean);
 begin
-  IconSetLabel.Visible:=PrgSetup.ActivateIncompleteFeatures;
-  IconSetListbox.Visible:=PrgSetup.ActivateIncompleteFeatures;
-  IconSetPreviewLabel.Visible:=PrgSetup.ActivateIncompleteFeatures;
-  IconSetImage.Visible:=PrgSetup.ActivateIncompleteFeatures;
-  IconSetAuthorLabel.Visible:=PrgSetup.ActivateIncompleteFeatures;
-  IconSetAuthorNameLabel.Visible:=PrgSetup.ActivateIncompleteFeatures;
 end;
 
 procedure TSetupFrameSurface.HideFrame;
@@ -179,6 +181,13 @@ begin
       end;
     end;
   end;
+end;
+
+procedure TSetupFrameSurface.IconCustomizeLabelClick(Sender: TObject);
+begin
+  If FileExists(PrgDataDir+SettingsFolder+'\'+IconsConfFile)
+    then OpenFileInEditor(PrgDataDir+SettingsFolder+'\'+IconsConfFile)
+    else MessageDlg(Format(LanguageSetup.MessageCouldNotFindFile,[PrgDataDir+SettingsFolder+'\'+IconsConfFile]),mtError,[mbOK],0);
 end;
 
 end.

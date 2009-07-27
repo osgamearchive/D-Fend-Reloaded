@@ -32,7 +32,8 @@ Function ShowSelectProfilesDialog(const AOwner : TComponent; const AGameDB : TGa
 
 implementation
 
-uses VistaToolsUnit, LanguageSetupUnit, GameDBToolsUnit, CommonTools;
+uses VistaToolsUnit, LanguageSetupUnit, GameDBToolsUnit, CommonTools,
+     IconLoaderUnit;
 
 {$R *.dfm}
 
@@ -47,6 +48,9 @@ begin
   SelectAllButton.Caption:=LanguageSetup.All;
   SelectNoneButton.Caption:=LanguageSetup.None;
   SelectGenreButton.Caption:=LanguageSetup.GameBy;
+
+  UserIconLoader.DialogImage(DI_OK,OKButton);
+  UserIconLoader.DialogImage(DI_Cancel,CancelButton);
 end;
 
 procedure TSelectProfilesForm.FormShow(Sender: TObject);

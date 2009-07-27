@@ -67,6 +67,9 @@ begin
 
   UserIconLoader.DialogImage(DI_Add,AddButton);
   UserIconLoader.DialogImage(DI_Delete,DelButton);
+  UserIconLoader.DialogImage(DI_OK,OKButton);
+  UserIconLoader.DialogImage(DI_Cancel,CancelButton);
+  UserIconLoader.DialogImage(DI_Help,HelpButton);
 end;
 
 procedure TUserInfoForm.FormShow(Sender: TObject);

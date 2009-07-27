@@ -12,7 +12,7 @@ priority=higher,normal
 [dosbox]
 memsize=63
 captures=
-machine=vga
+machine=svga_s3
 
 [cpu]
 cycles=45000

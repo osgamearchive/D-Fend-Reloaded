@@ -56,7 +56,8 @@ type
 implementation
 
 uses VistaToolsUnit, LanguageSetupUnit, PrgSetupUnit, PrgConsts, HashCalc,
-     CommonTools, WizardFormUnit, OperationModeInfoFormUnit, IconLoaderUnit;
+     CommonTools, WizardFormUnit, OperationModeInfoFormUnit, IconLoaderUnit,
+     ZipPackageUnit;
 
 {$R *.dfm}
 
@@ -135,8 +136,10 @@ begin
 end;
 
 procedure TWizardTemplateFrame.SearchTemplates(const GameFile : String);
-Var I : Integer;
+Var I,J,NeededForList1 : Integer;
     GameCheckSum, GameFileShort : String;
+    ListNr, ListType : TList;
+    CompleteMatch : Boolean;
 begin
   TemplateType1List.Items.Clear;
   TemplateType2List.Items.Clear;
@@ -144,14 +147,33 @@ begin
   GameCheckSum:=GetMD5Sum(MakeAbsPath(GameFile,PrgSetup.BaseDir));
   If Trim(GameFile)='' then GameFileShort:='' else GameFileShort:=Trim(ExtUpperCase(ExtractFileName(GameFile)));
 
-  For I:=0 to AutoSetupDB.Count-1 do begin
-    If (AutoSetupDB[I].GameExeMD5<>'') and (AutoSetupDB[I].GameExeMD5=GameCheckSum) and (Trim(GameFile)<>'') then begin
-      TemplateType1List.Items.AddObject(AutoSetupDB[I].CacheName,AutoSetupDB[I]);
-    end else begin
-      If Trim(ExtUpperCase(ExtractFileName(AutoSetupDB[I].GameExe)))=GameFileShort then
-        TemplateType2List.Items.AddObject(AutoSetupDB[I].CacheName,AutoSetupDB[I]);
+  {Find matching auto setup templates}
+  ListNr:=TList.Create;
+  ListType:=TList.Create;
+  try
+    CompleteMatch:=False;
+    For I:=0 to AutoSetupDB.Count-1 do begin
+      If Trim(ExtUpperCase(ExtractFileName(AutoSetupDB[I].GameExe)))<>GameFileShort then continue;
+      ListNr.Add(Pointer(I));
+      ListType.Add(Pointer(0));
+      If (AutoSetupDB[I].GameExeMD5='') or (AutoSetupDB[I].GameExeMD5<>GameCheckSum) then continue;
+      ListType[ListType.Count-1]:=Pointer(1);
+      If not AdditionalDataMatching(ExtractFilePath(MakeAbsPath(GameFile,PrgSetup.BaseDir)),AutoSetupDB[I]) then continue;
+      ListType[ListType.Count-1]:=Pointer(2);
+      CompleteMatch:=True;
     end;
+    If CompleteMatch then NeededForList1:=2 else NeededForList1:=1;
+    For I:=0 to ListNr.Count-1 do begin
+      J:=Integer(ListNr[I]);
+      If Integer(ListType[I])<NeededForList1
+        then TemplateType2List.Items.AddObject(AutoSetupDB[J].CacheName,AutoSetupDB[J])
+        else TemplateType1List.Items.AddObject(AutoSetupDB[J].CacheName,AutoSetupDB[J]);
+    end;
+  finally
+    ListNr.Free;
+    ListType.Free;
   end;
+
   If TemplateType1List.Items.Count>0 then TemplateType1List.ItemIndex:=0;
   If TemplateType2List.Items.Count>0 then TemplateType2List.ItemIndex:=0;
 

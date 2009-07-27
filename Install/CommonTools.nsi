@@ -67,6 +67,9 @@ InstallDirRegKey HKLM "Software\D-Fend Reloaded" "ProgramFolder"
 !insertmacro MUI_RESERVEFILE_LANGDLL
 ReserveFile "..\Bin\License.txt"
 
+ShowInstDetails show
+ShowUninstDetails nevershow
+
 
 
 ; Pack program file
@@ -86,9 +89,9 @@ ReserveFile "..\Bin\License.txt"
 !define MUI_HEADERIMAGE_BITMAP "${NSISDIR}\Contrib\Graphics\Header\win.bmp"
 !define MUI_HEADERIMAGE_UNBITMAP "Images\1035.bmp"
 !ifdef Update
-  !define MUI_WELCOMEFINISHPAGE_BITMAP "Images\13c.bmp"
+  !define MUI_WELCOMEFINISHPAGE_BITMAP "Images\D-Fend Reloaded - Update Installer.bmp"
 !else
-  !define MUI_WELCOMEFINISHPAGE_BITMAP "Images\13b.bmp"
+  !define MUI_WELCOMEFINISHPAGE_BITMAP "Images\D-Fend Reloaded - Installer.bmp"
 !endif
 !define MUI_UNWELCOMEFINISHPAGE_BITMAP "Images\27.bmp"
 
@@ -168,6 +171,13 @@ FunctionEnd
 
 !macro CommonSections
   !define TO_MS 2000
+  
+  # Not working well
+  #Section -AllowCancel
+  #  SectionIn RO
+  #  GetDlgItem $0 $HWNDPARENT 2
+  #  EnableWindow $0 1
+  #SectionEnd
 
   Section "-CloseDFend"
     SectionIn RO	
@@ -316,3 +326,23 @@ FunctionEnd
       UAC::Unload
   FunctionEnd
 !macroend
+
+
+
+; Check for not installing DFR directly into the program folder
+; ============================================================
+
+Function .onVerifyInstDir
+  GetFullPathName $0 $INSTDIR
+  
+  GetFullPathName $1 $PROGRAMFILES
+  StrCmp $0 $1 +1 DirCheck2
+  Abort
+  
+  DirCheck2:
+  GetFullPathName $1 $WINDIR
+  StrCmp $0 $1 +1 DirCheckOK
+  Abort
+  
+  DirCheckOK:
+FunctionEnd

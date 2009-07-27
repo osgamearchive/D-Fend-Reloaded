@@ -64,6 +64,8 @@ begin
   UserIconLoader.DialogImage(DI_Add,CustomSetsEnvAdd);
   UserIconLoader.DialogImage(DI_Delete,CustomSetsEnvDel);
 
+  AddDefaultValueHint(ReportedDOSVersionComboBox);
+
   HelpContext:=ID_ProfileEditDOSEnvironment;
 end;
 

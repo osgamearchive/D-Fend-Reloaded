@@ -38,7 +38,7 @@ Procedure ShowLanguageEditorDialog(const AOwner : TComponent; const ALanguageFil
 implementation
 
 uses Math, IniFiles, VistaToolsUnit, LanguageSetupUnit, PrgSetupUnit, PrgConsts,
-     CommonTools, HelpConsts;
+     CommonTools, HelpConsts, IconLoaderUnit;
 
 {$R *.dfm}
 
@@ -54,13 +54,15 @@ begin
   CloseButton.Caption:=LanguageSetup.Close;
   Caption:=LanguageSetup.LanguageEditorCaption;
 
+  UserIconLoader.DialogImage(DI_Close,CloseButton);
+
   DefaultLanguageFile:=PrgDir+LanguageSubDir+'\English.ini';
   LastSection:=-1;
 end;
 
 procedure TLanguageEditorForm.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
-  If (Key=VK_F1) and (Shift=[]) then Application.HelpCommand(HELP_CONTEXT,ID_HelpLanguageEditor);
+  If (Key=VK_F1) and (Shift=[]) then Application.HelpCommand(HELP_CONTEXT,ID_ExtrasLanguageEditor);
 end;
 
 procedure TLanguageEditorForm.FormShow(Sender: TObject);

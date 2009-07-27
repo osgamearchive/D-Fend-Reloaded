@@ -30,6 +30,8 @@ type
     CheckBoxUnderline: TCheckBox;
     WindowsExeIconsCheckBox: TCheckBox;
     ShowTooltipsCheckBox: TCheckBox;
+    NoteInTooltipLabel: TLabel;
+    NoteInTooltipEdit: TSpinEdit;
     procedure GamesListBackgroundColorBoxChange(Sender: TObject);
     procedure GamesListBackgroundEditChange(Sender: TObject);
     procedure GamesListBackgroundButtonClick(Sender: TObject);
@@ -52,8 +54,8 @@ type
 
 implementation
 
-uses LanguageSetupUnit, VistaToolsUnit, PrgSetupUnit, CommonTools, HelpConsts,
-     IconLoaderUnit;
+uses Math, LanguageSetupUnit, VistaToolsUnit, PrgSetupUnit, CommonTools,
+     HelpConsts, IconLoaderUnit;
 
 {$R *.dfm}
 
@@ -90,6 +92,7 @@ begin
   NoFlicker(CheckBoxUnderline);
   NoFlicker(WindowsExeIconsCheckBox);
   NoFlicker(ShowTooltipsCheckBox);
+  NoFlicker(NoteInTooltipEdit);
 
   S:=Trim(PrgSetup.GamesListViewBackground);
   If S='' then GamesListBackgroundRadioButton1.Checked:=True else begin
@@ -124,6 +127,7 @@ begin
 
   WindowsExeIconsCheckBox.Checked:=PrgSetup.UseWindowsExeIcons;
   ShowTooltipsCheckBox.Checked:=PrgSetup.ShowTooltips;
+  NoteInTooltipEdit.Value:=Min(100,Max(1,PrgSetup.NoteLinesInTooltips));
 
   UserIconLoader.DialogImage(DI_SelectFile,GamesListBackgroundButton);
 end;
@@ -159,6 +163,7 @@ begin
 
   WindowsExeIconsCheckBox.Caption:=LanguageSetup.SetupFormUseWindowsExeIcons;
   ShowTooltipsCheckBox.Caption:=LanguageSetup.MenuViewShowTooltips;
+  NoteInTooltipLabel.Caption:=LanguageSetup.SetupFormNoteLinesInTooltips;
 
   HelpContext:=ID_FileOptionsAppearanceList;
 end;
@@ -193,6 +198,7 @@ begin
 
   WindowsExeIconsCheckBox.Checked:=True;
   ShowTooltipsCheckBox.Checked:=True;
+  NoteInTooltipEdit.Value:=5;
 end;
 
 procedure TSetupFrameGamesListAppearance.SaveSetup;
@@ -210,6 +216,7 @@ begin
   PrgSetup.FavoritesUnderline:=CheckBoxUnderline.Checked;
   PrgSetup.UseWindowsExeIcons:=WindowsExeIconsCheckBox.Checked;
   PrgSetup.ShowTooltips:=ShowTooltipsCheckBox.Checked;
+  PrgSetup.NoteLinesInTooltips:=NoteInTooltipEdit.Value;
 end;
 
 procedure TSetupFrameGamesListAppearance.GamesListBackgroundColorBoxChange(Sender: TObject);

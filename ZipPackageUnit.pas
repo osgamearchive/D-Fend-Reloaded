@@ -6,6 +6,9 @@ uses Classes, Math, GameDBUnit;
 Procedure BuildZipPackage(const AOwner : TComponent; const AGame : TGame; const AFileName : String);
 Function ImportZipPackage(const AOwner : TComponent; const AFileName : String; const AGameDB : TGameDB) : TGame;
 
+Function AdditionalDataMatching(const Folder : String; const Template : TGame) : Boolean;
+
+Function GetTemplateFromFolderExt(const IsFolderScan : Boolean; Folder : String; const AutoSetupDB : TGameDB; const StartableFiles : TStringList = nil) : TStringList;
 Function GetTemplateFromFolder(const IsFolderScan : Boolean; Folder : String; const AutoSetupDB : TGameDB; var FileToStart : String; const StartableFiles : TStringList = nil) : Integer;
 
 Procedure TempZipFilesStartCleanUp;
@@ -15,7 +18,7 @@ implementation
 uses Windows, SysUtils, Forms, Controls, Dialogs, ShellAPI, ShlObj, SevenZipVCL,
      CommonTools, LanguageSetupUnit, GameDBToolsUnit, PrgSetupUnit, PrgConsts,
      UninstallFormUnit, ZipInfoFormUnit, DosBoxUnit, ScummVMUnit, HashCalc,
-     SelectFileToStartFormUnit, ImportSelectTemplateFormUnit;
+     ImportSelectTemplateFormUnit, SelectTemplateForZipImportFormUnit;
 
 Function CopyFileWithMsg(const Source, Dest : String) : Boolean;
 begin
@@ -55,7 +58,7 @@ begin
             If IncludeTrailingPathDelimiter(ExtUpperCase(MakeAbsPath(NewGame.CaptureFolder,PrgSetup.BaseDir)))=S then begin
               S:=IncludeTrailingPathDelimiter(Dest+Rec.Name);
               I:=0;
-              While DirectoryExists(IncludeTrailingPathDelimiter(S)) do begin
+              While (not PrgSetup.IgnoreDirectoryCollisions) and DirectoryExists(IncludeTrailingPathDelimiter(S)) do begin
                 inc(I); S:=IncludeTrailingPathDelimiter(ExcludeTrailingPathDelimiter(Dest+Rec.Name)+IntToStr(I));
               end;
               If not CopyFolderWithMsg(Source+Rec.Name,S,NewGame) then exit;
@@ -65,7 +68,7 @@ begin
               If IncludeTrailingPathDelimiter(ExtUpperCase(MakeAbsPath(NewGame.DataDir,PrgSetup.BaseDir)))=S then begin
                 S:=IncludeTrailingPathDelimiter(Dest+Rec.Name);
                 I:=0;
-                While DirectoryExists(IncludeTrailingPathDelimiter(S)) do begin
+                While (not PrgSetup.IgnoreDirectoryCollisions) and DirectoryExists(IncludeTrailingPathDelimiter(S)) do begin
                   inc(I); S:=IncludeTrailingPathDelimiter(ExcludeTrailingPathDelimiter(Dest+Rec.Name)+IntToStr(I));
                 end;
                 If not CopyFolderWithMsg(Source+Rec.Name,S,NewGame) then exit;
@@ -151,7 +154,7 @@ begin
 
   S:=Dir+ChangeFileExt(ExtractFileName(Game.SetupFile),'.conf');
   If DOSBoxMode(Game) then begin
-    St:=BuildConfFile(Game,False,False);
+    St:=BuildConfFile(Game,False,False,-1);
     If St<>nil then begin
       try
         try St.SaveToFile(S); except MessageDlg(Format(LanguageSetup.MessageCouldNotSaveFile,[S]),mtError,[mbOK],0); exit; end;
@@ -415,12 +418,36 @@ begin
   end;
 end;
 
-Function GetTemplateFromFolder(const IsFolderScan : Boolean; Folder : String; const AutoSetupDB : TGameDB; var FileToStart : String; const StartableFiles : TStringList) : Integer;
-Var PrgFiles,MatchingTemplates : TStringList;
+Function AdditionalDataMatching(const Folder : String; const Template : TGame) : Boolean;
+Var I : Integer;
+    F,C : String;
+    NotMatching : Boolean;
+begin
+  result:=False; NotMatching:=False;
+  For I:=1 to 5 do begin
+    Case I of
+      1 : begin F:=Template.AddtionalChecksumFile1; C:=Template.AddtionalChecksumFile1Checksum; end;
+      2 : begin F:=Template.AddtionalChecksumFile2; C:=Template.AddtionalChecksumFile2Checksum; end;
+      3 : begin F:=Template.AddtionalChecksumFile3; C:=Template.AddtionalChecksumFile3Checksum; end;
+      4 : begin F:=Template.AddtionalChecksumFile4; C:=Template.AddtionalChecksumFile4Checksum; end;
+      5 : begin F:=Template.AddtionalChecksumFile5; C:=Template.AddtionalChecksumFile5Checksum; end;
+    End;
+    If F='' then continue;
+    If FileExists(Folder+F) then begin
+      If GetMD5Sum(Folder+F)=C then result:=True else NotMatching:=True;
+    end;
+  end;
+  if NotMatching then result:=False;
+end;
+
+Function GetTemplateFromFolderExt(const IsFolderScan : Boolean; Folder : String; const AutoSetupDB : TGameDB; const StartableFiles : TStringList) : TStringList;
+Var PrgFiles : TStringList;
     I,J,LastLevel,NewLevel : Integer;
     GameCheckSum : String;
+    MatchByAdditionalData : TList;
+    B : Boolean;
 begin
-  result:=-1; FileToStart:='';
+  result:=TStringList.Create;
 
   Folder:=IncludeTrailingPathDelimiter(Folder);
 
@@ -429,23 +456,62 @@ begin
     RatePrgFiles(PrgFiles);
     If StartableFiles<>nil then begin StartableFiles.Clear; StartableFiles.AddStrings(PrgFiles); end;
 
-    {Find Template}
-    MatchingTemplates:=TStringList.Create;
-    try
-      LastLevel:=1000; NewLevel:=-1;
-      repeat
-        For I:=0 to PrgFiles.Count-1 do begin J:=Integer(PrgFiles.Objects[I]); If (J<LastLevel) and (J>NewLevel) then NewLevel:=J; end;
-        If NewLevel=-1 then break;
+    {Find all matching auto setup templates}
+    LastLevel:=1000; NewLevel:=-1;
+    repeat
+      For I:=0 to PrgFiles.Count-1 do begin J:=Integer(PrgFiles.Objects[I]); If (J<LastLevel) and (J>NewLevel) then NewLevel:=J; end;
+      If NewLevel=-1 then break;
 
-        For I:=0 to PrgFiles.Count-1 do If Integer(PrgFiles.Objects[I])=NewLevel then begin
-          GameCheckSum:=GetMD5Sum(Folder+PrgFiles[I]);
-          For J:=0 to AutoSetupDB.Count-1 do If (AutoSetupDB[J].GameExeMD5<>'') and (AutoSetupDB[J].GameExeMD5=GameCheckSum) then begin
-            MatchingTemplates.AddObject(PrgFiles[I],TObject(J));
+      For I:=0 to PrgFiles.Count-1 do If Integer(PrgFiles.Objects[I])=NewLevel then begin
+        GameCheckSum:=GetMD5Sum(Folder+PrgFiles[I]);
+        For J:=0 to AutoSetupDB.Count-1 do If (AutoSetupDB[J].GameExeMD5<>'') and (AutoSetupDB[J].GameExeMD5=GameCheckSum) then begin
+          result.AddObject(PrgFiles[I],TObject(J));
+        end;
+      end;
+      LastLevel:=NewLevel; NewLevel:=-1;
+    until False;
+
+    {If there is more than one, use additional checksums}
+    If result.Count>0 then begin
+      MatchByAdditionalData:=TList.Create;
+      try
+        B:=False;
+        For I:=0 to result.Count-1 do If AdditionalDataMatching(Folder,AutoSetupDB[Integer(result.Objects[I])]) then begin
+          MatchByAdditionalData.Add(Pointer(1)); B:=True;
+        end else begin
+          MatchByAdditionalData.Add(Pointer(0));
+        end;
+        If B then begin
+          I:=0;
+          While I<result.Count do if Integer(MatchByAdditionalData[I])=0 then begin
+            result.Delete(I);
+            MatchByAdditionalData.Delete(I);
+          end else begin
+            inc(I);
           end;
         end;
-        LastLevel:=NewLevel; NewLevel:=-1;
-      until False;
+      finally
+        MatchByAdditionalData.Free;
+      end;
+    end;
+  finally
+    PrgFiles.Free;
+  end;
+end;
 
+Function GetTemplateFromFolder(const IsFolderScan : Boolean; Folder : String; const AutoSetupDB : TGameDB; var FileToStart : String; const StartableFiles : TStringList) : Integer;
+Var MatchingTemplates,PrgFiles : TStringList;
+    I,J,NewLevel : Integer;
+begin
+  result:=-1;
+
+  PrgFiles:=TStringList.Create;
+  try
+    MatchingTemplates:=GetTemplateFromFolderExt(IsFolderScan,Folder,AutoSetupDB,PrgFiles);
+    try
+      If StartableFiles<>nil then begin StartableFiles.Clear; StartableFiles.AddStrings(PrgFiles); end;
+
+      {If there is still more than one, let the user select the template to use}
       If MatchingTemplates.Count>0 then begin
         If IsFolderScan then begin
           J:=ShowSelectTemplateDialog(Application.MainForm,Folder,AutoSetupDB,MatchingTemplates);
@@ -460,33 +526,27 @@ begin
         end;
         exit;
       end;
+
+      {Use defalt template on highest ranked PrgFile}
+      NewLevel:=-1;
+      For I:=0 to PrgFiles.Count-1 do begin
+        J:=Integer(PrgFiles.Objects[I]);
+        If (J>NewLevel) then begin NewLevel:=J; FileToStart:=PrgFiles[I] end;
+      end;
     finally
       MatchingTemplates.Free;
     end;
-
-    {Use defalt template on highest ranked PrgFile}
-    NewLevel:=-1;
-    For I:=0 to PrgFiles.Count-1 do begin
-      J:=Integer(PrgFiles.Objects[I]);
-      If (J>NewLevel) then begin NewLevel:=J; FileToStart:=PrgFiles[I] end;
-    end;
-
   finally
     PrgFiles.Free;
   end;
 end;
 
-
-Function GetFolderForGame(const GameDir : String; const AutoSetupDB : TGameDB; TemplateNr : Integer; const NewGameFolderSuggestion : String) : String;
+Function GetFolderForGame(const GameDir : String; const NewGameFolderSuggestion : String) : String;
 Var I : Integer;
 begin
-  If TemplateNr>=0 then begin
-    result:=MakeFileSysOKFolderName(AutoSetupDB[TemplateNr].CacheName);
-  end else begin
-    If NewGameFolderSuggestion='' then result:='Game' else result:=NewGameFolderSuggestion;
-  end;
+  If NewGameFolderSuggestion='' then result:='Game' else result:=NewGameFolderSuggestion;
 
-  If not DirectoryExists(GameDir+result) then exit;
+  If (not DirectoryExists(GameDir+result)) or PrgSetup.IgnoreDirectoryCollisions then exit;
 
   I:=1;
   repeat
@@ -518,14 +578,62 @@ begin
   If (Files=0) and (Folders=1) and (SubFolder<>'') then result:=IncludeTrailingPathDelimiter(IncludeTrailingPathDelimiter(Dir)+SubFolder);
 end;
 
-Function CreateGameFromSimpleFolder(Dir : String; const GameDB : TGameDB) : TGame;
-Var TempProfFile,ProfFile,FileToStart,SetupFileToStart,NewGameFolder,GameDir,NewGameFolderSuggestion,ProfileName : String;
-    TemplateDB, AutoSetupDB : TGameDB;
-    I,J,StdTemplateNr,AutoTemplateNr : Integer;
-    G : TGame;
-    StartableFiles : TStringList;
-    S : String;
+Function AddGameFromSimpleFolder(Dir : String; const GameDB, TemplateDB, AutoSetupDB : TGameDB; const ProfileName, ProfileFolder, FileToStart, SetupFileToStart : String; const TemplateNr : Integer) : TGame;
+Var GameDir,NewGameFolder,S : String;
+    I,J : Integer;
     Rec : TSearchRec;
+    G : TGame;
+begin
+  result:=nil;
+
+  {Create folder for new game}
+  GameDir:=IncludeTrailingPathDelimiter(MakeAbsPath(PrgSetup.GameDir,PrgSetup.BaseDir));
+  NewGameFolder:=GetFolderForGame(GameDir,ProfileFolder);
+  ForceDirectories(GameDir+NewGameFolder);
+  if not CopyFolderWithMsg(Dir,GameDir+NewGameFolder) then exit;
+
+  {Create game DB record}
+  I:=GameDB.Add(ProfileName); result:=GameDB[I];
+  If TemplateNr<0 then begin
+    If TemplateNr=-1 then begin
+      G:=TGame.Create(PrgSetup); try result.AssignFrom(G); finally G.Free; end;
+    end else begin
+      result.AssignFrom(TemplateDB[-TemplateNr-2]);
+    end;
+  end else begin
+    GameDB[I].AssignFrom(AutoSetupDB[TemplateNr]);
+  end;
+  result.ProfileMode:='DOSBox';
+  result.Name:=ProfileName;
+  result.GameExe:=MakeRelPath(GameDir+NewGameFolder+'\'+FileToStart,PrgSetup.BaseDir);
+  If Trim(SetupFileToStart)<>'' then result.SetupExe:=MakeRelPath(GameDir+NewGameFolder+'\'+SetupFileToStart,PrgSetup.BaseDir);
+
+  {Look for Icons in game folder}
+  J:=FindFirst(GameDir+NewGameFolder+'\*.ico',faAnyFile,Rec);
+  try
+    If J=0 then result.Icon:=MakeRelPath(GameDir+NewGameFolder+'\'+Rec.Name,PrgSetup.BaseDir);
+  finally
+    FindClose(Rec);
+  end;
+
+  {Set capture directory}
+  S:=IncludeTrailingPathDelimiter(PrgSetup.CaptureDir)+MakeFileSysOKFolderName(result.CacheName)+'\';
+  I:=0;
+  While (not PrgSetup.IgnoreDirectoryCollisions) and DirectoryExists(MakeAbsPath(S,PrgSetup.BaseDir)) do begin
+    inc(I); S:=IncludeTrailingPathDelimiter(PrgSetup.CaptureDir)+MakeFileSysOKFolderName(result.CacheName)+IntToStr(I)+'\';
+  end;
+  result.CaptureFolder:=MakeRelPath(S,PrgSetup.BaseDir);
+  ForceDirectories(MakeAbsPath(result.CaptureFolder,PrgSetup.BaseDir));
+
+  result.StoreAllValues;
+  result.LoadCache;
+end;
+
+Function CreateGameFromSimpleFolder(Dir : String; const GameDB : TGameDB; const ArchiveFileName : String) : TGame;
+Var AutoSetupDB,TemplateDB : TGameDB;
+    StartableFiles, AutoSetup : TStringList;
+    Nr : Integer;
+    ProfileName,FileToStart,SetupFileToStart,ProfileFolder : String;
 begin
   result:=nil;
 
@@ -535,76 +643,24 @@ begin
   AutoSetupDB:=TGameDB.Create(PrgDataDir+AutoSetupSubDir);
   StartableFiles:=TStringList.Create;
   try
-    AutoTemplateNr:=GetTemplateFromFolder(False,Dir,AutoSetupDB,FileToStart,StartableFiles);
-    SetupFileToStart:='';
-    If FileToStart='' then begin
-      if AutoTemplateNr<>-2 then MessageDlg(LanguageSetup.MessageZipImportError,mtError,[mbOK],0);
-      exit;
-    end;
-    If AutoTemplateNr<0 then begin
-      StdTemplateNr:=-1;
-      NewGameFolderSuggestion:='Game';
-      If not ShowSelectFileToStartDialog(Application.MainForm,FileToStart,SetupFileToStart,StartableFiles,NewGameFolderSuggestion,StdTemplateNr) then exit;
-    end;
-
-    GameDir:=IncludeTrailingPathDelimiter(MakeAbsPath(PrgSetup.GameDir,PrgSetup.BaseDir));
-    NewGameFolder:=GetFolderForGame(GameDir,AutoSetupDB,AutoTemplateNr,NewGameFolderSuggestion);
-    ForceDirectories(GameDir+NewGameFolder);
-    if not CopyFolderWithMsg(Dir,GameDir+NewGameFolder) then exit;
-
-    If AutoTemplateNr<0 then begin
-      ProfileName:=ChangeFileExt(FileToStart,'');
-      ProfileName:=ExtUpperCase(Copy(ProfileName,1,1))+ExtLowerCase(Copy(ProfileName,2,MaxInt));
-
-      I:=GameDB.Add(ProfileName);
-      If StdTemplateNr<0 then begin
-        G:=TGame.Create(PrgSetup); try GameDB[I].AssignFrom(G); finally G.Free; end;
-      end else begin
-        TemplateDB:=TGameDB.Create(PrgDataDir+TemplateSubDir);
-        try
-          If TemplateDB.Count=0 then begin
-            G:=TGame.Create(PrgSetup); try GameDB[I].AssignFrom(G); finally G.Free; end;
-          end else begin
-            GameDB[I].AssignFrom(TemplateDB[Max(0,Min(TemplateDB.Count-1,StdTemplateNr))]);
-          end;
-        finally
-          TemplateDB.Free;
-        end;
-      end;
-      GameDB[I].Name:=ProfileName;
-    end else begin
-      I:=GameDB.Add(AutoSetupDB[AutoTemplateNr].CacheName);
-      GameDB[I].AssignFrom(AutoSetupDB[AutoTemplateNr]);
-    end;
-    GameDB[I].ProfileMode:='DOSBox';
-    GameDB[I].StoreAllValues;
-    GameDB[I].LoadCache;
-
-    result:=GameDB[I];
-    result.GameExe:=MakeRelPath(GameDir+NewGameFolder+'\'+FileToStart,PrgSetup.BaseDir);
-    If SetupFileToStart<>'' then result.SetupExe:=MakeRelPath(GameDir+NewGameFolder+'\'+SetupFileToStart,PrgSetup.BaseDir);
-
-    {Look for Icons in game folder}
-    J:=FindFirst(GameDir+NewGameFolder+'\*.ico',faAnyFile,Rec);
+    AutoSetup:=GetTemplateFromFolderExt(False,Dir,AutoSetupDB,StartableFiles);
+    If StartableFiles.Count=0 then begin MessageDlg(LanguageSetup.MessageZipImportError,mtError,[mbOK],0); exit; end;
     try
-      If J=0 then GameDB[I].Icon:=MakeRelPath(GameDir+NewGameFolder+'\'+Rec.Name,PrgSetup.BaseDir);
+      TemplateDB:=TGameDB.Create(PrgDataDir+TemplateSubDir);
+      try
+        If not ShowSelectTemplateForZipImportDialog(Application.MainForm,AutoSetupDB,TemplateDB,StartableFiles,AutoSetup,ArchiveFileName,ProfileName,FileToStart,SetupFileToStart,ProfileFolder,Nr) then exit;
+        result:=AddGameFromSimpleFolder(Dir,GameDB,TemplateDB,AutoSetupDB,ProfileName,ProfileFolder,FileToStart,SetupFileToStart,Nr);
+        if result=nil then exit;
+      finally
+        TemplateDB.Free;
+      end;
     finally
-      FindClose(Rec);
+      AutoSetup.Free;
     end;
-
-    S:=IncludeTrailingPathDelimiter(PrgSetup.CaptureDir)+MakeFileSysOKFolderName(result.CacheName)+'\';
-    I:=0;
-    While DirectoryExists(MakeAbsPath(S,PrgSetup.BaseDir)) do begin
-      inc(I); S:=IncludeTrailingPathDelimiter(PrgSetup.CaptureDir)+MakeFileSysOKFolderName(result.CacheName)+IntToStr(I)+'\';
-    end;
-    result.CaptureFolder:=S;
-    ForceDirectories(MakeAbsPath(result.CaptureFolder,PrgSetup.BaseDir));
   finally
     AutoSetupDB.Free;
     StartableFiles.Free;
   end;
-
-  MessageDlg(Format(LanguageSetup.MessageZipImportSuccess,[result.CacheName]),mtInformation,[mbOK],0);
 end;
 
 Function CreateGameFromDFRPackageFolder(const Dir : String; const GameDB : TGameDB; const TempProfFile : String) : TGame;
@@ -630,14 +686,14 @@ begin
 end;
 
 
-Function CreateGameFromFolder(const Dir : String; const GameDB : TGameDB) : TGame;
+Function CreateGameFromFolder(const Dir : String; const GameDB : TGameDB; const ArchivFileName : String) : TGame;
 Var TempProfFile : String;
 begin
   TempProfFile:=GetProfFileName(Dir);
 
   If TempProfFile='' then begin
     {Add simple zip archive}
-    result:=CreateGameFromSimpleFolder(Dir,GameDB);
+    result:=CreateGameFromSimpleFolder(Dir,GameDB,ArchivFileName);
   end else begin
     {Add normal zip package (with prof file)}
     result:=CreateGameFromDFRPackageFolder(Dir,GameDB,TempProfFile);
@@ -657,7 +713,7 @@ begin
 
   try
     if not ExtractZipFile(AOwner,AFileName,Temp) then exit;
-    result:=CreateGameFromFolder(Temp,AGameDB);
+    result:=CreateGameFromFolder(Temp,AGameDB,AFileName);
     If result<>nil then begin
       result.StoreAllValues;
       result.LoadCache;

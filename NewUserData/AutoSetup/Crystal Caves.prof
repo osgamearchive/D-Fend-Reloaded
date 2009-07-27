@@ -45,6 +45,7 @@ ExtraExe6=
 ExtraExe7=
 ExtraExe8=
 ExtraExe9=
+SecureMode=1
 
 [ExtraInfo]
 Favorite=0
@@ -116,6 +117,8 @@ VolumeSBLeft=100
 VolumeSBRight=100
 VolumeFMLeft=100
 VolumeFMRight=100
+VolumeCDLeft=100
+VolumeCDRight=100
 
 [sblaster]
 mixer=1
@@ -126,6 +129,7 @@ hdma=5
 oplrate=22050
 sbtype=sb16
 oplmode=auto
+oplemu=default
 
 [gus]
 gus=1
@@ -181,18 +185,22 @@ GFXDetails=3
 Walkspeed=2
 GameZipFile=
 Savepath=
+RenderMode=
+ExtraPath=
+Platform=
 
 [dosbox]
 memsize=32
 captures=
 DOSBoxDirectory=
-machine=vga
+machine=vga_s3
 
 [cpu]
 cyclesup=500
 cyclesdown=20
 core=auto
 cycles=3000
+type=auto
 
 [serial]
 serial1=Dummy
@@ -226,4 +234,17 @@ AfterExecution=
 [vga]
 videoram=2048
 svgachipset=3s
+PixelShader=none
+
+[ExtraGameIdentify]
+File1.Filename=
+File1.Checksum=
+File2.Filename=
+File2.Checksum=
+File3.Filename=
+File3.Checksum=
+File4.Filename=
+File4.Checksum=
+File5.Filename=
+File5.Checksum=
 

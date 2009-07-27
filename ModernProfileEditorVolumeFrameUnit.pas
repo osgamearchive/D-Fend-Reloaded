@@ -50,6 +50,13 @@ type
     SoundVolumeFMRightTrackBar: TTrackBar;
     SoundVolumeLeftLabel6: TLabel;
     SoundVolumeRightLabel6: TLabel;
+    SoundVolumeCDLabel: TLabel;
+    SoundVolumeLeftLabel7: TLabel;
+    SoundVolumeRightLabel7: TLabel;
+    SoundVolumeCDLeftEdit: TSpinEdit;
+    SoundVolumeCDRightEdit: TSpinEdit;
+    SoundVolumeCDLeftTrackBar: TTrackBar;
+    SoundVolumeCDRightTrackBar: TTrackBar;
     procedure SpinEditChange(Sender: TObject);
     procedure TrackBarChange(Sender: TObject);
   private
@@ -86,6 +93,8 @@ begin
   NoFlicker(SoundVolumeSBRightEdit);
   NoFlicker(SoundVolumeFMLeftEdit);
   NoFlicker(SoundVolumeFMRightEdit);
+  NoFlicker(SoundVolumeCDLeftEdit);
+  NoFlicker(SoundVolumeCDRightEdit);
 
   SoundVolumeLeftLabel1.Caption:=LanguageSetup.Left;
   SoundVolumeLeftLabel2.Caption:=LanguageSetup.Left;
@@ -93,18 +102,21 @@ begin
   SoundVolumeLeftLabel4.Caption:=LanguageSetup.Left;
   SoundVolumeLeftLabel5.Caption:=LanguageSetup.Left;
   SoundVolumeLeftLabel6.Caption:=LanguageSetup.Left;
+  SoundVolumeLeftLabel7.Caption:=LanguageSetup.Left;
   SoundVolumeRightLabel1.Caption:=LanguageSetup.Right;
   SoundVolumeRightLabel2.Caption:=LanguageSetup.Right;
   SoundVolumeRightLabel3.Caption:=LanguageSetup.Right;
   SoundVolumeRightLabel4.Caption:=LanguageSetup.Right;
   SoundVolumeRightLabel5.Caption:=LanguageSetup.Right;
   SoundVolumeRightLabel6.Caption:=LanguageSetup.Right;
+  SoundVolumeRightLabel7.Caption:=LanguageSetup.Right;
   SoundVolumeMasterLabel.Caption:=LanguageSetup.ProfileEditorSoundMasterVolume;
   SoundVolumeDisneyLabel.Caption:=LanguageSetup.ProfileEditorSoundMiscDisneySoundsSource;
   SoundVolumeSpeakerLabel.Caption:=LanguageSetup.ProfileEditorSoundMiscPCSpeaker;
   SoundVolumeGUSLabel.Caption:=LanguageSetup.ProfileEditorSoundGUS;
   SoundVolumeSBLabel.Caption:=LanguageSetup.ProfileEditorSoundSoundBlaster;
   SoundVolumeFMLabel.Caption:=LanguageSetup.ProfileEditorSoundFM;
+  SoundVolumeCDLabel.Caption:=LanguageSetup.ProfileEditorSoundCD;
 
   JustChanging:=False;
 
@@ -125,6 +137,8 @@ begin
   SoundVolumeSBRightEdit.Value:=Game.MixerVolumeSBRight;
   SoundVolumeFMLeftEdit.Value:=Game.MixerVolumeFMLeft;
   SoundVolumeFMRightEdit.Value:=Game.MixerVolumeFMRight;
+  SoundVolumeCDLeftEdit.Value:=Game.MixerVolumeCDLeft;
+  SoundVolumeCDRightEdit.Value:=Game.MixerVolumeCDRight;
 
   SpinEditChange(self);
 end;
@@ -150,6 +164,9 @@ begin
     SoundVolumeSBRightTrackBar.Position:=SoundVolumeSBRightTrackBar.Max-SoundVolumeSBRightEdit.Value;
     SoundVolumeFMLeftTrackBar.Position:=SoundVolumeFMLeftTrackBar.Max-SoundVolumeFMLeftEdit.Value;
     SoundVolumeFMRightTrackBar.Position:=SoundVolumeFMRightTrackBar.Max-SoundVolumeFMRightEdit.Value;
+    SoundVolumeCDLeftTrackBar.Position:=SoundVolumeCDLeftTrackBar.Max-SoundVolumeCDLeftEdit.Value;
+    SoundVolumeCDRightTrackBar.Position:=SoundVolumeCDRightTrackBar.Max-SoundVolumeCDRightEdit.Value;
+
   finally
     JustChanging:=False;
   end;
@@ -172,6 +189,8 @@ begin
     SoundVolumeSBRightEdit.Value:=SoundVolumeSBRightTrackBar.Max-SoundVolumeSBRightTrackBar.Position;
     SoundVolumeFMLeftEdit.Value:=SoundVolumeFMLeftTrackBar.Max-SoundVolumeFMLeftTrackBar.Position;
     SoundVolumeFMRightEdit.Value:=SoundVolumeFMRightTrackBar.Max-SoundVolumeFMRightTrackBar.Position;
+    SoundVolumeCDLeftEdit.Value:=SoundVolumeCDLeftTrackBar.Max-SoundVolumeCDLeftTrackBar.Position;
+    SoundVolumeCDRightEdit.Value:=SoundVolumeCDRightTrackBar.Max-SoundVolumeCDRightTrackBar.Position;
   finally
     JustChanging:=False;
   end;
@@ -196,6 +215,8 @@ begin
   Game.MixerVolumeSBRight:=SoundVolumeSBRightEdit.Value;
   Game.MixerVolumeFMLeft:=SoundVolumeFMLeftEdit.Value;
   Game.MixerVolumeFMRight:=SoundVolumeFMRightEdit.Value;
+  Game.MixerVolumeCDLeft:=SoundVolumeCDLeftEdit.Value;
+  Game.MixerVolumeCDRight:=SoundVolumeCDRightEdit.Value;
 end;
 
 end.

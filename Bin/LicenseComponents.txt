@@ -55,9 +55,11 @@ Dr.SAGURA Media Player
 
 Used artwork:
 
-Program icon by T.B.@Vogons
+Program icon by burnsflipper (guybrush_threepwood@Vogons)
 
 Toolbar icons of the modern icon set:
 http://www.famfamfam.com/lab/icons/mini/ and
 http://www.famfamfam.com/lab/icons/silk/
 (licensed under the creative commons attribution 2.5 license)
+
+Installer artwork by Tim Molderez (tim.molderez@telenet.be)

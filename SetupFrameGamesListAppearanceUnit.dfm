@@ -46,6 +46,13 @@ object SetupFrameGamesListAppearance: TSetupFrameGamesListAppearance
     Height = 13
     Caption = 'Schriftfarbe:'
   end
+  object NoteInTooltipLabel: TLabel
+    Left = 32
+    Top = 296
+    Width = 230
+    Height = 13
+    Caption = 'Maximale Anzahl an Kommentarzeilen im Tooltip:'
+  end
   object GamesListBackgroundRadioButton1: TRadioButton
     Left = 16
     Top = 16
@@ -113,13 +120,13 @@ object SetupFrameGamesListAppearance: TSetupFrameGamesListAppearance
     Left = 16
     Top = 140
     Width = 551
-    Height = 52
+    Height = 46
     Anchors = [akLeft, akTop, akRight]
     Caption = 'Anzeige f'#252'r "Nicht definiert"'
     TabOrder = 7
     DesignSize = (
       551
-      52)
+      46)
     object NotSetRadioButton1: TRadioButton
       Left = 16
       Top = 18
@@ -157,9 +164,9 @@ object SetupFrameGamesListAppearance: TSetupFrameGamesListAppearance
   end
   object FavoriteGroupBox: TGroupBox
     Left = 16
-    Top = 198
+    Top = 192
     Width = 551
-    Height = 45
+    Height = 42
     Anchors = [akLeft, akTop, akRight]
     Caption = 'Darstellung der Favoriten'
     TabOrder = 8
@@ -190,7 +197,7 @@ object SetupFrameGamesListAppearance: TSetupFrameGamesListAppearance
   end
   object WindowsExeIconsCheckBox: TCheckBox
     Left = 16
-    Top = 263
+    Top = 250
     Width = 551
     Height = 17
     Anchors = [akLeft, akTop, akRight]
@@ -199,12 +206,22 @@ object SetupFrameGamesListAppearance: TSetupFrameGamesListAppearance
   end
   object ShowTooltipsCheckBox: TCheckBox
     Left = 16
-    Top = 285
+    Top = 273
     Width = 551
     Height = 17
     Anchors = [akLeft, akTop, akRight]
     Caption = 'Tooltips anzeigen'
     TabOrder = 10
+  end
+  object NoteInTooltipEdit: TSpinEdit
+    Left = 32
+    Top = 313
+    Width = 57
+    Height = 22
+    MaxValue = 100
+    MinValue = 1
+    TabOrder = 11
+    Value = 0
   end
   object ImageOpenDialog: TOpenDialog
     DefaultExt = 'jpeg'

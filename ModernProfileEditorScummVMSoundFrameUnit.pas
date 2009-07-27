@@ -71,6 +71,8 @@ begin
   with OutputRateComboBox.Items do begin Add('11025'); Add('22050'); Add('44100'); end;
   St:=ValueToList(InitData.GameDB.ConfOpt.ScummVMMusicDriver,';,'); try MusicDriverComboBox.Items.AddStrings(St); finally St.Free; end;
 
+  AddDefaultValueHint(MusicDriverComboBox);
+
   HelpContext:=ID_ProfileEditSound;
 end;
 

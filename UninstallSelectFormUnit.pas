@@ -39,7 +39,8 @@ Function UninstallMultipleGames(const AOwner : TComponent; const AGameDB : TGame
 implementation
 
 uses VistaToolsUnit, LanguageSetupUnit, UninstallFormUnit, CommonTools,
-     PrgSetupUnit, PrgConsts, ProgressFormUnit, GameDBToolsUnit, HelpConsts;
+     PrgSetupUnit, PrgConsts, WaitFormUnit, GameDBToolsUnit, HelpConsts,
+     IconLoaderUnit;
 
 {$R *.dfm}
 
@@ -61,6 +62,10 @@ begin
   SelectAllButton.Caption:=LanguageSetup.All;
   SelectNoneButton.Caption:=LanguageSetup.None;
   SelectGenreButton.Caption:=LanguageSetup.GameBy;
+
+  UserIconLoader.DialogImage(DI_OK,OKButton);
+  UserIconLoader.DialogImage(DI_Cancel,CancelButton);
+  UserIconLoader.DialogImage(DI_Help,HelpButton);
 end;
 
 procedure TUninstallSelectForm.FormShow(Sender: TObject);

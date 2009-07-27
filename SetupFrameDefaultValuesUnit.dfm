@@ -21,7 +21,7 @@ object SetupFrameDefaultValues: TSetupFrameDefaultValues
     Height = 21
     Style = csDropDownList
     Anchors = [akLeft, akTop, akRight]
-    ItemHeight = 13
+    ItemHeight = 0
     TabOrder = 0
     OnChange = DefaultValueComboBoxChange
     OnDropDown = DefaultValueComboBoxDropDown

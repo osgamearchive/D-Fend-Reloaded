@@ -41,7 +41,6 @@ object ImportSelectTemplateForm: TImportSelectTemplateForm
     TabOrder = 0
     OnClick = OKButtonClick
     Kind = bkOK
-    ExplicitTop = 217
   end
   object CancelButton: TBitBtn
     Left = 110
@@ -51,7 +50,6 @@ object ImportSelectTemplateForm: TImportSelectTemplateForm
     Anchors = [akLeft, akBottom]
     TabOrder = 1
     Kind = bkCancel
-    ExplicitTop = 217
   end
   object ComboBox: TComboBox
     Left = 8

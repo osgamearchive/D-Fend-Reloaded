@@ -43,7 +43,6 @@ object OperationModeInfoForm: TOperationModeInfoForm
     Anchors = [akLeft, akBottom]
     TabOrder = 0
     Kind = bkOK
-    ExplicitTop = 289
   end
   object PrgDirEdit: TLabeledEdit
     Left = 16
@@ -56,7 +55,6 @@ object OperationModeInfoForm: TOperationModeInfoForm
     EditLabel.Caption = 'PrgDirEdit'
     ReadOnly = True
     TabOrder = 7
-    ExplicitTop = 197
   end
   object PrgDataDirEdit: TLabeledEdit
     Left = 16
@@ -69,7 +67,6 @@ object OperationModeInfoForm: TOperationModeInfoForm
     EditLabel.Caption = 'PrgDataDirEdit'
     ReadOnly = True
     TabOrder = 8
-    ExplicitTop = 245
   end
   object CheckBox1: TCheckBox
     Left = 16
@@ -132,7 +129,6 @@ object OperationModeInfoForm: TOperationModeInfoForm
     TabOrder = 1
     OnClick = HelpButtonClick
     Kind = bkHelp
-    ExplicitTop = 289
   end
   object BaseDirEdit: TLabeledEdit
     Left = 16
@@ -145,6 +141,5 @@ object OperationModeInfoForm: TOperationModeInfoForm
     EditLabel.Caption = 'BaseDirEdit'
     ReadOnly = True
     TabOrder = 9
-    ExplicitTop = 293
   end
 end

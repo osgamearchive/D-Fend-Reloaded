@@ -16,6 +16,7 @@
 <h1>Version history</h1>
 
 <p class="small">
+  <a href="#ver080">Version 0.8.0 (07/28/2009)</a><br />
   <a href="#ver070">Version 0.7.0 (04/28/2009)</a><br />
   <a href="#ver061">Version 0.6.1 (10/31/2008)</a><br />
   <a href="#ver060">Version 0.6.0 (10/20/2008)</a><br />
@@ -30,6 +31,38 @@
   <a href="#ver011">Version 0.1.1 (12/18/2007)</a><br />
   <a href="#ver010">Version 0.1.0 (11/08/2007)</a>
 </p>
+
+<a onclick="Work('ver080')" name="ver080" href="#"><h2>&raquo; Version 0.8.0 (07/28/2009)</h2></a>
+<div id="ver080">
+<ul>
+  <li>DOSBox 0.73 is supported and bundled with D-Fend Reloaded.</li>
+  <li>The user can switch between different icon sets for the toolbar, the menus and the dialogs now.</li>
+  <li>The dialog for scanning the games folder for new games has been rewritten and offers more options now.</li>
+  <li>Faster program start when using large game lists.</li>
+  <li>More settings in the multiple profiles editor.</li>
+  <li>New program icon and logo made by burnsflipper, the designer of the original D-Fend logo.</li>
+  <li>New tab "Notes" at the bottom of the program window for direct access to the stored game notes.</li>
+  <li>Now you can choose to use the game filesnames or the folder names as names for the new profiles when scanning the games folder for new games.</li>
+  <li>Via the new multiple shortcut creation dialog you can create shortcuts for more than one game at once.</li>
+  <li>Now the user can select the profile name, the template to use, the destination folder and the file to start when importing zip files (regardless if the new game was identified by an auto setup template or not).</li>
+  <li>Support for user-defined interpreters (like before only for QBasic) inside DOSBox.</li>
+  <li>Better algorithm for scaling images when displaying captured screenshots.</li>
+  <li>Now icons can also be added to the icon manager by dragging them to the icon manager window and by scanning the games folder for new icons. Additionally the icon manager will show icons added by copying them to the icons folder immediately.</li>
+  <li>New optional start mode: Fullscreen without window border.</li>
+  <li>The default parent directory for the capture folders for games can be configurated in the setup dialog now.</li>
+  <li>The icon size for the game icons in the games list in view mode "Icon" can be configurated now.</li>
+  <li>The first start wizard has been improved and now is easier to use.</li>
+  <li>Now "Pause" can be chosen as DOSBox background priority.</li>
+  <li>The scan games folder for new games function is now also respecting the extra program folders of existing profiles and is not trying to detect games in this folders anymore.</li>
+  <li>Cleaned up menu structure (in particular the function for creating archive or exe packages for multiple games have been moved from the Extras to the Export menu).</li>
+  <li>Option to hide the menubar.</li>
+  <li>Faster search for DOSBox if it is not stored in the default directory.</li>
+  <li>[Fix] Error message when closing the profile editor dialog when editing a template.</li>
+  <li>[Fix] If the first run wizard is closed by clicking the window close "X" the settings are not stored.</li>
+  <li>[Fix] Now 16-bit Windows exe files are also recogniced as Windows program files and the user is warned if he trys to start a 16-bit Windows program file via DOSBox.</li>
+  <li>[Fix] When running a profile using a helper program to be executed after the main program via a shortcut the helper program was not executed.</li>
+</ul>
+</div>
 
 <a onclick="Work('ver070')" name="ver070" href="#"><h2>&raquo; Version 0.7.0 (04/28/2009)</h2></a>
 <div id="ver070">

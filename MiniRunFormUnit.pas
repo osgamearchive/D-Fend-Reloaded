@@ -33,7 +33,7 @@ Function ShowMiniRunDialog(const AOwner : TComponent; const AGameDB : TGameDB) :
 implementation
 
 uses VistaToolsUnit, LanguageSetupUnit, CommonTools, DosBoxUnit, ScummVMUnit,
-     GameDBToolsUnit, WindowsProfileUnit;
+     GameDBToolsUnit, WindowsProfileUnit, IconLoaderUnit;
 
 {$R *.dfm}
 
@@ -48,6 +48,9 @@ begin
   Caption:=LanguageSetup.TrayPopupRunInfo;
   OKButton.Caption:=LanguageSetup.OK;
   CancelButton.Caption:=LanguageSetup.Cancel;
+
+  UserIconLoader.DialogImage(DI_OK,OKButton);
+  UserIconLoader.DialogImage(DI_Cancel,CancelButton);
 
   Top:=Screen.WorkAreaRect.Bottom-Height;
   Left:=Screen.WorkAreaRect.Right-Width;

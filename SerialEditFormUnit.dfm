@@ -180,6 +180,8 @@ object SerialEditForm: TSerialEditForm
       Left = 0
       Top = 0
       Caption = 'NullModem'
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object NullModemPortLabel: TLabel
         Left = 17
         Top = 8
@@ -287,6 +289,8 @@ object SerialEditForm: TSerialEditForm
       Left = 0
       Top = 0
       Caption = 'DirectSerial'
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object DirectSerialRXDelayLabel: TLabel
         Left = 17
         Top = 61

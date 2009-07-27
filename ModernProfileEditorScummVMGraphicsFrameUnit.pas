@@ -46,6 +46,9 @@ begin
   RenderModeLabel.Caption:=LanguageSetup.ProfileEditorScummVMRenderMode;
   St:=ValueToList(InitData.GameDB.ConfOpt.ScummVMRenderMode,';,'); try RenderModeComboBox.Items.AddStrings(St); finally St.Free; end;
 
+  AddDefaultValueHint(FilterComboBox);
+  AddDefaultValueHint(RenderModeComboBox);
+
   StartFullscreenCheckBox.Caption:=LanguageSetup.GameStartFullscreen;
   KeepAspectRatioCheckBox.Caption:=LanguageSetup.GameAspectCorrection;
 

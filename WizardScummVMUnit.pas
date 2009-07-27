@@ -125,17 +125,17 @@ begin
     then Game.ScummVMGame:=ScummVMGamesList.NameFromDescription(GameNameComboBox.Text)
     else Game.ScummVMGame:='';
   If DataFolderButton.Visible then begin
-    Game.DataDir:=DataFolderEdit.Text;
+    Game.DataDir:=MakeRelPath(DataFolderEdit.Text,PrgSetup.BaseDir);
   end else begin
     If DataFolderAutomaticCheckBox.Checked then begin
       If PrgSetup.DataDir='' then T:=PrgSetup.BaseDir else T:=PrgSetup.DataDir;
       S:=IncludeTrailingPathDelimiter(T)+MakeFileSysOKFolderName(Game.Name)+'\';
       I:=0;
-      While DirectoryExists(MakeAbsPath(S,PrgSetup.BaseDir)) do begin
+      While (not PrgSetup.IgnoreDirectoryCollisions) and DirectoryExists(MakeAbsPath(S,PrgSetup.BaseDir)) do begin
         inc(I);
         S:=IncludeTrailingPathDelimiter(T)+MakeFileSysOKFolderName(Game.Name)+IntToStr(I)+'\';
       end;
-      Game.DataDir:=S;
+      Game.DataDir:=MakeRelPath(S,PrgSetup.BaseDir);
     end else begin
       Game.DataDir:='';
     end;

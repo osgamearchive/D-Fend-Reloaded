@@ -26,7 +26,7 @@ Procedure ShowFullscreenInfoDialog(const AOwner : TComponent);
 
 implementation
 
-uses LanguageSetupUnit, VistaToolsUnit, CommonTools, PrgSetupUnit;
+uses LanguageSetupUnit, VistaToolsUnit, CommonTools, PrgSetupUnit, IconLoaderUnit;
 
 {$R *.dfm}
 
@@ -39,6 +39,8 @@ begin
   InfoLabel.Caption:=LanguageSetup.FullscreenInfoInfo;
   CheckBox.Caption:=LanguageSetup.FullscreenInfoCheckbox;
   OKButton.Caption:=LanguageSetup.OK;
+
+  UserIconLoader.DialogImage(DI_OK,OKButton);
 
   InfoLabel.Font.Style:=[fsBold];
 end;

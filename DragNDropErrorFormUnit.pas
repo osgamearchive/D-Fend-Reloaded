@@ -29,7 +29,7 @@ implementation
 
 {$R *.dfm}
 
-uses VistaToolsUnit, LanguageSetupUnit, CommonTools;
+uses VistaToolsUnit, LanguageSetupUnit, CommonTools, IconLoaderUnit;
 
 procedure TDragNDropErrorForm.FormCreate(Sender: TObject);
 begin
@@ -39,6 +39,8 @@ begin
   Caption:=LanguageSetup.DragDropErrorInfoDialogCaption;
   InfoLabel.Caption:=LanguageSetup.DragDropErrorInfoDialogLabel;
   OKButton.Caption:=LanguageSetup.OK;
+
+  UserIconLoader.DialogImage(DI_OK,OKButton);
 end;
 
 procedure TDragNDropErrorForm.FormShow(Sender: TObject);

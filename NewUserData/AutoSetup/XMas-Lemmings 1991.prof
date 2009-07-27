@@ -1,21 +1,37 @@
 [Extra]
-Loadhigh=0
-CloseOnExit=1
-AutoMountCDs=0
-Overridegamestart=0
-OverrideMount=0
-LoadFixVal=64
 NrOfMounts=1
-Tab=1
 Tab2=0
 Exe=VGALEMMI.BAT
 ExeMD5=DA87CD4730CF0FB4334416E85D57A801
-Setup=
 SetupMD5=
-GameParameters=
-SetupParameters=
 LastModification=39549-83447
 0=.\VirtualHD;Drive;C;False;;
+Environment=PATH[61]Z:\[13][10]
+Loadhigh=0
+CloseOnExit=1
+AutoMountCDs=0
+SecureMode=1
+Overridegamestart=0
+OverrideMount=0
+LoadFixVal=64
+Tab=0
+Setup=
+GameParameters=
+SetupParameters=
+ExtraDirs=
+ExtraFiles=
+ScreenshotListScreenshot=
+ExtraExe0=
+ExtraExe1=
+ExtraExe2=
+ExtraExe3=
+ExtraExe4=
+ExtraExe5=
+ExtraExe6=
+ExtraExe7=
+ExtraExe8=
+ExtraExe9=
+DataDir=
 1=
 2=
 3=
@@ -29,36 +45,33 @@ autoexec=
 BootImage=
 Finalization=
 CustomSettings=
-Environment=PATH[61]Z:\[13]
 ProfileMode=DOSBox
-ExtraDirs=
-ExtraFiles=
-DataDir=
 
 [ExtraInfo]
-Favorite=0
-Name=XMas-Lemmings 1991
-Icon=
 Genre=Lemmings
 Developer=DMA Design Limited
 Publisher=Psygnosis Limited
 Year=1991
+Language=English
+Favorite=0
+Name=XMas-Lemmings 1991
+Icon=
 Notes=
 WWW=
-Language=English
 UserInfo=
 
 [sdl]
-fullscreen=1
 autolock=0
 fulldouble=1
+output=overlay
+mapperfile=mapper.txt
+fullscreen=1
 usecancodes=1
 sensitivity=100
-output=overlay
 windowresolution=original
 fullresolution=original
 priority=higher,normal
-mapperfile=mapper.txt
+DOSBoxlanguage=default
 
 [dos]
 Force2ButtonMouseMode=0
@@ -76,8 +89,8 @@ CapsLockStatus=
 ScrollLockStatus=
 
 [render]
-aspect=0
 TextModeLines=25
+aspect=0
 frameskip=0
 scaler=normal2x
 
@@ -115,25 +128,28 @@ VolumeSBLeft=100
 VolumeSBRight=100
 VolumeFMLeft=100
 VolumeFMRight=100
+VolumeCDLeft=100
+VolumeCDRight=100
 
 [sblaster]
+sbtype=sbpro2
 mixer=1
 sbbase=220
 irq=7
 dma=1
 hdma=5
 oplrate=22050
-sbtype=sbpro2
 oplmode=auto
+oplemu=default
 
 [gus]
+irq2=5
+dma2=1
 gus=1
 gusrate=22050
 gusbase=240
 irq1=5
-irq2=5
 dma1=1
-dma2=1
 ultradir=C:\ULTRASND
 
 [speaker]
@@ -168,31 +184,67 @@ GamePath=
 Filter=2x
 Language=en
 MusicDriver=auto
+ConfirmExit=0
+AltIntro=0
+MusicMute=0
+ObjectLabels=0
+ReverseStereo=0
+SFXMute=0
+CDROM=0
+JoystickNum=0
+GFXDetails=3
+Walkspeed=2
+GameZipFile=
+RenderMode=
+Savepath=
+ExtraPath=
+Platform=
 
 [dosbox]
+DOSBoxDirectory=Default
+machine=vga_s3
 memsize=16
-captures=
-DOSBoxDirectory=
-machine=vga
+captures=.\Capture\
 
 [cpu]
-cyclesup=500
-cyclesdown=20
 core=normal
 cycles=3000
+cyclesup=500
+cyclesdown=20
+type=auto
 
 [vga]
 videoram=2048
 svgachipset=s3
+PixelShader=
 
 [serial]
 serial1=Dummy
-serial2=dummy
-serial3=disabled
-serial4=disabled
+serial2=Dummy
+serial3=Disabled
+serial4=Disabled
 
 [midi]
 mpu401=intelligent
 device=default
 config=
+
+[ExtraGameIdentify]
+File1.Filename=LEVEL000.DAT
+File2.Filename=VGAGR0.DAT
+File3.Filename=GROUND0O.DAT
+File4.Filename=GROUND2O.DAT
+File5.Filename=INSTALL.EXE
+File1.Checksum=0CD9F9D5D922277D233F4D6B06D4040C
+File2.Checksum=B6128E6021212C0AE6CFF5BE9FDA7513
+File3.Checksum=F25355FB4C78E3CDBE5BEEE72C0D629B
+File4.Checksum=5193119BDECF2FA1511A59A2C8AF24CE
+File5.Checksum=0AE813142726176D3DEEC38F84C87B02
+
+[ExtraCommands]
+BeforeExecution.Wait=1
+BeforeExecution.Minimized=0
+AfterExecution.Minimized=0
+BeforeExecution=
+AfterExecution=
 

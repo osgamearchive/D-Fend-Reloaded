@@ -23,6 +23,8 @@ type
     OplSampleRateComboBox: TComboBox;
     OplSampleRateLabel: TLabel;
     UseMixerCheckBox: TCheckBox;
+    OplEmuComboBox: TComboBox;
+    OplEmuLabel: TLabel;
   private
     { Private-Deklarationen }
   public
@@ -51,6 +53,7 @@ begin
   NoFlicker(DMAComboBox);
   NoFlicker(HDMAComboBox);
   NoFlicker(OplModeComboBox);
+  NoFlicker(OplEmuComboBox);
   NoFlicker(OplSampleRateComboBox);
   NoFlicker(UseMixerCheckBox);
 
@@ -66,9 +69,20 @@ begin
   St:=ValueToList(InitData.GameDB.ConfOpt.HDMA,';,'); try HDMAComboBox.Items.AddStrings(St); finally St.Free; end;
   OplModeLabel.Caption:=LanguageSetup.ProfileEditorSoundSBOplMode;
   St:=ValueToList(InitData.GameDB.ConfOpt.Oplmode,';,'); try OplModeComboBox.Items.AddStrings(St); finally St.Free; end;
+  OplEmuLabel.Caption:=LanguageSetup.GameOplemu;
+  St:=ValueToList(InitData.GameDB.ConfOpt.OPLEmu,';,'); try OplEmuComboBox.Items.AddStrings(St); finally St.Free; end;
   OplSampleRateLabel.Caption:=LanguageSetup.ProfileEditorSoundSBOplRate;
   St:=ValueToList(InitData.GameDB.ConfOpt.OPLRate,';,'); try OplSampleRateComboBox.Items.AddStrings(St); finally St.Free; end;
   UseMixerCheckBox.Caption:=LanguageSetup.ProfileEditorSoundSBUseMixer;
+
+  AddDefaultValueHint(TypeComboBox);
+  AddDefaultValueHint(AddressComboBox);
+  AddDefaultValueHint(InterruptComboBox);
+  AddDefaultValueHint(DMAComboBox);
+  AddDefaultValueHint(HDMAComboBox);
+  AddDefaultValueHint(OplModeComboBox);
+  AddDefaultValueHint(OplEmuComboBox);
+  AddDefaultValueHint(OplSampleRateComboBox);
 
   HelpContext:=ID_ProfileEditSoundSoundBlaster;
 end;
@@ -98,6 +112,7 @@ begin
   SetComboBox(DMAComboBox,IntToStr(Game.SBDMA),'1');
   SetComboBox(HDMAComboBox,IntToStr(Game.SBHDMA),'5');
   SetComboBox(OplModeComboBox,Game.SBOplMode,'auto');
+  SetComboBox(OplEmuComboBox,Game.SBOplEmu,'default');
   SetComboBox(OplSampleRateComboBox,IntToStr(Game.SBOplRate),'22050');
   UseMixerCheckBox.Checked:=Game.SBMixer;
 end;
@@ -119,6 +134,7 @@ begin
   try Game.SBDMA:=StrToInt(DMAComboBox.Text); except end;
   try Game.SBHDMA:=StrToInt(HDMAComboBox.Text); except end;
   Game.SBOplMode:=OplModeComboBox.Text;
+  Game.SBOplEmu:=OplEmuComboBox.Text;
   try Game.SBOplRate:=StrToInt(OplSampleRateComboBox.Text); except end;
   Game.SBMixer:=UseMixerCheckBox.Checked;
 end;

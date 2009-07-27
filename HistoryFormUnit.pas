@@ -38,7 +38,7 @@ Procedure ShowHistoryDialog(const AOwner : TComponent);
 implementation
 
 uses GameDBToolsUnit, LanguageSetupUnit, VistaToolsUnit, CommonTools,
-     HelpConsts, PrgSetupUnit;
+     HelpConsts, PrgSetupUnit, IconLoaderUnit;
 
 {$R *.dfm}
 
@@ -59,6 +59,10 @@ begin
   CloseButton.Caption:=LanguageSetup.Close;
   ClearButton.Caption:=LanguageSetup.Clear;
   HelpButton.Caption:=LanguageSetup.Help;
+
+  UserIconLoader.DialogImage(DI_Close,CloseButton);
+  UserIconLoader.DialogImage(DI_Clear,ClearButton);
+  UserIconLoader.DialogImage(DI_Help,HelpButton);
 
   LoadHistory(ListView);
   LoadHistoryStatistics(ListView2);

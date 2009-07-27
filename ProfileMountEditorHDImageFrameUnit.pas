@@ -104,7 +104,7 @@ end;
 function TProfileMountEditorHDImageFrame.Done: String;
 begin
   {ImageFile;IMAGE;LetterOR23;;;geometry}
-  result:=ImageEdit.Text+';Image;'+ImageDriveLetterComboBox.Text+';;;'+ImageGeometryEdit.Text;
+  result:=MakeRelPath(ImageEdit.Text,PrgSetup.BaseDir)+';Image;'+ImageDriveLetterComboBox.Text+';;;'+ImageGeometryEdit.Text;
 end;
 
 function TProfileMountEditorHDImageFrame.GetName: String;

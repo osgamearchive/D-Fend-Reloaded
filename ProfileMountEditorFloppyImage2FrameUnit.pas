@@ -135,7 +135,8 @@ Var S : String;
     I : Integer;
 begin
   {ImageFile;FLOPPYIMAGE;Letter;;;}
-  S:=FloppyImageTab.Cells[0,0]; For I:=1 to FloppyImageTab.RowCount-1 do S:=S+'$'+FloppyImageTab.Cells[0,I];
+  S:=MakeRelPath(FloppyImageTab.Cells[0,0],PrgSetup.BaseDir); For I:=1 to FloppyImageTab.RowCount-1 do S:=S+'$'+MakeRelPath(FloppyImageTab.Cells[0,I],PrgSetup.BaseDir);
+
   result:=S+';FloppyImage;'+FloppyImageDriveLetterComboBox2.Text+';;;';
 end;
 

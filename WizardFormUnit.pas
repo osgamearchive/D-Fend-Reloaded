@@ -111,6 +111,9 @@ begin
 
   UserIconLoader.DialogImage(DI_Previous,PreviousButton);
   UserIconLoader.DialogImage(DI_Next,NextButton);
+  UserIconLoader.DialogImage(DI_OK,OKButton);
+  UserIconLoader.DialogImage(DI_Cancel,CancelButton);
+  UserIconLoader.DialogImage(DI_Help,HelpButton);
 
   DoOKButtonClick:=False;
   ActivePage:=0;

@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, Buttons, ComCtrls, ImgList;
+  Dialogs, StdCtrls, Buttons, ComCtrls, ImgList, ExtCtrls, Menus;
 
 type
   TIconManagerForm = class(TForm)
@@ -20,6 +20,10 @@ type
     CustomIconEdit: TEdit;
     CustomIconButton: TSpeedButton;
     HelpButton: TBitBtn;
+    Timer: TTimer;
+    PopupMenu: TPopupMenu;
+    PopupAddIcon: TMenuItem;
+    PopupAddAllIcons: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure ListViewDblClick(Sender: TObject);
     procedure OKButtonClick(Sender: TObject);
@@ -35,10 +39,18 @@ type
     procedure FormShow(Sender: TObject);
     procedure HelpButtonClick(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure FormResize(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
+    procedure TimerTimer(Sender: TObject);
+    procedure ListViewDragDrop(Sender, Source: TObject; X, Y: Integer);
   private
     { Private-Deklarationen }
     Dir, LastIcon : String;
+    hIconsChangeNotification : THandle;
     Procedure LoadIcons;
+    Procedure PostResize(var Msg : TMessage); Message WM_USER+1;
+    Procedure ScanFolderForIcons(const Folder : String);
+    Procedure AddIconFromFolder(const IconFile : String);
   public
     { Public-Deklarationen }
     IconName : String;
@@ -53,7 +65,7 @@ Function ShowIconManager(const AOwner : TComponent; var AIcon : String; const AD
 implementation
 
 uses LanguageSetupUnit, VistaToolsUnit, CommonTools, PrgConsts, PrgSetupUnit,
-     HelpConsts, IconLoaderUnit;
+     HelpConsts, IconLoaderUnit, ClassExtensions;
 
 {$R *.dfm}
 
@@ -70,6 +82,8 @@ begin
   CancelButton.Caption:=LanguageSetup.Cancel;
   HelpButton.Caption:=LanguageSetup.Help;
   AddButton.Caption:=LanguageSetup.Add;
+  PopupAddIcon.Caption:=LanguageSetup.MenuExtrasIconManagerAddSingle;
+  PopupAddAllIcons.Caption:=LanguageSetup.MenuExtrasIconManagerAddAll;
   DelButton.Caption:=LanguageSetup.Del;
 
   OpenDialog.Title:=LanguageSetup.MenuExtrasIconManagerDialog;
@@ -78,13 +92,44 @@ begin
   Dir:=IncludeTrailingPathDelimiter(PrgDataDir+IconsSubDir);
 
   UserIconLoader.DialogImage(DI_SelectFile,CustomIconButton);
+  UserIconLoader.DialogImage(DI_OK,OKButton);
+  UserIconLoader.DialogImage(DI_Cancel,CancelButton);
+  UserIconLoader.DialogImage(DI_Add,AddButton);
+  UserIconLoader.DialogImage(DI_Delete,DelButton);
+  UserIconLoader.DialogImage(DI_Help,HelpButton);
+
+  hIconsChangeNotification:=FindFirstChangeNotification(
+    PChar(PrgDataDir+IconsSubDir),
+    True,
+    FILE_NOTIFY_CHANGE_FILE_NAME or FILE_NOTIFY_CHANGE_DIR_NAME or FILE_NOTIFY_CHANGE_ATTRIBUTES or FILE_NOTIFY_CHANGE_SIZE or FILE_NOTIFY_CHANGE_LAST_WRITE or FILE_NOTIFY_CHANGE_SECURITY
+  );
 end;
 
 procedure TIconManagerForm.FormShow(Sender: TObject);
 begin
   LastIcon:=IconName;
   LoadIcons;
+
+  ListView:=TListView(NewWinControlType(ListView,TListViewAcceptingFilesAndSpecialHint,ctcmDangerousMagic));
+  TListViewAcceptingFilesAndSpecialHint(ListView).ActivateAcceptFiles;
+
+  Timer.Enabled:=True;
 end;
+
+procedure TIconManagerForm.FormDestroy(Sender: TObject);
+begin
+  If hIconsChangeNotification<>INVALID_HANDLE_VALUE then FindCloseChangeNotification(hIconsChangeNotification);
+end;
+
+procedure TIconManagerForm.TimerTimer(Sender: TObject);
+begin
+  If (hIconsChangeNotification<>INVALID_HANDLE_VALUE) and (WaitForSingleObject(hIconsChangeNotification,0)=WAIT_OBJECT_0) then begin
+    If ListView.Selected<>nil then LastIcon:=ListView.Selected.Caption else LastIcon:='';
+    LoadIcons;
+    FindNextChangeNotification(hIconsChangeNotification);
+  end;
+end;
+
 
 procedure TIconManagerForm.LoadIcons;
 Var I : Integer;
@@ -138,7 +183,6 @@ begin
   end;
 end;
 
-
 procedure TIconManagerForm.OKButtonClick(Sender: TObject);
 begin
   If LibraryIconRadioButton.Checked then begin
@@ -152,6 +196,16 @@ begin
   end;
 end;
 
+procedure TIconManagerForm.FormResize(Sender: TObject);
+begin
+  PostMessage(Handle,WM_User+2,0,0);
+end;
+
+procedure TIconManagerForm.PostResize(var Msg: TMessage);
+begin
+  If Assigned(ListView) then ListView.Arrange(arAlignLeft);
+end;
+
 procedure TIconManagerForm.ListViewChange(Sender: TObject; Item: TListItem; Change: TItemChange);
 begin
   DelButton.Enabled:=(ListView.ItemIndex>=0);
@@ -161,6 +215,18 @@ procedure TIconManagerForm.ListViewDblClick(Sender: TObject);
 begin
   LibraryIconRadioButton.Checked:=True;
   OKButton.Click;
+end;
+
+procedure TIconManagerForm.ListViewDragDrop(Sender, Source: TObject; X, Y: Integer);
+Var FileList : TStringList;
+    I : Integer;
+begin
+  If (Source=nil) or (not (Source is TStringList)) then exit;
+  FileList:=(Source as TStringList);
+
+  For I:=0 to FileList.Count-1 do begin
+    CopyFile(PChar(FileList[I]),PChar(PrgDataDir+IconsSubDir+'\'+ExtractFileName(FileList[I])),False);
+  end;
 end;
 
 procedure TIconManagerForm.ListViewKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -174,20 +240,65 @@ begin
 end;
 
 procedure TIconManagerForm.AddButtonClick(Sender: TObject);
-Var S : String;
+Var P : TPoint;
+    S : String;
 begin
-  S:=ExtractFilePath(MakeAbsIconName(Trim(CustomIconEdit.Text)));
-  If S='' then S:=DefaultCustomIconFolder;
-  If S='' then S:=PrgSetup.BaseDir;
-  If S<>'' then OpenDialog.InitialDir:=S;
-  if not OpenDialog.Execute then exit;
+  Case (Sender as TComponent).Tag of
+    0 : begin
+          P:=ClientToScreen(Point(AddButton.Left,AddButton.Top));
+          PopupMenu.Popup(P.X+5,P.Y+5);
+        end;
+    1 : begin
+          S:=ExtractFilePath(MakeAbsIconName(Trim(CustomIconEdit.Text)));
+          If S='' then S:=DefaultCustomIconFolder;
+          If S='' then S:=PrgSetup.BaseDir;
+          If S<>'' then OpenDialog.InitialDir:=S;
+          if not OpenDialog.Execute then exit;
+          if not CopyFile(PChar(OpenDialog.FileName),PChar(Dir+ExtractFileName(OpenDialog.FileName)),True) then begin
+            MessageDlg(Format(LanguageSetup.MessageCouldNotCopyFile,[OpenDialog.FileName,Dir+ExtractFileName(OpenDialog.FileName)]),mtError,[mbOK],0);
+            exit;
+          end;
+          LastIcon:=ExtractFileName(OpenDialog.FileName);
+          LoadIcons;
+        end;
+    2 : begin
+          Enabled:=False;
+          try
+            ScanFolderForIcons(MakeAbsPath(PrgSetup.GameDir,PrgSetup.BaseDir));
+          finally
+            Enabled:=True;
+          end;
+          LoadIcons;
+        end;
+  End;
+end;
 
-  if not CopyFile(PChar(OpenDialog.FileName),PChar(Dir+ExtractFileName(OpenDialog.FileName)),True) then begin
-    MessageDlg(Format(LanguageSetup.MessageCouldNotCopyFile,[OpenDialog.FileName,Dir+ExtractFileName(OpenDialog.FileName)]),mtError,[mbOK],0);
-    exit;
+procedure TIconManagerForm.ScanFolderForIcons(const Folder : String);
+Var Rec : TSearchRec;
+    I : Integer;
+begin
+  Application.ProcessMessages;
+
+  I:=FindFirst(IncludeTrailingPathDelimiter(Folder)+'*.ico',faAnyFile,Rec);
+  try
+    While I=0 do begin
+      If (Rec.Attr and faDirectory)=0 then AddIconFromFolder(IncludeTrailingPathDelimiter(Folder)+Rec.Name);
+      I:=FindNext(Rec);
+    end;
+  finally
+    FindClose(Rec);
   end;
-  LastIcon:=ExtractFileName(OpenDialog.FileName);
-  LoadIcons;
+
+  I:=FindFirst(IncludeTrailingPathDelimiter(Folder)+'*.*',faDirectory,Rec);
+  try
+    While I=0 do begin
+      If ((Rec.Attr and faDirectory)=faDirectory) and (Rec.Name<>'.') and (Rec.Name<>'..') then
+        ScanFolderForIcons(IncludeTrailingPathDelimiter(Folder)+Rec.Name);
+      I:=FindNext(Rec);
+    end;
+  finally
+    FindClose(Rec);
+  end;
 end;
 
 procedure TIconManagerForm.ListViewClick(Sender: TObject);
@@ -198,6 +309,30 @@ end;
 procedure TIconManagerForm.CustomIconEditChange(Sender: TObject);
 begin
   CustomIconRadioButton.Checked:=True;
+end;
+
+procedure TIconManagerForm.AddIconFromFolder(const IconFile: String);
+Var DestFile : String;
+    I : Integer;
+begin
+  Application.ProcessMessages;
+
+  DestFile:=PrgDataDir+IconsSubDir+'\'+ExtractFileName(IconFile);
+
+  If not FileExists(DestFile) then begin
+    CopyFile(PChar(IconFile),PChar(DestFile),True);
+    exit;
+  end;
+
+  If CompareFiles(IconFile,DestFile) then exit;
+
+  I:=1;
+  While FileExists(ChangeFileExt(DestFile,IntToStr(I)+'.ico')) do begin
+    If CompareFiles(IconFile,ChangeFileExt(DestFile,IntToStr(I)+'.ico')) then exit;
+    inc(I);
+  end;
+
+  CopyFile(PChar(IconFile),PChar(ChangeFileExt(DestFile,IntToStr(I)+'.ico')),True);
 end;
 
 procedure TIconManagerForm.CustomIconButtonClick(Sender: TObject);

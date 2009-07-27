@@ -1,5 +1,59 @@
 D-Fend Reloaded Changelog
 
+Version 0.8.0 (07/28/2009)
+==========================
+
+- DOSBox 0.73 is supported and bundled with D-Fend Reloaded.
+- The user can switch between different icon sets for the toolbar, the menus
+  and the dialogs now.
+- The dialog for scanning the games folder for new games has been rewritten
+  and offers more options now.
+- Faster program start when using large game lists.
+- More settings in the multiple profiles editor.
+- New program icon and logo made by burnsflipper, the designer of the original
+  D-Fend logo.
+- New tab "Notes" at the bottom of the program window for direct access to the
+  stored game notes.
+- Now you can choose to use the game filesnames or the folder names as names
+  for the new profiles when scanning the games folder for new games.
+- Via the new multiple shortcut creation dialog you can create shortcuts for
+  more than one game at once.
+- Now the user can select the profile name, the template to use, the 
+  destination folder and the file to start when importing zip files
+  (regardless if the new game was identified by an auto setup template or not).
+- Support for user-defined interpreters (like before only for QBasic) inside
+  DOSBox.
+- Better algorithm for scaling images when displaying captured screenshots.
+- Now icons can also be added to the icon manager by dragging them to the icon
+  manager window and by scanning the games folder for new icons. Additionally
+  the icon manager will show icons added by copying them to the icons folder
+  immediately.
+- New optional start mode: Fullscreen without window border.
+- The default parent directory for the capture folders for games can be
+  configurated in the setup dialog now.
+- The icon size for the game icons in the games list in view mode "Icon" can
+  be configurated now.
+- The first start wizard has been improved and now is easier to use.
+- Now "Pause" can be chosen as DOSBox background priority.
+- The scan games folder for new games function is now also respecting the extra
+  program folders of existing profiles and is not trying to detect games in
+  this folders anymore.
+- Cleaned up menu structure (in particular the function for creating archive or
+  exe packages for multiple games have been moved from the Extras to the Export
+  menu).
+- Option to hide the menubar.
+- Faster search for DOSBox if it is not stored in the default directory.
+- [Fix] Error message when closing the profile editor dialog when editing a
+  template.
+- [Fix] If the first run wizard is closed by clicking the window close "X" the
+  settings are not stored.
+- [Fix] Now 16-bit Windows exe files are also recogniced as Windows program
+  files and the user is warned if he trys to start a 16-bit Windows program 
+  file via DOSBox.
+- [Fix] When running a profile using a helper program to be executed after the
+  main program via a shortcut the helper program was not executed.
+
+
 Version 0.7.0 (04/28/2009)
 ==========================
 - Dutch language file (thanks to Tim Molderez)
@@ -536,7 +590,7 @@ Version 0.3.1 (02/18/2008)
 - CDs can be ripped to ISO images and used as DOSBox drives.
 - Floppy disks can be ripped to IMG images and used as DOSBox drives.
 - Screenshots and captured sounds can be renamed.
-- Captured screenshots can be set as windows wallpaper image.
+- Captured screenshots can be set as Windows wallpaper image.
 - If DOSBox is started in window mode, the DOSBox window can be centered on
   screen.
 - [Fix] CPU cycles settings "Auto" and "Max" in the modern profile editor

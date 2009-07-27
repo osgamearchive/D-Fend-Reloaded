@@ -24,7 +24,6 @@ object ListScummVMGamesForm: TListScummVMGamesForm
     Align = alClient
     ItemHeight = 13
     TabOrder = 0
-    ExplicitHeight = 401
   end
   object Panel1: TPanel
     Left = 0

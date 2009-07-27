@@ -91,6 +91,8 @@ begin
     St.Free;
   end;
 
+  AddDefaultValueHint(CPUTypeComboBox);
+
   HelpContext:=ID_ProfileEditCPU;
 end;
 
@@ -125,8 +127,6 @@ end;
 
 procedure TModernProfileEditorCPUFrame.ShowFrame;
 begin
-  CPUTypeLabel.Visible:=PrgSetup.AllowCPUType;
-  CPUTypeComboBox.Visible:=PrgSetup.AllowCPUType;
 end;
 
 function TModernProfileEditorCPUFrame.CheckValue: Boolean;

@@ -64,6 +64,8 @@ begin
   //SaveDialog.Caption:=LanguageSetup.
   //SaveDialog.Filter:=LanguageSetup.
   UserIconLoader.DialogImage(DI_SelectFile,SelectFileButton);
+  UserIconLoader.DialogImage(DI_OK,OKButton);
+  UserIconLoader.DialogImage(DI_Cancel,CancelButton);
 end;
 
 procedure TCreateXMLForm.FormShow(Sender: TObject);

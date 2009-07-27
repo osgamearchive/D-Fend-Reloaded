@@ -37,7 +37,6 @@ object ModernProfileEditorCPUFrame: TModernProfileEditorCPUFrame
     Width = 69
     Height = 13
     Caption = 'CPUTypeLabel'
-    Visible = False
   end
   object CPUCoreRadioGroup: TRadioGroup
     Left = 24
@@ -118,6 +117,5 @@ object ModernProfileEditorCPUFrame: TModernProfileEditorCPUFrame
     Style = csDropDownList
     ItemHeight = 13
     TabOrder = 4
-    Visible = False
   end
 end

@@ -197,7 +197,7 @@ implementation
 uses Math, LanguageSetupUnit, VistaToolsUnit, CommonTools, PrgConsts,
      PrgSetupUnit, IconManagerFormUnit, ProfileMountEditorFormUnit,
      SerialEditFormUnit, UserInfoFormUnit, IconLoaderUnit, GameDBToolsUnit,
-     ModernProfileEditorFormUnit, DOSBoxUnit, HelpConsts;
+     ModernProfileEditorFormUnit, DOSBoxUnit, HelpConsts, TextEditPopupUnit;
 
 {$R *.dfm}
 
@@ -218,6 +218,11 @@ begin
   Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName);
 
   AutoexecBootFloppyImageTab.ColWidths[0]:=AutoexecBootFloppyImageTab.ClientWidth-25;
+
+  SetRichEditPopup(NotesMemo);
+  SetRichEditPopup(CustomSetsMemo);
+  SetRichEditPopup(AutoexecMemo);
+  SetRichEditPopup(FinalizationMemo);
 
   MoveStatus:=0;
 
@@ -509,6 +514,9 @@ begin
   UserIconLoader.DialogImage(DI_Add,ImageListM,0);
   UserIconLoader.DialogImage(DI_Edit,ImageListM,1);
   UserIconLoader.DialogImage(DI_Delete,ImageListM,2);
+  UserIconLoader.DialogImage(DI_OK,OKButton);
+  UserIconLoader.DialogImage(DI_Cancel,CancelButton);
+  UserIconLoader.DialogImage(DI_Help,HelpButton);
 
   { Sound Sheet }
 
@@ -588,18 +596,12 @@ begin
     Strings.Add(LanguageSetup.ProfileEditorSoundGUSAddress+'=');
     ItemProps[Strings.Count-1].ReadOnly:=True;
     St:=ValueToList(GameDB.ConfOpt.GUSBase,';,'); try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
-    Strings.Add(LanguageSetup.ProfileEditorSoundGUSIRQ1+'=');
+    Strings.Add(LanguageSetup.ProfileEditorSoundGUSIRQ+'=');
     ItemProps[Strings.Count-1].ReadOnly:=True;
-    St:=ValueToList(GameDB.ConfOpt.IRQ1,';,'); try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
-    Strings.Add(LanguageSetup.ProfileEditorSoundGUSIRQ2+'=');
-    St:=ValueToList(GameDB.ConfOpt.IRQ2,';,'); try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
+    St:=ValueToList(GameDB.ConfOpt.GUSIRQ,';,'); try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
+    Strings.Add(LanguageSetup.ProfileEditorSoundGUSDMA+'=');
     ItemProps[Strings.Count-1].ReadOnly:=True;
-    Strings.Add(LanguageSetup.ProfileEditorSoundGUSDMA1+'=');
-    ItemProps[Strings.Count-1].ReadOnly:=True;
-    St:=ValueToList(GameDB.ConfOpt.Dma1,';,'); try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
-    Strings.Add(LanguageSetup.ProfileEditorSoundGUSDMA2+'=');
-    ItemProps[Strings.Count-1].ReadOnly:=True;
-    St:=ValueToList(GameDB.ConfOpt.Dma2,';,'); try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
+    St:=ValueToList(GameDB.ConfOpt.GUSDma,';,'); try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
     Strings.Add(LanguageSetup.ProfileEditorSoundGUSRate+'=');
     ItemProps[Strings.Count-1].ReadOnly:=True;
     St:=ValueToList(GameDB.ConfOpt.GUSRate,';,'); try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
@@ -1075,11 +1077,9 @@ begin
       ValueFromIndex[0]:=RemoveUnderline(LanguageSetup.Yes);
       ValueFromIndex[1]:='240';
       ValueFromIndex[2]:='5';
-      ValueFromIndex[3]:='5';
-      ValueFromIndex[4]:='1';
-      ValueFromIndex[5]:='1';
-      ValueFromIndex[6]:='22050';
-      ValueFromIndex[7]:='C:\ULTRASND';
+      ValueFromIndex[3]:='1';
+      ValueFromIndex[4]:='22050';
+      ValueFromIndex[5]:='C:\ULTRASND';
     end;
     with SoundMIDIValueListEditor.Strings do begin
       ValueFromIndex[0]:='intelligent';
@@ -1120,12 +1120,10 @@ begin
     with SoundGUSValueListEditor.Strings do begin
       If Game.GUS then ValueFromIndex[0]:=RemoveUnderline(LanguageSetup.Yes) else ValueFromIndex[0]:=RemoveUnderline(LanguageSetup.No);
       ValueFromIndex[1]:=IntToStr(Game.GUSBase);
-      ValueFromIndex[2]:=IntToStr(Game.GUSIRQ1);
-      ValueFromIndex[3]:=IntToStr(Game.GUSIRQ2);
-      ValueFromIndex[4]:=IntToStr(Game.GUSDMA1);
-      ValueFromIndex[5]:=IntToStr(Game.GUSDMA2);
-      ValueFromIndex[6]:=IntToStr(Game.GUSRate);
-      If Game.GUSUltraDir<>'' then ValueFromIndex[7]:=Game.GUSUltraDir;
+      ValueFromIndex[2]:=IntToStr(Game.GUSIRQ);
+      ValueFromIndex[3]:=IntToStr(Game.GUSDMA);
+      ValueFromIndex[4]:=IntToStr(Game.GUSRate);
+      If Game.GUSUltraDir<>'' then ValueFromIndex[5]:=Game.GUSUltraDir;
     end;
     with SoundMIDIValueListEditor.Strings do begin
       If Game.MIDIType<>'' then ValueFromIndex[0]:=Game.MIDIType;
@@ -1483,7 +1481,7 @@ begin
     Game.SetupParameters:=ValueFromIndex[7];
     Game.LoadFix:=(ValueFromIndex[8]=RemoveUnderline(LanguageSetup.Yes));
     try Game.LoadFixMemory:=StrToInt(Trim(ValueFromIndex[9])); except end;
-    Game.CaptureFolder:=ValueFromIndex[10];
+    Game.CaptureFolder:=MakeRelPath(ValueFromIndex[10],PrgSetup.BaseDir);
   end;
   Game.ExtraFiles:=ListToValue(ExtraFilesListBox.Items);
   Game.ExtraDirs:=ListToValue(ExtraDirsListBox.Items);
@@ -1498,7 +1496,7 @@ begin
       Game.Year:=ValueFromIndex[3];
       Game.Language:=GetEnglishLanguageName(ValueFromIndex[4]);
       Game.WWW:=ValueFromIndex[5];
-      Game.DataDir:=ValueFromIndex[6];
+      Game.DataDir:=MakeRelPath(ValueFromIndex[6],PrgSetup.BaseDir);
       Game.Favorite:=(ValueFromIndex[7]=RemoveUnderline(LanguageSetup.Yes));
     end;
     Game.Notes:=StringListToString(NotesMemo.Lines);
@@ -1602,12 +1600,10 @@ begin
   with SoundGUSValueListEditor.Strings do begin
     Game.GUS:=(ValueFromIndex[0]=RemoveUnderline(LanguageSetup.Yes));
     Game.GUSBase:=StrToInt(Trim(ValueFromIndex[1]));
-    Game.GUSIRQ1:=StrToInt(Trim(ValueFromIndex[2]));
-    Game.GUSIRQ2:=StrToInt(Trim(ValueFromIndex[3]));
-    Game.GUSDMA1:=StrToInt(Trim(ValueFromIndex[4]));
-    Game.GUSDMA2:=StrToInt(Trim(ValueFromIndex[5]));
-    Game.GUSRate:=StrToInt(Trim(ValueFromIndex[6]));
-    Game.GUSUltraDir:=ValueFromIndex[7];
+    Game.GUSIRQ:=StrToInt(Trim(ValueFromIndex[2]));
+    Game.GUSDMA:=StrToInt(Trim(ValueFromIndex[3]));
+    Game.GUSRate:=StrToInt(Trim(ValueFromIndex[4]));
+    Game.GUSUltraDir:=ValueFromIndex[5];
   end;
   with SoundMIDIValueListEditor.Strings do begin
     Game.MIDIType:=ValueFromIndex[0];
@@ -1816,7 +1812,7 @@ begin
           If (Trim(ValueFromIndex[10])<>'') and DirectoryExists(MakeAbsPath(ValueFromIndex[10],PrgSetup.BaseDir)) then exit;
           S:=IncludeTrailingPathDelimiter(PrgSetup.CaptureDir)+MakeFileSysOKFolderName(ValueFromIndex[0])+'\';
           I:=0;
-          while DirectoryExists(MakeAbsPath(S,PrgSetup.BaseDir)) do begin
+          while (not PrgSetup.IgnoreDirectoryCollisions) and DirectoryExists(MakeAbsPath(S,PrgSetup.BaseDir)) do begin
             inc(I);
             S:=IncludeTrailingPathDelimiter(PrgSetup.CaptureDir)+MakeFileSysOKFolderName(ValueFromIndex[0])+IntToStr(I)+'\';
           end;
@@ -1986,61 +1982,18 @@ begin
 end;
 
 procedure TProfileEditorForm.ProfileSettingsValueListEditorEditButtonClick(Sender: TObject);
-Var S,T : String;
+Var S : String;
 begin
   Case ProfileSettingsValueListEditor.Row of
     3 : begin
           If ProfileSettingsValueListEditor.Strings.ValueFromIndex[3]=RemoveUnderline(LanguageSetup.Yes) then exit;
-          OpenDialog.DefaultExt:='exe';
-          OpenDialog.Title:=LanguageSetup.ProfileEditorEXEDialog;
-          If (Trim(PrgSetup.QBasic)<>'') and FileExists(Trim(PrgSetup.QBasic))
-            then OpenDialog.Filter:=LanguageSetup.ProfileEditorEXEFilterWithBasic
-            else OpenDialog.Filter:=LanguageSetup.ProfileEditorEXEFilter;
           S:=ProfileSettingsValueListEditor.Strings.ValueFromIndex[2];
-          T:=ProfileSettingsValueListEditor.Strings.ValueFromIndex[4];
-          If Trim(S)='' then begin
-            If Trim(T)='' then begin
-              If PrgSetup.GameDir=''
-                then OpenDialog.InitialDir:=PrgSetup.BaseDir
-                else OpenDialog.InitialDir:=PrgSetup.GameDir;
-            end else begin
-              OpenDialog.InitialDir:=ExtractFilePath(MakeAbsPath(T,PrgSetup.BaseDir));
-            end;
-          end else begin
-            OpenDialog.InitialDir:=ExtractFilePath(MakeAbsPath(S,PrgSetup.BaseDir));
-          end;
-
-          if not OpenDialog.Execute then exit;
-          S:=MakeRelPath(OpenDialog.FileName,PrgSetup.BaseDir);
-          If S='' then exit;
-          ProfileSettingsValueListEditor.Strings.ValueFromIndex[2]:=S;
+          If SelectProgramFile(S,ProfileSettingsValueListEditor.Strings.ValueFromIndex[2],ProfileSettingsValueListEditor.Strings.ValueFromIndex[4],False,self) then ProfileSettingsValueListEditor.Strings.ValueFromIndex[2]:=S;
         end;
     6 : begin
           If ProfileSettingsValueListEditor.Strings.ValueFromIndex[6]=RemoveUnderline(LanguageSetup.Yes) then exit;
-          S:=MakeAbsPath(ProfileSettingsValueListEditor.Strings.ValueFromIndex[4],PrgSetup.BaseDir);
-          OpenDialog.DefaultExt:='exe';
-          OpenDialog.Title:=LanguageSetup.ProfileEditorEXEDialog;
-          If (Trim(PrgSetup.QBasic)<>'') and FileExists(Trim(PrgSetup.QBasic))
-            then OpenDialog.Filter:=LanguageSetup.ProfileEditorEXEFilterWithBasic
-            else OpenDialog.Filter:=LanguageSetup.ProfileEditorEXEFilter;
-          T:=ProfileSettingsValueListEditor.Strings.ValueFromIndex[2];
           S:=ProfileSettingsValueListEditor.Strings.ValueFromIndex[4];
-          If Trim(S)='' then begin
-            If Trim(T)='' then begin
-              If PrgSetup.GameDir=''
-                then OpenDialog.InitialDir:=PrgSetup.BaseDir
-                else OpenDialog.InitialDir:=PrgSetup.GameDir;
-            end else begin
-              OpenDialog.InitialDir:=ExtractFilePath(MakeAbsPath(T,PrgSetup.BaseDir));
-            end;
-          end else begin
-            OpenDialog.InitialDir:=ExtractFilePath(MakeAbsPath(S,PrgSetup.BaseDir));
-          end;
-
-          if not OpenDialog.Execute then exit;
-          S:=MakeRelPath(OpenDialog.FileName,PrgSetup.BaseDir);
-          If S='' then exit;
-          ProfileSettingsValueListEditor.Strings.ValueFromIndex[4]:=S;
+          If SelectProgramFile(S,ProfileSettingsValueListEditor.Strings.ValueFromIndex[4],ProfileSettingsValueListEditor.Strings.ValueFromIndex[2],False,self) then ProfileSettingsValueListEditor.Strings.ValueFromIndex[4]:=S;
         end;
    11 : begin
           S:=PrgSetup.BaseDir;
@@ -2220,10 +2173,19 @@ end;
 { global }
 
 Function EditGameProfilInt(const AOwner : TComponent; const AGameDB : TGameDB; var AGame : TGame; const ADefaultGame : TGame; const ASearchLinkFile : TLinkFile; const ADeleteOnExit : TStringList; const PrevButton, NextButton, RestorePos : Boolean; const EditingTemplate : Boolean; const ANewExeFile : String; const HideGameInfoPage : Boolean) : Integer;
+Var D : Double;
+    S : String;
+    I : Integer;
 begin
   If ScummVMMode(AGame) or ScummVMMode(ADefaultGame) or WindowsExeMode(AGame) or WindowsExeMode(ADefaultGame) then begin
     result:=ModernProfileEditorFormUnit.EditGameProfilInt(AOwner,AGameDB,AGame,ADefaultGame,ASearchLinkFile,ADeleteOnExit,PrevButton,NextButton,RestorePos,EditingTemplate,ANewExeFile,HideGameInfoPage);
     exit;
+  end;
+
+  If (AGame<>nil) and (Trim(ExtUpperCase(AGame.VideoCard))='VGA') then begin
+    S:=CheckDOSBoxVersion(GetDOSBoxNr(AGame)); For I:=1 to length(S) do If (S[I]=',') or (S[I]='.') then S[I]:=DecimalSeparator;
+    if not TryStrToFloat(S,D) then D:=0.72;
+    If D>0.72 then begin AGame.VideoCard:='svga_s3'; AGame.StoreAllValues; end;
   end;
 
   ProfileEditorForm:=TProfileEditorForm.Create(AOwner);

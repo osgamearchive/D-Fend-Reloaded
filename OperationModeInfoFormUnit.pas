@@ -36,7 +36,8 @@ Procedure ShowOperationModeInfoDialog(const AOwner : TComponent);
 
 implementation
 
-uses VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgSetupUnit, HelpConsts;
+uses VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgSetupUnit, HelpConsts,
+     IconLoaderUnit;
 
 {$R *.dfm}
 
@@ -55,6 +56,9 @@ begin
   CheckBox5.Caption:=LanguageSetup.OperationModeInfoDOSBoxRelative;
   OKButton.Caption:=LanguageSetup.OK;
   HelpButton.Caption:=LanguageSetup.Help;
+
+  UserIconLoader.DialogImage(DI_OK,OKButton);
+  UserIconLoader.DialogImage(DI_Help,HelpButton);
 
   Case OperationMode of
     omPrgDir   : begin

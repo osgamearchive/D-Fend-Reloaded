@@ -41,7 +41,7 @@ type
 implementation
 
 uses Math, LanguageSetupUnit, VistaToolsUnit, PrgSetupUnit, CommonTools,
-     HelpConsts, IconLoaderUnit;
+     HelpConsts, IconLoaderUnit, TextEditPopupUnit;
 
 {$R *.dfm}
 
@@ -65,6 +65,8 @@ begin
 
   NoFlicker(DefaultValueComboBox);
 
+  SetRichEditPopup(DefaultValueMemo);
+
   UserIconLoader.DialogImage(DI_ResetDefault,DefaultValueSpeedButton);
 
   LastIndex:=-1;
@@ -75,7 +77,9 @@ begin
 end;
 
 procedure TSetupFrameDefaultValues.LoadLanguage;
+Procedure AddString(const Lang, S : String); begin DefaultValueComboBox.Items.AddObject(Lang,ValueToList(S,';,')); end;
 Var I,J : Integer;
+    P1,P2,S1,S2,S3 : String;
 begin
   DefaultValueLabel.Caption:=LanguageSetup.SetupFormDefaultValueLabel;
   DefaultValueSpeedButton.Caption:=LanguageSetup.SetupFormDefaultValueReset;
@@ -91,48 +95,61 @@ begin
   DefaultValueComboBox.Items.Clear;
   SetLength(DefaultValueLists,0);
 
-  DefaultValueComboBox.Items.AddObject(LanguageSetup.GameResolution,ValueToList(GameDB.ConfOpt.Resolution,';,'));
-  DefaultValueComboBox.Items.AddObject(LanguageSetup.GameJoysticks,ValueToList(GameDB.ConfOpt.Joysticks,';,'));
-  DefaultValueComboBox.Items.AddObject(LanguageSetup.GameScale,ValueToList(GameDB.ConfOpt.Scale,';,'));
-  DefaultValueComboBox.Items.AddObject(LanguageSetup.GameRender,ValueToList(GameDB.ConfOpt.Render,';,'));
-  DefaultValueComboBox.Items.AddObject(LanguageSetup.GameCycles,ValueToList(GameDB.ConfOpt.Cycles,';,'));
-  DefaultValueComboBox.Items.AddObject(LanguageSetup.GameVideo,ValueToList(GameDB.ConfOpt.Video,';,'));
-  DefaultValueComboBox.Items.AddObject(LanguageSetup.GameMemory,ValueToList(GameDB.ConfOpt.Memory,';,'));
-  DefaultValueComboBox.Items.AddObject(LanguageSetup.GameFrameskip,ValueToList(GameDB.ConfOpt.Frameskip,';,'));
-  DefaultValueComboBox.Items.AddObject(LanguageSetup.GameCore,ValueToList(GameDB.ConfOpt.Core,';,'));
-  DefaultValueComboBox.Items.AddObject(LanguageSetup.GameSblaster,ValueToList(GameDB.ConfOpt.Sblaster,';,'));
-  DefaultValueComboBox.Items.AddObject(LanguageSetup.GameOplmode,ValueToList(GameDB.ConfOpt.Oplmode,';,'));
-  DefaultValueComboBox.Items.AddObject(LanguageSetup.GameKeyboardLayout,ValueToList(GameDB.ConfOpt.KeyboardLayout,';,'));
-  DefaultValueComboBox.Items.AddObject(LanguageSetup.GameKeyboardCodepage,ValueToList(GameDB.ConfOpt.Codepage,';,'));
-  DefaultValueComboBox.Items.AddObject(LanguageSetup.GameReportedDOSVersion,ValueToList(GameDB.ConfOpt.ReportedDOSVersion,';,'));
-  DefaultValueComboBox.Items.AddObject(LanguageSetup.ProfileEditorSoundMIDIDevice,ValueToList(GameDB.ConfOpt.MIDIDevice,';,'));
-  DefaultValueComboBox.Items.AddObject(LanguageSetup.ProfileEditorSoundBlockSize,ValueToList(GameDB.ConfOpt.Blocksize,';,'));
-  DefaultValueComboBox.Items.AddObject(LanguageSetup.GameCyclesDown,ValueToList(GameDB.ConfOpt.CyclesDown,';,'));
-  DefaultValueComboBox.Items.AddObject(LanguageSetup.GameCyclesUp,ValueToList(GameDB.ConfOpt.CyclesUp,';,'));
-  DefaultValueComboBox.Items.AddObject(LanguageSetup.ProfileEditorSoundSBDMA,ValueToList(GameDB.ConfOpt.Dma,';,'));
-  DefaultValueComboBox.Items.AddObject(LanguageSetup.ProfileEditorSoundGUSDMA1,ValueToList(GameDB.ConfOpt.Dma1,';,'));
-  DefaultValueComboBox.Items.AddObject(LanguageSetup.ProfileEditorSoundGUSDMA2,ValueToList(GameDB.ConfOpt.Dma2,';,'));
-  DefaultValueComboBox.Items.AddObject(LanguageSetup.ProfileEditorSoundGUSAddress,ValueToList(GameDB.ConfOpt.GUSBase,';,'));
-  DefaultValueComboBox.Items.AddObject(LanguageSetup.ProfileEditorSoundGUSRate,ValueToList(GameDB.ConfOpt.GUSRate,';,'));
-  DefaultValueComboBox.Items.AddObject(LanguageSetup.ProfileEditorSoundSBHDMA,ValueToList(GameDB.ConfOpt.HDMA,';,'));
-  DefaultValueComboBox.Items.AddObject(LanguageSetup.ProfileEditorSoundSBIRQ,ValueToList(GameDB.ConfOpt.IRQ,';,'));
-  DefaultValueComboBox.Items.AddObject(LanguageSetup.ProfileEditorSoundGUSIRQ1,ValueToList(GameDB.ConfOpt.IRQ1,';,'));
-  DefaultValueComboBox.Items.AddObject(LanguageSetup.ProfileEditorSoundGUSIRQ2,ValueToList(GameDB.ConfOpt.IRQ2,';,'));
-  DefaultValueComboBox.Items.AddObject(LanguageSetup.ProfileEditorSoundMIDIType,ValueToList(GameDB.ConfOpt.MPU401,';,'));
-  DefaultValueComboBox.Items.AddObject(LanguageSetup.ProfileEditorSoundSBOplRate,ValueToList(GameDB.ConfOpt.OPLRate,';,'));
-  DefaultValueComboBox.Items.AddObject(LanguageSetup.ProfileEditorSoundMiscPCSpeakerRate,ValueToList(GameDB.ConfOpt.PCRate,';,'));
-  DefaultValueComboBox.Items.AddObject(LanguageSetup.ProfileEditorSoundSampleRate,ValueToList(GameDB.ConfOpt.Rate,';,'));
-  DefaultValueComboBox.Items.AddObject(LanguageSetup.ProfileEditorSoundSBAddress,ValueToList(GameDB.ConfOpt.SBBase,';,'));
-  DefaultValueComboBox.Items.AddObject(LanguageSetup.GameMouseSensitivity,ValueToList(GameDB.ConfOpt.MouseSensitivity,';,'));
-  DefaultValueComboBox.Items.AddObject(LanguageSetup.ProfileEditorSoundMiscTandyRate,ValueToList(GameDB.ConfOpt.TandyRate,';,'));
-  DefaultValueComboBox.Items.AddObject(LanguageSetup.ProfileEditorScummVMFilter,ValueToList(GameDB.ConfOpt.ScummVMFilter,';,'));
-  DefaultValueComboBox.Items.AddObject(LanguageSetup.ProfileEditorScummVMMusicDriver,ValueToList(GameDB.ConfOpt.ScummVMMusicDriver,';,'));
-  DefaultValueComboBox.Items.AddObject(LanguageSetup.GameVGAChipset,ValueToList(GameDB.ConfOpt.VGAChipsets,';,'));
-  DefaultValueComboBox.Items.AddObject(LanguageSetup.GameVideoRam,ValueToList(GameDB.ConfOpt.VGAVideoRAM,';,'));
-  DefaultValueComboBox.Items.AddObject('ScummVM '+LanguageSetup.ProfileEditorScummVMRenderMode,ValueToList(GameDB.ConfOpt.ScummVMRenderMode,';,'));
-  DefaultValueComboBox.Items.AddObject('ScummVM '+LanguageSetup.ProfileEditorScummVMPlatform,ValueToList(GameDB.ConfOpt.ScummVMPlatform,';,'));
-  DefaultValueComboBox.Items.AddObject(LanguageSetup.ProfileEditorScummVMLanguageLong,ValueToList(GameDB.ConfOpt.ScummVMLanguages,';,'));
-  DefaultValueComboBox.Items.AddObject(LanguageSetup.GameCPUType,ValueToList(GameDB.ConfOpt.CPUType,';,'));
+  P1:='(DOSBox) ';
+  P2:='(ScummVM) ';
+  S1:='SoundBlaster ';
+  S2:='GUS ';
+  S3:='MIDI ';
+
+  AddString(P1+LanguageSetup.GameCore,GameDB.ConfOpt.Core);
+  AddString(P1+LanguageSetup.GameCPUType,GameDB.ConfOpt.CPUType);
+  AddString(P1+LanguageSetup.GameCycles,GameDB.ConfOpt.Cycles);
+  AddString(P1+LanguageSetup.GameCyclesDown,GameDB.ConfOpt.CyclesDown);
+  AddString(P1+LanguageSetup.GameCyclesUp,GameDB.ConfOpt.CyclesUp);
+
+  AddString(P1+LanguageSetup.GameVideo,GameDB.ConfOpt.Video);
+  AddString(P1+LanguageSetup.GameMemory,GameDB.ConfOpt.Memory);
+  AddString(P1+LanguageSetup.GameFrameskip,GameDB.ConfOpt.Frameskip);
+  AddString(P1+LanguageSetup.GameResolution,GameDB.ConfOpt.Resolution);
+  AddString(P1+LanguageSetup.GameScale,GameDB.ConfOpt.Scale);
+  AddString(P1+LanguageSetup.GameRender,GameDB.ConfOpt.Render);
+  AddString(P1+LanguageSetup.GameVGAChipset,GameDB.ConfOpt.VGAChipsets);
+  AddString(P1+LanguageSetup.GameVideoRam,GameDB.ConfOpt.VGAVideoRAM);
+
+  AddString(P1+LanguageSetup.GameKeyboardLayout,GameDB.ConfOpt.KeyboardLayout);
+  AddString(P1+LanguageSetup.GameKeyboardCodepage,GameDB.ConfOpt.Codepage);
+  AddString(P1+LanguageSetup.GameMouseSensitivity,GameDB.ConfOpt.MouseSensitivity);
+  AddString(P1+LanguageSetup.GameReportedDOSVersion,GameDB.ConfOpt.ReportedDOSVersion);
+
+  AddString(P1+LanguageSetup.ProfileEditorSoundSampleRate,GameDB.ConfOpt.Rate);
+  AddString(P1+LanguageSetup.ProfileEditorSoundBlockSize,GameDB.ConfOpt.Blocksize);
+
+  AddString(P1+LanguageSetup.GameSblaster,GameDB.ConfOpt.Sblaster);
+  AddString(P1+S1+LanguageSetup.ProfileEditorSoundSBAddress,GameDB.ConfOpt.SBBase);
+  AddString(P1+S1+LanguageSetup.ProfileEditorSoundSBIRQ,GameDB.ConfOpt.IRQ);
+  AddString(P1+S1+LanguageSetup.ProfileEditorSoundSBDMA,GameDB.ConfOpt.Dma);
+  AddString(P1+S1+LanguageSetup.ProfileEditorSoundSBHDMA,GameDB.ConfOpt.HDMA);
+  AddString(P1+LanguageSetup.GameOplmode,GameDB.ConfOpt.Oplmode);
+  AddString(P1+LanguageSetup.GameOplemu,GameDB.ConfOpt.OplEmu);
+  AddString(P1+LanguageSetup.ProfileEditorSoundSBOplRate,GameDB.ConfOpt.OPLRate);
+
+  AddString(P1+S2+LanguageSetup.ProfileEditorSoundGUSAddress,GameDB.ConfOpt.GUSBase);
+  AddString(P1+S2+LanguageSetup.ProfileEditorSoundGUSRate,GameDB.ConfOpt.GUSRate);
+  AddString(P1+S2+LanguageSetup.ProfileEditorSoundGUSIRQ,GameDB.ConfOpt.GUSIRQ);
+  AddString(P1+S2+LanguageSetup.ProfileEditorSoundGUSDMA,GameDB.ConfOpt.GUSDma);
+
+  AddString(P1+LanguageSetup.ProfileEditorSoundMIDIDevice,GameDB.ConfOpt.MIDIDevice);
+  AddString(P1+S3+LanguageSetup.ProfileEditorSoundMIDIType,GameDB.ConfOpt.MPU401);
+
+  AddString(P1+LanguageSetup.ProfileEditorSoundMiscPCSpeakerRate,GameDB.ConfOpt.PCRate);
+  AddString(P1+LanguageSetup.ProfileEditorSoundMiscTandyRate,GameDB.ConfOpt.TandyRate);
+  AddString(P1+LanguageSetup.GameJoysticks,GameDB.ConfOpt.Joysticks);
+
+  AddString(P2+LanguageSetup.ProfileEditorScummVMPlatform,GameDB.ConfOpt.ScummVMPlatform);
+  AddString(P2+LanguageSetup.ProfileEditorScummVMLanguageLong,GameDB.ConfOpt.ScummVMLanguages);
+  AddString(P2+LanguageSetup.ProfileEditorScummVMRenderMode,GameDB.ConfOpt.ScummVMRenderMode);
+  AddString(P2+LanguageSetup.ProfileEditorScummVMFilter,GameDB.ConfOpt.ScummVMFilter);
+  AddString(P2+LanguageSetup.ProfileEditorScummVMMusicDriver,GameDB.ConfOpt.ScummVMMusicDriver);
 
   SetLength(DefaultValueLists,DefaultValueComboBox.Items.Count);
   For J:=0 to length(DefaultValueLists)-1 do DefaultValueLists[J]:=TStringList(DefaultValueComboBox.Items.Objects[J]);
@@ -161,51 +178,61 @@ begin
 end;
 
 procedure TSetupFrameDefaultValues.SaveSetup;
+Var I : Integer;
+Function GetString : String; begin result:=ListToValue(TStringList(DefaultValueComboBox.Items.Objects[I]),','); inc(I); end;
 begin
   DefaultValueComboBoxChange(self);
 
-  GameDB.ConfOpt.Resolution:=ListToValue(TStringList(DefaultValueComboBox.Items.Objects[0]),',');
-  GameDB.ConfOpt.Joysticks:=ListToValue(TStringList(DefaultValueComboBox.Items.Objects[1]),',');
-  GameDB.ConfOpt.Scale:=ListToValue(TStringList(DefaultValueComboBox.Items.Objects[2]),',');
-  GameDB.ConfOpt.Render:=ListToValue(TStringList(DefaultValueComboBox.Items.Objects[3]),',');
-  GameDB.ConfOpt.Cycles:=ListToValue(TStringList(DefaultValueComboBox.Items.Objects[4]),',');
-  GameDB.ConfOpt.Video:=ListToValue(TStringList(DefaultValueComboBox.Items.Objects[5]),',');
-  GameDB.ConfOpt.Memory:=ListToValue(TStringList(DefaultValueComboBox.Items.Objects[6]),',');
-  GameDB.ConfOpt.Frameskip:=ListToValue(TStringList(DefaultValueComboBox.Items.Objects[7]),',');
-  GameDB.ConfOpt.Core:=ListToValue(TStringList(DefaultValueComboBox.Items.Objects[8]),',');
-  GameDB.ConfOpt.Sblaster:=ListToValue(TStringList(DefaultValueComboBox.Items.Objects[9]),',');
-  GameDB.ConfOpt.Oplmode:=ListToValue(TStringList(DefaultValueComboBox.Items.Objects[10]),',');
-  GameDB.ConfOpt.KeyboardLayout:=ListToValue(TStringList(DefaultValueComboBox.Items.Objects[11]),',');
-  GameDB.ConfOpt.Codepage:=ListToValue(TStringList(DefaultValueComboBox.Items.Objects[12]),',');
-  GameDB.ConfOpt.ReportedDOSVersion:=ListToValue(TStringList(DefaultValueComboBox.Items.Objects[13]),',');
-  GameDB.ConfOpt.MIDIDevice:=ListToValue(TStringList(DefaultValueComboBox.Items.Objects[14]),',');
-  GameDB.ConfOpt.Blocksize:=ListToValue(TStringList(DefaultValueComboBox.Items.Objects[15]),',');
-  GameDB.ConfOpt.CyclesDown:=ListToValue(TStringList(DefaultValueComboBox.Items.Objects[16]),',');
-  GameDB.ConfOpt.CyclesUp:=ListToValue(TStringList(DefaultValueComboBox.Items.Objects[17]),',');
-  GameDB.ConfOpt.Dma:=ListToValue(TStringList(DefaultValueComboBox.Items.Objects[18]),',');
-  GameDB.ConfOpt.Dma1:=ListToValue(TStringList(DefaultValueComboBox.Items.Objects[19]),',');
-  GameDB.ConfOpt.Dma2:=ListToValue(TStringList(DefaultValueComboBox.Items.Objects[20]),',');
-  GameDB.ConfOpt.GUSBase:=ListToValue(TStringList(DefaultValueComboBox.Items.Objects[21]),',');
-  GameDB.ConfOpt.GUSRate:=ListToValue(TStringList(DefaultValueComboBox.Items.Objects[22]),',');
-  GameDB.ConfOpt.HDMA:=ListToValue(TStringList(DefaultValueComboBox.Items.Objects[23]),',');
-  GameDB.ConfOpt.IRQ:=ListToValue(TStringList(DefaultValueComboBox.Items.Objects[24]),',');
-  GameDB.ConfOpt.IRQ1:=ListToValue(TStringList(DefaultValueComboBox.Items.Objects[25]),',');
-  GameDB.ConfOpt.IRQ2:=ListToValue(TStringList(DefaultValueComboBox.Items.Objects[26]),',');
-  GameDB.ConfOpt.MPU401:=ListToValue(TStringList(DefaultValueComboBox.Items.Objects[27]),',');
-  GameDB.ConfOpt.OPLRate:=ListToValue(TStringList(DefaultValueComboBox.Items.Objects[28]),',');
-  GameDB.ConfOpt.PCRate:=ListToValue(TStringList(DefaultValueComboBox.Items.Objects[29]),',');
-  GameDB.ConfOpt.Rate:=ListToValue(TStringList(DefaultValueComboBox.Items.Objects[30]),',');
-  GameDB.ConfOpt.SBBase:=ListToValue(TStringList(DefaultValueComboBox.Items.Objects[31]),',');
-  GameDB.ConfOpt.MouseSensitivity:=ListToValue(TStringList(DefaultValueComboBox.Items.Objects[32]),',');
-  GameDB.ConfOpt.TandyRate:=ListToValue(TStringList(DefaultValueComboBox.Items.Objects[33]),',');
-  GameDB.ConfOpt.ScummVMFilter:=ListToValue(TStringList(DefaultValueComboBox.Items.Objects[34]),',');
-  GameDB.ConfOpt.ScummVMMusicDriver:=ListToValue(TStringList(DefaultValueComboBox.Items.Objects[35]),',');
-  GameDB.ConfOpt.VGAChipsets:=ListToValue(TStringList(DefaultValueComboBox.Items.Objects[36]),',');
-  GameDB.ConfOpt.VGAVideoRAM:=ListToValue(TStringList(DefaultValueComboBox.Items.Objects[37]),',');
-  GameDB.ConfOpt.ScummVMRenderMode:=ListToValue(TStringList(DefaultValueComboBox.Items.Objects[38]),',');
-  GameDB.ConfOpt.ScummVMPlatform:=ListToValue(TStringList(DefaultValueComboBox.Items.Objects[39]),',');
-  GameDB.ConfOpt.ScummVMLanguages:=ListToValue(TStringList(DefaultValueComboBox.Items.Objects[40]),',');
-  GameDB.ConfOpt.CPUType:=ListToValue(TStringList(DefaultValueComboBox.Items.Objects[41]),',');
+  I:=0;
+  GameDB.ConfOpt.Core:=GetString;
+  GameDB.ConfOpt.CPUType:=GetString;
+  GameDB.ConfOpt.Cycles:=GetString;
+  GameDB.ConfOpt.CyclesDown:=GetString;
+  GameDB.ConfOpt.CyclesUp:=GetString;
+
+  GameDB.ConfOpt.Video:=GetString;
+  GameDB.ConfOpt.Memory:=GetString;
+  GameDB.ConfOpt.Frameskip:=GetString;
+  GameDB.ConfOpt.Resolution:=GetString;
+  GameDB.ConfOpt.Scale:=GetString;
+  GameDB.ConfOpt.Render:=GetString;
+  GameDB.ConfOpt.VGAChipsets:=GetString;
+  GameDB.ConfOpt.VGAVideoRAM:=GetString;
+
+  GameDB.ConfOpt.KeyboardLayout:=GetString;
+  GameDB.ConfOpt.Codepage:=GetString;
+  GameDB.ConfOpt.MouseSensitivity:=GetString;
+  GameDB.ConfOpt.ReportedDOSVersion:=GetString;
+
+  GameDB.ConfOpt.Rate:=GetString;
+  GameDB.ConfOpt.Blocksize:=GetString;
+
+  GameDB.ConfOpt.Sblaster:=GetString;
+  GameDB.ConfOpt.SBBase:=GetString;
+  GameDB.ConfOpt.IRQ:=GetString;
+  GameDB.ConfOpt.Dma:=GetString;
+  GameDB.ConfOpt.HDMA:=GetString;
+  GameDB.ConfOpt.Oplmode:=GetString;
+  GameDB.ConfOpt.OplEmu:=GetString;
+  GameDB.ConfOpt.OPLRate:=GetString;
+
+  GameDB.ConfOpt.GUSBase:=GetString;
+  GameDB.ConfOpt.GUSRate:=GetString;
+  GameDB.ConfOpt.GUSIRQ:=GetString;
+  GameDB.ConfOpt.GUSDma:=GetString;
+
+  GameDB.ConfOpt.MIDIDevice:=GetString;
+  GameDB.ConfOpt.MPU401:=GetString;
+
+  GameDB.ConfOpt.PCRate:=GetString;
+  GameDB.ConfOpt.TandyRate:=GetString;
+  GameDB.ConfOpt.Joysticks:=GetString;
+
+  GameDB.ConfOpt.ScummVMPlatform:=GetString;
+  GameDB.ConfOpt.ScummVMLanguages:=GetString;
+  GameDB.ConfOpt.ScummVMRenderMode:=GetString;
+  GameDB.ConfOpt.ScummVMFilter:=GetString;
+  GameDB.ConfOpt.ScummVMMusicDriver:=GetString;
 end;
 
 procedure TSetupFrameDefaultValues.DefaultValueComboBoxChange(Sender: TObject);
@@ -237,60 +264,68 @@ end;
 
 procedure TSetupFrameDefaultValues.PopupMenuWork(Sender: TObject);
 Var All : Boolean;
-    I : Integer;
-Procedure Work(const J : Integer; S : String);
+    I,J : Integer;
+Procedure Work(S : String);
 begin
   If (I<>J) and (not All) then exit;
   TStringList(DefaultValueComboBox.Items.Objects[J]).Free;
   DefaultValueComboBox.Items.Objects[J]:=ValueToList(S,';,');
+  inc(J);
 end;
 begin
   All:=((Sender as TComponent).Tag=1);
 
-  I:=LastIndex; LastIndex:=-1;
+  I:=LastIndex; LastIndex:=-1; J:=0;
 
-  Work(0,DefaultValuesResolution);
-  Work(1,DefaultValuesJoysticks);
-  Work(2,DefaultValuesScale);
-  Work(3,DefaultValueRender);
-  Work(4,DefaultValueCycles);
-  Work(5,DefaultValuesVideo);
-  Work(6,DefaultValuesMemory);
-  Work(7,DefaultValuesFrameSkip);
-  Work(8,DefaultValuesCore);
-  Work(9,DefaultValueSBlaster);
-  Work(10,DefaultValuesOPLModes);
-  Work(11,DefaultValuesKeyboardLayout);
-  Work(12,DefaultValuesCodepage);
-  Work(13,DefaultValuesReportedDOSVersion);
-  Work(14,DefaultValuesMIDIDevice);
-  Work(15,DefaultValuesBlocksize);
-  Work(16,DefaultValuesCyclesDown);
-  Work(17,DefaultValuesCyclesUp);
-  Work(18,DefaultValuesDMA);
-  Work(19,DefaultValuesDMA1);
-  Work(20,DefaultValuesDMA2);
-  Work(21,DefaultValuesGUSBase);
-  Work(22,DefaultValuesGUSRate);
-  Work(23,DefaultValuesHDMA);
-  Work(24,DefaultValuesIRQ);
-  Work(25,DefaultValuesIRQ1);
-  Work(26,DefaultValuesIRQ2);
-  Work(27,DefaultValuesMPU401);
-  Work(28,DefaultValuesOPLRate);
-  Work(29,DefaultValuesPCRate);
-  Work(30,DefaultValuesRate);
-  Work(31,DefaultValuesSBBase);
-  Work(32,DefaultValuesMouseSensitivity);
-  Work(33,DefaultValuesTandyRate);
-  Work(34,DefaultValuesScummVMFilter);
-  Work(35,DefaultValuesScummVMMusicDriver);
-  Work(36,DefaultValuesVGAChipsets);
-  Work(37,DefaultValuesVGAVideoRAM);
-  Work(38,DefaultValuesScummVMRenderMode);
-  Work(39,DefaultValuesScummVMPlatform);
-  Work(40,DefaultValuesScummVMLanguages);
-  Work(41,DefaultValuesCPUType);
+  Work(DefaultValuesCore);
+  Work(DefaultValuesCPUType);
+  Work(DefaultValueCycles);
+  Work(DefaultValuesCyclesDown);
+  Work(DefaultValuesCyclesUp);
+
+  Work(DefaultValuesVideo);
+  Work(DefaultValuesMemory);
+  Work(DefaultValuesFrameSkip);
+  Work(DefaultValuesResolution);
+  Work(DefaultValuesScale);
+  Work(DefaultValueRender);
+  Work(DefaultValuesVGAChipsets);
+  Work(DefaultValuesVGAVideoRAM);
+
+  Work(DefaultValuesKeyboardLayout);
+  Work(DefaultValuesCodepage);
+  Work(DefaultValuesMouseSensitivity);
+  Work(DefaultValuesReportedDOSVersion);
+
+  Work(DefaultValuesRate);
+  Work(DefaultValuesBlocksize);
+
+  Work(DefaultValueSBlaster);
+  Work(DefaultValuesSBBase);
+  Work(DefaultValuesIRQ);
+  Work(DefaultValuesDMA);
+  Work(DefaultValuesHDMA);
+  Work(DefaultValuesOPLModes);
+  Work(DefaultValuesOplEmu);
+  Work(DefaultValuesOPLRate);
+
+  Work(DefaultValuesGUSBase);
+  Work(DefaultValuesGUSRate);
+  Work(DefaultValuesIRQ1);
+  Work(DefaultValuesDMA1);
+
+  Work(DefaultValuesMIDIDevice);
+  Work(DefaultValuesMPU401);
+
+  Work(DefaultValuesPCRate);
+  Work(DefaultValuesTandyRate);
+  Work(DefaultValuesJoysticks);
+
+  Work(DefaultValuesScummVMPlatform);
+  Work(DefaultValuesScummVMLanguages);
+  Work(DefaultValuesScummVMRenderMode);
+  Work(DefaultValuesScummVMFilter);
+  Work(DefaultValuesScummVMMusicDriver);
 
   DefaultValueComboBox.ItemIndex:=I; DefaultValueComboBoxChange(Sender);
 end;

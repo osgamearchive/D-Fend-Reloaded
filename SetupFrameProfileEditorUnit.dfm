@@ -61,6 +61,5 @@ object SetupFrameProfileEditor: TSetupFrameProfileEditor
     Anchors = [akLeft, akTop, akRight]
     Caption = 'Profildateinamen immer gem'#228#223' dem Profilnamen umbenennen'
     TabOrder = 4
-    Visible = False
   end
 end

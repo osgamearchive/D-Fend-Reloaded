@@ -32,7 +32,7 @@ Function ShowSelectTemplateDialog(const AOwner : TComponent; const GameFolder : 
 
 implementation
 
-uses LanguageSetupUnit, VistaToolsUnit, CommonTools, PrgSetupUnit;
+uses LanguageSetupUnit, VistaToolsUnit, CommonTools, PrgSetupUnit, IconLoaderUnit;
 
 {$R *.dfm}
 
@@ -44,6 +44,9 @@ begin
   Caption:=LanguageSetup.SelectAutoSetupTemplate;
   OKButton.Caption:=LanguageSetup.OK;
   CancelButton.Caption:=LanguageSetup.Cancel;
+
+  UserIconLoader.DialogImage(DI_OK,OKButton);
+  UserIconLoader.DialogImage(DI_Cancel,CancelButton);
 
   SelectedTemplate:=-1;
 end;
@@ -72,8 +75,6 @@ begin
   result:=-1;
   If MatchingTemplates.Count=0 then exit;
   If MatchingTemplates.Count=1 then begin result:=0; exit; end;
-
-  If not PrgSetup.ActivateIncompleteFeatures then begin result:=0; exit; end;
 
   ImportSelectTemplateForm:=TImportSelectTemplateForm.Create(AOwner);
   try

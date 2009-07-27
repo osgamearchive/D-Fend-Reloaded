@@ -6,7 +6,7 @@ uses Graphics;
 {PrgSetup.ImageFilter: 0..8, 0=off, 1=simple&slow, 2=Box, 3=Triangle, 4=Hermite, 5=Bell, 6=B-Spline, 7=Lanczos3, 8=Mitchell}
 
 Function ScaleImage(const SourcePic : TPicture; const Factor : Double) : TBitmap; overload;
-Procedure ScaleImage(const Source, Dest : TBitmap; const DestW, DestH : Integer); overload;
+Procedure ScaleImage(const Source, Dest : TBitmap; const DestW, DestH : Integer; const UseFiltering : Boolean = True); overload;
 
 implementation
 
@@ -72,11 +72,11 @@ begin
   end;
 end;
 
-Procedure ScaleImage(const Source, Dest : TBitmap; const DestW, DestH : Integer);
+Procedure ScaleImage(const Source, Dest : TBitmap; const DestW, DestH : Integer; const UseFiltering : Boolean);
 Var TempDest : TBitmap;
     W,H,UseFilter : Integer;
 begin
-  UseFilter:=PrgSetup.ImageFilter-1;
+  If UseFiltering then UseFilter:=PrgSetup.ImageFilter-1 else UseFilter:=0;
 
   TempDest:=TBitmap.Create;
   try

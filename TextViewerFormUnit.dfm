@@ -25,8 +25,6 @@ object TextViewerForm: TTextViewerForm
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 0
-    ExplicitTop = 451
-    ExplicitWidth = 409
     object CloseButton: TBitBtn
       Left = 4
       Top = 4
@@ -44,9 +42,5 @@ object TextViewerForm: TTextViewerForm
     Align = alClient
     ReadOnly = True
     TabOrder = 1
-    ExplicitLeft = 208
-    ExplicitTop = 224
-    ExplicitWidth = 185
-    ExplicitHeight = 89
   end
 end

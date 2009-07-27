@@ -11,7 +11,6 @@ type
     OKButton: TBitBtn;
     CancelButton: TBitBtn;
     List: TValueListEditor;
-    OpenDialog: TOpenDialog;
     InfoLabel: TLabel;
     HelpButton: TBitBtn;
     procedure FormCreate(Sender: TObject);
@@ -25,18 +24,19 @@ type
   public
     { Public-Deklarationen }
     ExeFiles : TStringList;
-    DefaultPath : String;
+    WindowsMode : Boolean;
+    GameExe, SetupExe : String;
   end;
 
 var
   ExtraExeEditForm: TExtraExeEditForm;
 
-Function ShowExtraExeEditDialog(const AOwner : TComponent; const AExeFiles : TStringList; const ADefaultPath : String) : Boolean;
+Function ShowExtraExeEditDialog(const AOwner : TComponent; const AExeFiles : TStringList; const AWindowsMode : Boolean; const AGameExe, AGameSetup : String) : Boolean;
 
 implementation
 
 uses Math, LanguageSetupUnit, CommonTools, VistaToolsUnit, PrgSetupUnit,
-     HelpConsts;
+     HelpConsts, IconLoaderUnit, GameDBToolsUnit;
 
 {$R *.dfm}
 
@@ -59,6 +59,14 @@ begin
   OKButton.Caption:=LanguageSetup.OK;
   CancelButton.Caption:=LanguageSetup.Cancel;
   HelpButton.Caption:=LanguageSetup.Help;
+
+  UserIconLoader.DialogImage(DI_OK,OKButton);
+  UserIconLoader.DialogImage(DI_Cancel,CancelButton);
+  UserIconLoader.DialogImage(DI_Help,HelpButton);
+
+  WindowsMode:=False;
+  GameExe:='';
+  SetupExe:='';
 end;
 
 procedure TExtraExeEditForm.FormShow(Sender: TObject);
@@ -77,17 +85,8 @@ end;
 procedure TExtraExeEditForm.ListEditButtonClick(Sender: TObject);
 Var S : String;
 begin
-    S:=MakeAbsPath(List.Strings.ValueFromIndex[List.Row-1],PrgSetup.BaseDir);
-    OpenDialog.DefaultExt:='exe';
-    OpenDialog.Title:=LanguageSetup.ProfileEditorEXEDialog;
-    If (Trim(PrgSetup.QBasic)<>'') and FileExists(Trim(PrgSetup.QBasic))
-      then OpenDialog.Filter:=LanguageSetup.ProfileEditorEXEFilterWithBasic
-      else OpenDialog.Filter:=LanguageSetup.ProfileEditorEXEFilter;
-    OpenDialog.InitialDir:=DefaultPath;
-    if not OpenDialog.Execute then exit;
-    S:=MakeRelPath(OpenDialog.FileName,PrgSetup.BaseDir);
-    If S='' then exit;
-    List.Strings.ValueFromIndex[List.Row-1]:=S;
+  S:=MakeAbsPath(List.Strings.ValueFromIndex[List.Row-1],PrgSetup.BaseDir);
+  If SelectProgramFile(S,GameExe,SetupExe,WindowsMode,self) then List.Strings.ValueFromIndex[List.Row-1]:=S;
 end;
 
 procedure TExtraExeEditForm.OKButtonClick(Sender: TObject);
@@ -116,12 +115,14 @@ end;
 
 { global }
 
-Function ShowExtraExeEditDialog(const AOwner : TComponent; const AExeFiles : TStringList; const ADefaultPath : String) : Boolean;
+Function ShowExtraExeEditDialog(const AOwner : TComponent; const AExeFiles : TStringList; const AWindowsMode : Boolean; const AGameExe, AGameSetup : String) : Boolean;
 begin
   ExtraExeEditForm:=TExtraExeEditForm.Create(AOwner);
   try
     ExtraExeEditForm.ExeFiles:=AExeFiles;
-    ExtraExeEditForm.DefaultPath:=ADefaultPath;
+    ExtraExeEditForm.WindowsMode:=AWindowsMode;
+    ExtraExeEditForm.GameExe:=AGameExe;
+    ExtraExeEditForm.SetupExe:=AGameSetup;
     result:=(ExtraExeEditForm.ShowModal=mrOK);
   finally
     ExtraExeEditForm.Free;

@@ -42,7 +42,7 @@ object ModernProfileEditorDOSBoxFrame: TModernProfileEditorDOSBoxFrame
     Left = 24
     Top = 16
     Width = 201
-    Height = 105
+    Height = 118
     Caption = 'DOSBoxForegroundPriorityRadioGroup'
     TabOrder = 0
   end
@@ -50,15 +50,15 @@ object ModernProfileEditorDOSBoxFrame: TModernProfileEditorDOSBoxFrame
     Left = 248
     Top = 16
     Width = 201
-    Height = 105
+    Height = 118
     Caption = 'DOSBoxBackgroundPriorityRadioGroup'
     TabOrder = 1
   end
   object CloseDOSBoxOnExitCheckBox: TCheckBox
     Left = 24
-    Top = 136
+    Top = 144
     Width = 601
-    Height = 17
+    Height = 15
     Anchors = [akLeft, akTop, akRight]
     Caption = 'CloseDOSBoxOnExitCheckBox'
     TabOrder = 2

@@ -51,7 +51,7 @@ type
 implementation
 
 uses VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgSetupUnit, HelpConsts,
-     IconLoaderUnit;
+     IconLoaderUnit, TextEditPopupUnit;
 
 {$R *.dfm}
 
@@ -72,6 +72,9 @@ begin
   NoFlicker(AutoexecBootFloppyImage);
   NoFlicker(AutoexecBootHDImageComboBox);
   NoFlicker(AutoexecBootFloppyImageTab);
+
+  SetRichEditPopup(AutoexecMemo);
+  SetRichEditPopup(FinalizationMemo);
 
   AutoexecOverrideGameStartCheckBox.Caption:=LanguageSetup.ProfileEditorAutoexecOverrideGameStart;
   AutoexecOverrideMountingCheckBox.Caption:=LanguageSetup.ProfileEditorAutoexecOverrideMounting;

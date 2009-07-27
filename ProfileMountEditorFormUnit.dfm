@@ -49,7 +49,7 @@ object ProfileMountEditorForm: TProfileMountEditorForm
       Width = 202
       Height = 21
       Style = csDropDownList
-      ItemHeight = 0
+      ItemHeight = 13
       TabOrder = 0
       OnChange = TypeComboBoxChange
     end

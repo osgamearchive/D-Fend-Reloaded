@@ -106,12 +106,15 @@ object HistoryForm: THistoryForm
         ViewStyle = vsReport
         OnColumnClick = ListViewColumnClick
         OnCompare = ListViewCompare
-        ExplicitHeight = 369
       end
     end
     object TabSheet2: TTabSheet
       Caption = 'Statistik'
       ImageIndex = 1
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object ListView2: TListView
         Left = 0
         Top = 0

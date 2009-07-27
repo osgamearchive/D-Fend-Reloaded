@@ -61,6 +61,8 @@ begin
   PlatformLabel.Caption:=LanguageSetup.ProfileEditorScummVMPlatform;
   St:=ValueToList(InitData.GameDB.ConfOpt.ScummVMPlatform,';,'); try PlatformComboBox.Items.AddStrings(St); finally St.Free; end;
 
+  AddDefaultValueHint(PlatformComboBox);
+
   HelpContext:=ID_ProfileEditHardware;
 end;
 

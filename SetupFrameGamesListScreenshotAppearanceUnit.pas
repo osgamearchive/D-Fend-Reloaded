@@ -21,6 +21,7 @@ type
     ScreenshotPreviewLabel: TLabel;
     ScreenshotPreviewEdit: TSpinEdit;
     ImageOpenDialog: TOpenDialog;
+    ReselectCategoryCheckBox: TCheckBox;
     procedure ScreenshotsListBackgroundColorBoxChange(Sender: TObject);
     procedure ScreenshotsListBackgroundEditChange(Sender: TObject);
     procedure ScreenshotsListBackgroundButtonClick(Sender: TObject);
@@ -60,6 +61,7 @@ Var S : String;
 begin
   PBaseDir:=InitData.PBaseDir;
 
+  NoFlicker(ReselectCategoryCheckBox);
   NoFlicker(ScreenshotsListBackgroundRadioButton1);
   NoFlicker(ScreenshotsListBackgroundRadioButton2);
   NoFlicker(ScreenshotsListBackgroundColorBox);
@@ -68,6 +70,8 @@ begin
   NoFlicker(ScreenshotsListFontSizeEdit);
   NoFlicker(ScreenshotsListFontColorBox);
   NoFlicker(ScreenshotPreviewEdit);
+
+  ReselectCategoryCheckBox.Checked:=PrgSetup.RestorePreviewerCategory;
 
   S:=Trim(PrgSetup.ScreenshotsListViewBackground);
   If S='' then ScreenshotsListBackgroundRadioButton1.Checked:=True else begin
@@ -94,6 +98,8 @@ end;
 procedure TSetupFrameGamesListScreenshotAppearance.LoadLanguage;
 Var GermanColorNames : Boolean;
 begin
+  ReselectCategoryCheckBox.Caption:=LanguageSetup.SetupFormStartRestorePreviewerCategory;
+
   GermanColorNames:=(ExtUpperCase(ExtractFileName(LanguageSetup.SetupFile))='DEUTSCH.INI') or (ExtUpperCase(ExtractFileName(LanguageSetup.SetupFile))='GERMAN.INI');
 
   ScreenshotsListBackgroundRadioButton1.Caption:=LanguageSetup.SetupFormBackgroundColorDefault;
@@ -127,6 +133,7 @@ end;
 
 procedure TSetupFrameGamesListScreenshotAppearance.RestoreDefaults;
 begin
+  ReselectCategoryCheckBox.Checked:=True;
   ScreenshotsListBackgroundRadioButton1.Checked:=True;
   ScreenshotsListBackgroundColorBox.Selected:=clBlack;
   ScreenshotsListBackgroundEdit.Text:='';
@@ -137,6 +144,7 @@ end;
 
 procedure TSetupFrameGamesListScreenshotAppearance.SaveSetup;
 begin
+  PrgSetup.RestorePreviewerCategory:=ReselectCategoryCheckBox.Checked;
   If ScreenshotsListBackgroundRadioButton1.Checked then PrgSetup.ScreenshotsListViewBackground:='';
   If ScreenshotsListBackgroundRadioButton2.Checked then PrgSetup.ScreenshotsListViewBackground:=ColorToString(ScreenshotsListBackgroundColorBox.Selected);
   If ScreenshotsListBackgroundRadioButton3.Checked then PrgSetup.ScreenshotsListViewBackground:=ScreenshotsListBackgroundEdit.Text;

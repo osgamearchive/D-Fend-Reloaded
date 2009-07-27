@@ -1,40 +1,27 @@
 [Extra]
-Loadhigh=0
-CloseOnExit=1
-AutoMountCDs=0
-Overridegamestart=0
-OverrideMount=0
-LoadFixVal=64
 NrOfMounts=1
-Tab=1
 Tab2=0
 Exe=WOLF3D.EXE
 ExeMD5=9A1D0BA1E2224133966876993519806C
-Setup=
 SetupMD5=
-GameParameters=
-SetupParameters=
 LastModification=39549-83447
 0=.\VirtualHD;Drive;C;False;;
-1=
-2=
-3=
-4=
-5=
-6=
-7=
-8=
-9=
-autoexec=[13]
-BootImage=
-Finalization=
-CustomSettings=
-Environment=PATH[61]Z:\[13]
-ProfileMode=DOSBox
+autoexec=[13][10]
+Environment=PATH[61]Z:\[13][10]
+ScreenshotListScreenshot=
+Loadhigh=0
+CloseOnExit=1
+AutoMountCDs=0
+SecureMode=1
+Overridegamestart=0
+OverrideMount=0
+LoadFixVal=64
+Tab=0
+Setup=
+GameParameters=
+SetupParameters=
 ExtraDirs=
 ExtraFiles=
-DataDir=
-ScreenshotListScreenshot=
 ExtraExe0=
 ExtraExe1=
 ExtraExe2=
@@ -45,23 +32,38 @@ ExtraExe6=
 ExtraExe7=
 ExtraExe8=
 ExtraExe9=
+DataDir=
+1=
+2=
+3=
+4=
+5=
+6=
+7=
+8=
+9=
+BootImage=
+Finalization=
+CustomSettings=
+ProfileMode=DOSBox
 
 [ExtraInfo]
-Favorite=0
-Name=Wolfenstein 3D
-Icon=
 Genre=First Person
 Developer=id Software
 Publisher=Apogee Software
 Year=1992
+Language=English
+Favorite=0
+Name=Wolfenstein 3D
+Icon=
 Notes=
 WWW=
-Language=English
 UserInfo=
 
 [sdl]
-fullscreen=1
 autolock=0
+mapperfile=mapper.txt
+fullscreen=1
 fulldouble=0
 usecancodes=1
 sensitivity=100
@@ -69,7 +71,6 @@ output=surface
 windowresolution=original
 fullresolution=original
 priority=higher,normal
-mapperfile=mapper.txt
 DOSBoxlanguage=default
 
 [dos]
@@ -88,8 +89,8 @@ CapsLockStatus=
 ScrollLockStatus=
 
 [render]
-aspect=0
 TextModeLines=25
+aspect=0
 frameskip=0
 scaler=normal2x
 
@@ -127,6 +128,8 @@ VolumeSBLeft=100
 VolumeSBRight=100
 VolumeFMLeft=100
 VolumeFMRight=100
+VolumeCDLeft=100
+VolumeCDRight=100
 
 [sblaster]
 mixer=1
@@ -137,15 +140,16 @@ hdma=5
 oplrate=22050
 sbtype=sb16
 oplmode=auto
+oplemu=default
 
 [gus]
+irq2=5
+dma2=1
 gus=1
 gusrate=22050
 gusbase=240
 irq1=5
-irq2=5
 dma1=1
-dma2=1
 ultradir=C:\ULTRASND
 
 [speaker]
@@ -192,28 +196,33 @@ GFXDetails=3
 Walkspeed=2
 GameZipFile=
 Savepath=
+RenderMode=
+ExtraPath=
+Platform=
 
 [dosbox]
+DOSBoxDirectory=Default
+machine=vga_s3
 memsize=16
-captures=
-DOSBoxDirectory=
-machine=vga
+captures=.\Capture\
 
 [cpu]
-cyclesup=500
-cyclesdown=20
 core=normal
 cycles=3000
+cyclesup=500
+cyclesdown=20
+type=auto
 
 [vga]
 videoram=2048
 svgachipset=s3
+PixelShader=
 
 [serial]
 serial1=Dummy
-serial2=dummy
-serial3=disabled
-serial4=disabled
+serial2=Dummy
+serial3=Disabled
+serial4=Disabled
 
 [midi]
 mpu401=intelligent
@@ -226,4 +235,16 @@ BeforeExecution.Minimized=0
 AfterExecution.Minimized=0
 BeforeExecution=
 AfterExecution=
+
+[ExtraGameIdentify]
+File1.Filename=AUDIOHED.WL6
+File2.Filename=GAMEMAPS.WL6
+File3.Filename=MAPHEAD.WL6
+File4.Filename=VGAHEAD.WL6
+File5.Filename=VGAGRAPH.WL6
+File1.Checksum=3BFAC1F5DE61D8A1A7DF949FBDE873FC
+File2.Checksum=05EE51E9BC7D60F01A05334B1CFAB1A5
+File3.Checksum=ACCC0231D871A4350DA4374D87B57D88
+File4.Checksum=9F0A9DA0A8AC0B831C2FB5EFD1A1E6FB
+File5.Checksum=977242319585DBD9A47C666D4B93FB3F
 

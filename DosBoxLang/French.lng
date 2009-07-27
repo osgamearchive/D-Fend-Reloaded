@@ -1,118 +1,219 @@
-:SDL_CONFIGFILE_HELP
-fullscreen -- D‚marrer DOSBox directement en mode plein ‚cran.
-fulldouble -- Utiliser le double buffering en mode plein ‚cran.
-fullresolution -- R‚solution … utiliser pour le plein ‚cran: original ou taille fixe (ex: 1024x768).
-windowresolution -- Mettre l'‚chelle de la fenˆtre … cette taille SI le mode de sortie supporte le hardware scaling.
-output -- Mode … utiliser pour la sortie: surface,overlay,opengl,openglnb,ddraw.
-autolock -- La souris se bloquera automatiquement si on clique sur l'‚cran.
-sensitivity -- Sensibilit‚ de la souris.
-waitonerror -- Attendre avant de fermer la console si une erreur se produit dans DOSBox.
-priority -- Niveaux de priorit‚ pour DOSBox: lower(faible),normal,higher(‚lev‚),highest(le plus ‚lev‚), pause(quand inactif).
-            La deuxiŠme valeur aprŠs la virgule est lorsque DOSBox n'est pas actif/r‚duit.
-mapperfile -- Fichier utilis‚ pour charger/sauver la correspondance touches/‚v‚nements.
-usescancodes -- Empˆche l'utilisation des symkeys, peut ne pas fonctionner sur tous les systŠmes d'exploitation.
+:CONFIG_FULLSCREEN
+D‚marrer DOSBox directement en mode plein ‚cran.
 .
-:DOSBOX_CONFIGFILE_HELP
-language -- S‚lectionner un autre fichier de langue.
-memsize -- Quantit‚ de m‚moire dont DOSBox dispose, en m‚gaoctets.
-machine -- Type de machine … ‚muler: hercules,cga,tandy,pcjr,vga.
-captures -- R‚pertoire o— les objets comme les sons wave, musiques midi, et captures d'‚cran sont enregistr‚es.
+:CONFIG_FULLDOUBLE
+Utiliser le double buffering en mode plein ‚cran.
 .
-:RENDER_CONFIGFILE_HELP
-frameskip -- Nombre d'images que DOSBox saute avant d'en afficher une autre.
-aspect -- Applique une correction d'aspect, si le mode de sortie ne supporte pas le scaling, cela peut ralentir le fonctionnement!
-scaler -- Scaler utilis‚ pour agrandir/am‚liorer les modes basse r‚solution.
-          Les valeurs support‚es sont none,normal2x,normal3x,advmame2x,advmame3x,hq2x,hq3x,
-          														2xsai,super2xsai,supereagle,advinterp2x,advinterp3x,
-          														tv2x,tv3x,rgb2x,rgb3x,scan2x,scan3x.
-          Si l'option forced est utilis‚e (comme avec scaler=hq2x forced)le scaler sera utilis‚
-          mˆme si le r‚sultat ne semble pas celui escompt‚.	
+:CONFIG_FULLRESOLUTION
+R‚solution … utiliser pour le plein ‚cran: original ou taille fixe (ex: 1024x768).
 .
-:CPU_CONFIGFILE_HELP
-core -- Core CPU utilis‚ dans l'‚mulation: normal,simple,dynamic,auto.
-				auto bascule de normal … dynamic si c'est appropri‚.
-cycles -- Nombre d'instructions que DOSBox essaye d'‚muler … chaque milliseconde.
-					Param‚trer une trop grande valeur donne des coupures de son et des saccades.
-          Vous pouvez aussi laisser DOSBox d‚terminer la valeur correcte en r‚glant la valeur sur max.
-          Le paramŠtre par d‚faut (auto) bascule vers max si c'est appropri‚.
-cycleup   -- Nombre de cycles … ajouter/r‚duire avec la combinaison de touches.
-cycledown -- Le param‚trer … moins de 100 donnera un pourcentage.
+:CONFIG_WINDOWRESOLUTION
+Mettre l'‚chelle de la fenˆtre … cette taille SI le mode de sortie supporte le hardware scaling.
 .
-:MIXER_CONFIGFILE_HELP
-nosound -- Activer le mode silence, le son est cependant toujours ‚mul‚.
-rate -- Taux d'‚chantillonnage du Mixer, param‚trer tout p‚riph‚rique plus
-        haut que ceci va probablement d‚t‚riorer sa qualit‚ de son.
-blocksize -- Taille de bloc du Mixer, des blocs plus gros peuvent aider pour
-             les saccades de son mais il sera aussi moins en phase.
-prebuffer -- Nombre de millisecondes de donn‚es … garder en amont du blocksize.
+:CONFIG_OUTPUT
+SystŠme vid‚o … utiliser pour la sortie.
 .
-:MIDI_CONFIGFILE_HELP
-mpu401      -- Type de MPU-401 … ‚muler: none, uart ou intelligent.
-device      -- P‚riph‚rique qui recevra les donn‚es MIDI du MPU-401.
-               Cela peut ˆtre default,alsa,oss,win32,coreaudio,none.
-config      -- Options de configuration sp‚cifique pour le p‚riph‚rique.
-               Pour Windows mettre l'ID du p‚riph‚rique … utiliser.
-               Voir le fichier README pour les d‚tails.
+:CONFIG_AUTOLOCK
+La souris se verrouillera automatiquement en cliquant sur l'‚cran.
 .
-:SBLASTER_CONFIGFILE_HELP
-sbtype -- Type de Soundblaster … ‚muler: none,sb1,sb2,sbpro1,sbpro2,sb16.
-sbbase,irq,dma,hdma -- Les adresses IO/IRQ/DMA/DMA Haut de la Soundblaster.
-mixer -- Permet au mixer Soundblaster de modifier le mixer de DOSBox.
-oplmode -- Type d'‚mulation OPL: auto,cms,opl2,dualopl2,opl3.
-           pour auto, le mode est d‚termin‚ par le type de Soundblaster.
-           Tous les modes OPL sont de type 'Adlib', sauf pour CMS.
-oplrate -- Taux d'‚chantillonnage de l'‚mulation musicale OPL.
+:CONFIG_SENSITIVITY
+Sensibilit‚ de la souris.
 .
-:GUS_CONFIGFILE_HELP
-gus -- Activer l'‚mulation Gravis Ultrasound.
-gusbase,irq1,irq2,dma1,dma2 -- Adresses IO/IRQ/DMA de la Gravis
-           Ultrasound (des IRQ identiques et des DMA identiques sont OK.)
-gusrate -- Taux d'‚chantillonnage de l'‚mulation Ultrasound.
-ultradir -- Chemin vers le r‚pertoire Ultrasound. Dans ce r‚pertoire,
-            il devrait y avoir un r‚pertoire MIDI qui contient
-            les fichiers patch pour l'‚coute en GUS. Le jeu de patch
-            utilis‚ avec Timidity devrait bien fonctionner.
+:CONFIG_WAITONERROR
+Attendre avant de fermer la console si une erreur se produit dans DOSBox.
 .
-:SPEAKER_CONFIGFILE_HELP
-pcspeaker -- Activer l'‚mulation Haut-Parleur PC.
-pcrate -- Taux d'‚chantillonnage de la g‚n‚ration de son du Haut-Parleur PC.
-tandy -- Activer l'‚mulation du Tandy Sound System (off,on,auto).
-         Pour auto, l'‚mulation Tandysound est pr‚sente seulement si la 
-         machine est param‚tr‚e sur tandy.
-tandyrate -- Taux d'‚chantillonnage de la g‚n‚ration 3-Voix Tandy.
-disney -- Activer l'‚mulation Disney Sound Source. Covox Voice Master et Speech Thing compatibles.
+:CONFIG_PRIORITY
+Niveaux de priorit‚ pour DOSBox. La deuxiŠme valeur aprŠs la virgule est lorsque DOSBox n'est pas actif/r‚duit. (pause n'est valable que pour la seconde entr‚e).
 .
-:JOYSTICK_CONFIGFILE_HELP
-joysticktype -- Type de joystick … ‚muler: auto (d‚faut), none(aucun),
-                2axis (supporte deux joysticks),
-                4axis (supporte un joystick, premier joystick utilis‚),
-                4axis_2 (supporte un joystick, second joystick utilis‚),
-                fcs (Thrustmaster) ,ch (CH Flightstick).
-                none d‚sactive l'‚mulation du joystick.
-                auto choisit l'‚mulation selon le(s) joystick(s) r‚el(s).
-timed -- Activer des intervalles de temps pour les axes (false est l'ancienne m‚thode de comportement)
-autofire -- Tirer continuellement tant que le bouton est activ‚.
-swap34 -- Echanger les 3Šme et 4Šme axes. Peut ˆtre utile avec certains joysticks.
-buttonwrap -- Activer l'inversion de bouton pour le nombre de boutons ‚mul‚s.
+:CONFIG_MAPPERFILE
+Fichier utilis‚ pour charger/sauver les correspondances touche/‚v‚nement.
 .
-:SERIAL_CONFIGFILE_HELP
-serial1-4 -- D‚finir le type de p‚riph‚rique connect‚ au port s‚rie.
-             Peut ˆtre disabled(d‚sactiv‚), dummy(factice), modem, nullmodem, directserial.
-             Les paramŠtres additionnels doivent ˆtre sur la mˆme ligne sous la forme
-             paramŠtre:valeur. Le paramŠtre pour tous les types est irq.
-             Pour directserial: realport (requis), rxdelay (optionel).
-             Pour modem: listenport (optionel).
-             Pour nullmodem: server, rxdelay, txdelay, telnet, usedtr,
-                             transparent, port, inhsocket (tous optionels).
-             Exemple: serial1=modem listenport:5000
+:CONFIG_USESCANCODES
+Empˆche l'utilisation des symkeys, peut ne pas fonctionner sur tous les systŠmes d'exploitation.
 .
-:DOS_CONFIGFILE_HELP
-xms -- Activer le support m‚moire XMS (ou ‚tendue).
-ems -- Activer le support m‚moire EMS (ou pagin‚e).
-umb -- Activer le support UMB (bloc m‚moire sup‚rieure).
-keyboardlayout -- Code langue pour la disposition du clavier (ou aucun).
+:CONFIG_LANGUAGE
+S‚lectionner un autre fichier de langue.
 .
-:IPX_CONFIGFILE_HELP
+:CONFIG_MACHINE
+Type de machine … ‚muler.
+.
+:CONFIG_CAPTURES
+R‚pertoire o— les objets comme les sons wave, musiques midi, et captures d'‚cran sont enregistr‚es.
+.
+:CONFIG_MEMSIZE
+Quantit‚ de m‚moire dont DOSBox dispose, en M‚gaoctets.
+  Il est mieux de laisser cette valeur d'origine pour ‚viter les problŠmes avec certains jeux,
+  bien que quelques jeux puissent n‚cessiter une valeur plus ‚lev‚e.
+  Il n'y a g‚n‚ralement pas de gain de vitesse en augmentant cette valeur.
+. 
+:CONFIG_FRAMESKIP
+Nombre d'images que DOSBox saute avant d'en afficher une autre.
+.
+:CONFIG_ASPECT
+Applique une correction d'aspect, si le mode de sortie ne supporte pas le scaling, cela peut ralentir le fonctionnement!.
+.
+:CONFIG_SCALER
+Scaler utilis‚ pour agrandir/am‚liorer les modes basse r‚solution. Si l'option "forced" est utilis‚e, le scaler sera utilis‚ mˆme si le r‚sultat ne semble pas celui escompt‚.
+.
+:CONFIG_CORE
+Core CPU utilis‚ dans l'‚mulation. "auto" bascule de "normal" … "dynamic" si c'est disponible et appropri‚.
+.
+:CONFIG_CPUTYPE
+Type de CPU utilis‚ dans l'‚mulation. "auto" est le choix le plus rapide.
+.
+:CONFIG_CYCLES
+Nombre d'instructions que DOSBox essaye d'‚muler … chaque milliseconde. Param‚trer une trop grande valeur donne des coupures de son et des saccades. Les cycles ˆuvent ˆtre d‚finis de 3 fa‡ons:
+  'auto'          essaye de deviner ce dont un jeu a besoin.
+                  Cela fonctionne g‚n‚ralement, mais peut ‚chouer avec certains jeux.
+  'fixed #nombre' d‚finira une quantit‚ fixe de cycles. C'est g‚n‚ralement ce qu'il faut si 'auto' ‚choue.
+                  (Exemple: fixed 4000)
+  'max'           allouera autant de cycles que votre ordinateur est capable de g‚rer.
+.
+:CONFIG_CYCLEUP
+Nombre de cycles … ajouter/r‚duire avec la combinaison de touches.
+.
+:CONFIG_CYCLEDOWN
+Le param‚trer … moins de 100 donnera un pourcentage.
+.
+:CONFIG_NOSOUND
+Activer le mode silence, le son est cependant toujours ‚mul‚.
+.
+:CONFIG_RATE
+Taux d'‚chantillonnage du Mixer, param‚trer tout taux d'un p‚riph‚rique plus haut que ceci va probablement d‚teriorer leur qualit‚ sonore.
+.
+:CONFIG_BLOCKSIZE
+Taille de bloc du Mixer, des blocs plus gros peuvent aider pour les saccades de son mais il sera aussi moins en phase.
+.
+:CONFIG_PREBUFFER
+Nombre de millisecondes de donn‚es … garder en amont du paramŠtre blocksize.
+.
+:CONFIG_MPU401
+Type de MPU-401 … ‚muler.
+.
+:CONFIG_MIDIDEVICE
+P‚riph‚rique qui recevra les donn‚es MIDI du MPU-401.
+.
+:CONFIG_MIDICONFIG
+Options de configuration sp‚cifique pour le pilote de p‚riph‚rique. C'est g‚n‚ralement l'ID du p‚riph‚rique que vous voulez utiliser. Voir le fichier README pour les d‚tails.
+.
+:CONFIG_SBTYPE
+Type de Soundblaster … ‚muler.
+.
+:CONFIG_SBBASE
+Adresse IO de la soundblaster.
+.
+:CONFIG_IRQ
+Num‚ro IRQ de la soundblaster.
+.
+:CONFIG_DMA
+Num‚ro DMA de la soundblaster.
+.
+:CONFIG_HDMA
+Nu‚mro DMA Haut de la soundblaster.
+.
+:CONFIG_SBMIXER
+Permet au mixer Soundblaster de modifier le mixer de DOSBox.
+.
+:CONFIG_OPLMODE
+Type d'‚mulation OPL. Pour "auto", le mode est d‚termin‚ par le type de Soundblaster. Tous les modes OPL sont compatibles Adlib, sauf pour CMS.
+.
+:CONFIG_OPLEMU
+Source pour l'‚mulation OPL. "compat" ou "old" pourraient offrir une meilleure qualit‚ (voir ‚galement oplrate).
+.
+:CONFIG_OPLRATE
+Taux d'‚chantillonnage de l'‚mulation musicale OPL. Utiliser 49716 pour la meilleure qualit‚ (param‚trer le taux du mixer en cons‚quence).
+.
+:CONFIG_GUS
+Activer l'‚mulation Gravis Ultrasound.
+.
+:CONFIG_GUSRATE
+Taux d'‚chantillonnage de l'‚mulation Ultrasound.
+.
+:CONFIG_GUSBASE
+Adresse de base IO de la Gravis Ultrasound.
+.
+:CONFIG_GUSIRQ
+Num‚ro IRQ number de la Gravis Ultrasound.
+.
+:CONFIG_GUSDMA
+Canal DMA de la the Gravis Ultrasound.
+.
+:CONFIG_ULTRADIR
+Chemin vers le r‚pertoire Ultrasound. Dans ce r‚pertoire,
+il devrait y avoir un r‚pertoire MIDI qui contient
+les fichiers patch pour l'‚coute en GUS. Le jeu de patch
+utilis‚ avec Timidity devrait bien fonctionner.
+.
+:CONFIG_PCSPEAKER
+Activer l'‚mulation Haut-Parleur PC.
+.
+:CONFIG_PCRATE
+Taux d'‚chantillonnage de la g‚n‚ration de son du Haut-Parleur PC.
+.
+:CONFIG_TANDY
+Activer l'‚mulation du Tandy Sound System. Pour "auto", l'‚mulation est pr‚sente seulement si la machine est param‚tr‚e sur "tandy".
+.
+:CONFIG_TANDYRATE
+Taux d'‚chantillonnage de la g‚n‚ration 3-Voix Tandy.
+.
+:CONFIG_DISNEY
+Activer l'‚mulation Disney Sound Source. (Covox Voice Master et Speech Thing compatibles).
+.
+:CONFIG_JOYSTICKTYPE
+Type de joystick … ‚muler: auto (d‚faut), none(aucun)
+2axis (supporte deux joysticks),
+4axis (supporte un joystick, premier joystick utilis‚),
+4axis_2 (supporte un joystick, second joystick utilis‚),
+fcs (Thrustmaster), ch (CH Flightstick).
+"none" d‚sactive l'‚mulation du joystick.
+"auto" choisit l'‚mulation selon le(s) joystick(s) r‚el(s).
+.
+:CONFIG_TIMED
+Activer des intervalles de temps pour les axes ("false" est l'ancienne m‚thode de comportement).
+.
+:CONFIG_AUTOFIRE
+Tirer continuellement tant que le bouton est activ‚.
+.
+:CONFIG_SWAP34
+Echanger les 3Šme et 4Šme axes. Peut ˆtre utile avec certains joysticks.
+.
+:CONFIG_BUTTONWRAP
+Activer l'inversion de bouton pour le nombre de boutons ‚mul‚s.
+.
+:CONFIG_SERIAL1
+D‚finir le type de p‚riph‚rique connect‚ au port s‚rie.
+Peut ˆtre disabled(d‚sactiv‚), dummy(factice), modem, nullmodem, directserial.
+Les paramŠtres additionnels doivent ˆtre sur la mˆme ligne sous la forme
+paramŠtre:valeur. Le paramŠtre pour tous les types est irq.
+Pour directserial: realport (requis), rxdelay (optionnel).
+                  (realport:COM1 realport:ttyS0).
+Pour modem: listenport (optionnel).
+Pour nullmodem: server, rxdelay, txdelay, telnet, usedtr,
+                transparent, port, inhsocket (tous optionels).
+Exemple: serial1=modem listenport:5000.
+.
+:CONFIG_SERIAL2
+voir serial1.
+.
+:CONFIG_SERIAL3
+voir serial1.
+.
+:CONFIG_SERIAL4
+voir serial1.
+.
+:CONFIG_XMS
+Activer la prise en charge de m‚moire XMS (ou ‚tendue).
+.
+:CONFIG_EMS
+Activer la prise en charge de m‚moire EMS (ou pagin‚e).
+.
+:CONFIG_UMB
+Activer la prise en charge des UMB (bloc m‚moire sup‚rieure).
+.
+:CONFIG_KEYBOARDLAYOUT
+Code langue pour la disposition du clavier (ou aucun).
+.
+:CONFIG_IPX
 ipx -- Activer l'‚mulation ipx … travers UDP/IP.
 .
 :AUTOEXEC_CONFIGFILE_HELP
@@ -123,6 +224,9 @@ Les lignes de cette section seront lanc‚es au d‚marrage.
 # Les lignes commen‡ant avec un # sont des lignes de commentaires.
 # Elles servent … documenter (briŠvement) la fonction de chaque option.
 .
+:CONFIG_SUGGESTED_VALUES
+Valeurs possibles
+.
 :PROGRAM_CONFIG_FILE_ERROR
 Impossible d'ouvrir le fichier %s
 .
@@ -130,6 +234,12 @@ Impossible d'ouvrir le fichier %s
 Outil de configuration:
 Utiliser -writeconf nom_de_fichier pour ‚crire la configuration actuelle.
 Utiliser -writelang nom_de_fichier pour ‚crire le fichier de langue actuel.
+.
+:PROGRAM_CONFIG_SECURE_ON
+Bascul‚ en mode s‚curis‚.
+.
+:PROGRAM_CONFIG_SECURE_DISALLOW
+Cette op‚ration n'est pas permise en mode s‚curis‚.
 .
 :PROGRAM_CONFIG_SECTION_ERROR
 La section %s n'existe pas.
@@ -247,7 +357,6 @@ Pour plus d'informations sur DOSBox, visiter [34;1mhttp://dosbox.sourceforge.ne
 
 [31;1mDOSBox s'arrˆtera/sortira sans avertissement si une erreur est survenue![0m
 
-
 .
 :PROGRAM_INTRO_MOUNT_START
 [32;1mVoici quelques commandes pour commencer:[0m
@@ -268,7 +377,8 @@ les fichiers.
 [44;1mÉÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ»
 º [32mmount c ~/dosprog[37m cr‚era un lecteur C avec ~/dosprog pour contenu. º
 º                                                                     º
-º [32m~/dosprog[37m est un exemple. Le remplacer avec votre propre r‚pertoire de jeux. [37m º
+º [32m~/dosprog[37m est un exemple. Le remplacer avec votre propre r‚pertoire      º
+º de jeux.                                                                   [37mº
 ÈÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¼[0m
 .
 :PROGRAM_INTRO_MOUNT_END
@@ -314,7 +424,7 @@ Elles peuvent ˆtre chang‚es dans le [33mkeymapper[0m.
 [33;1mALT-PAUSE[0m   : Mettre en pause DOSBox.
 [33;1mCTRL-F1[0m     : D‚marrer le [33mkeymapper[0m.
 [33;1mCTRL-F4[0m     : Actualiser le cache r‚pertoire de tous les lecteurs!
-              Echanger les disques images mont‚s.
+              Basculer entre les disques images mont‚s.
 [33;1mCTRL-ALT-F5[0m : D‚marrer/Arrˆter la cr‚ation d'un film de la sortie ‚cran.
 [33;1mCTRL-F5[0m     : Sauvegarder une capture d'‚cran.
 [33;1mCTRL-F6[0m     : D‚marrrer/Arrˆter l'enregistrement de la sortie son en un
@@ -343,7 +453,7 @@ Cette commande d‚marre DosBox … partir d'une disquette ou d'une image sur
 disque dur.
 
 Pour cette commande, on peut sp‚cifier une succession de disquettes 
-‚changeables en pressant Ctrl-F4, et -l sp‚cifie le lecteur mont‚ … partir
+… basculer en pressant Ctrl-F4, et -l sp‚cifie le lecteur mont‚ … partir
 duquel d‚marrer. Si aucune lettre de lecteur n'est sp‚cifi‚e, cela met par
 d‚faut le d‚marrage … partir du lecteur A.
 Les seules lettres de lecteur d‚marrables sont A, C, et D.  Pour d‚marrer 
@@ -429,6 +539,9 @@ L'utilisation de fichiers multiples n'est support‚ que pour les images cue/iso.
 .
 :PROGRAM_KEYB_INFO
 La page de code %i a ‚t‚ charg‚e.
+.
+:PROGRAM_KEYB_INFO_LAYOUT
+La page de code %i a ‚t‚ charg‚e pour la disposition %s
 .
 :PROGRAM_KEYB_SHOWHELP
 [32;1mKEYB[0m [ID disposition clavier[ num‚ro page de code[ fichier page de code]]]
@@ -589,7 +702,7 @@ Il n'est possible d'utiliser SUBST que sur les lecteurs locaux.
 .
 :SHELL_STARTUP_END
  [44;1mº [32mAMUSEZ-VOUS BIEN![37m                                                          º[0m
- [44;1mº [32mL'‚quipe DOSBox[37m                                                            º[0m
+ [44;1mº [32mL'‚quipe DOSBox [33mhttp://dosbox.com[37m                                          º[0m
  [44;1mÈÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¼[0m
 .
 :SHELL_CMD_CHDIR_HELP
@@ -709,5 +822,5 @@ Fourni pour compatibilit‚.
 Voir et indiquer la version de DOS report‚e.
 .
 :SHELL_CMD_VER_VER
-DOSBox version %s. Version de DOS report‚e %d.%d.
+DOSBox version %s. Version de DOS report‚e %d.%02d.
 .

@@ -3,7 +3,7 @@ object FirstRunWizardForm: TFirstRunWizardForm
   Top = 0
   BorderStyle = bsDialog
   Caption = 'FirstRunWizardForm'
-  ClientHeight = 279
+  ClientHeight = 293
   ClientWidth = 565
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -13,34 +13,130 @@ object FirstRunWizardForm: TFirstRunWizardForm
   Font.Style = []
   KeyPreview = True
   OldCreateOrder = False
-  Position = poOwnerFormCenter
+  Position = poScreenCenter
+  OnClose = FormClose
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnKeyDown = FormKeyDown
   OnShow = FormShow
+  DesignSize = (
+    565
+    293)
   PixelsPerInch = 96
   TextHeight = 13
   object Notebook: TNotebook
     Left = -1
     Top = 0
     Width = 569
-    Height = 241
+    Height = 258
+    Anchors = [akLeft, akTop, akRight, akBottom]
+    PageIndex = 1
     TabOrder = 0
+    ExplicitHeight = 274
+    object TPage
+      Left = 0
+      Top = 0
+      Caption = 'Start'
+      ExplicitHeight = 283
+      object StartLabel: TLabel
+        Left = 8
+        Top = 8
+        Width = 553
+        Height = 50
+        AutoSize = False
+        Caption = 
+          'In this wizard you can configurate the basic settings needed to ' +
+          'use D-Fend Reloaded. You can also change all settings offered in' +
+          ' this wizard from the program settings dialog.'
+        WordWrap = True
+      end
+      object StartLabelLanguage: TLabel
+        Left = 8
+        Top = 60
+        Width = 91
+        Height = 13
+        Caption = 'Program language:'
+      end
+      object StartLabelLanguageValue: TLabel
+        Left = 8
+        Top = 75
+        Width = 33
+        Height = 13
+        Caption = 'English'
+      end
+      object StartLabelDOSBox: TLabel
+        Left = 8
+        Top = 100
+        Width = 74
+        Height = 13
+        Caption = 'DOSBox folder:'
+      end
+      object StartLabelDOSBoxValue: TLabel
+        Left = 8
+        Top = 115
+        Width = 253
+        Height = 13
+        Caption = 'Default (C:\Program files\D-Fend Reloaded\DOSBox)'
+      end
+      object StartLabelDOSBoxLanguage: TLabel
+        Left = 8
+        Top = 140
+        Width = 90
+        Height = 13
+        Caption = 'DOSBox language:'
+      end
+      object StartLabelDOSBoxLanguageValue: TLabel
+        Left = 8
+        Top = 155
+        Width = 33
+        Height = 13
+        Caption = 'English'
+      end
+      object StartLabelGamesFolder: TLabel
+        Left = 8
+        Top = 180
+        Width = 67
+        Height = 13
+        Caption = 'Games folder:'
+      end
+      object StartLabelGamesFolderValue: TLabel
+        Left = 8
+        Top = 195
+        Width = 245
+        Height = 13
+        Caption = 'Default (C:\Users\you\D-Fend Reloaded\VirtualHD)'
+      end
+      object StartLabelUpdates: TLabel
+        Left = 8
+        Top = 220
+        Width = 83
+        Height = 13
+        Caption = 'Update checking:'
+      end
+      object StartLabelUpdatesValue: TLabel
+        Left = 8
+        Top = 235
+        Width = 101
+        Height = 13
+        Caption = 'Manual checking only'
+      end
+    end
     object TPage
       Left = 0
       Top = 0
       Caption = 'ProgramLanguage'
+      ExplicitHeight = 283
       object LanguageLabel: TLabel
-        Left = 16
+        Left = 8
         Top = 79
         Width = 90
         Height = 13
         Caption = 'Programmsprache:'
       end
       object LanguageInfoLabel: TLabel
-        Left = 16
+        Left = 8
         Top = 125
-        Width = 497
+        Width = 537
         Height = 76
         AutoSize = False
         Caption = 'LanguageInfoLabel'
@@ -49,8 +145,8 @@ object FirstRunWizardForm: TFirstRunWizardForm
       end
       object LanguageTopInfoLabel: TLabel
         AlignWithMargins = True
-        Left = 16
-        Top = 16
+        Left = 8
+        Top = 8
         Width = 537
         Height = 26
         Caption = 
@@ -60,7 +156,7 @@ object FirstRunWizardForm: TFirstRunWizardForm
         WordWrap = True
       end
       object LanguageComboBox: TComboBox
-        Left = 16
+        Left = 8
         Top = 98
         Width = 290
         Height = 21
@@ -74,11 +170,10 @@ object FirstRunWizardForm: TFirstRunWizardForm
       Left = 0
       Top = 0
       Caption = 'DOSBox'
-      ExplicitWidth = 0
-      ExplicitHeight = 0
+      ExplicitHeight = 283
       DesignSize = (
         569
-        241)
+        258)
       object DosBoxButton: TSpeedButton
         Left = 530
         Top = 98
@@ -103,9 +198,9 @@ object FirstRunWizardForm: TFirstRunWizardForm
         OnClick = DosBoxButtonClick
       end
       object DOSBoxTopInfoLabel: TLabel
-        Left = 16
-        Top = 16
-        Width = 537
+        Left = 8
+        Top = 8
+        Width = 545
         Height = 57
         AutoSize = False
         Caption = 
@@ -115,7 +210,7 @@ object FirstRunWizardForm: TFirstRunWizardForm
         WordWrap = True
       end
       object DOSBoxInfoLabel: TLabel
-        Left = 16
+        Left = 8
         Top = 128
         Width = 537
         Height = 105
@@ -147,9 +242,9 @@ object FirstRunWizardForm: TFirstRunWizardForm
         OnClick = WarningButtonClick
       end
       object DosBoxDirEdit: TLabeledEdit
-        Left = 16
+        Left = 8
         Top = 98
-        Width = 508
+        Width = 516
         Height = 21
         EditLabel.Width = 67
         EditLabel.Height = 13
@@ -162,18 +257,17 @@ object FirstRunWizardForm: TFirstRunWizardForm
       Left = 0
       Top = 0
       Caption = 'DOSBoxLanguage'
-      ExplicitWidth = 0
-      ExplicitHeight = 0
+      ExplicitHeight = 283
       object DosBoxLangLabel: TLabel
-        Left = 16
+        Left = 8
         Top = 79
         Width = 84
         Height = 13
         Caption = 'DosBoxLangLabel'
       end
       object DOSBoxLanguageTopInfoLabel: TLabel
-        Left = 16
-        Top = 16
+        Left = 8
+        Top = 8
         Width = 545
         Height = 57
         AutoSize = False
@@ -184,7 +278,7 @@ object FirstRunWizardForm: TFirstRunWizardForm
         WordWrap = True
       end
       object DOSBoxLanguageInfoLabel2: TLabel
-        Left = 16
+        Left = 8
         Top = 128
         Width = 545
         Height = 73
@@ -196,12 +290,12 @@ object FirstRunWizardForm: TFirstRunWizardForm
         WordWrap = True
       end
       object DosBoxLangEditComboBox: TComboBox
-        Left = 16
+        Left = 8
         Top = 98
         Width = 290
         Height = 21
         Style = csDropDownList
-        ItemHeight = 0
+        ItemHeight = 13
         TabOrder = 0
       end
     end
@@ -209,12 +303,11 @@ object FirstRunWizardForm: TFirstRunWizardForm
       Left = 0
       Top = 0
       Caption = 'GameDir'
-      ExplicitWidth = 0
-      ExplicitHeight = 0
+      ExplicitHeight = 283
       object GameDirTopInfoLabel: TLabel
-        Left = 16
-        Top = 16
-        Width = 529
+        Left = 8
+        Top = 8
+        Width = 545
         Height = 57
         AutoSize = False
         Caption = 
@@ -247,7 +340,7 @@ object FirstRunWizardForm: TFirstRunWizardForm
         OnClick = GameDirButtonClick
       end
       object GameDirInfoLabel: TLabel
-        Left = 16
+        Left = 8
         Top = 125
         Width = 537
         Height = 84
@@ -256,9 +349,9 @@ object FirstRunWizardForm: TFirstRunWizardForm
         WordWrap = True
       end
       object GameDirEdit: TLabeledEdit
-        Left = 16
+        Left = 8
         Top = 98
-        Width = 506
+        Width = 516
         Height = 21
         EditLabel.Width = 58
         EditLabel.Height = 13
@@ -270,13 +363,12 @@ object FirstRunWizardForm: TFirstRunWizardForm
       Left = 0
       Top = 0
       Caption = 'Update'
-      ExplicitWidth = 0
-      ExplicitHeight = 0
+      ExplicitHeight = 283
       DesignSize = (
         569
-        241)
+        258)
       object UpdateLabel: TLabel
-        Left = 32
+        Left = 8
         Top = 156
         Width = 534
         Height = 45
@@ -290,14 +382,14 @@ object FirstRunWizardForm: TFirstRunWizardForm
         WordWrap = True
       end
       object UpdateTopInfoLabel: TLabel
-        Left = 16
-        Top = 16
+        Left = 8
+        Top = 8
         Width = 309
         Height = 13
         Caption = 'Please select when D-Fend Reloaded should search for updates:'
       end
       object Update0RadioButton: TRadioButton
-        Left = 16
+        Left = 8
         Top = 35
         Width = 540
         Height = 17
@@ -308,7 +400,7 @@ object FirstRunWizardForm: TFirstRunWizardForm
         TabStop = True
       end
       object Update1RadioButton: TRadioButton
-        Left = 16
+        Left = 8
         Top = 58
         Width = 540
         Height = 17
@@ -317,7 +409,7 @@ object FirstRunWizardForm: TFirstRunWizardForm
         TabOrder = 1
       end
       object Update2RadioButton: TRadioButton
-        Left = 16
+        Left = 8
         Top = 81
         Width = 540
         Height = 17
@@ -326,7 +418,7 @@ object FirstRunWizardForm: TFirstRunWizardForm
         TabOrder = 2
       end
       object Update3RadioButton: TRadioButton
-        Left = 16
+        Left = 8
         Top = 104
         Width = 540
         Height = 17
@@ -335,7 +427,7 @@ object FirstRunWizardForm: TFirstRunWizardForm
         TabOrder = 3
       end
       object UpdateCheckBox: TCheckBox
-        Left = 16
+        Left = 8
         Top = 135
         Width = 550
         Height = 17
@@ -343,7 +435,7 @@ object FirstRunWizardForm: TFirstRunWizardForm
         TabOrder = 4
       end
       object UpdateNowCheckBox: TCheckBox
-        Left = 16
+        Left = 8
         Top = 207
         Width = 540
         Height = 17
@@ -355,11 +447,11 @@ object FirstRunWizardForm: TFirstRunWizardForm
   end
   object BackButton: TBitBtn
     Left = 8
-    Top = 247
+    Top = 264
     Width = 97
     Height = 25
-    Caption = 'Zur'#252'ck'
-    Enabled = False
+    Anchors = [akLeft, akBottom]
+    Caption = 'Back'
     TabOrder = 1
     OnClick = BackButtonClick
     Glyph.Data = {
@@ -376,12 +468,14 @@ object FirstRunWizardForm: TFirstRunWizardForm
       3333333333333333333333333333333333333333333333333333333333333333
       3333333333333333333333333333333333333333333333333333}
     NumGlyphs = 2
+    ExplicitTop = 289
   end
   object NextButton: TBitBtn
-    Left = 111
-    Top = 247
+    Left = 60
+    Top = 264
     Width = 97
     Height = 25
+    Anchors = [akLeft, akBottom]
     Caption = 'Next'
     TabOrder = 2
     OnClick = NextButtonClick
@@ -400,34 +494,64 @@ object FirstRunWizardForm: TFirstRunWizardForm
       3333333333333333333333333333333333333333333333333333}
     Layout = blGlyphRight
     NumGlyphs = 2
+    ExplicitTop = 273
   end
   object OKButton: TBitBtn
-    Left = 111
-    Top = 247
+    Left = 99
+    Top = 264
     Width = 97
     Height = 25
+    Anchors = [akLeft, akBottom]
     TabOrder = 3
     Visible = False
-    OnClick = OKButtonClick
     Kind = bkOK
+    ExplicitTop = 273
   end
   object AcceptAllSettingsButton: TBitBtn
     Left = 317
-    Top = 247
+    Top = 264
     Width = 198
     Height = 25
-    Caption = '&Alle Einstellungen akzeptieren'
-    TabOrder = 5
-    OnClick = OKButtonClick
+    Anchors = [akLeft, akBottom]
+    Caption = '&Accept all settings'
+    TabOrder = 4
     Kind = bkAll
+    ExplicitTop = 289
   end
   object HelpButton: TBitBtn
-    Left = 214
-    Top = 247
+    Left = 521
+    Top = 264
     Width = 97
     Height = 25
-    TabOrder = 4
+    Anchors = [akLeft, akBottom]
+    TabOrder = 6
     OnClick = HelpButtonClick
     Kind = bkHelp
+    ExplicitTop = 273
+  end
+  object EditSettingsButton: TBitBtn
+    Left = 182
+    Top = 264
+    Width = 198
+    Height = 25
+    Anchors = [akLeft, akBottom]
+    Caption = '&Edit settings'
+    TabOrder = 5
+    OnClick = NextButtonClick
+    Glyph.Data = {
+      76010000424D7601000000000000760000002800000020000000100000000100
+      04000000000000010000120B0000120B00001000000000000000000000000000
+      800000800000008080008000000080008000808000007F7F7F00BFBFBF000000
+      FF0000FF000000FFFF00FF000000FF00FF00FFFF0000FFFFFF00333333000000
+      000033333377777777773333330FFFFFFFF03FF3FF7FF33F3FF700300000FF0F
+      00F077F777773F737737E00BFBFB0FFFFFF07773333F7F3333F7E0BFBF000FFF
+      F0F077F3337773F3F737E0FBFBFBF0F00FF077F3333FF7F77F37E0BFBF00000B
+      0FF077F3337777737337E0FBFBFBFBF0FFF077F33FFFFFF73337E0BF0000000F
+      FFF077FF777777733FF7000BFB00B0FF00F07773FF77373377373330000B0FFF
+      FFF03337777373333FF7333330B0FFFF00003333373733FF777733330B0FF00F
+      0FF03333737F37737F373330B00FFFFF0F033337F77F33337F733309030FFFFF
+      00333377737FFFFF773333303300000003333337337777777333}
+    NumGlyphs = 2
+    ExplicitTop = 273
   end
 end

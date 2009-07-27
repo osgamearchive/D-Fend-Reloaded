@@ -46,7 +46,7 @@ type
 implementation
 
 uses VistaToolsUnit, LanguageSetupUnit, CommonTools, ClassExtensions,
-     IconLoaderUnit;
+     IconLoaderUnit, TextEditPopupUnit;
 
 {$R *.dfm}
 
@@ -56,6 +56,8 @@ procedure TWizardGameInfoFrame.Init(const AGameDB: TGameDB; const ALinkFile : TL
 Var St : TStringList;
 begin
   SetVistaFonts(self);
+
+  SetRichEditPopup(NotesMemo);
 
   InfoLabel.Font.Style:=[fsBold];
 

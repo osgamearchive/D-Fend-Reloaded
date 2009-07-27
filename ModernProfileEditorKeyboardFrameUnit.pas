@@ -94,6 +94,9 @@ begin
   CustomKeyMapperButton.Hint:=LanguageSetup.ChooseFile;
   UserIconLoader.DialogImage(DI_SelectFile,CustomKeyMapperButton);
 
+  AddDefaultValueHint(KeyboardLayoutComboBox);
+  AddDefaultValueHint(CodepageComboBox);
+
   HelpContext:=ID_ProfileEditKeyboard;
 end;
 

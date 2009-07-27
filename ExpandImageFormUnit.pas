@@ -67,6 +67,9 @@ begin
 
   UserIconLoader.DialogImage(DI_SelectFile,FileNameButton);
   UserIconLoader.DialogImage(DI_SelectFolder,FolderButton);
+  UserIconLoader.DialogImage(DI_OK,OKButton);
+  UserIconLoader.DialogImage(DI_Cancel,CancelButton);
+  UserIconLoader.DialogImage(DI_Help,HelpButton);
 end;
 
 procedure TExpandImageForm.ButtonWork(Sender: TObject);

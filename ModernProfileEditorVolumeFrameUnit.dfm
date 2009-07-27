@@ -1,7 +1,7 @@
 object ModernProfileEditorVolumeFrame: TModernProfileEditorVolumeFrame
   Left = 0
   Top = 0
-  Width = 468
+  Width = 583
   Height = 475
   TabOrder = 0
   object SoundVolumeLeftLabel1: TLabel
@@ -125,6 +125,27 @@ object ModernProfileEditorVolumeFrame: TModernProfileEditorVolumeFrame
   end
   object SoundVolumeRightLabel6: TLabel
     Left = 368
+    Top = 381
+    Width = 33
+    Height = 13
+    Caption = 'Rechts'
+  end
+  object SoundVolumeCDLabel: TLabel
+    Left = 448
+    Top = 236
+    Width = 14
+    Height = 13
+    Caption = 'CD'
+  end
+  object SoundVolumeLeftLabel7: TLabel
+    Left = 448
+    Top = 381
+    Width = 23
+    Height = 13
+    Caption = 'Links'
+  end
+  object SoundVolumeRightLabel7: TLabel
+    Left = 512
     Top = 381
     Width = 33
     Height = 13
@@ -415,6 +436,54 @@ object ModernProfileEditorVolumeFrame: TModernProfileEditorVolumeFrame
     PageSize = 5
     Frequency = 10
     TabOrder = 22
+    TickMarks = tmBoth
+    OnChange = TrackBarChange
+  end
+  object SoundVolumeCDLeftEdit: TSpinEdit
+    Left = 448
+    Top = 400
+    Width = 49
+    Height = 22
+    MaxValue = 200
+    MinValue = 0
+    TabOrder = 24
+    Value = 100
+    OnChange = SpinEditChange
+  end
+  object SoundVolumeCDRightEdit: TSpinEdit
+    Left = 512
+    Top = 400
+    Width = 49
+    Height = 22
+    MaxValue = 200
+    MinValue = 0
+    TabOrder = 25
+    Value = 100
+    OnChange = SpinEditChange
+  end
+  object SoundVolumeCDLeftTrackBar: TTrackBar
+    Left = 448
+    Top = 255
+    Width = 45
+    Height = 114
+    Max = 200
+    Orientation = trVertical
+    PageSize = 5
+    Frequency = 10
+    TabOrder = 26
+    TickMarks = tmBoth
+    OnChange = TrackBarChange
+  end
+  object SoundVolumeCDRightTrackBar: TTrackBar
+    Left = 512
+    Top = 255
+    Width = 45
+    Height = 114
+    Max = 200
+    Orientation = trVertical
+    PageSize = 5
+    Frequency = 10
+    TabOrder = 27
     TickMarks = tmBoth
     OnChange = TrackBarChange
   end

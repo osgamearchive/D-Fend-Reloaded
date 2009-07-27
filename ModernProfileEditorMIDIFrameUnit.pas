@@ -45,6 +45,9 @@ begin
   St:=ValueToList(InitData.GameDB.ConfOpt.MIDIDevice,';,'); try DeviceComboBox.Items.AddStrings(St); finally St.Free; end;
   AdditionalSettingsEdit.EditLabel.Caption:=LanguageSetup.ProfileEditorSoundMIDIConfigInfo;
 
+  AddDefaultValueHint(TypeComboBox);
+  AddDefaultValueHint(DeviceComboBox);
+
   HelpContext:=ID_ProfileEditSoundMIDI;
 end;
 

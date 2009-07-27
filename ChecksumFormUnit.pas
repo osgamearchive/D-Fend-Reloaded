@@ -30,7 +30,7 @@ Function ShowCheckSumWarningDialog(const AOwner : TComponent; const Text : Strin
 
 implementation
 
-uses VistaToolsUnit, LanguageSetupUnit, CommonTools;
+uses VistaToolsUnit, LanguageSetupUnit, CommonTools, IconLoaderUnit;
 
 {$R *.dfm}
 
@@ -48,6 +48,10 @@ begin
   YesButton.Caption:=LanguageSetup.Yes;
   NoButton.Caption:=LanguageSetup.No;
   TurnOffButton.Caption:=LanguageSetup.CheckSumTurnOffForProfile;
+
+  UserIconLoader.DialogImage(DI_Yes,YesButton);
+  UserIconLoader.DialogImage(DI_No,NoButton);
+  UserIconLoader.DialogImage(DI_Abort,TurnOffButton);
 
   ButtonResult:=1;
 end;

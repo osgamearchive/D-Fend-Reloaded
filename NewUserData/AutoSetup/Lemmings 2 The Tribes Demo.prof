@@ -47,6 +47,18 @@ ProfileMode=DOSBox
 ExtraDirs=
 ExtraFiles=
 DataDir=
+SecureMode=1
+ScreenshotListScreenshot=
+ExtraExe0=
+ExtraExe1=
+ExtraExe2=
+ExtraExe3=
+ExtraExe4=
+ExtraExe5=
+ExtraExe6=
+ExtraExe7=
+ExtraExe8=
+ExtraExe9=
 
 [sdl]
 fullscreen=1
@@ -59,6 +71,7 @@ windowresolution=original
 fullresolution=original
 priority=higher,normal
 mapperfile=default
+DOSBoxlanguage=default
 
 [dos]
 Force2ButtonMouseMode=0
@@ -104,6 +117,8 @@ VolumeSBLeft=100
 VolumeSBRight=100
 VolumeFMLeft=100
 VolumeFMRight=100
+VolumeCDLeft=100
+VolumeCDRight=100
 
 [sblaster]
 mixer=1
@@ -114,6 +129,7 @@ hdma=5
 oplrate=22050
 sbtype=sb16
 oplmode=auto
+oplemu=default
 
 [gus]
 gus=1
@@ -157,18 +173,34 @@ GamePath=
 Filter=2x
 Language=en
 MusicDriver=auto
+ConfirmExit=0
+AltIntro=0
+MusicMute=0
+ObjectLabels=0
+ReverseStereo=0
+SFXMute=0
+CDROM=0
+JoystickNum=0
+GFXDetails=3
+Walkspeed=2
+GameZipFile=
+RenderMode=
+Savepath=
+ExtraPath=
+Platform=
 
 [dosbox]
 memsize=32
 captures=
 DOSBoxDirectory=
-machine=vga
+machine=vga_s3
 
 [cpu]
 cyclesup=500
 cyclesdown=20
 core=auto
 cycles=10000
+type=auto
 
 [serial]
 serial1=Dummy
@@ -180,4 +212,39 @@ serial4=disabled
 mpu401=intelligent
 device=default
 config=
+
+[glide]
+glide=0
+
+[printer]
+printer=0
+multipage=0
+dpi=360
+width=85
+height=110
+printoutput=ps
+
+[ExtraCommands]
+BeforeExecution.Wait=1
+BeforeExecution.Minimized=0
+AfterExecution.Minimized=0
+BeforeExecution=
+AfterExecution=
+
+[vga]
+videoram=2048
+svgachipset=3s
+PixelShader=none
+
+[ExtraGameIdentify]
+File1.Filename=
+File1.Checksum=
+File2.Filename=
+File2.Checksum=
+File3.Filename=
+File3.Checksum=
+File4.Filename=
+File4.Checksum=
+File5.Filename=
+File5.Checksum=
 

@@ -301,9 +301,4 @@ object WizardPrgFileFrame: TWizardPrgFileFrame
     Caption = 'Verzeichnis f'#252'r zus'#228'tzliche Dateien automatisch festlegen'
     TabOrder = 5
   end
-  object OpenDialog: TOpenDialog
-    DefaultExt = 'exe'
-    Left = 456
-    Top = 56
-  end
 end

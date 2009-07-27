@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
+<!DOCTYPE DFRPackagesFile SYSTEM "http://dfendreloaded.sourceforge.net/Packages/DFRPackagesFile.dtd">
+
+<DFRPackagesFile Name="Official addons (languages and auto setup templates) for D-Fend Reloaded" LastUpdateDate="10/07/2008">
+  <Language
+    Name="Dummy language"
+	Version="0.7.10"
+	Author="Alexander Herzog"
+	PackageChecksum="B9883E3128AB333D6C00C45388316F26"
+	Size="82815">http://dfendreloaded.sourceforge.net/Packages/DummyLang.ini</Language>
+  <AutoSetup
+    Name="Airbus A320"
+	Genre="Flightsimulation"
+	Developer="Thalion Software"
+	Publisher="Thalion Software"
+	Year="1992"
+	Language="English"
+	PackageChecksum="A987EA321FD81257CDC9561415D97000"
+	Size="3000">http://dfendreloaded.sourceforge.net/Packages/Airbus_A320.prof</AutoSetup>
+  <AutoSetup
+    Name="Atomix"
+	Genre="Puzzle"
+	Developer="Softtouch"
+	Publisher="Thalion Software"
+	Year="1990"
+	Language="English"
+	PackageChecksum="A3CC65A673D5A3A2084424034082054E"
+ 	Size="2508">http://dfendreloaded.sourceforge.net/Packages/Atomix.prof</AutoSetup>
+  <Icon
+    Name="Testicon"
+    FileChecksum="D8E07FE5052501166B19D2F5A73D6193"
+    Size="138607">http://dfendreloaded.sourceforge.net/Packages/NewDFR.ico</Icon>
+  <IconSet
+    Name="Test-Icon-Set"
+	FileChecksum="-"
+	Version="0.8.0"
+	Author="nobody"
+	Size="48665">http://dfendreloaded.sourceforge.net/Packages/TestSet.zip</IconSet>
+  <IconSet
+    Name="Test-Icon-Set"
+	FileChecksum="-"
+	Version="0.7.11"
+	Author="nobody"
+	Size="48665">http://dfendreloaded.sourceforge.net/Packages/TestSet.zip</IconSet>	
+</DFRPackagesFile>

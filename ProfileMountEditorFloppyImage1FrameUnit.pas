@@ -106,7 +106,7 @@ end;
 function TProfileMountEditorFloppyImage1Frame.Done: String;
 begin
   {ImageFile;FLOPPYIMAGE;Letter;;;}
-  result:=FloppyImageEdit.Text+';FloppyImage;'+FloppyImageDriveLetterComboBox.Text+';;;';
+  result:=MakeRelPath(FloppyImageEdit.Text,PrgSetup.BaseDir)+';FloppyImage;'+FloppyImageDriveLetterComboBox.Text+';;;';
 end;
 
 function TProfileMountEditorFloppyImage1Frame.GetName: String;

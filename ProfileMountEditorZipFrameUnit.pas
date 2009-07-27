@@ -147,7 +147,7 @@ begin
   end;
 
   {RealFolder$ZipFile;ZIP;Letter;False;;FreeSpace;DeleteMode(no;files;folder)}
-  S:=ZipFolderEdit.Text+'$'+ZipFileEdit.Text+';ZIP;'+ZipFolderDriveLetterComboBox.Text+';False;';
+  S:=MakeRelPath(ZipFolderEdit.Text,PrgSetup.BaseDir)+'$'+MakeRelPath(ZipFileEdit.Text,PrgSetup.BaseDir)+';ZIP;'+ZipFolderDriveLetterComboBox.Text+';False;';
   S:=S+';'+IntToStr(ZipFolderFreeSpaceTrackBar.Position);
   Case RepackTypeComboBox.ItemIndex of
     0 : S:=S+';no';

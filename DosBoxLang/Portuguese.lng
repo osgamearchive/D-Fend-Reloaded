@@ -1,120 +1,231 @@
-:SDL_CONFIGFILE_HELP
-fullscreen -- Iniciar o dosbox em tela-cheia.
-fulldouble -- Usar buffer duplo quando em tela-cheia.
-fullresolution -- Que resolução usar no modo tela-cheia: original ou tamanho fixo (ex. 1024x768).
-windowresolution -- Ajustar a janela para este tamanho SE o dispositivo de saída suportar escalagem.
-output -- O que deverá ser utilizado para saída: surface,overlay,opengl,openglnb,ddraw.
-autolock -- Capturar o mouse automaticamente, quando clicar na tela do dosbox.
-sensitiviy -- Sensibilidade do mouse.
-waitonerror -- Se ocorrer algum erro com o dosbox, aguardar o fechamento do console.
-priority -- Níveis de prioridade para o dosbox: lowest,lower,normal,higher,highest,pause (quando não focado)
-            A segunda opção, depois da vírgula, é usada quando o dosbox está em segundo plano.
-mapperfile -- Arquivo utilizado para carregar/salvar o mapeamento das teclas/eventos.
-usescancodes -- Evite o uso de symkeys. Pode não funcionar em certos sistemas operacionais.
+:CONFIG_FULLSCREEN
+Iniciar o dosbox em tela-cheia.
 .
-:DOSBOX_CONFIGFILE_HELP
-language -- Selecionar outro arquivo de idioma.
-memsize -- Quantidade de memória para o dosbox utilizar, em megabytes.
-machine -- Tipo de máquina à emular:hercules,cga,tandy,pcjr,vga.
-captures -- Diretório para salvar a captura de tela, sons, música.
+:CONFIG_FULLDOUBLE
+Usar buffer duplo quando em tela-cheia.
 .
-:RENDER_CONFIGFILE_HELP
-frameskip -- Quantos frames o dosbox irá ignorar antes de desenhar outro.
-aspect -- Fazer correção do aspecto. Se a saída não suportar escalagem, o desempenho do dosbox poderá ser reduzido!
-scaler -- Escala utilizada para ampliar/melhorar modos de baixa resolução.
-          Os modos suportados são: none,normal2x,normal3x,advmame2x,advmame3x,hq2x,hq3x,
-                        2xsai,super2xsai,supereagle,advinterp2x,advinterp3x,
-                        tv2x,tv3x,rgb2x,rgb3x,scan2x,scan3x.
-          Se "forced" for adicionado (exemplo: scaler=hq2x forced), a escala será usada
-          mesmo se o resultado não for o desejado.
+:CONFIG_FULLRESOLUTION
+Que resolução usar no modo tela-cheia: original ou tamanho fixo (ex. 1024x768).
 .
-:CPU_CONFIGFILE_HELP
-core -- Tipo de emulação do processador: simple,normal,dynamic,auto.
-        auto alterna de normal para dynamic quando apropriado.
-cycles -- Quantidade de instruções que o dosbox emulará por milisegundo.
-          Não é recomendável colocar um valor maior do que seu computador possa suportar.
-          Também é possível deixar o DOSBox encontrar o valor correto colocando como valor max.
-          O valor padrão (auto) ajusta automaticamente para max se apropriado.
-cycleup   -- Quantidade de ciclos para aumentar/diminuir ao apertar as teclas correspondentes.
-cycledown -- Valores menores que 100 correspondem à porcentagens.
+:CONFIG_WINDOWRESOLUTION
+Ajustar a janela para este tamanho SE o dispositivo de saída suportar escalagem.
 .
-:MIXER_CONFIGFILE_HELP
-nosound -- Ativar modo silencioso. Ainda assim, o som continuará sendo emulado.
-rate -- Taxa de amostra do mixer. Ajustar qualquer dispositivo a um valor maior
-        que este provavelmente diminua sua qualidade.
-blocksize -- Tamanho do bloco do mixer. Blocos maiores podem evitar sons picotados
-             mas o som poderá sair com atraso.
-prebuffer -- Quantos milisegundos de dados manter antes do buffer.
+:CONFIG_OUTPUT
+Qual sistema utilizar para saída de vídeo.
 .
-:MIDI_CONFIGFILE_HELP
-mpu401      -- Tipo de MPU-401 a emular: none, uart or intelligent.
-device      -- Dispositivo que receberá as informações MIDI a partir do MPU-401.
-               Valores possíveis: default,alsa,oss,win32,coreaudio,none.
-config      -- Opções especiais de configuração para o dispositivo. No Windows, coloque
-               o id. do dispositivo que deseja usar. Veja o arquivo README para mais detalhes.
+:CONFIG_AUTOLOCK
+Capturar o mouse automaticamente, quando clicar na tela do dosbox.
 .
-:SBLASTER_CONFIGFILE_HELP
-sbtype -- Tipo de SoundBlaster a emular: none,sb1,sb2,sbpro1,sbpro2,sb16.
-sbbase,irq,dma,hdma -- Valores IO/IRQ/DMA/HighDMA do SoundBlaster.
-mixer -- Permitir que o mixer do SoundBlaster modifique o mixer do dosbox.
-oplmode -- Tipo de emulação OPL: auto,cms,opl2,dualopl2,opl3.
-           Em auto, o modo é determinado pelo tipo do SoundBlaster.
-           Todos os modos em OPL são 'Adlib', exceto CMS.
-oplrate -- Taxa de mostragem da emulação da música OPL.
+:CONFIG_SENSITIVITY
+Sensibilidade do mouse.
 .
-:GUS_CONFIGFILE_HELP
-gus -- Ativar a emulação do Gravis Ultrasound.
-gusbase,irq1,irq2,dma1,dma2 -- Valores IO/IRQ/DMA do
-           Gravis Ultrasound. (Podem ter os mesmos IRQs e DMAs).
-gusrate -- Taxa de amostragem da emulação do GUS.
-ultradir -- Caminho para o diretório do Ultrasound. Neste diretório
-            deverá haver uma pasta de MIDI que contém
-            o banco de sons para a reprodução do GUS. Também podem ser
-            usados os mesmos que funcionam com Timidity.
+:CONFIG_WAITONERROR
+Se ocorrer algum erro com o dosbox, aguardar o fechamento do console.
 .
-:SPEAKER_CONFIGFILE_HELP
-pcspeaker -- Ativar a emulação do PC-Speaker.
-pcrate -- Taxa de amostragem do som do PC-Speaker.
-tandy -- Ativar emulação do Tandy Sound System (off,on,auto).
-         Em auto, a emulação do Tandysound só será feita se a máquina for Tandy.
-tandyrate -- Taxa de amostragem do Tandy 3-Voice generation.
-disney -- Ativar a emulação do Disney Sound Source. Covox Voice Master e Speech Thing compatíveis.
+:CONFIG_PRIORITY
+Níveis de prioridade para o dosbox. A segunda opção, depois da vírgula, é usada quando o dosbox está em segundo plano (O pause só é válido para a segunda opção).
 .
-:JOYSTICK_CONFIGFILE_HELP
-joysticktype -- Tipo do joystick a emular: auto (padrão), none,
-                2axis (suporta 2 joysticks),
-                4axis (suporta 1 joystick, o primeiro será utilizado),
-                4axis_2 (suporta 1 joystick, o segundo será utilizado),
-                fcs (Thrustmaster), ch (CH Flightstick).
-                none desativa a emulação do joystick.
-                auto determina a emulação de acordo com o joystick(s) utilizado(s).
-timed -- Ativa intervalos temporizados para os eixos. (desativado funciona da maneira antiga).
-autofire -- Atira continuamente enquanto o botão estiver pressionado.
-swap34 -- Inverter o 3º e o 4º eixo. Pode ser útil para alguns joysticks.
-buttonwrap -- Ativar agrupamento dos botões quando um certo número for emulado.
+:CONFIG_MAPPERFILE
+Arquivo utilizado para carregar/salvar o mapeamento das teclas/eventos.
 .
-:SERIAL_CONFIGFILE_HELP
-serial1-4 -- Configure o tipo de dispositivo conectado a porta serial.
-             Pode ser disabled, dummy, modem, nullmodem, directserial.
-             Parâmetros adicionais devem estar na mesma linha da seguinte forma
-             parâmetro:valor. O parâmetro comum é irq.
-             para directserial: realport (obrigatório), rxdelay (opcional).
-             para modem: listenport (opcional).
-             para nullmodem: server, rxdelay, txdelay, telnet, usedtr,
-                            transparent, port, inhsocket (todos opcionais).
-             Exemplo: serial1=modem listenport:5000
+:CONFIG_USESCANCODES
+Evite o uso de symkeys. Pode não funcionar em certos sistemas operacionais.
 .
-:DOS_CONFIGFILE_HELP
-xms -- Habilitar suporte a XMS.
-ems -- Habilitar suporte a EMS.
-umb -- Habilitar suporte a UMB.
-keyboardlayout -- Código do idioma para layout do teclado (ou nenhum).
+:CONFIG_LANGUAGE
+Selecionar outro arquivo de idioma.
 .
-:IPX_CONFIGFILE_HELP
-ipx -- Ativar emulação IPX sobre UDP/IP.
+:CONFIG_MACHINE
+Tipo de máquina à emular.
+.
+:CONFIG_CAPTURES
+Diretório para salvar a captura de tela, sons, música.
+.
+:CONFIG_MEMSIZE
+Quantidade de memória para o dosbox utilizar, em megabytes.
+  O melhor valor é o padrão. Ele evitará problemas com alguns jogos.
+  Contudo outros jogos talvez precisem de um valor maior.
+  Geralmente não há melhora na velocidade aumentando-se esse valor.
+.
+:CONFIG_FRAMESKIP
+Quantos frames o dosbox irá ignorar antes de desenhar outro.
+.
+:CONFIG_ASPECT
+Fazer correção do aspecto. Se a saída não suportar escalagem, o desempenho do dosbox poderá ser reduzido!
+.
+:CONFIG_SCALER
+Escala utilizada para ampliar/melhorar modos de baixa resolução. Se 'forced' for adicionado, a escala será usada mesmo se o resultado não for o desejado.
+.
+:CONFIG_CORE
+Núcleo do processador usado na emulação. auto alterna de normal para dynamic quando apropriado.
+.
+:CONFIG_CPUTYPE
+Tipo de emulação do processador. auto é a opção de melhor velocidade.
+.
+:CONFIG_CYCLES
+Quantidade de instruções que o dosbox emulará por milisegundo. Colocar um valor muito alto pode ocasionar perda de áudio e redução da velocidade. Os ciclos podem ser ajustados de 3 maneiras:
+  'auto'          tenta descobrir o melhor valor.
+                  Geralmente funciona, mas poderá falhar para alguns jogos.
+  'fixed #número' ajusta uma quantidade fixa de ciclos. Isso poderá ser usado caso 'auto' falhe.
+                  (Exemplo: fixed 4000)
+  'max'           aloca a maior quantidade de ciclos que seu computador pode suportar.
+.
+:CONFIG_CYCLEUP
+Quantidade de ciclos para aumentar/diminuir ao apertar as teclas correspondentes.
+.
+:CONFIG_CYCLEDOWN
+Valores menores que 100 correspondem à porcentagens.
+.
+:CONFIG_NOSOUND
+Ativar modo silencioso. Ainda assim, o som continuará sendo emulado.
+.
+:CONFIG_RATE
+Taxa de amostra do mixer. Ajustar qualquer valor maior que este provavelmente diminua a qualidade do áudio.
+.
+:CONFIG_BLOCKSIZE
+Tamanho do bloco do mixer. Blocos maiores podem evitar sons picotados mas o som poderá sair com atraso.
+.
+:CONFIG_PREBUFFER
+Quantos milisegundos de dados manter antes do buffer.
+.
+:CONFIG_MPU401
+Tipo de MPU-401 a emular.
+.
+:CONFIG_MIDIDEVICE
+Dispositivo que receberá as informações MIDI a partir do MPU-401.
+.
+:CONFIG_MIDICONFIG
+Opções especiais de configuração para o dispositivo. No Windows, coloque o id. do dispositivo que deseja usar. Veja o arquivo README para mais detalhes.
+.
+:CONFIG_SBTYPE
+Tipo de SoundBlaster a emular.
+.
+:CONFIG_SBBASE
+Valor do 'IO address' do SoundBlaster.
+.
+:CONFIG_IRQ
+Valor do IRQ do SoundBlaster.
+.
+:CONFIG_DMA
+Valor do DMA do SoundBlaster.
+.
+:CONFIG_HDMA
+Valor 'High DMA' do SoundBlaster.
+.
+:CONFIG_SBMIXER
+Permitir que o mixer do SoundBlaster modifique o mixer do dosbox.
+.
+:CONFIG_OPLMODE
+Tipo de emulação OPL. Em 'auto', o modo é determinado pelo tipo do SoundBlaster. Todos os modos OPL são compatíveis com Adlib, exceto pelo 'cms'.
+.
+:CONFIG_OPLEMU
+Provedor da emulação do OPL. compat ou old devem oferecer melhor qualidade (veja também oplrate).
+.
+:CONFIG_OPLRATE
+Taxa de mostragem da emulação da música OPL. Use 49716 para a mais alta qualidade (ajuste a taxa de amostragem do mixer correspondente).
+.
+:CONFIG_GUS
+Ativar a emulação do Gravis Ultrasound.
+.
+:CONFIG_GUSRATE
+Taxa de amostragem da emulação do GUS.
+.
+:CONFIG_GUSBASE
+Valor do 'IO address' do Gravis Ultrasound.
+.
+:CONFIG_GUSIRQ
+Valor do IRQ do Gravis Ultrasound.
+.
+:CONFIG_GUSDMA
+Valor do 'DMA channel' do Gravis Ultrasound.
+.
+:CONFIG_ULTRADIR
+Caminho para o diretório do Ultrasound. Neste diretório
+deverá haver uma pasta de MIDI que contém
+o banco de sons para a reprodução do GUS. Também podem ser
+usados os mesmos que funcionam com Timidity.
+.
+:CONFIG_PCSPEAKER
+Ativar a emulação do PC-Speaker.
+.
+:CONFIG_PCRATE
+Taxa de amostragem do som do PC-Speaker.
+.
+:CONFIG_TANDY
+Ativar emulação do Tandy Sound System. Em 'auto' a emulação do Tandysound só será feita se a máquina estiver como 'Tandy'.
+.
+:CONFIG_TANDYRATE
+Taxa de amostragem do Tandy 3-Voice generation.
+.
+:CONFIG_DISNEY
+Ativar a emulação do Disney Sound Source. (Covox Voice Master e Speech Thing compatíveis).
+.
+:CONFIG_JOYSTICKTYPE
+Tipo do joystick a emular: auto (padrão), none,
+2axis (suporta 2 joysticks),
+4axis (suporta 1 joystick, o primeiro será utilizado),
+4axis_2 (suporta 1 joystick, o segundo será utilizado),
+fcs (Thrustmaster), ch (CH Flightstick).
+none desativa a emulação do joystick.
+auto determina a emulação de acordo com o joystick(s) utilizado(s).
+.
+:CONFIG_TIMED
+Ativa intervalos temporizados para os eixos. (desativado funciona da maneira antiga).
+.
+:CONFIG_AUTOFIRE
+Atira continuamente enquanto o botão estiver pressionado.
+.
+:CONFIG_SWAP34
+Inverter o 3º e o 4º eixo. Pode ser útil para alguns joysticks.
+.
+:CONFIG_BUTTONWRAP
+Ativar agrupamento dos botões quando um certo número for emulado.
+.
+:CONFIG_SERIAL1
+Configure o tipo de dispositivo conectado a porta serial.
+Pode ser disabled, dummy, modem, nullmodem, directserial.
+Parâmetros adicionais devem estar na mesma linha da seguinte forma
+parâmetro:valor. O parâmetro comum é irq.
+para directserial: realport (obrigatório), rxdelay (opcional).
+                  (realport:COM1 realport:ttyS0).
+para modem: listenport (opcional).
+para nullmodem: server, rxdelay, txdelay, telnet, usedtr,
+               transparent, port, inhsocket (todos opcionais).
+Exemplo: serial1=modem listenport:5000
+.
+:CONFIG_SERIAL2
+Veja serial1
+.
+:CONFIG_SERIAL3
+Veja serial1
+.
+:CONFIG_SERIAL4
+Veja serial1
+.
+:CONFIG_XMS
+Habilitar suporte a XMS.
+.
+:CONFIG_EMS
+Habilitar suporte a EMS.
+.
+:CONFIG_UMB
+Habilitar suporte a UMB.
+.
+:CONFIG_KEYBOARDLAYOUT
+Código do idioma para layout do teclado (ou nenhum).
+.
+:CONFIG_IPX
+Ativar emulação IPX sobre UDP/IP.
 .
 :AUTOEXEC_CONFIGFILE_HELP
 As linhas nesta seção serão sempre executadas ao se iniciar o dosbox.
+.
+:CONFIGFILE_INTRO
+# Esse é o arquivo de configurações do DOSBox %s.
+# Linhas começando com # são linhas de comentário.
+# São usadas para informar (rapidamente) o efeito que cada opção causará.
+.
+:CONFIG_SUGGESTED_VALUES
+Valores possíveis
 .
 :PROGRAM_CONFIG_FILE_ERROR
 NÆo foi poss¡vel abrir o arquivo %s
@@ -123,6 +234,12 @@ NÆo foi poss¡vel abrir o arquivo %s
 Ferramenta config:
 Use -writeconf nomedoarquivo para salvar as configura‡äes atuais.
 Use -writelang nomedoarquivo para salvar os textos do idioma utilizado.
+.
+:PROGRAM_CONFIG_SECURE_ON
+Modo seguro ativado.
+.
+:PROGRAM_CONFIG_SECURE_DISALLOW
+Essa opera‡Æo nÆo ‚ permitida no modo seguro.
 .
 :PROGRAM_CONFIG_SECTION_ERROR
 A se‡Æo %s nÆo existe.
@@ -666,11 +783,6 @@ Ver e ajustar a versÆo relatada do DOS.
 :SHELL_CMD_VER_VER
 DOSBox versÆo %s. VersÆo relatada do DOS %d.%d.
 .
-:CONFIGFILE_INTRO
-# Esse é o arquivo de configurações do DOSBox %s.
-# Linhas começando com # são linhas de comentário.
-# São usadas para informar (rapidamente) o efeito que cada opção causará.
-.
 :PROGRAM_MOUNT_ALREADY_MOUNTED
 A unidade %c j  est  montada com %s
 .
@@ -691,4 +803,7 @@ Tente [31mcd %s[0m
 .
 :SHELL_CMD_CHDIR_HINT_3
 Vocˆ ainda est  na unidade Z:. Mude para uma unidade montada digitando [31mC:[0m.
+.
+:PROGRAM_KEYB_INFO_LAYOUT
+Codepage %i carregado para o layout de teclado %s
 .

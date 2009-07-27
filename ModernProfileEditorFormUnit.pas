@@ -87,6 +87,8 @@ Function ModernEditGameTemplate(const AOwner : TComponent; const AGameDB : TGame
 
 Function EditGameProfilInt(const AOwner : TComponent; const AGameDB : TGameDB; var AGame : TGame; const ADefaultGame : TGame; const ASearchLinkFile : TLinkFile; const ADeleteOnExit : TStringList; const PrevButton, NextButton, RestorePos : Boolean; const EditingTemplate : Boolean; const ANewExeFile : String; const HideGameInfoPage : Boolean) : Integer;
 
+Procedure AddDefaultValueHint(const AComboBox : TComboBox);
+
 implementation
 
 uses Math, VistaToolsUnit, LanguageSetupUnit, ModernProfileEditorBaseFrameUnit,
@@ -104,6 +106,7 @@ uses Math, VistaToolsUnit, LanguageSetupUnit, ModernProfileEditorBaseFrameUnit,
      ModernProfileEditorScummVMFrameUnit, ModernProfileEditorScummVMSoundFrameUnit,
      ModernProfileEditorPrinterFrameUnit, ModernProfileEditorScummVMGameFrameUnit,
      ModernProfileEditorHelperProgramsFrameUnit, ModernProfileEditorScummVMHardwareFrameUnit,
+     ModernProfileEditorAddtionalChecksumFrameUnit,
      IconLoaderUnit, GameDBToolsUnit, PrgSetupUnit, CommonTools, DOSBoxUnit, HelpConsts;
 
 {$R *.dfm}
@@ -178,6 +181,9 @@ begin
   UserIconLoader.DialogImage(DI_Previous,PreviousButton);
   UserIconLoader.DialogImage(DI_Next,NextButton);
   UserIconLoader.DialogImage(DI_ViewFile,ShowConfButton);
+  UserIconLoader.DialogImage(DI_OK,OKButton);
+  UserIconLoader.DialogImage(DI_Cancel,CancelButton);
+  UserIconLoader.DialogImage(DI_Help,HelpButton);
 
   ScummVM:=ScummVMMode(Game) or ScummVMMode(LoadTemplate);
   WindowsMode:=WindowsExeMode(Game) or WindowsExeMode(LoadTemplate);
@@ -206,6 +212,7 @@ begin
       {Windows mode}
       F:=TModernProfileEditorBaseFrame.Create(self); N:=AddTreeNode(nil,F,TModernProfileEditorBaseFrame(F),LanguageSetup.ProfileEditorProfileSettingsSheet,0,0);
       BaseFrame:=F;
+      if EditingTemplate then begin F:=TModernProfileEditorAddtionalChecksumFrame.Create(self); AddTreeNode(N,F,TModernProfileEditorAddtionalChecksumFrame(F),LanguageSetup.ProfileEditorAdditionalChecksums,0,0); end;
       If not HideGameInfoPage then begin F:=TModernProfileEditorGameInfoFrame.Create(self); AddTreeNode(N,F,TModernProfileEditorGameInfoFrame(F),LanguageSetup.ProfileEditorGameInfoSheet,1,1); end;
       F:=TModernProfileEditorDirectoryFrame.Create(self); AddTreeNode(N,F,TModernProfileEditorDirectoryFrame(F),LanguageSetup.ProfileEditorGameDirectorySheet,0,8);
       F:=TModernProfileEditorHelperProgramsFrame.Create(self); AddTreeNode(N,F,TModernProfileEditorHelperProgramsFrame(F),LanguageSetup.ProfileEditorHelperProgramsSheet,0,0);
@@ -213,6 +220,7 @@ begin
       {DOSBox mode}
       F:=TModernProfileEditorBaseFrame.Create(self); N:=AddTreeNode(nil,F,TModernProfileEditorBaseFrame(F),LanguageSetup.ProfileEditorProfileSettingsSheet,0,0);
       BaseFrame:=F;
+      if EditingTemplate then begin F:=TModernProfileEditorAddtionalChecksumFrame.Create(self); AddTreeNode(N,F,TModernProfileEditorAddtionalChecksumFrame(F),LanguageSetup.ProfileEditorAdditionalChecksums,0,0); end;
       If not HideGameInfoPage then begin F:=TModernProfileEditorGameInfoFrame.Create(self); AddTreeNode(N,F,TModernProfileEditorGameInfoFrame(F),LanguageSetup.ProfileEditorGameInfoSheet,1,1); end;
       F:=TModernProfileEditorDirectoryFrame.Create(self); AddTreeNode(N,F,TModernProfileEditorDirectoryFrame(F),LanguageSetup.ProfileEditorGameDirectorySheet,0,8);
       F:=TModernProfileEditorHelperProgramsFrame.Create(self); AddTreeNode(N,F,TModernProfileEditorHelperProgramsFrame(F),LanguageSetup.ProfileEditorHelperProgramsSheet,0,0);
@@ -447,7 +455,10 @@ begin
     Game:=GameDB[I];
   end;
 
-  For I:=0 to Tree.Items.Count-1 do FrameList[Integer(Tree.Items[I].Data)].IFrame.GetGame(Game);
+  For I:=0 to Tree.Items.Count-1 do begin
+    FrameList[Integer(Tree.Items[I].Data)].IFrame.GetGame(Game);
+    ProfileName:=Game.Name;
+  end;
 
   If Tree.Selected<>nil then begin
     LastPage:=FrameList[Integer(Tree.Selected.Data)].PageCode;
@@ -462,7 +473,7 @@ begin
   Game.StoreAllValues;
   Game.LoadCache;
 
-  If (not WindowsMode) and (not ScummVM) then begin
+  If (not WindowsMode) and (not ScummVM) and (not EditingTemplate) then begin
     St:=TStringList.Create;
     try
       BuildAutoexec(Game,False,St,True,-1,False,False);
@@ -512,7 +523,16 @@ end;
 { global }
 
 Function EditGameProfilInt(const AOwner : TComponent; const AGameDB : TGameDB; var AGame : TGame; const ADefaultGame : TGame; const ASearchLinkFile : TLinkFile; const ADeleteOnExit : TStringList; const PrevButton, NextButton, RestorePos : Boolean; const EditingTemplate : Boolean; const ANewExeFile : String; const HideGameInfoPage : Boolean) : Integer;
+Var D : Double;
+    S : String;
+    I : Integer;
 begin
+  If (AGame<>nil) and (Trim(ExtUpperCase(AGame.VideoCard))='VGA') then begin
+    S:=CheckDOSBoxVersion(GetDOSBoxNr(AGame)); For I:=1 to length(S) do If (S[I]=',') or (S[I]='.') then S[I]:=DecimalSeparator;
+    if not TryStrToFloat(S,D) then D:=0.72;
+    If D>0.72 then begin AGame.VideoCard:='svga_s3'; AGame.StoreAllValues; end;
+  end;
+
   ModernProfileEditorForm:=TModernProfileEditorForm.Create(AOwner);
 
   try
@@ -612,6 +632,16 @@ begin
     RestorePos:=True;
   until (I=0) or (I=-2);
   result:=(I<>-2);
+end;
+
+Procedure AddDefaultValueHint(const AComboBox : TComboBox);
+Var S : String;
+    I : Integer;
+begin
+  S:=LanguageSetup.ProfileEditorDefaultValueHint;
+  If length(S)>80 then For I:=80 downto 1 do If S[I]=#32 then begin S[I]:=#13; break; end;
+  AComboBox.Hint:=S;
+  AComboBox.ShowHint:=True;
 end;
 
 end.

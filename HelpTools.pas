@@ -222,6 +222,7 @@ var
    HFile: string;
 begin
    result := false;
+
    if assigned(fOnHelp) then result := fOnHelp(command, data, callhelp);
    if not callHelp then exit;
    if assigned(fAppOnHelp) then result := fAppOnHelp(command, data, callhelp);
@@ -243,7 +244,6 @@ begin
      end;
      Result := rHandle <> 0;
    end;
-
    if (not result) and (fHelpType <> htHTMLhelp) then
    begin
      case Command of

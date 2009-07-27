@@ -88,7 +88,6 @@ end;
 
 procedure TPlaySoundForm.FormShow(Sender: TObject);
 Var S : String;
-    OK : Boolean;
 begin
   Timer.Enabled:=False;
 

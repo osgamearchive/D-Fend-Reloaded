@@ -12,7 +12,7 @@ type
     MainSheet: TTabSheet;
     LicenseSheet: TTabSheet;
     CompLicenseSheet: TTabSheet;
-    BitBtn1: TBitBtn;
+    OKButton: TBitBtn;
     VersionLabel: TLabel;
     Label1: TLabel;
     WrittenByLabel: TLabel;
@@ -31,14 +31,20 @@ type
     EasterImage2: TImage;
     EasterImage3: TImage;
     Timer: TTimer;
-    Image2: TImage;
     Image3: TImage;
+    LicensePanel: TPanel;
+    LicenseComboBox: TComboBox;
+    ChangeLogPanel: TPanel;
+    ChangeLogComboBox: TComboBox;
+    Image4: TImage;
     procedure FormShow(Sender: TObject);
     procedure HomepageLabelClick(Sender: TObject);
     procedure Label1DblClick(Sender: TObject);
     procedure TimerTimer(Sender: TObject);
     procedure FormKeyPress(Sender: TObject; var Key: Char);
     procedure Image3Click(Sender: TObject);
+    procedure LicenseComboBoxChange(Sender: TObject);
+    procedure ChangeLogComboBoxChange(Sender: TObject);
   private
     { Private-Deklarationen }
     FImage : TImage;
@@ -54,7 +60,8 @@ Procedure ShowInfoDialog(const AOwner : TComponent);
 
 implementation
 
-uses ShellAPI, VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgConsts, PrgSetupUnit;
+uses ShellAPI, VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgConsts,
+     PrgSetupUnit, IconLoaderUnit;
 
 {$R *.dfm}
 
@@ -77,6 +84,8 @@ begin
   CompLicenseSheet.Caption:=LanguageSetup.InfoFormCompLicense;
   ChangeLogTabSheet.Caption:=LanguageSetup.InfoFormChangeLog;
 
+  UserIconLoader.DialogImage(DI_OK,OKButton);
+
   VersionLabel.Caption:=GetFileVersionAsString;
   WrittenByLabel.Caption:=LanguageSetup.InfoFormWrittenBy+' Alexander Herzog';
   S:='alexanderherzog'; T:='users.sourceforge.net';
@@ -88,25 +97,24 @@ begin
   LanguageAuthorsTab.ColWidths[2]:=75;
   LanguageAuthorsTab.ColWidths[1]:=LanguageAuthorsTab.ClientWidth-LanguageAuthorsTab.ColWidths[0]-LanguageAuthorsTab.ColWidths[2]-5;
 
-  If FileExists(PrgDir+'License.txt') then begin
-    try LicenseMemo.Lines.LoadFromFile(PrgDir+'License.txt'); except end;
-  end else begin
-    try LicenseMemo.Lines.LoadFromFile(PrgDir+BinFolder+'\'+'License.txt'); except end;
-  end;
-  LicenseMemo.Lines.Insert(0,'');
+  LicenseComboBox.Items.AddObject('D-Fend Reloaded',TObject(0));
+  LicenseComboBox.Items.AddObject('DOSBox',TObject(1));
+  If (Trim(PrgSetup.ScummVMPath)<>'') and DirectoryExists(PrgSetup.ScummVMPath) then LicenseComboBox.Items.AddObject('ScummVM',TObject(2));
+  LicenseComboBox.ItemIndex:=0;
+  LicenseComboBoxChange(Sender);
+
   If FileExists(PrgDir+'LicenseComponents.txt') then begin
     try CompLicenseMemo.Lines.LoadFromFile(PrgDir+'LicenseComponents.txt'); except end;
   end else begin
     try CompLicenseMemo.Lines.LoadFromFile(PrgDir+BinFolder+'\'+'LicenseComponents.txt'); except end;
   end;
   CompLicenseMemo.Lines.Insert(0,'');
-  If FileExists(PrgDir+'ChangeLog.txt') then begin
-    try ChangeLogMemo.Lines.LoadFromFile(PrgDir+'ChangeLog.txt'); except end;
-  end else begin
-    try ChangeLogMemo.Lines.LoadFromFile(PrgDir+BinFolder+'\'+'ChangeLog.txt'); except end;
-  end;
-  If ChangeLogMemo.Lines.Count>0 then ChangeLogMemo.Lines.Delete(0);
-  ChangeLogMemo.Font.Name:='Courier New';
+
+  ChangeLogComboBox.Items.AddObject('D-Fend Reloaded',TObject(0));
+  ChangeLogComboBox.Items.AddObject('DOSBox',TObject(1));
+  If (Trim(PrgSetup.ScummVMPath)<>'') and DirectoryExists(PrgSetup.ScummVMPath) then ChangeLogComboBox.Items.AddObject('ScummVM',TObject(2));
+  ChangeLogComboBox.ItemIndex:=0;
+  ChangeLogComboBoxChange(Sender);
 
   St:=TStringList.Create;
   StShort:=TStringList.Create;
@@ -191,6 +199,35 @@ begin
   FImage:=TImage.Create(MainSheet); FImage.Parent:=MainSheet; Dir:=3;
   with FImage do begin AutoSize:=True; Transparent:=True; Top:=0; Left:=-100; Picture.Assign(EasterImage1.Picture); DoubleBuffered:=True; end;
   Timer.Enabled:=True;
+end;
+
+procedure TInfoForm.LicenseComboBoxChange(Sender: TObject);
+Var S : String;
+begin
+  LicenseMemo.Lines.Clear;
+  Case Integer(LicenseComboBox.Items.Objects[LicenseComboBox.ItemIndex]) of
+    0 : If FileExists(PrgDir+BinFolder+'\'+'License.txt') then S:=PrgDir+BinFolder+'\'+'License.txt' else S:=PrgDir+'License.txt';
+    1 : S:=IncludeTrailingPathDelimiter(PrgSetup.DOSBoxSettings[0].DosBoxDir)+'COPYING.txt';
+    2 : S:=IncludeTrailingPathDelimiter(PrgSetup.ScummVMPath)+'COPYING.txt';
+  end;
+  If S<>'' then begin
+     try LicenseMemo.Lines.LoadFromFile(S); except end;
+  end;
+end;
+
+procedure TInfoForm.ChangeLogComboBoxChange(Sender: TObject);
+Var S : String;
+begin
+  ChangeLogMemo.Lines.Clear;
+  Case Integer(ChangeLogComboBox.Items.Objects[ChangeLogComboBox.ItemIndex]) of
+    0 : If FileExists(PrgDir+BinFolder+'\'+'ChangeLog.txt') then S:=PrgDir+BinFolder+'\'+'ChangeLog.txt' else S:=PrgDir+'ChangeLog.txt';
+    1 : S:=IncludeTrailingPathDelimiter(PrgSetup.DOSBoxSettings[0].DosBoxDir)+'NEWS.txt';
+    2 : S:=IncludeTrailingPathDelimiter(PrgSetup.ScummVMPath)+'NEWS.txt';
+  End;
+  If S<>'' then begin
+     try ChangeLogMemo.Lines.LoadFromFile(S); except end;
+  end;
+  ChangeLogMemo.Font.Name:='Courier New';
 end;
 
 procedure TInfoForm.TimerTimer(Sender: TObject);

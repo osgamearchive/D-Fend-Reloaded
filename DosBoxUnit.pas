@@ -10,7 +10,7 @@ Procedure RunExtraFile(const Game : TGame; const ExtraFile : Integer);
 Procedure RunCommand(const Game : TGame; const Command : String; const DisableFullscreen : Boolean = False);
 Procedure RunWithCommandline(const Game : TGame; const CommandLine : String; const DisableFullscreen : Boolean = False);
 
-Function BuildConfFile(const Game : TGame; const RunSetup : Boolean; const WarnIfNotReachable : Boolean; const RunExtraFile : Integer = -1) : TStringList;
+Function BuildConfFile(const Game : TGame; const RunSetup : Boolean; const WarnIfNotReachable : Boolean; const RunExtraFile : Integer) : TStringList;
 Function BuildAutoexec(const Game : TGame; const RunSetup : Boolean; const St : TStringList; const WarnIfNotReachable : Boolean; const RunExtraFile : Integer; const WarnIfWindowsExe, SelectCD : Boolean) : Boolean;
 
 Function IsWindowsExe(const FileName : String) : Boolean;
@@ -259,13 +259,9 @@ begin
       result:='mount '+St[2]+' "'+UnmapDrive(ShortName(S),ptMount)+'" -t cdrom';
       If Trim(UpperCase(St[3]))='TRUE' then result:=result+' -IOCTL';
       If Trim(UpperCase(St[3]))='NOIOCTL' then result:=result+' -NOIOCTL';
-      If PrgSetup.AllowMoreIOCTLSettings then begin
-        If Trim(UpperCase(St[3]))='DX' then result:=result+' -IOCTL_DX';
-        If Trim(UpperCase(St[3]))='DIO' then result:=result+' -IOCTL_DIO';
-        If Trim(UpperCase(St[3]))='MCI' then result:=result+' -IOCTL_MCI';
-      end else begin
-        If (Trim(UpperCase(St[3]))='DX') or (Trim(UpperCase(St[3]))='DIO') or (Trim(UpperCase(St[3]))='MCI') then result:=result+' -IOCTL';
-      end;
+      If Trim(UpperCase(St[3]))='DX' then result:=result+' -IOCTL_DX';
+      If Trim(UpperCase(St[3]))='DIO' then result:=result+' -IOCTL_DIO';
+      If Trim(UpperCase(St[3]))='MCI' then result:=result+' -IOCTL_MCI';
       If St[4]<>'' then result:=result+' -label '+St[4];
     end;
 
@@ -434,6 +430,72 @@ begin
   result:=True;
 end;
 
+Function MountUserInterpreter(const Autoexec : TStringList; const Game : TGame; const FreeDriveLetters : String; var InterpreterPathAndFile : String; const InterpreterNr : Integer) : Boolean;
+Var InterpreterFile,S,T,Path,Drive : String;
+    I : Integer;
+    St : TStringList;
+begin
+  result:=False;
+
+  If InterpreterNr>=PrgSetup.UserInterpretersPrograms.Count then exit;
+
+  InterpreterPathAndFile:=ExtractFileName(PrgSetup.UserInterpretersPrograms[InterpreterNr]);
+
+  InterpreterFile:=Trim(MakeAbsPath(PrgSetup.UserInterpretersPrograms[InterpreterNr],PrgSetup.BaseDir));
+  If (InterpreterFile='') or (not FileExists(InterpreterFile)) then exit;
+
+  T:=MakePathShort(Trim(ExtractFilePath(InterpreterFile)));
+  Path:=''; Drive:='';
+  For I:=0 to Game.NrOfMounts-1 do begin
+    St:=ValueToList(Game.Mount[I]);
+    try
+      If St.Count=3 then St.Add('false');
+      If St.Count=4 then St.Add('');
+      If St.Count<5 then continue;
+      If (Trim(ExtUpperCase(St[1]))<>'DRIVE') and (Trim(ExtUpperCase(St[1]))<>'CDROM') and (Trim(ExtUpperCase(St[1]))<>'FLOPPY') then continue;
+      S:=MakePathShort(MakeAbsPath(IncludeTrailingPathDelimiter(St[0]),PrgSetup.BaseDir));
+
+      If Copy(T,1,length(S))=S then begin
+        S:=Copy(T,length(S)+1,MaxInt);
+        If (Drive='') or (length(S)<length(Path)) then begin Path:=S; Drive:=St[2]+':'; end;
+      end;
+    finally
+      St.Free;
+    end;
+  end;
+  If Drive='' then begin
+    For I:=length(FreeDriveLetters) downto 1 do If FreeDriveLetters[I]<>'-' then begin
+      Autoexec.Add('mount '+FreeDriveLetters[I]+' '+UnmapDrive(ExtractFilePath(T),ptMount));
+      InterpreterPathAndFile:=FreeDriveLetters[I]+':\'+ExtractFileName(InterpreterFile);
+      break;
+    end;
+  end else begin
+    If (Path<>'') and (Path[1]='\') then Path:=Copy(Path,2,MaxInt);
+    InterpreterPathAndFile:=IncludeTrailingPathDelimiter(Drive+'\'+Path)+ExtractFileName(InterpreterFile);
+  end;
+
+  result:=True;
+end;
+
+Function RunViaUserInterpreter(const ProgramFile : String) : Integer;
+Var I,J : Integer;
+    Ext : String;
+    St : TStringList;
+begin
+  result:=-1;
+  Ext:=Trim(ExtUpperCase(ExtractFileExt(ProgramFile)));
+  If (Ext<>'') and (Ext[1]='.') then Ext:=Copy(Ext,2,MaxInt);
+
+  For I:=0 to PrgSetup.UserInterpretersExtensions.Count-1 do begin
+    St:=ValueToList(PrgSetup.UserInterpretersExtensions[I]);
+    try
+      For J:=0 to St.Count-1 do If Trim(ExtUpperCase(St[J]))=Ext then begin result:=I; exit; end;
+    finally
+      St.Free;
+    end;
+  end;
+end;
+
 Function BuildRunCommands(const St : TStringList; const ProgramFile, ProgramParameters : String; const UseLoadFix : Boolean; const LoadFixMemory : Integer; const Use4DOS, UseDOS32A : Boolean; const Game : TGame; const FreeDriveLetters : String; const WarnIfNotReachable, WarnIfWindowsExe : Boolean) : Boolean;
 Var Prefix,S,T,UsePath,Mount,Unmount : String;
     I : Integer;
@@ -512,41 +574,58 @@ begin
 
   If UseLoadFix then Prefix:='loadfix -'+IntToStr(LoadFixMemory)+' ' else Prefix:='';
 
-  If PrgSetup.AllowSecureMode and Game.SecureMode then St.Add('Z:\config.com -securemode > nul');
-
-  If ExtUpperCase(ExtractFileExt(ProgramFile))='.BAS' then begin
-    {Run via QBasic}
-    if not MountQBasic(St,Game,FreeDriveLetters,S) then begin
-      If WarnIfNotReachable then
+  I:=RunViaUserInterpreter(ProgramFile);
+  If I>=0 then begin
+    {Run via user defined interpreter}
+    if not MountUserInterpreter(St,Game,FreeDriveLetters,S,I) then begin
+      If WarnIfNotReachable then begin
         Application.Restore;
-        MessageDlg(Format(LanguageSetup.MessageQBasicNeededToExecuteFile,[ExtractFileName(ProgramFile)]),mtError,[mbOK],0);
+        MessageDlg(Format(LanguageSetup.MessageUserInterpreterNeededToExecuteFile,[PrgSetup.UserInterpretersPrograms[I],ExtractFileName(ProgramFile)]),mtError,[mbOK],0);
+      end;
     end;
-    T:=Trim(PrgSetup.QBasicParam); If T='' then T:='/run %s';
-    try T:=Format(T,[ExtractFileName(ProgramFile)]); except T:=Format('/run %s',[ExtractFileName(ProgramFile)]); end;
+    If PrgSetup.UserInterpretersParameters.Count>I then T:=Trim(PrgSetup.UserInterpretersParameters[I]) else T:='';
+    If T='' then T:='%s';
+    try T:=Format(T,[ExtractFileName(ProgramFile)]); except T:=Format('%s',[ExtractFileName(ProgramFile)]); end;
     T:=S+' '+T;
   end else begin
-    If (not UseLoadFix) and (not Use4DOS) and (not UseDOS32A) and (Trim(ExtUpperCase(ExtractFileExt(ProgramFile)))='.BAT') then Prefix:='call ';
-
-    If (T<>'') and (Trim(ProgramParameters)<>'') then T:=' '+ProgramParameters else T:='';
-    If Copy(Trim(ExtUpperCase(ProgramFile)),1,7)='DOSBOX:' then begin
-      S:=ExtractFileName(ProgramFile);
+    If ExtUpperCase(ExtractFileExt(ProgramFile))='.BAS' then begin
+      {Run via QBasic}
+      if not MountQBasic(St,Game,FreeDriveLetters,S) then begin
+        If WarnIfNotReachable then begin
+          Application.Restore;
+          MessageDlg(Format(LanguageSetup.MessageQBasicNeededToExecuteFile,[ExtractFileName(ProgramFile)]),mtError,[mbOK],0);
+        end;
+      end;
+      T:=Trim(PrgSetup.QBasicParam); If T='' then T:='/run %s';
+      try T:=Format(T,[ExtractFileName(ProgramFile)]); except T:=Format('/run %s',[ExtractFileName(ProgramFile)]); end;
+      T:=S+' '+T;
     end else begin
-      S:=MakeDOSBoxPath(ExtractFileName(ProgramFile),ExtractFilePath(ProgramFile));
-      If (S<>'') and (S[1]='\') then S:=Copy(S,2,MaxInt);
-    end;
-    T:=S+T;
+      {Just run in DOSBox}
+      If (not UseLoadFix) and (not Use4DOS) and (not UseDOS32A) and (Trim(ExtUpperCase(ExtractFileExt(ProgramFile)))='.BAT') then Prefix:='call ';
 
-    If UseDOS32A and (not NoFreeDOS) then begin
-      St.Add(UsePath+'DOS32A.EXE '+T);
-      exit;
-    end;
+      If (T<>'') and (Trim(ProgramParameters)<>'') then T:=' '+ProgramParameters else T:='';
+      If Copy(Trim(ExtUpperCase(ProgramFile)),1,7)='DOSBOX:' then begin
+        S:=ExtractFileName(ProgramFile);
+      end else begin
+        S:=MakeDOSBoxPath(ExtractFileName(ProgramFile),ExtractFilePath(ProgramFile));
+        If (S<>'') and (S[1]='\') then S:=Copy(S,2,MaxInt);
+      end;
+      T:=S+T;
 
-    If Use4DOS and (not NoFreeDOS) then begin
-      If T<>'' then T:=' /C '+T;
-      St.Add(UsePath+'4DOS.COM'+T);
-      exit;
+      If UseDOS32A and (not NoFreeDOS) then begin
+        St.Add(UsePath+'DOS32A.EXE '+T);
+        exit;
+      end;
+
+      If Use4DOS and (not NoFreeDOS) then begin
+        If T<>'' then T:=' /C '+T;
+        St.Add(UsePath+'4DOS.COM'+T);
+        exit;
+      end;
     end;
   end;
+
+  If Game.SecureMode then St.Add('Z:\config.com -securemode > nul');
 
   St.Add(Prefix+T);
 end;
@@ -707,6 +786,7 @@ begin
   SetVolume('GUS',Game.MixerVolumeGUSLeft,Game.MixerVolumeGUSRight);
   SetVolume('SB',Game.MixerVolumeSBLeft,Game.MixerVolumeSBRight);
   SetVolume('FM',Game.MixerVolumeFMLeft,Game.MixerVolumeFMRight);
+  SetVolume('CDAUDIO',Game.MixerVolumeCDLeft,Game.MixerVolumeCDRight);
 
   { Text mode lines }
 
@@ -779,7 +859,7 @@ begin
     end;
   end else begin
     If Game.AutoexecOverridegamestart then begin
-      If PrgSetup.AllowSecureMode and Game.SecureMode then St.Add('Z:\config.com -securemode > nul');
+      If Game.SecureMode then St.Add('Z:\config.com -securemode > nul');
     end else begin
       If RunExtraFile>=0 then begin
         T:=Trim(Game.ExtraPrgFile[RunExtraFile]);
@@ -853,9 +933,15 @@ Function BuildConfFile(const Game : TGame; const RunSetup : Boolean; const WarnI
 Var St : TStringList;
     S,T : String;
     DOSBoxNr : Integer;
+    DOSBoxVersion : Double;
+    I : Integer;
 begin
   DOSBoxNr:=Max(0,GetDOSBoxNr(Game));
-
+  If DOSBoxNr>=0 then S:=CheckDOSBoxVersion(DOSBoxNr) else S:=CheckDOSBoxVersion(-1,Game.CustomDOSBoxDir);
+  If S=''
+    then DOSBoxVersion:=MinSupportedDOSBoxVersion
+    else try DOSBoxVersion:=StrToFloatEx(S); except DOSBoxVersion:=MinSupportedDOSBoxVersion; end;
+    
   result:=TStringList.Create;
 
   result.Add('[sdl]');
@@ -890,7 +976,13 @@ begin
     If S='' then S:=PrgSetup.DOSBoxSettings[DOSBoxNr].DosBoxLanguage;
     If FileExists(S) then result.Add('language='+UnmapDrive(S,ptDOSBox));
   end;
-  result.Add('machine='+Game.VideoCard);
+  S:=Game.VideoCard; T:=Trim(ExtUpperCase((S)));
+  If DOSBoxVersion>0.72 then begin
+    If T='VGA' then S:='svga_s3';
+  end else begin
+    If (T='VGAONLY') or (T='SVGA_S3') or (T='SVGA_ET3000') or (T='SVGA_ET4000') or (T='SVGA_PARADISE') or (T='VESA_NOLFB') or (T='VESA_OLDVBE') then S:='vga';
+  end;
+  result.Add('machine='+S);
   result.Add('captures='+UnmapDrive(MakeAbsPath(Game.CaptureFolder,PrgSetup.BaseDir),ptScreenshot));
   result.Add('memsize='+IntToStr(Game.Memory));
 
@@ -916,10 +1008,13 @@ begin
   result.Add('');
   result.Add('[cpu]');
   result.Add('core='+Game.Core);
-  If PrgSetup.AllowCPUType then begin
-    If Trim(Game.CPUType)<>'' then result.Add('cputype='+Game.CPUType);
+  If Trim(Game.CPUType)<>'' then result.Add('cputype='+Game.CPUType);
+
+  If DOSBoxVersion>0.72 then begin
+    If TryStrToInt(Game.Cycles,I) then result.Add('cycles=fixed '+Game.Cycles) else result.Add('cycles='+Game.Cycles);
+  end else begin
+    result.Add('cycles='+Game.Cycles);
   end;
-  result.Add('cycles='+Game.Cycles);
   result.Add('cycleup='+IntToStr(Game.CyclesUp));
   result.Add('cycledown='+IntToStr(Game.CyclesDown));
 
@@ -933,8 +1028,13 @@ begin
   result.Add('');
   result.Add('[midi]');
   result.Add('mpu401='+Game.MIDIType);
-  result.Add('device='+Game.MIDIDevice);
-  result.Add('config='+Game.MIDIConfig);
+  If DOSBoxVersion>0.72 then begin
+    result.Add('mididevice='+Game.MIDIDevice);
+    result.Add('midiconfig='+Game.MIDIConfig);
+  end else begin
+    result.Add('device='+Game.MIDIDevice);
+    result.Add('config='+Game.MIDIConfig);
+  end;
 
   result.Add('');
   result.Add('[sblaster]');
@@ -943,19 +1043,27 @@ begin
   result.Add('irq='+IntToStr(Game.SBIRQ));
   result.Add('dma='+IntToStr(Game.SBDMA));
   result.Add('hdma='+IntToStr(Game.SBHDMA));
-  result.Add('mixer='+BoolToStr(Game.SBMixer));
+  If DOSBoxVersion>0.72
+    then result.Add('sbmixer='+BoolToStr(Game.SBMixer))
+    else result.Add('mixer='+BoolToStr(Game.SBMixer));
   result.Add('oplmode='+Game.SBOplMode);
   result.Add('oplrate='+IntToStr(Game.SBOplRate));
+  If DOSBoxVersion>0.72 then result.Add('oplemu='+Game.SBOplEmu);
 
   result.Add('');
   result.Add('[gus]');
   result.Add('gus='+BoolToStr(Game.GUS));
   result.Add('gusrate='+IntToStr(Game.GUSRate));
   result.Add('gusbase='+IntToStr(Game.GUSBase));
-  result.Add('irq1='+IntToStr(Game.GUSIRQ1));
-  result.Add('irq2='+IntToStr(Game.GUSIRQ2));
-  result.Add('dma1='+IntToStr(Game.GUSDMA1));
-  result.Add('dma2='+IntToStr(Game.GUSDMA2));
+  If DOSBoxVersion>0.72 then begin
+    result.Add('gusirq='+IntToStr(Game.GUSIRQ));
+    result.Add('gusdma='+IntToStr(Game.GUSDMA));
+  end else begin
+    result.Add('irq1='+IntToStr(Game.GUSIRQ));
+    result.Add('irq2='+IntToStr(Game.GUSIRQ));
+    result.Add('dma1='+IntToStr(Game.GUSDMA));
+    result.Add('dma2='+IntToStr(Game.GUSDMA));
+  end;
   result.Add('ultradir='+Game.GUSUltraDir);
 
   result.Add('');
@@ -1175,7 +1283,7 @@ begin
 
   try
     If Trim(Game.CaptureFolder)='' then begin
-      Game.CaptureFolder:=MakeAbsPath(PrgSetup.CaptureDir,PrgSetup.BaseDir);
+      Game.CaptureFolder:=MakeRelPath(PrgSetup.CaptureDir,PrgSetup.BaseDir);
       Game.StoreAllValues;
     end;
     ForceDirectories(MakeAbsPath(Game.CaptureFolder,PrgSetup.BaseDir));
@@ -1269,10 +1377,25 @@ begin
   end;
 end;
 
+Function DeepWindowsCheck(const FSt : TFileStream) : Boolean;
+const SearchString='Microsoft Windows';
+Var I,J : Integer;
+    A : Array[0..$400] of Char;
+begin
+  result:=False;
+  FSt.Seek(0,soBeginning); FSt.ReadBuffer(A,SizeOf(A));
+  J:=1;
+  For I:=0 to $400 do If A[I]<>SearchString[J] then J:=1 else begin
+    inc(J);
+    If J=length(SearchString) then begin result:=True; exit; end;
+  end;
+end;
+
 Function IsWindowsExe(const FileName : String) : Boolean;
 Var FSt : TFileStream;
     I : Integer;
     C : Array[0..3] of Char;
+    W : Word;
 begin
   result:=False;
   If not FileExists(FileName) then exit;
@@ -1284,12 +1407,22 @@ begin
       FSt.Read(C,4);
       If (C[0]<>'M') or (C[1]<>'Z') then exit;
       If $3C>FSt.Size-4 then exit;
+
+      {Detect win32 PE header}
       FSt.Seek($3C,soBeginning);
       FSt.Read(I,4);
       If (I<0) or (I>FSt.Size-4) then exit;
       FSt.Seek(I,soBeginning);
       FSt.Read(C,4);
-      result:=(C[0]='P') and (C[1]='E') and (C[2]=#0) and (C[3]=#0);
+      If (C[0]='P') and (C[1]='E') and (C[2]=#0) and (C[3]=#0) then begin result:=True; exit; end;
+
+      {Detect win16 NE header}
+      FSt.Seek($3C,soBeginning);
+      FSt.Read(W,2);
+      If W>FSt.Size-2 then exit;
+      FSt.Seek(W,soBeginning);
+      FSt.Read(C,2);
+      If (C[0]='N') and (C[1]='E') then begin result:=DeepWindowsCheck(FSt); exit; end;
     finally
       FSt.Free;
     end;

@@ -10,6 +10,11 @@ const ID_Index=1;
 
       ID_FileExportConf=1001;
       ID_FileExportProf=1002;
+      ID_FileImportZip=1011;
+      ID_FileImportDownload=ID_Index; //... Will be changed in 0.9
+      ID_FileExportBuildInstallers=1012;
+      ID_FileExportBuildZipPackages=1013;
+      ID_FileExportPackageListCreator=ID_Index; //... Will be changed in 0.9
       ID_FileOptions=1100;
       ID_FileOptionsGeneral=1101;
       ID_FileOptionsDirectories=1102;
@@ -40,6 +45,9 @@ const ID_Index=1;
       ID_FileOptionsZipPackers=1127;
       ID_FileOptionsGamesListTranslations=1128;
       ID_FileOptionsGameListInIconMode=1129;
+      ID_FileOptionsMenubar=1130;
+      ID_FileOptionsUserInterpreters=1131;
+      ID_FileOptionsImageScaling=1132;
 
       ID_ViewQuickStarter=1501;
 
@@ -85,6 +93,7 @@ const ID_Index=1;
       ID_ProfileEditStarting=2123;
       ID_ProfileEditHelperPrograms=2124;
       ID_ProfileEditHardware=2125;
+      ID_ProfileEditAdditionalChecksums=2126;
 
       ID_ExtrasManageIcons=3001;
       ID_ExtrasViewHistory=3002;
@@ -100,17 +109,15 @@ const ID_Index=1;
       ID_ExtrasEditMultipleProfiles=3012;
       ID_ExtrasUninstallMultipleGames=3013;
       ID_ExtrasTransferProfiles=3014;
-      ID_ExtrasBuildInstallers=3015;
-      ID_ExtrasBuildZipPackages=3016;
       ID_ExtrasCheckProfiles=3017;
       ID_ExtrasCreateShortcuts=3018;
+      ID_ExtrasLanguageEditor=3019;
 
       ID_HelpForum=4001;
-      ID_HelpLanguageEditor=4002;
       ID_HelpStatistics=4003;
       ID_HelpOperationMode=4004;
       ID_HelpSearchForUpdates=4005;
-	  ID_HelpOldGames=4006;
+      ID_HelpOldGames=4006;
 
 implementation
 

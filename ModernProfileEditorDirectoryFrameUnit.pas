@@ -154,15 +154,16 @@ Var S,DefaultFolder,OldFolder : String;
 begin
   If FLastCurrentProfileName=FCurrentProfileName^ then exit;
 
-  S:=Trim(ExtUpperCase(ScreenshotFolderEdit.Text));
+  S:=Trim(ExtUpperCase(MakeRelPath(ScreenshotFolderEdit.Text,PrgSetup.BaseDir)));
 
-  DefaultFolder:=Trim(ExtUpperCase(IncludeTrailingPathDelimiter(PrgSetup.CaptureDir)));
-  OldFolder:=Trim(ExtUpperCase(IncludeTrailingPathDelimiter(PrgSetup.CaptureDir)+MakeFileSysOKFolderName(FLastCurrentProfileName)+'\'));
+  DefaultFolder:=Trim(ExtUpperCase(MakeRelPath(IncludeTrailingPathDelimiter(PrgSetup.CaptureDir),PrgSetup.BaseDir)));
+  OldFolder:=Trim(ExtUpperCase(MakeRelPath(IncludeTrailingPathDelimiter(PrgSetup.CaptureDir)+MakeFileSysOKFolderName(FLastCurrentProfileName)+'\',PrgSetup.BaseDir)));
 
   If (S=DefaultFolder) or (S=OldFolder) then begin
-    ScreenshotFolderEdit.Text:=IncludeTrailingPathDelimiter(PrgSetup.CaptureDir)+MakeFileSysOKFolderName(FCurrentProfileName^)+'\';
+    ScreenshotFolderEdit.Text:=MakeRelPath(IncludeTrailingPathDelimiter(PrgSetup.CaptureDir)+MakeFileSysOKFolderName(FCurrentProfileName^)+'\',PrgSetup.BaseDir);
     FLastCurrentProfileName:=FCurrentProfileName^;
   end else begin
+    ShowMessage(S+#13+DefaultFolder+#13+OldFolder);
     Timer.Enabled:=False;
   end;
 end;
@@ -174,11 +175,15 @@ end;
 
 procedure TModernProfileEditorDirectoryFrame.GetGame(const Game: TGame);
 begin
-  Game.CaptureFolder:=ScreenshotFolderEdit.Text;
-  Game.DataDir:=DataFolderEdit.Text;
+  If Timer.Enabled then begin
+    Timer.Enabled:=False;
+    TimerTimer(Timer);
+  end;
+
+  Game.CaptureFolder:=MakeRelPath(ScreenshotFolderEdit.Text,PrgSetup.BaseDir);
+  Game.DataDir:=MakeRelPath(DataFolderEdit.Text,PrgSetup.BaseDir);
   Game.Extrafiles:=ListToValue(ExtraFilesListBox.Items);
   Game.ExtraDirs:=ListToValue(ExtraDirsListBox.Items);
-  Timer.Enabled:=False;
 end;
 
 procedure TModernProfileEditorDirectoryFrame.ExtraDirsListBoxClick(Sender: TObject);
@@ -300,7 +305,7 @@ begin
 
   S:=IncludeTrailingPathDelimiter(PrgSetup.CaptureDir)+MakeFileSysOKFolderName(FCurrentProfileName^)+'\';
   I:=0;
-  while DirectoryExists(MakeAbsPath(S,PrgSetup.BaseDir)) do begin
+  while (not PrgSetup.IgnoreDirectoryCollisions) and DirectoryExists(MakeAbsPath(S,PrgSetup.BaseDir)) do begin
     inc(I);
     S:=IncludeTrailingPathDelimiter(PrgSetup.CaptureDir)+MakeFileSysOKFolderName(FCurrentProfileName^)+IntToStr(I)+'\';
   end;
@@ -318,7 +323,7 @@ begin
   T:=MakeRelPath(IncludeTrailingPathDelimiter(S)+MakeFileSysOKFolderName(FCurrentProfileName^)+'\',PrgSetup.BaseDir,True);
 
   I:=0;
-  while DirectoryExists(MakeAbsPath(T,PrgSetup.BaseDir)) do begin
+  while (not PrgSetup.IgnoreDirectoryCollisions) and DirectoryExists(MakeAbsPath(T,PrgSetup.BaseDir)) do begin
     inc(I);
     T:=MakeRelPath(IncludeTrailingPathDelimiter(S)+MakeFileSysOKFolderName(FCurrentProfileName^)+IntToStr(I)+'\',PrgSetup.BaseDir,True);
   end;

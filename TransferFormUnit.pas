@@ -51,7 +51,7 @@ Function TransferGames(const AOwner : TComponent; const AGameDB : TGameDB) : Boo
 implementation
 
 uses ShlObj, VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgConsts,
-     ProgressFormUnit, GameDBToolsUnit, SmallWaitFormUnit, UninstallFormUnit,
+     WaitFormUnit, GameDBToolsUnit, SmallWaitFormUnit, UninstallFormUnit,
      HelpConsts, IconLoaderUnit;
 
 {$R *.dfm}
@@ -74,6 +74,9 @@ begin
   CopyDFRCheckBox.Caption:=LanguageSetup.TransferFormCopyDFendReloadedPrgFiles;
 
   UserIconLoader.DialogImage(DI_SelectFolder,DestPrgDirButton);
+  UserIconLoader.DialogImage(DI_OK,OKButton);
+  UserIconLoader.DialogImage(DI_Cancel,CancelButton);
+  UserIconLoader.DialogImage(DI_Help,HelpButton);
 end;
 
 procedure TTransferForm.FormShow(Sender: TObject);
@@ -326,8 +329,20 @@ begin
         NewSetup.PathToFREEDOS:='.\VirtualHD\FREEDOS\';
         If FileExists(DestPrgDir+OggEncPrgFile) then NewSetup.WaveEncOgg:='.\'+OggEncPrgFile;
 
+        S:=MakeRelPath(PrgSetup.ScummVMPath,PrgSetup.BaseDir);
+        If Copy(S,1,2)='.\' then NewSetup.ScummVMPath:=MakeAbsPath(S,DestPrgDir);
         S:=MakeRelPath(PrgSetup.QBasic,PrgSetup.BaseDir);
         If Copy(S,1,2)='.\' then NewSetup.QBasic:=MakeAbsPath(S,DestPrgDir);
+        S:=MakeRelPath(PrgSetup.WaveEncOgg,PrgSetup.BaseDir);
+        If Copy(S,1,2)='.\' then NewSetup.WaveEncOgg:=MakeAbsPath(S,DestPrgDir);
+        S:=MakeRelPath(PrgSetup.WaveEncMp3,PrgSetup.BaseDir);
+        If Copy(S,1,2)='.\' then NewSetup.WaveEncMp3:=MakeAbsPath(S,DestPrgDir);
+        NewSetup.UserInterpretersPrograms.Clear;
+        For I:=0 to PrgSetup.UserInterpretersPrograms.Count-1 do begin
+          S:=MakeRelPath(PrgSetup.UserInterpretersPrograms[I],PrgSetup.BaseDir);
+          If Copy(S,1,2)<>'.\' then S:=PrgSetup.UserInterpretersPrograms[I];
+          NewSetup.UserInterpretersPrograms.Add(S);
+        end;
 
         OperationMode:=omPortable;
         TempPrgDir:=DestPrgDir;
@@ -404,7 +419,7 @@ begin
 end;
 
 function TTransferForm.GetDestPrgDataDir(const OpMode: TOperationMode; var DestPrgDataDir: String): Boolean;
-Var S : String;
+Var S,T : String;
     LocalPrgSetup : TPrgSetup;
     SaveOpMode : TOperationMode;
 begin
@@ -416,6 +431,7 @@ begin
     S:=IncludeTrailingPathDelimiter(Trim(DestPrgDirEdit.Text));
   end;
 
+  T:=S;
   S:=S+SettingsFolder+'\'+ExtractFileName(MainSetupFile);
   if not FileExists(S) then begin
     MessageDlg(Format(LanguageSetup.MessageNoSetupFileFound,[ExtractFilePath(S)]),mtError,[mbOK],0);
@@ -426,7 +442,7 @@ begin
 
   SaveOpMode:=OperationMode;
   OperationMode:=OpMode;
-  TempPrgDir:=IncludeTrailingPathDelimiter(ExtractFilePath(S));
+  TempPrgDir:=IncludeTrailingPathDelimiter(ExtractFilePath(T));
   LocalPrgSetup:=TPrgSetup.Create(S);
   try
     DestPrgDataDir:=LocalPrgSetup.BaseDir;
@@ -570,7 +586,7 @@ begin
   S:=Trim(Game.CaptureFolder);
   If S<>'' then begin
     S:=IncludeTrailingPathDelimiter(S);
-    If DirectoryExists(DestDataDir+S) then begin
+    If (not PrgSetup.IgnoreDirectoryCollisions) and DirectoryExists(DestDataDir+S) then begin
       I:=0;
       repeat inc(I); until not DirectoryExists(DestDataDir+IncludeTrailingPathDelimiter(ExcludeTrailingPathDelimiter(S)+IntToStr(I)));
       T:=IncludeTrailingPathDelimiter(ExcludeTrailingPathDelimiter(S)+IntToStr(I));
@@ -608,7 +624,7 @@ begin
   S:=Trim(Game.DataDir);
   If S<>'' then begin
     S:=IncludeTrailingPathDelimiter(S);
-    If DirectoryExists(DestDataDir+S) then begin
+    If (not PrgSetup.IgnoreDirectoryCollisions) and DirectoryExists(DestDataDir+S) then begin
       I:=0;
       repeat inc(I); until not DirectoryExists(DestDataDir+IncludeTrailingPathDelimiter(ExcludeTrailingPathDelimiter(S)+IntToStr(I)));
       T:=IncludeTrailingPathDelimiter(ExcludeTrailingPathDelimiter(S)+IntToStr(I));

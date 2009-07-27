@@ -36,7 +36,8 @@ Function CheckDriveData(const MountByDataType : TMountByData; const Data : Strin
 
 implementation
 
-uses LanguageSetupUnit, VistaToolsUnit, CommonTools, SelectCDDriveToMountFormUnit;
+uses LanguageSetupUnit, VistaToolsUnit, CommonTools, SelectCDDriveToMountFormUnit,
+     IconLoaderUnit;
 
 {$R *.dfm}
 
@@ -56,6 +57,8 @@ begin
   End;
 
   CancelButton.Caption:=LanguageSetup.Cancel;
+
+  UserIconLoader.DialogImage(DI_Cancel,CancelButton);
 
   Timer.Enabled:=True;
 end;

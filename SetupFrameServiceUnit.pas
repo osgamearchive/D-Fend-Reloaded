@@ -13,6 +13,7 @@ type
     Service1Button: TBitBtn;
     Service2Button: TBitBtn;
     Service5Button: TBitBtn;
+    Service6Button: TBitBtn;
     procedure ButtonWork(Sender: TObject);
   private
     { Private-Deklarationen }
@@ -33,7 +34,7 @@ type
 implementation
 
 uses LanguageSetupUnit, VistaToolsUnit, GameDBToolsUnit, PrgConsts, HelpConsts,
-     IconLoaderUnit;
+     IconLoaderUnit, PackageDBToolsUnit, PackageDBLanguage, PrgSetupUnit;
 
 {$R *.dfm}
 
@@ -52,12 +53,15 @@ begin
   NoFlicker(Service2Button);
   NoFlicker(Service3Button);
   NoFlicker(Service4Button);
+  NoFlicker(Service5Button);
+  NoFlicker(Service6Button);
 
-  UserIconLoader.DialogImage(DI_ResetDefault,Service3Button);
-  UserIconLoader.DialogImage(DI_ResetDefault,Service4Button);
+  UserIconLoader.DialogImage(DI_ResetProfile,Service3Button);
+  UserIconLoader.DialogImage(DI_ResetProfile,Service4Button);
   UserIconLoader.DialogImage(DI_Clear,Service1Button);
   UserIconLoader.DialogImage(DI_Folders,Service2Button);
   UserIconLoader.DialogImage(DI_Calculator,Service5Button);
+  UserIconLoader.DialogImage(DI_Delete,Service6Button);
 end;
 
 procedure TSetupFrameService.BeforeChangeLanguage;
@@ -71,6 +75,7 @@ begin
   Service3Button.Caption:=LanguageSetup.SetupFormService3;
   Service4Button.Caption:=LanguageSetup.SetupFormService4;
   Service5Button.Caption:=LanguageSetup.SetupFormService5;
+  Service6Button.Caption:=LANG_SetupClearCache;
 
   HelpContext:=ID_FileOptionsService;
 end;
@@ -84,6 +89,7 @@ begin
   Service1Button.Visible:=AdvencedMode;
   Service2Button.Visible:=AdvencedMode;
   Service5Button.Visible:=AdvencedMode;
+  Service6Button.Visible:=AdvencedMode and PrgSetup.ActivateIncomplete09Features;
 end;
 
 procedure TSetupFrameService.HideFrame;
@@ -122,6 +128,7 @@ begin
           ReBuildTemplates;
         end;
     4 : CreateCheckSumsForAllGames(GameDB);
+    5 : ClearPackageCache;
   end;
 end;
 

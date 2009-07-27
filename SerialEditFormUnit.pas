@@ -60,7 +60,8 @@ Function ShowSerialEditDialog(const AOwner : TComponent; var AProfileString : St
 
 implementation
 
-uses Math, VistaToolsUnit, LanguageSetupUnit, CommonTools, HelpConsts;
+uses Math, VistaToolsUnit, LanguageSetupUnit, CommonTools, HelpConsts,
+     IconLoaderUnit;
 
 {$R *.dfm}
 
@@ -106,6 +107,10 @@ begin
 
   DirectSerialPortEdit.EditLabel.Caption:=LanguageSetup.SerialFormDirectSerialPort;
   DirectSerialRXDelayLabel.Caption:=LanguageSetup.SerialFormRXDelay;
+
+  UserIconLoader.DialogImage(DI_OK,OKButton);
+  UserIconLoader.DialogImage(DI_Cancel,CancelButton);
+  UserIconLoader.DialogImage(DI_Help,HelpButton);
 end;
 
 procedure TSerialEditForm.SetIRQ(const S: String);

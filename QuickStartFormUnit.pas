@@ -492,6 +492,8 @@ begin
   CaptureDir:=MakeAbsPath(PrgSetup.CaptureDir,PrgDataDir);
   DataDir:=MakeAbsPath(PrgSetup.DataDir,PrgSetup.BaseDir);
 
+  BackupSelNode:=nil;
+
   DisableGUI;
   Tree.Items.BeginUpdate;
   try
@@ -1091,7 +1093,7 @@ begin
 end;
 
 Procedure TQuickStartForm.AddAutoexecCDCommands(const Game : TGame; const Path : String);
-Var I,J : Integer;
+Var I : Integer;
     St,St2 : TStringList;
     S,T : String;
 begin

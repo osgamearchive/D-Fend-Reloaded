@@ -58,6 +58,9 @@ begin
   FileNameButton.Hint:=LanguageSetup.ChooseFile;
   InfoLabel.Caption:=LanguageSetup.ReadImageInfo;
   UserIconLoader.DialogImage(DI_SelectFile,FileNameButton);
+  UserIconLoader.DialogImage(DI_OK,OKButton);
+  UserIconLoader.DialogImage(DI_Cancel,CancelButton);
+  UserIconLoader.DialogImage(DI_Help,HelpButton);
 
   FloppyMode:=False;
   WriteMode:=False;

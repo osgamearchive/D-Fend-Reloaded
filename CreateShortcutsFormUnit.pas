@@ -88,6 +88,9 @@ begin
   FolderEdit.Text:=GetSpecialFolder(Handle,CSIDL_DESKTOPDIRECTORY);
 
   UserIconLoader.DialogImage(DI_SelectFolder,SelectFolderButton);
+  UserIconLoader.DialogImage(DI_OK,OKButton);
+  UserIconLoader.DialogImage(DI_Cancel,CancelButton);
+  UserIconLoader.DialogImage(DI_Help,HelpButton);
 end;
 
 procedure TCreateShortcutsForm.FormShow(Sender: TObject);

@@ -32,7 +32,7 @@ Function ShowLanguageEditorStartDialog(const AOwner : TComponent; var LanguageFi
 implementation
 
 uses VistaToolsUnit, LanguageSetupUnit, PrgSetupUnit, PrgConsts, CommonTools,
-     HelpConsts;
+     HelpConsts, IconLoaderUnit;
 
 {$R *.dfm}
 
@@ -49,6 +49,10 @@ begin
   Caption:=LanguageSetup.LanguageEditorCaption;
   EditThisRadioButton.Caption:=LanguageSetup.LanguageEditorEditThisLanguage;
   EditNewRadioButton.Caption:=LanguageSetup.LanguageEditorEditNewLanguage;
+
+  UserIconLoader.DialogImage(DI_OK,OKButton);
+  UserIconLoader.DialogImage(DI_Cancel,CancelButton);
+  UserIconLoader.DialogImage(DI_Help,HelpButton);
 end;
 
 procedure TLanguageEditorStartForm.LanguageNameEditChange(Sender: TObject);
@@ -58,7 +62,7 @@ end;
 
 procedure TLanguageEditorStartForm.HelpButtonClick(Sender: TObject);
 begin
-  Application.HelpCommand(HELP_CONTEXT,ID_HelpLanguageEditor);
+  Application.HelpCommand(HELP_CONTEXT,ID_ExtrasLanguageEditor);
 end;
 
 procedure TLanguageEditorStartForm.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);

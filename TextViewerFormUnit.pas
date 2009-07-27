@@ -27,7 +27,7 @@ Procedure ShowTextViewerDialog(const AOwner : TComponent; const ATitle, AText : 
 
 implementation
 
-uses VistaToolsUnit, LanguageSetupUnit, CommonTools;
+uses VistaToolsUnit, LanguageSetupUnit, CommonTools, IconLoaderUnit;
 
 {$R *.dfm}
 
@@ -37,6 +37,8 @@ begin
   Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName);
 
   CloseButton.Caption:=LanguageSetup.Close;
+
+  UserIconLoader.DialogImage(DI_Close,CloseButton);
 end;
 
 procedure TTextViewerForm.FormShow(Sender: TObject);

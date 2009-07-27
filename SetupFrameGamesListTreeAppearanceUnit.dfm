@@ -50,7 +50,7 @@ object SetupFrameGamesListTreeAppearance: TSetupFrameGamesListTreeAppearance
     Anchors = [akLeft, akTop, akRight]
     Caption = 'Standard Hintergrundfarbe'
     Checked = True
-    TabOrder = 0
+    TabOrder = 1
     TabStop = True
   end
   object TreeViewBackgroundRadioButton2: TRadioButton
@@ -59,7 +59,7 @@ object SetupFrameGamesListTreeAppearance: TSetupFrameGamesListTreeAppearance
     Width = 129
     Height = 17
     Caption = 'Hintergrundfarbe'
-    TabOrder = 1
+    TabOrder = 2
   end
   object TreeViewBackgroundColorBox: TColorBox
     Left = 151
@@ -67,7 +67,7 @@ object SetupFrameGamesListTreeAppearance: TSetupFrameGamesListTreeAppearance
     Width = 130
     Height = 22
     ItemHeight = 16
-    TabOrder = 2
+    TabOrder = 3
     OnChange = TreeViewBackgroundColorBoxChange
   end
   object TreeViewFontSizeEdit: TSpinEdit
@@ -77,7 +77,7 @@ object SetupFrameGamesListTreeAppearance: TSetupFrameGamesListTreeAppearance
     Height = 22
     MaxValue = 48
     MinValue = 1
-    TabOrder = 3
+    TabOrder = 4
     Value = 9
   end
   object TreeViewFontColorBox: TColorBox
@@ -86,14 +86,16 @@ object SetupFrameGamesListTreeAppearance: TSetupFrameGamesListTreeAppearance
     Width = 130
     Height = 22
     ItemHeight = 16
-    TabOrder = 4
+    TabOrder = 5
   end
-  object TreeViewGroupsEdit: TMemo
+  object TreeViewGroupsEdit: TRichEdit
     Left = 16
     Top = 204
     Width = 161
     Height = 78
-    TabOrder = 5
+    PlainText = True
+    ScrollBars = ssBoth
+    TabOrder = 6
   end
   object UserKeysList: TBitBtn
     Left = 183
@@ -101,7 +103,7 @@ object SetupFrameGamesListTreeAppearance: TSetupFrameGamesListTreeAppearance
     Width = 178
     Height = 25
     Caption = 'Existierende Benutzerschl'#252'ssel'
-    TabOrder = 6
+    TabOrder = 7
     OnClick = UserKeysListClick
   end
   object ReselectFilterCheckBox: TCheckBox
@@ -111,9 +113,10 @@ object SetupFrameGamesListTreeAppearance: TSetupFrameGamesListTreeAppearance
     Height = 17
     Anchors = [akLeft, akTop, akRight]
     Caption = 'Zuletzt ausgew'#228'hlte Kategorie beim Start erneut ausw'#228'hlen'
-    TabOrder = 7
+    TabOrder = 0
   end
   object PopupMenu: TPopupMenu
+    OnPopup = PopupMenuPopup
     Left = 184
     Top = 233
   end

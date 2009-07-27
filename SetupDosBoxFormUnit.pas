@@ -40,7 +40,8 @@ Procedure FastSearchAllTools;
 
 implementation
 
-uses ShlObj, PrgSetupUnit, LanguageSetupUnit, PrgConsts, CommonTools, VistaToolsUnit;
+uses ShlObj, PrgSetupUnit, LanguageSetupUnit, PrgConsts, CommonTools,
+     VistaToolsUnit, IconLoaderUnit;
 
 {$R *.dfm}
 
@@ -54,6 +55,8 @@ begin
   DoubleBuffered:=True;
   SetVistaFonts(self);
   Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName);
+
+  UserIconLoader.DialogImage(DI_Abort,AbortButton);
 
   PostMessage(Handle,WM_USER+1,0,0);
 end;
@@ -110,7 +113,7 @@ begin
   end;
 
   inc(Count);
-  If Count mod 2000=0 then begin
+  If Count mod 20=0 then begin
     InfoLabel.Caption:=Dir;
     Application.ProcessMessages;
     If Aborted then exit;
@@ -119,7 +122,7 @@ begin
   I:=FindFirst(Dir+'*.*',faDirectory,Rec);
   try
     while I=0 do begin
-      If (Rec.Name<>'.') and (Rec.Name<>'..') then begin
+      If ((Rec.Attr and faDirectory)<>0) and (Rec.Name<>'.') and (Rec.Name<>'..') then begin
         result:=SearchDir(Dir+Rec.Name+'\');
         if result or Aborted then exit;
       end;

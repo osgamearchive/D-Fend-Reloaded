@@ -37,7 +37,7 @@ Function SelectProfile(const AOwner : TComponent; const AGameDB : TGameDB) : TGa
 
 implementation
 
-uses VistaToolsUnit, LanguageSetupUnit, CommonTools;
+uses VistaToolsUnit, LanguageSetupUnit, CommonTools, IconLoaderUnit;
 
 {$R *.dfm}
 
@@ -52,6 +52,9 @@ begin
   Caption:=LanguageSetup.TemplateFormNewFromProfileCaption;
   OKButton.Caption:=LanguageSetup.OK;
   CancelButton.Caption:=LanguageSetup.Cancel;
+
+  UserIconLoader.DialogImage(DI_OK,OKButton);
+  UserIconLoader.DialogImage(DI_Cancel,CancelButton);
 end;
 
 procedure TTemplateSelectProfileForm.LoadList;

@@ -45,7 +45,7 @@ implementation
 
 uses ShlObj, VistaToolsUnit, LanguageSetupUnit, DosBoxUnit, CommonTools,
      PrgSetupUnit, GameDBToolsUnit, ScummVMUnit, HelpConsts, TemplateFormUnit,
-     IconLoaderUnit ;
+     IconLoaderUnit;
 
 {$R *.dfm}
 
@@ -66,6 +66,9 @@ begin
   SelectGenreButton.Caption:=LanguageSetup.GameBy;
   ExportAutoSetupTemplatesCheckBox.Caption:=LanguageSetup.CreateConfFormAutoSetup;
   UserIconLoader.DialogImage(DI_SelectFolder,SelectFolderButton);
+  UserIconLoader.DialogImage(DI_OK,OKButton);
+  UserIconLoader.DialogImage(DI_Cancel,CancelButton);
+  UserIconLoader.DialogImage(DI_Help,HelpButton);
 
   ProfFileMode:=False;
 end;
@@ -131,6 +134,7 @@ begin
         If ScummVMMode(G) then continue;
         CreateGameCheckSum(G,False);
         CreateSetupCheckSum(G,False);
+        AddAdditionalChecksumDataToAutoSetupTemplate(G);
         G2:=TGame.Create(Dir+ExtractFileName(G.SetupFile));
         try
           G2.AssignFrom(G);
@@ -154,7 +158,7 @@ begin
         St:=BuildScummVMIniFile(G);
       end else begin
         S:=Dir+ChangeFileExt(ExtractFileName(G.SetupFile),'.conf');
-        St:=BuildConfFile(G,False,False);
+        St:=BuildConfFile(G,False,False,-1);
         If St=nil then continue;
       end;
       try

@@ -89,7 +89,7 @@ end;
 function TProfileMountEditorFloppyDriveFrame.Done: String;
 begin
   {RealFolder;FLOPPY;Letter;False;;}
-  result:=FloppyEdit.Text+';Floppy;'+FloppyDriveLetterComboBox.Text+';False;;';
+  result:=MakeRelPath(FloppyEdit.Text,PrgSetup.BaseDir)+';Floppy;'+FloppyDriveLetterComboBox.Text+';False;;';
 end;
 
 function TProfileMountEditorFloppyDriveFrame.GetName: String;

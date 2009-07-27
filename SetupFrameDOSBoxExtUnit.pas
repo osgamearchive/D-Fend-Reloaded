@@ -23,10 +23,6 @@ type
     RenderModesCheckBox: TCheckBox;
     VideoModesCheckBox: TCheckBox;
     MIDICheckBox: TCheckBox;
-    SecureModeCheckBox: TCheckBox;
-    MoreIOCTLSettingsCheckBox: TCheckBox;
-    CPUGroupBox: TGroupBox;
-    CPUTypeCheckBox: TCheckBox;
     PixelShaderCheckBox: TCheckBox;
     procedure DefaultValueChanged(Sender: TObject);
   private
@@ -69,8 +65,6 @@ begin
   NoFlicker(MountDialogGroupBox);
   NoFlicker(MultiFloppyImageCheckBox);
   NoFlicker(PhysFSCheckBox);
-  NoFlicker(SecureModeCheckBox);
-  NoFlicker(MoreIOCTLSettingsCheckBox);
   NoFlicker(GraphicsGroupBox);
   NoFlicker(ExtendedTextModeCheckBox);
   NoFlicker(GlideEmulationCheckBox);
@@ -82,13 +76,9 @@ begin
   NoFlicker(MIDICheckBox);
   NoFlicker(PrinterGroupBox);
   NoFlicker(PrinterCheckBox);
-  NoFlicker(CPUGroupBox);
-  NoFlicker(CPUTypeCheckBox);
 
   MultiFloppyImageCheckBox.Checked:=PrgSetup.AllowMultiFloppyImagesMount;
   PhysFSCheckBox.Checked:=PrgSetup.AllowPhysFSUsage;
-  SecureModeCheckBox.Checked:=PrgSetup.AllowSecureMode;
-  MoreIOCTLSettingsCheckBox.Checked:=PrgSetup.AllowMoreIOCTLSettings;
   ExtendedTextModeCheckBox.Checked:=PrgSetup.AllowTextModeLineChange;
   GlideEmulationCheckBox.Checked:=PrgSetup.AllowGlideSettings;
   VGAChipsetCheckBox.Checked:=PrgSetup.AllowVGAChipsetSettings;
@@ -112,7 +102,6 @@ begin
   ValueChanged[2]:=False;
 
   PrinterCheckBox.Checked:=PrgSetup.AllowPrinterSettings;
-  CPUTypeCheckBox.Checked:=PrgSetup.AllowCPUType;
 end;
 
 procedure TSetupFrameDOSBoxExt.DefaultValueChanged(Sender: TObject);
@@ -146,8 +135,6 @@ begin
   MountDialogGroupBox.Caption:=LanguageSetup.SetupFormDosBoxCVSMountGroup;
   MultiFloppyImageCheckBox.Caption:=LanguageSetup.SetupFormDosBoxCVSMultipleFloppyImages;
   PhysFSCheckBox.Caption:=LanguageSetup.SetupFormDosBoxCVSPhysFS;
-  SecureModeCheckBox.Caption:=LanguageSetup.SetupFormDosBoxCVSSecureMode;
-  MoreIOCTLSettingsCheckBox.Caption:=LanguageSetup.SetupFormDosBoxCVSMoreIOCTLSettings;
   GraphicsGroupBox.Caption:=LanguageSetup.SetupFormDosBoxCVSGraphicsGroup;
   ExtendedTextModeCheckBox.Caption:=LanguageSetup.SetupFormDosBoxCVSExtendedTextMode;
   GlideEmulationCheckBox.Caption:=LanguageSetup.SetupFormDosBoxCVSGlideEmulation;
@@ -159,8 +146,6 @@ begin
   MIDICheckBox.Caption:=LanguageSetup.SetupFormDosBoxCVSMidiModes;
   PrinterGroupBox.Caption:=LanguageSetup.SetupFormDosBoxCVSPrinterGroup;
   PrinterCheckBox.Caption:=LanguageSetup.SetupFormDosBoxCVSPrinter;
-  CPUGroupBox.Caption:=LanguageSetup.SetupFormDosBoxCVSCPUGroup;
-  CPUTypeCheckBox.Caption:=LanguageSetup.SetupFormDosBoxCVSCPU;
 
   HelpContext:=ID_FileOptionsDOSBoxCVSFeatures;
 end;
@@ -181,14 +166,11 @@ procedure TSetupFrameDOSBoxExt.RestoreDefaults;
 begin
   MultiFloppyImageCheckBox.Checked:=False;
   PhysFSCheckBox.Checked:=False;
-  SecureModeCheckBox.Checked:=False;
-  MoreIOCTLSettingsCheckBox.Checked:=False;
   ExtendedTextModeCheckBox.Checked:=False;
   GlideEmulationCheckBox.Checked:=False;
   VGAChipsetCheckBox.Checked:=False;
   PixelShaderCheckBox.Checked:=False;
   PrinterCheckBox.Checked:=False;
-  CPUTypeCheckBox.Checked:=False;
 end;
 
 function TSetupFrameDOSBoxExt.DefaultValueChange(const OldList, Value: String; const SetIt: Boolean): String;
@@ -219,8 +201,6 @@ procedure TSetupFrameDOSBoxExt.SaveSetup;
 begin
   PrgSetup.AllowMultiFloppyImagesMount:=MultiFloppyImageCheckBox.Checked;
   PrgSetup.AllowPhysFSUsage:=PhysFSCheckBox.Checked;
-  PrgSetup.AllowSecureMode:=SecureModeCheckBox.Checked;
-  PrgSetup.AllowMoreIOCTLSettings:=MoreIOCTLSettingsCheckBox.Checked;
   PrgSetup.AllowTextModeLineChange:=ExtendedTextModeCheckBox.Checked;
   PrgSetup.AllowGlideSettings:=GlideEmulationCheckBox.Checked;
   PrgSetup.AllowVGAChipsetSettings:=VGAChipsetCheckBox.Checked;
@@ -243,7 +223,6 @@ begin
   end;
 
   PrgSetup.AllowPrinterSettings:=PrinterCheckBox.Checked;
-  PrgSetup.AllowCPUType:=CPUTypeCheckBox.Checked;
 end;
 
 end.

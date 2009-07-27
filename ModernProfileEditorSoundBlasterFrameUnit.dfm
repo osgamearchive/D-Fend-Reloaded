@@ -50,11 +50,18 @@ object ModernProfileEditorSoundBlasterFrame: TModernProfileEditorSoundBlasterFra
     Caption = 'OplModeLabel'
   end
   object OplSampleRateLabel: TLabel
-    Left = 120
+    Left = 216
     Top = 192
     Width = 98
     Height = 13
     Caption = 'OplSampleRateLabel'
+  end
+  object OplEmuLabel: TLabel
+    Left = 120
+    Top = 192
+    Width = 61
+    Height = 13
+    Caption = 'OplEmuLabel'
   end
   object TypeComboBox: TComboBox
     Left = 24
@@ -111,13 +118,13 @@ object ModernProfileEditorSoundBlasterFrame: TModernProfileEditorSoundBlasterFra
     TabOrder = 5
   end
   object OplSampleRateComboBox: TComboBox
-    Left = 120
+    Left = 216
     Top = 211
     Width = 81
     Height = 21
     Style = csDropDownList
     ItemHeight = 13
-    TabOrder = 6
+    TabOrder = 7
   end
   object UseMixerCheckBox: TCheckBox
     Left = 24
@@ -126,6 +133,15 @@ object ModernProfileEditorSoundBlasterFrame: TModernProfileEditorSoundBlasterFra
     Height = 17
     Anchors = [akLeft, akTop, akRight]
     Caption = 'UseMixerCheckBox'
-    TabOrder = 7
+    TabOrder = 8
+  end
+  object OplEmuComboBox: TComboBox
+    Left = 120
+    Top = 211
+    Width = 81
+    Height = 21
+    Style = csDropDownList
+    ItemHeight = 13
+    TabOrder = 6
   end
 end

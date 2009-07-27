@@ -29,7 +29,8 @@
 
 Section "$(LANGNAME_DFendReloaded)" ID_DFend
   SectionIn RO
-  SetDetailsPrint both
+  
+  SetDetailsPrint none
   
   ; Read installation type
   ; ($InstallDataType=0 <=> Prg dir mode, $InstallDataType=1 <=> User dir mode; in user dir mode $DataInstDir will contain the data directory otherwise $INSTDIR)
@@ -54,11 +55,18 @@ Section "$(LANGNAME_DFendReloaded)" ID_DFend
   
   ; Update main files
   
+  SetDetailsPrint both
+  DetailPrint "$(LANGNAME_UpdateDFendReloaded)"
+
+  SetDetailsPrint listonly
   SetOutPath "$INSTDIR"
+  SetDetailsPrint none  
   File "..\DFend.exe"
   File "..\Readme_OperationMode.txt"
   
+  SetDetailsPrint listonly
   SetOutPath "$INSTDIR\Bin"  
+  SetDetailsPrint none  
   File "..\Bin\oggenc2.exe"
   File "..\Bin\mkdosfs.exe"
   File "..\Bin\LicenseComponents.txt"
@@ -75,11 +83,15 @@ Section "$(LANGNAME_DFendReloaded)" ID_DFend
   IntCmp $InstallDataType 2 +2
   File "..\Bin\DFendGameExplorerData.dll"
   
+  SetDetailsPrint listonly
   SetOutPath "$INSTDIR\Lang"
+  SetDetailsPrint none  
   File "..\Lang\*.ini"
   File "..\Lang\*.chm"
 
+  SetDetailsPrint listonly
   SetOutPath "$INSTDIR\IconSets"
+  SetDetailsPrint none  
   File /r "..\IconSets\*.*"
   
   ; Remove files in $INSTDIR for which the new position is $INSTDIR\Bin
@@ -106,29 +118,30 @@ Section "$(LANGNAME_DFendReloaded)" ID_DFend
   
   ; Update config file
   
-  WriteINIStr $DataInstDir\ConfOpt.dat resolution value original,320x200,640x432,640x480,720x480,800x600,1024x768,1152x864,1280x720,1280x768,1280x960,1280x1024,1600x1200,1920x1080,1920x1200,0x0
-  WriteINIStr $DataInstDir\ConfOpt.dat joysticks value none,auto,2axis,4axis,fcs,ch
-  WriteINIStr $DataInstDir\ConfOpt.dat GUSRate value 8000,11025,22050,32000,44100,48000,50000
-  WriteINIStr $DataInstDir\ConfOpt.dat OPLRate value 8000,11025,22050,32000,44100,48000,50000
-  WriteINIStr $DataInstDir\ConfOpt.dat PCRate value 8000,11025,22050,32000,44100,48000,50000
-  WriteINIStr $DataInstDir\ConfOpt.dat Rate value 8000,11025,22050,32000,44100,48000,50000
-  WriteINIStr $DataInstDir\ConfOpt.dat scale value "No Scaling (none),Nearest neighbor upscaling with factor 2 (normal2x),Nearest neighbor upscaling with factor 3 (normal3x),Advanced upscaling with factor 2 (advmame2x),Advanced upscaling with factor 3 (advmame3x),high quality with factor 2 (hq2x), high quality with factor 3 (hq3x),2xsai (2xsai), super2xsai (super2xsai), supereagle (supereagle),Advanced interpoling with factor 2 (advinterp2x),Advanced interpoling with factor 3 (advinterp3x),Advanced upscaling with sharpening with factor 2 (tv2x),Advanced upscaling with sharpening with factor 3 (tv3x),Simulates the phopsphors on a dot trio CRT with factor 2 (rgb2x),Simulates the phopsphors on a dot trio CRT with factor 3 (rgb3x),Nearest neighbor with black lines with factor 2 (scan2x),Nearest neighbor with black lines with factor 3 (scan3x)"
+  WriteINIStr $DataInstDir\Settings\ConfOpt.dat resolution value original,320x200,320x240,640x432,640x480,720x480,800x600,1024x768,1152x864,1280x720,1280x768,1280x960,1280x1024,1600x1200,1920x1080,1920x1200,0x0
+  WriteINIStr $DataInstDir\Settings\ConfOpt.dat joysticks value none,auto,2axis,4axis,fcs,ch
+  WriteINIStr $DataInstDir\Settings\ConfOpt.dat GUSRate value 8000,11025,22050,32000,44100,48000,50000
+  WriteINIStr $DataInstDir\Settings\ConfOpt.dat OPLRate value 8000,11025,22050,32000,44100,48000,50000
+  WriteINIStr $DataInstDir\Settings\ConfOpt.dat PCRate value 8000,11025,22050,32000,44100,48000,50000
+  WriteINIStr $DataInstDir\Settings\ConfOpt.dat Rate value 8000,11025,22050,32000,44100,48000,50000
+  WriteINIStr $DataInstDir\Settings\ConfOpt.dat scale value "No Scaling (none),Nearest neighbor upscaling with factor 2 (normal2x),Nearest neighbor upscaling with factor 3 (normal3x),Advanced upscaling with factor 2 (advmame2x),Advanced upscaling with factor 3 (advmame3x),high quality with factor 2 (hq2x), high quality with factor 3 (hq3x),2xsai (2xsai), super2xsai (super2xsai), supereagle (supereagle),Advanced interpoling with factor 2 (advinterp2x),Advanced interpoling with factor 3 (advinterp3x),Advanced upscaling with sharpening with factor 2 (tv2x),Advanced upscaling with sharpening with factor 3 (tv3x),Simulates the phopsphors on a dot trio CRT with factor 2 (rgb2x),Simulates the phopsphors on a dot trio CRT with factor 3 (rgb3x),Nearest neighbor with black lines with factor 2 (scan2x),Nearest neighbor with black lines with factor 3 (scan3x)"
+  WriteINIStr $DataInstDir\Settings\ConfOpt.dat video value "hercules,cga,tandy,pcjr,ega,vgaonly,svga_s3,svga_et3000,svga_et4000,svga_paradise,vesa_nolfb,vesa_oldvbe"
   
   ; Update templates
-  
-  SetDetailsPrint none
-  
+
   IntCmp $InstallDataType 1 WriteNewUserDir
     ; Prg dir mode -> Update files directly
+
+	SetDetailsPrint listonly
+    SetOutPath "$DataInstDir\AutoSetup"
+	SetDetailsPrint none
+    File "..\NewUserData\AutoSetup\*.prof"	
 	
     SetOutPath "$DataInstDir\Capture\DOSBox DOS"
     File "..\NewUserData\Capture\DOSBox DOS\*.*"
 
     SetOutPath "$DataInstDir\Templates"
     File "..\NewUserData\Templates\*.prof"
-	
-    SetOutPath "$DataInstDir\AutoSetup"
-    File "..\NewUserData\AutoSetup\*.prof"	
 
     SetOutPath "$DataInstDir\IconLibrary"
     File "..\NewUserData\IconLibrary\*.*"
@@ -139,15 +152,17 @@ Section "$(LANGNAME_DFendReloaded)" ID_DFend
   Goto TemplateWritingFinish
   WriteNewUserDir:  
     ; User dir mode -> Update files in NewUserData folder
-  
+
+	SetDetailsPrint listonly
+    SetOutPath "$INSTDIR\NewUserData\AutoSetup"
+	SetDetailsPrint none
+    File "..\NewUserData\AutoSetup\*.prof"
+
     SetOutPath "$INSTDIR\NewUserData\Capture\DOSBox DOS"
     File "..\NewUserData\Capture\DOSBox DOS\*.*"
 
     SetOutPath "$INSTDIR\NewUserData\Templates"
     File "..\NewUserData\Templates\*.prof"
-	
-    SetOutPath "$INSTDIR\NewUserData\AutoSetup"
-    File "..\NewUserData\AutoSetup\*.prof"	
 
     SetOutPath "$INSTDIR\NewUserData\IconLibrary"
     File "..\NewUserData\IconLibrary\*.*"
@@ -165,10 +180,12 @@ Section "$(LANGNAME_DFendReloaded)" ID_DFend
 
   TemplateWritingFinish:
   
-  SetDetailsPrint both
-  
   ; Install DOSZip
   
+  SetDetailsPrint both
+  DetailPrint "$(LANGNAME_InstallDOSZip)"
+  SetDetailsPrint listonly
+
   IntCmp $InstallDataType 1 DoszipToNewUserDir
     SetOutPath "$DataInstDir\VirtualHD\DOSZIP"
   Goto DoszipWritingStart
@@ -178,12 +195,16 @@ Section "$(LANGNAME_DFendReloaded)" ID_DFend
   
   SetDetailsPrint none
   File /r "..\NewUserData\DOSZIP\*.*"
-  SetDetailsPrint both
   
   IntCmp $InstallDataType 2 NoUninstallerUpdate
   
   ; Update uninstaller
+  SetDetailsPrint both
+  DetailPrint "$(LANGNAME_UpdateUninstaller)"
+  SetDetailsPrint listonly
   SetOutPath "$INSTDIR"
+  SetDetailsPrint none
+  
   WriteUninstaller "Uninstall.exe"
   SetShellVarContext all
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\D-Fend Reloaded" "DisplayVersion" "${VER_MAYOR}.${VER_MINOR1}.${VER_MINOR2}"
@@ -201,6 +222,43 @@ Section "$(LANGNAME_DFendReloaded)" ID_DFend
   ${GameExplorer_AddGame} all $INSTDIR\Bin\DFendGameExplorerData.dll $INSTDIR $INSTDIR\DFend.exe $GEGUID  
   
   NoUninstallerUpdate:
+  
+  ; Update DOSBox installation
+  
+  IfFileExists "$INSTDIR\DOSBox\*.*" 0 NoDOSBoxUpdate
+  
+  SetDetailsPrint both
+  DetailPrint "$(LANGNAME_UpdateDOSBox)"
+  SetDetailsPrint listonly
+  SetOutPath "$INSTDIR\DOSBox"
+  SetDetailsPrint none
+
+  File "..\DOSBox\README.txt"
+  ; not changed File "..\DOSBox\COPYING.txt"
+  File "..\DOSBox\THANKS.txt"
+  File "..\DOSBox\NEWS.txt"
+  ; not changed File "..\DOSBox\AUTHORS.txt"
+  File "..\DOSBox\INSTALL.txt"
+  File "..\DOSBox\DOSBox.exe"
+  File "..\DOSBox\dosbox.conf"
+  File "..\DOSBox\SDL.dll"
+  File "..\DOSBox\SDL_net.dll"
+  
+  SetOutPath "$INSTDIR\DOSBox\zmbv"
+  ; not changed File "..\DOSBox\zmbv\zmbv.dll"
+  File "..\DOSBox\zmbv\zmbv.inf"
+  ; not changed File "..\DOSBox\zmbv\README.txt"
+
+  SetOutPath "$INSTDIR\DOSBox"
+  File "..\DosBoxLang\Readme-0.73-French.txt"
+  File "..\DosBoxLang\French.dosbox.conf"
+  File "..\DosBoxLang\French.lng"
+  File "..\DosBoxLang\Portuguese.lng"
+  File "..\DosBoxLang\Portuguese.dosbox.conf"
+  File "..\DosBoxLang\Turkish.lng"
+  File "..\DosBoxLang\Readme-0.72-Persian.rtf"
+  
+  NoDOSBoxUpdate:
 SectionEnd
 
 

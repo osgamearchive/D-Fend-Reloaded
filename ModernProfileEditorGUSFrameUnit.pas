@@ -15,12 +15,8 @@ type
     SampleRateComboBox: TComboBox;
     Interrupt1ComboBox: TComboBox;
     Interrupt1Label: TLabel;
-    Interrupt2ComboBox: TComboBox;
-    Interrupt2Label: TLabel;
     DMA1ComboBox: TComboBox;
     DMA1Label: TLabel;
-    DMA2ComboBox: TComboBox;
-    DMA2Label: TLabel;
     PathEdit: TLabeledEdit;
   private
     { Private-Deklarationen }
@@ -48,9 +44,7 @@ begin
   NoFlicker(AddressComboBox);
   NoFlicker(SampleRateComboBox);
   NoFlicker(Interrupt1ComboBox);
-  NoFlicker(Interrupt2ComboBox);
   NoFlicker(DMA1ComboBox);
-  NoFlicker(DMA2ComboBox);
   NoFlicker(PathEdit);
 
   ActivateGUSCheckBox.Caption:=LanguageSetup.ProfileEditorSoundGUSEnabled;
@@ -58,15 +52,16 @@ begin
   St:=ValueToList(InitData.GameDB.ConfOpt.GUSBase,';,'); try AddressComboBox.Items.AddStrings(St); finally St.Free; end;
   SampleRateLabel.Caption:=LanguageSetup.ProfileEditorSoundGUSRate;
   St:=ValueToList(InitData.GameDB.ConfOpt.GUSRate,';,'); try SampleRateComboBox.Items.AddStrings(St); finally St.Free; end;
-  Interrupt1Label.Caption:=LanguageSetup.ProfileEditorSoundGUSIRQ1;
-  St:=ValueToList(InitData.GameDB.ConfOpt.IRQ1,';,'); try Interrupt1ComboBox.Items.AddStrings(St); finally St.Free; end;
-  Interrupt2Label.Caption:=LanguageSetup.ProfileEditorSoundGUSIRQ2;
-  St:=ValueToList(InitData.GameDB.ConfOpt.IRQ2,';,'); try Interrupt2ComboBox.Items.AddStrings(St); finally St.Free; end;
-  DMA1Label.Caption:=LanguageSetup.ProfileEditorSoundGUSDMA1;
-  St:=ValueToList(InitData.GameDB.ConfOpt.Dma1,';,'); try DMA1ComboBox.Items.AddStrings(St); finally St.Free; end;
-  DMA2Label.Caption:=LanguageSetup.ProfileEditorSoundGUSDMA2;
-  St:=ValueToList(InitData.GameDB.ConfOpt.Dma2,';,'); try DMA2ComboBox.Items.AddStrings(St); finally St.Free; end;
+  Interrupt1Label.Caption:=LanguageSetup.ProfileEditorSoundGUSIRQ;
+  St:=ValueToList(InitData.GameDB.ConfOpt.GUSIRQ,';,'); try Interrupt1ComboBox.Items.AddStrings(St); finally St.Free; end;
+  DMA1Label.Caption:=LanguageSetup.ProfileEditorSoundGUSDMA;
+  St:=ValueToList(InitData.GameDB.ConfOpt.GUSDma,';,'); try DMA1ComboBox.Items.AddStrings(St); finally St.Free; end;
   PathEdit.EditLabel.Caption:=LanguageSetup.ProfileEditorSoundGUSPath;
+
+  AddDefaultValueHint(AddressComboBox);
+  AddDefaultValueHint(SampleRateComboBox);
+  AddDefaultValueHint(Interrupt1ComboBox);
+  AddDefaultValueHint(DMA1ComboBox);
 
   HelpContext:=ID_ProfileEditSoundGUS;
 end;
@@ -93,10 +88,8 @@ begin
   ActivateGUSCheckBox.Checked:=Game.GUS;
   SetComboBox(AddressComboBox,IntToStr(Game.GUSBase),'240');
   SetComboBox(SampleRateComboBox,IntToStr(Game.GUSRate),'22050');
-  SetComboBox(Interrupt1ComboBox,IntToStr(Game.GUSIRQ1),'5');
-  SetComboBox(Interrupt2ComboBox,IntToStr(Game.GUSIRQ2),'5');
-  SetComboBox(DMA1ComboBox,IntToStr(Game.GUSDMA1),'1');
-  SetComboBox(DMA2ComboBox,IntToStr(Game.GUSDMA2),'1');
+  SetComboBox(Interrupt1ComboBox,IntToStr(Game.GUSIRQ),'5');
+  SetComboBox(DMA1ComboBox,IntToStr(Game.GUSDMA),'1');
   PathEdit.Text:=Game.GUSUltraDir;
 end;
 
@@ -114,10 +107,8 @@ begin
   Game.GUS:=ActivateGUSCheckBox.Checked;
   try Game.GUSBase:=StrtoInt(AddressComboBox.Text); except end;
   try Game.GUSRate:=StrtoInt(SampleRateComboBox.Text); except end;
-  try Game.GUSIRQ1:=StrtoInt(Interrupt1ComboBox.Text); except end;
-  try Game.GUSIRQ2:=StrtoInt(Interrupt2ComboBox.Text); except end;
-  try Game.GUSDMA1:=StrtoInt(DMA1ComboBox.Text); except end;
-  try Game.GUSDMA2:=StrtoInt(DMA2ComboBox.Text); except end;
+  try Game.GUSIRQ:=StrtoInt(Interrupt1ComboBox.Text); except end;
+  try Game.GUSDMA:=StrtoInt(DMA1ComboBox.Text); except end;
   Game.GUSUltraDir:=PathEdit.Text;
 end;
 

@@ -53,11 +53,12 @@ type
 implementation
 
 uses Math, VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgSetupUnit,
-     PrgConsts, HelpConsts, IconLoaderUnit;
+     PrgConsts, HelpConsts, IconLoaderUnit, TextEditPopupUnit;
 
 {$R *.dfm}
 
-const Priority : Array[0..3] of String = ('lower','normal','higher','highest');
+const FPriority : Array[0..3] of String = ('lower','normal','higher','highest');
+const BPriority : Array[0..4] of String = ('pause','lower','normal','higher','highest');
 
 { TModernProfileEditorDOSBoxFrame }
 
@@ -91,6 +92,8 @@ begin
   NoFlicker(CustomSetsLoadButton);
   NoFlicker(CustomSetsSaveButton);
 
+  SetRichEditPopup(CustomSetsMemo);
+
   DOSBoxForegroundPriorityRadioGroup.Caption:=LanguageSetup.GamePriorityForeground;
   with DOSBoxForegroundPriorityRadioGroup.Items do begin
     Add(LanguageSetup.GamePriorityLower);
@@ -100,6 +103,7 @@ begin
   end;
   DOSBoxBackgroundPriorityRadioGroup.Caption:=LanguageSetup.GamePriorityBackground;
   with DOSBoxBackgroundPriorityRadioGroup.Items do begin
+    Add(LanguageSetup.GamePriorityPause);
     Add(LanguageSetup.GamePriorityLower);
     Add(LanguageSetup.GamePriorityNormal);
     Add(LanguageSetup.GamePriorityHigher);
@@ -143,20 +147,20 @@ Var St : TStringList;
 begin
   St:=ValueToList(Game.Priority,',');
   try
-    If (St.Count>=1) and (St[0]<>'') then S:=St[0] else S:=Priority[2];
-    If (St.Count>=2) and (St[1]<>'') then T:=St[1] else T:=Priority[1];
+    If (St.Count>=1) and (St[0]<>'') then S:=St[0] else S:=FPriority[2];
+    If (St.Count>=2) and (St[1]<>'') then T:=St[1] else T:=BPriority[2];
   finally
     St.Free;
   end;
   S:=Trim(ExtUpperCase(S));
   DOSBoxForegroundPriorityRadioGroup.ItemIndex:=1;
-  For I:=0 to DOSBoxForegroundPriorityRadioGroup.Items.Count-1 do If ExtUpperCase(Priority[I])=S then begin
+  For I:=0 to DOSBoxForegroundPriorityRadioGroup.Items.Count-1 do If ExtUpperCase(FPriority[I])=S then begin
     DOSBoxForegroundPriorityRadioGroup.ItemIndex:=I;
     break;
   end;
   T:=Trim(ExtUpperCase(T));
   DOSBoxBackgroundPriorityRadioGroup.ItemIndex:=2;
-  For I:=0 to DOSBoxBackgroundPriorityRadioGroup.Items.Count-1 do If ExtUpperCase(Priority[I])=T then begin
+  For I:=0 to DOSBoxBackgroundPriorityRadioGroup.Items.Count-1 do If ExtUpperCase(BPriority[I])=T then begin
     DOSBoxBackgroundPriorityRadioGroup.ItemIndex:=I;
     break;
   end;
@@ -267,7 +271,7 @@ end;
 
 procedure TModernProfileEditorDOSBoxFrame.GetGame(const Game: TGame);
 begin
-  Game.Priority:=Priority[DOSBoxForegroundPriorityRadioGroup.ItemIndex]+','+Priority[DOSBoxBackgroundPriorityRadioGroup.ItemIndex];
+  Game.Priority:=FPriority[DOSBoxForegroundPriorityRadioGroup.ItemIndex]+','+BPriority[DOSBoxBackgroundPriorityRadioGroup.ItemIndex];
   Game.CloseDosBoxAfterGameExit:=CloseDOSBoxOnExitCheckBox.Checked;
   If DefaultDOSBoxInstallationRadioButton.Checked then begin
     Game.CustomDOSBoxDir:=PrgSetup.DOSBoxSettings[DOSBoxInstallationComboBox.ItemIndex].Name;

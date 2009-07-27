@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
+<!DOCTYPE DFRPackagesList SYSTEM "http://dfendreloaded.sourceforge.net/Packages/DFRPackagesList.dtd">
+
+<DFRPackagesList LastUpdateDate="09/09/2008">
+  <DFRPackagesFile URL="http://dfendreloaded.sourceforge.net/Packages/DFRFreeware.xml" />
+  <DFRPackagesFile URL="http://dfendreloaded.sourceforge.net/Packages/DFRAddons.xml" />
+</DFRPackagesList>

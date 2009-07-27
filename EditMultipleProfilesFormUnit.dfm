@@ -52,7 +52,7 @@ object EditMultipleProfilesForm: TEditMultipleProfilesForm
     Top = 0
     Width = 634
     Height = 475
-    ActivePage = TabSheet1
+    ActivePage = TabSheet2
     Align = alTop
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 0

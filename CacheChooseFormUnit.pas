@@ -31,7 +31,7 @@ Procedure ShowRestoreDeletedDialog(const AOwner : TComponent; const AProfileList
 
 implementation
 
-uses VistaToolsUnit, LanguageSetupUnit, CommonTools;
+uses VistaToolsUnit, LanguageSetupUnit, CommonTools, IconLoaderUnit;
 
 {$R *.dfm}
 
@@ -43,6 +43,8 @@ begin
   OKButton.Caption:=LanguageSetup.OK;
 
   RestoreDeletedMode:=False;
+
+  UserIconLoader.DialogImage(DI_OK,OKButton);
 end;
 
 procedure TCacheChooseForm.FormShow(Sender: TObject);

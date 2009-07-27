@@ -67,20 +67,13 @@ begin
   CDROMLabelEdit.EditLabel.Caption:=LanguageSetup.ProfileMountingLabel;
 
   CDROMDriveAccessLabel.Caption:=LanguageSetup.ProfileMountingCDROMAccess;
-  If PrgSetup.AllowMoreIOCTLSettings then begin
-    while CDROMDriveAccessComboBox.Items.Count<6 do CDROMDriveAccessComboBox.Items.Add('');
-    CDROMDriveAccessComboBox.Items[0]:=LanguageSetup.ProfileMountingCDROMAccessNormal;
-    CDROMDriveAccessComboBox.Items[1]:=LanguageSetup.ProfileMountingCDROMAccessIOCTL;
-    CDROMDriveAccessComboBox.Items[2]:=LanguageSetup.ProfileMountingCDROMAccessIOCTL_DX;
-    CDROMDriveAccessComboBox.Items[3]:=LanguageSetup.ProfileMountingCDROMAccessIOCTL_DIO;
-    CDROMDriveAccessComboBox.Items[4]:=LanguageSetup.ProfileMountingCDROMAccessIOCTL_MCI;
-    CDROMDriveAccessComboBox.Items[5]:=LanguageSetup.ProfileMountingCDROMAccessNOIOCTL;
-  end else begin
-    while CDROMDriveAccessComboBox.Items.Count<3 do CDROMDriveAccessComboBox.Items.Add('');
-    CDROMDriveAccessComboBox.Items[0]:=LanguageSetup.ProfileMountingCDROMAccessNormal;
-    CDROMDriveAccessComboBox.Items[1]:=LanguageSetup.ProfileMountingCDROMAccessIOCTL;
-    CDROMDriveAccessComboBox.Items[2]:=LanguageSetup.ProfileMountingCDROMAccessNOIOCTL;
-  end;
+  while CDROMDriveAccessComboBox.Items.Count<6 do CDROMDriveAccessComboBox.Items.Add('');
+  CDROMDriveAccessComboBox.Items[0]:=LanguageSetup.ProfileMountingCDROMAccessNormal;
+  CDROMDriveAccessComboBox.Items[1]:=LanguageSetup.ProfileMountingCDROMAccessIOCTL;
+  CDROMDriveAccessComboBox.Items[2]:=LanguageSetup.ProfileMountingCDROMAccessIOCTL_DX;
+  CDROMDriveAccessComboBox.Items[3]:=LanguageSetup.ProfileMountingCDROMAccessIOCTL_DIO;
+  CDROMDriveAccessComboBox.Items[4]:=LanguageSetup.ProfileMountingCDROMAccessIOCTL_MCI;
+  CDROMDriveAccessComboBox.Items[5]:=LanguageSetup.ProfileMountingCDROMAccessNOIOCTL;
   CDROMDriveAccessComboBox.ItemIndex:=0;
 
   UserIconLoader.DialogImage(DI_SelectFolder,CDROMButton);
@@ -154,14 +147,10 @@ begin
         S:=Trim(ExtUpperCase(St[3]));
         CDROMDriveAccessComboBox.ItemIndex:=0;
         If S='TRUE' then CDROMDriveAccessComboBox.ItemIndex:=1;
-        If PrgSetup.AllowMoreIOCTLSettings then begin
-          If S='DX' then CDROMDriveAccessComboBox.ItemIndex:=2;
-          If S='DIO' then CDROMDriveAccessComboBox.ItemIndex:=3;
-          If S='MCI' then CDROMDriveAccessComboBox.ItemIndex:=4;
-          If S='NOIOCTL' then CDROMDriveAccessComboBox.ItemIndex:=5;
-        end else begin
-          If S='NOIOCTL' then CDROMDriveAccessComboBox.ItemIndex:=2;
-        end;
+        If S='DX' then CDROMDriveAccessComboBox.ItemIndex:=2;
+        If S='DIO' then CDROMDriveAccessComboBox.ItemIndex:=3;
+        If S='MCI' then CDROMDriveAccessComboBox.ItemIndex:=4;
+        If S='NOIOCTL' then CDROMDriveAccessComboBox.ItemIndex:=5;
       end;
       If St.Count>=5 then begin
         CDROMLabelEdit.Text:=St[4];
@@ -188,24 +177,16 @@ function TProfileMountEditorCDDriveFrame.Done: String;
 Var S,T : String;
 begin
   {RealFolder;CDROM;Letter;IO;Label; (ASK /  NUMBER:x /  LABEL:x / FILE:x / FOLDER:x)}
-  If PrgSetup.AllowMoreIOCTLSettings then begin
-    Case CDROMDriveAccessComboBox.ItemIndex of
-      1 : S:='true';
-      2 : S:='dx';
-      3 : S:='dio';
-      4 : S:='mci';
-      5 : S:='NoIOCTL';
-      else S:='false';
-    end;
-  end else begin
-    Case CDROMDriveAccessComboBox.ItemIndex of
-      1 : S:='true';
-      2 : S:='NoIOCTL';
-      else S:='false';
-    end;
+  Case CDROMDriveAccessComboBox.ItemIndex of
+    1 : S:='true';
+    2 : S:='dx';
+    3 : S:='dio';
+    4 : S:='mci';
+    5 : S:='NoIOCTL';
+    else S:='false';
   end;
   Case CDMountTypeComboBox.ItemIndex of
-    0 : T:=CDROMEdit.Text;
+    0 : T:=MakeRelPath(CDROMEdit.Text,PrgSetup.BaseDir);
     1 : T:='NUMBER:'+IntToStr(CDDriveNumberEdit.Value);
     2 : T:='ASK';
     3 : T:='LABEL:'+CDLabelEdit.Text;

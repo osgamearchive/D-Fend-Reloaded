@@ -55,7 +55,6 @@ uses Math, VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgSetupUnit,
 { TWizardFinishFrame }
 
 procedure TWizardFinishFrame.Init(const GameDB: TGameDB);
-Var L : TListColumn;
 begin
   SetVistaFonts(self);
 

@@ -118,7 +118,7 @@ joysticktype=none
 [dosbox]
 memsize=32
 captures=.\Capture\
-machine=vga
+machine=svga_s3
 
 [serial]
 serial1=dummy

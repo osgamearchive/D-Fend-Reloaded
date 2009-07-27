@@ -98,17 +98,19 @@ implementation
 uses Math, VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgSetupUnit,
      IconLoaderUnit, LanguageEditorFormUnit, LanguageEditorStartFormUnit,
      HelpConsts, SetupFrameBaseUnit, SetupFrameDirectoriesUnit,
-     SetupFrameSurfaceUnit, SetupFrameLanguageUnit, SetupFrameToolbarUnit,
-     SetupFrameGamesListColumnsUnit, SetupFrameGamesListAppearanceUnit,
-     SetupFrameGamesListTreeAppearanceUnit, SetupFrameGamesListScreenshotAppearanceUnit,
-     SetupFrameProfileEditorUnit, SetupFrameDefaultValuesUnit,
-     SetupFrameProgramsUnit, SetupFrameDOSBoxUnit, SetupFrameDOSBoxExtUnit,
-     SetupFrameFreeDOSUnit, SetupFrameScummVMUnit, SetupFrameQBasicUnit,
-     SetupFrameWaveEncoderUnit, SetupFrameSecurityUnit, SetupFrameServiceUnit,
-     SetupFrameUpdateUnit, SetupFrameWineUnit, SetupFrameCompressionUnit,
-     SetupFrameGamesListScreenshotModeAppearanceUnit, SetupFrameEditorUnit,
-     SetupFrameViewerUnit, SetupFrameWindowsGamesUnit, SetupFrameZipPrgsUnit,
-     SetupFrameCustomLanguageStringsUnit, SetupFrameGameListIconModeAppearanceUnit;
+     SetupFrameSurfaceUnit, SetupFrameLanguageUnit, SetupFrameMenubarUnit,
+     SetupFrameToolbarUnit, SetupFrameGamesListColumnsUnit,
+     SetupFrameGamesListAppearanceUnit, SetupFrameGamesListTreeAppearanceUnit,
+     SetupFrameGamesListScreenshotAppearanceUnit, SetupFrameProfileEditorUnit,
+     SetupFrameDefaultValuesUnit, SetupFrameProgramsUnit, SetupFrameDOSBoxUnit,
+     SetupFrameDOSBoxExtUnit, SetupFrameFreeDOSUnit, SetupFrameScummVMUnit,
+     SetupFrameQBasicUnit, SetupFrameWaveEncoderUnit, SetupFrameSecurityUnit,
+     SetupFrameServiceUnit, SetupFrameUpdateUnit, SetupFrameWineUnit,
+     SetupFrameCompressionUnit, SetupFrameGamesListScreenshotModeAppearanceUnit,
+     SetupFrameEditorUnit, SetupFrameViewerUnit, SetupFrameWindowsGamesUnit,
+     SetupFrameZipPrgsUnit, SetupFrameCustomLanguageStringsUnit,
+     SetupFrameGameListIconModeAppearanceUnit, SetupFrameUserInterpreterFrameUnit,
+     SetupFrameImageScalingUnit;
 
 {$R *.dfm}
 
@@ -144,6 +146,10 @@ begin
 
   UserIconLoader.DirectLoad(ImageList,'SetupForm');
   UserIconLoader.DialogImage(DI_ResetDefault,RestoreDefaultValuesButton);
+  UserIconLoader.DialogImage(DI_OK,OKButton);
+  UserIconLoader.DialogImage(DI_Cancel,CancelButton);
+  UserIconLoader.DialogImage(DI_Help,HelpButton);
+
   InitFramesList;
   LoadLanguage;
 
@@ -182,7 +188,11 @@ begin
   Frames[C].IsEmpty:=IsEmpty;
   NewFrame.DoubleBuffered:=True;
   NewFrame.Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName);
-  NewFrameInterface.InitGUIAndLoadSetup(InitData);
+  try
+    NewFrameInterface.InitGUIAndLoadSetup(InitData);
+  except
+    on E : Exception do MessageDlg(E.Message,mtError,[mbOk],0);
+  end;
 end;
 
 procedure TSetupForm.InitFramesList;
@@ -197,15 +207,17 @@ begin
   F:=TSetupFrameSurface.Create(self); AddTreeNode(nil,F,TSetupFrameSurface(F),False,12); Root:=F; IconSetFrame:=F;
   F:=TSetupFrameLanguage.Create(self); AddTreeNode(Root,F,TSetupFrameLanguage(F),False,2,True); LanguageFrame:=F; Root2:=F;
   F:=TSetupFrameCustomLanguageStrings.Create(self); AddTreeNode(Root2,F,TSetupFrameCustomLanguageStrings(F),True,3,False);
+  F:=TSetupFrameMenubar.Create(self); AddTreeNode(Root,F,TSetupFrameMenubar(F),True,13);
   F:=TSetupFrameToolbar.Create(self); AddTreeNode(Root,F,TSetupFrameToolbar(F),True,13); ToolbarFrame:=F;
   F:=TSetupFrameGamesListTreeAppearance.Create(self); AddTreeNode(Root,F,TSetupFrameGamesListTreeAppearance(F),True,22); TreeListFrame:=F;
   F:=TSetupFrameGamesListAppearance.Create(self); AddTreeNode(Root,F,TSetupFrameGamesListAppearance(F),True,3); Root2:=F;
   F:=TSetupFrameGamesListColumns.Create(self); AddTreeNode(Root2,F,TSetupFrameGamesListColumns(F),True,3);
   F:=TSetupFrameGamesListScreenshotModeAppearance.Create(self); AddTreeNode(Root2,F,TSetupFrameGamesListScreenshotModeAppearance(F),True,20);
-  If PrgSetup.ActivateIncompleteFeatures then begin
-    F:=TSetupFrameGameListIconModeAppearance.Create(self); AddTreeNode(Root2,F,TSetupFrameGameListIconModeAppearance(F),True,21);
-  end;
+  F:=TSetupFrameGameListIconModeAppearance.Create(self); AddTreeNode(Root2,F,TSetupFrameGameListIconModeAppearance(F),True,21);
   F:=TSetupFrameGamesListScreenshotAppearance.Create(self); AddTreeNode(Root,F,TSetupFrameGamesListScreenshotAppearance(F),True,18);
+  If PrgSetup.ActivateIncompleteFeatures then begin
+    F:=TSetupFrameImageScaling.Create(self); AddTreeNode(Root,F,TSetupFrameImageScaling(F),True,18);
+  end;
 
   F:=TSetupFrameProfileEditor.Create(self); AddTreeNode(nil,F,TSetupFrameProfileEditor(F),True,8); Root:=F;
   F:=TSetupFrameDefaultValues.Create(self); AddTreeNode(Root,F,TSetupFrameDefaultValues(F),True,6);
@@ -216,6 +228,7 @@ begin
   F:=TSetupFrameFreeDOS.Create(self); AddTreeNode(Root,F,TSetupFrameFreeDOS(F),False,15,True);
   F:=TSetupFrameScummVM.Create(self); AddTreeNode(Root,F,TSetupFrameScummVM(F),False,10);
   F:=TSetupFrameQBasic.Create(self); AddTreeNode(Root,F,TSetupFrameQBasic(F),False,11);
+  F:=TSetupFrameUserInterpreterFrame.Create(self); AddTreeNode(Root,F,TSetupFrameUserInterpreterFrame(F),True,23);
   F:=TSetupFrameWaveEncoder.Create(self); AddTreeNode(Root,F,TSetupFrameWaveEncoder(F),False,9,False);
   F:=TSetupFrameZipPrgs.Create(self); AddTreeNode(Root,F,TSetupFrameZipPrgs(F),True,16,False);
   F:=TSetupFrameEditor.Create(self); AddTreeNode(Root,F,TSetupFrameEditor(F),True,17,False);

@@ -17,7 +17,9 @@ object IconManagerForm: TIconManagerForm
   OldCreateOrder = False
   Position = poOwnerFormCenter
   OnCreate = FormCreate
+  OnDestroy = FormDestroy
   OnKeyDown = FormKeyDown
+  OnResize = FormResize
   OnShow = FormShow
   DesignSize = (
     551
@@ -55,7 +57,6 @@ object IconManagerForm: TIconManagerForm
     Anchors = [akLeft, akTop, akRight, akBottom]
     Columns = <>
     HideSelection = False
-    IconOptions.Arrangement = iaLeft
     IconOptions.AutoArrange = True
     LargeImages = ImageList
     ReadOnly = True
@@ -65,6 +66,7 @@ object IconManagerForm: TIconManagerForm
     OnChange = ListViewChange
     OnClick = ListViewClick
     OnDblClick = ListViewDblClick
+    OnDragDrop = ListViewDragDrop
     OnKeyDown = ListViewKeyDown
   end
   object OKButton: TBitBtn
@@ -183,5 +185,26 @@ object IconManagerForm: TIconManagerForm
     DefaultExt = 'ico'
     Left = 488
     Top = 277
+  end
+  object Timer: TTimer
+    Enabled = False
+    Interval = 500
+    OnTimer = TimerTimer
+    Left = 464
+    Top = 248
+  end
+  object PopupMenu: TPopupMenu
+    Left = 424
+    Top = 272
+    object PopupAddIcon: TMenuItem
+      Tag = 1
+      Caption = 'Add single icon'
+      OnClick = AddButtonClick
+    end
+    object PopupAddAllIcons: TMenuItem
+      Tag = 2
+      Caption = 'Scan games folder and add all icons'
+      OnClick = AddButtonClick
+    end
   end
 end

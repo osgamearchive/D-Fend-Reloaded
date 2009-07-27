@@ -58,6 +58,9 @@ begin
   SaveDialog.Title:=LanguageSetup.BuildInstallerDestFileTitle;
   SaveDialog.Filter:=LanguageSetup.BuildInstallerDestFileFilter;
   UserIconLoader.DialogImage(DI_SelectFile,DestFileButton);
+  UserIconLoader.DialogImage(DI_OK,OKButton);
+  UserIconLoader.DialogImage(DI_Cancel,CancelButton);
+  UserIconLoader.DialogImage(DI_Help,HelpButton);
 end;
 
 procedure TBuildInstallerForSingleGameForm.FormShow(Sender: TObject);
@@ -78,8 +81,6 @@ end;
 function TBuildInstallerForSingleGameForm.BuildNSIScript: Boolean;
 Var NSIFileName : String;
     St : TStringList;
-    I,J : Integer;
-    S : String;
 begin
   result:=False;
   NSIFileName:=Trim(DestFileEdit.Text);

@@ -25,7 +25,8 @@ Procedure ShowListScummVMGamesDialog(const AOwner : TComponent);
 
 implementation
 
-uses VistaToolsUnit, LanguageSetupUnit, CommonTools, ScummVMToolsUnit;
+uses VistaToolsUnit, LanguageSetupUnit, CommonTools, ScummVMToolsUnit,
+     IconLoaderUnit;
 
 {$R *.dfm}
 
@@ -37,6 +38,8 @@ begin
 
   Caption:=LanguageSetup.MenuHelpScummVMCompatibilityListCaption;
   CloseButton.Caption:=LanguageSetup.Close;
+
+  UserIconLoader.DialogImage(DI_Close,CloseButton);
 
   If ScummVMGamesList.Count=0 then ScummVMGamesList.LoadListFromScummVM(True);
   ListBox.Items.AddStrings(ScummVMGamesList.DescriptionList);

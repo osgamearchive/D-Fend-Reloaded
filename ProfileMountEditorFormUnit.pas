@@ -66,7 +66,7 @@ uses LanguageSetupUnit, VistaToolsUnit, CommonTools, PrgSetupUnit,
      ProfileMountEditorCDDriveFrameUnit, ProfileMountEditorFloppyImage1FrameUnit,
      ProfileMountEditorFloppyImage2FrameUnit, ProfileMountEditorCDImageFrameUnit,
      ProfileMountEditorHDImageFrameUnit, ProfileMountEditorPhysFSFrameUnit,
-     ProfileMountEditorZipFrameUnit, HelpConsts;
+     ProfileMountEditorZipFrameUnit, HelpConsts, IconLoaderUnit;
 
 {$R *.dfm}
 
@@ -83,6 +83,10 @@ begin
   OKButton.Caption:=LanguageSetup.OK;
   CancelButton.Caption:=LanguageSetup.Cancel;
   HelpButton.Caption:=LanguageSetup.Help;
+
+  UserIconLoader.DialogImage(DI_OK,OKButton);
+  UserIconLoader.DialogImage(DI_Cancel,CancelButton);
+  UserIconLoader.DialogImage(DI_Help,HelpButton);
 end;
 
 procedure TProfileMountEditorForm.AddFrame(const Frame : TFrame; const FrameI: TProfileMountEditorFrame);

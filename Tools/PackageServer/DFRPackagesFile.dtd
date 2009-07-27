@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!ELEMENT DFRPackagesFile (Game | AutoSetup | Language | ExePackage | Icon | IconSet)+>
+<!ATTLIST DFRPackagesFile
+	Name CDATA #REQUIRED
+	LastUpdateDate CDATA #REQUIRED
+>
+
+<!ELEMENT Game (#PCDATA)>
+<!ATTLIST Game
+	Name CDATA #REQUIRED
+	Genre CDATA #REQUIRED
+	Developer CDATA #REQUIRED
+	Publisher CDATA #REQUIRED
+	Year CDATA #REQUIRED
+	Language CDATA #REQUIRED
+	License CDATA #REQUIRED
+	FileChecksum CDATA #REQUIRED
+	Size CDATA #REQUIRED
+>
+
+<!ELEMENT AutoSetup (#PCDATA)>
+<!ATTLIST AutoSetup
+	Name CDATA #REQUIRED
+	Genre CDATA #REQUIRED
+	Developer CDATA #REQUIRED
+	Publisher CDATA #REQUIRED
+	Year CDATA #REQUIRED
+	Language CDATA #REQUIRED
+	FileChecksum CDATA #REQUIRED
+	Size CDATA #REQUIRED
+>
+
+<!ELEMENT Language (#PCDATA)>
+<!ATTLIST Language
+	Name CDATA #REQUIRED
+	Version CDATA #REQUIRED
+	Author CDATA #REQUIRED
+	FileChecksum CDATA #REQUIRED
+	Size CDATA #REQUIRED
+>
+
+<!ELEMENT ExePackage (#PCDATA)>
+<!ATTLIST ExePackage
+	Name CDATA #REQUIRED
+	Description CDATA #REQUIRED
+	FileChecksum CDATA #REQUIRED
+	Size CDATA #REQUIRED
+>
+
+<!ELEMENT Icon (#PCDATA)>
+<!ATTLIST Icon
+	Name CDATA #REQUIRED
+	FileChecksum CDATA #REQUIRED
+	Size CDATA #REQUIRED
+>
+
+<!ELEMENT IconSet (#PCDATA)>
+<!ATTLIST IconSet
+	Name CDATA #REQUIRED
+	Version CDATA #REQUIRED
+	Author CDATA #REQUIRED
+	FileChecksum CDATA #REQUIRED
+	Size CDATA #REQUIRED
+>

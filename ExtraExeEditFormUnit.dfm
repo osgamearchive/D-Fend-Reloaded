@@ -3,7 +3,7 @@ object ExtraExeEditForm: TExtraExeEditForm
   Top = 0
   BorderStyle = bsDialog
   Caption = 'ExtraExeEditForm'
-  ClientHeight = 374
+  ClientHeight = 402
   ClientWidth = 645
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -19,14 +19,14 @@ object ExtraExeEditForm: TExtraExeEditForm
   OnShow = FormShow
   DesignSize = (
     645
-    374)
+    402)
   PixelsPerInch = 96
   TextHeight = 13
   object InfoLabel: TLabel
     Left = 8
     Top = 302
     Width = 629
-    Height = 36
+    Height = 65
     Anchors = [akLeft, akTop, akRight]
     AutoSize = False
     Caption = 'InfoLabel'
@@ -34,7 +34,7 @@ object ExtraExeEditForm: TExtraExeEditForm
   end
   object OKButton: TBitBtn
     Left = 8
-    Top = 341
+    Top = 373
     Width = 97
     Height = 25
     TabOrder = 0
@@ -43,7 +43,7 @@ object ExtraExeEditForm: TExtraExeEditForm
   end
   object CancelButton: TBitBtn
     Left = 111
-    Top = 341
+    Top = 373
     Width = 97
     Height = 25
     TabOrder = 1
@@ -63,15 +63,11 @@ object ExtraExeEditForm: TExtraExeEditForm
   end
   object HelpButton: TBitBtn
     Left = 214
-    Top = 341
+    Top = 373
     Width = 97
     Height = 25
     TabOrder = 3
     OnClick = HelpButtonClick
     Kind = bkHelp
-  end
-  object OpenDialog: TOpenDialog
-    Left = 608
-    Top = 7
   end
 end

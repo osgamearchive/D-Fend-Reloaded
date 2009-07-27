@@ -88,6 +88,9 @@ begin
   UserIconLoader.DialogImage(DI_Down,MoveDownButton);
   UserIconLoader.DialogImage(DI_Import,ImportButton);
   UserIconLoader.DialogImage(DI_Export,ExportButton);
+  UserIconLoader.DialogImage(DI_OK,OKButton);
+  UserIconLoader.DialogImage(DI_Cancel,CancelButton);
+  UserIconLoader.DialogImage(DI_Help,HelpButton);
 
   FormResize(Sender);
 end;

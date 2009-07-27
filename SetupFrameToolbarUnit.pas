@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, 
-  Dialogs, StdCtrls, Spin, Buttons, SetupFormUnit, CheckLst;
+  Dialogs, StdCtrls, Spin, Buttons, CheckLst, SetupFormUnit;
 
 type
   TSetupFrameToolbar = class(TFrame, ISetupFrame)
@@ -67,7 +67,7 @@ begin
   ShowToolbarCheckBox.Checked:=PrgSetup.ShowToolbar;
   ShowToolbarCaptionsCheckBox.Checked:=PrgSetup.ShowToolbarTexts;
 
-  If ButtonsListBox.Items.Count=0 then for I:=0 to 6 do ButtonsListBox.Items.Add('');
+  If ButtonsListBox.Items.Count=0 then for I:=0 to 7 do ButtonsListBox.Items.Add('');
   ButtonsListBox.Checked[0]:=PrgSetup.ShowToolbarButtonClose;
   ButtonsListBox.Checked[1]:=PrgSetup.ShowToolbarButtonRun;
   ButtonsListBox.Checked[2]:=PrgSetup.ShowToolbarButtonRunSetup;
@@ -75,6 +75,7 @@ begin
   ButtonsListBox.Checked[4]:=PrgSetup.ShowToolbarButtonEdit;
   ButtonsListBox.Checked[5]:=PrgSetup.ShowToolbarButtonDelete;
   ButtonsListBox.Checked[6]:=PrgSetup.ShowSearchBox;
+  ButtonsListBox.Checked[7]:=PrgSetup.ShowToolbarButtonHelp;
 
   AddButtonFunctionComboBox.ItemIndex:=Min(2,Max(0,PrgSetup.AddButtonFunction));
   ToolbarImageCheckBox.Checked:=Trim(PrgSetup.ToolbarBackground)<>'';
@@ -102,6 +103,7 @@ begin
   ButtonsListBox.Items[4]:=RemoveUnderline(LanguageSetup.ButtonEdit);
   ButtonsListBox.Items[5]:=RemoveUnderline(LanguageSetup.ButtonDelete);
   ButtonsListBox.Items[6]:=RemoveUnderline(LanguageSetup.MenuViewShowSearchBox);
+  ButtonsListBox.Items[7]:=RemoveUnderline(LanguageSetup.ButtonHelp);
   AddButtonFunctionLabel.Caption:=LanguageSetup.SetupFormAddButtonFunctionLabel;
   I:=AddButtonFunctionComboBox.ItemIndex;
   AddButtonFunctionComboBox.Items[0]:=LanguageSetup.SetupFormAddButtonFunctionAdd;
@@ -138,6 +140,7 @@ begin
   ButtonsListBox.Checked[4]:=True;
   ButtonsListBox.Checked[5]:=True;
   ButtonsListBox.Checked[6]:=True;
+  ButtonsListBox.Checked[7]:=True;
   AddButtonFunctionComboBox.ItemIndex:=2;
   ToolbarImageCheckBox.Checked:=False;
   ToolbarImageEdit.Text:='';
@@ -155,6 +158,7 @@ begin
   PrgSetup.ShowToolbarButtonEdit:=ButtonsListBox.Checked[4];
   PrgSetup.ShowToolbarButtonDelete:=ButtonsListBox.Checked[5];
   PrgSetup.ShowSearchBox:=ButtonsListBox.Checked[6];
+  PrgSetup.ShowToolbarButtonHelp:=ButtonsListBox.Checked[7];
   PrgSetup.AddButtonFunction:=AddButtonFunctionComboBox.ItemIndex;
   If ToolbarImageCheckBox.Checked then PrgSetup.ToolbarBackground:=ToolbarImageEdit.Text else PrgSetup.ToolbarBackground:='';
   PrgSetup.ToolbarFontSize:=ToolbarFontSizeEdit.Value;

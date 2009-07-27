@@ -75,6 +75,7 @@ Type TPackerSetting=class
 Type TPrgSetup=class(TBasePrgSetup)
   private
     FDOSBox, FPacker : TList;
+    FUserInterpretersPrograms, FUserInterpretersParameters, FUserInterpretersExtensions : TStringList;
     Procedure ReadSettings;
     Procedure InitDirs;
     Procedure DoneDirs;
@@ -84,6 +85,8 @@ Type TPrgSetup=class(TBasePrgSetup)
     Procedure DeleteOldDOSBoxSettings;
     Procedure LoadPackerSettings;
     Procedure DeleteOldPackerSettings;
+    Procedure LoadUserInterpreterSettings;
+    Procedure SaveUserInterpreterSettings;
     Function GetListCount(Index : Integer) : Integer;
     Function GetDOSBoxSettings(I : Integer) : TDOSBoxSetting;
     Function GetPackerSettings(I : Integer) : TPackerSetting;
@@ -140,7 +143,10 @@ Type TPrgSetup=class(TBasePrgSetup)
     property CaptureDir : String index 38 read GetString write SetString;
     property IconSet : String index 39 read GetString write SetString;
 
-    property LinuxRemap[DriveLetter : Char]  : String read GetDriveLetter write SetDriveLetter;
+    property LinuxRemap[DriveLetter : Char] : String read GetDriveLetter write SetDriveLetter;
+    property UserInterpretersPrograms : TStringList read FUserInterpretersPrograms;
+    property UserInterpretersParameters : TStringList read FUserInterpretersParameters;
+    property UserInterpretersExtensions : TStringList read FUserInterpretersExtensions;
 
     property AskBeforeDelete : Boolean index 0 read GetBoolean write SetBoolean;
     property ReopenLastProfileEditorTab : Boolean index 1 read GetBoolean write SetBoolean;
@@ -183,34 +189,38 @@ Type TPrgSetup=class(TBasePrgSetup)
     property ShowToolbarButtonAdd : Boolean index 38 read GetBoolean write SetBoolean;
     property ShowToolbarButtonEdit : Boolean index 39 read GetBoolean write SetBoolean;
     property ShowToolbarButtonDelete : Boolean index 40 read GetBoolean write SetBoolean;
-    property RestoreWhenDOSBoxCloses : Boolean index 41 read GetBoolean write SetBoolean;
-    property FavoritesBold : Boolean index 42 read GetBoolean write SetBoolean;
-    property FavoritesItalic : Boolean index 43 read GetBoolean write SetBoolean;
-    property FavoritesUnderline : Boolean index 44 read GetBoolean write SetBoolean;
-    property ScreenshotListUseFirstScreenshot : Boolean index 45 read GetBoolean write SetBoolean;
-    property FullscreenInfo : Boolean index 46 read GetBoolean write SetBoolean;
-    property GridLinesInGamesList : Boolean index 47 read GetBoolean write SetBoolean;
-    property QuickStarterMaximized : Boolean index 48 read GetBoolean write SetBoolean;
-    property QuickStarterDOSBoxFullscreen : Boolean index 49 read GetBoolean write SetBoolean;
-    property QuickStarterDOSBoxAutoClose : Boolean index 50 read GetBoolean write SetBoolean;
-    property FileTypeFallbackForEditor : Boolean index 51 read GetBoolean write SetBoolean;
-    property AutoFixLineWrap : Boolean index 52 read GetBoolean write SetBoolean;
-    property CenterScummVMWindow : Boolean index 53 read GetBoolean write SetBoolean;
-    property HideScummVMConsole : Boolean index 54 read GetBoolean write SetBoolean;
-    property ShowShortNameWarnings : Boolean index 55 read GetBoolean write SetBoolean;
-    property RestoreWhenScummVMCloses : Boolean index 56 read GetBoolean write SetBoolean;
-    property UseWindowsExeIcons : Boolean index 57 read GetBoolean write SetBoolean;
-    property MinimizeOnWindowsGameStart : Boolean index 58 read GetBoolean write SetBoolean;
-    property RestoreWhenWindowsGameCloses : Boolean index 59 read GetBoolean write SetBoolean;
-    property RestoreFilter : Boolean index 60 read GetBoolean write SetBoolean;
-    property AllowSecureMode : Boolean index 61 read GetBoolean write SetBoolean;
-    property AllowMoreIOCTLSettings : Boolean index 62 read GetBoolean write SetBoolean;
-    property AllowCPUType : Boolean index 63 read GetBoolean write SetBoolean;
-    property AllowPixelShader : Boolean index 64 read GetBoolean write SetBoolean;
-    property StoreColumnWidths : Boolean index 65 read GetBoolean write SetBoolean;
-    property ActivateIncompleteFeatures : Boolean index 66 read GetBoolean write SetBoolean;
-    property RenameProfFileOnRenamingProfile : Boolean index 67 read GetBoolean write SetBoolean;
-    property ScanFolderAllGames : Boolean index 68 read GetBoolean write SetBoolean;
+    property ShowToolbarButtonHelp : Boolean index 41 read GetBoolean write SetBoolean;
+    property RestoreWhenDOSBoxCloses : Boolean index 42 read GetBoolean write SetBoolean;
+    property FavoritesBold : Boolean index 43 read GetBoolean write SetBoolean;
+    property FavoritesItalic : Boolean index 44 read GetBoolean write SetBoolean;
+    property FavoritesUnderline : Boolean index 45 read GetBoolean write SetBoolean;
+    property ScreenshotListUseFirstScreenshot : Boolean index 46 read GetBoolean write SetBoolean;
+    property FullscreenInfo : Boolean index 47 read GetBoolean write SetBoolean;
+    property GridLinesInGamesList : Boolean index 48 read GetBoolean write SetBoolean;
+    property QuickStarterMaximized : Boolean index 49 read GetBoolean write SetBoolean;
+    property QuickStarterDOSBoxFullscreen : Boolean index 50 read GetBoolean write SetBoolean;
+    property QuickStarterDOSBoxAutoClose : Boolean index 51 read GetBoolean write SetBoolean;
+    property FileTypeFallbackForEditor : Boolean index 52 read GetBoolean write SetBoolean;
+    property AutoFixLineWrap : Boolean index 53 read GetBoolean write SetBoolean;
+    property CenterScummVMWindow : Boolean index 54 read GetBoolean write SetBoolean;
+    property HideScummVMConsole : Boolean index 55 read GetBoolean write SetBoolean;
+    property ShowShortNameWarnings : Boolean index 56 read GetBoolean write SetBoolean;
+    property RestoreWhenScummVMCloses : Boolean index 57 read GetBoolean write SetBoolean;
+    property UseWindowsExeIcons : Boolean index 58 read GetBoolean write SetBoolean;
+    property MinimizeOnWindowsGameStart : Boolean index 59 read GetBoolean write SetBoolean;
+    property RestoreWhenWindowsGameCloses : Boolean index 60 read GetBoolean write SetBoolean;
+    property RestoreFilter : Boolean index 61 read GetBoolean write SetBoolean;
+    property AllowPixelShader : Boolean index 62 read GetBoolean write SetBoolean;
+    property StoreColumnWidths : Boolean index 63 read GetBoolean write SetBoolean;
+    property RenameProfFileOnRenamingProfile : Boolean index 64 read GetBoolean write SetBoolean;
+    property ScanFolderAllGames : Boolean index 65 read GetBoolean write SetBoolean;
+    property ScanFolderUseFileName : Boolean index 66 read GetBoolean write SetBoolean;
+    property ShowAddGameInfoOnEmptyGamesList : Boolean index 67 read GetBoolean write SetBoolean;
+    property RestorePreviewerCategory : Boolean index 68 read GetBoolean write SetBoolean;
+    property ShowMainMenu : Boolean index 69 read GetBoolean write SetBoolean;
+    property IgnoreDirectoryCollisions : Boolean index 70 read GetBoolean write SetBoolean;
+    property ActivateIncompleteFeatures : Boolean index 71 read GetBoolean write SetBoolean;
+    property ActivateIncomplete09Features : Boolean index 72 read GetBoolean write SetBoolean;
 
     property MainLeft : Integer index 0 read GetInteger write SetInteger;
     property MainTop : Integer index 1 read GetInteger write SetInteger;
@@ -239,6 +249,8 @@ Type TPrgSetup=class(TBasePrgSetup)
     property LastWizardMode : Integer index 24 read GetInteger write SetInteger;
     property IconSize : Integer index 25 read GetInteger write SetInteger;
     property ImageFilter : Integer index 26 read GetInteger write SetInteger;
+    property NoteLinesInTooltips : Integer index 27 read GetInteger write SetInteger;
+    property PreviewerCategory : Integer index 28 read GetInteger write SetInteger;
 
     property DOSBoxSettingsCount : Integer index 0 read GetListCount;
     property DOSBoxSettings[I : Integer] : TDOSBoxSetting read GetDOSBoxSettings;
@@ -259,7 +271,7 @@ Procedure InitDOSBoxData(var DOSBoxData : TDOSBoxData);
 
 implementation
 
-uses ShlObj, SysUtils, Forms, CommonTools, PrgConsts, GameDBToolsUnit;
+uses ShlObj, SysUtils, Forms, Math, CommonTools, PrgConsts, GameDBToolsUnit;
 
 { TDOSBoxSetting }
 
@@ -401,8 +413,12 @@ begin
 
   FDOSBox:=TList.Create;
   FPacker:=TList.Create;
+  FUserInterpretersPrograms:=TStringList.Create;
+  FUserInterpretersParameters:=TStringList.Create;
+  FUserInterpretersExtensions:=TStringList.Create;
   LoadDOSBoxSettings;
   LoadPackerSettings;
+  LoadUserInterpreterSettings;
 end;
 
 destructor TPrgSetup.Destroy;
@@ -415,6 +431,11 @@ begin
   DeleteOldPackerSettings;
   For I:=0 to FPacker.Count-1 do TPackerSetting(FPacker[I]).Free;
   FPacker.Free;
+
+  SaveUserInterpreterSettings;
+  FUserInterpretersPrograms.Free;
+  FUserInterpretersParameters.Free;
+  FUserInterpretersExtensions.Free;
 
   DoneDirs;
   inherited Destroy;
@@ -456,6 +477,44 @@ begin
   While MemIni.SectionExists('Packer-'+IntToStr(I)) do begin
     MemIni.EraseSection('Packer-'+IntToStr(I));
     Inc(I);
+  end;
+end;
+
+Procedure TPrgSetup.LoadUserInterpreterSettings;
+Var I : Integer;
+    S,T,U : String;
+begin
+  For I:=0 to 99 do begin
+    S:=Trim(GetString(500+I));
+    T:=Trim(GetString(600+I));
+    U:=Trim(GetString(700+I));
+    If (S<>'') or (T<>'') or (U<>'') then begin
+      If (OperationMode=omPortable) and (S<>'') then S:=MakeExtAbsPath(S,PrgDir);
+      FUserInterpretersPrograms.Add(S);
+      FUserInterpretersParameters.Add(T);
+      FUserInterpretersExtensions.Add(U);
+    end;
+  end;
+end;
+
+Procedure TPrgSetup.SaveUserInterpreterSettings;
+Var I,M : Integer;
+    S,T,U : String;
+begin
+  M:=Max(Max(FUserInterpretersPrograms.Count,FUserInterpretersParameters.Count),FUserInterpretersExtensions.Count);
+  For I:=0 to M-1 do begin
+    If I<FUserInterpretersPrograms.Count then S:=Trim(FUserInterpretersPrograms[I]) else S:='';
+    If I<FUserInterpretersParameters.Count then T:=Trim(FUserInterpretersParameters[I]) else T:='';
+    If I<FUserInterpretersExtensions.Count then U:=Trim(FUserInterpretersExtensions[I]) else U:='';
+    If (OperationMode=omPortable) and (S<>'') then S:=MakeExtRelPath(S,PrgDir);
+    SetString(500+I,S);
+    SetString(600+I,T);
+    SetString(700+I,U);
+  end;
+  For I:=M to 99 do begin
+    SetString(500+I,'');
+    SetString(600+I,'');
+    SetString(700+I,'');
   end;
 end;
 
@@ -503,6 +562,10 @@ begin
   AddStringRec(38,'ProgramSets','CaptureDefaultPath','.\'+CaptureSubDir+'\');
   AddStringRec(39,'ProgramSets','IconSet','Modern');
 
+  For I:=0 to 99 do AddStringRec(500+I,'Interpreters','Program'+IntToStr(I+1),'');
+  For I:=0 to 99 do AddStringRec(600+I,'Interpreters','Parameters'+IntToStr(I+1),'');
+  For I:=0 to 99 do AddStringRec(700+I,'Interpreters','Extensions'+IntToStr(I+1),'');
+
   For I:=0 to 25 do AddStringRec(1000+I,'WineSupport',chr(ord('A')+I),'');
 
   AddBooleanRec(0,'ProgramSets','AskBeforeDelete',True);
@@ -546,34 +609,38 @@ begin
   AddBooleanRec(38,'ProgramSets','ShowToolbarButtonAdd',True);
   AddBooleanRec(39,'ProgramSets','ShowToolbarButtonEdit',True);
   AddBooleanRec(40,'ProgramSets','ShowToolbarButtonDelete',True);
-  AddBooleanRec(41,'ProgramSets','RestoreWindowWhenDOSBoxCloses',False);
-  AddBooleanRec(42,'ProgramSets','Favorites.Bold',True);
-  AddBooleanRec(43,'ProgramSets','Favorites.Italic',False);
-  AddBooleanRec(44,'ProgramSets','Favorites.Underline',False);
-  AddBooleanRec(45,'ProgramSets','ScreenshotsGamesList.UseFirstScreenshot',True);
-  AddBooleanRec(46,'ProgramSets','ShowFullscreenInfo',True);
-  AddBooleanRec(47,'ProgramSets','GridLinesInGamesList',False);
-  AddBooleanRec(48,'ProgramSets','QuickStarterMaximized',False);
-  AddBooleanRec(49,'ProgramSets','QuickStarterDOSBoxFullscreen',False);
-  AddBooleanRec(50,'ProgramSets','QuickStarterDOSBoxAutoClose',True);
-  AddBooleanRec(51,'ProgramSets','FileTypeFallbackForEditor',True);
-  AddBooleanRec(52,'ProgramSets','AutoFixLineWrap',False);
-  AddBooleanRec(53,'ProgramSets','CenterScummVMWindow',False);
-  AddBooleanRec(54,'ProgramSets','HideScummVMConsole',False);
-  AddBooleanRec(55,'ProgramSets','ShowShortNameWarnings',True);
-  AddBooleanRec(56,'ProgramSets','RestoreWhenScummVMCloses',False);
-  AddBooleanRec(57,'ProgramSets','UseWindowsExeIcons',True);
-  AddBooleanRec(58,'ProgramSets','MinimizeOnWindowsGameStart',False);
-  AddBooleanRec(59,'ProgramSets','RestoreWhenWindowsGameCloses',False);
-  AddBooleanRec(60,'ProgramSets','RestoreFilter',True);
-  AddBooleanRec(61,'ProgramSets','AllowSecureMode',False);
-  AddBooleanRec(62,'ProgramSets','AllowMoreIOCTLSettings',False);
-  AddBooleanRec(63,'ProgramSets','AllowCPUType',False);
-  AddBooleanRec(64,'ProgramSets','AllowPixelShader',False);
-  AddBooleanRec(65,'ProgramSets','StoreColWidths',False);
-  AddBooleanRec(66,'ProgramSets','ActivateIncompleteFeatures',False);
-  AddBooleanRec(67,'ProgramSets','RenameProfFileOnRenamingProfile',False);
-  AddBooleanRec(68,'ProgramSets','ScanFolderAllGames',False);
+  AddBooleanRec(41,'ProgramSets','ShowToolbarButtonHelp',True);
+  AddBooleanRec(42,'ProgramSets','RestoreWindowWhenDOSBoxCloses',False);
+  AddBooleanRec(43,'ProgramSets','Favorites.Bold',True);
+  AddBooleanRec(44,'ProgramSets','Favorites.Italic',False);
+  AddBooleanRec(45,'ProgramSets','Favorites.Underline',False);
+  AddBooleanRec(46,'ProgramSets','ScreenshotsGamesList.UseFirstScreenshot',True);
+  AddBooleanRec(47,'ProgramSets','ShowFullscreenInfo',True);
+  AddBooleanRec(48,'ProgramSets','GridLinesInGamesList',False);
+  AddBooleanRec(49,'ProgramSets','QuickStarterMaximized',False);
+  AddBooleanRec(50,'ProgramSets','QuickStarterDOSBoxFullscreen',False);
+  AddBooleanRec(51,'ProgramSets','QuickStarterDOSBoxAutoClose',True);
+  AddBooleanRec(52,'ProgramSets','FileTypeFallbackForEditor',True);
+  AddBooleanRec(53,'ProgramSets','AutoFixLineWrap',False);
+  AddBooleanRec(54,'ProgramSets','CenterScummVMWindow',False);
+  AddBooleanRec(55,'ProgramSets','HideScummVMConsole',False);
+  AddBooleanRec(56,'ProgramSets','ShowShortNameWarnings',True);
+  AddBooleanRec(57,'ProgramSets','RestoreWhenScummVMCloses',False);
+  AddBooleanRec(58,'ProgramSets','UseWindowsExeIcons',True);
+  AddBooleanRec(59,'ProgramSets','MinimizeOnWindowsGameStart',False);
+  AddBooleanRec(60,'ProgramSets','RestoreWhenWindowsGameCloses',False);
+  AddBooleanRec(61,'ProgramSets','RestoreFilter',True);
+  AddBooleanRec(62,'ProgramSets','AllowPixelShader',False);
+  AddBooleanRec(63,'ProgramSets','StoreColWidths',False);
+  AddBooleanRec(64,'ProgramSets','RenameProfFileOnRenamingProfile',False);
+  AddBooleanRec(65,'ProgramSets','ScanFolderAllGames',False);
+  AddBooleanRec(66,'ProgramSets','ScanFolderUseFileName',True);
+  AddBooleanRec(67,'ProgramSets','ShowAddGameInfoOnEmptyGamesList',True);
+  AddBooleanRec(68,'ProgramSets','RestorePreviewerCategory',True);
+  AddBooleanRec(69,'ProgramSets','ShowMainMenu',True);
+  AddBooleanRec(70,'ProgramSets','IgnoreDirectoryCollisions',False);
+  AddBooleanRec(71,'ProgramSets','ActivateIncompleteFeatures',False);
+  AddBooleanRec(72,'ProgramSets','ActivateIncomplete09Features',False);
 
   AddIntegerRec(0,'ProgramSets','MainLeft',-1);
   AddIntegerRec(1,'ProgramSets','MainTop',-1);
@@ -601,7 +668,9 @@ begin
   AddIntegerRec(23,'ProgramSets','DOSBoxShortFileNameAlgorithm',3);
   AddIntegerRec(24,'ProgramSets','LastWizardMode',1);
   AddIntegerRec(25,'ProgramSets','IconSize',32);
-  AddIntegerRec(26,'ProgramSets','ImageFilter',0);
+  AddIntegerRec(26,'ProgramSets','ImageFilter',6);
+  AddIntegerRec(27,'ProgramSets','NoteLinesInTooltips',5);
+  AddIntegerRec(28,'ProgramSets','PreviewerCategory',0);
 end;
 
 Procedure TPrgSetup.InitDirs;

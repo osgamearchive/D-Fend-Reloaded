@@ -1,21 +1,37 @@
 [Extra]
-Loadhigh=0
-CloseOnExit=1
-AutoMountCDs=0
-Overridegamestart=0
-OverrideMount=0
-LoadFixVal=64
 NrOfMounts=1
-Tab=1
 Tab2=0
 Exe=SIERRA.COM
 ExeMD5=48E6FAEB6AF8E540FED0523F17EC4C0D
 Setup=INSTALL.EXE
 SetupMD5=01C9F9009D839E3B7E1CAF1CFCDE9305
-GameParameters=
-SetupParameters=
 LastModification=39549-83446
 0=.\VirtualHD;Drive;C;False;;
+Environment=PATH[61]Z:\[13][10]
+Loadhigh=0
+CloseOnExit=1
+AutoMountCDs=0
+SecureMode=1
+Overridegamestart=0
+OverrideMount=0
+LoadFixVal=64
+Tab=0
+GameParameters=
+SetupParameters=
+ExtraDirs=
+ExtraFiles=
+ScreenshotListScreenshot=
+ExtraExe0=
+ExtraExe1=
+ExtraExe2=
+ExtraExe3=
+ExtraExe4=
+ExtraExe5=
+ExtraExe6=
+ExtraExe7=
+ExtraExe8=
+ExtraExe9=
+DataDir=
 1=
 2=
 3=
@@ -29,28 +45,25 @@ autoexec=
 BootImage=
 Finalization=
 CustomSettings=
-Environment=PATH[61]Z:\[13]
 ProfileMode=DOSBox
-ExtraDirs=
-ExtraFiles=
-DataDir=
 
 [ExtraInfo]
-Favorite=0
-Name=Larry 3
-Icon=
 Genre=Adventure
 Developer=Sierra On-Line
 Publisher=Sierra On-Line
 Year=1989
-Notes=The age verification can be skiped by pressing Ctrl+Alt+X.[13]
-WWW=
+Notes=The age verification can be skiped by pressing Ctrl+Alt+X.[13][10]
 Language=English
+Favorite=0
+Name=Larry 3
+Icon=
+WWW=
 UserInfo=
 
 [sdl]
-fullscreen=1
 autolock=0
+mapperfile=mapper.txt
+fullscreen=1
 fulldouble=0
 usecancodes=1
 sensitivity=100
@@ -58,7 +71,7 @@ output=surface
 windowresolution=original
 fullresolution=original
 priority=higher,normal
-mapperfile=mapper.txt
+DOSBoxlanguage=default
 
 [dos]
 Force2ButtonMouseMode=0
@@ -76,8 +89,8 @@ CapsLockStatus=
 ScrollLockStatus=
 
 [render]
-aspect=0
 TextModeLines=25
+aspect=0
 frameskip=0
 scaler=normal2x
 
@@ -115,6 +128,8 @@ VolumeSBLeft=100
 VolumeSBRight=100
 VolumeFMLeft=100
 VolumeFMRight=100
+VolumeCDLeft=100
+VolumeCDRight=100
 
 [sblaster]
 mixer=1
@@ -125,15 +140,16 @@ hdma=5
 oplrate=22050
 sbtype=sb16
 oplmode=auto
+oplemu=default
 
 [gus]
+irq2=5
+dma2=1
 gus=1
 gusrate=22050
 gusbase=240
 irq1=5
-irq2=5
 dma1=1
-dma2=1
 ultradir=C:\ULTRASND
 
 [speaker]
@@ -168,31 +184,67 @@ GamePath=
 Filter=2x
 Language=en
 MusicDriver=auto
+ConfirmExit=0
+AltIntro=0
+MusicMute=0
+ObjectLabels=0
+ReverseStereo=0
+SFXMute=0
+CDROM=0
+JoystickNum=0
+GFXDetails=3
+Walkspeed=2
+GameZipFile=
+RenderMode=
+Savepath=
+ExtraPath=
+Platform=
 
 [dosbox]
+DOSBoxDirectory=Default
+machine=vga_s3
 memsize=16
-captures=
-DOSBoxDirectory=
-machine=vga
+captures=.\Capture\
 
 [cpu]
-cyclesup=500
-cyclesdown=20
 core=normal
 cycles=3000
+cyclesup=500
+cyclesdown=20
+type=auto
 
 [vga]
 videoram=2048
 svgachipset=s3
+PixelShader=
 
 [serial]
 serial1=Dummy
-serial2=dummy
-serial3=disabled
-serial4=disabled
+serial2=Dummy
+serial3=Disabled
+serial4=Disabled
 
 [midi]
 mpu401=intelligent
 device=default
 config=
+
+[ExtraGameIdentify]
+File1.Filename=LARRY3.DRV
+File2.Filename=CMS.DRV
+File3.Filename=EGA320.DRV
+File4.Filename=IBMKBD.DRV
+File5.Filename=INSTALL.HLP
+File1.Checksum=4ADB1FC07345C203E2005DAC10002B02
+File2.Checksum=8D5AD9B51C0C6B82A7ABBCF13FE1B0B4
+File3.Checksum=D2F9E9EA730745558926518C930E7375
+File4.Checksum=AB91B093A010AEB63866F71BC491110E
+File5.Checksum=FA18CDE121EF9F9B612880EF6CBBE64F
+
+[ExtraCommands]
+BeforeExecution.Wait=1
+BeforeExecution.Minimized=0
+AfterExecution.Minimized=0
+BeforeExecution=
+AfterExecution=
 

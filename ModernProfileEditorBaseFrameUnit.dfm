@@ -102,6 +102,15 @@ object ModernProfileEditorBaseFrame: TModernProfileEditorBaseFrame
       OnClick = ExeSelectButtonClick
       ExplicitLeft = 431
     end
+    object InfoButton1: TSpeedButton
+      Left = 532
+      Top = 68
+      Width = 23
+      Height = 16
+      Anchors = [akTop, akRight]
+      Caption = 'Info'
+      OnClick = GameRelPathButton
+    end
     object GameExeEdit: TLabeledEdit
       Left = 16
       Top = 45
@@ -130,7 +139,10 @@ object ModernProfileEditorBaseFrame: TModernProfileEditorBaseFrame
       Top = 68
       Width = 510
       Height = 17
+      Anchors = [akLeft, akTop, akRight]
       Caption = 'Dateipfad relativ zur DOSBox-Verzeichnisstruktur interpretieren'
+      ParentShowHint = False
+      ShowHint = True
       TabOrder = 1
       OnClick = RelPathCheckBoxClick
     end
@@ -182,6 +194,15 @@ object ModernProfileEditorBaseFrame: TModernProfileEditorBaseFrame
       Caption = 'InfoLabel'
       WordWrap = True
     end
+    object InfoButton2: TSpeedButton
+      Left = 532
+      Top = 68
+      Width = 23
+      Height = 16
+      Anchors = [akTop, akRight]
+      Caption = 'Info'
+      OnClick = GameRelPathButton
+    end
     object SetupExeEdit: TLabeledEdit
       Left = 16
       Top = 45
@@ -211,7 +232,10 @@ object ModernProfileEditorBaseFrame: TModernProfileEditorBaseFrame
       Top = 68
       Width = 510
       Height = 17
+      Anchors = [akLeft, akTop, akRight]
       Caption = 'Dateipfad relativ zur DOSBox-Verzeichnisstruktur interpretieren'
+      ParentShowHint = False
+      ShowHint = True
       TabOrder = 1
       OnClick = RelPathCheckBoxClick
     end
@@ -295,7 +319,7 @@ object ModernProfileEditorBaseFrame: TModernProfileEditorBaseFrame
       Height = 21
       Style = csDropDownList
       Anchors = [akLeft, akTop, akRight]
-      ItemHeight = 13
+      ItemHeight = 0
       TabOrder = 0
       OnChange = GameComboBoxChange
     end

@@ -51,6 +51,8 @@ begin
   WrapCheckBox.Caption:=LanguageSetup.ProfileEditorSoundJoystickButtonwrap;
   WrapInfoLabel.Caption:=LanguageSetup.ProfileEditorSoundJoystickButtonwrapInfo;
 
+  AddDefaultValueHint(TypeComboBox);
+
   HelpContext:=ID_ProfileEditJoystick;
 end;
 

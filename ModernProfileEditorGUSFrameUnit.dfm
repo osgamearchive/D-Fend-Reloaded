@@ -28,26 +28,12 @@ object ModernProfileEditorGUSFrame: TModernProfileEditorGUSFrame
     Height = 13
     Caption = 'Interrupt1Label'
   end
-  object Interrupt2Label: TLabel
-    Left = 128
-    Top = 120
-    Width = 75
-    Height = 13
-    Caption = 'Interrupt2Label'
-  end
   object DMA1Label: TLabel
     Left = 24
     Top = 176
     Width = 53
     Height = 13
     Caption = 'DMA1Label'
-  end
-  object DMA2Label: TLabel
-    Left = 128
-    Top = 176
-    Width = 53
-    Height = 13
-    Caption = 'DMA2Label'
   end
   object ActivateGUSCheckBox: TCheckBox
     Left = 24
@@ -85,15 +71,6 @@ object ModernProfileEditorGUSFrame: TModernProfileEditorGUSFrame
     ItemHeight = 13
     TabOrder = 3
   end
-  object Interrupt2ComboBox: TComboBox
-    Left = 128
-    Top = 139
-    Width = 81
-    Height = 21
-    Style = csDropDownList
-    ItemHeight = 13
-    TabOrder = 4
-  end
   object DMA1ComboBox: TComboBox
     Left = 24
     Top = 195
@@ -101,16 +78,7 @@ object ModernProfileEditorGUSFrame: TModernProfileEditorGUSFrame
     Height = 21
     Style = csDropDownList
     ItemHeight = 13
-    TabOrder = 5
-  end
-  object DMA2ComboBox: TComboBox
-    Left = 128
-    Top = 195
-    Width = 81
-    Height = 21
-    Style = csDropDownList
-    ItemHeight = 13
-    TabOrder = 6
+    TabOrder = 4
   end
   object PathEdit: TLabeledEdit
     Left = 24
@@ -121,6 +89,6 @@ object ModernProfileEditorGUSFrame: TModernProfileEditorGUSFrame
     EditLabel.Width = 40
     EditLabel.Height = 13
     EditLabel.Caption = 'PathEdit'
-    TabOrder = 7
+    TabOrder = 5
   end
 end

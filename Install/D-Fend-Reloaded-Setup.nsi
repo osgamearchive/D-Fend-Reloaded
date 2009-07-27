@@ -74,7 +74,12 @@ Page custom InstallType
 
 Section "$(LANGNAME_DFendReloaded)" ID_DFend
   SectionIn RO
+  
   SetDetailsPrint both
+  DetailPrint "$(LANGNAME_InstallDFendReloaded)"
+  SetDetailsPrint listonly
+  SetOutPath "$INSTDIR"  
+  SetDetailsPrint none
   
   ; Installation type
   ; ($InstallDataType=0 <=> Prg dir mode, $InstallDataType=1 <=> User dir mode; in user dir mode $DataInstDir will contain the data directory otherwise $INSTDIR)
@@ -147,8 +152,17 @@ Section "$(LANGNAME_DFendReloaded)" ID_DFend
   Delete "$INSTDIR\mkdosfs.exe"
   Delete "$INSTDIR\mediaplr.dll"
   
-  SetDetailsPrint none
+  ; Update config file
   
+  WriteINIStr $DataInstDir\Settings\ConfOpt.dat resolution value original,320x200,320x240,640x432,640x480,720x480,800x600,1024x768,1152x864,1280x720,1280x768,1280x960,1280x1024,1600x1200,1920x1080,1920x1200,0x0
+  WriteINIStr $DataInstDir\Settings\ConfOpt.dat joysticks value none,auto,2axis,4axis,fcs,ch
+  WriteINIStr $DataInstDir\Settings\ConfOpt.dat GUSRate value 8000,11025,22050,32000,44100,48000,50000
+  WriteINIStr $DataInstDir\Settings\ConfOpt.dat OPLRate value 8000,11025,22050,32000,44100,48000,50000
+  WriteINIStr $DataInstDir\Settings\ConfOpt.dat PCRate value 8000,11025,22050,32000,44100,48000,50000
+  WriteINIStr $DataInstDir\Settings\ConfOpt.dat Rate value 8000,11025,22050,32000,44100,48000,50000
+  WriteINIStr $DataInstDir\Settings\ConfOpt.dat scale value "No Scaling (none),Nearest neighbor upscaling with factor 2 (normal2x),Nearest neighbor upscaling with factor 3 (normal3x),Advanced upscaling with factor 2 (advmame2x),Advanced upscaling with factor 3 (advmame3x),high quality with factor 2 (hq2x), high quality with factor 3 (hq3x),2xsai (2xsai), super2xsai (super2xsai), supereagle (supereagle),Advanced interpoling with factor 2 (advinterp2x),Advanced interpoling with factor 3 (advinterp3x),Advanced upscaling with sharpening with factor 2 (tv2x),Advanced upscaling with sharpening with factor 3 (tv3x),Simulates the phopsphors on a dot trio CRT with factor 2 (rgb2x),Simulates the phopsphors on a dot trio CRT with factor 3 (rgb3x),Nearest neighbor with black lines with factor 2 (scan2x),Nearest neighbor with black lines with factor 3 (scan3x)"
+  WriteINIStr $DataInstDir\Settings\ConfOpt.dat video value "hercules,cga,tandy,pcjr,ega,vgaonly,svga_s3,svga_et3000,svga_et4000,svga_paradise,vesa_nolfb,vesa_oldvbe"
+
   ; Install templates  
   
   IntCmp $InstallDataType 1 WriteNewUserDir
@@ -188,8 +202,6 @@ Section "$(LANGNAME_DFendReloaded)" ID_DFend
 
   TemplateWritingFinish:
   
-  SetDetailsPrint both
-  
   ; Create "VirtualHD" folder in data dir
   
   CreateDirectory "$DataInstDir\VirtualHD"
@@ -215,6 +227,14 @@ Section "$(LANGNAME_DFendReloaded)" ID_DFend
   ; Create uninstaller and start menu entries
   
   IntCmp $InstallDataType 2 NoDFendStartMenuLinks
+  
+  SetDetailsPrint both
+  DetailPrint "$(LANGNAME_InstallStartMenu)"
+  SetDetailsPrint listonly
+  SetShellVarContext all
+  SetOutPath "$SMPROGRAMS"  
+  SetDetailsPrint none  
+  
   SetOutPath "$INSTDIR"
   WriteUninstaller "Uninstall.exe"
   
@@ -255,8 +275,12 @@ SectionGroup "$(LANGNAME_DOSBox)" ID_DosBox
   
 Section "$(LANGNAME_ProgramFiles)" ID_DosBoxProgramFiles
   SetDetailsPrint both
+  DetailPrint "$(LANGNAME_InstallDOSBox)"
+  SetDetailsPrint listonly
   SetOutPath "$INSTDIR\DOSBox"
   SetDetailsPrint none
+
+  SetOutPath "$INSTDIR\DOSBox"
   File "..\DOSBox\README.txt"
   File "..\DOSBox\COPYING.txt"
   File "..\DOSBox\THANKS.txt"
@@ -300,13 +324,20 @@ SectionEnd
 
 Section "$(LANGNAME_LanguageFiles)" ID_DosBoxLanguageFiles
   SetDetailsPrint both
+  DetailPrint "$(LANGNAME_InstallDOSBoxLanguage)"
+  SetDetailsPrint listonly
   SetOutPath "$INSTDIR\DOSBox"
   SetDetailsPrint none
+
+  SetOutPath "$INSTDIR\DOSBox"
   File "..\DosBoxLang\*.*"
 SectionEnd
 
 Section "$(LANGNAME_VideoCodec)" ID_DosBoxVideoCodec
   SetDetailsPrint both
+  DetailPrint "$(LANGNAME_InstallDOSBoxCodec)"
+  SetDetailsPrint listonly
+
   ClearErrors
   ReadRegStr $R0 HKLM "SOFTWARE\Microsoft\Windows NT\CurrentVersion" CurrentVersion
   IfErrors we_9x2 we_nt2
@@ -316,6 +347,8 @@ Section "$(LANGNAME_VideoCodec)" ID_DosBoxVideoCodec
   we_9x2:
   Exec '"rundll32" setupx.dll,InstallHinfSection DefaultInstall 128 $INSTDIR\DOSBox\zmbv\zmbv.inf'
   end2:
+  
+  SetDetailsPrint none
 SectionEnd
  
 SectionGroupEnd
@@ -325,7 +358,9 @@ SectionGroupEnd
 SectionGroup "$(LANGNAME_Tools)" ID_Tools
 
 Section "$(LANGNAME_FreeDosTools)" ID_FreeDosTools
-  SetDetailsPrint both
+  SetDetailsPrint both  
+  DetailPrint "$(LANGNAME_InstallFreeDOS)"
+  SetDetailsPrint listonly
   
   IntCmp $InstallDataType 1 FreeDOSToNewUserDir
     SetOutPath "$DataInstDir\VirtualHD\FREEDOS"
@@ -340,6 +375,8 @@ SectionEnd
 
 Section "$(LANGNAME_Doszip)" ID_Doszip
   SetDetailsPrint both
+  DetailPrint "$(LANGNAME_InstallDOSZip)"
+  SetDetailsPrint listonly
   
   IntCmp $InstallDataType 1 DoszipToNewUserDir
     SetOutPath "$DataInstDir\VirtualHD\DOSZIP"
@@ -358,6 +395,8 @@ SectionGroupEnd
 
 Section "$(LANGNAME_DesktopShortcut)" ID_DesktopShortcut
   SetDetailsPrint both
+  DetailPrint "$(LANGNAME_InstallDesktopShortcut)"
+  SetDetailsPrint listonly
   SetShellVarContext all
   CreateShortCut "$DESKTOP\$(LANGNAME_DFendReloaded).lnk" "$INSTDIR\DFend.exe" 
 SectionEnd

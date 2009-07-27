@@ -105,7 +105,6 @@ end;
 
 procedure TModernProfileEditorDrivesFrame.ShowFrame;
 begin
-  SecureModeCheckBox.Visible:=PrgSetup.AllowSecureMode;
 end;
 
 procedure TModernProfileEditorDrivesFrame.LoadMountingList;

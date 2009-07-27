@@ -1,6 +1,4 @@
-D-Fend Reloaded can manage multiple icon sets for the toolbar, menu and dialog icons. An icon set is nothing more than a collection of icons and an Icons.ini file saying which icon to use where. (The Icons.ini ist the same one as in the "Settings" directory.)
-
-To activate an icon set write the line IconSet=<SubDirName> ("IconSet=Classic" for example) in the [ProgramSets] section of the DFend.ini file. (The next version of D-Fend Reloaded will also bring a GUI for changing the icon set without restarting the program.)
+D-Fend Reloaded can manage multiple icon sets for the toolbar, menu and dialog icons. An icon set is nothing more than a collection of icons and an Icons.ini file saying which icon to use where. (The Icons.ini is the same one as in the "Settings" directory.) You can activate different icon sets from the program settings dialog.
 
 For each icon D-Fend Reloaded will look in the following order for custom icons:
 1.) It will look for icon definitions in the Icons.ini file in the "Settings" directory. If it find a definition there, it will use this icon.

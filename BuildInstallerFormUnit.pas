@@ -88,6 +88,7 @@ function AddTemplateToNSIScript(const NSI: TStringList; const Game: TGame): Bool
 function AddAutoSetupToNSIScript(const NSI: TStringList; const Game: TGame): Boolean;
 function AddGameToNSIScript(const NSI: TStringList; const Game: TGame): Boolean;
 function BuildEXEInstaller(const Handle : THandle; const FileName : String) : Boolean;
+Function GetNSISPath : String;
 
 implementation
 
@@ -121,6 +122,9 @@ begin
   InstTypeRadioGroup.Items[0]:=LanguageSetup.BuildInstallerInstTypeScriptOnly;
   InstTypeRadioGroup.Items[1]:=LanguageSetup.BuildInstallerInstTypeFullInstaller;
   UserIconLoader.DialogImage(DI_SelectFile,DestFileButton);
+  UserIconLoader.DialogImage(DI_OK,OKButton);
+  UserIconLoader.DialogImage(DI_Cancel,CancelButton);
+  UserIconLoader.DialogImage(DI_Help,HelpButton);
 
   { AutoSetup templates }
 
@@ -139,6 +143,9 @@ begin
   InstTypeRadioGroup2.Items[0]:=LanguageSetup.BuildInstallerInstTypeScriptOnly;
   InstTypeRadioGroup2.Items[1]:=LanguageSetup.BuildInstallerInstTypeFullInstaller;
   UserIconLoader.DialogImage(DI_SelectFile,DestFileButton2);
+  UserIconLoader.DialogImage(DI_OK,OKButton2);
+  UserIconLoader.DialogImage(DI_Cancel,CancelButton2);
+  UserIconLoader.DialogImage(DI_Help,HelpButton2);
 
   { AutoSetup templates }
 
@@ -157,6 +164,9 @@ begin
   InstTypeRadioGroup3.Items[0]:=LanguageSetup.BuildInstallerInstTypeScriptOnly;
   InstTypeRadioGroup3.Items[1]:=LanguageSetup.BuildInstallerInstTypeFullInstaller;
   UserIconLoader.DialogImage(DI_SelectFile,DestFileButton3);
+  UserIconLoader.DialogImage(DI_OK,OKButton3);
+  UserIconLoader.DialogImage(DI_Cancel,CancelButton3);
+  UserIconLoader.DialogImage(DI_Help,HelpButton3);
 
   { Dialog }
 
@@ -483,7 +493,7 @@ end;
 
 procedure TBuildInstallerForm.HelpButtonClick(Sender: TObject);
 begin
-  Application.HelpCommand(HELP_CONTEXT,ID_ExtrasBuildInstallers);
+  Application.HelpCommand(HELP_CONTEXT,ID_FileExportBuildInstallers);
 end;
 
 procedure TBuildInstallerForm.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -724,24 +734,32 @@ begin
   result:=True;
 end;
 
-function BuildEXEInstaller(const Handle : THandle; const FileName : String) : Boolean;
+Function GetNSISPath : String;
 Var Reg : TRegistry;
-    S : String;
 begin
-  result:=False;
-
-  {Check if NSIS is installed}
-  S:='';
+  result:='';
   Reg:=TRegistry.Create;
   try
     Reg.RootKey:=HKEY_LOCAL_MACHINE;
     Reg.Access:=KEY_QUERY_VALUE;
-    if Reg.OpenKey('SOFTWARE\NSIS',False) then S:=Reg.ReadString('');
+    if Reg.OpenKey('SOFTWARE\NSIS',False) then begin
+      result:=Reg.ReadString('');
+      If not FileExists(IncludeTrailingPathDelimiter(result)+'makensisw.exe') then result:='';
+    end;
   finally
     Reg.Free;
   end;
+end;
 
-  If (S='') or (not FileExists(IncludeTrailingPathDelimiter(S)+'makensisw.exe')) then begin
+function BuildEXEInstaller(const Handle : THandle; const FileName : String) : Boolean;
+Var S : String;
+begin
+  result:=False;
+
+  {Check if NSIS is installed}
+  S:=GetNSISPath;
+
+  If S='' then begin
     MessageDlg(Format(LanguageSetup.MessageCouldNotFindFile,['makensisw.exe'])+#13+LanguageSetup.BuildInstallerNeedNSIS,mtError,[mbOK],0);
     exit;
   end;

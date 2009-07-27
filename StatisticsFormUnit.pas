@@ -24,13 +24,13 @@ type
 var
   StatisticsForm: TStatisticsForm;
 
-Procedure ShowInfoTextDialog(const AOwner : TComponent; const ACaption : String; const AText : TStringList);
+Procedure ShowInfoTextDialog(const AOwner : TComponent; const ACaption : String; const AText : TStringList; const WordWrap : Boolean = False);
 Procedure ShowStatisticsDialog(const AOwner : TComponent; const AGameDB : TGameDB);
 
 implementation
 
 uses VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgSetupUnit, PrgConsts,
-     HelpConsts;
+     HelpConsts, IconLoaderUnit;
 
 {$R *.dfm}
 
@@ -41,6 +41,9 @@ begin
 
   OKButton.Caption:=LanguageSetup.OK;
   HelpButton.Caption:=LanguageSetup.Help;
+
+  UserIconLoader.DialogImage(DI_OK,OKButton);
+  UserIconLoader.DialogImage(DI_Help,HelpButton);
 end;
 
 procedure TStatisticsForm.HelpButtonClick(Sender: TObject);
@@ -129,12 +132,13 @@ begin
   end;
 end;
 
-Procedure ShowInfoTextDialog(const AOwner : TComponent; const ACaption : String; const AText : TStringList);
+Procedure ShowInfoTextDialog(const AOwner : TComponent; const ACaption : String; const AText : TStringList; const WordWrap : Boolean);
 begin
   StatisticsForm:=TStatisticsForm.Create(AOwner);
   try
     StatisticsForm.Caption:=ACaption;
     StatisticsForm.Memo.Lines.AddStrings(AText);
+    StatisticsForm.Memo.WordWrap:=WordWrap;
     StatisticsForm.HelpButton.Visible:=False;
     StatisticsForm.ShowModal;
   finally

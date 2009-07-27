@@ -56,7 +56,7 @@ type
 implementation
 
 uses Math, VistaToolsUnit, LanguageSetupUnit, CommonTools, HelpConsts,
-     PrgSetupUnit, PrgConsts, IconLoaderUnit;
+     PrgSetupUnit, PrgConsts, IconLoaderUnit, TextEditPopupUnit;
 
 {$R *.dfm}
 
@@ -80,6 +80,8 @@ begin
   NoFlicker(CustomSetsClearButton);
   NoFlicker(CustomSetsLoadButton);
   NoFlicker(CustomSetsSaveButton);
+
+  SetRichEditPopup(CustomSetsMemo);
 
   LanguageLabel.Caption:=LanguageSetup.ProfileEditorScummVMLanguage;
   AutosaveLabel.Caption:=LanguageSetup.ProfileEditorScummVMAutosave;

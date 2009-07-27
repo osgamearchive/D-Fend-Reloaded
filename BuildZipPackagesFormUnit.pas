@@ -62,6 +62,9 @@ begin
   SelectNoneButton.Caption:=LanguageSetup.None;
   SelectGenreButton.Caption:=LanguageSetup.GameBy;
   UserIconLoader.DialogImage(DI_SelectFolder,DestFolderButton);
+  UserIconLoader.DialogImage(DI_OK,OKButton);
+  UserIconLoader.DialogImage(DI_Cancel,CancelButton);
+  UserIconLoader.DialogImage(DI_Help,HelpButton);
 end;
 
 procedure TBuildZipPackagesForm.FormShow(Sender: TObject);
@@ -117,7 +120,7 @@ end;
 
 procedure TBuildZipPackagesForm.HelpButtonClick(Sender: TObject);
 begin
-  Application.HelpCommand(HELP_CONTEXT,ID_ExtrasBuildZipPackages);
+  Application.HelpCommand(HELP_CONTEXT,ID_FileExportBuildZipPackages);
 end;
 
 procedure TBuildZipPackagesForm.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);

@@ -37,6 +37,19 @@ LangString LANGNAME_FreeDosTools ${LANG_POLISH} "Narzêdzia FreeDOS'a do u¿ycia w
 LangString LANGNAME_Doszip ${LANG_POLISH} "Doszip Commander"
 LangString LANGNAME_DesktopShortcut ${LANG_POLISH} "Skrót na pulpicie"
 
+LangString LANGNAME_InstallDFendReloaded ${LANG_POLISH} "Instalowanie g³ównych komponentów D-Fend Reloaded"
+LangString LANGNAME_InstallStartMenu ${LANG_POLISH} "Tworzenie skrótów w Menu Start"
+LangString LANGNAME_InstallDOSBox ${LANG_POLISH} "Instalowanie DOSBox'a"
+LangString LANGNAME_InstallDOSBoxLanguage ${LANG_POLISH} "Instalowanie plików jêzykowych DOSBox'a"
+LangString LANGNAME_InstallDOSBoxCodec ${LANG_POLISH} "Instalowanie kodeków video DOSBox'a"
+LangString LANGNAME_InstallFreeDOS ${LANG_POLISH} "Instalowanie FreeDOS'a"
+LangString LANGNAME_InstallDOSZip ${LANG_POLISH} "Instalowanie DOSZip Commander'a"
+LangString LANGNAME_InstallDesktopShortcut ${LANG_POLISH} "Tworzenie skrótu na pulpicie"
+
+LangString LANGNAME_UpdateDFendReloaded ${LANG_POLISH} "Uaktualnianie g³ównych komponentów D-Fend Reloaded"
+LangString LANGNAME_UpdateUninstaller ${LANG_POLISH} "Uaktualnianie programu odinstalowuj¹cego"
+LangString LANGNAME_UpdateDOSBox ${LANG_POLISH} "Uaktualnianie DOSBox'a"
+
 LangString DESC_DFend ${LANG_POLISH} "D-Fend Reloaded jest graficznym interfejsem do zarz¹dzania DOS'owymi grami."
 LangString DESC_DosBox ${LANG_POLISH} "DOSBox jest emulatorem DOS'a u¿ywanym przez D-Fend Reloaded."
 LangString DESC_DosBoxProgramFiles ${LANG_POLISH} "Pliki programów emulatora DOS'a."

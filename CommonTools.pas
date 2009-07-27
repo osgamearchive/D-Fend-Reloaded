@@ -34,6 +34,7 @@ Function GetFileVersionEx(const AFileName: string) : Cardinal;
 Function GetFileVersionAsString : String;
 Function GetNormalFileVersionAsString : String;
 Function GetShortFileVersionAsString : String;
+Function VersionToInt(Version : String) : Integer;
 
 Procedure RunAndWait(const PrgFile, Path : String; const HideWindow : Boolean);
 Function RunAndGetOutput(const PrgFile, Parameters : String; const HideWindow : Boolean): TStringList;
@@ -91,6 +92,8 @@ Function DeleteFileToRecycleBin(const FileName : String; const AllowContinueNext
 Function DeleteFileToRecycleBin(const FileName : String) : Boolean; overload;
 Function DeleteFileToRecycleBinWithPause(const FileName : String; const AllowContinueNext : Boolean; var ContinueNext : Boolean) : Boolean;
 Function DeleteFileToRecycleBinNoWarning(const FileName : String) : Boolean;
+
+Function CompareFiles(const File1, File2 : String) : Boolean; {True=files match}
 
 Function ForceForegroundWindow(Wnd:HWND):Boolean;
 
@@ -441,15 +444,15 @@ end;
 {
 CSIDL_COOKIES              Cookies
 CSIDL_DESKTOPDIRECTORY     Desktop
-CSIDL_FAVORITES            Favoriten
-CSIDL_HISTORY              Internet-Verlauf
+CSIDL_FAVORITES            Favorites
+CSIDL_HISTORY              Internet history
 CSIDL_INTERNET_CACHE       "Temporary Internet Files"
-CSIDL_PERSONAL             Eigene Dateien
-CSIDL_PROGRAMS             "Programme" im Startmenü
-CSIDL_RECENT               "Dokumente" im Startmenü
-CSIDL_SENDTO               "Senden an" im Kontextmenü
-CSIDL_STARTMENU            Startmenü
-CSIDL_STARTUP              Autostart
+CSIDL_PERSONAL             User files
+CSIDL_PROGRAMS             "Programe files" in start menu
+CSIDL_RECENT               "Documents" in start menu
+CSIDL_SENDTO               "Send to" in context menu
+CSIDL_STARTMENU            Start menu
+CSIDL_STARTUP              Auto start
 }
 function GetSpecialFolder(hWindow: HWND; Folder: Integer): String;
 var pMalloc: IMalloc;
@@ -515,6 +518,20 @@ Var I : Integer;
 begin
   I:=GetFileVersion(ExpandFileName(Application.ExeName));
   result:=Format('%d.%d',[I div 65536,I mod 65536]);
+end;
+
+Function VersionToInt(Version : String) : Integer;
+Var I,J : Integer;
+begin
+  result:=0;
+  I:=Pos('.',Version);
+  while I>0 do begin
+    J:=0; TryStrToInt(Copy(Version,1,I-1),J); Version:=Copy(Version,I+1,MaxInt);
+    result:=result*100+J;
+    I:=Pos('.',Version);
+  end;
+  J:=0; TryStrToInt(Version,J);
+  result:=result*100+J;
 end;
 
 Procedure RunAndWait(const PrgFile, Path : String; const HideWindow : Boolean);
@@ -1559,6 +1576,8 @@ begin
   result:=True;
   If not PrgSetup.DeleteOnlyInBaseDir then exit;
 
+  if not DirectoryExists(Folder) then exit;
+
   Folder:=IncludeTrailingPathDelimiter(DirToDelete);
   S:=ShortName(PrgSetup.BaseDir);
   If ExtUpperCase(Copy(ShortName(Folder),1,length(S)))=ExtUpperCase(S) then exit;
@@ -1975,6 +1994,37 @@ begin
   end;
 
   result:=(SHFileOperation(FileOp)=0) and (not FileOp.fAnyOperationsAborted);
+end;
+
+Function CompareFiles(const File1, File2 : String) : Boolean;
+const BSize=4096;
+Var FSt1,FSt2 : TFileStream;
+    B1,B2 : Array[0..BSize-1] of Byte;
+    C : Cardinal;
+    I,J : Integer;
+begin
+  result:=False;
+
+  FSt1:=TFileStream.Create(File1,fmOpenRead);
+  try
+    FSt2:=TFileStream.Create(File2,fmOpenRead);
+    try
+      If FSt1.Size<>FSt2.Size then exit;
+      C:=FSt1.Size;
+      While C>0 do begin
+        I:=Min(C,BSize);
+        FSt1.ReadBuffer(B1,I);
+        FSt2.ReadBuffer(B2,I);
+        For J:=0 to I-1 do If B1[J]<>B2[J] then exit;
+        dec(C,I);
+      end;
+    finally
+      FSt2.Free;
+    end;
+  finally
+    FSt1.Free;
+  end;
+  result:=True;
 end;
 
 { This method was discovered by user DRON from www.delphikingdom.com site }

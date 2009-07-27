@@ -28,29 +28,28 @@ Type TConfOpt=class(TBasePrgSetup)
     property CyclesDown : String index 16 read GetString write SetString;
     property CyclesUp : String index 17 read GetString write SetString;
     property Dma : String index 18 read GetString write SetString;
-    property Dma1 : String index 19 read GetString write SetString;
-    property Dma2 : String index 20 read GetString write SetString;
-    property GUSBase : String index 21 read GetString write SetString;
-    property GUSRate : String index 22 read GetString write SetString;
-    property HDMA : String index 23 read GetString write SetString;
-    property IRQ : String index 24 read GetString write SetString;
-    property IRQ1 : String index 25 read GetString write SetString;
-    property IRQ2 : String index 26 read GetString write SetString;
-    property MPU401 : String index 27 read GetString write SetString;
-    property OPLRate : String index 28 read GetString write SetString;
-    property PCRate : String index 29 read GetString write SetString;
-    property Rate : String index 30 read GetString write SetString;
-    property SBBase : String index 31 read GetString write SetString;
-    property MouseSensitivity : String index 32 read GetString write SetString;
-    property TandyRate : String index 33 read GetString write SetString;
-    property ScummVMFilter : String index 34 read GetString write SetString;
-    property ScummVMMusicDriver : String index 35 read GetString write SetString;
-    property VGAChipsets : String index 36 read GetString write SetString;
-    property VGAVideoRAM : String index 37 read GetString write SetString;
-    property ScummVMRenderMode : String index 38 read GetString write SetString;
-    property ScummVMPlatform : String index 39 read GetString write SetString;
-    property ScummVMLanguages : String index 40 read GetString write SetString;
-    property CPUType : String index 41 read GetString write SetString;
+    property GUSDma : String index 19 read GetString write SetString;
+    property GUSBase : String index 20 read GetString write SetString;
+    property GUSRate : String index 21 read GetString write SetString;
+    property HDMA : String index 22 read GetString write SetString;
+    property IRQ : String index 23 read GetString write SetString;
+    property GUSIRQ : String index 24 read GetString write SetString;
+    property MPU401 : String index 25 read GetString write SetString;
+    property OPLRate : String index 26 read GetString write SetString;
+    property PCRate : String index 27 read GetString write SetString;
+    property Rate : String index 28 read GetString write SetString;
+    property SBBase : String index 29 read GetString write SetString;
+    property MouseSensitivity : String index 30 read GetString write SetString;
+    property TandyRate : String index 31 read GetString write SetString;
+    property ScummVMFilter : String index 32 read GetString write SetString;
+    property ScummVMMusicDriver : String index 33 read GetString write SetString;
+    property VGAChipsets : String index 34 read GetString write SetString;
+    property VGAVideoRAM : String index 35 read GetString write SetString;
+    property ScummVMRenderMode : String index 36 read GetString write SetString;
+    property ScummVMPlatform : String index 37 read GetString write SetString;
+    property ScummVMLanguages : String index 38 read GetString write SetString;
+    property CPUType : String index 39 read GetString write SetString;
+    property OplEmu : String index 40 read GetString write SetString;
 end;
 
 const NR_Name=1;
@@ -171,6 +170,9 @@ const NR_Name=1;
       NR_MixerVolumeSBRight=614;
       NR_MixerVolumeFMLeft=615;
       NR_MixerVolumeFMRight=616;
+      NR_MixerVolumeCDLeft=617;
+      NR_MixerVolumeCDRight=618;
+
       NR_SBType=701;
       NR_SBBase=702;
       NR_SBIRQ=703;
@@ -179,14 +181,13 @@ const NR_Name=1;
       NR_SBMixer=706;
       NR_SBOplMode=707;
       NR_SBOplRate=708;
+      NR_SBOplEmu=709;
       NR_GUS=801;
       NR_GUSRate=802;
       NR_GUSBase=803;
-      NR_GUSIRQ1=804;
-      NR_GUSIRQ2=805;
-      NR_GUSDMA1=806;
-      NR_GUSDMA2=807;
-      NR_GUSUltraDir=808;
+      NR_GUSIRQ=804;
+      NR_GUSDMA=805;
+      NR_GUSUltraDir=806;
       NR_MIDIType=901;
       NR_MIDIDevice=902;
       NR_MIDIConfig=903;
@@ -253,6 +254,17 @@ const NR_Name=1;
       NR_CommandBeforeExecutionWait=1452;
       NR_CommandBeforeExecutionMinimized=1453;
       NR_CommandAfterExecutionMinimized=1454;
+
+      NR_AddtionalChecksumFile1=1500;
+      NR_AddtionalChecksumFile1Checksum=1501;
+      NR_AddtionalChecksumFile2=1502;
+      NR_AddtionalChecksumFile2Checksum=1503;
+      NR_AddtionalChecksumFile3=1504;
+      NR_AddtionalChecksumFile3Checksum=1505;
+      NR_AddtionalChecksumFile4=1506;
+      NR_AddtionalChecksumFile4Checksum=1507;
+      NR_AddtionalChecksumFile5=1508;
+      NR_AddtionalChecksumFile5Checksum=1509;
 
 
 const ScummVMSettings : Array[0..31] of Integer =(
@@ -410,6 +422,8 @@ Type TGame=class(TBasePrgSetup)
     property MixerVolumeSBRight : Integer index NR_MixerVolumeSBRight read GetInteger write SetInteger;
     property MixerVolumeFMLeft : Integer index NR_MixerVolumeFMLeft read GetInteger write SetInteger;
     property MixerVolumeFMRight : Integer index NR_MixerVolumeFMRight read GetInteger write SetInteger;
+    property MixerVolumeCDLeft : Integer index NR_MixerVolumeCDLeft read GetInteger write SetInteger;
+    property MixerVolumeCDRight : Integer index NR_MixerVolumeCDRight read GetInteger write SetInteger;
     property SBType : String index NR_SBType read GetString write SetString;
     property SBBase : Integer index NR_SBBase read GetInteger write SetInteger;
     property SBIRQ : Integer index NR_SBIRQ read GetInteger write SetInteger;
@@ -418,13 +432,12 @@ Type TGame=class(TBasePrgSetup)
     property SBMixer : Boolean index NR_SBMixer read GetBoolean write SetBoolean;
     property SBOplMode : String index NR_SBOplMode read GetString write SetString;
     property SBOplRate : Integer index NR_SBOplRate read GetInteger write SetInteger;
+    property SBOplEmu : String index NR_SBOplEmu read GetString write SetString;
     property GUS : Boolean index NR_GUS read GetBoolean write SetBoolean;
     property GUSRate : Integer index NR_GUSRate read GetInteger write SetInteger;
     property GUSBase : Integer index NR_GUSBase read GetInteger write SetInteger;
-    property GUSIRQ1 : Integer index NR_GUSIRQ1 read GetInteger write SetInteger;
-    property GUSIRQ2 : Integer index NR_GUSIRQ2 read GetInteger write SetInteger;
-    property GUSDMA1 : Integer index NR_GUSDMA1 read GetInteger write SetInteger;
-    property GUSDMA2 : Integer index NR_GUSDMA2 read GetInteger write SetInteger;
+    property GUSIRQ : Integer index NR_GUSIRQ read GetInteger write SetInteger;
+    property GUSDMA : Integer index NR_GUSDMA read GetInteger write SetInteger;
     property GUSUltraDir : String index NR_GUSUltraDir read GetString write SetString;
     property MIDIType : String index NR_MIDIType read GetString write SetString;
     property MIDIDevice : String index NR_MIDIDevice read GetString write SetString;
@@ -492,6 +505,17 @@ Type TGame=class(TBasePrgSetup)
     property CommandBeforeExecutionWait : Boolean index NR_CommandBeforeExecutionWait read GetBoolean write SetBoolean;
     property CommandBeforeExecutionMinimized : Boolean index NR_CommandBeforeExecutionMinimized read GetBoolean write SetBoolean;
     property CommandAfterExecutionMinimized : Boolean index NR_CommandAfterExecutionMinimized read GetBoolean write SetBoolean;
+
+    property AddtionalChecksumFile1 : String index NR_AddtionalChecksumFile1 read GetString write SetString;
+    property AddtionalChecksumFile1Checksum : String index NR_AddtionalChecksumFile1Checksum read GetString write SetString;
+    property AddtionalChecksumFile2 : String index NR_AddtionalChecksumFile2 read GetString write SetString;
+    property AddtionalChecksumFile2Checksum : String index NR_AddtionalChecksumFile2Checksum read GetString write SetString;
+    property AddtionalChecksumFile3 : String index NR_AddtionalChecksumFile3 read GetString write SetString;
+    property AddtionalChecksumFile3Checksum : String index NR_AddtionalChecksumFile3Checksum read GetString write SetString;
+    property AddtionalChecksumFile4 : String index NR_AddtionalChecksumFile4 read GetString write SetString;
+    property AddtionalChecksumFile4Checksum : String index NR_AddtionalChecksumFile4Checksum read GetString write SetString;
+    property AddtionalChecksumFile5 : String index NR_AddtionalChecksumFile5 read GetString write SetString;
+    property AddtionalChecksumFile5Checksum : String index NR_AddtionalChecksumFile5Checksum read GetString write SetString;
 end;
 
 Type TGameDB=class
@@ -537,7 +561,7 @@ end;
 
 Var DefaultValueReaderGame : TGame = nil;
 
-Const DefaultValuesResolution='original,320x200,640x432,640x480,720x480,800x600,1024x768,1152x864,1280x720,1280x768,1280x960,1280x1024,1600x1200,1920x1080,1920x1200,0x0';
+Const DefaultValuesResolution='original,320x200,320x240,640x432,640x480,720x480,800x600,1024x768,1152x864,1280x720,1280x768,1280x960,1280x1024,1600x1200,1920x1080,1920x1200,0x0';
       DefaultValuesJoysticks='none,auto,2axis,4axis,fcs,ch';
       DefaultValuesScale='No Scaling (none),Nearest neighbor upscaling with factor 2 (normal2x),Nearest neighbor upscaling with factor 3 (normal3x),'+
                          'Advanced upscaling with factor 2 (advmame2x),Advanced upscaling with factor 3 (advmame3x),'+
@@ -547,13 +571,24 @@ Const DefaultValuesResolution='original,320x200,640x432,640x480,720x480,800x600,
                          'Nearest neighbor with black lines with factor 2 (scan2x),Nearest neighbor with black lines with factor 3 (scan3x)';
       DefaultValueRender='surface,overlay,opengl,openglnb,ddraw';
       DefaultValueCycles='auto,max,500,1000,1500,2000,2500,3000,3500,4000,4500,5000,6000,7000,8000,9000,10000,11000,12000,12000,13000,14000,15000,16000,17000,18000,19000,20000';
-      DefaultValuesVideo='hercules,cga,tandy,vga';
+      DefaultValuesVideo='hercules,cga,tandy,pcjr,ega,vgaonly,svga_s3,svga_et3000,svga_et4000,svga_paradise,vesa_nolfb,vesa_oldvbe';
       DefaultValuesMemory='0,1,2,4,8,16,32,63';
       DefaultValuesFrameSkip='0,1,2,3,4,5,6,7,8,9,10';
       DefaultValuesCore='auto,normal,dynamic,simple';
       DefaultValueSBlaster='none,sb1,sb2,sbpro1,sbpro2,sb16';
       DefaultValuesOPLModes='auto,cms,opl2,dualopl2,opl3';
-      DefaultValuesKeyboardLayout='default,Albania (SQ),Argentina (LA),Armenia (HY),Australia (US),Austria (GR),Azerbaijan (AZ),'+
+      DefaultValuesKeyboardLayout='default,Albania (SQ),Argentina (LA),Armenia (HY),Australia (US),Austria (GR),Azerbaijan (AZ),Belarus (BL),Belarus (BY),'+
+                                  'Belgium (BE),Bosnia & Herzegovina (YU),Bosnia & Herzegovina (BA),Brazil (BR),Brazil (br274),Bulgaria (BG),Canada (CF),'+
+                                  'Canada (CA),Chile (LA),Colombia (LA),Croatia (YU),Croatia (HR),Czech Republic (CZ243),Denmark (DK),Ecuador (LA),'+
+                                  'Estonia (ET),Estonia (EE),Faeroe Islands (FO),Finland (SU),Finland (FI),France (FR),Greece (GK),Greece (EL),Germany (GR),'+
+                                  'Croatia (HR),Hungary (HU),Iceland (IS),Ireland (UK),Italy (IT),Japan (JP),Kazakhstan (KK),Kyrgyzstan (KY),'+
+                                  'Latin-American-Spanish (LA),Latvia (LV),Lithuania (LT221),Macedonia (MK),Malta (MT),Malta (ML),Mexico (LA),Mongolia (MN),'+
+                                  'Mongolia (MO),Netherlands (NL),New Zealand (US),Niger (NE),Nigeria (NG),Norway (NO),Philippines (PH),Poland (PL),'+
+                                  'Portugal (PO),Romania (RO),Russia (RU),Serbia & Montenegro (YC),Serbia & Montenegro (SR),Slovakia (SK),Slovenia (YU),'+
+                                  'Slovenia (SI),South Africa (US),Spain (SP),Spain (ES),Sweden (SV),Switzerland - French (SF),Switzerland - German (SG),'+
+                                  'Switzerland - German (SD),Tadjikistan (TJ),Turkmenistan (TM),Turkey (TR),United Kingdom (UK),Ukraine (UR),Ukraine (UA),'+
+                                  'US (US),US (UX),US Dvorak (DV),US Left-Hand Dvorak (LH),US Right-Hand Dvorak (RH),Uzbekistan (UZ),Venezuela (LA),Vietnam (VI)';
+      {DefaultValuesKeyboardLayout='default,Albania (SQ),Argentina (LA),Armenia (HY),Australia (US),Austria (GR),Azerbaijan (AZ),'+
                                   'Belarus (BL),Belarus (BY),Belgium (BE),Bosnia & Herzegovina (YU),Bosnia & Herzegovina (BA),Brazil BR),Brazil (br274),'+
                                   'Bulgaria (BG),Canada (CF),Canada (CA),Chile (LA),Colombia (LA),Croatia (YU),Croatia (HR),Czech Republic (CZ243),Denmark (DK),'+
                                   'Ecuador (LA),Estonia (ET),Estonia (EE),Faeroe Islands (FO),Finland (SU),Finland (FI),France (FR),Greece (GK),Germany (GR),'+
@@ -562,7 +597,7 @@ Const DefaultValuesResolution='original,320x200,640x432,640x480,720x480,800x600,
                                   'New Zealand (US),Niger (NE),Nigeria (NG),Norway (NO),Philippines (PH),Poland (PL),Portugal (PO),Romania (RO),Russia (RU),'+
                                   'Serbia & Montenegro (YC),Serbia & Montenegro (SR),Slovakia (SK),Slovenia (YU),Slovenia (SI),South Africa (US),Spain (SP),'+
                                   'Spain (ES),Sweden (SV),Switzerland - French (SF),Switzerland - German (SG),Switzerland - German (SD),Tadjikistan (TJ),'+
-                                  'Turkmenistan (TM),Turkey (TR),UK (UK),Ukraine (UR),Ukraine (UA),US (US),Uzbekistan (UZ),Venezuela (LA),Vietnam (VI)';
+                                  'Turkmenistan (TM),Turkey (TR),UK (UK),Ukraine (UR),Ukraine (UA),US (US),Uzbekistan (UZ),Venezuela (LA),Vietnam (VI)';}
       DefaultValuesCodepage='default,437,850,852,860,863,865,866';
       DefaultValuesReportedDOSVersion='default,6.2,6.0,5.0,4.0,3.3';
       DefaultValuesMIDIDevice='default,alsa,oss,win32,coreaudio,none';
@@ -571,17 +606,15 @@ Const DefaultValuesResolution='original,320x200,640x432,640x480,720x480,800x600,
       DefaultValuesCyclesUp='20,50,100,500,1000,2000,5000,10000';
       DefaultValuesDMA='0,1,3';
       DefaultValuesDMA1='0,1,3';
-      DefaultValuesDMA2='0,1,3';
       DefaultValuesGUSBase='210,220,240,260,280';
-      DefaultValuesGUSRate='8000,11025,22050,32000,44100,48000,50000';
+      DefaultValuesGUSRate='8000,11025,22050,32000,44100,48000,49716';
       DefaultValuesHDMA='5,6,7';
       DefaultValuesIRQ='3,5,7,10,11';
       DefaultValuesIRQ1='3,5,7,10,11';
-      DefaultValuesIRQ2='3,5,7,10,11';
       DefaultValuesMPU401='none,intelligent,uart';
-      DefaultValuesOPLRate='8000,11025,22050,32000,44100,48000,50000';
-      DefaultValuesPCRate='8000,11025,22050,32000,44100,48000,50000';
-      DefaultValuesRate='8000,11025,22050,32000,44100,48000,50000';
+      DefaultValuesOPLRate='8000,11025,22050,32000,44100,48000,49716';
+      DefaultValuesPCRate='8000,11025,22050,32000,44100,48000,49716';
+      DefaultValuesRate='8000,11025,22050,32000,44100,48000,49716';
       DefaultValuesSBBase='210,220,240,260,280';
       DefaultValuesMouseSensitivity='10,20,30,40,50,60,70,80,90,100,125,150,175,200,250,300,350,400,450,500,550,600,700,800,900,1000';
       DefaultValuesTandyRate='8000,11025,22050,32000,44100';
@@ -596,11 +629,12 @@ Const DefaultValuesResolution='original,320x200,640x432,640x480,720x480,800x600,
       DefaultValuesScummVMPlatform='auto,2gs,3do,acorn,amiga,atari,c64,fmtowns,mac,nes,pc,pce,segacd,windows';
       DefaultValuesScummVMLanguages='maniac:en-de-fr-it-es,zak:en-de-fr-it-es,dig_jp-zh-kr,comi:en-de-fr-it-pt-es-jp-zh-kr,sky:gb-en-de-fr-it-pt-es-se,sword1:en-de-fr-it-es-pt-cz,simon1:en-de-fr-it-es-hb-pl-ru,simon2:en-de-fr-it-es-hb-pl-ru';
       DefaultValuesCPUType='auto,386,386_slow,486_slow,pentium_slow,386_prefetch';
+      DefaultValuesOplEmu='default,compat,fast,old';
 
 implementation
 
-uses Windows, SysUtils, Dialogs, CommonTools, PrgConsts, PrgSetupUnit,
-     LanguageSetupUnit, GameDBToolsUnit;
+uses Windows, SysUtils, Forms, Dialogs, CommonTools, PrgConsts, PrgSetupUnit,
+     LanguageSetupUnit, GameDBToolsUnit, WaitFormUnit;
 
 { TConfOpt }
 
@@ -628,28 +662,27 @@ begin
   AddStringRec(17,'CyclesUp','value',DefaultValuesCyclesUp);
   AddStringRec(18,'DMA','value',DefaultValuesDMA);
   AddStringRec(19,'DMA1','value',DefaultValuesDMA1);
-  AddStringRec(20,'DMA2','value',DefaultValuesDMA2);
-  AddStringRec(21,'GUSBase','value',DefaultValuesGUSBase);
-  AddStringRec(22,'GUSRate','value',DefaultValuesGUSRate);
-  AddStringRec(23,'HDMA','value',DefaultValuesHDMA);
-  AddStringRec(24,'IRQ','value',DefaultValuesIRQ);
-  AddStringRec(25,'IRQ1','value',DefaultValuesIRQ1);
-  AddStringRec(26,'IRQ2','value',DefaultValuesIRQ2);
-  AddStringRec(27,'MPU401','value',DefaultValuesMPU401);
-  AddStringRec(28,'OPLRate','value',DefaultValuesOPLRate);
-  AddStringRec(29,'PCRate','value',DefaultValuesPCRate);
-  AddStringRec(30,'Rate','value',DefaultValuesRate);
-  AddStringRec(31,'SBBase','value',DefaultValuesSBBase);
-  AddStringRec(32,'MouseSensitivity','value',DefaultValuesMouseSensitivity);
-  AddStringRec(33,'TandyRate','value',DefaultValuesTandyRate);
-  AddStringRec(34,'ScummVMFilter','value',DefaultValuesScummVMFilter);
-  AddStringRec(35,'ScummVMMusicDriver','value',DefaultValuesScummVMMusicDriver);
-  AddStringRec(36,'VGAChipsets','value',DefaultValuesVGAChipsets);
-  AddStringRec(37,'VGAVideoRAM','value',DefaultValuesVGAVideoRAM);
-  AddStringRec(38,'ScummVMRenderMode','value',DefaultValuesScummVMRenderMode);
-  AddStringRec(39,'ScummVMPlatform','value',DefaultValuesScummVMPlatform);
-  AddStringRec(40,'ScummVMLanguages','value',DefaultValuesScummVMLanguages);
-  AddStringRec(41,'CPUType','value',DefaultValuesCPUType);
+  AddStringRec(20,'GUSBase','value',DefaultValuesGUSBase);
+  AddStringRec(21,'GUSRate','value',DefaultValuesGUSRate);
+  AddStringRec(22,'HDMA','value',DefaultValuesHDMA);
+  AddStringRec(23,'IRQ','value',DefaultValuesIRQ);
+  AddStringRec(24,'IRQ1','value',DefaultValuesIRQ1);
+  AddStringRec(25,'MPU401','value',DefaultValuesMPU401);
+  AddStringRec(26,'OPLRate','value',DefaultValuesOPLRate);
+  AddStringRec(27,'PCRate','value',DefaultValuesPCRate);
+  AddStringRec(28,'Rate','value',DefaultValuesRate);
+  AddStringRec(29,'SBBase','value',DefaultValuesSBBase);
+  AddStringRec(30,'MouseSensitivity','value',DefaultValuesMouseSensitivity);
+  AddStringRec(31,'TandyRate','value',DefaultValuesTandyRate);
+  AddStringRec(32,'ScummVMFilter','value',DefaultValuesScummVMFilter);
+  AddStringRec(33,'ScummVMMusicDriver','value',DefaultValuesScummVMMusicDriver);
+  AddStringRec(34,'VGAChipsets','value',DefaultValuesVGAChipsets);
+  AddStringRec(35,'VGAVideoRAM','value',DefaultValuesVGAVideoRAM);
+  AddStringRec(36,'ScummVMRenderMode','value',DefaultValuesScummVMRenderMode);
+  AddStringRec(37,'ScummVMPlatform','value',DefaultValuesScummVMPlatform);
+  AddStringRec(38,'ScummVMLanguages','value',DefaultValuesScummVMLanguages);
+  AddStringRec(39,'CPUType','value',DefaultValuesCPUType);
+  AddStringRec(40,'SBOplEmu','value',DefaultValuesOplEmu);
 end;
 
 destructor TConfOpt.Destroy;
@@ -749,7 +782,7 @@ begin
   AddIntegerRec(NR_CyclesDown,'cpu','cyclesdown',20);
   AddStringRec(NR_CPUType,'cpu','type','auto');
   AddIntegerRec(NR_FrameSkip,'render','frameskip',0);
-  AddStringRec(NR_VideoCard,'dosbox','machine','vga');
+  AddStringRec(NR_VideoCard,'dosbox','machine','svga_s3');
   AddStringRec(NR_KeyboardLayout,'dos','keyboardlayout','default');
   AddStringRec(NR_Codepage,'dos','codepage','default');
   AddStringRec(NR_Serial1,'serial','serial1','dummy');
@@ -808,6 +841,8 @@ begin
   AddIntegerRec(NR_MixerVolumeSBRight,'mixer','VolumeSBRight',100);
   AddIntegerRec(NR_MixerVolumeFMLeft,'mixer','VolumeFMLeft',100);
   AddIntegerRec(NR_MixerVolumeFMRight,'mixer','VolumeFMRight',100);
+  AddIntegerRec(NR_MixerVolumeCDLeft,'mixer','VolumeCDLeft',100);
+  AddIntegerRec(NR_MixerVolumeCDRight,'mixer','VolumeCDRight',100);
   AddStringRec(NR_SBType,'sblaster','sbtype','sb16');
   AddIntegerRec(NR_SBBase,'sblaster','sbbase',220);
   AddIntegerRec(NR_SBIRQ,'sblaster','irq',7);
@@ -816,13 +851,12 @@ begin
   AddBooleanRec(NR_SBMixer,'sblaster','mixer',true);
   AddStringRec(NR_SBOplMode,'sblaster','oplmode','auto');
   AddIntegerRec(NR_SBOplRate,'sblaster','oplrate',22050);
+  AddStringRec(NR_SBOplEmu,'sblaster','oplemu','default');
   AddBooleanRec(NR_GUS,'gus','gus',true);
   AddIntegerRec(NR_GUSRate,'gus','gusrate',22050);
   AddIntegerRec(NR_GUSBase,'gus','gusbase',240);
-  AddIntegerRec(NR_GUSIRQ1,'gus','irq1',5);
-  AddIntegerRec(NR_GUSIRQ2,'gus','irq2',5);
-  AddIntegerRec(NR_GUSDMA1,'gus','dma1',1);
-  AddIntegerRec(NR_GUSDMA2,'gus','dma2',1);
+  AddIntegerRec(NR_GUSIRQ,'gus','irq1',5);
+  AddIntegerRec(NR_GUSDMA,'gus','dma1',1);
   AddStringRec(NR_GUSUltraDir,'gus','ultradir','C:\ULTRASND');
   AddStringRec(NR_MIDIType,'midi','mpu401','intelligent');
   AddStringRec(NR_MIDIDevice,'midi','device','default');
@@ -889,6 +923,17 @@ begin
   AddBooleanRec(NR_CommandBeforeExecutionWait,'ExtraCommands','BeforeExecution.Wait',True);
   AddBooleanRec(NR_CommandBeforeExecutionMinimized,'ExtraCommands','BeforeExecution.Minimized',False);
   AddBooleanRec(NR_CommandAfterExecutionMinimized,'ExtraCommands','AfterExecution.Minimized',False);
+
+  AddStringRec(NR_AddtionalChecksumFile1,'ExtraGameIdentify','File1.Filename','');
+  AddStringRec(NR_AddtionalChecksumFile1Checksum,'ExtraGameIdentify','File1.Checksum','');
+  AddStringRec(NR_AddtionalChecksumFile2,'ExtraGameIdentify','File2.Filename','');
+  AddStringRec(NR_AddtionalChecksumFile2Checksum,'ExtraGameIdentify','File2.Checksum','');
+  AddStringRec(NR_AddtionalChecksumFile3,'ExtraGameIdentify','File3.Filename','');
+  AddStringRec(NR_AddtionalChecksumFile3Checksum,'ExtraGameIdentify','File3.Checksum','');
+  AddStringRec(NR_AddtionalChecksumFile4,'ExtraGameIdentify','File4.Filename','');
+  AddStringRec(NR_AddtionalChecksumFile4Checksum,'ExtraGameIdentify','File4.Checksum','');
+  AddStringRec(NR_AddtionalChecksumFile5,'ExtraGameIdentify','File5.Filename','');
+  AddStringRec(NR_AddtionalChecksumFile5Checksum,'ExtraGameIdentify','File5.Checksum','');
 end;
 
 Function TGame.GetExtraPrgFile(I : Integer) : String;
@@ -982,7 +1027,12 @@ begin
   FGameList:=TList.Create;
   FConfOpt:=TConfOpt.Create;
   FDir:=IncludeTrailingPathDelimiter(ADir);
-  LoadList;
+  If Application.MainForm<>nil then Application.MainForm.Enabled:=False;
+  try
+    LoadList;
+  finally
+    If Application.MainForm<>nil then Application.MainForm.Enabled:=True;
+  end;
   DeleteOldFiles;
 end;
 
@@ -1018,27 +1068,44 @@ end;
 procedure TGameDB.LoadList;
 Var Rec : TSearchRec;
     I{$IFDEF LargeListTest},J{$ENDIF} : Integer;
+    List : TStringList;
 begin
   Clear;
 
   ForceDirectories(FDir);
 
-  I:=FindFirst(FDir+'*.prof',faAnyFile,Rec);
+  List:=TStringList.Create;
   try
-    while I=0 do begin
-      {$IFDEF LargeListTest}
-        If FDir=PrgDataDir+GameListSubDir+'\' then begin
-          For J:=1 to 50 do LoadGameFromFile(FDir+Rec.Name);
-        end else begin
-          LoadGameFromFile(FDir+Rec.Name);
-        end;
-      {$ELSE}
-        LoadGameFromFile(FDir+Rec.Name);
-      {$ENDIF}
-      I:=FindNext(Rec);
+    I:=FindFirst(FDir+'*.prof',faAnyFile,Rec);
+    try
+      while I=0 do begin
+        If (Rec.Attr and faDirectory)=0 then List.Add(Rec.Name);
+        I:=FindNext(Rec);
+      end;
+    finally
+      FindClose(Rec);
+    end;
+    If List.Count>100 then WaitForm:=CreateWaitForm(nil,LanguageSetup.MessageLoadingDataBase,List.Count) else  WaitForm:=nil;
+    try
+      For I:=0 to List.Count-1 do begin
+        If Assigned(WaitForm) and ((I mod 25)=0) then WaitForm.Step(I);
+        {$IFDEF LargeListTest}
+          If FDir=PrgDataDir+GameListSubDir+'\' then begin
+            For J:=1 to 50 do LoadGameFromFile(FDir+List[I]);
+          end else begin
+            LoadGameFromFile(FDir+Rec.Name);
+          end;
+        {$ELSE}
+          LoadGameFromFile(FDir+List[I]);
+          Application.ProcessMessages;
+        {$ENDIF}
+      end;
+    finally
+      If Assigned(WaitForm) then FreeAndNil(WaitForm);
+      If Application.MainForm<>nil then ForceForegroundWindow(Application.MainForm.Handle);
     end;
   finally
-    FindClose(Rec);
+    List.Free;
   end;
 end;
 

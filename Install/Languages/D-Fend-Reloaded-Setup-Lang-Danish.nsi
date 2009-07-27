@@ -37,6 +37,19 @@ LangString LANGNAME_FreeDosTools ${LANG_DANISH} "FreeDOS Værktøjer til brug i DO
 LangString LANGNAME_Doszip ${LANG_DANISH} "Doszip Kommandør"
 LangString LANGNAME_DesktopShortcut ${LANG_DANISH} "Skrivebord genvej"
 
+LangString LANGNAME_InstallDFendReloaded ${LANG_DANISH} "Installation af D-Fend Reloaded vigtigste komponenter"
+LangString LANGNAME_InstallStartMenu ${LANG_DANISH} "Oprettelse Startmenuen genvej"
+LangString LANGNAME_InstallDOSBox ${LANG_DANISH} "Installing DOSBox"
+LangString LANGNAME_InstallDOSBoxLanguage ${LANG_DANISH} "Installing DOSBox language files"
+LangString LANGNAME_InstallDOSBoxCodec ${LANG_DANISH} "Installing DOSBox video codec"
+LangString LANGNAME_InstallFreeDOS ${LANG_DANISH} "Installing FreeDOS"
+LangString LANGNAME_InstallDOSZip ${LANG_DANISH} "Installing DOSZip Commander"
+LangString LANGNAME_InstallDesktopShortcut ${LANG_DANISH} "Oprettelse skrivebord genvej"
+
+LangString LANGNAME_UpdateDFendReloaded ${LANG_DANISH} "Ajourføring D-Fend Reloaded vigtigste komponenter"
+LangString LANGNAME_UpdateUninstaller ${LANG_DANISH} "Ajourføring uninstalle"
+LangString LANGNAME_UpdateDOSBox ${LANG_DANISH} "Updating DOSBox"
+
 LangString DESC_DFend ${LANG_DANISH} "D-Fend Reloaded er den grafiske brugergrænseflade til administration af DOS spil."
 LangString DESC_DosBox ${LANG_DANISH} "DOSBox er DOS-emulator benyttes af D-Fend Reloaded."
 LangString DESC_DosBoxProgramFiles ${LANG_DANISH} "Program filer fra DOS-emulator."

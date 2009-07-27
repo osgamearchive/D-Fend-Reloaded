@@ -10,7 +10,7 @@ object SetupFrameGamesListScreenshotAppearance: TSetupFrameGamesListScreenshotAp
   object ScreenshotsListBackgroundButton: TSpeedButton
     Tag = 8
     Left = 544
-    Top = 77
+    Top = 117
     Width = 23
     Height = 22
     Anchors = [akTop, akRight]
@@ -34,101 +34,110 @@ object SetupFrameGamesListScreenshotAppearance: TSetupFrameGamesListScreenshotAp
   end
   object ScreenshotsListFontSizeLabel: TLabel
     Left = 16
-    Top = 120
+    Top = 160
     Width = 59
     Height = 13
     Caption = 'Schriftgr'#246#223'e'
   end
   object ScreenshotsListFontColorLabel: TLabel
     Left = 140
-    Top = 120
+    Top = 160
     Width = 61
     Height = 13
     Caption = 'Schriftfarbe:'
   end
   object ScreenshotPreviewLabel: TLabel
     Left = 16
-    Top = 176
+    Top = 216
     Width = 157
     Height = 13
     Caption = 'Gr'#246#223'e der Screenshot-Vorschau:'
   end
   object ScreenshotsListBackgroundRadioButton1: TRadioButton
     Left = 16
-    Top = 16
+    Top = 56
     Width = 551
     Height = 17
     Anchors = [akLeft, akTop, akRight]
     Caption = 'Standard Hintergrundfarbe'
     Checked = True
-    TabOrder = 0
+    TabOrder = 1
     TabStop = True
   end
   object ScreenshotsListBackgroundRadioButton2: TRadioButton
     Left = 16
-    Top = 48
+    Top = 88
     Width = 129
     Height = 17
     Caption = 'Hintergrundfarbe'
-    TabOrder = 1
+    TabOrder = 2
   end
   object ScreenshotsListBackgroundColorBox: TColorBox
     Left = 151
-    Top = 46
+    Top = 86
     Width = 130
     Height = 22
     ItemHeight = 16
-    TabOrder = 2
+    TabOrder = 3
     OnChange = ScreenshotsListBackgroundColorBoxChange
   end
   object ScreenshotsListBackgroundRadioButton3: TRadioButton
     Left = 16
-    Top = 80
+    Top = 120
     Width = 129
     Height = 17
     Caption = 'Hintergrundbild'
-    TabOrder = 3
+    TabOrder = 4
   end
   object ScreenshotsListBackgroundEdit: TEdit
     Left = 151
-    Top = 78
+    Top = 118
     Width = 387
     Height = 21
     Anchors = [akLeft, akTop, akRight]
-    TabOrder = 4
+    TabOrder = 5
     OnChange = ScreenshotsListBackgroundEditChange
   end
   object ScreenshotsListFontSizeEdit: TSpinEdit
     Left = 16
-    Top = 139
+    Top = 179
     Width = 59
     Height = 22
     MaxValue = 48
     MinValue = 1
-    TabOrder = 5
+    TabOrder = 6
     Value = 9
   end
   object ScreenshotsListFontColorBox: TColorBox
     Left = 140
-    Top = 139
+    Top = 179
     Width = 130
     Height = 22
     ItemHeight = 16
-    TabOrder = 6
+    TabOrder = 7
   end
   object ScreenshotPreviewEdit: TSpinEdit
     Left = 16
-    Top = 195
+    Top = 235
     Width = 67
     Height = 22
     MaxValue = 250
     MinValue = 20
-    TabOrder = 7
+    TabOrder = 8
     Value = 100
+  end
+  object ReselectCategoryCheckBox: TCheckBox
+    Left = 16
+    Top = 16
+    Width = 551
+    Height = 17
+    Anchors = [akLeft, akTop, akRight]
+    Caption = 'Zuletzt ausgew'#228'hlte Kategorie beim Start erneut ausw'#228'hlen'
+    TabOrder = 0
   end
   object ImageOpenDialog: TOpenDialog
     DefaultExt = 'jpeg'
     Left = 296
-    Top = 22
+    Top = 62
   end
 end

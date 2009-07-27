@@ -40,7 +40,7 @@ Function CreateLinuxShortCut(const AOwner : TComponent; const Game : TGame) : Bo
 implementation
 
 uses ShlObj, VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgSetupUnit,
-     PrgConsts, GameDBToolsUnit, DosBoxUnit, HelpConsts;
+     PrgConsts, GameDBToolsUnit, DosBoxUnit, HelpConsts, IconLoaderUnit;
 
 {$R *.dfm}
 
@@ -59,6 +59,10 @@ begin
   OKButton.Caption:=LanguageSetup.OK;
   CancelButton.Caption:=LanguageSetup.Cancel;
   HelpButton.Caption:=LanguageSetup.Help;
+
+  UserIconLoader.DialogImage(DI_OK,OKButton);
+  UserIconLoader.DialogImage(DI_Cancel,CancelButton);
+  UserIconLoader.DialogImage(DI_Help,HelpButton);
 end;
 
 procedure TCreateShortcutForm.FormShow(Sender: TObject);
@@ -157,7 +161,7 @@ begin
     ConfFile:=IncludeTrailingPathDelimiter(ExtractFilePath(SaveDialog.FileName))+ExtractFileName(MakeAbsPath(ChangeFileExt(Game.SetupFile,'.conf'),PrgSetup.BaseDir));
     St:=TStringList.Create;
     try
-      St2:=BuildConfFile(Game,False,False);
+      St2:=BuildConfFile(Game,False,False,-1);
       if St2=nil then exit;
       try
         try

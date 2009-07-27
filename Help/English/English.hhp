@@ -23,6 +23,7 @@ Index.html
 Menu.html
 Introduction.html
 Introduction2.html
+FirstRunWizard.html
 FileImportConf.html
 FileImportProf.html
 FileImportZip.html
@@ -31,6 +32,8 @@ FileExportConf.html
 FileExportProf.html
 FileExportZip.html
 FileExportInstaller.html
+FileExportBuildInstallers.html
+FileExportBuildZipPackages.html
 FileOptions.html
 FileOptionsGeneral.html
 FileOptionsDirectories.html
@@ -40,6 +43,7 @@ FileOptionsWineSupport.html
 FileOptionsUserInterface.html
 FileOptionsLanguage.html
 FileOptionsGamesListTranslations.html
+FileOptionsMenubar.html
 FileOptionsToolbar.html
 FileOptionsColumnsInTheGamesList.html
 FileOptionsAppearanceList.html
@@ -54,6 +58,7 @@ FileOptionsDOSBoxCVSFeatures.html
 FileOptionsFreeDOS.html
 FileOptionsScummVM.html
 FileOptionsQBasic.html
+FileOptionsUserInterpreters.html
 FileOptionsWaveEncoder.html
 FileOptionsZipPackers.html
 FileOptionsTextEditor.html
@@ -61,7 +66,10 @@ FileOptionsMediaViewers.html
 FileOptionsWindowsGames.html
 FileOptionsService.html
 FileOptionsSearchForUpdates.html
+FileOptionsImageScaling.html
 FileQuit.html
+ViewShowMenubar.html
+ViewShowToolbar.html
 ViewShowTree.html
 ViewShowScreenshots.html
 ViewShowSearchbox.html
@@ -83,6 +91,7 @@ ProfileAddFromTemplate.html
 ProfileWithWizard.html
 ProfileEdit.html
 ProfileEditProfile.html
+ProfileEditAdditionalChecksums.html
 ProfileEditProgramInformation.html
 ProfileEditProgramDirectories.html
 ProfileEditHelperPrograms.html
@@ -138,12 +147,10 @@ ExtrasScanGamesFolder.html
 ExtrasEditMultipleProfiles.html
 ExtrasUninstallMultipleGames.html
 ExtrasTransferProfiles.html
-ExtrasBuildInstallers.html
-ExtrasBuildZipPackages.html
 ExtrasCreateShortcuts.html
 ExtrasCheckProfiles.html
+ExtrasLanguageEditor.html
 HelpForum.html
-HelpLanguageEditor.html
 HelpOldGames.html
 HelpStatistics.html
 HelpOperationMode.html
@@ -162,6 +169,9 @@ GPL3.html
 
 #define FileExportConf 1001
 #define FileExportProf 1002
+#define FileImportZip 1011
+#define FileExportBuildInstallers 1012
+#define FileExportBuildZipPackages 1013
 
 #define FileOptions 1100
 #define FileOptionsGeneral 1101
@@ -193,6 +203,9 @@ GPL3.html
 #define FileOptionsZipPackers 1127
 #define FileOptionsGamesListTranslations 1128
 #define FileOptionsListInIconsMode 1129
+#define FileOptionsMenubar 1130
+#define FileOptionsUserInterpreters 1131
+#define FileOptionsImageScaling 1132
 
 #define ViewQuickStarter 1501
 
@@ -238,6 +251,7 @@ GPL3.html
 #define ProfileEditStarting 2123
 #define ProfileEditHelperPrograms 2124
 #define ProfileEditHardware 2125
+#define ProfileEditAdditionalChecksums 2126
 
 #define ExtrasManageIcons 3001
 #define ExtrasViewHistory 3002
@@ -253,13 +267,11 @@ GPL3.html
 #define ExtrasEditMultipleProfiles 3012
 #define ExtrasUninstallMultipleGames 3013
 #define ExtrasTransferProfiles 3014
-#define ExtrasBuildInstallers 3015
-#define ExtrasBuildZipPackages 3016
 #define ExtrasCheckProfiles 3017
 #define ExtrasCreateShortcuts 3018
+#define ExtrasLanguageEditor 3019
 
 #define HelpForum 4001
-#define HelpLanguageEditor 4002
 #define HelpStatistics 4003
 #define HelpOperationMode 4004
 #define HelpSearchForUpdates 4005
