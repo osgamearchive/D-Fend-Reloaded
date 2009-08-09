@@ -1,153 +1,28 @@
 [Global]
-Cut=Cut
-Cut.HintMain=Cuts the selected text to the clipboard.
-Copy.HintMain=Copys the selected text to the clipboard.
-Paste=Paste
-Paste.HintMain=Pastes text from the clipboard.
-Undo=Undo
-Undo.HintMain=Undos the last edit step.
-
-[CharsetSettings]
-HTMLCharset=iso-8859-1
-
-[Messages]
-LoadingDataBase=Loading data base
-UserInterpreterNeededToExecuteFile=The user defined interpreter %s is needed to execute the file %s but is not reachable.
-
-[Menu]
-File.Import.Zip.Caption=Import archive file
-File.Export.CreateInstaller=&Create installer package...
-View.ShowMenubar=Show &menubar
-View.ShowMenubar.HideWarning=You cannot hide the menubar and the toolbar at the same time. Otherwise there would be no way to restore them.
-View.ShowMenubar.RestoreInfo=You can restore the menubar via the context menu of the toolbar.
-View.ShowToolbar=Show tool&bar
-Extras.IconManager.Add.Single=Add single icon
-Extras.IconManager.Add.All=Scan games folder and add all icons
-Extras.CreateShortcuts=Create shortcuts for multiple games...
-Extras.TranslationEditor=Translation editor...
-Button.Help=&Help
-Button.Help.HintMainWindow=Opens the help function.
-ToolbarPopup.SetupButtons=Setup toolbar buttons...
-ToolbarPopup.SetupIconSet=Setup icon set...
-
-[Capture]
-Notes=Notes
+SelectAll=Select all
 
 [ProfileEditorForm]
-RelativePath.Info=Info
-RelativePath.Hint=This function has noting to do with the portable operation mode of D-Fend Realoded! This function is ment to access files inside ISO images mounted in DOSBox which cannot be accessed by the Windows file structure. If you want to run D-Fend Reloaded from different place use a portalbe installation. This function will not help you running D-Fend Reloaded portabely.
-Mounting.AutoMountCDs.Short=Mount all available CDs
-Mounting.SecureMode.Short=Disable mounting after DOSBox start
-Sound.CD=CD audio
-AdditionalChecksums=Additional checksums
-AdditionalChecksums.Files=Files
-AdditionalChecksums.Checksums=Checksums
-AdditionalChecksums.DeleteChecksum=Remove checksum
-AdditionalChecksums.AddAll=Autonatically add checksums
-AdditionalChecksums.DeleteAll=Remove all checksums
-AdditionalChecksums.SelectFolder=Select directory for adding checksums from
-AdditionalChecksums.SelectFileFilter=All files (*.*)|*.*
-DefaultValueHint=You can edit the values offered in this box on the "Default values" page of the setup dialog.
+Tools=Tools
+Tools.Run=Run game with current configuration
+Tools.ResetAllPagesConfirm=Do you really want to reset all pages?
+Tools.ResetPage=Reset this page to the default values
+Tools.ResetAllPages=Reset all pages to the default values
+Tools.ResetToTemplate=Reset to template
+Tools.ResetToTemplate.Page=Reset this page
+Tools.ResetToTemplate.AllPages=Reset all pages
+Tools.ResetToAutoSetup=Reset to auto setup template
+Tools.ResetToAutoSetup.Page=Select auto setup template and reset this page...
+Tools.ResetToAutoSetup.AllPages=Select auto setup template and reset all pages...
+Tools.ResetToAutoSetup.Select=Select auto setup template
 
 [SetupForm]
-CaptureDir=Default base folder for capture directories
-CaptureDir.Select=Select capture folder
-StartFullscreen=Fullscreen without window border
-IconSets=Icon sets:
-IconSets.Preview=Preview:
-IconSets.Author=Author:
-IconSets.Customize=Open icons customizing file
-RestoreSelectedPreviewerCategory=Restore selected previewer category on restart
-ProfileEditorRenameProfFilesOnRenamingProfile=Rename profile file when renaming the profile automatically
-Menubar=Menubar
-DefaultValue.Platform.DOSBox=DOSBox
-DefaultValue.Platform.ScummVM=ScummVM
-DefaultValue.Sound.SoundBlaster=SoundBlaster
-DefaultValue.Sound.GUS=GUS
-DefaultValue.Sound.MIDI=MIDI
-CHANGED: GamesListGUI.ListAppearance=Games list
-CHANGED: GamesListGUI.TreeAppearance=Tree structure
-CHANGED: GamesListGUI.ScreenshotListAppearance=Media preview
-NoteLinesInTooltips=Maximum number of note lines in the tooltips in the games list:
-GameListIconMode=List in icons mode
-GameListIconMode.IconSize=Icon size to use
-UserDefinedInterpreters=User-defined interpreters
-UserDefinedInterpreters.Label=User-defined interpreter
-UserDefinedInterpreters.AddHint=Add interpreter record
-UserDefinedInterpreters.DeleteHint=Delete selected interpreter record
-UserDefinedInterpreters.DeleteWarning=Do you really want to delete the record for the interpreter %s ?
-UserDefinedInterpreters.Program=Program file of the interpreter
-UserDefinedInterpreters.Program.Title=Select interpreter program file
-UserDefinedInterpreters.Program.Filter=All executables (*.exe, *.com, *.bat)|*.exe;*.com;*.bat|All files (*.*)|*.*
-UserDefinedInterpreters.Parameters=Parameters (%s=name of the data file to interpret)
-UserDefinedInterpreters.Extensions=Extensions of the data files (use ; as separator)
-
-[TemplateForm]
-CheckChecksums=Check for duplicate checksums...
-CheckChecksums.CheckingDB=Checking data base
-CheckChecksums.SameChecksum=(same checksum as "%s")
-CheckChecksums.MessageOK=All checksums in the auto setup templates data base are unique.
-CheckChecksums.WarningTitle=Auto setup templates checksum check
-CheckChecksums.MissingChecksumsInfo=The following auto setup templates have no main exe file checksum. You should recreate this templates from real profiles:
-CheckChecksums.NonUniqueChecksumsInfo=The checksums for the following profiles are not unique. You should add additional checksums to them:
-
-[ChangeProfilesForm]
-MountingChangeSettings=Change mounting settings
-MountingChangeSettings.Global=Mount games base folder as drive C: (default)
-MountingChangeSettings.Local=Only mount the folder where the game is stored as drive C:
-
-[GameSetup]
-Cycles.Auto=Auto
-Cycles.Max=Max
-Oplemu=OPL emulation
-Priority.Pause=Pause
-
-[FirstRunWizard]
-CHANGED: Caption=Welcome to D-Fend Reloaded
-InfoOverview=In this wizard you can configurate the basic settings needed to use D-Fend Reloaded. You can also change all settings offered in this wizard from the program settings dialog.
-InfoUpdateShort=Update checking
-EditSettings=Edit settings
-MainFormInfoBar=To add a new game to D-Fend Reloaded just drop the archive file containing the game to the program window or copy the game to a subfolder of the games folder (see Extras|Open games folder) and add it via the wizard (Profiles|Add with wizard) or scan the games folder for new games (Extras|Scan games folder for new games). Also see the online help on how to add a game (Help|Adding games).
-MainFormInfoBar.CloseHint=Remove this information bar.
-
-[ExtraExeEdit]
-Info=The program files defined in this dialog are offered to start via the context menu of the profile. If you want to access files relatively to the DOSBox directory structure you can place a "DOSBOX:" before the path ("DOSBOX:C:\game\gamefile.exe" for example).
-
-[AutoDetectGames]
-CHANGED: OpenFolderButton.Hint=Open games folder
-OpenFolderButton.Hint=Open games folder in Explorer
-CHANGED: ScanButton=Scan games folder
-ScanButton.Hint=Scans the games folder for new games.
-AddButton=Add selected games
-AddButton.Hint=Adds the selected games to the games list.
-ProfileNameSelection=Name scheme
-ProfileNameSelection.Hint=Defines how the scan function should name the new profiles.
-ProfileNameSelection.GameFilename=Chosse game filename as profile name
-ProfileNameSelection.Foldername=Choose folder name as profile name
-Result.Start=Click "Scan games folder" to scan for new games. The found games will be listed in this window so you can decide which to add to the games list.
-Popup.SelectAll=Select all
-Popup.SelectOnlyAutoSetup=Select only auto setup profiles
-Popup.SelectNone=Unselect all
-List.Name=Name
-List.Folder=Folder
-List.Filename=Filename
-List.Template=Template
-Edit.ProfileName=Profile name
-Edit.TemplateType=Template type
-Edit.TemplateType.User=User template
-Edit.TemplateType.AutoSetup1=Auto setup template
-Edit.TemplateType.AutoSetup2=Matching auto setup template
-Edit.Template=Template to use
-Edit.ProgramFile=Program file
-Scanning=Scanning folder
-
-[CreateShortcuts]
-Caption=Create shortcuts
-Info=Select games to create shortcuts for
-InfoWine=Folder to create link files in
-UseProfileIcons=Use icons from profiles
-
-[SelectAutoSetupTemplate]
-Caption=Select auto setup template to use
-WhileImportingZip=There are multiple matching auto setup templates for the game. Please select which template should be used when adding this game.
-WhileScanningFolder=There are multiple matching auto setup templates for the game located in %s. Please select which template should be used when adding this game.
+AlwaysCreateConfFiles=Always create conf files for all profiles (off: only when starting DOSBox)
+ImageScaling=Image scaling 
+ImageScaling.Label=Algorithm used for scaling images 
+ImageScaling.Algorithm.Box=Box 
+ImageScaling.Algorithm.Triangle=Triangle 
+ImageScaling.Algorithm.Hermite=Hermite 
+ImageScaling.Algorithm.Bell=Bell 
+ImageScaling.Algorithm.BSpline=B-spline 
+ImageScaling.Algorithm.Lanczos3=Lanczos3 
+ImageScaling.Algorithm.Mitchell=Mitchell 

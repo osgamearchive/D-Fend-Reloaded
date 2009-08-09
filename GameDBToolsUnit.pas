@@ -48,13 +48,14 @@ Function BuildDefaultDosProfile(const GameDB : TGameDB; const CopyFiles : Boolea
 Procedure BuildDefaultProfile;
 Procedure ReBuildTemplates;
 Function CopyFiles(Source, Dest : String; const OverwriteExistingFiles : Boolean) : Boolean;
-Procedure UpdateUserDataFolderAfterUpgrade(const GameDB : TGameDB);
+Procedure UpdateUserDataFolderAndSettingsAfterUpgrade(const GameDB : TGameDB);
 Procedure UpdateSettingsFilesLocation;
 
 { Extras }
 
 Procedure ExportGamesList(const GameDB : TGameDB; const FileName : String);
 Procedure EditDefaultProfile(const AOwner : TComponent; const GameDB : TGameDB; const ASearchLinkFile : TLinkFile; const ADeleteOnExit : TStringList);
+Procedure CreateConfFilesForProfiles(const GameDB : TGameDB; const Dir : String);
 
 { History }
 
@@ -110,6 +111,10 @@ Procedure OpenConfigurationFile(const Game : TGame; const DeleteOnExit : TString
 { Program file selection }
 
 Function SelectProgramFile(var FileName : String; const HintFirstFile, HintSecondFile : String; const WindowsMode : Boolean; const Owner : TComponent) : Boolean;
+
+{ Change mounting settings in templates }
+
+Function BuildGameDirMountData(const Template : TGame; const ProgrammFileDir, SetupFileDir : String) : TStringList;
 
 implementation
 
@@ -1592,7 +1597,9 @@ end;
 
 Procedure DeleteOldFiles;
 begin
-  DeleteFiles(PrgDataDir+GameListSubDir,'*.conf');
+  If not PrgSetup.CreateConfFilesForProfiles or (OperationMode=omPortable) then begin
+    DeleteFiles(PrgDataDir+GameListSubDir,'*.conf');
+  end;
   DeleteFiles(PrgDataDir+GameListSubDir,'tempprof.*');
   ExtDeleteFile(PrgDataDir+'Developers.dat',ftProfile);
   ExtDeleteFile(PrgDataDir+'Genres.dat',ftProfile);
@@ -1699,38 +1706,39 @@ begin
   result:=True;
 end;
 
-Procedure UpdateUserDataFolderAfterUpgrade(const GameDB : TGameDB);
+Procedure UpdateUserDataFolderAndSettingsAfterUpgrade(const GameDB : TGameDB);
 Var Source : String;
     I : Integer;
     DB : TGameDB;
 begin
   {Copy new and changed NewUserData files to DataDir}
-  If PrgDataDir=PrgDir then exit;
+  If PrgDataDir<>PrgDir then begin
 
-  {Update installer package base script}
-  If FileExists(PrgDir+NSIInstallerHelpFile) then begin
-    CopyFile(PChar(PrgDir+NSIInstallerHelpFile),PChar(PrgDataDir+SettingsFolder+'\'+NSIInstallerHelpFile),False); {False = overwrite existing file}
-  end else begin
-    If FileExists(PrgDir+BinFolder+'\'+NSIInstallerHelpFile) then begin
-      CopyFile(PChar(PrgDir+BinFolder+'\'+NSIInstallerHelpFile),PChar(PrgDataDir+SettingsFolder+'\'+NSIInstallerHelpFile),False); {False = overwrite existing file}
+    {Update installer package base script}
+    If FileExists(PrgDir+NSIInstallerHelpFile) then begin
+      CopyFile(PChar(PrgDir+NSIInstallerHelpFile),PChar(PrgDataDir+SettingsFolder+'\'+NSIInstallerHelpFile),False); {False = overwrite existing file}
+    end else begin
+      If FileExists(PrgDir+BinFolder+'\'+NSIInstallerHelpFile) then begin
+        CopyFile(PChar(PrgDir+BinFolder+'\'+NSIInstallerHelpFile),PChar(PrgDataDir+SettingsFolder+'\'+NSIInstallerHelpFile),False); {False = overwrite existing file}
+      end;
     end;
-  end;
 
-  {Copy Icons.ini to settings folder}
-  If FileExists(PrgDir+NewUserDataSubDir+'\'+IconsConfFile) then begin
-    If FileExists(PrgDataDir+SettingsFolder+'\'+IconsConfFile) then begin
-      If FileExists(PrgDataDir+SettingsFolder+'\'+ChangeFileExt(IconsConfFile,'.old')) then DeleteFile(PrgDataDir+SettingsFolder+'\'+ChangeFileExt(IconsConfFile,'.old'));
-      RenameFile(PrgDataDir+SettingsFolder+'\'+IconsConfFile,PrgDataDir+SettingsFolder+'\'+ChangeFileExt(IconsConfFile,'.old'));
+    {Copy Icons.ini to settings folder}
+    If FileExists(PrgDir+NewUserDataSubDir+'\'+IconsConfFile) then begin
+      If FileExists(PrgDataDir+SettingsFolder+'\'+IconsConfFile) then begin
+        If FileExists(PrgDataDir+SettingsFolder+'\'+ChangeFileExt(IconsConfFile,'.old')) then DeleteFile(PrgDataDir+SettingsFolder+'\'+ChangeFileExt(IconsConfFile,'.old'));
+        RenameFile(PrgDataDir+SettingsFolder+'\'+IconsConfFile,PrgDataDir+SettingsFolder+'\'+ChangeFileExt(IconsConfFile,'.old'));
+      end;
+      CopyFile(PChar(PrgDir+NewUserDataSubDir+'\'+IconsConfFile),PChar(PrgDataDir+SettingsFolder+'\'+IconsConfFile),True);
     end;
-    CopyFile(PChar(PrgDir+NewUserDataSubDir+'\'+IconsConfFile),PChar(PrgDataDir+SettingsFolder+'\'+IconsConfFile),True);
+
+    {Add new auto setup templates}
+    CopyFiles(PrgDir+NewUserDataSubDir+'\'+AutoSetupSubDir,PrgDataDir+AutoSetupSubDir,False); {False = do not overwrite existing file}
+
+    {Update DozZip}
+    Source:=PrgDir+NewUserDataSubDir+'\DOSZIP\';
+    If DirectoryExists(Source) then CopyFiles(Source,IncludeTrailingPathDelimiter(PrgSetup.GameDir)+'DOSZIP\',True);
   end;
-
-  {Add new auto setup templates}
-  CopyFiles(PrgDir+NewUserDataSubDir+'\'+AutoSetupSubDir,PrgDataDir+AutoSetupSubDir,False); {False = do not overwrite existing file}
-
-  {Update DozZip}
-  Source:=PrgDir+NewUserDataSubDir+'\DOSZIP\';
-  If DirectoryExists(Source) then CopyFiles(Source,IncludeTrailingPathDelimiter(PrgSetup.GameDir)+'DOSZIP\',True);
 
   {Update video card default values}
   GameDB.ConfOpt.Video:=DefaultValuesVideo;
@@ -1761,7 +1769,30 @@ begin
   end;
   If (I>0) and (GameDB[I].CacheLanguage='multilingual') then begin
     GameDB[I].Language:='Multilingual'; GameDB[I].StoreAllValues; GameDB[I].LoadCache;
-  end; 
+  end;
+
+  {Update settings in ConfOpt.dat}
+  If VersionToInt(PrgSetup.DFendVersion)<800 then begin
+    GameDB.ConfOpt.Resolution:=DefaultValuesResolution;
+    GameDB.ConfOpt.Scale:=DefaultValuesScale;
+    GameDB.ConfOpt.Video:=DefaultValuesVideo;
+  end;
+  If VersionToInt(PrgSetup.DFendVersion)<801 then begin
+    GameDB.ConfOpt.Joysticks:=DefaultValuesJoysticks;
+    GameDB.ConfOpt.GUSRate:=DefaultValuesGUSRate;
+    GameDB.ConfOpt.OPLRate:=DefaultValuesOPLRate;
+    GameDB.ConfOpt.PCRate:=DefaultValuesPCRate;
+    GameDB.ConfOpt.Rate:=DefaultValuesRate;
+    GameDB.ConfOpt.Oplmode:=DefaultValuesOPLModes;
+    GameDB.ConfOpt.SBBase:=DefaultValuesSBBase;
+    GameDB.ConfOpt.GUSBase:=DefaultValuesGUSBase;
+    GameDB.ConfOpt.Dma:=DefaultValuesDMA;
+    GameDB.ConfOpt.GUSDma:=DefaultValuesDMA1;
+    GameDB.ConfOpt.HDMA:=DefaultValuesHDMA;
+    GameDB.ConfOpt.Memory:=DefaultValuesMemory;
+  end;
+
+  GameDB.ConfOpt.StoreAllValues;
 end;
 
 Procedure MoveDataFile(const FileName : String);
@@ -2240,6 +2271,55 @@ begin
     DefaultGame.Free;
     L.Free;
     L2.Free;
+  end;
+end;
+
+Function GetAllConfFiles(const Dir : String) : TStringList;
+Var Rec : TSearchRec;
+    I : Integer;
+begin
+  result:=TStringList.Create;
+
+  I:=FindFirst(IncludeTrailingPathDelimiter(Dir)+'*.conf',faAnyFile,Rec);
+  try
+    While I=0 do begin
+      If (Rec.Attr and faDirectory)=0 then result.Add(ExtUpperCase(Rec.Name));
+      I:=FindNext(Rec);
+    end;
+  finally
+    FindClose(Rec);
+  end;
+end;
+
+Function NeedUpdate(const ProfFile, ConfFile : String) : Boolean;
+Var D1,D2 : TDateTime;
+begin
+  If not FileExists(ConfFile) then begin result:=True; exit; end;
+  D1:=GetFileDate(ProfFile); D2:=GetFileDate(ConfFile);
+  result:=(D1<0.001) or (D2<0.001) or (D2<D1-5/86400);
+end;
+
+Procedure CreateConfFilesForProfiles(const GameDB : TGameDB; const Dir : String);
+Var St,St2 : TStringList;
+    S,T : String;
+    I,J : Integer;
+begin
+  St:=GetAllConfFiles(Dir);
+  try
+    For I:=0 to GameDB.Count-1 do begin
+      If not DOSBoxMode(GameDB[I]) then exit;
+      S:=GameDB[I].SetupFile; T:=ChangeFileExt(S,'.conf');
+      If NeedUpdate(S,T) then begin
+        St2:=BuildConfFile(GameDB[I],False,False,-1);
+        try St2.SaveToFile(T); finally St2.Free; end;
+      end;
+      J:=St.IndexOf(ExtUpperCase(ExtractFileName(T))); If J>=0 then St.Delete(J);
+    end;
+
+    S:=IncludeTrailingPathDelimiter(Dir);
+    For I:=0 to St.Count-1 do DeleteFile(S+St[I]);
+  finally
+    St.Free;
   end;
 end;
 
@@ -3111,6 +3191,99 @@ begin
   finally
     OpenDialog.Free;
   end;
+end;
+
+function NextFreeDriveLetter(const Mounting : TStringList): Char;
+Var I : Integer;
+    B : Boolean;
+    St : TStringList;
+begin
+  result:='C';
+  repeat
+    B:=True;
+    For I:=0 to Mounting.Count-1 do begin
+      St:=ValueToList(Mounting[I]);
+      try
+        If St.Count<3 then continue;
+        if UpperCase(St[2])=result then begin inc(result); B:=False; break; end;
+      finally
+        St.Free;
+      end;
+    end;
+  until B;
+end;
+
+function CanReachFile(const Mounting : TStringList; const FileName: String): Boolean;
+Var S,FilePath : String;
+    St : TStringList;
+    I : Integer;
+begin
+  result:=False;
+  FilePath:=Trim(ExtUpperCase(IncludeTrailingPathDelimiter(ShortName(MakeAbsPath(ExtractFilePath(FileName),PrgSetup.BaseDir)))));
+  For I:=0 to Mounting.Count-1 do begin
+    St:=ValueToList(Mounting[I]);
+    try
+      {Types to check:
+       RealFolder;DRIVE;Letter;False;;FreeSpace
+       RealFolder;FLOPPY;Letter;False;;
+       RealFolder;CDROM;Letter;IO;Label;
+       all other are images}
+      If St.Count<2 then continue;
+      S:=Trim(ExtUpperCase(St[1]));
+      If (S<>'DRIVE') and (S<>'FLOPPY') and (S<>'CDROM') then continue;
+      S:=Trim(ExtUpperCase(IncludeTrailingPathDelimiter(ShortName(MakeAbsPath(St[0],PrgSetup.BaseDir)))));
+
+      result:=(Copy(FilePath,1,length(S))=S);
+      if result then exit;
+    finally
+      St.Free;
+    end;
+  end;
+end;
+
+Procedure AddPrgDir(const Mounting : TStringList; const ProgrammFileDir : String);
+begin
+  if CanReachFile(Mounting,ProgrammFileDir) then exit;
+  If Mounting.Count=10 then Mounting.Delete(9);
+  Mounting.Add(MakeRelPath(ProgrammFileDir,PrgSetup.BaseDir)+';Drive;'+NextFreeDriveLetter(Mounting)+';false;');
+end;
+
+Function BuildGameDirMountData(const Template : TGame; const ProgrammFileDir, SetupFileDir : String) : TStringList;
+Var G : TGame;
+    I : Integer;
+    St : TStringList;
+    S,T : String;
+    B : Boolean;
+begin
+  result:=TStringList.Create;
+
+  {Load from template}
+  If Template=nil then G:=TGame.Create(PrgSetup) else G:=Template;
+  try
+    For I:=0 to 9 do
+      If G.NrOfMounts>=I+1 then result.Add(G.Mount[I]) else break;
+  finally
+    If Template=nil then G.Free;
+  end;
+
+  {Add GameDir}
+  B:=False;
+  T:=Trim(ExtUpperCase(IncludeTrailingPathDelimiter(ShortName(MakeAbsPath(PrgSetup.GameDir,PrgSetup.BaseDir)))));
+  For I:=0 to result.Count-1 do begin
+    St:=ValueToList(result[I]);
+    try
+      If (St.Count<2) or (Trim(ExtUpperCase(St[1]))<>'DRIVE') then continue;
+      S:=Trim(ExtUpperCase(IncludeTrailingPathDelimiter(ShortName(MakeAbsPath(St[0],PrgSetup.BaseDir)))));
+      B:=(T=S); If B then break;
+    finally
+      St.Free;
+    end;
+  end;
+  if not B then result.Add(MakeRelPath(PrgSetup.GameDir,PrgSetup.BaseDir,True)+';DRIVE;'+NextFreeDriveLetter(result)+';False;;105');
+
+  {Add program file and setup file dir}
+  If ProgrammFileDir<>'' then AddPrgDir(result,ProgrammFileDir);
+  If SetupFileDir<>'' then AddPrgDir(result,SetupFileDir);
 end;
 
 end.

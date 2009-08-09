@@ -64,11 +64,9 @@ type
     JustChanging : Boolean;
   public
     { Public-Deklarationen }
-    Procedure InitGUI(const InitData : TModernProfileEditorInitData);
+    Procedure InitGUI(var InitData : TModernProfileEditorInitData);
     Procedure SetGame(const Game : TGame; const LoadFromTemplate : Boolean);
-    Function CheckValue : Boolean;
     Procedure GetGame(const Game : TGame);
-    Procedure ShowFrame;
   end;
 
 implementation
@@ -79,7 +77,7 @@ uses VistaToolsUnit, LanguageSetupUnit, HelpConsts;
 
 { TModernProfileEditorVolumeFrame }
 
-procedure TModernProfileEditorVolumeFrame.InitGUI(const InitData : TModernProfileEditorInitData);
+procedure TModernProfileEditorVolumeFrame.InitGUI(var InitData : TModernProfileEditorInitData);
 begin
   NoFlicker(SoundVolumeMasterLeftEdit);
   NoFlicker(SoundVolumeMasterRightEdit);
@@ -143,10 +141,6 @@ begin
   SpinEditChange(self);
 end;
 
-procedure TModernProfileEditorVolumeFrame.ShowFrame;
-begin
-end;
-
 procedure TModernProfileEditorVolumeFrame.SpinEditChange(Sender: TObject);
 begin
   If JustChanging then exit;
@@ -194,11 +188,6 @@ begin
   finally
     JustChanging:=False;
   end;
-end;
-
-function TModernProfileEditorVolumeFrame.CheckValue: Boolean;
-begin
-  result:=True;
 end;
 
 procedure TModernProfileEditorVolumeFrame.GetGame(const Game: TGame);

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
+<!DOCTYPE DFRPackagesFile SYSTEM "http://dfendreloaded.sourceforge.net/Packages/DFRPackagesFile.dtd">
+
+<DFRPackagesFile Name="Official freeware download list for D-Fend Reloaded" LastUpdateDate="08/09/2009">
+  <ExePackage
+    Name="Programs package"
+    Description="Freeware:\\4DOS 7.61, Necromancer's Dos Navigator, Fasttracker 2, ScreamTracker 3.21, FreeDOS (Boot-Image), DOSBox Info (DB-Info 1.0.2), OpenGEM, VGA Copy 6.25\\\\Shareware:\\AnsiDraw 3.0, The Draw 4.63"
+    PackageChecksum="1EB211B24314F01AB9C8978AE3185427"
+    Size="14852789">D-Fend-Reloaded-DemoPackage1.exe</ExePackage>
+  <ExePackage
+    Name="Adventure, roleplay and strategy games package"
+    Description="Freeware:\\Beneath a Steel Sky, Beyond the Titanic, Castle Adventure, Supernova, The Adventures of Maddog Williams\\\\Shareware:\\Super ZZT, Ancients 1: Deathwatch, Mystic Towers, Solar Winds"
+    PackageChecksum="B0F59AC42DED3CC3B70779A88F1F503E"
+    Size="11427343">D-Fend-Reloaded-DemoPackage2.exe</ExePackage>
+  <ExePackage
+    Name="Action games package"
+    Description="Freeware:\\Beast, Major Stryker, One Must Fall 2097, Overkill, Striker, Traffic Department 2192, Xenophage: Alien Bloodsport\\\\Shareware:\\Highway Hunter, Kiloblaster, Raptor, Seek and Destroy, Tyrian 2000, Zone 66, Terminal Velocity, Epic Pinball, Extreme Pinball, Death Rally, Slicks'n'Slide, Wacky Wheels"
+    PackageChecksum="4BFAB90351E15FA388D88F18B2123156"
+    Size="75735193">D-Fend-Reloaded-DemoPackage3.exe</ExePackage>
+  <ExePackage
+    Name="Puzzle and board games package"
+    Description="Freeware:\\Railroad Tycoon Deluxe, Adventures of Robbo, Game of Robot (Junior), Heartlight PC\\\\Shareware/Demo:\\Magjongg VGA, Lemmings 2: The Tribes Demo, Lemmings 3D Demo, Lemmings 3D Winterland Demo, Lemmings Demo, Oh no more Lemmings, XMas Lemmings '91 Demo, XMas Lemmings '92 Demo, Brix, Game of Robot 1, Game of Robot 2, Game of Robot 3, Game of Robot 4, Papanitzu, Ramona das Apfelwürmchen"
+    PackageChecksum="70CA2B8BE91FCFAD99F3DA9BFF601317"
+    Size="15818244">D-Fend-Reloaded-DemoPackage4.exe</ExePackage>
+  <ExePackage
+    Name="First person games package"
+    Description="Freeware:\\Ken's Labyrinth\\\\Shareware: Blake Stone: Aliens of Gold, Duke Nukem 3D, Radix: Beyond the Void, Rise of the Triad, Shadow Warrior"
+    PackageChecksum="2A3AA0705A0CEE0C2ADCBA3E45FD4F1D"
+    Size="23952775">D-Fend-Reloaded-DemoPackage5.exe</ExePackage>
+  <ExePackage
+    Name="Platform games package"
+    Description="Freeware:\\Alien Carnage (Halloween Harry Special Edition), Bio Menace, Electro Man, Jazz Jackrabbit: Holiday Hare, Jazz Jackrabbit: Holiday Hare 1995\\\\Shareware:\\Commander Keen 1 (Marooned on Mars), Commander Keen 4 (Secret of the Oracle), Cosmo's Cosmic Adventure, Crystal Caves, Duke Nukem 1, Duke Nukem 2, Halloween Harry, Hocus Pocus, Jazz Jackrabbit, Jill of the Jungle, Math Rescue, Monster Bash, Realms of Chaos, Secret Agent, Space Chase, Word Rescue, Xargon"
+    PackageChecksum="B5A7D0EEBA91611BBBEA0FFE9FB7EB4D"
+    Size="15861158">D-Fend-Reloaded-DemoPackage6.exe</ExePackage>
+  <ExePackage
+    Name="Demos package"
+    Description="119 Demos"
+    PackageChecksum="81B1586C82571EFAE55A6594826DF419"
+    Size="130398531">D-Fend-Reloaded-DemoPackage7.exe</ExePackage>
+  <Game
+    Name="Second Reality"
+	Genre="Demo"
+	Developer="Future Crew"
+	Publisher="Future Crew"
+	Year="1993"
+	Language="English"
+	License="Freeware"
+	PackageChecksum="A84E47350B2CC7A754BE7011A8C1947B"
+	GameExeChecksum="BF5F1D8C591BBFAD1533884DE35BF3B0"
+	Size="2515532">Second%20Reality.zip</Game>
+  <Game
+    Name="8088 Corruption"
+	Genre="Demo"
+	Developer="Hornet"
+	Publisher="Hornet"
+	Year="2004"
+	Language="English"
+	License="Freeware"
+	PackageChecksum="8E05D1D063E907249AA1481B4BB35670"
+	GameExeChecksum="F19F0373C1B2DADCB3A088A67CDDE5A0"
+	Size="2930456">8088%20Corruption.zip</Game>
+</DFRPackagesFile>

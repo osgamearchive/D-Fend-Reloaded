@@ -41,11 +41,9 @@ type
     { Private-Deklarationen }
   public
     { Public-Deklarationen }
-    Procedure InitGUI(const InitData : TModernProfileEditorInitData);
+    Procedure InitGUI(var InitData : TModernProfileEditorInitData);
     Procedure SetGame(const Game : TGame; const LoadFromTemplate : Boolean);
-    Function CheckValue : Boolean;
     Procedure GetGame(const Game : TGame);
-    Procedure ShowFrame;
   end;
 
 implementation
@@ -57,7 +55,7 @@ uses VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgSetupUnit, HelpConsts,
 
 { TModernProfileEditorStartFrame }
 
-procedure TModernProfileEditorStartFrame.InitGUI(const InitData : TModernProfileEditorInitData);
+procedure TModernProfileEditorStartFrame.InitGUI(var InitData : TModernProfileEditorInitData);
 Var S : String;
 begin
   NoFlicker(AutoexecOverrideGameStartCheckBox);
@@ -233,15 +231,6 @@ begin
           end;
         end;
   end;
-end;
-
-procedure TModernProfileEditorStartFrame.ShowFrame;
-begin
-end;
-
-function TModernProfileEditorStartFrame.CheckValue: Boolean;
-begin
-  result:=True;
 end;
 
 procedure TModernProfileEditorStartFrame.GetGame(const Game: TGame);

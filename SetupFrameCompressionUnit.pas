@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, 
-  Dialogs, SetupFormUnit, StdCtrls, ExtCtrls;
+  Dialogs, StdCtrls, ExtCtrls, SetupFormUnit;
 
 type
   TSetupFrameCompression = class(TFrame, ISetupFrame)

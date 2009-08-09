@@ -28,11 +28,9 @@ type
     { Private-Deklarationen }
   public
     { Public-Deklarationen }
-    Procedure InitGUI(const InitData : TModernProfileEditorInitData);
+    Procedure InitGUI(var InitData : TModernProfileEditorInitData);
     Procedure SetGame(const Game : TGame; const LoadFromTemplate : Boolean);
-    Function CheckValue : Boolean;
     Procedure GetGame(const Game : TGame);
-    Procedure ShowFrame;
   end;
 
 implementation
@@ -43,7 +41,7 @@ uses Math, VistaToolsUnit, LanguageSetupUnit, CommonTools, HelpConsts;
 
 { TModernProfileEditorScummVMSoundFrame }
 
-procedure TModernProfileEditorScummVMSoundFrame.InitGUI(const InitData : TModernProfileEditorInitData);
+procedure TModernProfileEditorScummVMSoundFrame.InitGUI(var InitData : TModernProfileEditorInitData);
 Var St : TStringList;
 begin
   NoFlicker(MusicVolumeEdit);
@@ -105,15 +103,6 @@ begin
   EnableGSCheckBox.Checked:=Game.ScummVMEnableGS;
   MultiMIDICheckBox.Checked:=Game.ScummVMMultiMIDI;
   SpeechMuteCheckBox.Checked:=Game.ScummVMSpeechMute;
-end;
-
-procedure TModernProfileEditorScummVMSoundFrame.ShowFrame;
-begin
-end;
-
-function TModernProfileEditorScummVMSoundFrame.CheckValue: Boolean;
-begin
-  result:=True;
 end;
 
 procedure TModernProfileEditorScummVMSoundFrame.GetGame(const Game: TGame);

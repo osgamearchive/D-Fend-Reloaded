@@ -37,6 +37,7 @@ type
     ScummVM, WindowsMode : Boolean;
     WizardMode : Integer;
     DoOKButtonClick : Boolean;
+    TemplateDB, AutoSetupDB : TGameDB;
     Procedure SetActivePage(NewPage : Integer);
     Function CalcProfileName : String;
     Function CalcProfileNameFromFile : String;
@@ -58,7 +59,7 @@ Function ShowWizardDialog(const AOwner : TComponent; const AGameDB : TGameDB; co
 implementation
 
 uses VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgSetupUnit,
-     GameDBToolsUnit, DOSBoxUnit, HelpConsts, IconLoaderUnit;
+     GameDBToolsUnit, DOSBoxUnit, HelpConsts, IconLoaderUnit, PrgConsts;
 
 {$R *.dfm}
 
@@ -102,6 +103,9 @@ begin
   SetVistaFonts(self);
   Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName);
 
+  TemplateDB:=TGameDB.Create(PrgDataDir+TemplateSubDir);
+  AutoSetupDB:=TGameDB.Create(PrgDataDir+AutoSetupSubDir);
+
   Caption:=LanguageSetup.WizardForm;
   PreviousButton.Caption:=LanguageSetup.WizardFormButtonPrevious;
   NextButton.Caption:=LanguageSetup.WizardFormButtonNext;
@@ -130,7 +134,7 @@ begin
   with WizardPrgFileFrame do begin Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName); Align:=alClient; Visible:=False; Init(GameDB); end;
 
   WizardTemplateFrame:=TWizardTemplateFrame.Create(self); WizardTemplateFrame.Parent:=self;
-  with WizardTemplateFrame do begin Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName); Align:=alClient; Visible:=False; Init(GameDB); end;
+  with WizardTemplateFrame do begin Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName); Align:=alClient; Visible:=False; Init(GameDB,TemplateDB,AutoSetupDB); end;
 
   WizardGameInfoFrame:=TWizardGameInfoFrame.Create(self); WizardGameInfoFrame.Parent:=self;
   with WizardGameInfoFrame do begin Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName); Align:=alClient; Visible:=False; Init(GameDB,LinkFile); end;

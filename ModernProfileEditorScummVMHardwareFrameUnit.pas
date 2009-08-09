@@ -24,11 +24,9 @@ type
     { Private-Deklarationen }
   public
     { Public-Deklarationen }
-    Procedure InitGUI(const InitData : TModernProfileEditorInitData);
+    Procedure InitGUI(var InitData : TModernProfileEditorInitData);
     Procedure SetGame(const Game : TGame; const LoadFromTemplate : Boolean);
-    Function CheckValue : Boolean;
     Procedure GetGame(const Game : TGame);
-    Procedure ShowFrame;
   end;
 
 implementation
@@ -39,7 +37,7 @@ uses Math, VistaToolsUnit, LanguageSetupUnit, CommonTools, HelpConsts;
 
 { TModernProfileEditorScummVMHardwareFrame }
 
-procedure TModernProfileEditorScummVMHardwareFrame.InitGUI(const InitData: TModernProfileEditorInitData);
+procedure TModernProfileEditorScummVMHardwareFrame.InitGUI(var InitData: TModernProfileEditorInitData);
 Var St : TStringList;
 begin
   NoFlicker(CDGroupBox);
@@ -83,15 +81,6 @@ begin
   For I:=0 to PlatformComboBox.Items.Count-1 do If S=Trim(ExtUpperCase(PlatformComboBox.Items[I])) then begin
     PlatformComboBox.ItemIndex:=I; break;
   end;
-end;
-
-procedure TModernProfileEditorScummVMHardwareFrame.ShowFrame;
-begin
-end;
-
-function TModernProfileEditorScummVMHardwareFrame.CheckValue: Boolean;
-begin
-  result:=True;
 end;
 
 procedure TModernProfileEditorScummVMHardwareFrame.GetGame(const Game: TGame);

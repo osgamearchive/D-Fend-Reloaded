@@ -69,7 +69,7 @@ object ModernProfileEditorSoundBlasterFrame: TModernProfileEditorSoundBlasterFra
     Width = 81
     Height = 21
     Style = csDropDownList
-    ItemHeight = 13
+    ItemHeight = 0
     TabOrder = 0
   end
   object AddressComboBox: TComboBox
@@ -78,7 +78,7 @@ object ModernProfileEditorSoundBlasterFrame: TModernProfileEditorSoundBlasterFra
     Width = 81
     Height = 21
     Style = csDropDownList
-    ItemHeight = 13
+    ItemHeight = 0
     TabOrder = 1
   end
   object InterruptComboBox: TComboBox
@@ -87,7 +87,7 @@ object ModernProfileEditorSoundBlasterFrame: TModernProfileEditorSoundBlasterFra
     Width = 81
     Height = 21
     Style = csDropDownList
-    ItemHeight = 13
+    ItemHeight = 0
     TabOrder = 2
   end
   object DMAComboBox: TComboBox
@@ -96,7 +96,7 @@ object ModernProfileEditorSoundBlasterFrame: TModernProfileEditorSoundBlasterFra
     Width = 81
     Height = 21
     Style = csDropDownList
-    ItemHeight = 13
+    ItemHeight = 0
     TabOrder = 3
   end
   object HDMAComboBox: TComboBox
@@ -105,7 +105,7 @@ object ModernProfileEditorSoundBlasterFrame: TModernProfileEditorSoundBlasterFra
     Width = 81
     Height = 21
     Style = csDropDownList
-    ItemHeight = 13
+    ItemHeight = 0
     TabOrder = 4
   end
   object OplModeComboBox: TComboBox
@@ -114,7 +114,7 @@ object ModernProfileEditorSoundBlasterFrame: TModernProfileEditorSoundBlasterFra
     Width = 81
     Height = 21
     Style = csDropDownList
-    ItemHeight = 13
+    ItemHeight = 0
     TabOrder = 5
   end
   object OplSampleRateComboBox: TComboBox
@@ -123,7 +123,7 @@ object ModernProfileEditorSoundBlasterFrame: TModernProfileEditorSoundBlasterFra
     Width = 81
     Height = 21
     Style = csDropDownList
-    ItemHeight = 13
+    ItemHeight = 0
     TabOrder = 7
   end
   object UseMixerCheckBox: TCheckBox
@@ -141,7 +141,7 @@ object ModernProfileEditorSoundBlasterFrame: TModernProfileEditorSoundBlasterFra
     Width = 81
     Height = 21
     Style = csDropDownList
-    ItemHeight = 13
+    ItemHeight = 0
     TabOrder = 6
   end
 end

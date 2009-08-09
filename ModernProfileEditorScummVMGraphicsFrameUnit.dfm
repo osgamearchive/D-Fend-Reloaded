@@ -28,7 +28,7 @@ object ModernProfileEditorScummVMGraphicsFrame: TModernProfileEditorScummVMGraph
     Height = 21
     Style = csDropDownList
     Anchors = [akLeft, akTop, akRight]
-    ItemHeight = 13
+    ItemHeight = 0
     TabOrder = 0
   end
   object StartFullscreenCheckBox: TCheckBox
@@ -56,7 +56,7 @@ object ModernProfileEditorScummVMGraphicsFrame: TModernProfileEditorScummVMGraph
     Height = 21
     Style = csDropDownList
     Anchors = [akLeft, akTop, akRight]
-    ItemHeight = 13
+    ItemHeight = 0
     TabOrder = 1
   end
 end

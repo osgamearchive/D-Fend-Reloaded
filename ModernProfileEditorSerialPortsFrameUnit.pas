@@ -13,11 +13,9 @@ type
     { Private-Deklarationen }
   public
     { Public-Deklarationen }
-    Procedure InitGUI(const InitData : TModernProfileEditorInitData);
+    Procedure InitGUI(var InitData : TModernProfileEditorInitData);
     Procedure SetGame(const Game : TGame; const LoadFromTemplate : Boolean);
-    Function CheckValue : Boolean;
     Procedure GetGame(const Game : TGame);
-    Procedure ShowFrame;
   end;
 
 implementation
@@ -28,8 +26,10 @@ uses LanguageSetupUnit, HelpConsts;
 
 { TModernProfileEditorSerialPortsFrame }
 
-procedure TModernProfileEditorSerialPortsFrame.InitGUI(const InitData : TModernProfileEditorInitData);
+procedure TModernProfileEditorSerialPortsFrame.InitGUI(var InitData : TModernProfileEditorInitData);
 begin
+  InitData.AllowDefaultValueReset:=False;
+
   InfoLabel.Caption:=LanguageSetup.ProfileEditorSerialPortsInfo;
 
   HelpContext:=ID_ProfileEditSerialPorts;
@@ -37,15 +37,6 @@ end;
 
 procedure TModernProfileEditorSerialPortsFrame.SetGame(const Game: TGame; const LoadFromTemplate: Boolean);
 begin
-end;
-
-procedure TModernProfileEditorSerialPortsFrame.ShowFrame;
-begin
-end;
-
-function TModernProfileEditorSerialPortsFrame.CheckValue: Boolean;
-begin
-  result:=True;
 end;
 
 procedure TModernProfileEditorSerialPortsFrame.GetGame(const Game: TGame);

@@ -18,11 +18,9 @@ type
     { Private-Deklarationen }
   public
     { Public-Deklarationen }
-    Procedure InitGUI(const InitData : TModernProfileEditorInitData);
+    Procedure InitGUI(var InitData : TModernProfileEditorInitData);
     Procedure SetGame(const Game : TGame; const LoadFromTemplate : Boolean);
-    Function CheckValue : Boolean;
     Procedure GetGame(const Game : TGame);
-    Procedure ShowFrame;
   end;
 
 implementation
@@ -33,7 +31,7 @@ uses VistaToolsUnit, LanguageSetupUnit, CommonTools, HelpConsts;
 
 { TModernProfileEditorScummVMGraphicsFrame }
 
-procedure TModernProfileEditorScummVMGraphicsFrame.InitGUI(const InitData : TModernProfileEditorInitData);
+procedure TModernProfileEditorScummVMGraphicsFrame.InitGUI(var InitData : TModernProfileEditorInitData);
 Var St : TStringList;
 begin
   NoFlicker(FilterComboBox);
@@ -86,15 +84,6 @@ begin
 
   StartFullscreenCheckBox.Checked:=Game.StartFullscreen;
   KeepAspectRatioCheckBox.Checked:=Game.AspectCorrection;
-end;
-
-procedure TModernProfileEditorScummVMGraphicsFrame.ShowFrame;
-begin
-end;
-
-function TModernProfileEditorScummVMGraphicsFrame.CheckValue: Boolean;
-begin
-  result:=True;
 end;
 
 procedure TModernProfileEditorScummVMGraphicsFrame.GetGame(const Game: TGame);

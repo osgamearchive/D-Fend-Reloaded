@@ -1,5 +1,36 @@
 D-Fend Reloaded Changelog
 
+Version 0.8.1 (08/10/2009)
+==========================
+- [Fix] If you press the delete key in the quick search box the program asks
+  you if you want to delete the currently selected profile.
+- [Fix] Pressing F3 while the wizard dialog is visible causes an access 
+  violation when closing the dialog.
+- [Fix] The update installer did not update all DOSBox language files.
+- [Fix] The scan games folder function was not automatically adjusting the
+  mounting settings from the auto setup templates if not VirtualHD was used
+  as games folder.
+- [Fix] Program window position is lost after restoring the program window if
+  using the minimize/restore on DOSBox start option in fullscreen mode without
+  border.
+- [Fix] In portable mode the automatic profile update after program upgrade to
+  make all profiles DOSBox 0.73 compatible did not work.
+- [Fix] The restore default values for this category button on the default 
+  values page of the profile editor only worked for the first category.
+- [Fix] Sometimes the screenshot viewer displayed a wrong resolution in the
+  status bar after resizing the viewer window.
+- [Fix] Wrong value "50000" instead of "49716" in the default values list for
+  sample rate settings.
+- [Fix] Added missing value "4axis_2" to joystick types default values list.
+- [Fix] Added missing values to default values lists for SoundBlaster and GUS,
+  DMA and IRQ settings.
+- [Fix] Added missing value "none" to SoundBlaster OPL mode default values 
+  list.
+- [Fix] Removed "0" from default values list for the memory size.
+- [Fix] The "How to add profiles" info panel at the bottom of the program
+  window was not automatically removed after adding the first profile.
+
+
 Version 0.8.0 (07/28/2009)
 ==========================
 

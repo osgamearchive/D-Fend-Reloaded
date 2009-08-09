@@ -45,11 +45,9 @@ type
   public
     { Public-Deklarationen }
     PortNr : Integer;
-    Procedure InitGUI(const InitData : TModernProfileEditorInitData);
+    Procedure InitGUI(var InitData : TModernProfileEditorInitData);
     Procedure SetGame(const Game : TGame; const LoadFromTemplate : Boolean);
-    Function CheckValue : Boolean;
     Procedure GetGame(const Game : TGame);
-    Procedure ShowFrame;
   end;
 
 implementation
@@ -60,7 +58,7 @@ uses Math, VistaToolsUnit, LanguageSetupUnit, CommonTools, HelpConsts;
 
 { TModernProfileEditorSerialPortFrame }
 
-procedure TModernProfileEditorSerialPortFrame.InitGUI(const InitData : TModernProfileEditorInitData);
+procedure TModernProfileEditorSerialPortFrame.InitGUI(var InitData : TModernProfileEditorInitData);
 begin
   Name:='SerialPort'+IntToStr(PortNr)+'Frame';
 
@@ -243,15 +241,6 @@ begin
   ModemPortEdit.Enabled:=ModemListenCheckBox.Checked;
 
   NullModemServerAddressEdit.Enabled:=NullModemClientRadioButton.Checked;
-end;
-
-procedure TModernProfileEditorSerialPortFrame.ShowFrame;
-begin
-end;
-
-function TModernProfileEditorSerialPortFrame.CheckValue: Boolean;
-begin
-  result:=True;
 end;
 
 procedure TModernProfileEditorSerialPortFrame.GetGame(const Game: TGame);

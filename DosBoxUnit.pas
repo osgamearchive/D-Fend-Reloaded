@@ -959,7 +959,9 @@ begin
   If (S='') or (ExtUpperCase(S)='DEFAULT') then S:=PrgSetup.DOSBoxSettings[DOSBoxNr].DosBoxMapperFile;
   result.Add('mapperfile='+UnmapDrive(MakeAbsPath(S,PrgDataDir),ptMapper));
   If PrgSetup.AllowPixelShader then begin
-    result.Add('pixelshader='+GetPixelShader(Game));
+    S:=GetPixelShader(Game);
+    If (S<>'') and (ExtUpperCase(Copy(S,length(S)-2,3))<>'.FX') then S:=S+'.fx';
+    result.Add('pixelshader='+S);
   end;
 
   result.Add('');

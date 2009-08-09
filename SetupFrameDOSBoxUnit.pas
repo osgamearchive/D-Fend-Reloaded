@@ -29,6 +29,7 @@ type
     PortableModeInfoButton: TBitBtn;
     WarningButton: TSpeedButton;
     ShortNameWarningsCheckBox: TCheckBox;
+    CreateConfFilesCheckBox: TCheckBox;
     procedure DosBoxDirEditChange(Sender: TObject);
     procedure ButtonWork(Sender: TObject);
     procedure DOSBoxDownloadURLClick(Sender: TObject);
@@ -86,6 +87,7 @@ begin
   NoFlicker(RestoreWindowCheckBox);
   NoFlicker(UseShortPathNamesCheckBox);
   NoFlicker(ShortNameWarningsCheckBox);
+  NoFlicker(CreateConfFilesCheckBox);
 
   SetLength(DOSBoxData,PrgSetup.DOSBoxSettingsCount);
   For I:=0 to length(DOSBoxData)-1 do begin
@@ -103,6 +105,8 @@ begin
   RestoreWindowCheckBox.Checked:=PrgSetup.RestoreWhenDOSBoxCloses;
   UseShortPathNamesCheckBox.Checked:=PrgSetup.UseShortFolderNames;
   ShortNameWarningsCheckBox.Checked:=PrgSetup.ShowShortNameWarnings;
+  CreateConfFilesCheckBox.Checked:=PrgSetup.CreateConfFilesForProfiles and (OperationMode<>omPortable);
+
   MinimizeDFendCheckBoxClick(self);
 
   UserIconLoader.DialogImage(DI_Edit,DOSBoxEditButton);
@@ -140,6 +144,7 @@ begin
   RestoreWindowCheckBox.Caption:=LanguageSetup.SetupFormRestoreWindow;
   UseShortPathNamesCheckBox.Caption:=LanguageSetup.SetupFormUseShortPathNames;
   ShortNameWarningsCheckBox.Caption:=LanguageSetup.SetupFormShortNameWarnings;
+  CreateConfFilesCheckBox.Caption:=LanguageSetup.SetupFormAlwaysCreateConfFiles;
   
   DOSBoxDownloadURLInfo.Caption:=LanguageSetup.SetupFormDOSBoxDownloadURL;
   DOSBoxDownloadURL.Caption:='http:/'+'/www.dosbox.com/download.php?main=1';
@@ -165,6 +170,8 @@ procedure TSetupFrameDOSBox.ShowFrame(const AdvencedMode: Boolean);
 begin
   MoreSettingsButton.Visible:=AdvencedMode;
   GlobalGroupBox.Visible:=AdvencedMode;
+  CreateConfFilesCheckBox.Enabled:=(OperationMode<>omPortable);
+  CreateConfFilesCheckBox.Visible:=PrgSetup.ActivateIncompleteFeatures;
 
   If AdvencedMode then begin
     DOSBoxDownloadURLInfo.Top:=GlobalGroupBox.Top+GlobalGroupBox.Height+10;
@@ -192,6 +199,7 @@ begin
   RestoreWindowCheckBox.Checked:=False;
   UseShortPathNamesCheckBox.Checked:=True;
   ShortNameWarningsCheckBox.Checked:=True;
+  CreateConfFilesCheckBox.Checked:=False;
   MinimizeDFendCheckBoxClick(self);
 end;
 
@@ -210,6 +218,7 @@ begin
   PrgSetup.RestoreWhenDOSBoxCloses:=RestoreWindowCheckBox.Checked;
   PrgSetup.UseShortFolderNames:=UseShortPathNamesCheckBox.Checked;
   PrgSetup.ShowShortNameWarnings:=ShortNameWarningsCheckBox.Checked;
+  PrgSetup.CreateConfFilesForProfiles:=CreateConfFilesCheckBox.Checked;
 end;
 
 procedure TSetupFrameDOSBox.DOSBoxInstallationComboBoxChange(Sender: TObject);

@@ -58,15 +58,15 @@ type
     ExtraExeFiles : TStringList;
     FGameDB : TGameDB;
     procedure LoadIcon;
+    Procedure CheckValue(Sender : TObject; var OK : Boolean);
+    Procedure ShowFrame(Sender : TObject);
   public
     { Public-Deklarationen }
     Constructor Create(AOwner : TComponent); override;
     Destructor Destroy; override;
-    Procedure InitGUI(const InitData : TModernProfileEditorInitData);
+    Procedure InitGUI(var InitData : TModernProfileEditorInitData);
     Procedure SetGame(const Game : TGame; const LoadFromTemplate : Boolean);
-    Function CheckValue : Boolean;
     Procedure GetGame(const Game : TGame);
-    Procedure ShowFrame;
   end;
 
 implementation
@@ -91,8 +91,12 @@ begin
   inherited Destroy;
 end;
 
-procedure TModernProfileEditorBaseFrame.InitGUI(const InitData : TModernProfileEditorInitData);
+procedure TModernProfileEditorBaseFrame.InitGUI(var InitData : TModernProfileEditorInitData);
 begin
+  InitData.OnCheckValue:=CheckValue;
+  InitData.OnShowFrame:=ShowFrame;
+  InitData.AllowDefaultValueReset:=False;
+
   ScummVM:=False;
   WindowsMode:=False;
 
@@ -277,13 +281,13 @@ begin
   end;
 end;
 
-function TModernProfileEditorBaseFrame.CheckValue: Boolean;
+Procedure TModernProfileEditorBaseFrame.CheckValue(Sender : TObject; var OK : Boolean);
 begin
-  result:=True;
+  OK:=True;
 
   If (Trim(ProfileNameEdit.Text)='') and (not ProfileNameEdit.ReadOnly) then begin
     MessageDlg(LanguageSetup.MessageNoProfileName,mtError,[mbOK],0);
-    result:=False;
+    OK:=False;
     exit;
   end;
 end;

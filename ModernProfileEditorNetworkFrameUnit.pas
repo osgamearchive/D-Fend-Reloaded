@@ -18,11 +18,9 @@ type
     { Private-Deklarationen }
   public
     { Public-Deklarationen }
-    Procedure InitGUI(const InitData : TModernProfileEditorInitData);
+    Procedure InitGUI(var InitData : TModernProfileEditorInitData);
     Procedure SetGame(const Game : TGame; const LoadFromTemplate : Boolean);
-    Function CheckValue : Boolean;
     Procedure GetGame(const Game : TGame);
-    Procedure ShowFrame;
   end;
 
 implementation
@@ -33,7 +31,7 @@ uses VistaToolsUnit, LanguageSetupUnit, CommonTools, HelpConsts;
 
 { TModernProfileEditorNetworkFrame }
 
-procedure TModernProfileEditorNetworkFrame.InitGUI(const InitData : TModernProfileEditorInitData);
+procedure TModernProfileEditorNetworkFrame.InitGUI(var InitData : TModernProfileEditorInitData);
 begin
   NoFlicker(ActivateCheckBox);
   NoFlicker(ConnectionsRadioGroup);
@@ -72,15 +70,6 @@ begin
   ConnectionsRadioGroup.Enabled:=ActivateCheckBox.Checked;
   ServerAddressEdit.Enabled:=ActivateCheckBox.Checked and (ConnectionsRadioGroup.ItemIndex=1);
   PortEdit.Enabled:=ActivateCheckBox.Checked;
-end;
-
-procedure TModernProfileEditorNetworkFrame.ShowFrame;
-begin
-end;
-
-function TModernProfileEditorNetworkFrame.CheckValue: Boolean;
-begin
-  result:=True;
 end;
 
 procedure TModernProfileEditorNetworkFrame.GetGame(const Game: TGame);

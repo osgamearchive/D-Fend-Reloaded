@@ -21,11 +21,9 @@ type
     { Private-Deklarationen }
   public
     { Public-Deklarationen }
-    Procedure InitGUI(const InitData : TModernProfileEditorInitData);
+    Procedure InitGUI(var InitData : TModernProfileEditorInitData);
     Procedure SetGame(const Game : TGame; const LoadFromTemplate : Boolean);
-    Function CheckValue : Boolean;
     Procedure GetGame(const Game : TGame);
-    Procedure ShowFrame;
   end;
 
 implementation
@@ -36,8 +34,10 @@ uses VistaToolsUnit, LanguageSetupUnit, HelpConsts;
 
 { TModernProfileEditorHelperProgramsFrame }
 
-procedure TModernProfileEditorHelperProgramsFrame.InitGUI(const InitData: TModernProfileEditorInitData);
+procedure TModernProfileEditorHelperProgramsFrame.InitGUI(var InitData: TModernProfileEditorInitData);
 begin
+  InitData.AllowDefaultValueReset:=False;
+
   NoFlicker(Command1CheckBox);
   NoFlicker(Command1Edit);
   NoFlicker(RunMinimized1CheckBox);
@@ -70,15 +70,6 @@ begin
   Command2CheckBox.Checked:=(S<>'');
   Command2Edit.Text:=S;
   RunMinimized2CheckBox.Checked:=Game.CommandAfterExecutionMinimized;
-end;
-
-procedure TModernProfileEditorHelperProgramsFrame.ShowFrame;
-begin
-end;
-
-function TModernProfileEditorHelperProgramsFrame.CheckValue: Boolean;
-begin
-  result:=True;
 end;
 
 procedure TModernProfileEditorHelperProgramsFrame.Command1EditChange(Sender: TObject);

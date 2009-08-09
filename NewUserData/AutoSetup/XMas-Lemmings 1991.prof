@@ -202,7 +202,7 @@ Platform=
 
 [dosbox]
 DOSBoxDirectory=Default
-machine=vga_s3
+machine=vgaonly
 memsize=16
 captures=.\Capture\
 

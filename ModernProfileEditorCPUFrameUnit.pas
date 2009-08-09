@@ -25,13 +25,12 @@ type
   private
     { Private-Deklarationen }
     SaveCycles : String;
+    Procedure CheckValue(Sender : TObject; var OK : Boolean);
   public
     { Public-Deklarationen }
-    Procedure InitGUI(const InitData : TModernProfileEditorInitData);
+    Procedure InitGUI(var InitData : TModernProfileEditorInitData);
     Procedure SetGame(const Game : TGame; const LoadFromTemplate : Boolean);
-    Function CheckValue : Boolean;
     Procedure GetGame(const Game : TGame);
-    Procedure ShowFrame;
   end;
 
 implementation
@@ -42,11 +41,13 @@ uses CommonTools, LanguageSetupUnit, VistaToolsUnit, HelpConsts, PrgSetupUnit;
 
 { TModernProfileEditorCPUFrame }
 
-procedure TModernProfileEditorCPUFrame.InitGUI(const InitData : TModernProfileEditorInitData);
+procedure TModernProfileEditorCPUFrame.InitGUI(var InitData : TModernProfileEditorInitData);
 Var St : TStringList;
     I : Integer;
     S : String;
 begin
+  InitData.OnCheckValue:=CheckValue;
+
   NoFlicker(CPUCoreRadioGroup);
   NoFlicker(CPUCyclesGroupBox);
   NoFlicker(CyclesAutoRadioButton);
@@ -125,16 +126,12 @@ begin
   end;
 end;
 
-procedure TModernProfileEditorCPUFrame.ShowFrame;
-begin
-end;
-
-function TModernProfileEditorCPUFrame.CheckValue: Boolean;
+Procedure TModernProfileEditorCPUFrame.CheckValue(Sender : TObject; var OK : Boolean);
 Var I : Integer;
     B : Boolean;
     S : String;
 begin
-  result:=True;
+  Ok:=True;
 
   If CyclesValueRadioButton.Checked then begin
     B:=TryStrToInt(CyclesComboBox.Text,I);
@@ -144,7 +141,7 @@ begin
     end;
     if not B then begin
       If MessageDlg(Format(LanguageSetup.MessageInvalidValue,[CyclesComboBox.Text,LanguageSetup.GameCycles,SaveCycles]),mtWarning,[mbYes,mbNo],0)<>mrYes then begin
-        result:=False;
+        Ok:=False;
         exit;
       end else begin
         CyclesComboBox.Text:=SaveCycles;

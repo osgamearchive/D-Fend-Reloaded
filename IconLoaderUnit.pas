@@ -65,6 +65,8 @@ const DI_OK=0;
       DI_More=57;
       DI_ResetProfile=58;
       DI_CloseX=59;
+      DI_Tools=60;
+      DI_DOSBox=61;
 
 Type TImageListRec=record
   ImageList, OriginalImageList : TImageList;

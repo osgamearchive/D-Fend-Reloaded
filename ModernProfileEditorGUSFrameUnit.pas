@@ -22,11 +22,9 @@ type
     { Private-Deklarationen }
   public
     { Public-Deklarationen }
-    Procedure InitGUI(const InitData : TModernProfileEditorInitData);
+    Procedure InitGUI(var InitData : TModernProfileEditorInitData);
     Procedure SetGame(const Game : TGame; const LoadFromTemplate : Boolean);
-    Function CheckValue : Boolean;
     Procedure GetGame(const Game : TGame);
-    Procedure ShowFrame;
   end;
 
 implementation
@@ -37,7 +35,7 @@ uses VistaToolsUnit, LanguageSetupUnit, CommonTools, HelpConsts;
 
 { TFrame1 }
 
-procedure TModernProfileEditorGUSFrame.InitGUI(const InitData : TModernProfileEditorInitData);
+procedure TModernProfileEditorGUSFrame.InitGUI(var InitData : TModernProfileEditorInitData);
 Var St : TStringList;
 begin
   NoFlicker(ActivateGUSCheckBox);
@@ -91,15 +89,6 @@ begin
   SetComboBox(Interrupt1ComboBox,IntToStr(Game.GUSIRQ),'5');
   SetComboBox(DMA1ComboBox,IntToStr(Game.GUSDMA),'1');
   PathEdit.Text:=Game.GUSUltraDir;
-end;
-
-procedure TModernProfileEditorGUSFrame.ShowFrame;
-begin
-end;
-
-function TModernProfileEditorGUSFrame.CheckValue: Boolean;
-begin
-  result:=True;
 end;
 
 procedure TModernProfileEditorGUSFrame.GetGame(const Game: TGame);

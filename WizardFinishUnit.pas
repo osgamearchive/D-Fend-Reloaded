@@ -35,7 +35,6 @@ type
     function NextFreeDriveLetter: Char;
     function UsedDriveLetters(const AllowedNr : Integer = -1): String;
     procedure LoadMountingList;
-    Function CanReachFile(const FileName : String) : Boolean;
   public
     { Public-Deklarationen }
     Procedure Init(const GameDB : TGameDB);
@@ -113,82 +112,16 @@ begin
     else SetLength(result,StrLen(PChar(result)));
 end;
 
-function TWizardFinishFrame.CanReachFile(const FileName: String): Boolean;
-Var S,FilePath : String;
-    St : TStringList;
-    I : Integer;
-begin
-  result:=False;
-  FilePath:=Trim(ExtUpperCase(IncludeTrailingPathDelimiter(ShortName(MakeAbsPath(ExtractFilePath(FileName),PrgSetup.BaseDir)))));
-  For I:=0 to Mounting.Count-1 do begin
-    St:=ValueToList(Mounting[I]);
-    try
-      {Types to check:
-       RealFolder;DRIVE;Letter;False;;FreeSpace
-       RealFolder;FLOPPY;Letter;False;;
-       RealFolder;CDROM;Letter;IO;Label;
-       all other are images}
-      If St.Count<2 then continue;
-      S:=Trim(ExtUpperCase(St[1]));
-      If (S<>'DRIVE') and (S<>'FLOPPY') and (S<>'CDROM') then continue;
-      S:=Trim(ExtUpperCase(IncludeTrailingPathDelimiter(ShortName(MakeAbsPath(St[0],PrgSetup.BaseDir)))));
-
-      result:=(Copy(FilePath,1,length(S))=S);
-      if result then exit;
-    finally
-      St.Free;
-    end;
-  end;
-end;
-
 procedure TWizardFinishFrame.LoadData(const Template: TGame; const GameFile, SetupFile, GameName : String);
-Var G : TGame;
-    S,T : String;
-    I : Integer;
-    St : TStringList;
-    B : Boolean;
+Var S,T : String;
 begin
   CurrentGameName:=GameName;
-
-  Mounting.Clear;
-
-  {Load from template}
-  If Template=nil then G:=TGame.Create(PrgSetup) else G:=Template;
-  try
-    For I:=0 to 9 do
-      If G.NrOfMounts>=I+1 then Mounting.Add(G.Mount[I]) else break;
-  finally
-    If Template=nil then G.Free;
-  end;
-
-  {Add GameDir}
-
-  B:=False;
-  T:=Trim(ExtUpperCase(IncludeTrailingPathDelimiter(ShortName(MakeAbsPath(PrgSetup.GameDir,PrgSetup.BaseDir)))));
-  For I:=0 to Mounting.Count-1 do begin
-    St:=ValueToList(Mounting[I]);
-    try
-      If (St.Count<2) or (Trim(ExtUpperCase(St[1]))<>'DRIVE') then continue;
-      S:=Trim(ExtUpperCase(IncludeTrailingPathDelimiter(ShortName(MakeAbsPath(St[0],PrgSetup.BaseDir)))));
-      B:=(T=S); If B then break;
-    finally
-      St.Free;
-    end;
-  end;
-  if not B then Mounting.Add(MakeRelPath(PrgSetup.GameDir,PrgSetup.BaseDir,True)+';DRIVE;'+NextFreeDriveLetter+';False;;105');
-
-  {Load from game}
-  If (Trim(GameFile)<>'') and (not CanReachFile(GameFile)) then begin
-    S:=IncludeTrailingPathDelimiter(MakeRelPath(ExtractFilePath(GameFile),PrgSetup.BaseDir));
-    Mounting.Add(S+';DRIVE;'+NextFreeDriveLetter+';False;;105');
-  end;
-
-  If (Trim(SetupFile)<>'') and (not CanReachFile(SetupFile)) then begin
-    S:=IncludeTrailingPathDelimiter(MakeRelPath(ExtractFilePath(SetupFile),PrgSetup.BaseDir));
-    Mounting.Add(S+';DRIVE;'+NextFreeDriveLetter+';False;;105');
-  end;
-
   CurrentGameFile:=GameFile;
+
+  Mounting.Free;
+  If Trim(GameFile)<>'' then S:=ExtractFilePath(GameFile) else S:='';
+  If Trim(SetupFile)<>'' then T:=ExtractFilePath(SetupFile) else T:='';
+  Mounting:=BuildGameDirMountData(Template,S,T);
 
   MountingSave.Assign(Mounting);
   LoadMountingList;

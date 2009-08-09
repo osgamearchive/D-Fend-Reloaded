@@ -47,6 +47,7 @@ Function CheckDOSBoxVersion(const Nr : Integer; const Path : String = '') : Stri
 Function OldDOSBoxVersion(const Version : String) : Boolean;
 Procedure DOSBoxOutdatedWarning(const DOSBoxPath : String);
 
+Function GetFileDate(const FileName : String) : TDateTime;
 Function GetFileDateAsString : String;
 
 Procedure CreateLink(const TargetName, Parameters, LinkFile, IconFile, Description : String);
@@ -937,22 +938,32 @@ begin
   MessageDlg(Format(LanguageSetup.MessageDOSBoxOutdated,[CheckDOSBoxVersion(-1,DOSBoxPath),S]),mtWarning,[mbOk],0);
 end;
 
-Function GetFileDateAsString : String;
+Function GetFileDate(const FileName : String) : TDateTime;
 Var hFile : THandle;
     CreationTime, AccessTime, WriteTime : TFileTime;
     SystemTime : TSystemTime;
 begin
-  result:='';
+  result:=0;
 
-  hFile:=CreateFile(PChar(ExpandFileName(Application.ExeName)),GENERIC_READ,FILE_SHARE_DELETE or FILE_SHARE_READ or FILE_SHARE_WRITE,nil,OPEN_EXISTING,0,0);
+  hFile:=CreateFile(PChar(FileName),GENERIC_READ,FILE_SHARE_DELETE or FILE_SHARE_READ or FILE_SHARE_WRITE,nil,OPEN_EXISTING,0,0);
   if hFile=INVALID_HANDLE_VALUE then exit;
   try
     if not GetFileTime(hFile,@CreationTime,@AccessTime,@WriteTime) then exit;
     if not FileTimeToSystemTime(CreationTime,SystemTime) then exit;
-    result:=DateToStr(SystemTimeToDateTime(SystemTime));
+    result:=SystemTimeToDateTime(SystemTime);
   finally
     CloseHandle(hFile);
   end;
+end;
+
+Function GetFileDateAsString : String;
+Var D : TDateTime;
+begin
+  result:='';
+
+  D:=GetFileDate(ExpandFileName(Application.ExeName));
+  If D<0.001 then exit;
+  result:=DateToStr(D);
 end;
 
 Procedure CreateLink(const TargetName, Parameters, LinkFile, IconFile, Description : String);

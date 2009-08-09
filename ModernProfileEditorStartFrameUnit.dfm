@@ -183,6 +183,10 @@ object ModernProfileEditorStartFrame: TModernProfileEditorStartFrame
     TabOrder = 2
     object AutoexecSheet1: TTabSheet
       Caption = 'Autoexec.bat'
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object Panel1: TPanel
         Left = 0
         Top = 192

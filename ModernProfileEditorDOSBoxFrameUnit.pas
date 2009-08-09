@@ -43,11 +43,9 @@ type
     { Public-Deklarationen }
     Constructor Create(AOwner : TComponent); override;
     Destructor Destroy; override;
-    Procedure InitGUI(const InitData : TModernProfileEditorInitData);
+    Procedure InitGUI(var InitData : TModernProfileEditorInitData);
     Procedure SetGame(const Game : TGame; const LoadFromTemplate : Boolean);
-    Function CheckValue : Boolean;
     Procedure GetGame(const Game : TGame);
-    Procedure ShowFrame;
   end;
 
 implementation
@@ -74,7 +72,7 @@ begin
   inherited Destroy;
 end;
 
-procedure TModernProfileEditorDOSBoxFrame.InitGUI(const InitData : TModernProfileEditorInitData);
+procedure TModernProfileEditorDOSBoxFrame.InitGUI(var InitData : TModernProfileEditorInitData);
 Var I : Integer;
     S : String;
 begin
@@ -258,15 +256,6 @@ begin
   If Trim(LangName)=''
     then UserLanguageComboBox.ItemIndex:=0
     else UserLanguageComboBox.ItemIndex:=Max(0,UserLanguageComboBox.Items.IndexOf(LangName));
-end;
-
-procedure TModernProfileEditorDOSBoxFrame.ShowFrame;
-begin
-end;
-
-function TModernProfileEditorDOSBoxFrame.CheckValue: Boolean;
-begin
-  result:=True;
 end;
 
 procedure TModernProfileEditorDOSBoxFrame.GetGame(const Game: TGame);

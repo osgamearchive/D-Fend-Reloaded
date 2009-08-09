@@ -44,13 +44,12 @@ type
     LastGameName, SaveLang : String;
     CurrentGameName, CurrentScummVMPath : PString;
     ConfOpt : TConfOpt;
+    Procedure ShowFrame(Sender: TObject);
   public
     { Public-Deklarationen }
-    Procedure InitGUI(const InitData : TModernProfileEditorInitData);
+    Procedure InitGUI(var InitData : TModernProfileEditorInitData);
     Procedure SetGame(const Game : TGame; const LoadFromTemplate : Boolean);
-    Function CheckValue : Boolean;
     Procedure GetGame(const Game : TGame);
-    Procedure ShowFrame;
   end;
 
 implementation
@@ -62,8 +61,10 @@ uses Math, VistaToolsUnit, LanguageSetupUnit, CommonTools, HelpConsts,
 
 { TModernProfileEditorScummVMFrame }
 
-procedure TModernProfileEditorScummVMFrame.InitGUI(const InitData : TModernProfileEditorInitData);
+procedure TModernProfileEditorScummVMFrame.InitGUI(var InitData : TModernProfileEditorInitData);
 begin
+  InitData.OnShowFrame:=ShowFrame;
+
   LastGameName:='';
 
   NoFlicker(LanguageComboBox);
@@ -196,11 +197,6 @@ begin
   end;
 
   LanguageComboBoxChange(self);
-end;
-
-function TModernProfileEditorScummVMFrame.CheckValue: Boolean;
-begin
-  result:=True;
 end;
 
 procedure TModernProfileEditorScummVMFrame.GetGame(const Game: TGame);

@@ -17,11 +17,9 @@ type
     { Private-Deklarationen }
   public
     { Public-Deklarationen }
-    Procedure InitGUI(const InitData : TModernProfileEditorInitData);
+    Procedure InitGUI(var InitData : TModernProfileEditorInitData);
     Procedure SetGame(const Game : TGame; const LoadFromTemplate : Boolean);
-    Function CheckValue : Boolean;
     Procedure GetGame(const Game : TGame);
-    Procedure ShowFrame;
   end;
 
 implementation
@@ -32,7 +30,7 @@ uses VistaToolsUnit, LanguageSetupUnit, CommonTools, HelpConsts;
 
 { TModernProfileEditorMIDIFrame }
 
-procedure TModernProfileEditorMIDIFrame.InitGUI(const InitData : TModernProfileEditorInitData);
+procedure TModernProfileEditorMIDIFrame.InitGUI(var InitData : TModernProfileEditorInitData);
 Var St : TStringList;
 begin
   NoFlicker(TypeComboBox);
@@ -73,15 +71,6 @@ begin
   SetComboBox(TypeComboBox,Game.MIDIType,'intelligent');
   SetComboBox(DeviceComboBox,Game.MIDIDevice,'default');
   AdditionalSettingsEdit.Text:=Game.MIDIConfig;
-end;
-
-procedure TModernProfileEditorMIDIFrame.ShowFrame;
-begin
-end;
-
-function TModernProfileEditorMIDIFrame.CheckValue: Boolean;
-begin
-  result:=True;
 end;
 
 procedure TModernProfileEditorMIDIFrame.GetGame(const Game: TGame);

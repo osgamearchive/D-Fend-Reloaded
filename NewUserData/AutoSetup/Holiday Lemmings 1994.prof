@@ -204,7 +204,7 @@ Platform=
 memsize=16
 captures=
 DOSBoxDirectory=
-machine=vga_s3
+machine=vgaonly
 
 [cpu]
 cyclesup=500

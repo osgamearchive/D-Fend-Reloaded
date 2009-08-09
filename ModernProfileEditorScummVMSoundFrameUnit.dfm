@@ -95,7 +95,7 @@ object ModernProfileEditorScummVMSoundFrame: TModernProfileEditorScummVMSoundFra
     Width = 94
     Height = 21
     Style = csDropDownList
-    ItemHeight = 13
+    ItemHeight = 0
     TabOrder = 4
   end
   object MusicDriverComboBox: TComboBox
@@ -105,7 +105,7 @@ object ModernProfileEditorScummVMSoundFrame: TModernProfileEditorScummVMSoundFra
     Height = 21
     Style = csDropDownList
     Anchors = [akLeft, akTop, akRight]
-    ItemHeight = 13
+    ItemHeight = 0
     TabOrder = 5
   end
   object NativeMT32CheckBox: TCheckBox

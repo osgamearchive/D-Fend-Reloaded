@@ -219,8 +219,9 @@ Type TPrgSetup=class(TBasePrgSetup)
     property RestorePreviewerCategory : Boolean index 68 read GetBoolean write SetBoolean;
     property ShowMainMenu : Boolean index 69 read GetBoolean write SetBoolean;
     property IgnoreDirectoryCollisions : Boolean index 70 read GetBoolean write SetBoolean;
-    property ActivateIncompleteFeatures : Boolean index 71 read GetBoolean write SetBoolean;
-    property ActivateIncomplete09Features : Boolean index 72 read GetBoolean write SetBoolean;
+    property CreateConfFilesForProfiles : Boolean index 71 read GetBoolean write SetBoolean;
+    property ActivateIncompleteFeatures : Boolean index 72 read GetBoolean write SetBoolean;
+    property ActivateIncomplete09Features : Boolean index 73 read GetBoolean write SetBoolean;
 
     property MainLeft : Integer index 0 read GetInteger write SetInteger;
     property MainTop : Integer index 1 read GetInteger write SetInteger;
@@ -639,8 +640,9 @@ begin
   AddBooleanRec(68,'ProgramSets','RestorePreviewerCategory',True);
   AddBooleanRec(69,'ProgramSets','ShowMainMenu',True);
   AddBooleanRec(70,'ProgramSets','IgnoreDirectoryCollisions',False);
-  AddBooleanRec(71,'ProgramSets','ActivateIncompleteFeatures',False);
-  AddBooleanRec(72,'ProgramSets','ActivateIncomplete09Features',False);
+  AddBooleanRec(71,'ProgramSets','CreateConfFilesForProfiles',False);
+  AddBooleanRec(72,'ProgramSets','ActivateIncompleteFeatures',False);
+  AddBooleanRec(73,'ProgramSets','ActivateIncomplete09Features',False);
 
   AddIntegerRec(0,'ProgramSets','MainLeft',-1);
   AddIntegerRec(1,'ProgramSets','MainTop',-1);

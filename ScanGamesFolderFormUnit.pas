@@ -92,7 +92,8 @@ Function ShowScanGamesFolderResultsDialog(const AOwner : TComponent; const AGame
 implementation
 
 uses ShellAPI, Math, CommonTools, PrgSetupUnit, LanguageSetupUnit, VistaToolsUnit,
-     HelpConsts, PrgConsts, WaitFormUnit, ZipPackageUnit, IconLoaderUnit;
+     HelpConsts, PrgConsts, WaitFormUnit, ZipPackageUnit, IconLoaderUnit,
+     GameDBToolsUnit;
 
 {$R *.dfm}
 
@@ -585,6 +586,8 @@ Var G,G2 : TGame;
     I : Integer;
     Folder : String;
     Rec : TSearchRec;
+    S : String;
+    St : TStringList;
 begin
   I:=GameDB.Add(NewGame.Name);
   G:=GameDB[I];
@@ -608,6 +611,16 @@ begin
     end;
     G.Name:=NewGame.Name;
     G.GameExe:=MakeRelPath(NewGame.ExeFile,PrgSetup.BaseDir);
+  end;
+
+  If Trim(NewGame.ExeFile)<>'' then S:=ExtractFilePath(NewGame.ExeFile) else S:='';
+  St:=BuildGameDirMountData(G,S,'');
+  try
+    For I:=0 to 9 do G.Mount[I]:='';
+    G.NrOfMounts:=St.Count;
+    For I:=0 to St.Count-1 do G.Mount[I]:=St[I];
+  finally
+    St.Free;
   end;
 
   Folder:=IncludeTrailingPathDelimiter(ExtractFilePath(NewGame.ExeFile));

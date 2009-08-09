@@ -19,11 +19,9 @@ type
     { Private-Deklarationen }
   public
     { Public-Deklarationen }
-    Procedure InitGUI(const InitData : TModernProfileEditorInitData);
+    Procedure InitGUI(var InitData : TModernProfileEditorInitData);
     Procedure SetGame(const Game : TGame; const LoadFromTemplate : Boolean);
-    Function CheckValue : Boolean;
     Procedure GetGame(const Game : TGame);
-    Procedure ShowFrame;
   end;
 
 implementation
@@ -34,7 +32,7 @@ uses VistaToolsUnit, LanguageSetupUnit, CommonTools, HelpConsts;
 
 { TModernProfileEditorJoystickFrame }
 
-procedure TModernProfileEditorJoystickFrame.InitGUI(const InitData : TModernProfileEditorInitData);
+procedure TModernProfileEditorJoystickFrame.InitGUI(var InitData : TModernProfileEditorInitData);
 Var St : TStringList;
 begin
   NoFlicker(TypeComboBox);
@@ -80,15 +78,6 @@ begin
   AutofireCheckBox.Checked:=Game.JoystickAutoFire;
   Swap34CheckBox.Checked:=Game.JoystickSwap34;
   WrapCheckBox.Checked:=Game.JoystickButtonwrap;
-end;
-
-procedure TModernProfileEditorJoystickFrame.ShowFrame;
-begin
-end;
-
-function TModernProfileEditorJoystickFrame.CheckValue: Boolean;
-begin
-  result:=True;
 end;
 
 procedure TModernProfileEditorJoystickFrame.GetGame(const Game: TGame);

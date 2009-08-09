@@ -10,14 +10,13 @@ uses
 
 {
 0.9:
-- GUI for selecting the scaling algorithm
+- GUI for selecting the scaling algorithm, creation of conf files,  profile editor reset to default button
 - Show/hide sections in multi profile editor
 - Direct downloading & installation of packages: Package creation tool, Language
-- Profile editor: Reset to default (=value from template) button
 - Other image file types in icons manager etc. (?)
-- Making bootable hard disk images
 - Making zip drives from normal mounted games and vice versa (?)
-- Basic support for more emulators (start them via Windows profiles) 
+- Making bootable hard disk images (?)
+- Basic support for more emulators (start them via Windows profiles) (?)
 }
 
 type
@@ -470,7 +469,7 @@ procedure TDFendReloadedMainForm.FormCreate(Sender: TObject);
 Var S : String;
     B : Boolean;
 begin
-  {Caption:=Caption+' (RELEASE CANDIDATE 1 OF VERSION 0.8)';}
+  {Caption:=Caption+' (RELEASE CANDIDATE 1 OF VERSION 0.9)';}
   {Caption:=Caption+' THIS IS A TEST VERSION ! NOT FOR REGULAR USE ! (Beta 1 of version 0.9)';}
 
   Height:=790;
@@ -570,8 +569,8 @@ begin
     PrgSetup.DFendVersion:=GetNormalFileVersionAsString;
   end else begin
     If PrgSetup.DFendVersion<>GetNormalFileVersionAsString then begin
+      UpdateUserDataFolderAndSettingsAfterUpgrade(GameDB);
       PrgSetup.DFendVersion:=GetNormalFileVersionAsString;
-      UpdateUserDataFolderAfterUpgrade(GameDB);
       FastSearchAllTools;
       LoadGUISetup(False);
     end else begin
@@ -801,6 +800,8 @@ begin
         then ScreenshotsInfoPanel.Caption:=''
         else ScreenshotsInfoPanel.Caption:=LanguageSetup.CaptureScreenshotsInfo;
     end;
+  end else begin
+    ScreenshotsInfoPanel.Caption:='';
   end;
   CaptureSoundTab.Caption:=LanguageSetup.CaptureSounds;
   CaptureVideoTab.Caption:=LanguageSetup.CaptureVideos;
@@ -1301,36 +1302,52 @@ begin
   ListViewSelectItem(self,ListView.Selected,ListView.Selected<>nil);
 end;
 
+Var TreeUpdateNeededAgain : Boolean = False;
+    TreeUpdateInProgress : Boolean = False;
+
 procedure TDFendReloadedMainForm.TreeViewChange(Sender: TObject; Node: TTreeNode);
 Var G : TGame;
     S : String;
     IL1, IL2 : TImageList;
 begin
-  If ListView.LargeImages=nil then IL1:=ListviewIconImageList else IL1:=ListView.LargeImages as TImageList;
-  If ListView.SmallImages=nil then IL2:=ListviewImageList else IL2:=ListView.SmallImages as TImageList;
+  If TreeUpdateInProgress then begin TreeUpdateNeededAgain:=True; exit; end;
 
-  UpdateGameNotes; LastSelectedGame:=nil;
-
-  ListView.Items.BeginUpdate;
+  TreeUpdateInProgress:=True;
   try
-    If ListView.Selected<>nil then G:=TGame(ListView.Selected.Data) else G:=nil;
+    repeat
+      TreeUpdateNeededAgain:=False;
+      
+      If GameDB.Count>1 then FirstRunInfoPanel.Visible:=False;
 
-    If SearchEdit.Font.Color<>clGray then S:=SearchEdit.Text else S:='';
+      If ListView.LargeImages=nil then IL1:=ListviewIconImageList else IL1:=ListView.LargeImages as TImageList;
+      If ListView.SmallImages=nil then IL2:=ListviewImageList else IL2:=ListView.SmallImages as TImageList;
 
-    If TreeView.Selected=nil then begin
-      AddGamesToList(ListView,IL2,IL1,ImageList,GameDB,RemoveUnderline(LanguageSetup.All),'',S,PrgSetup.ShowExtraInfo,ListSort,ListSortReverse,False,MenuViewsScreenshots.Checked);
-    end else begin
-      If TreeView.Selected.Parent=nil
-        then AddGamesToList(ListView,IL2,IL1,ImageList,GameDB,TreeView.Selected.Text,'',S,PrgSetup.ShowExtraInfo,ListSort,ListSortReverse,False,MenuViewsScreenshots.Checked)
-        else AddGamesToList(ListView,IL2,IL1,ImageList,GameDB,TreeView.Selected.Parent.Text,TreeView.Selected.Text,S,PrgSetup.ShowExtraInfo,ListSort,ListSortReverse,False,MenuViewsScreenshots.Checked);
-    end;
-    If G<>nil then begin
-      SelectGame(G);
-    end else begin
-      If ListView.Items.Count>0 then SelectGame(TGame(ListView.Items[0].Data));
-    end;
+      UpdateGameNotes; LastSelectedGame:=nil;
+
+      ListView.Items.BeginUpdate;
+      try
+        If ListView.Selected<>nil then G:=TGame(ListView.Selected.Data) else G:=nil;
+
+        If SearchEdit.Font.Color<>clGray then S:=SearchEdit.Text else S:='';
+
+        If TreeView.Selected=nil then begin
+          AddGamesToList(ListView,IL2,IL1,ImageList,GameDB,RemoveUnderline(LanguageSetup.All),'',S,PrgSetup.ShowExtraInfo,ListSort,ListSortReverse,False,MenuViewsScreenshots.Checked);
+        end else begin
+          If TreeView.Selected.Parent=nil
+            then AddGamesToList(ListView,IL2,IL1,ImageList,GameDB,TreeView.Selected.Text,'',S,PrgSetup.ShowExtraInfo,ListSort,ListSortReverse,False,MenuViewsScreenshots.Checked)
+            else AddGamesToList(ListView,IL2,IL1,ImageList,GameDB,TreeView.Selected.Parent.Text,TreeView.Selected.Text,S,PrgSetup.ShowExtraInfo,ListSort,ListSortReverse,False,MenuViewsScreenshots.Checked);
+        end;
+        If G<>nil then begin
+          SelectGame(G);
+        end else begin
+          If ListView.Items.Count>0 then SelectGame(TGame(ListView.Items[0].Data));
+        end;
+      finally
+        ListView.Items.EndUpdate;
+      end;
+    until not TreeUpdateNeededAgain;
   finally
-    ListView.Items.EndUpdate;
+    TreeUpdateInProgress:=False;
   end;
 end;
 
@@ -1980,6 +1997,9 @@ begin
   AddButtonMenuAddScummVM.Visible:=(Trim(PrgSetup.ScummVMPath)<>'');
   MenuHelpScummVMCompatibilityIntern.Visible:=(Trim(PrgSetup.ScummVMPath)<>'');
   TrayIconPopupAddScummVMProfile.Visible:=(Trim(PrgSetup.ScummVMPath)<>'');
+
+  GameDB.CreateConfFilesOnSave:=(OperationMode<>omPortable) and PrgSetup.CreateConfFilesForProfiles;
+  If (OperationMode<>omPortable) and PrgSetup.CreateConfFilesForProfiles then CreateConfFilesForProfiles(GameDB,PrgDataDir+GameListSubDir+'\');
 end;
 
 Procedure TDFendReloadedMainForm.StartWizard(const ExeFile : String; const WindowsExeFile : Boolean);
@@ -2012,6 +2032,7 @@ begin
      DefaultGame:=TGame.Create(PrgSetup);
    end;
 
+   Enabled:=False;
    try
      If Mode<>'' then begin
        DefaultGame.ProfileMode:=Mode;
@@ -2024,6 +2045,7 @@ begin
        end;
      end;
    finally
+     Enabled:=True;
      LoadSearchLinks;
      If TemplateNr>=0 then begin
        TemplateDB.Free;
@@ -2356,10 +2378,15 @@ begin
                try
                  For I:=0 to ListView.Items.Count-1 do L.Add(ListView.Items[I].Data);
                  G:=TGame(ListView.Selected.Data);
-                 If PrgSetup.DFendStyleProfileEditor then begin
-                   if not EditGameProfil(self,GameDB,G,nil,SearchLinkFile,DeleteOnExit,'',L) then exit;
-                 end else begin
-                   if not ModernEditGameProfil(self,GameDB,G,nil,SearchLinkFile,DeleteOnExit,'',L) then exit;
+                 Enabled:=False;
+                 try
+                   If PrgSetup.DFendStyleProfileEditor then begin
+                     if not EditGameProfil(self,GameDB,G,nil,SearchLinkFile,DeleteOnExit,'',L) then exit;
+                   end else begin
+                     if not ModernEditGameProfil(self,GameDB,G,nil,SearchLinkFile,DeleteOnExit,'',L) then exit;
+                   end;
+                 finally
+                   Enabled:=True;
                  end;
                  InitTreeViewForGamesList(TreeView,GameDB);
                  TreeViewChange(Sender,TreeView.Selected);
@@ -3380,8 +3407,11 @@ begin
   end;
   ForceForegroundWindow(Application.Handle);
   Application.BringToFront;
-  if (not SaveMaximizedState) and (WindowState<>wsMaximized)
-  then BoundsRect:=SaveBoundsRect;
+  if BorderStyle=bsNone then begin
+     Left:=0; Top:=0;
+  end else begin
+    if (not SaveMaximizedState) and (WindowState<>wsMaximized) then BoundsRect:=SaveBoundsRect;
+  end;
 end;
 
 procedure TDFendReloadedMainForm.TrayIconDblClick(Sender: TObject);

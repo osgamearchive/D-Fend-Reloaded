@@ -277,13 +277,17 @@ const ScummVMSettings : Array[0..31] of Integer =(
   NR_ScummVMPlatform
 );
 
-Type TGame=class(TBasePrgSetup)
+Type TGameDB=class;
+
+     TGame=class(TBasePrgSetup)
   private
+    FGameDB : TGameDB;
     Procedure InitData;
     Function GetExtraPrgFile(I : Integer) : String;
     Procedure SetExtraPrgFile(I : Integer; S : String);
     function GetMount(I: Integer): String;
     procedure SetMount(I: Integer; const Value: String);
+    Procedure CreateConfFile;
   public
     CacheName, CacheNameUpper : String;
     CacheGenre, CacheGenreUpper : String;
@@ -300,8 +304,10 @@ Type TGame=class(TBasePrgSetup)
 
     Procedure LoadCache;
     Procedure ReloadINI; override;
-
+    Procedure RenameINI(const NewFile : String); override;
     Procedure AssignFromButKeepScummVMSettings(const AGame : TGame);
+
+    property GameDB : TGameDB read FGameDB write FGameDB;
 
     property Name : String index NR_Name read GetString write SetString;
 
@@ -518,12 +524,13 @@ Type TGame=class(TBasePrgSetup)
     property AddtionalChecksumFile5Checksum : String index NR_AddtionalChecksumFile5Checksum read GetString write SetString;
 end;
 
-Type TGameDB=class
+     TGameDB=class
   private
     FDir : String;
     FGameList : TList;
     FOnChanged : TNotifyEvent;
     FConfOpt : TConfOpt;
+    FCreateConfFilesOnSave : Boolean;
     Procedure LoadList;
     Procedure GameChanged(Sender : TObject);
     Function LoadGameFromFile(const FileName : String) : Boolean;
@@ -557,12 +564,13 @@ Type TGameDB=class
     property Game[I : Integer] : TGame read GetGame; default;
     property ConfOpt : TConfOpt read FConfOpt;
     property OnChanged : TNotifyEvent read FOnChanged write FOnChanged;
+    property CreateConfFilesOnSave : Boolean read FCreateConfFilesOnSave write FCreateConfFilesOnSave;
 end;
 
 Var DefaultValueReaderGame : TGame = nil;
 
 Const DefaultValuesResolution='original,320x200,320x240,640x432,640x480,720x480,800x600,1024x768,1152x864,1280x720,1280x768,1280x960,1280x1024,1600x1200,1920x1080,1920x1200,0x0';
-      DefaultValuesJoysticks='none,auto,2axis,4axis,fcs,ch';
+      DefaultValuesJoysticks='none,auto,2axis,4axis,4axis_2,fcs,ch';
       DefaultValuesScale='No Scaling (none),Nearest neighbor upscaling with factor 2 (normal2x),Nearest neighbor upscaling with factor 3 (normal3x),'+
                          'Advanced upscaling with factor 2 (advmame2x),Advanced upscaling with factor 3 (advmame3x),'+
                          'high quality with factor 2 (hq2x), high quality with factor 3 (hq3x),2xsai (2xsai), super2xsai (super2xsai), supereagle (supereagle),'+
@@ -572,11 +580,11 @@ Const DefaultValuesResolution='original,320x200,320x240,640x432,640x480,720x480,
       DefaultValueRender='surface,overlay,opengl,openglnb,ddraw';
       DefaultValueCycles='auto,max,500,1000,1500,2000,2500,3000,3500,4000,4500,5000,6000,7000,8000,9000,10000,11000,12000,12000,13000,14000,15000,16000,17000,18000,19000,20000';
       DefaultValuesVideo='hercules,cga,tandy,pcjr,ega,vgaonly,svga_s3,svga_et3000,svga_et4000,svga_paradise,vesa_nolfb,vesa_oldvbe';
-      DefaultValuesMemory='0,1,2,4,8,16,32,63';
+      DefaultValuesMemory='1,2,4,8,16,32,63';
       DefaultValuesFrameSkip='0,1,2,3,4,5,6,7,8,9,10';
       DefaultValuesCore='auto,normal,dynamic,simple';
       DefaultValueSBlaster='none,sb1,sb2,sbpro1,sbpro2,sb16';
-      DefaultValuesOPLModes='auto,cms,opl2,dualopl2,opl3';
+      DefaultValuesOPLModes='auto,cms,opl2,dualopl2,opl3,none';
       DefaultValuesKeyboardLayout='default,Albania (SQ),Argentina (LA),Armenia (HY),Australia (US),Austria (GR),Azerbaijan (AZ),Belarus (BL),Belarus (BY),'+
                                   'Belgium (BE),Bosnia & Herzegovina (YU),Bosnia & Herzegovina (BA),Brazil (BR),Brazil (br274),Bulgaria (BG),Canada (CF),'+
                                   'Canada (CA),Chile (LA),Colombia (LA),Croatia (YU),Croatia (HR),Czech Republic (CZ243),Denmark (DK),Ecuador (LA),'+
@@ -604,18 +612,18 @@ Const DefaultValuesResolution='original,320x200,320x240,640x432,640x480,720x480,
       DefaultValuesBlocksize='512,1024,2048,3072,4096,8192';
       DefaultValuesCyclesDown='20,50,100,500,1000,2000,5000,10000';
       DefaultValuesCyclesUp='20,50,100,500,1000,2000,5000,10000';
-      DefaultValuesDMA='0,1,3';
-      DefaultValuesDMA1='0,1,3';
-      DefaultValuesGUSBase='210,220,240,260,280';
+      DefaultValuesDMA='0,1,3,5,6,7';
+      DefaultValuesDMA1='0,1,3,5,6,7';
+      DefaultValuesGUSBase='220,240,260,280,2a0,2c0,2e0,300';
       DefaultValuesGUSRate='8000,11025,22050,32000,44100,48000,49716';
-      DefaultValuesHDMA='5,6,7';
+      DefaultValuesHDMA='0,1,3,5,6,7';
       DefaultValuesIRQ='3,5,7,10,11';
       DefaultValuesIRQ1='3,5,7,10,11';
       DefaultValuesMPU401='none,intelligent,uart';
       DefaultValuesOPLRate='8000,11025,22050,32000,44100,48000,49716';
       DefaultValuesPCRate='8000,11025,22050,32000,44100,48000,49716';
       DefaultValuesRate='8000,11025,22050,32000,44100,48000,49716';
-      DefaultValuesSBBase='210,220,240,260,280';
+      DefaultValuesSBBase='220,240,260,280,2a0,2c0,2e0,300';
       DefaultValuesMouseSensitivity='10,20,30,40,50,60,70,80,90,100,125,150,175,200,250,300,350,400,450,500,550,600,700,800,900,1000';
       DefaultValuesTandyRate='8000,11025,22050,32000,44100';
       DefaultValuesScummVMFilter='No filtering. no scaling. Fastest (1x),No filtering. factor 2x. default for non 640x480 games (2x),No filtering. factor 3x (3x),2xSAI filter. factor 2x (2xsai),Enhanced 2xSAI filtering. factor 2x (super2xsai),'+
@@ -633,8 +641,8 @@ Const DefaultValuesResolution='original,320x200,320x240,640x432,640x480,720x480,
 
 implementation
 
-uses Windows, SysUtils, Forms, Dialogs, CommonTools, PrgConsts, PrgSetupUnit,
-     LanguageSetupUnit, GameDBToolsUnit, WaitFormUnit;
+uses Windows, SysUtils, Messages, Forms, Dialogs, CommonTools, PrgConsts,
+     PrgSetupUnit, LanguageSetupUnit, GameDBToolsUnit, WaitFormUnit, DOSBoxUnit;
 
 { TConfOpt }
 
@@ -696,6 +704,7 @@ end;
 Constructor TGame.Create(const ASetupFile : String);
 begin
   inherited Create(ASetupFile);
+  FGameDB:=nil;
   InitData;
   LoadCache;
 end;
@@ -703,6 +712,7 @@ end;
 constructor TGame.Create(const ABasePrgSetup: TBasePrgSetup);
 begin
   inherited Create(ABasePrgSetup);
+  FGameDB:=nil;
   InitData;
   LoadCache;
 end;
@@ -1008,10 +1018,36 @@ begin
   LoadCache;
 end;
 
+Procedure TGame.CreateConfFile;
+Var St : TStringList;
+begin
+  If not DOSBoxMode(self) then exit;
+
+  St:=BuildConfFile(self,False,False,-1);
+  try
+    St.SaveToFile(ChangeFileExt(SetupFile,'.conf'));
+  finally
+    St.Free;
+  end;
+end;
+
+
+Procedure TGame.RenameINI(const NewFile : String);
+Var OldName,NewName : String;
+begin
+  OldName:=ChangeFileExt(SetupFile,'.conf');
+  inherited RenameINI(NewFile);
+  NewName:=ChangeFileExt(SetupFile,'.conf');
+  If Assigned(FGameDB) and FGameDB.CreateConfFilesOnSave then begin
+    If FileExists(OldName) then MoveFile(PChar(OldName),PChar(NewName)) else CreateConfFile;
+  end;
+end;
+
 procedure TGame.UpdateFile;
 begin
   inherited UpdateFile;
   LastModification:=IntToStr(Round(Int(Now)))+'-'+IntToStr(Round(Frac(Now)*86400));
+  If Assigned(FGameDB) and FGameDB.CreateConfFilesOnSave then CreateConfFile;
 end;
 
 Procedure TGame.AssignFromButKeepScummVMSettings(const AGame : TGame);
@@ -1022,16 +1058,26 @@ end;
 { TGameDB }
 
 constructor TGameDB.Create(const ADir : String);
+Var Msg : tagMSG;
+    B : Boolean;
 begin
   inherited Create;
+  FCreateConfFilesOnSave:=False;
   FGameList:=TList.Create;
   FConfOpt:=TConfOpt.Create;
   FDir:=IncludeTrailingPathDelimiter(ADir);
-  If Application.MainForm<>nil then Application.MainForm.Enabled:=False;
+  B:=False;
+  If Application.MainForm<>nil then begin
+    B:=Application.MainForm.Enabled;
+   Application.MainForm.Enabled:=False;
+  end;
   try
     LoadList;
   finally
-    If Application.MainForm<>nil then Application.MainForm.Enabled:=True;
+    If Application.MainForm<>nil then begin
+      While PeekMessage(Msg,Application.MainForm.Handle,WM_INPUT,WM_INPUT,1) do ;
+      Application.MainForm.Enabled:=B;
+    end;
   end;
   DeleteOldFiles;
 end;
@@ -1059,6 +1105,7 @@ begin
 
   Game:=TGame.Create(FileName);
   Game.OnChanged:=GameChanged;
+  Game.GameDB:=self;
   FGameList.Add(Game);
 
   If Game.Cycles='Max' then Game.Cycles:='max';
@@ -1113,14 +1160,16 @@ procedure TGameDB.DeleteOldFiles;
 Var Rec : TSearchRec;
     I : Integer;
 begin
-  I:=FindFirst(FDir+'*.conf',faAnyFile,Rec);
-  try
-    while I=0 do begin
-      ExtDeleteFile(FDir+Rec.Name,ftProfile);
-      I:=FindNext(Rec);
+  If not PrgSetup.CreateConfFilesForProfiles or (OperationMode=omPortable) then begin
+    I:=FindFirst(FDir+'*.conf',faAnyFile,Rec);
+    try
+      while I=0 do begin
+        ExtDeleteFile(FDir+Rec.Name,ftProfile);
+        I:=FindNext(Rec);
+      end;
+    finally
+      FindClose(Rec);
     end;
-  finally
-    FindClose(Rec);
   end;
 
   I:=FindFirst(FDir+'Tempprof.*',faAnyFile,Rec);
@@ -1169,6 +1218,7 @@ begin
   Game:=TGame.Create(MakePROFFileName(AName,FDir,True));
   Game.Name:=AName;
   Game.OnChanged:=GameChanged;
+  Game.GameDB:=self;
   result:=FGameList.Add(Game);
 end;
 
@@ -1176,6 +1226,7 @@ Function TGameDB.Add(const AGame : TGame) : Integer;
 begin
   AGame.OnChanged:=GameChanged;
   result:=FGameList.Add(AGame);
+  AGame.GameDB:=self;
 end;
 
 function TGameDB.Delete(const Index: Integer): Boolean;
@@ -1189,6 +1240,9 @@ begin
 
   If FileExists(FileName) then begin
     If not ExtDeleteFile(FileName,ftProfile) then MessageDlg(Format(LanguageSetup.MessageCouldNotDeleteFile,[FileName]),mtError,[mbOK],0);
+  end;
+  If FileExists(ChangeFileExt(FileName,'.conf')) then begin
+    If not ExtDeleteFile(ChangeFileExt(FileName,'.conf'),ftProfile) then MessageDlg(Format(LanguageSetup.MessageCouldNotDeleteFile,[ChangeFileExt(FileName,'.conf')]),mtError,[mbOK],0);
   end;
 end;
 

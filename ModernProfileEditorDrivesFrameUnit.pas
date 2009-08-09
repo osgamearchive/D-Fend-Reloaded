@@ -37,11 +37,9 @@ type
   public
     { Public-Deklarationen }
     Destructor Destroy; override;
-    Procedure InitGUI(const InitData : TModernProfileEditorInitData);
+    Procedure InitGUI(var InitData : TModernProfileEditorInitData);
     Procedure SetGame(const Game : TGame; const LoadFromTemplate : Boolean);
-    Function CheckValue : Boolean;
     Procedure GetGame(const Game : TGame);
-    Procedure ShowFrame;
   end;
 
 implementation
@@ -53,7 +51,7 @@ uses Math, VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgSetupUnit,
 
 { TModernProfileEditorDrivesFrame }
 
-procedure TModernProfileEditorDrivesFrame.InitGUI(const InitData : TModernProfileEditorInitData);
+procedure TModernProfileEditorDrivesFrame.InitGUI(var InitData : TModernProfileEditorInitData);
 begin
   NoFlicker(MountingListView);
   NoFlicker(MountingAddButton);
@@ -101,10 +99,6 @@ begin
   LoadMountingList;
   AutoMountCheckBox.Checked:=Game.AutoMountCDs;
   SecureModeCheckBox.Checked:=Game.SecureMode;
-end;
-
-procedure TModernProfileEditorDrivesFrame.ShowFrame;
-begin
 end;
 
 procedure TModernProfileEditorDrivesFrame.LoadMountingList;
@@ -258,11 +252,6 @@ begin
     VK_RETURN : ButtonWork(MountingEditButton);
     VK_DELETE : ButtonWork(MountingDelButton);
   end;
-end;
-
-function TModernProfileEditorDrivesFrame.CheckValue: Boolean;
-begin
-  result:=True;
 end;
 
 procedure TModernProfileEditorDrivesFrame.GetGame(const Game: TGame);

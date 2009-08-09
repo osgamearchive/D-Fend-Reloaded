@@ -189,8 +189,8 @@ end;
 Function DownloadFile(const AOwner : TComponent; const Size : Integer; const AbsBase, URL, DestFile : String) : Boolean;
 Var S : String;
 begin
-  If ExtUpperCase(Copy(AbsBase,1,7))='HTTP://' then begin
-    If ExtUpperCase(Copy(URL,1,7))<>'HTTP://' then begin
+  If ExtUpperCase(Copy(AbsBase,1,7))='HTTP:/'+'/' then begin
+    If ExtUpperCase(Copy(URL,1,7))<>'HTTP:/'+'/' then begin
       S:=AbsBase; While (S<>'') and (S[length(S)]<>'/') do SetLength(S,length(S)-1);
       If (URL<>'') and (URL[1]<>'/') then begin
         S:=S+URL;

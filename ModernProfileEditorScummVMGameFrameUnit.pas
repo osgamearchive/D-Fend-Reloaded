@@ -30,13 +30,12 @@ type
     CurrentGameName : PString;
     EditingTemplate : Boolean;
     Function GameNames(const Games : Array of String) : String;
+    Procedure ShowFrame(Sender : TObject);
   public
     { Public-Deklarationen }
-    Procedure InitGUI(const InitData : TModernProfileEditorInitData);
+    Procedure InitGUI(var InitData : TModernProfileEditorInitData);
     Procedure SetGame(const Game : TGame; const LoadFromTemplate : Boolean);
-    Function CheckValue : Boolean;
     Procedure GetGame(const Game : TGame);
-    Procedure ShowFrame;
   end;
 
 implementation
@@ -48,8 +47,10 @@ uses Math, CommonTools, LanguageSetupUnit, VistaToolsUnit, ScummVMToolsUnit,
 
 { TModernProfileEditorScummVMGameFrame }
 
-procedure TModernProfileEditorScummVMGameFrame.InitGUI(const InitData: TModernProfileEditorInitData);
+procedure TModernProfileEditorScummVMGameFrame.InitGUI(var InitData: TModernProfileEditorInitData);
 begin
+  InitData.OnShowFrame:=ShowFrame;
+
   LastGameName:='';
 
   NoFlicker(AltIntroCheckBox);
@@ -106,7 +107,7 @@ begin
   WalkspeedEdit.Value:=Max(0,Min(4,Game.ScummVMWalkspeed));
 end;
 
-procedure TModernProfileEditorScummVMGameFrame.ShowFrame;
+procedure TModernProfileEditorScummVMGameFrame.ShowFrame(Sender : TObject);
 begin
   If LastGameName=LowerCase(CurrentGameName^) then exit;
   LastGameName:=LowerCase(CurrentGameName^);
@@ -118,11 +119,6 @@ begin
   MusicMuteCheckBox.Enabled:=EditingTemplate or (LastGameName='sword2') or (LastGameName='queen') or (LastGameName='simon1') or (LastGameName='simon2');
   SFXMuteCheckBox.Enabled:=EditingTemplate or (LastGameName='sword2') or (LastGameName='queen') or (LastGameName='simon1') or (LastGameName='simon2');
   WalkspeedEdit.Enabled:=EditingTemplate or (LastGameName='kyra1');
-end;
-
-function TModernProfileEditorScummVMGameFrame.CheckValue: Boolean;
-begin
-  result:=True;
 end;
 
 procedure TModernProfileEditorScummVMGameFrame.GetGame(const Game: TGame);

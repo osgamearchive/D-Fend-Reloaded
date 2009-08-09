@@ -7,12 +7,3 @@ Stick with the default values unless you are absolutely certain.
 MIDI:Opened device:win32
 DOS keyboard layout loaded with main language code GR for layout GR
 SHELL:Redirect output to nul
-SHELL:Redirect output to error.txt
-Capturing Screenshot to C:\Users\Alexander Herzog\D-Fend Reloaded\Capture\Hanse - Die Expedition\\spiel_000.png
-Capturing Screenshot to C:\Users\Alexander Herzog\D-Fend Reloaded\Capture\Hanse - Die Expedition\\spiel_001.png
-Capturing Screenshot to C:\Users\Alexander Herzog\D-Fend Reloaded\Capture\Hanse - Die Expedition\\spiel_002.png
-Capturing Screenshot to C:\Users\Alexander Herzog\D-Fend Reloaded\Capture\Hanse - Die Expedition\\spiel_003.png
-Capturing Screenshot to C:\Users\Alexander Herzog\D-Fend Reloaded\Capture\Hanse - Die Expedition\\spiel_004.png
-Capturing Screenshot to C:\Users\Alexander Herzog\D-Fend Reloaded\Capture\Hanse - Die Expedition\\spiel_005.png
-Capturing Screenshot to C:\Users\Alexander Herzog\D-Fend Reloaded\Capture\Hanse - Die Expedition\\spiel_006.png
-Capturing Screenshot to C:\Users\Alexander Herzog\D-Fend Reloaded\Capture\Hanse - Die Expedition\\spiel_007.png

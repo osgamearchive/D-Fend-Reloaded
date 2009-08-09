@@ -311,7 +311,7 @@ Var D : Double;
 begin
   If IntPicture=nil then exit;
 
-  StatusBar.Panels[0].Text:=IntToStr(Image.Picture.Width)+'x'+IntToStr(Image.Picture.Height);
+  StatusBar.Panels[0].Text:=IntToStr(IntPicture.Width)+'x'+IntToStr(IntPicture.Height);
   D:=Min(Image.ClientWidth/IntPicture.Width,Image.ClientHeight/IntPicture.Height);
   StatusBar.Panels[1].Text:=IntToStr(Round(D*100))+'%';
   StatusBar.Panels[2].Text:=ImageFile;

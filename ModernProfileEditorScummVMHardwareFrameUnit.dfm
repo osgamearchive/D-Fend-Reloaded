@@ -98,7 +98,7 @@ object ModernProfileEditorScummVMHardwareFrame: TModernProfileEditorScummVMHardw
     Height = 21
     Style = csDropDownList
     Anchors = [akLeft, akTop, akRight]
-    ItemHeight = 13
+    ItemHeight = 0
     TabOrder = 2
   end
 end

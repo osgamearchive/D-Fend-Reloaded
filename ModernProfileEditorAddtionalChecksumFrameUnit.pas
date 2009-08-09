@@ -40,11 +40,9 @@ type
     LastDir : String;
   public
     { Public-Deklarationen }
-    Procedure InitGUI(const InitData : TModernProfileEditorInitData);
+    Procedure InitGUI(var InitData : TModernProfileEditorInitData);
     Procedure SetGame(const Game : TGame; const LoadFromTemplate : Boolean);
-    Function CheckValue : Boolean;
     Procedure GetGame(const Game : TGame);
-    Procedure ShowFrame;
   end;
 
 implementation
@@ -56,7 +54,7 @@ uses CommonTools, LanguageSetupUnit, VistaToolsUnit, HelpConsts,
 
 { TModernProfileEditorAddtionalChecksumFrame }
 
-procedure TModernProfileEditorAddtionalChecksumFrame.InitGUI(const InitData: TModernProfileEditorInitData);
+procedure TModernProfileEditorAddtionalChecksumFrame.InitGUI(var InitData: TModernProfileEditorInitData);
 begin
   NoFlicker(FilenameEdit1);
   NoFlicker(FilenameEdit2);
@@ -121,10 +119,6 @@ begin
   FGame:=Game;
 end;
 
-procedure TModernProfileEditorAddtionalChecksumFrame.ShowFrame;
-begin
-end;
-
 procedure TModernProfileEditorAddtionalChecksumFrame.ButtonWork(Sender: TObject);
 Var I,J,K : Integer;
     Files,Checksums : T5StringArray;
@@ -162,11 +156,6 @@ begin
              TEdit(FindComponent('ChecksumEdit'+IntToStr(I))).Text:='';
            end;
   End;
-end;
-
-function TModernProfileEditorAddtionalChecksumFrame.CheckValue: Boolean;
-begin
-  result:=True;
 end;
 
 procedure TModernProfileEditorAddtionalChecksumFrame.GetGame(const Game: TGame);

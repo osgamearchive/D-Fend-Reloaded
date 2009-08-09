@@ -88,7 +88,6 @@ object PackageCreationForm: TPackageCreationForm
     TabOrder = 0
     object TabSheet1: TTabSheet
       Caption = 'Games'
-      ExplicitHeight = 310
       object Label1: TLabel
         Left = 12
         Top = 17
@@ -106,27 +105,22 @@ object PackageCreationForm: TPackageCreationForm
     object TabSheet2: TTabSheet
       Caption = 'Auto setup templates'
       ImageIndex = 1
-      ExplicitHeight = 256
     end
     object TabSheet3: TTabSheet
       Caption = 'Icons'
       ImageIndex = 2
-      ExplicitHeight = 256
     end
     object TabSheet6: TTabSheet
       Caption = 'Icon sets'
       ImageIndex = 2
-      ExplicitHeight = 256
     end
     object TabSheet4: TTabSheet
       Caption = 'Language files'
       ImageIndex = 3
-      ExplicitHeight = 256
     end
     object TabSheet5: TTabSheet
       Caption = 'Multiple games packages'
       ImageIndex = 4
-      ExplicitHeight = 256
     end
   end
   object OutputFileEdit: TLabeledEdit

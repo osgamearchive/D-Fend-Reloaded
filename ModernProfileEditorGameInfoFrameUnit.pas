@@ -37,11 +37,9 @@ type
     Procedure TabGetListForCell(ACol, ARow: Integer; DropdownListForCell : TStrings);
   public
     { Public-Deklarationen }
-    Procedure InitGUI(const InitData : TModernProfileEditorInitData);
+    Procedure InitGUI(var InitData : TModernProfileEditorInitData);
     Procedure SetGame(const Game : TGame; const LoadFromTemplate : Boolean);
-    Function CheckValue : Boolean;
     Procedure GetGame(const Game : TGame);
-    Procedure ShowFrame;
   end;
 
 implementation
@@ -53,9 +51,11 @@ uses LanguageSetupUnit, VistaToolsUnit, CommonTools, HelpConsts,
 
 { TModernProfileEditorGameInfoFrame }
 
-procedure TModernProfileEditorGameInfoFrame.InitGUI(const InitData : TModernProfileEditorInitData);
+procedure TModernProfileEditorGameInfoFrame.InitGUI(var InitData : TModernProfileEditorInitData);
 Var St : TStringList;
 begin
+  InitData.AllowDefaultValueReset:=False;
+
   NoFlicker(GameInfoValueListEditor);
   NoFlicker(FavouriteCheckBox);
   NoFlicker(Tab);
@@ -175,15 +175,6 @@ begin
   try NotesMemo.Lines.Assign(St); finally St.Free; end;
 
   FrameResize(self);
-end;
-
-procedure TModernProfileEditorGameInfoFrame.ShowFrame;
-begin
-end;
-
-function TModernProfileEditorGameInfoFrame.CheckValue: Boolean;
-begin
-  result:=True;
 end;
 
 procedure TModernProfileEditorGameInfoFrame.GetGame(const Game: TGame);

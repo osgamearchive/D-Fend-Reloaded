@@ -26,13 +26,12 @@ type
   private
     { Private-Deklarationen }
     FOldSampleRate, FOldBlockSize, FOldPreBuffer, FOldSpeakerRate, FOldTandyRate : Integer;
+    Procedure CheckValue(Sender : TObject; var OK : Boolean);
   public
     { Public-Deklarationen }
-    Procedure InitGUI(const InitData : TModernProfileEditorInitData);
+    Procedure InitGUI(var InitData : TModernProfileEditorInitData);
     Procedure SetGame(const Game : TGame; const LoadFromTemplate : Boolean);
-    Function CheckValue : Boolean;
     Procedure GetGame(const Game : TGame);
-    Procedure ShowFrame;
   end;
 
 implementation
@@ -43,9 +42,11 @@ uses VistaToolsUnit, LanguageSetupUnit, CommonTools, HelpConsts;
 
 { TModernProfileEditorSoundFrame }
 
-procedure TModernProfileEditorSoundFrame.InitGUI(const InitData : TModernProfileEditorInitData);
+procedure TModernProfileEditorSoundFrame.InitGUI(var InitData : TModernProfileEditorInitData);
 Var St : TStringList;
 begin
+  InitData.OnCheckValue:=CheckValue;
+
   NoFlicker(ActivateSoundCheckBox);
   NoFlicker(MixerGroupBox);
   NoFlicker(SampleRateComboBox);
@@ -120,42 +121,38 @@ begin
   ActivateDisneyCheckBox.Checked:=Game.SpeakerDisney;
 end;
 
-procedure TModernProfileEditorSoundFrame.ShowFrame;
-begin
-end;
-
-function TModernProfileEditorSoundFrame.CheckValue: Boolean;
+Procedure TModernProfileEditorSoundFrame.CheckValue(Sender : TObject; var OK : Boolean);
 Var I : Integer;
 begin
-  result:=True;
+  Ok:=True;
 
   If (not TryStrToInt(Trim(SampleRateComboBox.Text),I)) or (I<1) or (I>65536) then begin
     If MessageDlg(Format(LanguageSetup.MessageInvalidValue,[SampleRateComboBox.Text,LanguageSetup.ProfileEditorSoundSampleRate,IntToStr(FOldSampleRate)]),mtWarning,[mbYes,mbNo],0)<>mrYes then begin
-      result:=False; exit;
+      Ok:=False; exit;
     end;
   end;
 
   If (not TryStrToInt(Trim(BlockSizeComboBox.Text),I)) or (I<1) or (I>65536) then begin
     If MessageDlg(Format(LanguageSetup.MessageInvalidValue,[BlockSizeComboBox.Text,LanguageSetup.ProfileEditorSoundBlockSize,IntToStr(FOldBlockSize)]),mtWarning,[mbYes,mbNo],0)<>mrYes then begin
-      result:=False; exit;
+      Ok:=False; exit;
     end;
   end;
 
   If (not TryStrToInt(Trim(PreBufferComboBox.Text),I)) or (I<1) or (I>65536) then begin
     If MessageDlg(Format(LanguageSetup.MessageInvalidValue,[PreBufferComboBox.Text,LanguageSetup.ProfileEditorSoundPrebuffer,IntToStr(FOldPreBuffer)]),mtWarning,[mbYes,mbNo],0)<>mrYes then begin
-      result:=False; exit;
+      Ok:=False; exit;
     end;
   end;
 
   If (not TryStrToInt(Trim(PCSpeakerSampleRateComboBox.Text),I)) or (I<1) or (I>65536) then begin
     If MessageDlg(Format(LanguageSetup.MessageInvalidValue,[PCSpeakerSampleRateComboBox.Text,LanguageSetup.ProfileEditorSoundMiscPCSpeakerRate,IntToStr(FOldSpeakerRate)]),mtWarning,[mbYes,mbNo],0)<>mrYes then begin
-      result:=False; exit;
+      Ok:=False; exit;
     end;
   end;
 
   If (not TryStrToInt(Trim(TandyComboBox.Text),I)) or (I<1) or (I>65536) then begin
     If MessageDlg(Format(LanguageSetup.MessageInvalidValue,[TandyComboBox.Text,LanguageSetup.ProfileEditorSoundMiscTandyRate,IntToStr(FOldTandyRate)]),mtWarning,[mbYes,mbNo],0)<>mrYes then begin
-      result:=False; exit;
+      Ok:=False; exit;
     end;
   end;
 end;

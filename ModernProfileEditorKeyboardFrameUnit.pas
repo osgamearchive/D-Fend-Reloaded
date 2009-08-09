@@ -29,11 +29,9 @@ type
     { Private-Deklarationen }
   public
     { Public-Deklarationen }
-    Procedure InitGUI(const InitData : TModernProfileEditorInitData);
+    Procedure InitGUI(var InitData : TModernProfileEditorInitData);
     Procedure SetGame(const Game : TGame; const LoadFromTemplate : Boolean);
-    Function CheckValue : Boolean;
     Procedure GetGame(const Game : TGame);
-    Procedure ShowFrame;
   end;
 
 implementation
@@ -45,7 +43,7 @@ uses LanguageSetupUnit, VistaToolsUnit, CommonTools, PrgSetupUnit, HelpConsts,
 
 { TModernProfileEditorKeyboardFrame }
 
-procedure TModernProfileEditorKeyboardFrame.InitGUI(const InitData : TModernProfileEditorInitData);
+procedure TModernProfileEditorKeyboardFrame.InitGUI(var InitData : TModernProfileEditorInitData);
 Var St : TStringList;
 begin
   NoFlicker(UseScancodesCheckBox);
@@ -153,15 +151,6 @@ begin
     CustomKeyMapperFileRadioButton.Checked:=True;
     CustomKeyMapperEdit.Text:=Game.CustomKeyMappingFile;
   end;
-end;
-
-procedure TModernProfileEditorKeyboardFrame.ShowFrame;
-begin
-end;
-
-function TModernProfileEditorKeyboardFrame.CheckValue: Boolean;
-begin
-  result:=True;
 end;
 
 procedure TModernProfileEditorKeyboardFrame.GetGame(const Game: TGame);

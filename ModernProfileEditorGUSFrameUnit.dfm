@@ -50,7 +50,7 @@ object ModernProfileEditorGUSFrame: TModernProfileEditorGUSFrame
     Width = 81
     Height = 21
     Style = csDropDownList
-    ItemHeight = 13
+    ItemHeight = 0
     TabOrder = 1
   end
   object SampleRateComboBox: TComboBox
@@ -59,7 +59,7 @@ object ModernProfileEditorGUSFrame: TModernProfileEditorGUSFrame
     Width = 81
     Height = 21
     Style = csDropDownList
-    ItemHeight = 13
+    ItemHeight = 0
     TabOrder = 2
   end
   object Interrupt1ComboBox: TComboBox
@@ -68,7 +68,7 @@ object ModernProfileEditorGUSFrame: TModernProfileEditorGUSFrame
     Width = 81
     Height = 21
     Style = csDropDownList
-    ItemHeight = 13
+    ItemHeight = 0
     TabOrder = 3
   end
   object DMA1ComboBox: TComboBox
@@ -77,7 +77,7 @@ object ModernProfileEditorGUSFrame: TModernProfileEditorGUSFrame
     Width = 81
     Height = 21
     Style = csDropDownList
-    ItemHeight = 13
+    ItemHeight = 0
     TabOrder = 4
   end
   object PathEdit: TLabeledEdit

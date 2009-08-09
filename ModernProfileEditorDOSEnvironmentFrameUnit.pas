@@ -21,11 +21,9 @@ type
     { Private-Deklarationen }
   public
     { Public-Deklarationen }
-    Procedure InitGUI(const InitData : TModernProfileEditorInitData);
+    Procedure InitGUI(var InitData : TModernProfileEditorInitData);
     Procedure SetGame(const Game : TGame; const LoadFromTemplate : Boolean);
-    Function CheckValue : Boolean;
     Procedure GetGame(const Game : TGame);
-    Procedure ShowFrame;
   end;
 
 implementation
@@ -37,7 +35,7 @@ uses VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgSetupUnit, HelpConsts,
 
 { TModernProfileEditorDOSEnvironmentFrame }
 
-procedure TModernProfileEditorDOSEnvironmentFrame.InitGUI(const InitData : TModernProfileEditorInitData);
+procedure TModernProfileEditorDOSEnvironmentFrame.InitGUI(var InitData : TModernProfileEditorInitData);
 Var St : TStringList;
 begin
   NoFlicker(ReportedDOSVersionComboBox);
@@ -75,6 +73,7 @@ Var St : TStringList;
 begin
   ReportedDOSVersionComboBox.Text:=Game.ReportedDOSVersion;
   Use4DOSCheckBox.Checked:=Game.Use4DOS;
+  CustomSetsValueListEditor.Strings.Clear;
   If (Game.Environment='') and LoadFromTemplate then begin
     CustomSetsValueListEditor.Strings.Add('PATH=Z:\');
   end else begin
@@ -94,15 +93,6 @@ begin
     0 : CustomSetsValueListEditor.Strings.Add('Key=');
     1 : if (CustomSetsValueListEditor.Row>0) and (CustomSetsValueListEditor.RowCount>2) then CustomSetsValueListEditor.Strings.Delete(CustomSetsValueListEditor.Row-1);
   end;
-end;
-
-procedure TModernProfileEditorDOSEnvironmentFrame.ShowFrame;
-begin
-end;
-
-function TModernProfileEditorDOSEnvironmentFrame.CheckValue: Boolean;
-begin
-  result:=True;
 end;
 
 procedure TModernProfileEditorDOSEnvironmentFrame.GetGame(const Game: TGame);

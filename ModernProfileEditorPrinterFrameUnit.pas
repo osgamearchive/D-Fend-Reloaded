@@ -25,11 +25,9 @@ type
     { Private-Deklarationen }
   public
     { Public-Deklarationen }
-    Procedure InitGUI(const InitData : TModernProfileEditorInitData);
+    Procedure InitGUI(var InitData : TModernProfileEditorInitData);
     Procedure SetGame(const Game : TGame; const LoadFromTemplate : Boolean);
-    Function CheckValue : Boolean;
     Procedure GetGame(const Game : TGame);
-    Procedure ShowFrame;
   end;
 
 implementation
@@ -40,7 +38,7 @@ uses VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgSetupUnit, HelpConsts;
 
 { TFrame1 }
 
-procedure TModernProfileEditorPrinterFrame.InitGUI(const InitData : TModernProfileEditorInitData);
+procedure TModernProfileEditorPrinterFrame.InitGUI(var InitData : TModernProfileEditorInitData);
 begin
   NoFlicker(EnablePrinterEmulationCheckBox);
   NoFlicker(ResolutionEdit);
@@ -80,15 +78,6 @@ begin
   end;
 
   MultiPageCheckBox.Checked:=Game.PrinterMultiPage;
-end;
-
-procedure TModernProfileEditorPrinterFrame.ShowFrame;
-begin
-end;
-
-function TModernProfileEditorPrinterFrame.CheckValue: Boolean;
-begin
-  result:=True;
 end;
 
 procedure TModernProfileEditorPrinterFrame.GetGame(const Game: TGame);

@@ -186,7 +186,7 @@ object ModernProfileEditorDOSBoxFrame: TModernProfileEditorDOSBoxFrame
     Height = 21
     Style = csDropDownList
     Anchors = [akLeft, akTop, akRight]
-    ItemHeight = 13
+    ItemHeight = 0
     TabOrder = 4
     OnChange = DOSBoxInstallationComboBoxChange
   end
@@ -207,7 +207,7 @@ object ModernProfileEditorDOSBoxFrame: TModernProfileEditorDOSBoxFrame
     Height = 21
     Style = csDropDownList
     Anchors = [akTop, akRight]
-    ItemHeight = 13
+    ItemHeight = 0
     TabOrder = 8
   end
   object OpenDialog: TOpenDialog

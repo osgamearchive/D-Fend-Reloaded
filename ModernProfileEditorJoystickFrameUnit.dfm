@@ -28,7 +28,7 @@ object ModernProfileEditorJoystickFrame: TModernProfileEditorJoystickFrame
     Top = 43
     Width = 145
     Height = 21
-    ItemHeight = 13
+    ItemHeight = 0
     TabOrder = 0
     Text = 'TypeComboBox'
   end

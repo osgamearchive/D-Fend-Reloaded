@@ -26,6 +26,7 @@ type
     DefaultValueLists : Array of TStringList;
   public
     { Public-Deklarationen }
+    Constructor Create(AOwner : TComponent); override;
     Destructor Destroy; override;
     Function GetName : String;
     Procedure InitGUIAndLoadSetup(InitData : TInitData);
@@ -46,6 +47,12 @@ uses Math, LanguageSetupUnit, VistaToolsUnit, PrgSetupUnit, CommonTools,
 {$R *.dfm}
 
 { TSetupFrameDefaultValues }
+
+Constructor TSetupFrameDefaultValues.Create(AOwner : TComponent);
+begin
+  inherited Create(AOwner);
+  LastIndex:=-1;
+end;
 
 destructor TSetupFrameDefaultValues.Destroy;
 Var I : Integer;
@@ -68,8 +75,6 @@ begin
   SetRichEditPopup(DefaultValueMemo);
 
   UserIconLoader.DialogImage(DI_ResetDefault,DefaultValueSpeedButton);
-
-  LastIndex:=-1;
 end;
 
 procedure TSetupFrameDefaultValues.BeforeChangeLanguage;
@@ -267,13 +272,18 @@ Var All : Boolean;
     I,J : Integer;
 Procedure Work(S : String);
 begin
-  If (I<>J) and (not All) then exit;
-  TStringList(DefaultValueComboBox.Items.Objects[J]).Free;
-  DefaultValueComboBox.Items.Objects[J]:=ValueToList(S,';,');
-  inc(J);
+  try
+    If (I<>J) and (not All) then exit;
+    TStringList(DefaultValueComboBox.Items.Objects[J]).Free;
+    DefaultValueComboBox.Items.Objects[J]:=ValueToList(S,';,');
+  finally
+    inc(J);
+  end;
 end;
 begin
   All:=((Sender as TComponent).Tag=1);
+
+  If LastIndex<0 then LastIndex:=DefaultValueComboBox.ItemIndex;
 
   I:=LastIndex; LastIndex:=-1; J:=0;
 

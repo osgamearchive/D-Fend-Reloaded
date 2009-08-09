@@ -70,7 +70,7 @@ object ModernProfileEditorKeyboardFrame: TModernProfileEditorKeyboardFrame
     Width = 161
     Height = 21
     Style = csDropDownList
-    ItemHeight = 13
+    ItemHeight = 0
     TabOrder = 1
   end
   object UseScancodesCheckBox: TCheckBox
@@ -127,7 +127,7 @@ object ModernProfileEditorKeyboardFrame: TModernProfileEditorKeyboardFrame
     Width = 161
     Height = 21
     Style = csDropDownList
-    ItemHeight = 13
+    ItemHeight = 0
     TabOrder = 2
   end
   object DefaultKeyMapperFileRadioButton: TRadioButton

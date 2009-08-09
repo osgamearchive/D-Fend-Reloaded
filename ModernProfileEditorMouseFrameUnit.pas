@@ -20,11 +20,9 @@ type
     { Private-Deklarationen }
   public
     { Public-Deklarationen }
-    Procedure InitGUI(const InitData : TModernProfileEditorInitData);
+    Procedure InitGUI(var InitData : TModernProfileEditorInitData);
     Procedure SetGame(const Game : TGame; const LoadFromTemplate : Boolean);
-    Function CheckValue : Boolean;
     Procedure GetGame(const Game : TGame);
-    Procedure ShowFrame;
   end;
 
 implementation
@@ -35,7 +33,7 @@ uses VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgSetupUnit, HelpConsts;
 
 { TModernProfileEditorMouseFrame }
 
-procedure TModernProfileEditorMouseFrame.InitGUI(const InitData : TModernProfileEditorInitData);
+procedure TModernProfileEditorMouseFrame.InitGUI(var InitData : TModernProfileEditorInitData);
 begin
   NoFlicker(LockMouseCheckBox);
   NoFlicker(MouseSensitivityEdit);
@@ -69,15 +67,6 @@ begin
   MouseSensitivityEdit.Value:=Game.MouseSensitivity;
   Force2ButtonsCheckBox.Checked:=Game.Force2ButtonMouseMode;
   SwapButtonsCheckBox.Checked:=Game.SwapMouseButtons;
-end;
-
-procedure TModernProfileEditorMouseFrame.ShowFrame;
-begin
-end;
-
-function TModernProfileEditorMouseFrame.CheckValue: Boolean;
-begin
-  result:=True;
 end;
 
 procedure TModernProfileEditorMouseFrame.GetGame(const Game: TGame);

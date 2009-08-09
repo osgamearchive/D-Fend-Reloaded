@@ -151,17 +151,6 @@ Section "$(LANGNAME_DFendReloaded)" ID_DFend
   Delete "$INSTDIR\InstallVideoCodec.exe"
   Delete "$INSTDIR\mkdosfs.exe"
   Delete "$INSTDIR\mediaplr.dll"
-  
-  ; Update config file
-  
-  WriteINIStr $DataInstDir\Settings\ConfOpt.dat resolution value original,320x200,320x240,640x432,640x480,720x480,800x600,1024x768,1152x864,1280x720,1280x768,1280x960,1280x1024,1600x1200,1920x1080,1920x1200,0x0
-  WriteINIStr $DataInstDir\Settings\ConfOpt.dat joysticks value none,auto,2axis,4axis,fcs,ch
-  WriteINIStr $DataInstDir\Settings\ConfOpt.dat GUSRate value 8000,11025,22050,32000,44100,48000,50000
-  WriteINIStr $DataInstDir\Settings\ConfOpt.dat OPLRate value 8000,11025,22050,32000,44100,48000,50000
-  WriteINIStr $DataInstDir\Settings\ConfOpt.dat PCRate value 8000,11025,22050,32000,44100,48000,50000
-  WriteINIStr $DataInstDir\Settings\ConfOpt.dat Rate value 8000,11025,22050,32000,44100,48000,50000
-  WriteINIStr $DataInstDir\Settings\ConfOpt.dat scale value "No Scaling (none),Nearest neighbor upscaling with factor 2 (normal2x),Nearest neighbor upscaling with factor 3 (normal3x),Advanced upscaling with factor 2 (advmame2x),Advanced upscaling with factor 3 (advmame3x),high quality with factor 2 (hq2x), high quality with factor 3 (hq3x),2xsai (2xsai), super2xsai (super2xsai), supereagle (supereagle),Advanced interpoling with factor 2 (advinterp2x),Advanced interpoling with factor 3 (advinterp3x),Advanced upscaling with sharpening with factor 2 (tv2x),Advanced upscaling with sharpening with factor 3 (tv3x),Simulates the phopsphors on a dot trio CRT with factor 2 (rgb2x),Simulates the phopsphors on a dot trio CRT with factor 3 (rgb3x),Nearest neighbor with black lines with factor 2 (scan2x),Nearest neighbor with black lines with factor 3 (scan3x)"
-  WriteINIStr $DataInstDir\Settings\ConfOpt.dat video value "hercules,cga,tandy,pcjr,ega,vgaonly,svga_s3,svga_et3000,svga_et4000,svga_paradise,vesa_nolfb,vesa_oldvbe"
 
   ; Install templates  
   

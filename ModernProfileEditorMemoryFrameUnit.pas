@@ -30,11 +30,9 @@ type
     ProfileExe : PString;
   public
     { Public-Deklarationen }
-    Procedure InitGUI(const InitData : TModernProfileEditorInitData);
+    Procedure InitGUI(var InitData : TModernProfileEditorInitData);
     Procedure SetGame(const Game : TGame; const LoadFromTemplate : Boolean);
-    Function CheckValue : Boolean;
     Procedure GetGame(const Game : TGame);
-    Procedure ShowFrame;
   end;
 
 implementation
@@ -45,7 +43,7 @@ uses LanguageSetupUnit, VistaToolsUnit, CommonTools, PrgSetupUnit, HelpConsts;
 
 { TModernProfileEditorMemoryFrame }
 
-procedure TModernProfileEditorMemoryFrame.InitGUI(const InitData : TModernProfileEditorInitData);
+procedure TModernProfileEditorMemoryFrame.InitGUI(var InitData : TModernProfileEditorInitData);
 begin
   NoFlicker(MemoryEdit);
 
@@ -78,15 +76,6 @@ begin
   LoadFixEdit.Value:=Game.LoadFixMemory;
   DOS32ACheckBox.Checked:=Game.UseDOS32A;
   Timer.Enabled:=True;
-end;
-
-procedure TModernProfileEditorMemoryFrame.ShowFrame;
-begin
-end;
-
-function TModernProfileEditorMemoryFrame.CheckValue: Boolean;
-begin
-  result:=True;
 end;
 
 procedure TModernProfileEditorMemoryFrame.GetGame(const Game: TGame);

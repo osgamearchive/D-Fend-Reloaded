@@ -44,7 +44,7 @@ type
     Function CreateGameFromTemplate(const Template : TGame; const GameName : String) : TGame;
   public
     { Public-Deklarationen }
-    Procedure Init(const GameDB : TGameDB);
+    Procedure Init(const AGameDB, ATemplateDB, AAutoSetupDB : TGameDB);
     Procedure Done;
     Procedure SearchTemplates(const GameFile : String);
     Function CreateGame(const GameName : String) : TGame;
@@ -74,15 +74,15 @@ begin
   end;
 end;
 
-procedure TWizardTemplateFrame.Init(const GameDB: TGameDB);
+procedure TWizardTemplateFrame.Init(const AGameDB, ATemplateDB, AAutoSetupDB : TGameDB);
 Var I : Integer;
     St : TStringList;
 begin
   SetVistaFonts(self);
 
-  FGameDB:=GameDB;
-  TemplateDB:=TGameDB.Create(PrgDataDir+TemplateSubDir);
-  AutoSetupDB:=TGameDB.Create(PrgDataDir+AutoSetupSubDir);
+  FGameDB:=AGameDB;
+  TemplateDB:=ATemplateDB;
+  AutoSetupDB:=AAutoSetupDB;
 
   InfoLabel.Font.Style:=[fsBold];
   TemplateType1.Font.Style:=[fsBold];

@@ -259,7 +259,7 @@ object SetupFrameDOSBox: TSetupFrameDOSBox
       130)
     object MinimizeDFendCheckBox: TCheckBox
       Left = 16
-      Top = 24
+      Top = 20
       Width = 601
       Height = 17
       Anchors = [akLeft, akTop, akRight]
@@ -269,7 +269,7 @@ object SetupFrameDOSBox: TSetupFrameDOSBox
     end
     object RestoreWindowCheckBox: TCheckBox
       Left = 37
-      Top = 47
+      Top = 38
       Width = 580
       Height = 17
       Anchors = [akLeft, akTop, akRight]
@@ -278,7 +278,7 @@ object SetupFrameDOSBox: TSetupFrameDOSBox
     end
     object UseShortPathNamesCheckBox: TCheckBox
       Left = 16
-      Top = 79
+      Top = 68
       Width = 601
       Height = 17
       Anchors = [akLeft, akTop, akRight]
@@ -287,12 +287,23 @@ object SetupFrameDOSBox: TSetupFrameDOSBox
     end
     object ShortNameWarningsCheckBox: TCheckBox
       Left = 16
-      Top = 102
+      Top = 88
       Width = 601
       Height = 17
       Anchors = [akLeft, akTop, akRight]
       Caption = 'Show warning messages on DOSBox path name translation errors'
       TabOrder = 3
+    end
+    object CreateConfFilesCheckBox: TCheckBox
+      Left = 16
+      Top = 108
+      Width = 601
+      Height = 17
+      Anchors = [akLeft, akTop, akRight]
+      Caption = 
+        'Always create conf files for all profiles (off: only when starti' +
+        'ng DOSBox)'
+      TabOrder = 4
     end
   end
   object MoreSettingsButton: TBitBtn

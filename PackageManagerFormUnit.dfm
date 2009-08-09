@@ -180,10 +180,6 @@ object PackageManagerForm: TPackageManagerForm
     object TabSheet2: TTabSheet
       Caption = 'Auto setup templates'
       ImageIndex = 5
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object AutoSetupPanel: TPanel
         Left = 0
         Top = 236
@@ -246,10 +242,6 @@ object PackageManagerForm: TPackageManagerForm
     object TabSheet5: TTabSheet
       Caption = 'Icons'
       ImageIndex = 6
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object IconsPanel: TPanel
         Left = 0
         Top = 236
@@ -301,10 +293,6 @@ object PackageManagerForm: TPackageManagerForm
     object TabSheet6: TTabSheet
       Caption = 'Icon sets'
       ImageIndex = 6
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object IconSetsPanel: TPanel
         Left = 0
         Top = 236
@@ -401,12 +389,8 @@ object PackageManagerForm: TPackageManagerForm
     object TabSheet4: TTabSheet
       Caption = 'Multiple games packages'
       ImageIndex = 8
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object Splitter1: TSplitter
-        Left = 121
+        Left = 241
         Top = 0
         Height = 268
         ExplicitLeft = 168
@@ -416,7 +400,7 @@ object PackageManagerForm: TPackageManagerForm
       object ExePackagesListBox: TListBox
         Left = 0
         Top = 0
-        Width = 121
+        Width = 241
         Height = 268
         Align = alLeft
         ItemHeight = 13
@@ -424,21 +408,24 @@ object PackageManagerForm: TPackageManagerForm
         OnClick = ExePackagesListBoxClick
       end
       object ExePackagesPanel1: TPanel
-        Left = 124
+        Left = 244
         Top = 0
-        Width = 527
+        Width = 407
         Height = 268
         Align = alClient
         BevelOuter = bvNone
         TabOrder = 1
+        ExplicitLeft = 124
+        ExplicitWidth = 527
         object ExePackagesPanel2: TPanel
           Left = 0
           Top = 238
-          Width = 527
+          Width = 407
           Height = 30
           Align = alBottom
           BevelOuter = bvNone
           TabOrder = 0
+          ExplicitWidth = 527
           object ExePackagesButton: TBitBtn
             Left = 0
             Top = 4
@@ -489,13 +476,14 @@ object PackageManagerForm: TPackageManagerForm
         object ExePackagesMemo: TRichEdit
           Left = 0
           Top = 0
-          Width = 527
+          Width = 407
           Height = 238
           Align = alClient
           BorderStyle = bsNone
           PlainText = True
           ReadOnly = True
           TabOrder = 1
+          ExplicitWidth = 527
         end
       end
     end

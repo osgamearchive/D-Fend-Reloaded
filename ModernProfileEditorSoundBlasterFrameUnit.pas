@@ -29,11 +29,9 @@ type
     { Private-Deklarationen }
   public
     { Public-Deklarationen }
-    Procedure InitGUI(const InitData : TModernProfileEditorInitData);
+    Procedure InitGUI(var InitData : TModernProfileEditorInitData);
     Procedure SetGame(const Game : TGame; const LoadFromTemplate : Boolean);
-    Function CheckValue : Boolean;
     Procedure GetGame(const Game : TGame);
-    Procedure ShowFrame;
   end;
 
 implementation
@@ -44,7 +42,7 @@ uses VistaToolsUnit, LanguageSetupUnit, CommonTools, HelpConsts;
 
 { TModernProfileEditorSoundBlasterFrame }
 
-procedure TModernProfileEditorSoundBlasterFrame.InitGUI(const InitData : TModernProfileEditorInitData);
+procedure TModernProfileEditorSoundBlasterFrame.InitGUI(var InitData : TModernProfileEditorInitData);
 Var St : TStringList;
 begin
   NoFlicker(TypeComboBox);
@@ -115,15 +113,6 @@ begin
   SetComboBox(OplEmuComboBox,Game.SBOplEmu,'default');
   SetComboBox(OplSampleRateComboBox,IntToStr(Game.SBOplRate),'22050');
   UseMixerCheckBox.Checked:=Game.SBMixer;
-end;
-
-procedure TModernProfileEditorSoundBlasterFrame.ShowFrame;
-begin
-end;
-
-function TModernProfileEditorSoundBlasterFrame.CheckValue: Boolean;
-begin
-  result:=True;
 end;
 
 procedure TModernProfileEditorSoundBlasterFrame.GetGame(const Game: TGame);

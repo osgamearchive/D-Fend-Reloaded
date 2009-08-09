@@ -39,13 +39,12 @@ type
     ProfileDOSBoxInstallation : PString;
     LastPixelShader : String;
     Function GetDOSBoxDir : String;
+    Procedure ShowFrame(Sender : TObject);
   public
     { Public-Deklarationen }
-    Procedure InitGUI(const InitData : TModernProfileEditorInitData);
+    Procedure InitGUI(var InitData : TModernProfileEditorInitData);
     Procedure SetGame(const Game : TGame; const LoadFromTemplate : Boolean);
-    Function CheckValue : Boolean;
     Procedure GetGame(const Game : TGame);
-    Procedure ShowFrame;
   end;
 
 implementation
@@ -56,9 +55,11 @@ uses VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgSetupUnit, HelpConsts;
 
 { TModernProfileEditorGraphicsFrame }
 
-procedure TModernProfileEditorGraphicsFrame.InitGUI(const InitData : TModernProfileEditorInitData);
+procedure TModernProfileEditorGraphicsFrame.InitGUI(var InitData : TModernProfileEditorInitData);
 Var St : TStringList;
 begin
+  InitData.OnShowFrame:=ShowFrame;
+
   NoFlicker(WindowResolutionComboBox);
   NoFlicker(FullscreenResolutionComboBox);
   NoFlicker(StartFullscreenCheckBox);
@@ -233,11 +234,6 @@ begin
   For I:=0 to PixelShaderComboBox.Items.Count-1 do If Trim(ExtUpperCase(PixelShaderComboBox.Items[I]))=S then begin
     PixelShaderComboBox.ItemIndex:=I; break;
   end;
-end;
-
-function TModernProfileEditorGraphicsFrame.CheckValue: Boolean;
-begin
-  result:=True;
 end;
 
 procedure TModernProfileEditorGraphicsFrame.GetGame(const Game: TGame);

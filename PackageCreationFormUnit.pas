@@ -90,9 +90,9 @@ begin
    If St=nil then exit;
    try
      try
-       St.SaveToFile(SaveDialog.FileName);
+       St.SaveToFile(OutputFileEdit.Text);
      except
-       MessageDlg(Format(LanguageSetup.MessageCouldNotSaveFile,[SaveDialog.FileName]),mtError,[mbOK],0);
+       MessageDlg(Format(LanguageSetup.MessageCouldNotSaveFile,[OutputFileEdit.Text]),mtError,[mbOK],0);
        ModalResult:=mrNone; exit;
      end;
    finally

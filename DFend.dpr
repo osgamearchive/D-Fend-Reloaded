@@ -191,7 +191,8 @@ uses
   SetupFrameUserInterpreterFrameUnit in 'SetupFrameUserInterpreterFrameUnit.pas' {SetupFrameUserInterpreterFrame: TFrame},
   PackageCreationFormUnit in 'PackageCreationFormUnit.pas' {PackageCreationForm},
   TextEditPopupUnit in 'TextEditPopupUnit.pas',
-  SetupFrameImageScalingUnit in 'SetupFrameImageScalingUnit.pas' {SetupFrameImageScaling: TFrame};
+  SetupFrameImageScalingUnit in 'SetupFrameImageScalingUnit.pas' {SetupFrameImageScaling: TFrame},
+  SelectAutoSetupFormUnit in 'SelectAutoSetupFormUnit.pas' {SelectAutoSetupForm};
 
 {$R *.res}
 

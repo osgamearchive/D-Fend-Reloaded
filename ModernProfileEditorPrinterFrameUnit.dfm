@@ -107,7 +107,7 @@ object ModernProfileEditorPrinterFrame: TModernProfileEditorPrinterFrame
     Width = 121
     Height = 21
     Style = csDropDownList
-    ItemHeight = 13
+    ItemHeight = 0
     TabOrder = 4
   end
   object MultiPageCheckBox: TCheckBox

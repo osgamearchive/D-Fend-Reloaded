@@ -111,9 +111,13 @@ end;
 
 Function EncodeUpdateDate(const Date : TDateTime) : String;
 Var Y,M,D : Word;
+    S1,S2,S3 : String;
 begin
   DecodeDate(Date,Y,M,D);
-  result:=IntToStr(M)+'/'+IntToStr(D)+'/'+IntToStr(Y);
+  S1:=IntToStr(M); if length(S1)<2 then S1:='0'+S1;
+  S2:=IntToStr(D); if length(S2)<2 then S2:='0'+S2;
+  S3:=IntToStr(Y); if length(S3)<2 then S3:='0'+S3;
+  result:=S1+'/'+S2+'/'+S3;
 end;
 
 function DownloadFileFromInternet(const URL: String): TMemoryStream;
@@ -168,7 +172,7 @@ end;
 
 function DownloadFile(const URL: String): TMemoryStream;
 begin
-  If ExtUpperCase(Copy(URL,1,7))='HTTP://' then begin
+  If ExtUpperCase(Copy(URL,1,7))='HTTP:/'+'/' then begin
     result:=DownloadFileFromInternet(URL);
   end else begin
     result:=GetFileFromLocalPath(URL);
@@ -217,7 +221,7 @@ Function ExtractFileNameFromURL(const URL : String) : String;
 begin
   result:=URL;
 
-  If ExtUpperCase(Copy(URL,1,7))='HTTP://' then begin
+  If ExtUpperCase(Copy(URL,1,7))='HTTP:/'+'/' then begin
     result:=Copy(result,8,MaxInt);
     {I:=Pos('/',result); while I>0 do begin result:=Copy(result,I+1,MaxInt); I:=Pos('/',result); end;}
     result:=Replace(result,'/','-');

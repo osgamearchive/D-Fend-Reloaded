@@ -45,13 +45,12 @@ type
     FCurrentProfileName : PString;
     FLastCurrentProfileName : String;
     IsWindowsMode : Boolean;
+    Procedure ShowFrame(Sender: TObject);
   public
     { Public-Deklarationen }
-    Procedure InitGUI(const InitData : TModernProfileEditorInitData);
+    Procedure InitGUI(var InitData : TModernProfileEditorInitData);
     Procedure SetGame(const Game : TGame; const LoadFromTemplate : Boolean);
-    Function CheckValue : Boolean;
     Procedure GetGame(const Game : TGame);
-    Procedure ShowFrame;
   end;
 
 implementation
@@ -63,8 +62,11 @@ uses Math, LanguageSetupUnit, VistaToolsUnit, PrgSetupUnit, CommonTools,
 
 { TModernProfileEditorDirectoryFrame }
 
-procedure TModernProfileEditorDirectoryFrame.InitGUI(const InitData : TModernProfileEditorInitData);
+procedure TModernProfileEditorDirectoryFrame.InitGUI(var InitData : TModernProfileEditorInitData);
 begin
+  InitData.OnShowFrame:=ShowFrame;
+  InitData.AllowDefaultValueReset:=False;
+
   NoFlicker(ScreenshotFolderEdit);
   NoFlicker(DataFolderEdit);
   NoFlicker(ExtraFilesListBox);
@@ -166,11 +168,6 @@ begin
     ShowMessage(S+#13+DefaultFolder+#13+OldFolder);
     Timer.Enabled:=False;
   end;
-end;
-
-function TModernProfileEditorDirectoryFrame.CheckValue: Boolean;
-begin
-  result:=True;
 end;
 
 procedure TModernProfileEditorDirectoryFrame.GetGame(const Game: TGame);

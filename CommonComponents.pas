@@ -58,7 +58,7 @@ Type TBasePrgSetup=class
     Procedure ResetToDefault;
     Function CheckAndUpdateTimeStamp : TFileChangeStatus;
     Procedure ReloadINI; virtual;
-    Procedure RenameINI(const NewFile : String);
+    Procedure RenameINI(const NewFile : String); virtual;
     Procedure SetChanged;
     function GetString(const Index: Integer): String; inline;
     property SetupFile : String read FSetupFile;
