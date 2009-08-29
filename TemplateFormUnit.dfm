@@ -29,13 +29,8 @@ object TemplateForm: TTemplateForm
     Align = alClient
     TabOrder = 0
     OnChange = PageControlChange
-    ExplicitHeight = 400
     object TemplateTab: TTabSheet
       Caption = 'TemplateTab'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 372
       object ListView: TListView
         Left = 0
         Top = 0
@@ -53,7 +48,6 @@ object TemplateForm: TTemplateForm
         OnDblClick = ListViewDblClick
         OnKeyDown = ListViewKeyDown
         OnSelectItem = ListViewSelectItem
-        ExplicitHeight = 372
       end
     end
     object AutoSetupSheet: TTabSheet
@@ -98,7 +92,6 @@ object TemplateForm: TTemplateForm
       item
         Width = 50
       end>
-    ExplicitTop = 452
   end
   object CoolBar: TCoolBar
     Left = 0

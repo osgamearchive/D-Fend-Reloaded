@@ -27,6 +27,7 @@ Type
     function GetItem(Index: Integer): TFileNameInfo;
     procedure NewItem(LongName: String; isDir: Boolean);
     procedure SortItems;
+    function AddItemSorted(List: TList; Item: Pointer; SCompare: TListSortCompare): Integer;
     function GetItemsCount: Integer;
     procedure CreateShortName(var Item: TFileNameInfo);
     function CreateShortNameNumber(ShortName: String): Integer;
@@ -167,7 +168,6 @@ begin
         While (I=0) and (I<MaxListSize)  do
         begin
             NewItem(Rec.Name, (Rec.Attr and faDirectory)>0);
-            SortItems;
             I:=FindNext(Rec);
             if (ReadUpToFile<>'') and
                 (
@@ -224,6 +224,28 @@ begin
         LongNameList.sort(CompareLongItems)
     else
         LongNameList.sort(CompareLongItemsAnsi);
+end;
+
+function TFileNameConvertor.AddItemSorted(List: TList; Item: Pointer; SCompare: TListSortCompare): Integer;
+var
+    InsertIndex: Integer;
+    I: Integer;
+begin
+    InsertIndex:=-1;
+    if (List.Count>0) and (SCompare(Item, List.Last)<0) then
+        for I:=0 to List.Count-1 do
+            if SCompare(Item, List[I])<0 then
+            begin
+                InsertIndex:=I;
+                Break;
+            end;
+    if InsertIndex>=0 then
+    begin
+        List.Insert(InsertIndex, Item);
+        Result:=InsertIndex;
+    end
+    else
+        Result:=List.Add(Item);
 end;
 
 function TFileNameConvertor.GetItemsCount;
@@ -325,11 +347,15 @@ begin
     CreateShortName(Item);
     New(PItem);
     PItem^:=Item;
-    ItemList.Add(PItem);
+    AddItemSorted(ItemList, PItem,CompareItems);
     New(PLongN);
     PLongN.LongName:=LongName;
     PLongN.fnInfo:=PItem;
-    LongNameList.Add(PLongN);
+
+    if LinuxMode then
+        AddItemSorted(LongNameList, PLongN,CompareLongItems)
+    else
+        AddItemSorted(LongNameList, PLongN,CompareLongItemsAnsi);
 end;
 
 function TFileNameConvertor.RemoveSpaces(var S: String): Boolean;

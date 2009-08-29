@@ -32,7 +32,7 @@ Function DownloadFile(const AOwner : TComponent; const Size : Integer; const Abs
 
 implementation
 
-uses Math, CommonTools, VistaToolsUnit, LanguageSetupUnit, PackageDBLanguage;
+uses Math, CommonTools, VistaToolsUnit, LanguageSetupUnit;
 
 {$R *.dfm}
 
@@ -58,7 +58,7 @@ end;
 procedure TDownloadWaitForm.WorkEvent(ASender: TObject; AWorkMode: TWorkMode; AWorkCount: Integer);
 begin
   ProgressBar.Position:=AWorkCount;
-  DownloadWaitForm.Caption:=LANG_Downloading+' ['+IntToStr(100*AWorkCount div ProgressBar.Max)+'%]';
+  DownloadWaitForm.Caption:=LanguageSetup.PackageManagerDownloading+' ['+IntToStr(100*AWorkCount div ProgressBar.Max)+'%]';
   Invalidate;
   Paint;
   Application.ProcessMessages;
@@ -73,7 +73,7 @@ begin
   If not Assigned(DownloadWaitForm) then DownloadWaitForm:=TDownloadWaitForm.Create(AOwner);
   DownloadWaitForm.ProgressBar.Position:=0;
   DownloadWaitForm.ProgressBar.Max:=MaxPos;
-  DownloadWaitForm.Caption:=LANG_Downloading;
+  DownloadWaitForm.Caption:=LanguageSetup.PackageManagerDownloading;
   DownloadWaitForm.Show;
   DownloadWaitForm.Invalidate;
   DownloadWaitForm.Paint;
@@ -85,7 +85,7 @@ begin
   result:=True;
   If not Assigned(DownloadWaitForm) then exit;
   DownloadWaitForm.ProgressBar.Position:=Pos;
-  DownloadWaitForm.Caption:=LANG_Downloading+' ['+IntToStr(100*Pos div DownloadWaitForm.ProgressBar.Max)+'%]';
+  DownloadWaitForm.Caption:=LanguageSetup.PackageManagerDownloading+' ['+IntToStr(100*Pos div DownloadWaitForm.ProgressBar.Max)+'%]';
   DownloadWaitForm.Invalidate;
   DownloadWaitForm.Paint;
   Application.ProcessMessages;
@@ -182,7 +182,7 @@ begin
         If result then exit;
       end;
     end;
-    if MessageDlg(Format(LANG_MenuUpdateListsLocal,[ExtractFileName(URL)]),mtInformation,[mbOK,mbCancel],0)<>mrOK then exit;
+    if MessageDlg(Format(LanguageSetup.PackageManagerMenuUpdateListsLocal,[ExtractFileName(URL)]),mtInformation,[mbOK,mbCancel],0)<>mrOK then exit;
   until False;
 end;
 

@@ -4,19 +4,21 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, XPMan, StdCtrls, ComCtrls, ExtCtrls, ToolWin, ImgList, Menus,
-  AppEvnts, GameDBUnit, GameDBToolsUnit, ViewFilesFrameUnit, LinkFileUnit,
-  HelpTools, Buttons;
+  Dialogs, Buttons, XPMan, StdCtrls, ComCtrls, ExtCtrls, ToolWin, ImgList,
+  Menus, AppEvnts, GameDBUnit, GameDBToolsUnit, ViewFilesFrameUnit,
+  LinkFileUnit, HelpTools;
 
 {
 0.9:
-- GUI for selecting the scaling algorithm, creation of conf files,  profile editor reset to default button
-- Show/hide sections in multi profile editor
-- Direct downloading & installation of packages: Package creation tool, Language
+- Activate: New multiple profiles editor, selecting the scaling algorithm, creation of conf files, profile editor reset to default button, auto adding mounting records
+- Direct downloading & installation of packages: Language, activate help (also Service page in setup dialog)
+- Basic support for more emulators: Add via wizard, info label on user-defined interpreters setup page, activate help (also link on user-defined interpreters page)
+- Make wizard easier to handle: Merge page one and two
+- More than one genre per profile
+- Making zip drives from normal mounted games and vice versa
 - Other image file types in icons manager etc. (?)
-- Making zip drives from normal mounted games and vice versa (?)
 - Making bootable hard disk images (?)
-- Basic support for more emulators (start them via Windows profiles) (?)
+- Profile cache (?) 
 }
 
 type
@@ -321,6 +323,9 @@ type
     MenuViewShowToolbar: TMenuItem;
     N34: TMenuItem;
     ToolbarPopupShowMenubar: TMenuItem;
+    N42: TMenuItem;
+    MenuProfileAddOther: TMenuItem;
+    TrayIconPopupAddOther: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure TreeViewChange(Sender: TObject; Node: TTreeNode);
@@ -419,6 +424,7 @@ type
     Procedure DropImportFile(const FileName: String; var ErrorCode : String);
     Procedure StartWizard(const ExeFile : String; const WindowsExeFile : Boolean);
     Procedure AddProfile(const ExeFile : String; const Mode : String; const TemplateNr : Integer);
+    Procedure AddProfileForWindowsEmulator(const Nr : Integer);
     Procedure ZipInfoNotify(Sender : TObject);
     Procedure AddProfileFromQuickStarter(Sender : TObject; const FileName : String; const WindowsProfile, UseWizard : Boolean; const TemplateNr : Integer);
     Procedure QuickStarterCloseNotify(Sender : TObject);
@@ -457,7 +463,7 @@ uses ShellAPI, ShlObj, ClipBrd, Math, PNGImage, CommonTools, LanguageSetupUnit,
      ScanGamesFolderFormUnit, MediaInterface, ScummVMToolsUnit,
      CreateShortcutsFormUnit, EditMultipleProfilesFormUnit,
      PackageManagerFormUnit, PackageBuilderUnit, RunPrgManagerUnit,
-     PackageCreationFormUnit, TextEditPopupUnit;
+     PackageCreationFormUnit, TextEditPopupUnit, MultipleProfilesEditorFormUnit;
 
 {$R *.dfm}
 
@@ -646,7 +652,7 @@ begin
   MenuFileImportConfFile.Caption:=LanguageSetup.MenuFileImportConf;
   MenuFileImportProfFile.Caption:=LanguageSetup.MenuFileImportProf;
   MenuFileImportZIPFile.Caption:=LanguageSetup.MenuFileImportZIP;
-  MenuFileImportDownload.Visible:=PrgSetup.ActivateIncomplete09Features;
+  MenuFileImportDownload.Visible:=PrgSetup.ActivateIncompleteFeatures;
   MenuFileExport.Caption:=LanguageSetup.MenuFileExport;
   MenuFileExportGamesList.Caption:=LanguageSetup.MenuFileExportGamesList;
   MenuFileExportTransferProfiles.Caption:=LanguageSetup.MenuExtrasTransferProfiles;
@@ -654,7 +660,7 @@ begin
   MenuFileCreateProf.Caption:=LanguageSetup.MenuFileCreateProf;
   MenuFileCreateZIP.Caption:=LanguageSetup.MenuFileCreateZIP;
   MenuFileCreateInstaller.Caption:=LanguageSetup.MenuFileCreateInstaller;
-  MenuFileCreateXMlPackageList.Visible:=PrgSetup.ActivateIncomplete09Features;
+  MenuFileCreateXMlPackageList.Visible:=PrgSetup.ActivateIncompleteFeatures;
   MenuFileExportBuildInstaller.Caption:=LanguageSetup.MenuFileExportBuildInstaller;
   MenuFileExportBuildZipPackages.Caption:=LanguageSetup.MenuFileExportBuildZipPackages;
   MenuFileSetup.Caption:=LanguageSetup.MenuFileSetup;
@@ -688,6 +694,7 @@ begin
   MenuProfileAdd.Caption:=LanguageSetup.MenuProfileAdd;
   MenuProfileAddScummVM.Caption:=LanguageSetup.MenuProfileAddScummVM;
   MenuProfileAddWindows.Caption:=LanguageSetup.MenuProfileAddWindows;
+  MenuProfileAddOther.Caption:=LanguageSetup.MenuProfileAddOther;
   MenuProfileAddFromTemplate.Caption:=LanguageSetup.MenuProfileAddFromTemplate;
   MenuProfileAddWithWizard.Caption:=LanguageSetup.MenuProfileAddWithWizard;
   MenuProfileEdit.Caption:=LanguageSetup.MenuProfileEdit;
@@ -852,6 +859,7 @@ begin
   TrayIconPopupAddProfile.Caption:=LanguageSetup.TrayPopupAdd;
   TrayIconPopupAddScummVMProfile.Caption:=LanguageSetup.MenuProfileAddScummVM;
   TrayIconPopupAddWindowsProfile.Caption:=LanguageSetup.MenuProfileAddWindows;
+  TrayIconPopupAddOther.Caption:=LanguageSetup.MenuProfileAddOther;
   TrayIconPopupAddFromTemplate.Caption:=LanguageSetup.TrayPopupAddFromTemplate;
   TrayIconPopupAddWithWizard.Caption:=LanguageSetup.TrayPopupAddWithWizard;
   TrayIconPopupClose.Caption:=LanguageSetup.TrayPopupClose;
@@ -940,6 +948,7 @@ Var I,J : Integer;
     TN : TTreeNode;
     S : String;
     TreeViewChangeEvent : TTVChangedEvent;
+    M : TMenuItem;
 begin
   DoubleBuffered:=True;
   SearchEdit.DoubleBuffered:=True;
@@ -1005,8 +1014,8 @@ begin
             Position:=poDesigned;
             Menu:=MainMenu;
           end;
-          If (PrgSetup.TreeWidth>=0) and (PrgSetup.TreeWidth<9*ClientWidth div 10) then TreeView.Width:=PrgSetup.TreeWidth;
-          If (PrgSetup.ScreenshotHeight>=0) and (PrgSetup.ScreenshotHeight<9*ClientHeight div 10) then CapturePageControl.Height:=PrgSetup.ScreenshotHeight;
+          If (PrgSetup.TreeWidth>=50) and (PrgSetup.TreeWidth<9*ClientWidth div 10) then TreeView.Width:=PrgSetup.TreeWidth;
+          If (PrgSetup.ScreenshotHeight>=50) and (PrgSetup.ScreenshotHeight<9*ClientHeight div 10) then CapturePageControl.Height:=PrgSetup.ScreenshotHeight;
         end;
     2 : {Minimize in OnShow};
     3 : {Maximize in OnShow};
@@ -1017,9 +1026,13 @@ begin
   end;
 
   CapturePageControl.Visible:=PrgSetup.ShowScreenshots;
+  Splitter1.Visible:=CapturePageControl.Visible;
+  If Splitter1.Visible then Splitter1.Top:=CapturePageControl.Top-Splitter1.Height;
   MenuViewsShowScreenshots.Checked:=PrgSetup.ShowScreenshots;
 
   TreeView.Visible:=PrgSetup.ShowTree;
+  Splitter.Visible:=TreeView.Visible;
+  If Splitter.Visible then Splitter.Left:=TreeView.Left+TreeView.Width;
   MenuViewsShowTree.Checked:=PrgSetup.ShowTree;
 
   ButtonClose.Visible:=PrgSetup.ShowToolbarButtonClose;
@@ -1050,6 +1063,19 @@ begin
   MenuProfileMakeInstaller.Visible:=(GetNSISPath<>'');
   MenuFileExportBuildInstaller.Visible:=MenuProfileMakeInstaller.Visible;
   PopupMakeInstaller.Visible:=MenuProfileMakeInstaller.Visible;
+
+  MenuProfileAddOther.Visible:=(PrgSetup.WindowsBasedEmulatorsNames.Count>0);
+  TrayIconPopupAddOther.Visible:=(PrgSetup.WindowsBasedEmulatorsNames.Count>0);
+  MenuProfileAddOther.Clear;
+  TrayIconPopupAddOther.Clear;
+  For I:=0 to PrgSetup.WindowsBasedEmulatorsNames.Count-1 do begin
+    M:=TMenuItem.Create(MainMenu);
+    With M do begin Caption:=PrgSetup.WindowsBasedEmulatorsNames[I]+'...'; Tag:=4100+I; OnClick:=MenuWork; end;
+    MenuProfileAddOther.Add(M);
+    M:=TMenuItem.Create(MainMenu);
+    With M do begin Caption:=PrgSetup.WindowsBasedEmulatorsNames[I]+'...'; Tag:=4100+I; OnClick:=MenuWork; end;
+    TrayIconPopupAddOther.Add(M);
+  end;
 end;
 
 procedure TDFendReloadedMainForm.InitViewStyle;
@@ -1161,6 +1187,8 @@ end;
 
 procedure TDFendReloadedMainForm.PostShow(var Msg: TMessage);
 begin
+  Splitter1.Top:=CapturePageControl.Top-Splitter1.Height;
+
   Case PrgSetup.StartWindowSize of
     0 : begin
           {nothing}
@@ -1331,11 +1359,11 @@ begin
         If SearchEdit.Font.Color<>clGray then S:=SearchEdit.Text else S:='';
 
         If TreeView.Selected=nil then begin
-          AddGamesToList(ListView,IL2,IL1,ImageList,GameDB,RemoveUnderline(LanguageSetup.All),'',S,PrgSetup.ShowExtraInfo,ListSort,ListSortReverse,False,MenuViewsScreenshots.Checked);
+          AddGamesToList(ListView,IL2,IL1,ImageList,GameDB,RemoveUnderline(LanguageSetup.All),'',S,PrgSetup.ShowExtraInfo,ListSort,ListSortReverse,False,False,False,MenuViewsScreenshots.Checked);
         end else begin
           If TreeView.Selected.Parent=nil
-            then AddGamesToList(ListView,IL2,IL1,ImageList,GameDB,TreeView.Selected.Text,'',S,PrgSetup.ShowExtraInfo,ListSort,ListSortReverse,False,MenuViewsScreenshots.Checked)
-            else AddGamesToList(ListView,IL2,IL1,ImageList,GameDB,TreeView.Selected.Parent.Text,TreeView.Selected.Text,S,PrgSetup.ShowExtraInfo,ListSort,ListSortReverse,False,MenuViewsScreenshots.Checked);
+            then AddGamesToList(ListView,IL2,IL1,ImageList,GameDB,TreeView.Selected.Text,'',S,PrgSetup.ShowExtraInfo,ListSort,ListSortReverse,False,False,False,MenuViewsScreenshots.Checked)
+            else AddGamesToList(ListView,IL2,IL1,ImageList,GameDB,TreeView.Selected.Parent.Text,TreeView.Selected.Text,S,PrgSetup.ShowExtraInfo,ListSort,ListSortReverse,False,False,False,MenuViewsScreenshots.Checked);
         end;
         If G<>nil then begin
           SelectGame(G);
@@ -1768,7 +1796,7 @@ begin
   while AddButtonMenuAddFromTemplate.Count>0 do AddButtonMenuAddFromTemplate.Items[0].Free;
   while TrayIconPopupAddFromTemplate.Count>0 do TrayIconPopupAddFromTemplate.Items[0].Free;
 
-  TemplateDB:=TGameDB.Create(PrgDataDir+TemplateSubDir);
+  TemplateDB:=TGameDB.Create(PrgDataDir+TemplateSubDir,False);
   try
     MenuProfileAddFromTemplate.Visible:=(TemplateDB.Count>0);
     AddButtonMenuAddFromTemplate.Visible:=(TemplateDB.Count>0);
@@ -2026,7 +2054,7 @@ begin
    TemplateDB:=nil;
 
    If TemplateNr>=0 then begin
-     TemplateDB:=TGameDB.Create(PrgDataDir+TemplateSubDir);
+     TemplateDB:=TGameDB.Create(PrgDataDir+TemplateSubDir,False);
      DefaultGame:=TemplateDB[TemplateNr];
    end else begin
      DefaultGame:=TGame.Create(PrgSetup);
@@ -2059,6 +2087,54 @@ begin
    SelectGame(G);
 end;
 
+Procedure TDFendReloadedMainForm.AddProfileForWindowsEmulator(const Nr : Integer);
+Var I : Integer;
+    S,T,U : String;
+    G, DefaultGame : TGame;
+    ExeFile, Parameters : String;
+begin
+  OpenDialog.Title:=LanguageSetup.MenuProfileAddOtherSelectTitle;
+  If (PrgSetup.WindowsBasedEmulatorsNames.Count<=Nr) or (PrgSetup.WindowsBasedEmulatorsPrograms.Count<=Nr) or (PrgSetup.WindowsBasedEmulatorsParameters.Count<=Nr) or  (PrgSetup.WindowsBasedEmulatorsExtensions.Count<=Nr) then exit;
+  S:=Trim(PrgSetup.WindowsBasedEmulatorsExtensions[Nr]);
+  While S<>'' do begin
+   I:=Pos(';',S);
+   If T<>'' then T:=T+', ';
+   If U<>'' then U:=U+';';
+   If I=0 then begin
+     T:=T+'*.'+Trim(S);
+     U:=U+'*.'+Trim(S);
+     S:='';
+   end else begin
+     T:=T+'*.'+Trim(Copy(S,1,I-1));
+     U:=U+'*.'+Trim(Copy(S,1,I-1));
+     S:=Trim(Copy(S,I+1,MaxInt));
+   end;
+  end;
+  OpenDialog.Filter:=Format(LanguageSetup.MenuProfileAddOtherSelectFilter,[PrgSetup.WindowsBasedEmulatorsNames[Nr],T,U]);
+  If not OpenDialog.Execute then exit;
+
+  DefaultGame:=TGame.Create(PrgSetup);
+  G:=nil;
+
+  Enabled:=False;
+  try
+    DefaultGame.ProfileMode:='Windows';
+    ExeFile:=PrgSetup.WindowsBasedEmulatorsPrograms[Nr];
+    Parameters:=Format(PrgSetup.WindowsBasedEmulatorsParameters[Nr],[OpenDialog.FileName]);
+    DefaultGame.GameParameters:=Parameters;
+    if not ModernEditGameProfil(self,GameDB,G,DefaultGame,SearchLinkFile,DeleteOnExit,ExeFile) then exit;
+  finally
+    Enabled:=True;
+    LoadSearchLinks;
+    DefaultGame.ProfileMode:='DOSBox';
+    DefaultGame.GameParameters:='';
+    DefaultGame.Free;
+  end;
+  InitTreeViewForGamesList(TreeView,GameDB);
+  TreeViewChange(self,TreeView.Selected);
+  SelectGame(G);
+end;
+
 Procedure TDFendReloadedMainForm.AfterSetupDialog(ColWidths, UserCols : String);
 Var G : TGame;
     St,St1,St2 : TStringList;
@@ -2075,14 +2151,16 @@ begin
      SearchEdit.OnChange:=SearchEditChange;
    end;
    LoadGUISetup(False);
-   St1:=ValueToList(UserCols); St2:=ValueToList(GetUserCols); St:=ValueToList(ColWidths);
-   try
-     For I:=0 to Min(St1.Count,St2.Count)-1 do If ExtUpperCase(St1[I])<>ExtUpperCase(St2[I]) then St[8+I]:='-1';
-     ColWidths:=ListToValue(St);
-   finally
-     St.Free; St1.Free; St2.Free;
+   If ColWidths<>'' then begin
+     St1:=ValueToList(UserCols); St2:=ValueToList(GetUserCols); St:=ValueToList(ColWidths);
+     try
+       For I:=0 to Min(St1.Count,St2.Count)-1 do If ExtUpperCase(St1[I])<>ExtUpperCase(St2[I]) then St[8+I]:='-1';
+       ColWidths:=ListToValue(St);
+     finally
+       St.Free; St1.Free; St2.Free;
+     end;
+     GamesListLoadColWidthsFromString(ListView,ColWidths);
    end;
-   GamesListLoadColWidthsFromString(ListView,ColWidths);
    SelectGame(G);
 end;
 
@@ -2195,10 +2273,13 @@ begin
                end;
              end;
       1011 : begin
-               MessageDlg('The package manager is not yet complete. It''s may be buggy, not translated and also not using the user images.',mtWarning,[mbOK],0);
-               AutoSetupDB:=TGameDB.Create(PrgDataDir+AutoSetupSubDir);
+               AutoSetupDB:=TGameDB.Create(PrgDataDir+AutoSetupSubDir,False);
                try
-                 ShowPackageManagerDialog(self,GameDB,AutoSetupDB);
+                 S:=ShowPackageManagerDialog(self,GameDB,AutoSetupDB);
+                 If S<>'' then begin
+                   PrgSetup.Language:=ExtractFileName(S);
+                   AfterSetupDialog('','');
+                 end;
                  InitTreeViewForGamesList(TreeView,GameDB);
                  TreeViewChange(Sender,TreeView.Selected);
                finally
@@ -2214,6 +2295,9 @@ begin
       2001 : begin
                PrgSetup.ShowTree:=not PrgSetup.ShowTree;
                TreeView.Visible:=PrgSetup.ShowTree;
+               If TreeView.Visible and (TreeView.Width<50) then TreeView.Width:=50;
+               Splitter.Visible:=TreeView.Visible;
+               If Splitter.Visible then Splitter.Left:=TreeView.Left+TreeView.Width;
                MenuViewsShowTree.Checked:=PrgSetup.ShowTree;
                If not PrgSetup.ShowTree then begin
                  TreeView.Selected:=nil;
@@ -2223,6 +2307,9 @@ begin
       2002 : begin
                PrgSetup.ShowScreenshots:=not PrgSetup.ShowScreenshots;
                CapturePageControl.Visible:=PrgSetup.ShowScreenshots;
+               If CapturePageControl.Visible and (CapturePageControl.Height<50) then CapturePageControl.Height:=200;
+               Splitter1.Visible:=CapturePageControl.Visible;
+               If Splitter1.Visible then Splitter1.Top:=CapturePageControl.Top-Splitter1.Height;
                MenuViewsShowScreenshots.Checked:=PrgSetup.ShowScreenshots;
                ListViewSelectItem(Sender,ListView.Selected,True);
              end;
@@ -2501,6 +2588,7 @@ begin
                SaveDialog.FileName:=ExtractFileName(ChangeFileExt(TGame(ListView.Selected.Data).SetupFile,''));
                SaveDialog.Title:=LanguageSetup.ProfileMountingZipFileGeneral;
                SaveDialog.Filter:=ProcessFileNameFilter(LanguageSetup.ProfileMountingZipFileFilter2,LanguageSetup.ProfileMountingZipFileFilter2ArchiveFiles);
+               SaveDialog.InitialDir:=GetSpecialFolder(Handle,CSIDL_DESKTOPDIRECTORY);
                If not SaveDialog.Execute then exit;
                BuildZipPackage(self,TGame(ListView.Selected.Data),SaveDialog.Filename);
              end;
@@ -2510,6 +2598,7 @@ begin
                S:=MakeAbsPath(G.CaptureFolder,PrgSetup.BaseDir);
                If DirectoryExists(S) then ShellExecute(Handle,'explore',PChar(S),nil,PChar(S),SW_SHOW)
              end;
+      4100..4199 : AddProfileForWindowsEmulator((Sender as TComponent).Tag-4100);
       {Extras}
       5001 : begin S:=''; ShowIconManager(self,S,PrgSetup.GameDir,True); end;
       5002 : ShowHistoryDialog(self);
@@ -2539,7 +2628,11 @@ begin
       5008 : begin UpdateGameNotes; TransferGames(self,GameDB); end;
       5010 : begin
                If (ListView.Selected=nil) or (ListView.Selected.Data=nil) then G:=nil else G:=TGame(ListView.Selected.Data);
-               If not ShowEditMultipleProfilesDialog(self,GameDB) then exit;
+               If PrgSetup.ActivateIncompleteFeatures and (((GetKeyState(VK_LSHIFT) and $F0)<>0) or ((GetKeyState(VK_RSHIFT) and $F0)<>0)) then begin
+                 If not ShowMultipleProfilesEditorDialog(self,GameDB) then exit;
+               end else begin
+                 If not ShowEditMultipleProfilesDialog(self,GameDB) then exit;
+               end;
                InitTreeViewForGamesList(TreeView,GameDB);
                TreeViewChange(Sender,TreeView.Selected);
                SelectGame(G);

@@ -34,7 +34,7 @@ type
 implementation
 
 uses LanguageSetupUnit, VistaToolsUnit, GameDBToolsUnit, PrgConsts, HelpConsts,
-     IconLoaderUnit, PackageDBToolsUnit, PackageDBLanguage, PrgSetupUnit;
+     IconLoaderUnit, PackageDBToolsUnit, PrgSetupUnit;
 
 {$R *.dfm}
 
@@ -75,7 +75,7 @@ begin
   Service3Button.Caption:=LanguageSetup.SetupFormService3;
   Service4Button.Caption:=LanguageSetup.SetupFormService4;
   Service5Button.Caption:=LanguageSetup.SetupFormService5;
-  Service6Button.Caption:=LANG_SetupClearCache;
+  Service6Button.Caption:=LanguageSetup.SetupFormService6;
 
   HelpContext:=ID_FileOptionsService;
 end;
@@ -89,7 +89,7 @@ begin
   Service1Button.Visible:=AdvencedMode;
   Service2Button.Visible:=AdvencedMode;
   Service5Button.Visible:=AdvencedMode;
-  Service6Button.Visible:=AdvencedMode and PrgSetup.ActivateIncomplete09Features;
+  Service6Button.Visible:=AdvencedMode and PrgSetup.ActivateIncompleteFeatures;
 end;
 
 procedure TSetupFrameService.HideFrame;

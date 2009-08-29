@@ -27,7 +27,7 @@
     <Borland.Personality>Delphi.Personality</Borland.Personality>
     <Borland.ProjectType />
     <BorlandProject>
-<BorlandProject><Delphi.Personality><Parameters><Parameters Name="UseLauncher">False</Parameters><Parameters Name="LoadAllSymbols">True</Parameters><Parameters Name="LoadUnspecifiedSymbols">False</Parameters></Parameters><VersionInfo><VersionInfo Name="IncludeVerInfo">True</VersionInfo><VersionInfo Name="AutoIncBuild">False</VersionInfo><VersionInfo Name="MajorVer">0</VersionInfo><VersionInfo Name="MinorVer">8</VersionInfo><VersionInfo Name="Release">1</VersionInfo><VersionInfo Name="Build">29</VersionInfo><VersionInfo Name="Debug">False</VersionInfo><VersionInfo Name="PreRelease">False</VersionInfo><VersionInfo Name="Special">False</VersionInfo><VersionInfo Name="Private">False</VersionInfo><VersionInfo Name="DLL">False</VersionInfo><VersionInfo Name="Locale">1031</VersionInfo><VersionInfo Name="CodePage">1252</VersionInfo></VersionInfo><VersionInfoKeys><VersionInfoKeys Name="CompanyName"></VersionInfoKeys><VersionInfoKeys Name="FileDescription">D-Fend Reloaded</VersionInfoKeys><VersionInfoKeys Name="FileVersion">0.8.1.29</VersionInfoKeys><VersionInfoKeys Name="InternalName">D-Fend Reloaded</VersionInfoKeys><VersionInfoKeys Name="LegalCopyright">Alexander Herzog</VersionInfoKeys><VersionInfoKeys Name="LegalTrademarks"></VersionInfoKeys><VersionInfoKeys Name="OriginalFilename">DFend.exe</VersionInfoKeys><VersionInfoKeys Name="ProductName">D-Fend Reloaded</VersionInfoKeys><VersionInfoKeys Name="ProductVersion">1.0.0.0</VersionInfoKeys><VersionInfoKeys Name="Comments">GPL v3</VersionInfoKeys></VersionInfoKeys><Source><Source Name="MainSource">DFend.dpr</Source></Source></Delphi.Personality><ModelSupport>False</ModelSupport></BorlandProject></BorlandProject>
+<BorlandProject><Delphi.Personality><Parameters><Parameters Name="UseLauncher">False</Parameters><Parameters Name="LoadAllSymbols">True</Parameters><Parameters Name="LoadUnspecifiedSymbols">False</Parameters></Parameters><VersionInfo><VersionInfo Name="IncludeVerInfo">True</VersionInfo><VersionInfo Name="AutoIncBuild">False</VersionInfo><VersionInfo Name="MajorVer">0</VersionInfo><VersionInfo Name="MinorVer">8</VersionInfo><VersionInfo Name="Release">2</VersionInfo><VersionInfo Name="Build">33</VersionInfo><VersionInfo Name="Debug">False</VersionInfo><VersionInfo Name="PreRelease">False</VersionInfo><VersionInfo Name="Special">False</VersionInfo><VersionInfo Name="Private">False</VersionInfo><VersionInfo Name="DLL">False</VersionInfo><VersionInfo Name="Locale">1031</VersionInfo><VersionInfo Name="CodePage">1252</VersionInfo></VersionInfo><VersionInfoKeys><VersionInfoKeys Name="CompanyName"></VersionInfoKeys><VersionInfoKeys Name="FileDescription">D-Fend Reloaded</VersionInfoKeys><VersionInfoKeys Name="FileVersion">0.8.2.33</VersionInfoKeys><VersionInfoKeys Name="InternalName">D-Fend Reloaded</VersionInfoKeys><VersionInfoKeys Name="LegalCopyright">Alexander Herzog</VersionInfoKeys><VersionInfoKeys Name="LegalTrademarks"></VersionInfoKeys><VersionInfoKeys Name="OriginalFilename">DFend.exe</VersionInfoKeys><VersionInfoKeys Name="ProductName">D-Fend Reloaded</VersionInfoKeys><VersionInfoKeys Name="ProductVersion">1.0.0.0</VersionInfoKeys><VersionInfoKeys Name="Comments">GPL v3</VersionInfoKeys></VersionInfoKeys><Source><Source Name="MainSource">DFend.dpr</Source></Source></Delphi.Personality><ModelSupport>False</ModelSupport></BorlandProject></BorlandProject>
   </ProjectExtensions>
   <Import Project="$(MSBuildBinPath)\Borland.Delphi.Targets" />
   <ItemGroup>
@@ -244,6 +244,9 @@
     <DCCReference Include="ModernProfileEditorVolumeFrameUnit.pas">
       <Form>ModernProfileEditorVolumeFrame</Form>
     </DCCReference>
+    <DCCReference Include="MultipleProfilesEditorFormUnit.pas">
+      <Form>MultipleProfilesEditorForm</Form>
+    </DCCReference>
     <DCCReference Include="OperationModeInfoFormUnit.pas">
       <Form>OperationModeInfoForm</Form>
     </DCCReference>
@@ -252,7 +255,6 @@
       <Form>PackageCreationForm</Form>
     </DCCReference>
     <DCCReference Include="PackageDBCacheUnit.pas" />
-    <DCCReference Include="PackageDBLanguage.pas" />
     <DCCReference Include="PackageDBToolsUnit.pas" />
     <DCCReference Include="PackageDBUnit.pas" />
     <DCCReference Include="PackageManagerFormUnit.pas">
@@ -396,6 +398,9 @@
     </DCCReference>
     <DCCReference Include="SetupFrameMenubarUnit.pas">
       <Form>SetupFrameMenubar</Form>
+    </DCCReference>
+    <DCCReference Include="SetupFrameMoreEmulatorsUnit.pas">
+      <Form>SetupFrameMoreEmulators</Form>
     </DCCReference>
     <DCCReference Include="SetupFrameProfileEditorUnit.pas">
       <Form>SetupFrameProfileEditor</Form>

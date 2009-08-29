@@ -11,10 +11,10 @@ const ID_Index=1;
       ID_FileExportConf=1001;
       ID_FileExportProf=1002;
       ID_FileImportZip=1011;
-      ID_FileImportDownload=ID_Index; //... Will be changed in 0.9
+      ID_FileImportDownload=1014;
       ID_FileExportBuildInstallers=1012;
       ID_FileExportBuildZipPackages=1013;
-      ID_FileExportPackageListCreator=ID_Index; //... Will be changed in 0.9
+      ID_FileExportPackageListCreator=1015;
       ID_FileOptions=1100;
       ID_FileOptionsGeneral=1101;
       ID_FileOptionsDirectories=1102;
@@ -48,6 +48,7 @@ const ID_Index=1;
       ID_FileOptionsMenubar=1130;
       ID_FileOptionsUserInterpreters=1131;
       ID_FileOptionsImageScaling=1132;
+      ID_FileOptionsMoreEmulator=1133;
 
       ID_ViewQuickStarter=1501;
 

@@ -18,6 +18,8 @@ object EditMultipleProfilesForm: TEditMultipleProfilesForm
   Position = poOwnerFormCenter
   OnCreate = FormCreate
   OnKeyDown = FormKeyDown
+  OnMouseWheelDown = FormMouseWheelDown
+  OnMouseWheelUp = FormMouseWheelUp
   OnShow = FormShow
   DesignSize = (
     634
@@ -25,10 +27,10 @@ object EditMultipleProfilesForm: TEditMultipleProfilesForm
   PixelsPerInch = 96
   TextHeight = 13
   object ReplaceFolderToButton: TSpeedButton
-    Left = 391
-    Top = 433
+    Left = 375
+    Top = 486
     Width = 23
-    Height = 22
+    Height = 20
     Glyph.Data = {
       76010000424D7601000000000000760000002800000020000000100000000100
       04000000000000010000120B0000120B00001000000000000000000000000000
@@ -52,7 +54,7 @@ object EditMultipleProfilesForm: TEditMultipleProfilesForm
     Top = 0
     Width = 634
     Height = 475
-    ActivePage = TabSheet2
+    ActivePage = TabSheet1
     Align = alTop
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 0
@@ -113,6 +115,10 @@ object EditMultipleProfilesForm: TEditMultipleProfilesForm
     object TabSheet2: TTabSheet
       Caption = 'TabSheet2'
       ImageIndex = 1
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object ScrollBox: TScrollBox
         Left = 0
         Top = 0

@@ -37,11 +37,10 @@ object PackageManagerRepositoriesEditForm: TPackageManagerRepositoriesEditForm
       end>
     FixedSize = True
     FixedOrder = True
-    ExplicitWidth = 424
     object ToolBar: TToolBar
       Left = 2
       Top = 0
-      Width = 592
+      Width = 596
       Height = 22
       AutoSize = True
       ButtonWidth = 102
@@ -69,11 +68,13 @@ object PackageManagerRepositoriesEditForm: TPackageManagerRepositoriesEditForm
         OnClick = ButtonWork
       end
       object EditButton: TToolButton
+        Tag = 2
         Left = 191
         Top = 0
         AutoSize = True
         Caption = 'Edit source'
         ImageIndex = 2
+        OnClick = ButtonWork
       end
       object RemoveButton: TToolButton
         Tag = 3
@@ -94,7 +95,6 @@ object PackageManagerRepositoriesEditForm: TPackageManagerRepositoriesEditForm
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 1
-    ExplicitWidth = 424
     object OKButton: TBitBtn
       Left = 4
       Top = 4
@@ -122,25 +122,57 @@ object PackageManagerRepositoriesEditForm: TPackageManagerRepositoriesEditForm
       Kind = bkHelp
     end
   end
-  object ListView: TListView
+  object PageControl: TPageControl
     Left = 0
     Top = 26
     Width = 602
     Height = 223
+    ActivePage = TabSheet1
     Align = alClient
-    Checkboxes = True
-    Columns = <>
-    ReadOnly = True
-    PopupMenu = PopupMenu
     TabOrder = 2
-    ViewStyle = vsReport
-    OnChange = ListViewChange
-    OnDblClick = ListViewDblClick
-    OnKeyDown = ListViewKeyDown
-    ExplicitWidth = 424
+    OnChange = PageControlChange
+    object TabSheet1: TTabSheet
+      Caption = 'Official repositories'
+      object ListView1: TListView
+        Left = 0
+        Top = 0
+        Width = 594
+        Height = 195
+        Align = alClient
+        Checkboxes = True
+        Columns = <>
+        ReadOnly = True
+        PopupMenu = PopupMenu
+        TabOrder = 0
+        ViewStyle = vsReport
+        OnChange = ListViewChange
+        OnDblClick = ListViewDblClick
+        OnKeyDown = ListViewKeyDown
+      end
+    end
+    object TabSheet2: TTabSheet
+      Caption = 'User-defined repositories'
+      ImageIndex = 1
+      object ListView: TListView
+        Left = 0
+        Top = 0
+        Width = 594
+        Height = 195
+        Align = alClient
+        Checkboxes = True
+        Columns = <>
+        ReadOnly = True
+        PopupMenu = PopupMenu
+        TabOrder = 0
+        ViewStyle = vsReport
+        OnChange = ListViewChange
+        OnDblClick = ListViewDblClick
+        OnKeyDown = ListViewKeyDown
+      end
+    end
   end
   object ImageList: TImageList
-    Left = 40
+    Left = 280
     Top = 32
     Bitmap = {
       494C010104000C00040010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
@@ -416,7 +448,7 @@ object PackageManagerRepositoriesEditForm: TPackageManagerRepositoriesEditForm
   end
   object PopupMenu: TPopupMenu
     Images = ImageList
-    Left = 8
+    Left = 248
     Top = 32
     object PopupActivate: TMenuItem
       Caption = 'Activate source'

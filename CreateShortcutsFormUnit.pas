@@ -157,7 +157,11 @@ begin
       If WindowsExeMode(G) then begin
         CreateLink(MakeAbsPath(G.GameExe,PrgSetup.BaseDir),G.GameParameters,LinkFile,Icon,Format(LanguageSetup.CreateShortcutFormRunGameInScummVM,[G.Name]));
       end else begin
-        CreateLink(ExpandFileName(Application.ExeName),G.Name,LinkFile,Icon,Format(LanguageSetup.CreateShortcutFormRunGameInScummVM,[G.Name]));
+        If ScummVMMode(G) then begin
+          CreateLink(ExpandFileName(Application.ExeName),G.Name,LinkFile,Icon,Format(LanguageSetup.CreateShortcutFormRunGameInScummVM,[G.Name]));
+        end else begin
+          CreateLink(ExpandFileName(Application.ExeName),G.Name,LinkFile,Icon,Format(LanguageSetup.CreateShortcutFormRunGameInDOSBox,[G.Name]));
+        end;
       end;
     end;
   end;

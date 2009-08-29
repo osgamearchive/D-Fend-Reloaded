@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
 <!DOCTYPE DFRPackagesFile SYSTEM "http://dfendreloaded.sourceforge.net/Packages/DFRPackagesFile.dtd">
 
-<DFRPackagesFile Name="Official addons (languages and auto setup templates) for D-Fend Reloaded" LastUpdateDate="08/09/2009">
+<DFRPackagesFile Name="Official addons (languages and auto setup templates) for D-Fend Reloaded" LastUpdateDate="08/21/2009">
   <Language
     Name="(Test) Dummy language"
-	Version="0.8.1"
+	MinVersion="0.8.0"
+	MaxVersion="0.8.99"
 	Author="Alexander Herzog"
-	PackageChecksum="B9883E3128AB333D6C00C45388316F26"
-	Size="82815">DummyLang.ini</Language>
+	PackageChecksum="5F023856B1A61A8A7736AE15073D66E5"
+	Size="81226">DummyLang.ini</Language>
   <AutoSetup
     Name="(Test) Airbus A320"
 	Genre="Flightsimulation"
@@ -33,7 +34,8 @@
   <IconSet
     Name="(Test) Test-Icon-Set"
 	FileChecksum="-"
-	Version="0.8.1"
+	MinVersion="0.8.0"
+	MaxVersion="0.8.99"
 	Author="nobody"
 	Size="48665">TestSet.zip</IconSet>
 </DFRPackagesFile>

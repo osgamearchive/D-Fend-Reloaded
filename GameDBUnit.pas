@@ -2,6 +2,7 @@ unit GameDBUnit;
 interface
 
 {DEFINE LargeListTest}
+{DEFINE SpeedTest}
 
 uses Classes, CommonComponents;
 
@@ -298,8 +299,10 @@ Type TGameDB=class;
     CacheUserInfo : String;
 
     Constructor Create(const ASetupFile : String); overload;
+    Constructor CreateDelayed(const ASetupFile : String; const ATimeStampCheck : Boolean);
     Constructor Create(const ABasePrgSetup : TBasePrgSetup); overload;
     Destructor Destroy; override;
+    Procedure DelayedLoad;
     Procedure UpdateFile; override;
 
     Procedure LoadCache;
@@ -527,19 +530,21 @@ end;
      TGameDB=class
   private
     FDir : String;
+    FTimeStampCheck : Boolean;
     FGameList : TList;
     FOnChanged : TNotifyEvent;
     FConfOpt : TConfOpt;
     FCreateConfFilesOnSave : Boolean;
     Procedure LoadList;
     Procedure GameChanged(Sender : TObject);
-    Function LoadGameFromFile(const FileName : String) : Boolean;
+    Function LoadGameFromFile(const FileName : String; const NoInit : Boolean) : Boolean;
     Function MakePROFFileName(const AName, ADir : String; const CheckExistingFiles : Boolean) : String;
     function GetGame(I: Integer): TGame;
     function GetCount: Integer;
     Procedure DeleteOldFiles;
+    Function GetProfilesListFromDrive : TStringList;
   public
-    Constructor Create(const ADir : String);
+    Constructor Create(const ADir : String; const ATimeStampCheck : Boolean = True);
     Destructor Destroy; override;
     Procedure Clear;
     Function Add(const AName : String) : Integer; overload;
@@ -705,6 +710,18 @@ Constructor TGame.Create(const ASetupFile : String);
 begin
   inherited Create(ASetupFile);
   FGameDB:=nil;
+  InitData;
+  LoadCache;
+end;
+
+Constructor TGame.CreateDelayed(const ASetupFile : String; const ATimeStampCheck : Boolean);
+begin
+  If ATimeStampCheck then inherited Create(ASetupFile) else inherited CreateNoTimeStampCheck(ASetupFile);
+  FGameDB:=nil;
+end;
+
+Procedure TGame.DelayedLoad;
+begin
   InitData;
   LoadCache;
 end;
@@ -1057,7 +1074,7 @@ end;
 
 { TGameDB }
 
-constructor TGameDB.Create(const ADir : String);
+constructor TGameDB.Create(const ADir : String; const ATimeStampCheck : Boolean);
 Var Msg : tagMSG;
     B : Boolean;
 begin
@@ -1066,6 +1083,7 @@ begin
   FGameList:=TList.Create;
   FConfOpt:=TConfOpt.Create;
   FDir:=IncludeTrailingPathDelimiter(ADir);
+  FTimeStampCheck:=ATimeStampCheck;
   B:=False;
   If Application.MainForm<>nil then begin
     B:=Application.MainForm.Enabled;
@@ -1097,63 +1115,155 @@ begin
   FGameList.Clear;
 end;
 
-function TGameDB.LoadGameFromFile(const FileName: String): Boolean;
+function TGameDB.LoadGameFromFile(const FileName: String; const NoInit : Boolean): Boolean;
 Var Game : TGame;
 begin
   result:=FileExists(FileName);
   if not result then exit;
 
-  Game:=TGame.Create(FileName);
-  Game.OnChanged:=GameChanged;
-  Game.GameDB:=self;
+  If NoInit then begin
+    Game:=TGame.CreateDelayed(FileName,FTimeStampCheck);
+  end else begin
+    Game:=TGame.Create(FileName);
+    Game.OnChanged:=GameChanged;
+    Game.GameDB:=self;
+    If Game.Cycles='Max' then Game.Cycles:='max';
+    If Game.Cycles='Auto' then Game.Cycles:='auto';
+  end;
+  
   FGameList.Add(Game);
+end;
 
-  If Game.Cycles='Max' then Game.Cycles:='max';
-  If Game.Cycles='Auto' then Game.Cycles:='auto';
+Function TGameDB.GetProfilesListFromDrive : TStringList;
+Var Rec : TSearchRec;
+    I : Integer;
+begin
+  result:=TStringList.Create;
+
+  I:=FindFirst(FDir+'*.prof',faAnyFile,Rec);
+  try
+    while I=0 do begin
+      If (Rec.Attr and faDirectory)=0 then result.Add(Rec.Name);
+      I:=FindNext(Rec);
+    end;
+  finally
+    FindClose(Rec);
+  end;
+end;
+
+Type TLoadThread=class(TThread)
+  private
+    FGameDB : TGameDB;
+    FFrom, FTo : Integer;
+  protected
+    Procedure Execute; override;
+  public
+    Constructor Create(const AGameDB : TGameDB; const AFrom, ATo : Integer);
+end;
+
+Constructor TLoadThread.Create(const AGameDB : TGameDB; const AFrom, ATo : Integer);
+begin
+  inherited Create(True);
+  FGameDB:=AGameDB;
+  FFrom:=AFrom;
+  FTo:=ATo;
+  Resume;
+end;
+
+Procedure TLoadThread.Execute;
+Var I : Integer;
+    G : TGame;
+begin
+  For I:=FFrom to FTo do begin
+    G:=FGameDB[I];
+    G.DelayedLoad;
+    G.OnChanged:=FGameDB.GameChanged;
+    G.GameDB:=FGameDB;
+    If G.Cycles='Max' then G.Cycles:='max';
+    If G.Cycles='Auto' then G.Cycles:='auto';
+  end;
 end;
 
 procedure TGameDB.LoadList;
-Var Rec : TSearchRec;
-    I{$IFDEF LargeListTest},J{$ENDIF} : Integer;
+Var I{$IFDEF LargeListTest},J{$ENDIF},C : Integer;
     List : TStringList;
+    T : Array[0..15] of TLoadThread;
+    A : Array[0..15] of THandle;
+    {$IFDEF SpeedTest}C1,C2,C3 : Cardinal;{$ENDIF}
+    G : TGame;
 begin
   Clear;
-
   ForceDirectories(FDir);
 
-  List:=TStringList.Create;
+  List:=GetProfilesListFromDrive;
   try
-    I:=FindFirst(FDir+'*.prof',faAnyFile,Rec);
-    try
-      while I=0 do begin
-        If (Rec.Attr and faDirectory)=0 then List.Add(Rec.Name);
-        I:=FindNext(Rec);
+    If List.Count>100 then begin
+      {$IFDEF SpeedTest}C1:=GetTickCount;{$ENDIF}
+
+      {Step 1: Create game list records}
+      WaitForm:=CreateWaitForm(nil,LanguageSetup.MessageLoadingDataBase,List.Count);
+      try
+        FGameList.Capacity:=List.Count{$IFDEF LargeListTest}*10{$ENDIF};
+
+        For I:=0 to List.Count-1 do begin
+          If (I mod 25)=0 then WaitForm.Step(I);
+          {$IFDEF LargeListTest}
+            If FDir=PrgDataDir+GameListSubDir+'\' then begin
+              For J:=1 to 10 do LoadGameFromFile(FDir+List[I],True);
+            end else begin
+              LoadGameFromFile(FDir+List[I],True);
+            end;
+          {$ELSE}
+            LoadGameFromFile(FDir+List[I],True);
+          {$ENDIF}
+          If (I mod 10)=0 then Application.ProcessMessages;
+        end;
+      finally
+        FreeAndNil(WaitForm);
       end;
-    finally
-      FindClose(Rec);
-    end;
-    If List.Count>100 then WaitForm:=CreateWaitForm(nil,LanguageSetup.MessageLoadingDataBase,List.Count) else  WaitForm:=nil;
-    try
-      For I:=0 to List.Count-1 do begin
-        If Assigned(WaitForm) and ((I mod 25)=0) then WaitForm.Step(I);
-        {$IFDEF LargeListTest}
-          If FDir=PrgDataDir+GameListSubDir+'\' then begin
-            For J:=1 to 50 do LoadGameFromFile(FDir+List[I]);
-          end else begin
-            LoadGameFromFile(FDir+Rec.Name);
-          end;
-        {$ELSE}
-          LoadGameFromFile(FDir+List[I]);
+
+      {$IFDEF SpeedTest}C2:=GetTickCount;{$ENDIF}
+
+      {Step 2: Load data}
+      C:=CPUCount;
+      If C>1 then begin
+        {Multi threaded}
+        For I:=0 to C-1 do begin
+          T[I]:=TLoadThread.Create(self,I*Count div C,((I+1)*Count div C)-1);
+          A[I]:=T[I].Handle;
+        end;
+        repeat
+          if WaitForMultipleObjects(C,@A[0],True,100)=WAIT_OBJECT_0 then break;
           Application.ProcessMessages;
-        {$ENDIF}
+        until False;
+        For I:=0 to C-1 do T[I].Free;
+      end else begin
+        {Single threaded}
+        For I:=0 to FGameList.Count-1 do begin
+          G:=TGame(FGameList[I]);
+          G.DelayedLoad;
+          G.OnChanged:=GameChanged;
+          G.GameDB:=self;
+          If G.Cycles='Max' then G.Cycles:='max';
+          If G.Cycles='Auto' then G.Cycles:='auto';
+        end;
       end;
-    finally
-      If Assigned(WaitForm) then FreeAndNil(WaitForm);
-      If Application.MainForm<>nil then ForceForegroundWindow(Application.MainForm.Handle);
+
+      {$IFDEF SpeedTest}C3:=GetTickCount; ShowMessage(IntToStr(C2-C1)+#13+IntToStr(C3-C2)+#13+FDir);{$ENDIF}
+
+    end else begin
+
+      For I:=0 to List.Count-1 do begin
+        LoadGameFromFile(FDir+List[I],False);
+        If (I mod 10)=0 then Application.ProcessMessages;
+      end;
+
     end;
   finally
     List.Free;
   end;
+
+  If Application.MainForm<>nil then ForceForegroundWindow(Application.MainForm.Handle);
 end;
 
 procedure TGameDB.DeleteOldFiles;

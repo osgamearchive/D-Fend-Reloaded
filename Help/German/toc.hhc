@@ -190,16 +190,16 @@
 						<param name="Local" value="FileOptionsFreeDOS.html">
 						</OBJECT>
 					<LI> <OBJECT type="text/sitemap">
-						<param name="Name" value="ScummVM">
-						<param name="Local" value="FileOptionsScummVM.html">
-						</OBJECT>
-					<LI> <OBJECT type="text/sitemap">
 						<param name="Name" value="QBasic">
 						<param name="Local" value="FileOptionsQBasic.html">
 						</OBJECT>
 					<LI> <OBJECT type="text/sitemap">
 						<param name="Name" value="Benutzerdefinierte Interpreter">
 						<param name="Local" value="FileOptionsUserInterpreters.html">
+						</OBJECT>
+					<LI> <OBJECT type="text/sitemap">
+						<param name="Name" value="ScummVM">
+						<param name="Local" value="FileOptionsScummVM.html">
 						</OBJECT>
 					<LI> <OBJECT type="text/sitemap">
 						<param name="Name" value="Wavedatei-Encoder">
@@ -752,16 +752,16 @@
 					<param name="Local" value="FileOptionsFreeDOS.html">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
-					<param name="Name" value="ScummVM">
-					<param name="Local" value="FileOptionsScummVM.html">
-					</OBJECT>
-				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="QBasic">
 					<param name="Local" value="FileOptionsQBasic.html">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="Benutzerdefinierte Interpreter">
 					<param name="Local" value="FileOptionsUserInterpreters.html">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="ScummVM">
+					<param name="Local" value="FileOptionsScummVM.html">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="Wavedatei-Encoder">

@@ -110,7 +110,7 @@ uses Math, VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgSetupUnit,
      SetupFrameEditorUnit, SetupFrameViewerUnit, SetupFrameWindowsGamesUnit,
      SetupFrameZipPrgsUnit, SetupFrameCustomLanguageStringsUnit,
      SetupFrameGameListIconModeAppearanceUnit, SetupFrameUserInterpreterFrameUnit,
-     SetupFrameImageScalingUnit;
+     SetupFrameImageScalingUnit, SetupFrameMoreEmulatorsUnit;
 
 {$R *.dfm}
 
@@ -226,9 +226,12 @@ begin
   F:=TSetupFrameDOSBox.Create(self); AddTreeNode(Root,F,TSetupFrameDOSBox(F),False,4); Root2:=F;
   F:=TSetupFrameDOSBoxExt.Create(self); AddTreeNode(Root2,F,TSetupFrameDOSBoxExt(F),True,4);
   F:=TSetupFrameFreeDOS.Create(self); AddTreeNode(Root,F,TSetupFrameFreeDOS(F),False,15,True);
-  F:=TSetupFrameScummVM.Create(self); AddTreeNode(Root,F,TSetupFrameScummVM(F),False,10);
   F:=TSetupFrameQBasic.Create(self); AddTreeNode(Root,F,TSetupFrameQBasic(F),False,11);
   F:=TSetupFrameUserInterpreterFrame.Create(self); AddTreeNode(Root,F,TSetupFrameUserInterpreterFrame(F),True,23);
+  F:=TSetupFrameScummVM.Create(self); AddTreeNode(Root,F,TSetupFrameScummVM(F),False,10);
+  If PrgSetup.ActivateIncompleteFeatures then begin
+    F:=TSetupFrameMoreEmulators.Create(self); AddTreeNode(Root,F,TSetupFrameMoreEmulators(F),True,23);
+  end;
   F:=TSetupFrameWaveEncoder.Create(self); AddTreeNode(Root,F,TSetupFrameWaveEncoder(F),False,9,False);
   F:=TSetupFrameZipPrgs.Create(self); AddTreeNode(Root,F,TSetupFrameZipPrgs(F),True,16,False);
   F:=TSetupFrameEditor.Create(self); AddTreeNode(Root,F,TSetupFrameEditor(F),True,17,False);

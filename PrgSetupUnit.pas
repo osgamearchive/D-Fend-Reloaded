@@ -75,7 +75,8 @@ Type TPackerSetting=class
 Type TPrgSetup=class(TBasePrgSetup)
   private
     FDOSBox, FPacker : TList;
-    FUserInterpretersPrograms, FUserInterpretersParameters, FUserInterpretersExtensions : TStringList;
+    FDOSBoxBasedUserInterpretersPrograms, FDOSBoxBasedUserInterpretersParameters, FDOSBoxBasedUserInterpretersExtensions : TStringList;
+    FWindowsBasedEmulatorsNames, FWindowsBasedEmulatorsPrograms, FWindowsBasedEmulatorsParameters, FWindowsBasedEmulatorsExtensions : TStringList;
     Procedure ReadSettings;
     Procedure InitDirs;
     Procedure DoneDirs;
@@ -85,8 +86,8 @@ Type TPrgSetup=class(TBasePrgSetup)
     Procedure DeleteOldDOSBoxSettings;
     Procedure LoadPackerSettings;
     Procedure DeleteOldPackerSettings;
-    Procedure LoadUserInterpreterSettings;
-    Procedure SaveUserInterpreterSettings;
+    Procedure LoadStringListSettings;
+    Procedure SaveStringListSettings;
     Function GetListCount(Index : Integer) : Integer;
     Function GetDOSBoxSettings(I : Integer) : TDOSBoxSetting;
     Function GetPackerSettings(I : Integer) : TPackerSetting;
@@ -144,9 +145,15 @@ Type TPrgSetup=class(TBasePrgSetup)
     property IconSet : String index 39 read GetString write SetString;
 
     property LinuxRemap[DriveLetter : Char] : String read GetDriveLetter write SetDriveLetter;
-    property UserInterpretersPrograms : TStringList read FUserInterpretersPrograms;
-    property UserInterpretersParameters : TStringList read FUserInterpretersParameters;
-    property UserInterpretersExtensions : TStringList read FUserInterpretersExtensions;
+
+    property DOSBoxBasedUserInterpretersPrograms : TStringList read FDOSBoxBasedUserInterpretersPrograms;
+    property DOSBoxBasedUserInterpretersParameters : TStringList read FDOSBoxBasedUserInterpretersParameters;
+    property DOSBoxBasedUserInterpretersExtensions : TStringList read FDOSBoxBasedUserInterpretersExtensions;
+
+    property WindowsBasedEmulatorsNames : TStringList read FWindowsBasedEmulatorsNames;
+    property WindowsBasedEmulatorsPrograms : TStringList read FWindowsBasedEmulatorsPrograms;
+    property WindowsBasedEmulatorsParameters : TStringList read FWindowsBasedEmulatorsParameters;
+    property WindowsBasedEmulatorsExtensions : TStringList read FWindowsBasedEmulatorsExtensions;
 
     property AskBeforeDelete : Boolean index 0 read GetBoolean write SetBoolean;
     property ReopenLastProfileEditorTab : Boolean index 1 read GetBoolean write SetBoolean;
@@ -220,8 +227,8 @@ Type TPrgSetup=class(TBasePrgSetup)
     property ShowMainMenu : Boolean index 69 read GetBoolean write SetBoolean;
     property IgnoreDirectoryCollisions : Boolean index 70 read GetBoolean write SetBoolean;
     property CreateConfFilesForProfiles : Boolean index 71 read GetBoolean write SetBoolean;
-    property ActivateIncompleteFeatures : Boolean index 72 read GetBoolean write SetBoolean;
-    property ActivateIncomplete09Features : Boolean index 73 read GetBoolean write SetBoolean;
+    property AddMountingDataAutomatically : Boolean index 72 read GetBoolean write SetBoolean;
+    property ActivateIncompleteFeatures : Boolean index 73 read GetBoolean write SetBoolean;
 
     property MainLeft : Integer index 0 read GetInteger write SetInteger;
     property MainTop : Integer index 1 read GetInteger write SetInteger;
@@ -414,12 +421,16 @@ begin
 
   FDOSBox:=TList.Create;
   FPacker:=TList.Create;
-  FUserInterpretersPrograms:=TStringList.Create;
-  FUserInterpretersParameters:=TStringList.Create;
-  FUserInterpretersExtensions:=TStringList.Create;
+  FDOSBoxBasedUserInterpretersPrograms:=TStringList.Create;
+  FDOSBoxBasedUserInterpretersParameters:=TStringList.Create;
+  FDOSBoxBasedUserInterpretersExtensions:=TStringList.Create;
+  FWindowsBasedEmulatorsNames:=TStringList.Create;
+  FWindowsBasedEmulatorsPrograms:=TStringList.Create;
+  FWindowsBasedEmulatorsParameters:=TStringList.Create;
+  FWindowsBasedEmulatorsExtensions:=TStringList.Create;
   LoadDOSBoxSettings;
   LoadPackerSettings;
-  LoadUserInterpreterSettings;
+  LoadStringListSettings;
 end;
 
 destructor TPrgSetup.Destroy;
@@ -433,10 +444,14 @@ begin
   For I:=0 to FPacker.Count-1 do TPackerSetting(FPacker[I]).Free;
   FPacker.Free;
 
-  SaveUserInterpreterSettings;
-  FUserInterpretersPrograms.Free;
-  FUserInterpretersParameters.Free;
-  FUserInterpretersExtensions.Free;
+  SaveStringListSettings;
+  FDOSBoxBasedUserInterpretersPrograms.Free;
+  FDOSBoxBasedUserInterpretersParameters.Free;
+  FDOSBoxBasedUserInterpretersExtensions.Free;
+  FWindowsBasedEmulatorsNames.Free;
+  FWindowsBasedEmulatorsPrograms.Free;
+  FWindowsBasedEmulatorsParameters.Free;
+  FWindowsBasedEmulatorsExtensions.Free;  
 
   DoneDirs;
   inherited Destroy;
@@ -481,32 +496,49 @@ begin
   end;
 end;
 
-Procedure TPrgSetup.LoadUserInterpreterSettings;
+Procedure TPrgSetup.LoadStringListSettings;
 Var I : Integer;
-    S,T,U : String;
+    S,T,U,V : String;
 begin
+  {DOSBox based user interpreters}
   For I:=0 to 99 do begin
     S:=Trim(GetString(500+I));
     T:=Trim(GetString(600+I));
     U:=Trim(GetString(700+I));
     If (S<>'') or (T<>'') or (U<>'') then begin
       If (OperationMode=omPortable) and (S<>'') then S:=MakeExtAbsPath(S,PrgDir);
-      FUserInterpretersPrograms.Add(S);
-      FUserInterpretersParameters.Add(T);
-      FUserInterpretersExtensions.Add(U);
+      FDOSBoxBasedUserInterpretersPrograms.Add(S);
+      FDOSBoxBasedUserInterpretersParameters.Add(T);
+      FDOSBoxBasedUserInterpretersExtensions.Add(U);
+    end;
+  end;
+
+  {Windows based emulators}
+  For I:=0 to 99 do begin
+    S:=Trim(GetString(800+I));
+    T:=Trim(GetString(900+I));
+    U:=Trim(GetString(1000+I));
+    V:=Trim(GetString(1100+I));
+    If (S<>'') or (T<>'') or (U<>'') or (V<>'') then begin
+      FWindowsBasedEmulatorsNames.Add(S);
+      If (OperationMode=omPortable) and (T<>'') then T:=MakeExtAbsPath(T,PrgDir);
+      FWindowsBasedEmulatorsPrograms.Add(T);
+      FWindowsBasedEmulatorsParameters.Add(U);
+      FWindowsBasedEmulatorsExtensions.Add(V);
     end;
   end;
 end;
 
-Procedure TPrgSetup.SaveUserInterpreterSettings;
+Procedure TPrgSetup.SaveStringListSettings;
 Var I,M : Integer;
-    S,T,U : String;
+    S,T,U,V : String;
 begin
-  M:=Max(Max(FUserInterpretersPrograms.Count,FUserInterpretersParameters.Count),FUserInterpretersExtensions.Count);
+  {DOSBox based user interpreters}
+  M:=Max(Max(FDOSBoxBasedUserInterpretersPrograms.Count,FDOSBoxBasedUserInterpretersParameters.Count),FDOSBoxBasedUserInterpretersExtensions.Count);
   For I:=0 to M-1 do begin
-    If I<FUserInterpretersPrograms.Count then S:=Trim(FUserInterpretersPrograms[I]) else S:='';
-    If I<FUserInterpretersParameters.Count then T:=Trim(FUserInterpretersParameters[I]) else T:='';
-    If I<FUserInterpretersExtensions.Count then U:=Trim(FUserInterpretersExtensions[I]) else U:='';
+    If I<FDOSBoxBasedUserInterpretersPrograms.Count then S:=Trim(FDOSBoxBasedUserInterpretersPrograms[I]) else S:='';
+    If I<FDOSBoxBasedUserInterpretersParameters.Count then T:=Trim(FDOSBoxBasedUserInterpretersParameters[I]) else T:='';
+    If I<FDOSBoxBasedUserInterpretersExtensions.Count then U:=Trim(FDOSBoxBasedUserInterpretersExtensions[I]) else U:='';
     If (OperationMode=omPortable) and (S<>'') then S:=MakeExtRelPath(S,PrgDir);
     SetString(500+I,S);
     SetString(600+I,T);
@@ -516,6 +548,26 @@ begin
     SetString(500+I,'');
     SetString(600+I,'');
     SetString(700+I,'');
+  end;
+
+  {Windows based emulators}
+  M:=Max(Max(Max(FWindowsBasedEmulatorsNames.Count,FWindowsBasedEmulatorsPrograms.Count),FWindowsBasedEmulatorsParameters.Count),FWindowsBasedEmulatorsExtensions.Count);
+  For I:=0 to M-1 do begin
+    If I<FWindowsBasedEmulatorsNames.Count then S:=Trim(FWindowsBasedEmulatorsNames[I]) else S:='';
+    If I<FWindowsBasedEmulatorsPrograms.Count then T:=Trim(FWindowsBasedEmulatorsPrograms[I]) else T:='';
+    If I<FWindowsBasedEmulatorsParameters.Count then U:=Trim(FWindowsBasedEmulatorsParameters[I]) else U:='';
+    If I<FWindowsBasedEmulatorsExtensions.Count then V:=Trim(FWindowsBasedEmulatorsExtensions[I]) else V:='';
+    If (OperationMode=omPortable) and (T<>'') then T:=MakeExtRelPath(T,PrgDir);
+    SetString(800+I,S);
+    SetString(900+I,T);
+    SetString(1000+I,U);
+    SetString(1100+I,V);
+  end;
+  For I:=M to 99 do begin
+    SetString(800+I,'');
+    SetString(900+I,'');
+    SetString(1000+I,'');
+    SetString(1100+I,'');
   end;
 end;
 
@@ -563,11 +615,18 @@ begin
   AddStringRec(38,'ProgramSets','CaptureDefaultPath','.\'+CaptureSubDir+'\');
   AddStringRec(39,'ProgramSets','IconSet','Modern');
 
+  For I:=0 to 25 do AddStringRec(450+I,'WineSupport',chr(ord('A')+I),'');
+
+  {DOSBox based user interpreters}
   For I:=0 to 99 do AddStringRec(500+I,'Interpreters','Program'+IntToStr(I+1),'');
   For I:=0 to 99 do AddStringRec(600+I,'Interpreters','Parameters'+IntToStr(I+1),'');
   For I:=0 to 99 do AddStringRec(700+I,'Interpreters','Extensions'+IntToStr(I+1),'');
 
-  For I:=0 to 25 do AddStringRec(1000+I,'WineSupport',chr(ord('A')+I),'');
+  {Windows based emulators}
+  For I:=0 to 99 do AddStringRec(800+I,'WindowsBasedEmulators','Name'+IntToStr(I+1),'');
+  For I:=0 to 99 do AddStringRec(900+I,'WindowsBasedEmulators','Program'+IntToStr(I+1),'');
+  For I:=0 to 99 do AddStringRec(1000+I,'WindowsBasedEmulators','Parameters'+IntToStr(I+1),'');
+  For I:=0 to 99 do AddStringRec(1100+I,'WindowsBasedEmulators','Extensions'+IntToStr(I+1),'');
 
   AddBooleanRec(0,'ProgramSets','AskBeforeDelete',True);
   AddBooleanRec(1,'ProgramSets','ShowLastTab',False);
@@ -641,8 +700,8 @@ begin
   AddBooleanRec(69,'ProgramSets','ShowMainMenu',True);
   AddBooleanRec(70,'ProgramSets','IgnoreDirectoryCollisions',False);
   AddBooleanRec(71,'ProgramSets','CreateConfFilesForProfiles',False);
-  AddBooleanRec(72,'ProgramSets','ActivateIncompleteFeatures',False);
-  AddBooleanRec(73,'ProgramSets','ActivateIncomplete09Features',False);
+  AddBooleanRec(72,'ProgramSets','AddMountingDataAutomatically',False); //... Will be true by default in 0.9
+  AddBooleanRec(73,'ProgramSets','ActivateIncompleteFeatures',False);
 
   AddIntegerRec(0,'ProgramSets','MainLeft',-1);
   AddIntegerRec(1,'ProgramSets','MainTop',-1);
@@ -716,12 +775,12 @@ end;
 
 Function TPrgSetup.GetDriveLetter(DriveLetter: Char): String;
 begin
-  result:=GetString(1000+(ord(UpCase(DriveLetter)))-ord('A'));
+  result:=GetString(450+(ord(UpCase(DriveLetter)))-ord('A'));
 end;
 
 Procedure TPrgSetup.SetDriveLetter(DriveLetter: Char; const Value: String);
 begin
-  SetString(1000+(ord(UpCase(DriveLetter)))-ord('A'),Value);
+  SetString(450+(ord(UpCase(DriveLetter)))-ord('A'),Value);
 end;
 
 Function TPrgSetup.GetListCount(Index : Integer) : Integer;

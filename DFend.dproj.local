@@ -367,5 +367,10 @@
     <Transaction>2009.08.04 09:06:16.986.dfm,C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\SetupFrameDOSBoxConfUnit.dfm=</Transaction>
     <Transaction>2009.08.05 08:02:49.267.pas,C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\Unit1.pas=C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\SelectAutoSetupFormUnit.pas</Transaction>
     <Transaction>2009.08.05 08:02:49.267.dfm,C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\Unit1.dfm=C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\SelectAutoSetupFormUnit.dfm</Transaction>
+    <Transaction>2009.08.23 13:05:57.802.pas,C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\Unit1.pas=C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\MultipleProfilesEditorFormUnit.pas</Transaction>
+    <Transaction>2009.08.23 13:05:57.802.dfm,C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\Unit1.dfm=C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\MultipleProfilesEditorFormUnit.dfm</Transaction>
+    <Transaction>2009.08.24 10:59:19.574.pas,C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\PackageDBLanguage.pas=</Transaction>
+    <Transaction>2009.08.27 08:10:04.594.pas,C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\Unit1.pas=C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\SetupFrameMoreEmulatorsUnit.pas</Transaction>
+    <Transaction>2009.08.27 08:10:04.594.dfm,C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\Unit1.dfm=C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\SetupFrameMoreEmulatorsUnit.dfm</Transaction>
   </Transactions>
 </BorlandProject>

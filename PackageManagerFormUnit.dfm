@@ -415,8 +415,6 @@ object PackageManagerForm: TPackageManagerForm
         Align = alClient
         BevelOuter = bvNone
         TabOrder = 1
-        ExplicitLeft = 124
-        ExplicitWidth = 527
         object ExePackagesPanel2: TPanel
           Left = 0
           Top = 238
@@ -425,7 +423,6 @@ object PackageManagerForm: TPackageManagerForm
           Align = alBottom
           BevelOuter = bvNone
           TabOrder = 0
-          ExplicitWidth = 527
           object ExePackagesButton: TBitBtn
             Left = 0
             Top = 4
@@ -483,7 +480,6 @@ object PackageManagerForm: TPackageManagerForm
           PlainText = True
           ReadOnly = True
           TabOrder = 1
-          ExplicitWidth = 527
         end
       end
     end

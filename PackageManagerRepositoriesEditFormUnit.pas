@@ -4,8 +4,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, Buttons, ComCtrls, ExtCtrls, ImgList, ToolWin, PackageDBUnit,
-  Menus;
+  Dialogs, StdCtrls, Buttons, ComCtrls, ExtCtrls, ImgList, ToolWin, Menus,
+  PackageDBUnit;
 
 type
   TPackageManagerRepositoriesEditForm = class(TForm)
@@ -19,7 +19,6 @@ type
     OKButton: TBitBtn;
     CancelButton: TBitBtn;
     HelpButton: TBitBtn;
-    ListView: TListView;
     EditButton: TToolButton;
     PopupMenu: TPopupMenu;
     PopupActivate: TMenuItem;
@@ -27,6 +26,11 @@ type
     PopupAdd: TMenuItem;
     PopupEdit: TMenuItem;
     PopupRemove: TMenuItem;
+    PageControl: TPageControl;
+    TabSheet1: TTabSheet;
+    TabSheet2: TTabSheet;
+    ListView: TListView;
+    ListView1: TListView;
     procedure FormCreate(Sender: TObject);
     procedure HelpButtonClick(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -39,11 +43,14 @@ type
     procedure ListViewDblClick(Sender: TObject);
     procedure ListViewKeyDown(Sender: TObject; var Key: Word;
       Shift: TShiftState);
+    procedure PageControlChange(Sender: TObject);
   private
     { Private-Deklarationen }
     DBDir : String;
-    UserPackageList : TPackageListFile;
-    Procedure LoadList;
+    MainPackageList, UserPackageList : TPackageListFile;
+    JustLoading : Boolean;
+    AlreadyWarned : Boolean;
+    Procedure LoadLists;
     Function GetDescription(const URL : String) : String;
   public
     { Public-Deklarationen }
@@ -57,7 +64,7 @@ Function ShowPackageManagerRepositoriesEditDialog(const AOwner : TComponent) : B
 implementation
 
 uses Math, CommonTools, PrgSetupUnit, VistaToolsUnit, LanguageSetupUnit,
-     IconLoaderUnit, HelpConsts, PrgConsts, PackageDBToolsUnit, PackageDBLanguage;
+     IconLoaderUnit, HelpConsts, PrgConsts, PackageDBToolsUnit;
 
 {$R *.dfm}
 
@@ -66,15 +73,20 @@ begin
   SetVistaFonts(self);
   Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName);
 
-  Caption:=LANG_RepositoriesEditor;
-  ActivateButton.Caption:=LANG_RepositoriesEditorActivateSource;
-  AddButton.Caption:=LANG_RepositoriesEditorAddSource;
-  EditButton.Caption:=LANG_RepositoriesEditorEditSource;
-  RemoveButton.Caption:=LANG_RepositoriesEditorRemoveSource;
-  PopupActivate.Caption:=LANG_RepositoriesEditorPopupActivateSource;
-  PopupAdd.Caption:=LANG_RepositoriesEditorPopupAddSource;
-  PopupEdit.Caption:=LANG_RepositoriesEditorPopupEditSource;
-  PopupRemove.Caption:=LANG_RepositoriesEditorPopupRemoveSource;
+  JustLoading:=False;
+  AlreadyWarned:=False;
+
+  Caption:=LanguageSetup.RepositoriesEditor;
+  ActivateButton.Caption:=LanguageSetup.RepositoriesEditorActivateSource;
+  AddButton.Caption:=LanguageSetup.RepositoriesEditorAddSource;
+  EditButton.Caption:=LanguageSetup.RepositoriesEditorEditSource;
+  RemoveButton.Caption:=LanguageSetup.RepositoriesEditorRemoveSource;
+  TabSheet1.Caption:=LanguageSetup.RepositoriesEditorSourceOfficial;
+  TabSheet2.Caption:=LanguageSetup.RepositoriesEditorSourceUserDefined;
+  PopupActivate.Caption:=LanguageSetup.RepositoriesEditorPopupActivateSource;
+  PopupAdd.Caption:=LanguageSetup.RepositoriesEditorPopupAddSource;
+  PopupEdit.Caption:=LanguageSetup.RepositoriesEditorPopupEditSource;
+  PopupRemove.Caption:=LanguageSetup.RepositoriesEditorPopupRemoveSource;
   OKButton.Caption:=LanguageSetup.OK;
   CancelButton.Caption:=LanguageSetup.Cancel;
   HelpButton.Caption:=LanguageSetup.Help;
@@ -90,20 +102,29 @@ begin
 
   DBDir:=IncludeTrailingPathDelimiter(PrgDataDir+PackageDBSubFolder);
 
-  UserPackageList:=TPackageListFile.Create;
+  MainPackageList:=TPackageListFile.Create(True);
+  MainPackageList.LoadFromFile(DBDir+PackageDBMainFile);
+
+  UserPackageList:=TPackageListFile.Create(False);
   UserPackageList.LoadFromFile(DBDir+PackageDBUserFile);
 end;
 
 procedure TPackageManagerRepositoriesEditForm.FormShow(Sender: TObject);
 Var C : TListColumn;
 begin
-  C:=ListView.Columns.Add; C.Width:=-1; C.Caption:=LANG_RepositoriesEditorColumnURL;
-  C:=ListView.Columns.Add; C.Width:=-1; C.Caption:=LANG_RepositoriesEditorColumnDescription;
-  LoadList;
+  C:=ListView.Columns.Add; C.Width:=-1; C.Caption:=LanguageSetup.RepositoriesEditorColumnURL;
+  C:=ListView.Columns.Add; C.Width:=-1; C.Caption:=LanguageSetup.RepositoriesEditorColumnDescription;
+
+  C:=ListView1.Columns.Add; C.Width:=-1; C.Caption:=LanguageSetup.RepositoriesEditorColumnURL;
+  C:=ListView1.Columns.Add; C.Width:=-1; C.Caption:=LanguageSetup.RepositoriesEditorColumnDescription;
+
+  LoadLists;
 end;
 
 procedure TPackageManagerRepositoriesEditForm.FormDestroy(Sender: TObject);
 begin
+  JustLoading:=True;
+  MainPackageList.Free;
   UserPackageList.Free;
 end;
 
@@ -125,57 +146,118 @@ begin
   end;
 end;
 
-procedure TPackageManagerRepositoriesEditForm.LoadList;
+procedure TPackageManagerRepositoriesEditForm.LoadLists;
 Var I : Integer;
     L : TListItem;
 begin
-  ListView.Items.BeginUpdate;
+  JustLoading:=True;
   try
-    ListView.Items.Clear;
-    For I:=0 to UserPackageList.Count-1 do begin
-      L:=ListView.Items.Add;
-      L.Caption:=UserPackageList.URL[I];
-      L.Checked:=UserPackageList.Active[I];
-      L.SubItems.Add(GetDescription(UserPackageList.URL[I]));
-      L.Data:=Pointer(I);
+    {Official}
+    ListView1.Items.BeginUpdate;
+    try
+      ListView1.Items.Clear;
+      For I:=0 to MainPackageList.Count-1 do begin
+        L:=ListView1.Items.Add;
+        L.Caption:=MainPackageList.URL[I];
+        L.Checked:=MainPackageList.Active[I];
+        L.SubItems.Add(GetDescription(MainPackageList.URL[I]));
+        L.Data:=Pointer(I);
+      end;
+    finally
+      ListView1.Items.EndUpdate;
     end;
+
+    For I:=0 to ListView1.Columns.Count-1 do If ListView1.Items.Count>0 then begin
+      ListView1.Column[I].Width:=-2;
+      ListView1.Column[I].Width:=-1;
+    end else begin
+      ListView1.Column[I].Width:=-2;
+    end;
+    If ListView1.Items.Count>0 then ListView1.Selected:=ListView1.Items[0];
+
+
+    {User}
+    ListView.Items.BeginUpdate;
+    try
+      ListView.Items.Clear;
+      For I:=0 to UserPackageList.Count-1 do begin
+        L:=ListView.Items.Add;
+        L.Caption:=UserPackageList.URL[I];
+        L.Checked:=UserPackageList.Active[I];
+        L.SubItems.Add(GetDescription(UserPackageList.URL[I]));
+        L.Data:=Pointer(I);
+      end;
+    finally
+      ListView.Items.EndUpdate;
+    end;
+
+    For I:=0 to ListView.Columns.Count-1 do If ListView.Items.Count>0 then begin
+      ListView.Column[I].Width:=-2;
+      ListView.Column[I].Width:=-1;
+    end else begin
+      ListView.Column[I].Width:=-2;
+    end;
+    If ListView.Items.Count>0 then ListView.Selected:=ListView.Items[0];
+
+    {Common}
+    ListViewChange(self,ListView.Selected,ctState);
   finally
-    ListView.Items.EndUpdate;
+    JustLoading:=False;
   end;
-
-  For I:=0 to ListView.Columns.Count-1 do If ListView.Items.Count>0 then begin
-    ListView.Column[I].Width:=-2;
-    ListView.Column[I].Width:=-1;
-  end else begin
-    ListView.Column[I].Width:=-2;
-  end;
-
-  If ListView.Items.Count>0 then ListView.Selected:=ListView.Items[0];
-  ListViewChange(self,ListView.Selected,ctState);
 end;
 
 procedure TPackageManagerRepositoriesEditForm.ListViewChange(Sender: TObject; Item: TListItem; Change: TItemChange);
 begin
-  If ListView.Selected=nil then begin
-    ActivateButton.Enabled:=False;
-    ActivateButton.Caption:=LANG_RepositoriesEditorActivateSource;
-    PopupActivate.Caption:=LANG_RepositoriesEditorPopupActivateSource;
-  end else begin
-    ActivateButton.Enabled:=True;
-    If UserPackageList.Active[Integer(ListView.Selected.Data)] then begin
-      ActivateButton.Caption:=LANG_RepositoriesEditorDeactivateSource;
-      PopupActivate.Caption:=LANG_RepositoriesEditorPopupDeactivateSource;
+  If (not JustLoading) and (Item<>nil) and (Change=ctState) then begin
+    If Item.Owner=ListView1.Items
+      then MainPackageList.Active[Integer(Item.Data)]:=Item.Checked
+      else UserPackageList.Active[Integer(Item.Data)]:=Item.Checked;
+  end;
+
+  If PageControl.ActivePageIndex=0 then begin
+    If ListView1.Selected=nil then begin
+      ActivateButton.Enabled:=False;
+      ActivateButton.Caption:=LanguageSetup.RepositoriesEditorActivateSource;
+      PopupActivate.Caption:=LanguageSetup.RepositoriesEditorPopupActivateSource;
     end else begin
-      ActivateButton.Caption:=LANG_RepositoriesEditorActivateSource;
-      PopupActivate.Caption:=LANG_RepositoriesEditorPopupActivateSource;
+      ActivateButton.Enabled:=True;
+      If MainPackageList.Active[Integer(ListView1.Selected.Data)] then begin
+        ActivateButton.Caption:=LanguageSetup.RepositoriesEditorDeactivateSource;
+        PopupActivate.Caption:=LanguageSetup.RepositoriesEditorPopupDeactivateSource;
+      end else begin
+        ActivateButton.Caption:=LanguageSetup.RepositoriesEditorActivateSource;
+        PopupActivate.Caption:=LanguageSetup.RepositoriesEditorPopupActivateSource;
+      end;
+    end;
+  end else begin
+    If ListView.Selected=nil then begin
+      ActivateButton.Enabled:=False;
+      ActivateButton.Caption:=LanguageSetup.RepositoriesEditorActivateSource;
+      PopupActivate.Caption:=LanguageSetup.RepositoriesEditorPopupActivateSource;
+    end else begin
+      ActivateButton.Enabled:=True;
+      If UserPackageList.Active[Integer(ListView.Selected.Data)] then begin
+        ActivateButton.Caption:=LanguageSetup.RepositoriesEditorDeactivateSource;
+        PopupActivate.Caption:=LanguageSetup.RepositoriesEditorPopupDeactivateSource;
+      end else begin
+        ActivateButton.Caption:=LanguageSetup.RepositoriesEditorActivateSource;
+        PopupActivate.Caption:=LanguageSetup.RepositoriesEditorPopupActivateSource;
+      end;
     end;
   end;
-  PopupActivate.Enabled:=ActivateButton.Enabled;
 
-  EditButton.Enabled:=(ListView.Selected<>nil);
-  PopupEdit.Enabled:=(ListView.Selected<>nil);
-  RemoveButton.Enabled:=(ListView.Selected<>nil);
-  PopupRemove.Enabled:=(ListView.Selected<>nil);
+  PopupActivate.Enabled:=ActivateButton.Enabled;
+  AddButton.Enabled:=(PageControl.ActivePageIndex=1);
+  PopupAdd.Enabled:=(PageControl.ActivePageIndex=1);
+  EditButton.Enabled:=(PageControl.ActivePageIndex=1) and (ListView.Selected<>nil);
+  PopupEdit.Enabled:=(PageControl.ActivePageIndex=1) and (ListView.Selected<>nil);
+  RemoveButton.Enabled:=(PageControl.ActivePageIndex=1) and (ListView.Selected<>nil);
+  PopupRemove.Enabled:=(PageControl.ActivePageIndex=1) and (ListView.Selected<>nil);
+end;
+
+procedure TPackageManagerRepositoriesEditForm.PageControlChange(Sender: TObject);
+begin
+  ListViewChange(Sender,ListView.Selected,ctState);
 end;
 
 procedure TPackageManagerRepositoriesEditForm.ButtonWork(Sender: TObject);
@@ -183,34 +265,47 @@ Var I : Integer;
     S : String;
 begin
   Case (Sender as TComponent).Tag of
-    0 : If ListView.Selected<>nil then begin
-          ListView.Selected.Checked:=not ListView.Selected.Checked;
-          I:=Integer(ListView.Selected.Data);
-          UserPackageList.Active[I]:=not UserPackageList.Active[I];
-          ListViewChange(self,ListView.Selected,ctState);
+    0 : If PageControl.ActivePageIndex=0 then begin
+          If ListView1.Selected<>nil then begin
+            ListView1.Selected.Checked:=not ListView1.Selected.Checked;
+            I:=Integer(ListView1.Selected.Data);
+            MainPackageList.Active[I]:=not MainPackageList.Active[I];
+            ListViewChange(self,ListView.Selected,ctState);
+          end;
+        end else begin
+          If ListView.Selected<>nil then begin
+            ListView.Selected.Checked:=not ListView.Selected.Checked;
+            I:=Integer(ListView.Selected.Data);
+            UserPackageList.Active[I]:=not UserPackageList.Active[I];
+            ListViewChange(self,ListView.Selected,ctState);
+          end;
         end;
-    1 : begin
+    1 : If PageControl.ActivePageIndex=1 then begin
+          If not AlreadyWarned then begin
+            MessageDlg(LanguageSetup.RepositoriesEditorAddSourceWarning,mtWarning,[mbOk],0);
+            AlreadyWarned:=True;
+          end;
           S:='';
-          If not InputQuery(LANG_RepositoriesEditorAddSourceCaption,LANG_RepositoriesEditorURL,S) then exit;
+          If not InputQuery(LanguageSetup.RepositoriesEditorAddSourceCaption,LanguageSetup.RepositoriesEditorURL,S) then exit;
           UserPackageList.Add(S,True);
-          LoadList;
+          LoadLists;
           ListView.Selected:=ListView.Items[ListView.Items.Count-1];
         end;
-    2 : If ListView.Selected<>nil then begin
+    2 : If (PageControl.ActivePageIndex=1) and (ListView.Selected<>nil) then begin
           I:=Integer(ListView.Selected.Data);
           S:=UserPackageList.URL[I];
-          If not InputQuery(LANG_RepositoriesEditorEditSourceCaption,LANG_RepositoriesEditorURL,S) then exit;
+          If not InputQuery(LanguageSetup.RepositoriesEditorEditSourceCaption,LanguageSetup.RepositoriesEditorURL,S) then exit;
           UserPackageList.URL[I]:=S;
           ListView.Selected.Caption:=S;
           ListView.Selected.SubItems[0]:=GetDescription(S);
         end;
-    3 : If ListView.Selected<>nil then begin
-          If MessageDlg(LANG_RepositoriesEditorRemoveSourceConfirm,mtConfirmation,[mbYes,mbNo],0)<>mrYes then exit;
+    3 : If (PageControl.ActivePageIndex=1) and (ListView.Selected<>nil) then begin
+          If MessageDlg(LanguageSetup.RepositoriesEditorRemoveSourceConfirm,mtConfirmation,[mbYes,mbNo],0)<>mrYes then exit;
           I:=ListView.ItemIndex;
           S:=DBDir+ExtractFileNameFromURL(UserPackageList.URL[Integer(ListView.Selected.Data)]);
           If FileExists(S) then ExtDeleteFile(S,ftTemp);
           UserPackageList.Delete(Integer(ListView.Selected.Data));
-          LoadList;
+          LoadLists;
           If ListView.Items.Count>0 then ListView.ItemIndex:=Max(0,I-1);
           ListViewChange(self,ListView.Selected,ctState);
         end;
@@ -234,6 +329,7 @@ end;
 
 procedure TPackageManagerRepositoriesEditForm.OKButtonClick(Sender: TObject);
 begin
+  MainPackageList.SaveToFile(self);
   UserPackageList.SaveToFile(self);
 end;
 

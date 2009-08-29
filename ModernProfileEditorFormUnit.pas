@@ -217,7 +217,7 @@ begin
   M.Tag:=3; M.OnClick:=PopupMenuWork; ToolsPopupMenu.Items.Add(M);
   If ScummVM or WindowsMode then exit;
 
-  TemplateDB:=TGameDB.Create(PrgDataDir+TemplateSubDir);
+  TemplateDB:=TGameDB.Create(PrgDataDir+TemplateSubDir,False);
   try
     If TemplateDB.Count>0 then begin
 
@@ -330,7 +330,7 @@ begin
           try ResetTo(G,True); finally G.Free; end;
         end;
     4 : begin
-          DB:=TGameDB.Create(PrgDataDir+AutoSetupSubDir);
+          DB:=TGameDB.Create(PrgDataDir+AutoSetupSubDir,False);
           try
             Nr:=ShowSelectAutoSetupDialog(self,DB);
             If Nr>=0 then ResetTo(DB[Nr],False);
@@ -339,7 +339,7 @@ begin
           end;
         end;
     5 : begin
-          DB:=TGameDB.Create(PrgDataDir+AutoSetupSubDir);
+          DB:=TGameDB.Create(PrgDataDir+AutoSetupSubDir,False);
           try
             Nr:=ShowSelectAutoSetupDialog(self,DB);
             If Nr>=0 then ResetTo(DB[Nr],True);
@@ -348,11 +348,11 @@ begin
           end;
         end;
     10000..19999 : begin
-                     DB:=TGameDB.Create(PrgDataDir+TemplateSubDir);
+                     DB:=TGameDB.Create(PrgDataDir+TemplateSubDir,False);
                      try ResetTo(DB[(Sender as TComponent).Tag-10000],False); finally DB.Free; end;
                    end;
     20000..29999 : begin
-                     DB:=TGameDB.Create(PrgDataDir+TemplateSubDir);
+                     DB:=TGameDB.Create(PrgDataDir+TemplateSubDir,False);
                      try ResetTo(DB[(Sender as TComponent).Tag-20000],True); finally DB.Free; end;
                    end;
   end;
@@ -602,7 +602,7 @@ end;
 
 procedure TModernProfileEditorForm.OKButtonClick(Sender: TObject);
 Var I : Integer;
-    S : String;
+    S,T : String;
     St : TStringList;
     B : Boolean;
 begin
@@ -683,6 +683,23 @@ begin
   For I:=0 to Tree.Items.Count-1 do begin
     FrameList[Integer(Tree.Items[I].Data)].IFrame.GetGame(Game);
     ProfileName:=Game.Name;
+  end;
+
+  If (not WindowsMode) and (not ScummVM) and (LoadTemplate<>nil) and PrgSetup.AddMountingDataAutomatically then begin
+    St:=TStringList.Create;
+    try
+      For I:=0 to Game.NrOfMounts-1 do St.Add(Game.Mount[I]);
+      If Trim(Game.GameExe)='' then S:='' else S:=ExtractFilePath(Game.GameExe);
+      If ExtUpperCase(Copy(Trim(S),1,7))='DOSBOX:' then S:='';
+      If Trim(Game.SetupExe)='' then T:='' else T:=ExtractFilePath(Game.SetupExe);
+      If ExtUpperCase(Copy(Trim(T),1,7))='DOSBOX:' then T:='';
+      BuildGameDirMountData(St,S,T);
+      Game.NrOfMounts:=St.Count;
+      For I:=0 to St.Count-1 do Game.Mount[I]:=St[I];
+      For I:=St.Count to 9 do Game.Mount[I]:='';
+    finally
+      St.Free;
+    end;
   end;
 
   If Tree.Selected<>nil then begin

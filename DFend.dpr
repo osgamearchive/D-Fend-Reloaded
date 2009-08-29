@@ -181,7 +181,6 @@ uses
   FastMM4HTTPFixes in 'FastMM4HTTPFixes.pas',
   PackageBuilderUnit in 'PackageBuilderUnit.pas',
   PackageDBCacheUnit in 'PackageDBCacheUnit.pas',
-  PackageDBLanguage in 'PackageDBLanguage.pas',
   PackageDBToolsUnit in 'PackageDBToolsUnit.pas',
   PackageDBUnit in 'PackageDBUnit.pas',
   PackageManagerFormUnit in 'PackageManagerFormUnit.pas' {PackageManagerForm},
@@ -192,7 +191,9 @@ uses
   PackageCreationFormUnit in 'PackageCreationFormUnit.pas' {PackageCreationForm},
   TextEditPopupUnit in 'TextEditPopupUnit.pas',
   SetupFrameImageScalingUnit in 'SetupFrameImageScalingUnit.pas' {SetupFrameImageScaling: TFrame},
-  SelectAutoSetupFormUnit in 'SelectAutoSetupFormUnit.pas' {SelectAutoSetupForm};
+  SelectAutoSetupFormUnit in 'SelectAutoSetupFormUnit.pas' {SelectAutoSetupForm},
+  MultipleProfilesEditorFormUnit in 'MultipleProfilesEditorFormUnit.pas' {MultipleProfilesEditorForm},
+  SetupFrameMoreEmulatorsUnit in 'SetupFrameMoreEmulatorsUnit.pas' {SetupFrameMoreEmulators: TFrame};
 
 {$R *.res}
 

@@ -24,8 +24,8 @@ Procedure ClearPackageCache;
 
 implementation
 
-uses Windows, SysUtils, Forms, Dialogs, Controls, IdHTTP, PackageDBLanguage,
-     LanguageSetupUnit, CommonTools, PrgConsts, PrgSetupUnit;
+uses Windows, SysUtils, Forms, Dialogs, Controls, IdHTTP, LanguageSetupUnit,
+     CommonTools, PrgConsts, PrgSetupUnit;
 
 Function LoadXMLDoc(const FileName : String; var XMLDoc : TXMLDocument) : String;
 Var MSt : TMemoryStream;
@@ -52,7 +52,7 @@ begin
   XMLDoc.FileName:=FileName;
 
   If not XMLDoc.Active then begin
-    result:=Format(LANG_CouldNotActivateXML,[FileName]);
+    result:=Format(LanguageSetup.MessageCouldNotActivateXML,[FileName]);
     FreeAndNil(XMLDoc);
     exit;
   end;
@@ -166,7 +166,7 @@ begin
   repeat
     result:=GetFileFromAnyDrive(Path);
     If result<>nil then exit;
-    if MessageDlg(Format(LANG_MenuUpdateListsLocal,[ExtractFileName(Path)]),mtInformation,[mbOK,mbCancel],0)<>mrOK then exit;
+    if MessageDlg(Format(LanguageSetup.PackageManagerMenuUpdateListsLocal,[ExtractFileName(Path)]),mtInformation,[mbOK,mbCancel],0)<>mrOK then exit;
   until False;
 end;
 
@@ -200,9 +200,9 @@ end;
 
 Function GetNiceFileSize(const Size : Integer) : String;
 begin
-  If Size<1024 then begin result:=IntToStr(Size)+' '+LANG_Bytes; exit; end;
-  If Size<1024*1024 then begin result:=IntToStr(Size div 1024)+' '+LANG_KBytes; exit; end;
-  result:=IntToStr(Size div 1024 div 1024)+' '+LANG_MBytes;
+  If Size<1024 then begin result:=IntToStr(Size)+' '+LanguageSetup.Bytes; exit; end;
+  If Size<1024*1024 then begin result:=IntToStr(Size div 1024)+' '+LanguageSetup.KBytes; exit; end;
+  result:=IntToStr(Size div 1024 div 1024)+' '+LanguageSetup.MBytes;
 end;
 
 Function Replace(const S, FromStr, ToStr : String) : String;

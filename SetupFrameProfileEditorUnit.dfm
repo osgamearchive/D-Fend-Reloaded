@@ -2,11 +2,11 @@ object SetupFrameProfileEditor: TSetupFrameProfileEditor
   Left = 0
   Top = 0
   Width = 542
-  Height = 283
+  Height = 358
   TabOrder = 0
   DesignSize = (
     542
-    283)
+    358)
   object ReopenLastActiveProfileSheetCheckBox: TCheckBox
     Left = 16
     Top = 24
@@ -61,5 +61,19 @@ object SetupFrameProfileEditor: TSetupFrameProfileEditor
     Anchors = [akLeft, akTop, akRight]
     Caption = 'Profildateinamen immer gem'#228#223' dem Profilnamen umbenennen'
     TabOrder = 4
+  end
+  object AutoAddMountingsRadioGroup: TRadioGroup
+    Left = 16
+    Top = 250
+    Width = 520
+    Height = 63
+    Anchors = [akLeft, akTop, akRight]
+    Caption = 'Mounting-Einstellungen bei Bedarf automatisch hinzuf'#252'gen'
+    Items.Strings = (
+      'Nur beim Hinzuf'#252'gen '#252'ber den Assistenten'
+      
+        'Beim Hinzuf'#252'gen '#252'ber den Assistenten und '#252'ber den modernen Profi' +
+        'leditor')
+    TabOrder = 5
   end
 end

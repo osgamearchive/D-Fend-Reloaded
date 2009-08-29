@@ -66,6 +66,8 @@ Function ExtensionInList(Extension, List : String) : Boolean;
 
 Function ProcessFileNameFilter(Filter, ArchiveFiles : String) : String;
 
+Function GetCompressStrengthFromPrgSetup : TCompressStrength;
+
 implementation
 
 uses Math, LanguageSetupUnit, PrgSetupUnit, CommonTools, DOSBoxUnit, PrgConsts;
@@ -619,6 +621,18 @@ begin
     result:=Format(Filter,[S,U,T]);
   finally
     St.Free;
+  end;
+end;
+
+Function GetCompressStrengthFromPrgSetup : TCompressStrength;
+begin
+  Case PrgSetup.CompressionLevel of
+    0 : result:=SAVE;
+    1 : result:=FAST;
+    2 : result:=NORMAL;
+    3 : result:=MAXIMUM;
+    4 : result:=ULTRA;
+    else result:=MAXIMUM;
   end;
 end;
 

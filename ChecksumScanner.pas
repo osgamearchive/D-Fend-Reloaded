@@ -22,7 +22,7 @@ end;
 
 implementation
 
-uses SysUtils, CommonTools, HashCalc, WaitFormUnit, PackageDBLanguage;
+uses SysUtils, CommonTools, HashCalc, WaitFormUnit, LanguageSetupUnit;
 
 { TChecksumScanner }
 
@@ -67,7 +67,7 @@ begin
     FindClose(Rec);
   end;
 
-  If FShowScanDialog then WaitForm:=CreateWaitForm(FOwner,LANG_Scanning,FFileNames.Count) else WaitForm:=nil;
+  If FShowScanDialog then WaitForm:=CreateWaitForm(FOwner,LanguageSetup.PackageManagerScanning,FFileNames.Count) else WaitForm:=nil;
   try
     For I:=0 to FFileNames.Count-1 do begin
       If Assigned(WaitForm) then WaitForm.Step(I);

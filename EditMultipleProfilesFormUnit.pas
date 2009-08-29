@@ -34,6 +34,10 @@ type
     procedure HelpButtonClick(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure OKButtonClick(Sender: TObject);
+    procedure FormMouseWheelDown(Sender: TObject; Shift: TShiftState;
+      MousePos: TPoint; var Handled: Boolean);
+    procedure FormMouseWheelUp(Sender: TObject; Shift: TShiftState;
+      MousePos: TPoint; var Handled: Boolean);
   private
     { Private-Deklarationen }
     LastY : Integer;
@@ -543,7 +547,6 @@ begin
   end;
 end;
 
-
 procedure TEditMultipleProfilesForm.AddCaption(const Name: String);
 Var L : TLabel;
 begin
@@ -614,6 +617,30 @@ end;
 procedure TEditMultipleProfilesForm.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
   If (Key=VK_F1) and (Shift=[]) then HelpButtonClick(Sender);
+end;
+
+procedure TEditMultipleProfilesForm.FormMouseWheelUp(Sender: TObject; Shift: TShiftState; MousePos: TPoint; var Handled: Boolean);
+Var B : Boolean;
+    C : TControl;
+begin
+  B:=(Screen.ActiveControl=ScrollBox) or ((Screen.ActiveControl<>nil) and (Screen.ActiveControl.Parent=ScrollBox));
+  If (not B) and (PageControl.ActivePageIndex=1) then begin
+    C:=ScrollBox.Parent.ControlAtPos(ScrollBox.Parent.ScreenToClient(MousePos),False,True);
+    B:=(C=ScrollBox) or ((C<>nil) and (C.Parent=ScrollBox));
+  end;
+  If B then ScrollBox.VertScrollBar.Position:=Max(0,ScrollBox.VertScrollBar.Position-ScrollBox.VertScrollBar.Increment);
+end;
+
+procedure TEditMultipleProfilesForm.FormMouseWheelDown(Sender: TObject; Shift: TShiftState; MousePos: TPoint; var Handled: Boolean);
+Var B : Boolean;
+    C : TControl;
+begin
+  B:=(Screen.ActiveControl=ScrollBox) or ((Screen.ActiveControl<>nil) and (Screen.ActiveControl.Parent=ScrollBox));
+  If (not B) and (PageControl.ActivePageIndex=1) then begin
+    C:=ScrollBox.Parent.ControlAtPos(ScrollBox.Parent.ScreenToClient(MousePos),False,True);
+    B:=(C=ScrollBox) or ((C<>nil) and (C.Parent=ScrollBox));
+  end;
+  If B then ScrollBox.VertScrollBar.Position:=Min(ScrollBox.VertScrollBar.Range,ScrollBox.VertScrollBar.Position+ScrollBox.VertScrollBar.Increment);
 end;
 
 procedure TEditMultipleProfilesForm.InitSettings;
@@ -1033,7 +1060,7 @@ begin
       Nr:=ValueActive(9005); If Nr>=0 then G.JoystickButtonwrap:=GetYesNo;
 
       {Mounting}
-      Nr:=ValueActive(10000); If Nr>=0 then ReplaceFolderWork(G,TComboBox(Settings[Nr].Values[0]).Text,TEdit(Settings[Nr].Values[0]).Text);
+      Nr:=ValueActive(10000); If Nr>=0 then ReplaceFolderWork(G,TComboBox(Settings[Nr].Values[0]).Text,TEdit(Settings[Nr].Values[1]).Text);
       Nr:=ValueActive(10001); If Nr>=0 then G.AutoMountCDs:=GetYesNo;
       Nr:=ValueActive(10002); If Nr>=0 then G.SecureMode:=GetYesNo;
       Nr:=ValueActive(10003); If Nr>=0 then ChangeMountSetting(G,GetComboIndex=0);

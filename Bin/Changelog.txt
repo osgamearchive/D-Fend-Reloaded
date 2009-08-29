@@ -1,5 +1,23 @@
 D-Fend Reloaded Changelog
 
+Version 0.8.2 (08/31/2009)
+==========================
+- Faster program start.
+- Faster start of profiles on many games in the games directory.
+- [Fix] Previewer area at the bottom of them main window is not resizeable.
+- [Fix] When using the "Create multiple shortcuts" function the tooltip hints
+  for the created shortcuts can be wrong.
+- [Fix] When transfering, uninstalling, building archive files or building
+  installer packages from profiles using cue/bin CD images only the selected
+  cue file was processed; the bin file was ignored.
+- [Fix] The mounting search and replace function of the multiple profiles
+  editor did not work.
+- [Fix] The mouse wheel not working on settings page of the multiple profiles
+  editor.
+- [Fix] Sometimes a second taskbar entry appears when clicking the program
+  window while creation of an archive package is prepared.
+
+
 Version 0.8.1 (08/10/2009)
 ==========================
 - [Fix] If you press the delete key in the quick search box the program asks

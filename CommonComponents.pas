@@ -49,6 +49,7 @@ Type TBasePrgSetup=class
     procedure SetString(const Index: Integer; const Value: String);
   public
     Constructor Create(const ASetupFile : String); overload;
+    constructor CreateNoTimeStampCheck(const ASetupFile: String);
     Constructor Create(const ABasePrgSetup : TBasePrgSetup); overload;
     Destructor Destroy; override;
     Procedure UpdateFile; virtual;
@@ -104,7 +105,22 @@ begin
   end else begin
     Ini:=nil; FOwnIni:=False;
   end;
-  ClearLists;
+  FStoreConfigOnExit:=True;
+  FChanged:=False;
+end;
+
+constructor TBasePrgSetup.CreateNoTimeStampCheck(const ASetupFile: String);
+begin
+  inherited Create;
+  FSetupFile:=ASetupFile;
+  FLastTimeStamp:=0;
+  FFirstRun:=not FileExists(ASetupFile);
+  FOwnINI:=True;
+  If ASetupFile<>'' then begin
+    Ini:=TMemIniFile.Create(ASetupFile);
+  end else begin
+    Ini:=nil; FOwnIni:=False;
+  end;
   FStoreConfigOnExit:=True;
   FChanged:=False;
 end;

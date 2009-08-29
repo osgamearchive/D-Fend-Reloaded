@@ -262,7 +262,6 @@ end;
 procedure TZipManager.RepackData(const Folder, ZipFile: String; const DeleteType : Integer; const AddToZipFile : Boolean);
 Var AZipFile, ADestFolder : String;
     ADeleteMode : TDeleteMode;
-    ACompressStrength : TCompressStrength;
 begin
   AZipFile:=MakeAbsPath(ZipFile,PrgSetup.BaseDir);
   ADestFolder:=MakeAbsPath(Folder,PrgSetup.BaseDir);
@@ -273,18 +272,9 @@ begin
     else ADeleteMode:=dmNoNoWarning;
   end;
 
-  Case PrgSetup.CompressionLevel of
-    0 : ACompressStrength:=SAVE;
-    1 : ACompressStrength:=FAST;
-    2 : ACompressStrength:=NORMAL;
-    3 : ACompressStrength:=MAXIMUM;
-    4 : ACompressStrength:=ULTRA;
-    else ACompressStrength:=MAXIMUM;
-  end;
-
   If AddToZipFile
-    then ZipInfoFormUnit.AddToZipFile(Application.MainForm,AZipFile,ADestFolder,ADeleteMode,ACompressStrength)
-    else CreateZipFile(Application.MainForm,AZipFile,ADestFolder,ADeleteMode,ACompressStrength);
+    then ZipInfoFormUnit.AddToZipFile(Application.MainForm,AZipFile,ADestFolder,ADeleteMode,GetCompressStrengthFromPrgSetup)
+    else CreateZipFile(Application.MainForm,AZipFile,ADestFolder,ADeleteMode,GetCompressStrengthFromPrgSetup);
 end;
 
 procedure TZipManager.TimerWork(Sender: TObject);

@@ -1,5 +1,11 @@
 [Global]
 SelectAll=Select all
+Bytes=Bytes
+KBytels=KB
+MBytes=MB
+
+[Messages]
+CouldNotActivateXML=Could not activte the XML document %s.
 
 [ProfileEditorForm]
 Tools=Tools
@@ -16,13 +22,20 @@ Tools.ResetToAutoSetup.AllPages=Select auto setup template and reset all pages..
 Tools.ResetToAutoSetup.Select=Select auto setup template
 
 [SetupForm]
+ProfileEditorAutoAddMountings=Automatically add mounting records if needed
+ProfileEditorAutoAddMountings.OnlyWizard=Only when added via the profile wizard
+ProfileEditorAutoAddMountings.Always=When added via the profile wizard and via the modern profile editor
+Service6=Clear package cache and lists
 AlwaysCreateConfFiles=Always create conf files for all profiles (off: only when starting DOSBox)
-ImageScaling=Image scaling 
-ImageScaling.Label=Algorithm used for scaling images 
-ImageScaling.Algorithm.Box=Box 
-ImageScaling.Algorithm.Triangle=Triangle 
-ImageScaling.Algorithm.Hermite=Hermite 
-ImageScaling.Algorithm.Bell=Bell 
-ImageScaling.Algorithm.BSpline=B-spline 
-ImageScaling.Algorithm.Lanczos3=Lanczos3 
-ImageScaling.Algorithm.Mitchell=Mitchell 
+ImageScaling=Image scaling
+ImageScaling.Label=Algorithm used for scaling images
+ImageScaling.Algorithm.Box=Box
+ImageScaling.Algorithm.Triangle=Triangle
+ImageScaling.Algorithm.Hermite=Hermite
+ImageScaling.Algorithm.Bell=Bell
+ImageScaling.Algorithm.BSpline=B-spline
+ImageScaling.Algorithm.Lanczos3=Lanczos3
+ImageScaling.Algorithm.Mitchell=Mitchell
+
+[ChangeProfilesForm]
+SectionInfo=%d of %d settings selected for changing

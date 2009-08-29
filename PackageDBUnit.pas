@@ -50,11 +50,12 @@ end;
 
 Type TDownloadLanguageData=class(TDownloadData)
   private
-    FVersion, FAuthor : String;
+    FMinVersion, FMaxVersion, FAuthor : String;
   public
     Constructor Create(const APackageFileURL : String);
     Function LoadFromXMLNode(const N : IXMLNode) : Boolean; override;
-    property Version : String read FVersion;
+    property MinVersion : String read FMinVersion;
+    property MaxVersion : String read FMaxVersion;
     property Author : String read FAuthor;
 end;
 
@@ -69,11 +70,12 @@ end;
 
 Type TDownloadIconSetData=class(TDownloadData)
   private
-    FVersion, FAuthor : String;
+    FMinVersion, FMaxVersion, FAuthor : String;
   public
     Constructor Create(const APackageFileURL : String);
     Function LoadFromXMLNode(const N : IXMLNode) : Boolean; override;
-    property Version : String read FVersion;
+    property MinVersion : String read FMinVersion;
+    property MaxVersion : String read FMaxVersion;
     property Author : String read FAuthor;
 end;
 
@@ -124,13 +126,16 @@ Type TPackageListFile=class
     FURL : TStringList;
     FActive : TList;
     FFileName : String;
+    FIsMasterList : Boolean;
     function GetCount: Integer;
     function GetURL(I: Integer): String;
     function GetActive(I: Integer): Boolean;
     procedure SetActive(I: Integer; const Value: Boolean);
     procedure SetURL(I: Integer; const Value: String);
+    Procedure SpecialLoadActiveState;
+    Procedure SpecialSaveActiveState;
   public
-    Constructor Create;
+    Constructor Create(const AIsMasterList : Boolean);
     Destructor Destroy; override;
     Procedure Clear;
     Function LoadFromFile(const AFileName : String) : Boolean;
@@ -173,7 +178,7 @@ end;
 implementation
 
 uses Windows, SysUtils, Dialogs, XMLDom, XMLDoc, MSXMLDOM, PackageDBToolsUnit,
-     CommonTools, PackageDBLanguage, PrgConsts, PrgSetupUnit, LanguageSetupUnit;
+     CommonTools, PrgConsts, PrgSetupUnit, LanguageSetupUnit;
 
 { TDownloadData }
 
@@ -264,15 +269,16 @@ end;
 constructor TDownloadLanguageData.Create(const APackageFileURL : String);
 begin
   inherited Create(APackageFileURL);
-  FVersion:=''; FAuthor:='';
+  FMinVersion:=''; FMaxVersion:=''; FAuthor:='';
 end;
 
 function TDownloadLanguageData.LoadFromXMLNode(const N: IXMLNode): Boolean;
 begin
   result:=False;
   if not inherited LoadFromXMLNode(N) then exit;
-  If not CheckAttributes(N,['Version','Author']) then exit;
-  FVersion:=N.Attributes['Version'];
+  If not CheckAttributes(N,['MinVersion','MaxVersion','Author']) then exit;
+  FMinVersion:=N.Attributes['MinVersion'];
+  FMaxVersion:=N.Attributes['MaxVersion'];
   FAuthor:=N.Attributes['Author'];
   result:=True;
 end;
@@ -300,15 +306,16 @@ constructor TDownloadIconSetData.Create(const APackageFileURL : String);
 begin
   inherited Create(APackageFileURL);
   FChecksumXMLName:='FileChecksum';
-  FVersion:=''; FAuthor:='';
+  FMinVersion:=''; FMaxVersion:=''; FAuthor:='';
 end;
 
 function TDownloadIconSetData.LoadFromXMLNode(const N: IXMLNode): Boolean;
 begin
   result:=False;
   if not inherited LoadFromXMLNode(N) then exit;
-  If not CheckAttributes(N,['Version','Author']) then exit;
-  FVersion:=N.Attributes['Version'];
+  If not CheckAttributes(N,['MinVersion','MaxVersion','Author']) then exit;
+  FMinVersion:=N.Attributes['MinVersion'];
+  FMaxVersion:=N.Attributes['MaxVersion'];
   FAuthor:=N.Attributes['Author'];
   result:=True;
 end;
@@ -484,9 +491,10 @@ end;
 
 { TMainPackageFile }
 
-constructor TPackageListFile.Create;
+constructor TPackageListFile.Create(const AIsMasterList : Boolean);
 begin
   inherited Create;
+  FIsMasterList:=AIsMasterList;
   FUpdateDate:=0;
   FURL:=TStringList.Create;
   FActive:=TList.Create;
@@ -572,6 +580,8 @@ begin
     XMLDoc.Free;
   end;
 
+  If FIsMasterList then SpecialLoadActiveState;
+
   result:=True;
 end;
 
@@ -599,6 +609,8 @@ begin
   finally
     Doc.Free;
   end;
+
+  If FIsMasterList then SpecialSaveActiveState;
 end;
 
 Procedure TPackageListFile.UpdateFromServer(const URL, TempFile : String);
@@ -606,7 +618,7 @@ Var TempMainFile : TPackageListFile;
 begin
   if not DownloadFile(URL,TempFile) then exit;
 
-  TempMainFile:=TPackageListFile.Create;
+  TempMainFile:=TPackageListFile.Create(FIsMasterList);
   try
     if not TempMainFile.LoadFromFile(TempFile) then exit;
     If TempMainFile.UpdateDate<=UpdateDate then exit;
@@ -617,6 +629,52 @@ begin
   finally
     TempMainFile.Free;
     ExtDeleteFile(TempFile,ftTemp);
+  end;
+end;
+
+Procedure TPackageListFile.SpecialLoadActiveState;
+Var ActiveStateFileName : String;
+    St : TStringList;
+    I,J : Integer;
+    S : String;
+begin
+  ActiveStateFileName:=ChangeFileExt(FFileName,'.txt');
+
+  If not FileExists(ActiveStateFileName) then exit;
+
+  St:=TStringList.Create;
+  try
+    try St.LoadFromFile(ActiveStateFileName); except exit; end;
+    For I:=0 to St.Count-1 do begin
+      S:=St[I];
+      If (S<>'') and (S[1]=';') then continue;
+      J:=FURL.IndexOf(S);
+      If J>=0 then FActive[J]:=TObject(0);
+    end;
+  finally
+    St.Free;
+  end;
+end;
+
+Procedure TPackageListFile.SpecialSaveActiveState;
+Var ActiveStateFileName : String;
+    St : TStringList;
+    I : Integer;
+begin
+
+  ActiveStateFileName:=ChangeFileExt(FFileName,'.txt');
+
+  St:=TStringList.Create;
+  try
+    For I:=0 to FActive.Count-1 do If Integer(FActive[I])=0 then St.Add(FURL[I]);
+    If St.Count=0 then begin
+      DeleteFile(ActiveStateFileName);
+    end else begin
+      St.Insert(0,'; Deactivated main package lists');
+      try St.SaveToFile(ActiveStateFileName); except end;
+    end;  
+  finally
+    St.Free;
   end;
 end;
 
@@ -759,11 +817,11 @@ begin
   Clear;
   If not InitDBDir then exit;
 
-  MainFile:=TPackageListFile.Create;
+  MainFile:=TPackageListFile.Create(True);
   try
     MainFile.LoadFromFile(DBDir+PackageDBMainFile);
     If Update then MainFile.UpdateFromServer(PackageDBMainFileURL,DBDir+PackageDBTempFile);
-    UserFile:=TPackageListFile.Create;
+    UserFile:=TPackageListFile.Create(False);
     try
       UserFile.LoadFromFile(DBDir+PackageDBUserFile);
       InitPackageFiles(MainFile,UserFile,Update);

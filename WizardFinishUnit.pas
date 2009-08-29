@@ -120,7 +120,9 @@ begin
 
   Mounting.Free;
   If Trim(GameFile)<>'' then S:=ExtractFilePath(GameFile) else S:='';
+  If ExtUpperCase(Copy(Trim(S),1,7))='DOSBOX:' then S:='';
   If Trim(SetupFile)<>'' then T:=ExtractFilePath(SetupFile) else T:='';
+  If ExtUpperCase(Copy(Trim(T),1,7))='DOSBOX:' then T:='';
   Mounting:=BuildGameDirMountData(Template,S,T);
 
   MountingSave.Assign(Mounting);

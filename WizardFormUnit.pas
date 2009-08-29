@@ -103,8 +103,8 @@ begin
   SetVistaFonts(self);
   Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName);
 
-  TemplateDB:=TGameDB.Create(PrgDataDir+TemplateSubDir);
-  AutoSetupDB:=TGameDB.Create(PrgDataDir+AutoSetupSubDir);
+  TemplateDB:=TGameDB.Create(PrgDataDir+TemplateSubDir,False);
+  AutoSetupDB:=TGameDB.Create(PrgDataDir+AutoSetupSubDir,False);
 
   Caption:=LanguageSetup.WizardForm;
   PreviousButton.Caption:=LanguageSetup.WizardFormButtonPrevious;

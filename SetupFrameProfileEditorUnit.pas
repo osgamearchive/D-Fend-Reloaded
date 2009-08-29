@@ -13,6 +13,7 @@ type
     ProfileEditorModernRadioButton: TRadioButton;
     AutoSetScreenshotFolderRadioGroup: TRadioGroup;
     RenameProfFilesCheckBox: TCheckBox;
+    AutoAddMountingsRadioGroup: TRadioGroup;
   private
     { Private-Deklarationen }
   public
@@ -48,12 +49,14 @@ begin
   NoFlicker(ProfileEditorModernRadioButton);
   NoFlicker(AutoSetScreenshotFolderRadioGroup);
   NoFlicker(RenameProfFilesCheckBox);
+  NoFlicker(AutoAddMountingsRadioGroup);
 
   ReopenLastActiveProfileSheetCheckBox.Checked:=PrgSetup.ReopenLastProfileEditorTab;
   ProfileEditorDFendRadioButton.Checked:=PrgSetup.DFendStyleProfileEditor;
   ProfileEditorModernRadioButton.Checked:=not PrgSetup.DFendStyleProfileEditor;
   If PrgSetup.AlwaysSetScreenshotFolderAutomatically then AutoSetScreenshotFolderRadioGroup.ItemIndex:=1 else AutoSetScreenshotFolderRadioGroup.ItemIndex:=0;
   RenameProfFilesCheckBox.Checked:=PrgSetup.RenameProfFileOnRenamingProfile;
+  If PrgSetup.AddMountingDataAutomatically then AutoAddMountingsRadioGroup.ItemIndex:=1 else AutoAddMountingsRadioGroup.ItemIndex:=0;
 end;
 
 procedure TSetupFrameProfileEditor.BeforeChangeLanguage;
@@ -70,6 +73,10 @@ begin
   AutoSetScreenshotFolderRadioGroup.Items[1]:=LanguageSetup.SetupFormProfileEditorAutoSetScreenshotFolderAlways;
   RenameProfFilesCheckBox.Caption:=LanguageSetup.SetupFormProfileEditorRenameProfFilesOnRenamingProfile;
 
+  AutoAddMountingsRadioGroup.Caption:=LanguageSetup.SetupFormProfileEditorAutoAddMountings;
+  AutoAddMountingsRadioGroup.Items[0]:=LanguageSetup.SetupFormProfileEditorAutoAddMountingsOnlyWizard;
+  AutoAddMountingsRadioGroup.Items[1]:=LanguageSetup.SetupFormProfileEditorAutoAddMountingsAlways;
+
   HelpContext:=ID_FileOptionsProfileEditor;
 end;
 
@@ -79,6 +86,7 @@ end;
 
 procedure TSetupFrameProfileEditor.ShowFrame(const AdvencedMode: Boolean);
 begin
+  AutoAddMountingsRadioGroup.Visible:=PrgSetup.ActivateIncompleteFeatures;
 end;
 
 procedure TSetupFrameProfileEditor.HideFrame;
@@ -91,6 +99,7 @@ begin
   ProfileEditorModernRadioButton.Checked:=True;
   AutoSetScreenshotFolderRadioGroup.ItemIndex:=1;
   RenameProfFilesCheckBox.Checked:=False;
+  AutoAddMountingsRadioGroup.ItemIndex:=1;
 end;
 
 procedure TSetupFrameProfileEditor.SaveSetup;
@@ -99,6 +108,7 @@ begin
   PrgSetup.DFendStyleProfileEditor:=ProfileEditorDFendRadioButton.Checked;
   PrgSetup.AlwaysSetScreenshotFolderAutomatically:=(AutoSetScreenshotFolderRadioGroup.ItemIndex=1);
   PrgSetup.RenameProfFileOnRenamingProfile:=RenameProfFilesCheckBox.Checked;
+  PrgSetup.AddMountingDataAutomatically:=(AutoAddMountingsRadioGroup.ItemIndex=1);
 end;
 
 end.

@@ -27,12 +27,14 @@ FirstRunWizard.html
 FileImportConf.html
 FileImportProf.html
 FileImportZip.html
+FileImportPackage.html
 FileExportList.html
 FileExportConf.html
 FileExportProf.html
 FileExportZip.html
 FileExportInstaller.html
 FileExportBuildInstallers.html
+FileExportPackageList.html
 FileExportBuildZipPackages.html
 FileOptions.html
 FileOptionsGeneral.html
@@ -67,6 +69,7 @@ FileOptionsWindowsGames.html
 FileOptionsService.html
 FileOptionsSearchForUpdates.html
 FileOptionsImageScaling.html
+FileOptionsOtherEmulators.html
 FileQuit.html
 ViewShowMenubar.html
 ViewShowToolbar.html
@@ -170,8 +173,10 @@ GPL3.html
 #define FileExportConf 1001
 #define FileExportProf 1002
 #define FileImportZip 1011
+#define FileImportPackage 1014
 #define FileExportBuildInstallers 1012
 #define FileExportBuildZipPackages 1013
+#define FileExportPackageList 1015
 
 #define FileOptions 1100
 #define FileOptionsGeneral 1101
@@ -206,6 +211,7 @@ GPL3.html
 #define FileOptionsMenubar 1130
 #define FileOptionsUserInterpreters 1131
 #define FileOptionsImageScaling 1132
+#define FileOptionsOtherEmulators 1133
 
 #define ViewQuickStarter 1501
 

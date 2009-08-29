@@ -3,7 +3,7 @@ interface
 
 uses Classes, ComCtrls, Controls, Menus, CheckLst, GameDBUnit, LinkFileUnit;
 
-{DEFINE LargeListTest}
+{DEFINE SpeedTest}
 
 { Load Data to GUI }
 
@@ -14,8 +14,8 @@ Procedure InitListViewForGamesList(const AListView : TListView; const ShowExtraI
 
 Procedure AddGameToList(const AListView : TListView; var ItemsUsed : Integer; const AListViewImageList, AListViewIconImageList, AImageList : TImageList; const Game : TGame; const ShowExtraInfo : Boolean; const O,V : String; const VUserSt : TStringList; const T : String; const ScreenshotViewMode, ScummVMTemplate : Boolean); overload;
 Procedure AddGameToList(const AListView : TListView; var ItemsUsed : Integer; const AListViewImageList, AListViewIconImageList, AImageList : TImageList; const Game : TGame; const ShowExtraInfo, ScreenshotViewMode, ScummVMTemplate : Boolean); overload;
-Procedure AddGamesToList(const AListView : TListView; const AListViewImageList, AListViewIconImageList, AImageList : TImageList; const GameDB : TGameDB; const Group, SubGroup, SearchString : String; const ShowExtraInfo : Boolean; const SortBy : TSortListBy; const ReverseOrder, HideScummVMProfiles, ScreenshotViewMode : Boolean); overload;
-Procedure AddGamesToList(const AListView : TListView; const AListViewImageList, AListViewIconImageList, AImageList : TImageList; const GameDB : TGameDB; const Game : TGame; const Group, SubGroup, SearchString : String; const ShowExtraInfo : Boolean; const SortBy : TSortListBy; const ReverseOrder, HideScummVMProfiles, ScreenshotViewMode : Boolean); overload;
+Procedure AddGamesToList(const AListView : TListView; const AListViewImageList, AListViewIconImageList, AImageList : TImageList; const GameDB : TGameDB; const Group, SubGroup, SearchString : String; const ShowExtraInfo : Boolean; const SortBy : TSortListBy; const ReverseOrder, HideScummVMProfiles, HideWindowsProfiles, HideDefaultProfile, ScreenshotViewMode : Boolean); overload;
+Procedure AddGamesToList(const AListView : TListView; const AListViewImageList, AListViewIconImageList, AImageList : TImageList; const GameDB : TGameDB; const Game : TGame; const Group, SubGroup, SearchString : String; const ShowExtraInfo : Boolean; const SortBy : TSortListBy; const ReverseOrder, HideScummVMProfiles, HideWindowsProfiles, HideDefaultProfile, ScreenshotViewMode : Boolean); overload;
 Procedure GamesListSaveColWidths(const AListView : TListView);
 Procedure GamesListLoadColWidths(const AListView : TListView);
 Function GamesListSaveColWidthsToString(const AListView : TListView) : String;
@@ -36,7 +36,8 @@ Procedure LoadMountingListView(const MountingListView : TListView; const Mountin
 
 Procedure BuildCheckList(const CheckListBox : TCheckListBox; const GameDB : TGameDB; const WithDefaultProfile, HideScummVMAndWindowsProfiles : Boolean; const HideWindowsProfiles : Boolean = False);
 Procedure BuildSelectPopupMenu(const Popup : TPopupMenu; const GameDB : TGameDB; const OnClick : TNotifyEvent; const WithDefaultProfile : Boolean; const HideWindowsProfiles : Boolean = False);
-Procedure SelectGamesByPopupMenu(const Sender : TObject; const CheckListBox : TCheckListBox);
+Procedure SelectGamesByPopupMenu(const Sender : TObject; const CheckListBox : TCheckListBox); overload;
+Procedure SelectGamesByPopupMenu(const Sender : TObject; const ListView : TListView); overload;
 
 Function GetUserDataList(const GameDB : TGameDB) : TStringList;
 
@@ -114,7 +115,8 @@ Function SelectProgramFile(var FileName : String; const HintFirstFile, HintSecon
 
 { Change mounting settings in templates }
 
-Function BuildGameDirMountData(const Template : TGame; const ProgrammFileDir, SetupFileDir : String) : TStringList;
+Function BuildGameDirMountData(const Template : TGame; const ProgrammFileDir, SetupFileDir : String) : TStringList; overload;
+Procedure BuildGameDirMountData(const Mounting : TStringList; const ProgrammFileDir, SetupFileDir : String); overload;
 
 implementation
 
@@ -484,7 +486,7 @@ begin
   try
     St.Add(LanguageSetup.GameEmulationTypeDOSBox);
     St.Add(LanguageSetup.GameEmulationTypeScummVM);
-    If HideWindowsProfiles then St.Add(LanguageSetup.GameEmulationTypeWindows);
+    If not HideWindowsProfiles then St.Add(LanguageSetup.GameEmulationTypeWindows);
     BuildSelectPopupSubMenu(Popup,LanguageSetup.GameEmulationType,MenuSelect,MenuUnselect,5,OnClick,St);
   finally
     St.Free;
@@ -573,7 +575,7 @@ begin
   If not (Sender is TMenuItem) then exit;
   M:=Sender as TMenuItem;
   CategoryValue:=RemoveUnderline(Trim(ExtUpperCase(M.Caption)));
-  If CategoryValue=Trim(ExtUpperCase(LanguageSetup.NotSet)) then CategoryValue:=''; 
+  If CategoryValue=Trim(ExtUpperCase(LanguageSetup.NotSet)) then CategoryValue:='';
   Category:=M.Parent.Tag;
   Select:=(M.Parent.Parent.Tag=1);
   If Category=-1 then CategoryName:=RemoveUnderline(ExtUpperCase(M.Parent.Caption)) else CategoryName:='';
@@ -599,6 +601,47 @@ begin
       If ExtUpperCase(S)<>CategoryValue then continue;
     end;
     CheckListBox.Checked[I]:=Select;
+  end;
+end;
+
+Procedure SelectGamesByPopupMenu(const Sender : TObject; const ListView : TListView);
+Var Select : Boolean;
+    Category : Integer;
+    CategoryValue : String;
+    I : Integer;
+    M : TMenuItem;
+    G : TGame;
+    S, CategoryName : String;
+begin
+  If not (Sender is TMenuItem) then exit;
+  M:=Sender as TMenuItem;
+  CategoryValue:=RemoveUnderline(Trim(ExtUpperCase(M.Caption)));
+  If CategoryValue=Trim(ExtUpperCase(LanguageSetup.NotSet)) then CategoryValue:='';
+  Category:=M.Parent.Tag;
+  Select:=(M.Parent.Parent.Tag=1);
+  If Category=-1 then CategoryName:=RemoveUnderline(ExtUpperCase(M.Parent.Caption)) else CategoryName:='';
+
+  For I:=0 to ListView.Items.Count-1 do begin
+    G:=TGame(ListView.Items[I].Data);
+    If CategoryName<>'' then begin
+      If not UserDataContainValue(G.UserInfo,CategoryName,CategoryValue) then continue;
+    end else begin
+      Case Category of
+        0 : S:=GetCustomGenreName(G.CacheGenre);
+        1 : S:=G.CacheDeveloper;
+        2 : S:=G.CachePublisher;
+        3 : S:=G.CacheYear;
+        4 : S:=GetCustomLanguageName(G.CacheLanguage);
+        5 : begin
+              S:='DOSBox';
+              If ScummVMMode(G) then S:='ScummVM';
+              If WindowsExeMode(G) then S:='Windows';
+            end;
+      end;
+      S:=Trim(S);
+      If ExtUpperCase(S)<>CategoryValue then continue;
+    end;
+    ListView.Items[I].Checked:=Select;
   end;
 end;
 
@@ -817,20 +860,18 @@ Var IconNr,I,J,Nr : Integer;
     Icon : TIcon;
     St : TStringList;
 begin
+  {Set IconNr to the corrosponding icon in imagelist}
   B:=False; IconNr:=0;
-
   If ScreenshotViewMode then begin
     B:=LoadScreenshotToImageLists(Game,AListViewIconImageList);
     If B then IconNr:=AListViewIconImageList.Count-1;
   end;
-
   If not B then begin
     If Trim(Game.Icon)<>'' then S:=MakeAbsIconName(Game.Icon) else S:='';
     If (S='') and WindowsExeMode(Game) and PrgSetup.UseWindowsExeIcons then
       S:=MakeAbsIconName(MakeAbsPath(Game.GameExe,PrgSetup.BaseDir));
     If S<>'' then Icon:=IconCache.GetIcon(S) else Icon:=nil;
     B:=(Icon<>nil);
-
     If B then begin
       AListViewImageList.AddIcon(Icon);
       If ScreenshotViewMode then begin
@@ -846,11 +887,13 @@ begin
     If B then IconNr:=AListViewIconImageList.Count-1;
   end;
 
+  {Set L to TListItem to use}
   If ItemsUsed=AListView.Items.Count
     then L:=AListView.Items.Add
     else L:=AListView.Items[ItemsUsed];
   inc(ItemsUsed);
 
+  {Set caption}
   If (Game.CacheName='') and (not Game.OwnINI) then begin
     If ScummVMTemplate
       then L.Caption:=LanguageSetup.TemplateFormDefaultScummVM
@@ -859,6 +902,7 @@ begin
     If L.Caption<>Game.CacheName then L.Caption:=Game.CacheName;
   end;
 
+  {Set additional cols}
   with L do begin
     Data:=Game;
 
@@ -929,12 +973,12 @@ begin
   end;
 end;
 
-Procedure AddGamesToList(const AListView : TListView; const AListViewImageList, AListViewIconImageList, AImageList : TImageList; const GameDB : TGameDB; const Group, SubGroup, SearchString : String; const ShowExtraInfo : Boolean; const SortBy : TSortListBy; const ReverseOrder, HideScummVMProfiles, ScreenshotViewMode : Boolean);
+Procedure AddGamesToList(const AListView : TListView; const AListViewImageList, AListViewIconImageList, AImageList : TImageList; const GameDB : TGameDB; const Group, SubGroup, SearchString : String; const ShowExtraInfo : Boolean; const SortBy : TSortListBy; const ReverseOrder, HideScummVMProfiles, HideWindowsProfiles, HideDefaultProfile, ScreenshotViewMode : Boolean);
 begin
-  AddGamesToList(AListView,AListViewImageList,AListViewIconImageList,AImageList,GameDB,nil,Group,SubGroup,SearchString,ShowExtraInfo,SortBy,ReverseOrder,HideScummVMProfiles,ScreenshotViewMode);
+  AddGamesToList(AListView,AListViewImageList,AListViewIconImageList,AImageList,GameDB,nil,Group,SubGroup,SearchString,ShowExtraInfo,SortBy,ReverseOrder,HideScummVMProfiles,HideWindowsProfiles,HideDefaultProfile,ScreenshotViewMode);
 end;
 
-Procedure AddGamesToList(const AListView : TListView; const AListViewImageList, AListViewIconImageList, AImageList : TImageList; const GameDB : TGameDB; const Game : TGame; const Group, SubGroup, SearchString : String; const ShowExtraInfo : Boolean; const SortBy : TSortListBy; const ReverseOrder, HideScummVMProfiles, ScreenshotViewMode : Boolean); overload;
+Procedure AddGamesToList(const AListView : TListView; const AListViewImageList, AListViewIconImageList, AImageList : TImageList; const GameDB : TGameDB; const Game : TGame; const Group, SubGroup, SearchString : String; const ShowExtraInfo : Boolean; const SortBy : TSortListBy; const ReverseOrder, HideScummVMProfiles, HideWindowsProfiles, HideDefaultProfile,  ScreenshotViewMode : Boolean); overload;
 Var I,J,K,Nr,ItemsUsed : Integer;
     GroupUpper, SubGroupUpper, SearchStringUpper : String;
     B, FirstDefaultTemplate : Boolean;
@@ -948,9 +992,9 @@ Var I,J,K,Nr,ItemsUsed : Integer;
     VUserSt : TStringList;
     W : TWinControl;
     F : TForm;
-    {$IFDEF LargeListTest}Ca : Cardinal;{$ENDIF}
+    {$IFDEF SpeedTest}Ca : Cardinal;{$ENDIF}
 begin
-  {$IFDEF LargeListTest}Ca:=GetTickCount;{$ENDIF}
+  {$IFDEF SpeedTest}Ca:=GetTickCount;{$ENDIF}
 
   {Prepare ListView}
   AListViewImageList.Clear;
@@ -997,7 +1041,9 @@ begin
       B:=(Group=LanguageSetup.GameFavorites);
       for I:=0 to GameDB.Count-1 do begin
         If B and (not GameDB[I].Favorite) then continue;
+        If HideDefaultProfile and (GameDB[I].Name=DosBoxDOSProfile) then continue;
         If HideScummVMProfiles and (ScummVMMode(GameDB[I]) or WindowsExeMode(GameDB[I])) then continue;
+        If HideWindowsProfiles and WindowsExeMode(GameDB[I]) then continue;
         If (SearchStringUpper<>'') and (Pos(SearchStringUpper,GameDB[I].CacheNameUpper)=0) then continue;
         List.Add(GameDB[I]);
       end;
@@ -1018,6 +1064,7 @@ begin
 
       For I:=0 to GameDB.Count-1 do begin
         If HideScummVMProfiles and (ScummVMMode(GameDB[I]) or WindowsExeMode(GameDB[I])) then continue;
+        If HideDefaultProfile and (GameDB[I].Name=DosBoxDOSProfile) then continue;
         B:=False;
         Case Nr of
           0 : B:=(ExtUpperCase(GetCustomGenreName(GameDB[I].CacheGenre))=SubGroupUpper);
@@ -1097,13 +1144,13 @@ begin
           try
             If ReverseOrder then begin
               For I:=St.Count-1 downto 0 do begin
-                If (I mod 20=0) and Assigned(F) then Application.ProcessMessages;
+                If (I mod 25=0) and Assigned(F) then Application.ProcessMessages;
                 AddGameToList(AListView,ItemsUsed,AListViewImageList,AListViewIconImageList,AImageList,TGame(St.Objects[I]),ShowExtraInfo,O,V,VUserSt,T,ScreenshotViewMode,FirstDefaultTemplate);
                 If (TGame(St.Objects[I]).CacheName='') and (not TGame(St.Objects[I]).OwnINI) then FirstDefaultTemplate:=False;
               end;
             end else begin
               For I:=0 to St.Count-1 do begin
-                If (I mod 20=0) and Assigned(F) then Application.ProcessMessages;
+                If (I mod 25=0) and Assigned(F) then Application.ProcessMessages;
                 AddGameToList(AListView,ItemsUsed,AListViewImageList,AListViewIconImageList,AImageList,TGame(St.Objects[I]),ShowExtraInfo,O,V,VUserSt,T,ScreenshotViewMode, not FirstDefaultTemplate);
                 If (TGame(St.Objects[I]).CacheName='') and (not TGame(St.Objects[I]).OwnINI) then FirstDefaultTemplate:=False;
               end;
@@ -1133,7 +1180,7 @@ begin
     end;
   end;
 
-  {$IFDEF LargeListTest}Application.MainForm.Caption:=IntToStr(GetTickCount-Ca);{$ENDIF}
+  {$IFDEF SpeedTest}Application.MainForm.Caption:=IntToStr(GetTickCount-Ca);{$ENDIF}
 end;
 
 Function GamesListSaveColWidthsToString(const AListView : TListView) : String;
@@ -1745,7 +1792,7 @@ begin
   GameDB.ConfOpt.StoreAllValues;
 
   {Update templates and auto setup template: vga->svga_s3}
-  DB:=TGameDB.Create(PrgDataDir+TemplateSubDir);
+  DB:=TGameDB.Create(PrgDataDir+TemplateSubDir,False);
   try
     For I:=0 to DB.Count-1 do If Trim(ExtUpperCase(DB[I].VideoCard))='VGA' then begin
       DB[I].VideoCard:='vga_s3'; DB[I].StoreAllValues;
@@ -1753,7 +1800,7 @@ begin
   finally
     DB.Free;
   end;
-  DB:=TGameDB.Create(PrgDataDir+AutoSetupSubDir);
+  DB:=TGameDB.Create(PrgDataDir+AutoSetupSubDir,False);
   try
     For I:=0 to DB.Count-1 do If Trim(ExtUpperCase(DB[I].VideoCard))='VGA' then begin
       DB[I].VideoCard:='vga_s3'; DB[I].StoreAllValues;
@@ -2307,7 +2354,7 @@ begin
   St:=GetAllConfFiles(Dir);
   try
     For I:=0 to GameDB.Count-1 do begin
-      If not DOSBoxMode(GameDB[I]) then exit;
+      If not DOSBoxMode(GameDB[I]) then continue;
       S:=GameDB[I].SetupFile; T:=ChangeFileExt(S,'.conf');
       If NeedUpdate(S,T) then begin
         St2:=BuildConfFile(GameDB[I],False,False,-1);
@@ -3149,8 +3196,8 @@ begin
     If not WindowsMode then begin
       St:=TStringList.Create;
       try
-        For I:=0 to Min(PrgSetup.UserInterpretersPrograms.Count,PrgSetup.UserInterpretersExtensions.Count)-1 do begin
-          St2:=ValueToList(PrgSetup.UserInterpretersExtensions[I]);
+        For I:=0 to Min(PrgSetup.DOSBoxBasedUserInterpretersPrograms.Count,PrgSetup.DOSBoxBasedUserInterpretersExtensions.Count)-1 do begin
+          St2:=ValueToList(PrgSetup.DOSBoxBasedUserInterpretersExtensions[I]);
           try
             T:=''; U:='';
             For J:=0 to St2.Count-1 do begin
@@ -3162,7 +3209,7 @@ begin
               If T='' then T:='*.'+ExtLowerCase(St2[J]) else T:=T+', *.'+ExtLowerCase(St2[J]);
               If U='' then U:='*.'+ExtLowerCase(St2[J]) else U:=U+';*.'+ExtLowerCase(St2[J]);
             end;
-            S3:=S3+'|'+ChangeFileExt(ExtractFileName(PrgSetup.UserInterpretersPrograms[I]),'')+' ('+T+')|'+U;
+            S3:=S3+'|'+ChangeFileExt(ExtractFileName(PrgSetup.DOSBoxBasedUserInterpretersPrograms[I]),'')+' ('+T+')|'+U;
           finally
             St2.Free;
           end;
@@ -3284,6 +3331,36 @@ begin
   {Add program file and setup file dir}
   If ProgrammFileDir<>'' then AddPrgDir(result,ProgrammFileDir);
   If SetupFileDir<>'' then AddPrgDir(result,SetupFileDir);
+end;
+
+Procedure BuildGameDirMountData(const Mounting : TStringList; const ProgrammFileDir, SetupFileDir : String);
+Var B : Boolean;
+    I : Integer;
+    S,T : String;
+    St : TStringList;
+begin
+  {Everything already ok ?}
+  If ((Trim(ProgrammFileDir)='') or CanReachFile(Mounting,ProgrammFileDir)) and
+     ((Trim(SetupFileDir)='') or CanReachFile(Mounting,SetupFileDir)) then exit;
+
+  {Add GameDir}
+  B:=False;
+  T:=Trim(ExtUpperCase(IncludeTrailingPathDelimiter(ShortName(MakeAbsPath(PrgSetup.GameDir,PrgSetup.BaseDir)))));
+  For I:=0 to Mounting.Count-1 do begin
+    St:=ValueToList(Mounting[I]);
+    try
+      If (St.Count<2) or (Trim(ExtUpperCase(St[1]))<>'DRIVE') then continue;
+      S:=Trim(ExtUpperCase(IncludeTrailingPathDelimiter(ShortName(MakeAbsPath(St[0],PrgSetup.BaseDir)))));
+      B:=(T=S); If B then break;
+    finally
+      St.Free;
+    end;
+  end;
+  if not B then Mounting.Add(MakeRelPath(PrgSetup.GameDir,PrgSetup.BaseDir,True)+';DRIVE;'+NextFreeDriveLetter(Mounting)+';False;;105');
+
+  {Add program file and setup file dir}
+  If ProgrammFileDir<>'' then AddPrgDir(Mounting,ProgrammFileDir);
+  If SetupFileDir<>'' then AddPrgDir(Mounting,SetupFileDir);
 end;
 
 end.

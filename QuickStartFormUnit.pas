@@ -469,7 +469,7 @@ begin
     TemplateComboBox.Items.Clear;
 
     TemplateComboBox.Items.Add(LanguageSetup.TemplateFormDefault);
-    TemplateDB:=TGameDB.Create(PrgDataDir+TemplateSubDir);
+    TemplateDB:=TGameDB.Create(PrgDataDir+TemplateSubDir,False);
     try
       For I:=0 to TemplateDB.Count-1 do TemplateComboBox.Items.Add(TemplateDB[I].CacheName);
     finally
@@ -1013,7 +1013,7 @@ begin
       end;
     end else begin
       {Template from DB}
-      TemplateDB:=TGameDB.Create(PrgDataDir+TemplateSubDir);
+      TemplateDB:=TGameDB.Create(PrgDataDir+TemplateSubDir,False);
       try
         TempGame.AssignFrom(TemplateDB[TemplateComboBox.ItemIndex+1]);
       finally

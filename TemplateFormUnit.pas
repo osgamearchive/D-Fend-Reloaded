@@ -138,7 +138,7 @@ uses VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgConsts,
      ProfileEditorFormUnit, PrgSetupUnit, TemplateSelectProfileFormUnit,
      ModernProfileEditorFormUnit, SelectProfilesFormUnit,
      EditMultipleProfilesFormUnit, HelpConsts, IconLoaderUnit, WaitFormUnit,
-     StatisticsFormUnit;
+     StatisticsFormUnit, MultipleProfilesEditorFormUnit;
 
 {$R *.dfm}
 
@@ -246,8 +246,8 @@ begin
 
   { Init lists }
 
-  TemplateDB:=TGameDB.Create(PrgDataDir+TemplateSubDir);
-  AutoSetupDB:=TGameDB.Create(PrgDataDir+AutoSetupSubDir);
+  TemplateDB:=TGameDB.Create(PrgDataDir+TemplateSubDir,False);
+  AutoSetupDB:=TGameDB.Create(PrgDataDir+AutoSetupSubDir,False);
   PrgSetup.UpdateFile;
   DefaultTemplate:=TGame.Create(PrgSetup);
   If DefaultTemplate.Name<>'' then DefaultTemplate.Name:='';
@@ -309,7 +309,7 @@ begin
       G:=nil;
       GName:='';
     end;
-    AddGamesToList(ListView,ListViewImageList,ListViewIconImageList,ImageList,TemplateDB,DefaultTemplate,RemoveUnderline(LanguageSetup.All),'','',True,ListSort,ListSortReverse,False,False);
+    AddGamesToList(ListView,ListViewImageList,ListViewIconImageList,ImageList,TemplateDB,DefaultTemplate,RemoveUnderline(LanguageSetup.All),'','',True,ListSort,ListSortReverse,False,False,False,False);
     SelectGame(G,GName);
     If (ListView.Selected=nil) and (ListView.Items.Count>0) then ListView.Selected:=ListView.Items[0];
 
@@ -325,7 +325,7 @@ begin
   ListView2.Items.BeginUpdate;
   try
     If ListView2.Selected<>nil then G:=TGame(ListView2.Selected.Data) else G:=nil;
-    AddGamesToList(ListView2,ListViewImageList,ListViewIconImageList,ImageList,AutoSetupDB,RemoveUnderline(LanguageSetup.All),'','',True,ListSort2,ListSortReverse2,False,False);
+    AddGamesToList(ListView2,ListViewImageList,ListViewIconImageList,ImageList,AutoSetupDB,RemoveUnderline(LanguageSetup.All),'','',True,ListSort2,ListSortReverse2,False,False,False,False);
     SelectGame2(G);
     If (ListView2.Selected=nil) and (ListView2.Items.Count>0) then ListView2.Selected:=ListView2.Items[0];
 
@@ -690,7 +690,11 @@ begin
         end;
    16 : begin
           {Template: Multi edit}
-          ShowEditMultipleProfilesDialog(self,TemplateDB,True);
+          If PrgSetup.ActivateIncompleteFeatures and (((GetKeyState(VK_LSHIFT) and $F0)<>0) or ((GetKeyState(VK_RSHIFT) and $F0)<>0)) then begin
+            If not ShowMultipleProfilesEditorDialog(self,TemplateDB,True) then exit;
+          end else begin
+            If not ShowEditMultipleProfilesDialog(self,TemplateDB,True) then exit;
+          end;
           If ListView.Selected=nil then begin G:=nil; GName:=''; end else begin
             G:=TGame(ListView.Selected.Data);
             If G=DefaultTemplate then begin G:=nil; GName:=ListView.Selected.Caption; end else GName:='';
@@ -700,7 +704,11 @@ begin
         end;
    17 : begin
           {AutoSetup: Multi edit}
-          ShowEditMultipleProfilesDialog(self,AutoSetupDB,True);
+          If PrgSetup.ActivateIncompleteFeatures and (((GetKeyState(VK_LSHIFT) and $F0)<>0) or ((GetKeyState(VK_RSHIFT) and $F0)<>0)) then begin
+            If not ShowMultipleProfilesEditorDialog(self,AutoSetupDB,True) then exit;
+          end else begin
+            If not ShowEditMultipleProfilesDialog(self,AutoSetupDB,True) then exit;
+          end;
           If ListView2.Selected=nil then G:=nil else G:=TGame(ListView2.Selected.Data);
           LoadList2;
           SelectGame2(G);

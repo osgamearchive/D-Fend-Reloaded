@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, 
-  Dialogs, SetupFormUnit, StdCtrls, Buttons, ExtCtrls;
+  Dialogs, StdCtrls, Buttons, ExtCtrls, SetupFormUnit;
 
 type
   TSetupFrameUserInterpreterFrame = class(TFrame, ISetupFrame)
@@ -70,9 +70,9 @@ begin
   Extensions:=TStringList.Create;
   Parameters:=TStringList.Create;
 
-  Programs.Assign(PrgSetup.UserInterpretersPrograms);
-  Extensions.Assign(PrgSetup.UserInterpretersExtensions);
-  Parameters.Assign(PrgSetup.UserInterpretersParameters);
+  Programs.Assign(PrgSetup.DOSBoxBasedUserInterpretersPrograms);
+  Extensions.Assign(PrgSetup.DOSBoxBasedUserInterpretersExtensions);
+  Parameters.Assign(PrgSetup.DOSBoxBasedUserInterpretersParameters);
 
   NoFlicker(ComboBox);
   NoFlicker(ProgramEdit);
@@ -131,9 +131,9 @@ end;
 procedure TSetupFrameUserInterpreterFrame.SaveSetup;
 begin
   ComboBoxChange(self);
-  PrgSetup.UserInterpretersPrograms.Assign(Programs);
-  PrgSetup.UserInterpretersParameters.Assign(Parameters);
-  PrgSetup.UserInterpretersExtensions.Assign(Extensions);
+  PrgSetup.DOSBoxBasedUserInterpretersPrograms.Assign(Programs);
+  PrgSetup.DOSBoxBasedUserInterpretersParameters.Assign(Parameters);
+  PrgSetup.DOSBoxBasedUserInterpretersExtensions.Assign(Extensions);
 end;
 
 procedure TSetupFrameUserInterpreterFrame.LoadList;

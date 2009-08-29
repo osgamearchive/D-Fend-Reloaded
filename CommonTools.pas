@@ -98,6 +98,8 @@ Function CompareFiles(const File1, File2 : String) : Boolean; {True=files match}
 
 Function ForceForegroundWindow(Wnd:HWND):Boolean;
 
+Function CPUCount : Integer;
+
 Var TempPrgDir : String = ''; {Temporary overwrite normal PrgDir}
 
 implementation
@@ -466,7 +468,7 @@ begin
   SHGetSpecialFolderLocation(hWindow, Folder, pidl);
   GetMem(Path, MAX_PATH);
   SHGetPathFromIDList(pidl, Path);
-  Result := Path;
+  Result:=IncludeTrailingPathDelimiter(Path);
   FreeMem(Path);
 
   pMalloc.Free(pidl);
@@ -1905,7 +1907,7 @@ begin
   with FileOp do begin
     Wnd:=0;
     wFunc:=FO_DELETE;
-    pFrom:=PChar(ExtFileName);
+    pFrom:=@ExtFileName[1];
     pTo:=nil;
     fFlags:=FOF_NOCONFIRMATION+FOF_NOERRORUI+FOF_SILENT+FOF_ALLOWUNDO;
     fAnyOperationsAborted:=False;
@@ -2046,6 +2048,13 @@ begin
   FillChar(Input,SizeOf(Input),0);
   SendInput(1,Input,SizeOf(TInput));
   Result:=SetForegroundWindow(Wnd);
+end;
+
+Function CPUCount : Integer;
+Var SystemInfo : TSystemInfo;
+begin
+  GetSystemInfo(SystemInfo);
+  result:=SystemInfo.dwNumberOfProcessors;
 end;
 
 end.

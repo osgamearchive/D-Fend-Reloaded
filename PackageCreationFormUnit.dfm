@@ -3,7 +3,7 @@ object PackageCreationForm: TPackageCreationForm
   Top = 0
   BorderIcons = [biSystemMenu, biMaximize]
   Caption = 'PackageCreationForm'
-  ClientHeight = 423
+  ClientHeight = 442
   ClientWidth = 677
   Color = clBtnFace
   Constraints.MinHeight = 250
@@ -20,13 +20,13 @@ object PackageCreationForm: TPackageCreationForm
   OnShow = FormShow
   DesignSize = (
     677
-    423)
+    442)
   PixelsPerInch = 96
   TextHeight = 13
   object OutputFileButton: TSpeedButton
     Tag = 4
     Left = 646
-    Top = 355
+    Top = 356
     Width = 23
     Height = 22
     Anchors = [akRight, akBottom]
@@ -48,32 +48,42 @@ object PackageCreationForm: TPackageCreationForm
     ShowHint = True
     OnClick = OutputFileButtonClick
   end
+  object InfoLabel: TLabel
+    Left = 8
+    Top = 384
+    Width = 541
+    Height = 13
+    Anchors = [akLeft, akBottom]
+    Caption = 
+      'All additionally needed files (like game package archive files) ' +
+      'will be created in th directory of the package list file.'
+  end
   object OKButton: TBitBtn
     Left = 8
-    Top = 390
+    Top = 409
     Width = 90
     Height = 25
     Anchors = [akLeft, akBottom]
-    TabOrder = 1
+    TabOrder = 2
     OnClick = OKButtonClick
     Kind = bkOK
   end
   object CancelButton: TBitBtn
     Left = 104
-    Top = 390
-    Width = 90
-    Height = 25
-    Anchors = [akLeft, akBottom]
-    TabOrder = 2
-    Kind = bkCancel
-  end
-  object HelpButton: TBitBtn
-    Left = 201
-    Top = 390
+    Top = 409
     Width = 90
     Height = 25
     Anchors = [akLeft, akBottom]
     TabOrder = 3
+    Kind = bkCancel
+  end
+  object HelpButton: TBitBtn
+    Left = 201
+    Top = 409
+    Width = 90
+    Height = 25
+    Anchors = [akLeft, akBottom]
+    TabOrder = 4
     OnClick = HelpButtonClick
     Kind = bkHelp
   end
@@ -81,71 +91,402 @@ object PackageCreationForm: TPackageCreationForm
     Left = -1
     Top = -2
     Width = 680
-    Height = 323
+    Height = 339
     ActivePage = TabSheet1
     Anchors = [akLeft, akTop, akRight, akBottom]
     Images = ImageList
     TabOrder = 0
     object TabSheet1: TTabSheet
       Caption = 'Games'
-      object Label1: TLabel
-        Left = 12
-        Top = 17
-        Width = 600
-        Height = 56
-        AutoSize = False
-        Caption = 
-          'The package list creator is not yet implemented. Only a very bas' +
-          'ic tool is available. Enter the output filename and the URL and ' +
-          'click on "Ok". The program will ask for a single input file then' +
-          '. (Icon sets are not yet supported.)'
-        WordWrap = True
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
+      object GamesPanel: TPanel
+        Left = 0
+        Top = 274
+        Width = 672
+        Height = 36
+        Align = alBottom
+        BevelOuter = bvNone
+        TabOrder = 1
+        object GamesSelectAllButton: TBitBtn
+          Left = 0
+          Top = 6
+          Width = 107
+          Height = 25
+          Caption = 'SelectAllButton'
+          TabOrder = 0
+          OnClick = ButtonWork
+        end
+        object GamesSelectNoneButton: TBitBtn
+          Tag = 1
+          Left = 113
+          Top = 6
+          Width = 107
+          Height = 25
+          Caption = 'SelectNoneButton'
+          TabOrder = 1
+          OnClick = ButtonWork
+        end
+        object GamesSelectGenreButton: TBitBtn
+          Tag = 2
+          Left = 226
+          Top = 6
+          Width = 107
+          Height = 25
+          Caption = 'By ...'
+          TabOrder = 2
+          OnClick = ButtonWork
+        end
+      end
+      object GamesListView: TListView
+        Left = 0
+        Top = 0
+        Width = 672
+        Height = 274
+        Align = alClient
+        Checkboxes = True
+        Columns = <>
+        ReadOnly = True
+        TabOrder = 0
+        ViewStyle = vsReport
+        OnColumnClick = GamesListViewColumnClick
       end
     end
     object TabSheet2: TTabSheet
       Caption = 'Auto setup templates'
       ImageIndex = 1
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
+      object AutoSetupPanel: TPanel
+        Left = 0
+        Top = 274
+        Width = 672
+        Height = 36
+        Align = alBottom
+        BevelOuter = bvNone
+        TabOrder = 1
+        object AutoSetupSelectAllButton: TBitBtn
+          Tag = 3
+          Left = 0
+          Top = 6
+          Width = 107
+          Height = 25
+          Caption = 'SelectAllButton'
+          TabOrder = 0
+          OnClick = ButtonWork
+        end
+        object AutoSetupSelectNoneButton: TBitBtn
+          Tag = 4
+          Left = 113
+          Top = 6
+          Width = 107
+          Height = 25
+          Caption = 'SelectNoneButton'
+          TabOrder = 1
+          OnClick = ButtonWork
+        end
+        object AutoSetupSelectGenreButton: TBitBtn
+          Tag = 5
+          Left = 226
+          Top = 6
+          Width = 107
+          Height = 25
+          Caption = 'By ...'
+          TabOrder = 2
+          OnClick = ButtonWork
+        end
+      end
+      object AutoSetupListView: TListView
+        Left = 0
+        Top = 0
+        Width = 672
+        Height = 274
+        Align = alClient
+        Checkboxes = True
+        Columns = <>
+        ReadOnly = True
+        TabOrder = 0
+        ViewStyle = vsReport
+        OnColumnClick = AutoSetupListViewColumnClick
+      end
     end
     object TabSheet3: TTabSheet
       Caption = 'Icons'
       ImageIndex = 2
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
+      object IconsPanel: TPanel
+        Left = 0
+        Top = 274
+        Width = 672
+        Height = 36
+        Align = alBottom
+        BevelOuter = bvNone
+        TabOrder = 1
+        object IconsSelectAllButton: TBitBtn
+          Tag = 6
+          Left = 0
+          Top = 6
+          Width = 107
+          Height = 25
+          Caption = 'SelectAllButton'
+          TabOrder = 0
+          OnClick = ButtonWork
+        end
+        object IconsSelectNoneButton: TBitBtn
+          Tag = 7
+          Left = 113
+          Top = 6
+          Width = 107
+          Height = 25
+          Caption = 'SelectNoneButton'
+          TabOrder = 1
+          OnClick = ButtonWork
+        end
+      end
+      object IconsListView: TListView
+        Left = 0
+        Top = 0
+        Width = 672
+        Height = 274
+        Align = alClient
+        Checkboxes = True
+        Columns = <
+          item
+            AutoSize = True
+            Caption = 'Name'
+          end>
+        ReadOnly = True
+        ShowColumnHeaders = False
+        SmallImages = IconsImageList
+        TabOrder = 0
+        ViewStyle = vsReport
+      end
     end
     object TabSheet6: TTabSheet
       Caption = 'Icon sets'
       ImageIndex = 2
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
+      object IconSetsPanel: TPanel
+        Left = 0
+        Top = 274
+        Width = 672
+        Height = 36
+        Align = alBottom
+        BevelOuter = bvNone
+        TabOrder = 1
+        object IconSetsSelectAllButton: TBitBtn
+          Tag = 8
+          Left = 0
+          Top = 6
+          Width = 107
+          Height = 25
+          Caption = 'SelectAllButton'
+          TabOrder = 0
+          OnClick = ButtonWork
+        end
+        object IconSetsSelectNoneButton: TBitBtn
+          Tag = 9
+          Left = 113
+          Top = 6
+          Width = 107
+          Height = 25
+          Caption = 'SelectNoneButton'
+          TabOrder = 1
+          OnClick = ButtonWork
+        end
+      end
+      object IconSetsListBox: TCheckListBox
+        Left = 0
+        Top = 0
+        Width = 672
+        Height = 274
+        Align = alClient
+        ItemHeight = 13
+        TabOrder = 0
+      end
     end
     object TabSheet4: TTabSheet
       Caption = 'Language files'
       ImageIndex = 3
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
+      object LanguageFilesPanel: TPanel
+        Left = 0
+        Top = 274
+        Width = 672
+        Height = 36
+        Align = alBottom
+        BevelOuter = bvNone
+        TabOrder = 1
+        object LanguageFilesSelectAllButton: TBitBtn
+          Tag = 10
+          Left = 0
+          Top = 6
+          Width = 107
+          Height = 25
+          Caption = 'SelectAllButton'
+          TabOrder = 0
+          OnClick = ButtonWork
+        end
+        object LanguageFilesSelectNoneButton: TBitBtn
+          Tag = 11
+          Left = 113
+          Top = 6
+          Width = 107
+          Height = 25
+          Caption = 'SelectNoneButton'
+          TabOrder = 1
+          OnClick = ButtonWork
+        end
+      end
+      object LanguageFilesListBox: TCheckListBox
+        Left = 0
+        Top = 0
+        Width = 672
+        Height = 274
+        Align = alClient
+        ItemHeight = 13
+        TabOrder = 0
+      end
     end
     object TabSheet5: TTabSheet
       Caption = 'Multiple games packages'
       ImageIndex = 4
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
+      object PackagesPanel: TPanel
+        Left = 0
+        Top = 274
+        Width = 672
+        Height = 36
+        Align = alBottom
+        BevelOuter = bvNone
+        TabOrder = 1
+        object PackagesAddButton: TBitBtn
+          Tag = 12
+          Left = 0
+          Top = 6
+          Width = 107
+          Height = 25
+          Caption = 'Add'
+          TabOrder = 0
+          OnClick = ButtonWork
+          Glyph.Data = {
+            76010000424D7601000000000000760000002800000020000000100000000100
+            04000000000000010000130B0000130B00001000000000000000000000000000
+            800000800000008080008000000080008000808000007F7F7F00BFBFBF000000
+            FF0000FF000000FFFF00FF000000FF00FF00FFFF0000FFFFFF00333333333333
+            33333333FF33333333FF333993333333300033377F3333333777333993333333
+            300033F77FFF3333377739999993333333333777777F3333333F399999933333
+            33003777777333333377333993333333330033377F3333333377333993333333
+            3333333773333333333F333333333333330033333333F33333773333333C3333
+            330033333337FF3333773333333CC333333333FFFFF77FFF3FF33CCCCCCCCCC3
+            993337777777777F77F33CCCCCCCCCC3993337777777777377333333333CC333
+            333333333337733333FF3333333C333330003333333733333777333333333333
+            3000333333333333377733333333333333333333333333333333}
+          NumGlyphs = 2
+        end
+        object PackagesEditButton: TBitBtn
+          Tag = 13
+          Left = 113
+          Top = 6
+          Width = 107
+          Height = 25
+          Caption = 'Edit'
+          TabOrder = 1
+          OnClick = ButtonWork
+          Glyph.Data = {
+            76010000424D7601000000000000760000002800000020000000100000000100
+            04000000000000010000120B0000120B00001000000000000000000000000000
+            800000800000008080008000000080008000808000007F7F7F00BFBFBF000000
+            FF0000FF000000FFFF00FF000000FF00FF00FFFF0000FFFFFF00333333000000
+            000033333377777777773333330FFFFFFFF03FF3FF7FF33F3FF700300000FF0F
+            00F077F777773F737737E00BFBFB0FFFFFF07773333F7F3333F7E0BFBF000FFF
+            F0F077F3337773F3F737E0FBFBFBF0F00FF077F3333FF7F77F37E0BFBF00000B
+            0FF077F3337777737337E0FBFBFBFBF0FFF077F33FFFFFF73337E0BF0000000F
+            FFF077FF777777733FF7000BFB00B0FF00F07773FF77373377373330000B0FFF
+            FFF03337777373333FF7333330B0FFFF00003333373733FF777733330B0FF00F
+            0FF03333737F37737F373330B00FFFFF0F033337F77F33337F733309030FFFFF
+            00333377737FFFFF773333303300000003333337337777777333}
+          NumGlyphs = 2
+        end
+        object PackagesDelButton: TBitBtn
+          Tag = 14
+          Left = 226
+          Top = 6
+          Width = 107
+          Height = 25
+          Caption = 'Delete'
+          TabOrder = 2
+          OnClick = ButtonWork
+          Glyph.Data = {
+            76010000424D7601000000000000760000002800000020000000100000000100
+            04000000000000010000130B0000130B00001000000000000000000000000000
+            800000800000008080008000000080008000808000007F7F7F00BFBFBF000000
+            FF0000FF000000FFFF00FF000000FF00FF00FFFF0000FFFFFF00333333333333
+            333333333333333333FF33333333333330003333333333333777333333333333
+            300033FFFFFF3333377739999993333333333777777F3333333F399999933333
+            3300377777733333337733333333333333003333333333333377333333333333
+            3333333333333333333F333333333333330033333F33333333773333C3333333
+            330033337F3333333377333CC3333333333333F77FFFFFFF3FF33CCCCCCCCCC3
+            993337777777777F77F33CCCCCCCCCC399333777777777737733333CC3333333
+            333333377F33333333FF3333C333333330003333733333333777333333333333
+            3000333333333333377733333333333333333333333333333333}
+          NumGlyphs = 2
+        end
+      end
+      object PackagesListBox: TListBox
+        Left = 0
+        Top = 0
+        Width = 672
+        Height = 274
+        Align = alClient
+        ItemHeight = 13
+        TabOrder = 0
+        OnClick = PackagesListBoxClick
+        OnDblClick = PackagesListBoxDblClick
+        OnKeyDown = PackagesListBoxKeyDown
+      end
     end
   end
   object OutputFileEdit: TLabeledEdit
     Left = 8
-    Top = 355
+    Top = 357
     Width = 632
     Height = 21
     Anchors = [akLeft, akRight, akBottom]
     EditLabel.Width = 150
     EditLabel.Height = 13
     EditLabel.Caption = 'Filename of the package list file'
-    TabOrder = 4
+    TabOrder = 1
   end
   object OpenDialog: TOpenDialog
+    DefaultExt = 'exe'
     Left = 296
-    Top = 384
+    Top = 408
   end
   object SaveDialog: TSaveDialog
     DefaultExt = 'xml'
     Left = 328
-    Top = 384
+    Top = 408
   end
   object ImageList: TImageList
     Left = 360
-    Top = 384
+    Top = 408
     Bitmap = {
       494C010105000C00040010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000002000000001002000000000000020
@@ -417,5 +758,25 @@ object PackageCreationForm: TPackageCreationForm
       0000C003C00300000000C003C00300000000C003C00380000000C423C003FFFF
       0001FC3FC003FFFF8003FE7FC003FFFF00000000000000000000000000000000
       000000000000}
+  end
+  object GamesPopupMenu: TPopupMenu
+    Left = 392
+    Top = 408
+  end
+  object AutoSetupPopupMenu: TPopupMenu
+    Left = 424
+    Top = 408
+  end
+  object IconsImageList: TImageList
+    Left = 456
+    Top = 408
+  end
+  object DummyImageList1: TImageList
+    Left = 536
+    Top = 408
+  end
+  object DummyImageList2: TImageList
+    Left = 568
+    Top = 408
   end
 end

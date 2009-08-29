@@ -36,8 +36,8 @@ const DosBoxFileName='DOSBOX.EXE';
       QB45PrgFile='QB.exe';
       QB71PrgFile='QBX.exe';
 
-      PackageDBSubFolder='Packages';
-      PackageDBCacheSubFolder='Packages\Cache';
+      PackageDBSubFolder='Settings\Packages';
+      PackageDBCacheSubFolder='Settings\Packages\Cache';
       PackageDBMainFileURL='http:/'+'/dfendreloaded.sourceforge.net/Packages/DFR.xml';
       PackageDBTempFile='DFRTemp.xml';
       PackageDBMainFile='DFR.xml';

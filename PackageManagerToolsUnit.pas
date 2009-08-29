@@ -37,8 +37,8 @@ Function ExePackageInfo(const AObject : TObject; const PackageDBCache : TPackage
 
 implementation
 
-uses SysUtils, IniFiles, PackageDBLanguage, PackageDBToolsUnit, CommonTools,
-     LanguageSetupUnit, PrgSetupUnit, PrgConsts;
+uses SysUtils, IniFiles, PackageDBToolsUnit, CommonTools, LanguageSetupUnit,
+     PrgSetupUnit, PrgConsts;
 
 Function GetPackageManagerToolTip2(const DownloadAutoSetupData : TDownloadAutoSetupData) : String;
 begin
@@ -48,13 +48,13 @@ begin
     +#13+LanguageSetup.GamePublisher+': '+DownloadAutoSetupData.Publisher
     +#13+LanguageSetup.GameYear+': '+DownloadAutoSetupData.Year
     +#13+LanguageSetup.GameLanguage+': '+GetCustomLanguageName(DownloadAutoSetupData.Language)
-    +#13+LANG_ListDownloadSize+': '+GetNiceFileSize(DownloadAutoSetupData.Size);
+    +#13+LanguageSetup.PackageManagerDownloadSize+': '+GetNiceFileSize(DownloadAutoSetupData.Size);
 end;
 
 Function GetPackageManagerToolTip(const DownloadAutoSetupData : TDownloadAutoSetupData) : String;
 begin
   result:=DownloadAutoSetupData.Name;
-  If DownloadAutoSetupData is TDownloadZipData then result:=result+#13+LANG_ListLicense+': '+TDownloadZipData(DownloadAutoSetupData).License;
+  If DownloadAutoSetupData is TDownloadZipData then result:=result+#13+LanguageSetup.PackageManagerListLicense+': '+TDownloadZipData(DownloadAutoSetupData).License;
   result:=result+GetPackageManagerToolTip2(DownloadAutoSetupData);
 end;
 
@@ -62,9 +62,9 @@ Procedure InitPackageManagerListView(const AListView : TListView; const AutoSetu
 Var C : TListColumn;
 begin
   C:=AListView.Columns.Add; C.Width:=-1; C.Caption:=LanguageSetup.GameName;
-  if not AutoSetups then begin C:=AListView.Columns.Add; C.Width:=-1; C.Caption:=LANG_ListLicense; end;
+  if not AutoSetups then begin C:=AListView.Columns.Add; C.Width:=-1; C.Caption:=LanguageSetup.PackageManagerListLicense; end;
   C:=AListView.Columns.Add; C.Width:=-1; C.Caption:=LanguageSetup.GameGenre;
-  C:=AListView.Columns.Add; C.Width:=-1; C.Caption:=LANG_ListDownloadSize;
+  C:=AListView.Columns.Add; C.Width:=-1; C.Caption:=LanguageSetup.PackageManagerDownloadSize;
   C:=AListView.Columns.Add; C.Width:=-1; C.Caption:=LanguageSetup.GameDeveloper;
   C:=AListView.Columns.Add; C.Width:=-1; C.Caption:=LanguageSetup.GamePublisher;
   C:=AListView.Columns.Add; C.Width:=-1; C.Caption:=LanguageSetup.GameYear;
@@ -75,14 +75,14 @@ Procedure InitPackageManagerIconsListView(const AListView : TListView);
 Var C : TListColumn;
 begin
   C:=AListView.Columns.Add; C.Width:=-1; C.Caption:=LanguageSetup.GameName;
-  C:=AListView.Columns.Add; C.Width:=-1; C.Caption:=LANG_ListDownloadSize;
+  C:=AListView.Columns.Add; C.Width:=-1; C.Caption:=LanguageSetup.PackageManagerDownloadSize;
 end;
 
 Procedure InitPackageManagerIconSetsListView(const AListView : TListView);
 Var C : TListColumn;
 begin
   C:=AListView.Columns.Add; C.Width:=-1; C.Caption:=LanguageSetup.GameName;
-  C:=AListView.Columns.Add; C.Width:=-1; C.Caption:=LANG_ListDownloadSize;
+  C:=AListView.Columns.Add; C.Width:=-1; C.Caption:=LanguageSetup.PackageManagerDownloadSize;
 end;
 
 Function GameAlreadyInstalled(const Data : TDownloadAutoSetupData; const GameDB : TGameDB) : Boolean;
@@ -253,16 +253,17 @@ begin
   end;
 end;
 
-Function IconSetAlreadyInstalled(const Name, Version : String) : Boolean;
+Function IconSetAlreadyInstalled(const Name, MinVersion, MaxVersion : String) : Boolean;
 Var Rec : TSearchRec;
     I : Integer;
     Ini : TIniFile;
-    S1,S2 : String;
+    S1,S2,S3 : String;
 begin
   result:=False;
 
   S1:=Trim(ExtUpperCase(Name));
-  S2:=Trim(ExtUpperCase(Version));
+  S2:=Trim(ExtUpperCase(MinVersion));
+  S3:=Trim(ExtUpperCase(MaxVersion));
 
   I:=FindFirst(PrgDataDir+IconSetsFolder+'\*.*',faDirectory,Rec);
   try
@@ -270,7 +271,7 @@ begin
       If ((Rec.Attr and faDirectory)<>0) and (Rec.Name<>'.') and (Rec.Name<>'..') then begin
         Ini:=TIniFile.Create(PrgDataDir+IconSetsFolder+'\'+Rec.Name+'\'+IconsConfFile);
         try
-          If (S1=Trim(ExtUpperCase(Ini.ReadString('Information','Name','')))) and (S2=Trim(ExtUpperCase(Ini.ReadString('Information','Version','')))) then begin
+          If (S1=Trim(ExtUpperCase(Ini.ReadString('Information','Name','')))) and (S2=Trim(ExtUpperCase(Ini.ReadString('Information','MinVersion','')))) and (S3=Trim(ExtUpperCase(Ini.ReadString('Information','MaxVersion','')))) then begin
             result:=True; exit;
           end;
         finally
@@ -303,10 +304,10 @@ begin
       try
         For I:=0 to PackageDB.Count-1 do For J:=0 to PackageDB[I].IconSetCount-1 do begin
           Data:=PackageDB[I].IconSet[J];
-          If Data.Version<>GetNormalFileVersionAsString then continue;
+          If (VersionToInt(Data.MinVersion)>VersionToInt(GetNormalFileVersionAsString)) or (VersionToInt(Data.MaxVersion)<VersionToInt(GetNormalFileVersionAsString)) then continue;
           {Already installed ?}
           If HideIfAlreadyInstalled then begin
-            If IconSetAlreadyInstalled(Data.Name,Data.Version) then continue;
+            If IconSetAlreadyInstalled(Data.Name,Data.MinVersion,Data.MaxVersion) then continue;
           end;
           {Add to string list}
           St.AddObject(Data.Name,TObject(I*65536+J));
@@ -405,7 +406,7 @@ begin
 
       M:=TMenuItem.Create(PopupMenu);
       PopupMenu.Items.Add(M);
-      M.Caption:=LANG_NoFilter;
+      M.Caption:=LanguageSetup.PackageManagerNoFilter;
       M.Tag:=-1;
       M.OnClick:=OnClick;
 
@@ -415,7 +416,7 @@ begin
 
       If (not AutoSetups) and (FilterSelectLicense.Count>1) then begin
         M:=TMenuItem.Create(PopupMenu); PopupMenu.Items.Add(M); M.Tag:=1;
-        M.Caption:=LANG_ListLicense;
+        M.Caption:=LanguageSetup.PackageManagerListLicense;
         AddSubMenuItems(PopupMenu,M,FilterSelectLicense,OnClick);
       end;
 
@@ -475,23 +476,23 @@ begin
     DownloadExeData:=TDownloadExeData(AObject);
     result.Text:=ReplaceBRs(DownloadExeData.Description);
     result.Add('');
-    result.Add(LANG_DownloadSize+' '+GetNiceFileSize(DownloadExeData.Size));
+    result.Add(LanguageSetup.PackageManagerDownloadSize+': '+GetNiceFileSize(DownloadExeData.Size));
     S:=PackageDBCache.FindChecksum(DownloadExeData.Name);
     If S<>'' then begin
       result.Add('');
       If S=DownloadExeData.PackageChecksum then begin
-        result.Add(LANG_PackageAlreadyDownloaded);
+        result.Add(LanguageSetup.PackageManagerPackageAlreadyDownloaded);
       end else begin
-        result.Add(LANG_OldPackageAlreadyDownloaded);
+        result.Add(LanguageSetup.PackageManagerOldPackageAlreadyDownloaded);
       end;
     end;
   end else begin
     CachedPackage:=TCachedPackage(AObject);
     result.Text:=ReplaceBRs(CachedPackage.Description);
     result.Add('');
-    result.Add(LANG_DownloadSize+' '+GetNiceFileSize(CachedPackage.Size));
+    result.Add(LanguageSetup.PackageManagerDownloadSize+': '+GetNiceFileSize(CachedPackage.Size));
     result.Add('');
-    result.Add(LANG_PackageOnlyInCache);
+    result.Add(LanguageSetup.PackageManagerPackageOnlyInCache);
   end;
 end;
 

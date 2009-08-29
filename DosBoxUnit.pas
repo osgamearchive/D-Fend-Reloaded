@@ -2,6 +2,7 @@ unit DosBoxUnit;
 interface
 
 {DEFINE ShowSelectDialogEvenIfOnlyOneCDDrive}
+{DEFINE DOSBoxStartSpeedTest}
 
 uses Classes, GameDBUnit;
 
@@ -19,16 +20,49 @@ Function IsDOSExe(const FileName : String) : Boolean;
 var MinimizedAtDOSBoxStart : Boolean = False;
 
 Function ShortName(const LongName : String) : String;
-Function LongPath(const ShortPath : String) : String; overload;
-Function LongPath(const Root, ShortPath : String) : String; overload;
+Function LongPath(const ShortPath : String) : String; {also see WinExpandLongPathName} 
 
 implementation
 
-uses Windows, SysUtils, ShellAPI, Forms, Dialogs, Math,
+uses Windows, SysUtils, ShellAPI, Forms, Dialogs, ShlObj, Math,
      CommonTools, PrgSetupUnit, PrgConsts, LanguageSetupUnit, GameDBToolsUnit,
      ZipManagerUnit, ScreensaverControlUnit, FullscreenInfoFormUnit,
      DOSBoxCountUnit, DOSBoxShortNameUnit, RunPrgManagerUnit,
-     SelectCDDriveToMountFormUnit, SelectCDDriveToMountByDataFormUnit;
+     SelectCDDriveToMountFormUnit, SelectCDDriveToMountByDataFormUnit,
+     FileNameConvertor;
+
+{$IFDEF DOSBoxStartSpeedTest}
+var SpeedTestSt : TStringList = nil;
+    LastSpeedTestStep : String = '';
+    LastSpeedTestTickCount : Cardinal;
+
+Procedure SpeedTestInfo(const Info : String; const Init : Boolean=False);
+begin
+  If Assigned(SpeedTestSt) then begin
+    SpeedTestSt.Add(LastSpeedTestStep+': '+IntToStr(GetTickCount-LastSpeedTestTickCount)+'ms');
+    LastSpeedTestStep:=Info;
+    LastSpeedTestTickCount:=GetTickCount;
+    exit;
+  end;
+
+  If not Init then exit;
+
+  SpeedTestSt:=TStringList.Create;
+  LastSpeedTestStep:=Info;
+  LastSpeedTestTickCount:=GetTickCount;
+end;
+
+Procedure SpeedTestDone;
+begin
+  If not Assigned(SpeedTestSt) then exit;
+  SpeedTestInfo('');
+  try
+    SpeedTestSt.SaveToFile(GetSpecialFolder(Application.MainForm.Handle,CSIDL_DESKTOPDIRECTORY)+'DFRSpeedTest.txt');
+  finally
+    FreeAndNil(SpeedTestSt);
+  end;
+end;
+{$ENDIF}
 
 Function BoolToStr(const B : Boolean) : String;
 begin
@@ -56,11 +90,11 @@ begin
   while S<>'' do begin
     I:=Pos('\',S);
     If I=0 then begin T:=S; S:=''; end else begin T:=Copy(S,1,I-1); S:=Copy(S,I+1,MaxInt); end;
-    result:=result+LongPath(result,T)+'\';
+    result:=result+WinExpandLongPathName(result,T)+'\';
   end;
 end;
 
-Function LongPath(const Root, ShortPath : String) : String;
+{Function LongPath(const Root, ShortPath : String) : String; -> WinExpandLongPathName
 Var Rec : TSearchRec;
     I : Integer;
     LongRoot, ShortRoot : String;
@@ -81,7 +115,7 @@ begin
   finally
     FindClose(Rec);
   end;
-end;
+end;}
 
 Function AllSameDir(const St : TStringList) : Boolean;
 Var I : Integer;
@@ -106,7 +140,7 @@ begin
   while Part<>'' do begin
     I:=Pos('\',Part);
     If I=0 then begin S:=Part; Part:=''; end else begin S:=Copy(Part,1,I-1); Part:=Copy(Part,I+1,MaxInt); end;
-    S:=LongPath(Root,S);
+    S:=WinExpandLongPathName(Root,S);
     result:=result+'\'+DOSBoxShortName(MakeAbsPath(Root,PrgSetup.BaseDir),S);
     Root:=Root+S+'\';
   end;
@@ -437,11 +471,11 @@ Var InterpreterFile,S,T,Path,Drive : String;
 begin
   result:=False;
 
-  If InterpreterNr>=PrgSetup.UserInterpretersPrograms.Count then exit;
+  If InterpreterNr>=PrgSetup.DOSBoxBasedUserInterpretersPrograms.Count then exit;
 
-  InterpreterPathAndFile:=ExtractFileName(PrgSetup.UserInterpretersPrograms[InterpreterNr]);
+  InterpreterPathAndFile:=ExtractFileName(PrgSetup.DOSBoxBasedUserInterpretersPrograms[InterpreterNr]);
 
-  InterpreterFile:=Trim(MakeAbsPath(PrgSetup.UserInterpretersPrograms[InterpreterNr],PrgSetup.BaseDir));
+  InterpreterFile:=Trim(MakeAbsPath(PrgSetup.DOSBoxBasedUserInterpretersPrograms[InterpreterNr],PrgSetup.BaseDir));
   If (InterpreterFile='') or (not FileExists(InterpreterFile)) then exit;
 
   T:=MakePathShort(Trim(ExtractFilePath(InterpreterFile)));
@@ -486,8 +520,8 @@ begin
   Ext:=Trim(ExtUpperCase(ExtractFileExt(ProgramFile)));
   If (Ext<>'') and (Ext[1]='.') then Ext:=Copy(Ext,2,MaxInt);
 
-  For I:=0 to PrgSetup.UserInterpretersExtensions.Count-1 do begin
-    St:=ValueToList(PrgSetup.UserInterpretersExtensions[I]);
+  For I:=0 to PrgSetup.DOSBoxBasedUserInterpretersExtensions.Count-1 do begin
+    St:=ValueToList(PrgSetup.DOSBoxBasedUserInterpretersExtensions[I]);
     try
       For J:=0 to St.Count-1 do If Trim(ExtUpperCase(St[J]))=Ext then begin result:=I; exit; end;
     finally
@@ -506,6 +540,7 @@ begin
   result:=True;
 
   {Find path to FreeDOS and mount it if needed}
+  {$IFDEF DOSBoxStartSpeedTest} SpeedTestInfo('Find path to FreeDOS and mount it if needed'); {$ENDIF}
   TempMountFreeDOSDir(Game,FreeDriveLetters,UsePath,Mount,Unmount);
   NoFreeDOS:=(UsePath='');
   If Use4DOS or UseDOS32A then begin
@@ -515,14 +550,17 @@ begin
   S:=Trim(ExtUpperCase(ProgramFile));
   If (Copy(S,1,7)='DOSBOX:') and (length(S)>7) then begin
     {No path to file needed, because file is in image etc. and given path is local to DOSBox directory structure}
+    {$IFDEF DOSBoxStartSpeedTest} SpeedTestInfo('Build run command for DOSBox local file'); {$ENDIF}
     BuildLocalRunCommands(St,Trim(Copy(Trim(ProgramFile),8,MaxInt)),ProgramParameters,UseLoadFix,LoadFixMemory,Use4DOS,UseDOS32A,Game,FreeDriveLetters,WarnIfNotReachable);
   end else begin
     {Find path to file}
+    {$IFDEF DOSBoxStartSpeedTest} SpeedTestInfo('Find file to run'); {$ENDIF}
     If (Trim(ProgramFile)<>'') and (not FileExists(MakeAbsPath(ProgramFile,PrgSetup.BaseDir))) and WarnIfNotReachable then begin
       Application.Restore;
       MessageDlg(Format(LanguageSetup.MessageCouldNotFindFile,[MakeAbsPath(ProgramFile,PrgSetup.BaseDir)]),mtError,[mbOK],0);
     end;
 
+    {$IFDEF DOSBoxStartSpeedTest} SpeedTestInfo('Windows file check'); {$ENDIF}
     If IsWindowsExe(MakeAbsPath(ProgramFile,PrgSetup.BaseDir)) and WarnIfNotReachable and WarnIfWindowsExe then begin
       Application.Restore;
       MessageDlg(Format(LanguageSetup.MessageWindowsExeExecuteWarning,[MakeAbsPath(ProgramFile,PrgSetup.BaseDir)]),mtError,[mbOK],0);
@@ -530,6 +568,7 @@ begin
 
     T:=MakePathShort(Trim(ExtractFilePath(MakeAbsPath(ProgramFile,PrgSetup.BaseDir))));
 
+    {$IFDEF DOSBoxStartSpeedTest} SpeedTestInfo('Build directory change commands to select program direcotry'); {$ENDIF}
     If (Trim(ProgramFile)<>'') and (T<>'') then begin
       Path:=''; Drive:=''; RootPath:='';
       For I:=0 to Game.NrOfMounts-1 do begin
@@ -574,43 +613,52 @@ begin
 
   If UseLoadFix then Prefix:='loadfix -'+IntToStr(LoadFixMemory)+' ' else Prefix:='';
 
+  {$IFDEF DOSBoxStartSpeedTest} SpeedTestInfo('Run via user interpreter check'); {$ENDIF}
   I:=RunViaUserInterpreter(ProgramFile);
   If I>=0 then begin
     {Run via user defined interpreter}
+    {$IFDEF DOSBoxStartSpeedTest} SpeedTestInfo('Try to mount user interpreter directory'); {$ENDIF}
     if not MountUserInterpreter(St,Game,FreeDriveLetters,S,I) then begin
       If WarnIfNotReachable then begin
         Application.Restore;
-        MessageDlg(Format(LanguageSetup.MessageUserInterpreterNeededToExecuteFile,[PrgSetup.UserInterpretersPrograms[I],ExtractFileName(ProgramFile)]),mtError,[mbOK],0);
+        MessageDlg(Format(LanguageSetup.MessageUserInterpreterNeededToExecuteFile,[PrgSetup.DOSBoxBasedUserInterpretersPrograms[I],ExtractFileName(ProgramFile)]),mtError,[mbOK],0);
       end;
     end;
-    If PrgSetup.UserInterpretersParameters.Count>I then T:=Trim(PrgSetup.UserInterpretersParameters[I]) else T:='';
+    {$IFDEF DOSBoxStartSpeedTest} SpeedTestInfo('Build run command'); {$ENDIF}
+    If PrgSetup.DOSBoxBasedUserInterpretersParameters.Count>I then T:=Trim(PrgSetup.DOSBoxBasedUserInterpretersParameters[I]) else T:='';
     If T='' then T:='%s';
     try T:=Format(T,[ExtractFileName(ProgramFile)]); except T:=Format('%s',[ExtractFileName(ProgramFile)]); end;
     T:=S+' '+T;
   end else begin
     If ExtUpperCase(ExtractFileExt(ProgramFile))='.BAS' then begin
       {Run via QBasic}
+      {$IFDEF DOSBoxStartSpeedTest} SpeedTestInfo('Try to mount QBasic'); {$ENDIF}
       if not MountQBasic(St,Game,FreeDriveLetters,S) then begin
         If WarnIfNotReachable then begin
           Application.Restore;
           MessageDlg(Format(LanguageSetup.MessageQBasicNeededToExecuteFile,[ExtractFileName(ProgramFile)]),mtError,[mbOK],0);
         end;
       end;
+      {$IFDEF DOSBoxStartSpeedTest} SpeedTestInfo('Build run command'); {$ENDIF}
       T:=Trim(PrgSetup.QBasicParam); If T='' then T:='/run %s';
       try T:=Format(T,[ExtractFileName(ProgramFile)]); except T:=Format('/run %s',[ExtractFileName(ProgramFile)]); end;
       T:=S+' '+T;
     end else begin
       {Just run in DOSBox}
+      {$IFDEF DOSBoxStartSpeedTest} SpeedTestInfo('Build run command'); {$ENDIF}
       If (not UseLoadFix) and (not Use4DOS) and (not UseDOS32A) and (Trim(ExtUpperCase(ExtractFileExt(ProgramFile)))='.BAT') then Prefix:='call ';
 
       If (T<>'') and (Trim(ProgramParameters)<>'') then T:=' '+ProgramParameters else T:='';
       If Copy(Trim(ExtUpperCase(ProgramFile)),1,7)='DOSBOX:' then begin
         S:=ExtractFileName(ProgramFile);
       end else begin
+        {$IFDEF DOSBoxStartSpeedTest} SpeedTestInfo('Make DOSBox short path name'); {$ENDIF}
         S:=MakeDOSBoxPath(ExtractFileName(ProgramFile),ExtractFilePath(ProgramFile));
         If (S<>'') and (S[1]='\') then S:=Copy(S,2,MaxInt);
       end;
       T:=S+T;
+
+      {$IFDEF DOSBoxStartSpeedTest} SpeedTestInfo('Optionally add DOS32A or 4DOS commands'); {$ENDIF}
 
       If UseDOS32A and (not NoFreeDOS) then begin
         St.Add(UsePath+'DOS32A.EXE '+T);
@@ -741,6 +789,9 @@ begin
 
   { Environment variables }
 
+
+  {$IFDEF DOSBoxStartSpeedTest} SpeedTestInfo('Adding environment variables to [autoexec] section of DOSBox conf file'); {$ENDIF}
+
   St2:=StringToStringList(Game.Environment);
   try
     For I:=0 to St2.Count-1 do If Trim(St2[I])<>'' then St.Add('SET '+St2[I]);
@@ -749,6 +800,8 @@ begin
   end;
 
   { Keyboard layout }
+
+  {$IFDEF DOSBoxStartSpeedTest} SpeedTestInfo('Adding keyboard settings to [autoexec] section of DOSBox conf file'); {$ENDIF}
 
   T:=Trim(ExtUpperCase(Game.KeyboardLayout));
   If (T='') or (T='DEFAULT') then begin
@@ -772,6 +825,8 @@ begin
 
   { Reported DOS version }
 
+  {$IFDEF DOSBoxStartSpeedTest} SpeedTestInfo('Adding reported DOS version settings to [autoexec] section of DOSBox conf file'); {$ENDIF}
+
   S:=Trim(ExtUpperCase(Game.ReportedDOSVersion));
   If (S<>'') and (S<>'DEFAULT') and (S<>'AUTO') then begin
     If Pos('.',S)<>0 then begin T:=Trim(Copy(S,Pos('.',S)+1,MaxInt)); S:=Trim(Copy(S,1,Pos('.',S)-1)); end else begin T:=''; end;
@@ -779,6 +834,8 @@ begin
   end;
 
   { Mixer }
+
+  {$IFDEF DOSBoxStartSpeedTest} SpeedTestInfo('Adding mixer settings to [autoexec] section of DOSBox conf file'); {$ENDIF}
 
   SetVolume('MASTER',Game.MixerVolumeMasterLeft,Game.MixerVolumeMasterRight);
   SetVolume('DISNEY',Game.MixerVolumeDisneyLeft,Game.MixerVolumeDisneyRight);
@@ -790,6 +847,8 @@ begin
 
   { Text mode lines }
 
+  {$IFDEF DOSBoxStartSpeedTest} SpeedTestInfo('Adding text mode settings to [autoexec] section of DOSBox conf file'); {$ENDIF}
+
   If PrgSetup.AllowTextModeLineChange then begin
     If Game.TextModeLines=28 then St.Add('Z:\28.COM');
     If Game.TextModeLines=50 then St.Add('Z:\50.COM');
@@ -797,11 +856,15 @@ begin
 
   { IPX connect }
 
+  {$IFDEF DOSBoxStartSpeedTest} SpeedTestInfo('Adding IPX init to [autoexec] section of DOSBox conf file'); {$ENDIF}
+
   S:=Trim(ExtUpperCase(Game.IPXType));
   If S='CLIENT' then St.Add('IPXNET CONNECT '+Game.IPXAddress+' '+Game.IPXPort);
   If S='SERVER' then St.Add('IPXNET STARTSERVER '+Game.IPXPort);
 
   { Mounting }
+
+  {$IFDEF DOSBoxStartSpeedTest} SpeedTestInfo('Adding mount commands to [autoexec] section of DOSBox conf file'); {$ENDIF}
 
   FreeDriveLetters:='---DEFGHIJKLMNOPQRSTUVWXY-';
   SpecialMountedCDDrives:=''; {CD drives mounted by ASK, NUMBER, LABEL, FOLDER or FILE -> for AutoMountCDs to avoid double mounting}
@@ -819,6 +882,8 @@ begin
 
   { Setting num, caps and scroll lock and CuteMouse }
 
+  {$IFDEF DOSBoxStartSpeedTest} SpeedTestInfo('Adding num, caps, scroll and mouse settings to [autoexec] section of DOSBox conf file'); {$ENDIF}
+
   NumCommands:='';
   S:=Trim(ExtUpperCase(Game.NumLockStatus));
   If (S='ON') or (S='1') or (S='TRUE') then NumCommands:='/N1';
@@ -834,6 +899,8 @@ begin
   If Game.Force2ButtonMouseMode then MouseCommands:='/Y';
   If Game.SwapMouseButtons then begin If MouseCommands<>'' then MouseCommands:=MouseCommands+' '; MouseCommands:=MouseCommands+'/L'; end;
 
+  {$IFDEF DOSBoxStartSpeedTest} SpeedTestInfo('Determining how to temporary mount the FreeDOS directory'); {$ENDIF}
+
   TempMountFreeDOSDir(Game,FreeDriveLetters,UsePath,Mount,UnMount);
 
   If ((NumCommands<>'') or (MouseCommands<>'')) and (UsePath<>'') then begin
@@ -845,6 +912,8 @@ begin
 
   { User defined Autoexec }
 
+  {$IFDEF DOSBoxStartSpeedTest} SpeedTestInfo('Adding user defined autoexec lines to [autoexec] section of DOSBox conf file'); {$ENDIF}
+
   St2:=StringToStringList(Game.Autoexec);
   try St.AddStrings(St2); finally St2.Free; end;
 
@@ -852,15 +921,17 @@ begin
 
   S:=Trim(Game.AutoexecBootImage);
   If S<>'' then begin
+    {$IFDEF DOSBoxStartSpeedTest} SpeedTestInfo('Building image boot command'); {$ENDIF}
     If (S='2') or (S='3') then begin
       If S='2' then St.Add('boot -l C') else St.Add('boot -l D');
     end else begin
       BuildFloppyBoot(St,S,FreeDriveLetters);
     end;
   end else begin
-    If Game.AutoexecOverridegamestart then begin
+    If Game.AutoexecOverrideGamestart then begin
       If Game.SecureMode then St.Add('Z:\config.com -securemode > nul');
     end else begin
+      {$IFDEF DOSBoxStartSpeedTest} SpeedTestInfo('Selecting file to run'); {$ENDIF}
       If RunExtraFile>=0 then begin
         T:=Trim(Game.ExtraPrgFile[RunExtraFile]);
         I:=Pos(';',T);
@@ -936,12 +1007,14 @@ Var St : TStringList;
     DOSBoxVersion : Double;
     I : Integer;
 begin
+  {$IFDEF DOSBoxStartSpeedTest} SpeedTestInfo('Check DOSBox version'); {$ENDIF}
   DOSBoxNr:=Max(0,GetDOSBoxNr(Game));
   If DOSBoxNr>=0 then S:=CheckDOSBoxVersion(DOSBoxNr) else S:=CheckDOSBoxVersion(-1,Game.CustomDOSBoxDir);
   If S=''
     then DOSBoxVersion:=MinSupportedDOSBoxVersion
     else try DOSBoxVersion:=StrToFloatEx(S); except DOSBoxVersion:=MinSupportedDOSBoxVersion; end;
-    
+
+  {$IFDEF DOSBoxStartSpeedTest} SpeedTestInfo('Build [sdl] section of DOSBox conf file'); {$ENDIF}
   result:=TStringList.Create;
 
   result.Add('[sdl]');
@@ -959,11 +1032,13 @@ begin
   If (S='') or (ExtUpperCase(S)='DEFAULT') then S:=PrgSetup.DOSBoxSettings[DOSBoxNr].DosBoxMapperFile;
   result.Add('mapperfile='+UnmapDrive(MakeAbsPath(S,PrgDataDir),ptMapper));
   If PrgSetup.AllowPixelShader then begin
+    {$IFDEF DOSBoxStartSpeedTest} SpeedTestInfo('Get pixel shader'); {$ENDIF}
     S:=GetPixelShader(Game);
     If (S<>'') and (ExtUpperCase(Copy(S,length(S)-2,3))<>'.FX') then S:=S+'.fx';
     result.Add('pixelshader='+S);
   end;
 
+  {$IFDEF DOSBoxStartSpeedTest} SpeedTestInfo('Build [dosbox] section of DOSBox conf file'); {$ENDIF}
   result.Add('');
   result.Add('[dosbox]');
   S:=Trim(ExtUpperCase(Game.CustomDOSBoxLanguage));
@@ -993,6 +1068,8 @@ begin
   result.Add('frameskip='+IntToStr(Game.FrameSkip));
   result.Add('aspect='+BoolToStr(Game.AspectCorrection));
   result.Add('scaler='+Game.Scale);
+
+  {$IFDEF DOSBoxStartSpeedTest} SpeedTestInfo('Build [vga, glide, cpi, midi, sblaster, gus and speaker] sections of DOSBox conf file'); {$ENDIF}
 
   If PrgSetup.AllowVGAChipsetSettings then begin
     result.Add('');
@@ -1076,6 +1153,7 @@ begin
   result.Add('tandyrate='+IntToStr(Game.SpeakerTandyRate));
   result.Add('disney='+BoolToStr(Game.SpeakerDisney));
 
+  {$IFDEF DOSBoxStartSpeedTest} SpeedTestInfo('Build [dos] section of DOSBox conf file'); {$ENDIF}
   result.Add('');
   result.Add('[dos]');
   result.Add('xms='+BoolToStr(Game.XMS));
@@ -1094,6 +1172,8 @@ begin
   S:=Trim(ExtUpperCase(Game.Codepage));
   If (S='') or (S='DEFAULT') then S:=LanguageSetup.GameKeyboardCodepageDefault;
   result.Add('keyboardlayout='+T+' '+S);}
+
+  {$IFDEF DOSBoxStartSpeedTest} SpeedTestInfo('Build [joystick, serial, ipx, printer] section of DOSBox conf file'); {$ENDIF}
 
   result.Add('');
   result.Add('[joystick]');
@@ -1134,6 +1214,8 @@ begin
 
   if not BuildAutoexec(Game,RunSetup,result,WarnIfNotReachable,RunExtraFile,True,True) then begin result.Free; result:=nil; exit; end;
 
+  {$IFDEF DOSBoxStartSpeedTest} SpeedTestInfo('Add custom settings to DOSBox conf file'); {$ENDIF}
+
   St:=StringToStringList(Game.CustomSettings);
   try
     if result<>nil then result.AddStrings(St);
@@ -1173,6 +1255,7 @@ Var Add : String;
     Q : Array of Char;
     Waited : Boolean;
 begin
+  {$IFDEF DOSBoxStartSpeedTest} SpeedTestInfo('Building DOSBox command line'); {$ENDIF}
   Add:='';
   if PrgSetup.DOSBoxSettings[DOSBoxNr].HideDosBoxConsole then Add:=' -NOCONSOLE';
   If Trim(PrgSetup.DOSBoxSettings[DOSBoxNr].CommandLineParameters)<>'' then Add:=Add+' '+Trim(PrgSetup.DOSBoxSettings[DOSBoxNr].CommandLineParameters);
@@ -1183,6 +1266,7 @@ begin
     If ExtUpperCase(Copy(PrgFile,length(PrgFile)-3,4))<>'.EXE' then PrgFile:=IncludeTrailingPathDelimiter(MakeAbsPath(PrgFile,PrgSetup.BaseDir))+DosBoxFileName;
   end;
 
+  {$IFDEF DOSBoxStartSpeedTest} SpeedTestInfo('Searching DOSBox program file'); {$ENDIF}
   If not FileExists(PrgFile) then FindAlternativeDOSBoxFile(PrgFile);
 
   if not FileExists(PrgFile) then begin
@@ -1200,6 +1284,7 @@ begin
   If S='WINDIB' then Env:='windib';
   If S='DIRECTX' then Env:='directx';
   If Env<>'' then begin
+    {$IFDEF DOSBoxStartSpeedTest} SpeedTestInfo('Setting up environment variables for DOSBox'); {$ENDIF}
     Env:='SDL_VIDEODRIVER='+Env;
     P:=PCharArray(GetEnvironmentStrings);
     try
@@ -1220,6 +1305,7 @@ begin
 
   If FullScreen then ShowFullscreenInfoDialog(Application.MainForm);
 
+  {$IFDEF DOSBoxStartSpeedTest} SpeedTestInfo('Starting DOSBox'); {$ENDIF}
   with StartupInfo do begin
     cb:=SizeOf(TStartupInfo);
     lpReserved:=nil;
@@ -1254,6 +1340,7 @@ begin
   {ShellExecute(Application.MainForm.Handle,'open',PChar(IncludeTrailingPathDelimiter(PrgSetup.DosBoxDir)+DosBoxFileName),PChar('-CONF "'+ConfFile+'"'+Add),PChar(IncludeTrailingPathDelimiter((ExtractFilePath(ConfFile)))),SW_SHOW);}
 
   If PrgSetup.DOSBoxSettings[DOSBoxNr].CenterDOSBoxWindow and (not FullScreen) then begin
+    {$IFDEF DOSBoxStartSpeedTest} SpeedTestInfo('Center DOSBox window'); {$ENDIF}
     Sleep(1000); Waited:=True;
     CenterWindowFromProcessID(ProcessInformation.dwProcessId);
   end else begin
@@ -1279,11 +1366,14 @@ Var St : TStringList;
 begin
   AlreadyMinimized:=False;
 
+  {$IFDEF DOSBoxStartSpeedTest} SpeedTestInfo('File checksum test',True); {$ENDIF}
   If not RunCheck(Game,RunSetup,RunExtraFile) then exit;
 
+  {$IFDEF DOSBoxStartSpeedTest} SpeedTestInfo('DOSBox installation selection'); {$ENDIF}
   DOSBoxNr:=GetDOSBoxNr(Game);
 
   try
+    {$IFDEF DOSBoxStartSpeedTest} SpeedTestInfo('Capture folder check'); {$ENDIF}
     If Trim(Game.CaptureFolder)='' then begin
       Game.CaptureFolder:=MakeRelPath(PrgSetup.CaptureDir,PrgSetup.BaseDir);
       Game.StoreAllValues;
@@ -1295,27 +1385,34 @@ begin
 
     try
       try
+        {$IFDEF DOSBoxStartSpeedTest} SpeedTestInfo('Storing conf file'); {$ENDIF}
         St.SaveToFile(TempDir+DosBoxConfFileName);
       except
         Application.Restore;
         MessageDlg(Format(LanguageSetup.MessageCouldNotSaveFile,[TempDir+DosBoxConfFileName]),mtError,[mbOK],0);
         exit;
       end;
+      {$IFDEF DOSBoxStartSpeedTest} SpeedTestInfo('Adding historiy'); {$ENDIF}
       AddToHistory(Game.Name);
 
       If DOSBoxNr>=0 then T:=MakeAbsPath(PrgSetup.DOSBoxSettings[DOSBoxNr].DosBoxDir,PrgSetup.BaseDir) else T:=Trim(Game.CustomDOSBoxDir);
 
+      {$IFDEF DOSBoxStartSpeedTest} SpeedTestInfo('Process zipped drives'); {$ENDIF}
       ZipRecNr:=ZipManager.AddGame(Game,Error);
       If Error then exit;
 
+      {$IFDEF DOSBoxStartSpeedTest} SpeedTestInfo('Process run before main file'); {$ENDIF}
       RunPrgManager.RunBeforeExecutionCommand(Game);
 
       If PrgSetup.MinimizeOnDosBoxStart then begin
+        {$IFDEF DOSBoxStartSpeedTest} SpeedTestInfo('Minimize main window'); {$ENDIF}
         AlreadyMinimized:=(Application.MainForm.WindowState=wsMinimized);
         Application.Minimize;
       end;
 
       DOSBoxHandle:=RunDosBox(T,Max(0,DOSBoxNr),TempDir+DosBoxConfFileName,Game.StartFullscreen,DosBoxCommandLine);
+
+      {$IFDEF DOSBoxStartSpeedTest} SpeedTestDone; {$ENDIF}
 
       try
         If ZipRecNr>=0 then ZipManager.ActivateRepackCheck(ZipRecNr,DOSBoxHandle);

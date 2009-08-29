@@ -81,19 +81,20 @@ type
     { Public-Deklarationen }
     GameDB, AutoSetupDB : TGameDB;
     HideIfAlreadyInstalled : Boolean;
+    LanguageToActivate : String;
   end;
 
 var
   PackageManagerForm: TPackageManagerForm;
 
-Procedure ShowPackageManagerDialog(const AOwner : TComponent; const AGameDB, AAutoSetupDB : TGameDB);
+Function ShowPackageManagerDialog(const AOwner : TComponent; const AGameDB, AAutoSetupDB : TGameDB) : String; {result=language file to activate}
 
 implementation
 
-uses ShellAPI, IniFiles, PackageDBToolsUnit, PackageDBLanguage, CommonTools,
-     PrgConsts, DownloadWaitFormUnit, PrgSetupUnit, VistaToolsUnit,
-     LanguageSetupUnit, ZipPackageUnit, IconLoaderUnit, HelpConsts,
-     ZipInfoFormUnit, PackageManagerRepositoriesEditFormUnit;
+uses ShellAPI, IniFiles, PackageDBToolsUnit, CommonTools, PrgConsts,
+     DownloadWaitFormUnit, PrgSetupUnit, VistaToolsUnit, LanguageSetupUnit,
+     ZipPackageUnit, IconLoaderUnit, HelpConsts, ZipInfoFormUnit,
+     PackageManagerRepositoriesEditFormUnit;
 
 {$R *.dfm}
 
@@ -103,39 +104,40 @@ begin
   Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName);
 
   HideIfAlreadyInstalled:=True;
+  LanguageToActivate:='';
 
-  Caption:=LANG_Caption;
+  Caption:=LanguageSetup.PackageManager;
   CloseButton.Caption:=LanguageSetup.Close;
   CloseButton.Hint:=LanguageSetup.CloseHintWindow;
-  UpdateButton.Caption:=LANG_MenuUpdateLists;
-  UpdateButton.Hint:=LANG_MenuUpdateListsHint;
-  ResponsitoriesButton.Caption:=LANG_MenuRepositoriesList;
-  ResponsitoriesButton.Hint:=LANG_MenuRepositoriesListHint;
+  UpdateButton.Caption:=LanguageSetup.PackageManagerMenuUpdateLists;
+  UpdateButton.Hint:=LanguageSetup.PackageManagerMenuUpdateListsHint;
+  ResponsitoriesButton.Caption:=LanguageSetup.PackageManagerMenuRepositoriesList;
+  ResponsitoriesButton.Hint:=LanguageSetup.PackageManagerMenuRepositoriesListHint;
   HelpButton.Caption:=LanguageSetup.Help;
   HelpButton.Hint:=LanguageSetup.HelpHint;
 
-  TabSheet1.Caption:=LANG_PageGames;
-  TabSheet2.Caption:=LANG_PageAutoSetups;
-  TabSheet5.Caption:=LANG_PageIcons;
-  TabSheet6.Caption:=LANG_PageIconSets;
-  TabSheet3.Caption:=LANG_PageLanguages;
-  TabSheet4.Caption:=LANG_PageExePackages;
+  TabSheet1.Caption:=LanguageSetup.PackageManagerPageGames;
+  TabSheet2.Caption:=LanguageSetup.PackageManagerPageAutoSetups;
+  TabSheet5.Caption:=LanguageSetup.PackageManagerPageIcons;
+  TabSheet6.Caption:=LanguageSetup.PackageManagerPageIconSets;
+  TabSheet3.Caption:=LanguageSetup.PackageManagerPageLanguages;
+  TabSheet4.Caption:=LanguageSetup.PackageManagerPageExePackages;
 
-  //... Complete ImagesList customization in 0.9
+  //... Complete ImagesList customization for tabsheets in 0.9
   UserIconLoader.DialogImage(DI_CloseWindow,ImageList,0);
   UserIconLoader.DialogImage(DI_Update,ImageList,2);
   UserIconLoader.DialogImage(DI_Edit,ImageList,1);
   UserIconLoader.DialogImage(DI_ToolbarHelp,ImageList,3);
 
-  GamesFilterButton.Caption:=LANG_FilterList;
-  GamesButton.Caption:=LANG_InstallGames;
-  AutoSetupFilterButton.Caption:=LANG_FilterList;
-  AutoSetupButton.Caption:=LANG_InstallAutoSetups;
-  IconsButton.Caption:=LANG_InstallIcons;
-  IconSetsButton.Caption:=LANG_InstallIconSets;
-  LanguageButton.Caption:=LANG_InstallLanguages;
-  ExePackagesButton.Caption:=LANG_InstallPackage;
-  ExePackagesDelButton.Caption:=LANG_DeletePackage;
+  GamesFilterButton.Caption:=LanguageSetup.PackageManagerFilterList;
+  GamesButton.Caption:=LanguageSetup.PackageManagerInstallGames;
+  AutoSetupFilterButton.Caption:=LanguageSetup.PackageManagerFilterList;
+  AutoSetupButton.Caption:=LanguageSetup.PackageManagerInstallAutoSetups;
+  IconsButton.Caption:=LanguageSetup.PackageManagerInstallIcons;
+  IconSetsButton.Caption:=LanguageSetup.PackageManagerInstallIconSets;
+  LanguageButton.Caption:=LanguageSetup.PackageManagerInstallLanguages;
+  ExePackagesButton.Caption:=LanguageSetup.PackageManagerInstallPackage;
+  ExePackagesDelButton.Caption:=LanguageSetup.PackageManagerDeletePackage;
 
   UserIconLoader.DialogImage(DI_Import,GamesButton);
   UserIconLoader.DialogImage(DI_Import,AutoSetupButton);
@@ -206,7 +208,7 @@ begin
   St:=TStringList.Create;
   try
     For I:=0 to PackageDB.Count-1 do For J:=0 to PackageDB.List[I].LanguageCount-1 do begin
-      If PackageDB.List[I].Language[J].Version<>GetNormalFileVersionAsString then continue;
+      If (VersionToInt(PackageDB.List[I].Language[J].MinVersion)>VersionToInt(GetNormalFileVersionAsString)) or (VersionToInt(PackageDB.List[I].Language[J].MaxVersion)<VersionToInt(GetNormalFileVersionAsString)) then continue;
       If (not HideIfAlreadyInstalled) or (LanguageChecksumScanner1.GetChecksum(ExtractFileNameFromURL(PackageDB.List[I].Language[J].URL))<>PackageDB.List[I].Language[J].PackageChecksum) and (LanguageChecksumScanner2.GetChecksum(ExtractFileNameFromURL(PackageDB.List[I].Language[J].URL))<>PackageDB.List[I].Language[J].PackageChecksum) then begin
         St.AddObject(PackageDB.List[I].Language[J].Name+' ('+ LanguageSetup.InfoFormLanguageAuthor+': '+PackageDB.List[I].Language[J].Author+')',PackageDB.List[I].Language[J]);
       end;
@@ -235,7 +237,7 @@ begin
   ExePackagesListBoxClick(self);
 
   {Info label}
-  InfoLabel.Caption:=Lang_AllListsEmpty;
+  InfoLabel.Caption:=LanguageSetup.PackageManagerAllListsEmpty;
   InfoPanel.Visible:=False;
   For I:=0 to PackageDB.Count-1 do
     If PackageDB.List[I].GamesCount+PackageDB.List[I].AutoSetupCount+PackageDB.List[I].LanguageCount+PackageDB.List[I].ExePackageCount>0 then exit;
@@ -402,13 +404,15 @@ begin
 
         Ini:=TIniFile.Create(IncludeTrailingPathDelimiter(DestDir)+IconsConfFile);
         try
-          Ini.WriteString('Information','Version',DownloadIconSetData.Version);
+          Ini.WriteString('Information','Name',DownloadIconSetData.Name);
+          Ini.WriteString('Information','MinVersion',DownloadIconSetData.MinVersion);
+          Ini.WriteString('Information','MaxVersion',DownloadIconSetData.MaxVersion);
         finally
           Ini.Free;
         end;
       end;
     end;
-    If B then MessageDlg(LANG_IconSetDownloaded,mtInformation,[mbOK],0);
+    If B then MessageDlg(LanguageSetup.PackageManagerIconSetDownloaded,mtInformation,[mbOK],0);
   finally
     LoadLists;
   end;
@@ -416,23 +420,37 @@ end;
 
 procedure TPackageManagerForm.LanguageButtonClick(Sender: TObject);
 Var DownloadLanguageData : TDownloadLanguageData;
-    FileName : String;
-    I : Integer;
-    B : Boolean;
+    FileName,DestLangFile : String;
+    I,C : Integer;
+    Ini : TIniFile;
 begin
   try
-    B:=False;
+    C:=0; DestLangFile:='';
     For I:=0 to LanguageListBox.Items.Count-1 do If LanguageListBox.Checked[I] then begin
       DownloadLanguageData:=TDownloadLanguageData(LanguageListBox.Items.Objects[I]);
       FileName:=ExtractFileNameFromURL(DownloadLanguageData.URL);
       If DownloadFile(self,DownloadLanguageData.Size,DownloadLanguageData.PackageFileURL,DownloadLanguageData.URL,PackageDB.DBDir+FileName) then begin
-        B:=True;
+        inc(C);
         ForceDirectories(PrgDataDir+LanguageSubDir+'\');
-        If FileExists(PrgDataDir+LanguageSubDir+'\'+FileName) then ExtDeleteFile(PrgDataDir+LanguageSubDir+'\'+FileName,ftUninstall);
-        MoveFile(PChar(PackageDB.DBDir+FileName),PChar(PrgDataDir+LanguageSubDir+'\'+FileName));
+        DestLangFile:=PrgDataDir+LanguageSubDir+'\'+FileName;
+        If FileExists(DestLangFile) then ExtDeleteFile(DestLangFile,ftUninstall);
+        MoveFile(PChar(PackageDB.DBDir+FileName),PChar(DestLangFile));
+        Ini:=TIniFile.Create(DestLangFile);
+        try
+          Ini.WriteString('LanguageFileInfo','MaxVersion',DownloadLanguageData.MaxVersion);
+        finally
+          Ini.Free;
+        end;
       end;
     end;
-    If B then MessageDlg(LANG_LanguageDownloaded,mtInformation,[mbOK],0);
+    If C=1 then begin
+      If MessageDlg('Do you want to activate the downloaded language immediately?',mtConfirmation,[mbYes,mbNo],0)=mrYes then begin
+        LanguageToActivate:=DestLangFile;
+        Close;
+        exit;
+      end;
+    end;
+    If C>0 then MessageDlg(LanguageSetup.PackageManagerLanguageDownloaded,mtInformation,[mbOK],0);
   finally
     LanguageChecksumScanner1.ReScan;
     LanguageChecksumScanner2.ReScan;
@@ -495,10 +513,10 @@ begin
       PackageDBCache.AddCache(DownloadExeData.Name,DownloadExeData.Description,PackageDBCache.DBDir+FileName);
     end else begin
       If OldChecksum='' then begin
-        MessageDlg(Format(LANG_DownloadFailed,[DownloadExeData.URL]),mtError,[mbOK],0);
+        MessageDlg(Format(LanguageSetup.PackageManagerDownloadFailed,[DownloadExeData.URL]),mtError,[mbOK],0);
         exit;
       end else begin
-        if MessageDlg(LANG_DownloadFailedUseOldVersion,mtConfirmation,[mbYes,mbNo],0)<>mrYes then exit;
+        if MessageDlg(LanguageSetup.PackageManagerDownloadFailedUseOldVersion,mtConfirmation,[mbYes,mbNo],0)<>mrYes then exit;
         CachedPackage:=PackageDBCache.FindPackage(DownloadExeData.Name); if CachedPackage=nil then exit;
         ShellExecute(Handle,'open',PChar(CachedPackage.Filename),PChar('/D='+PrgDir),nil,SW_Show);
         Close;
@@ -524,7 +542,7 @@ end;
 
 { global }
 
-Procedure ShowPackageManagerDialog(const AOwner : TComponent; const AGameDB, AAutoSetupDB : TGameDB);
+Function ShowPackageManagerDialog(const AOwner : TComponent; const AGameDB, AAutoSetupDB : TGameDB) : String;
 begin
   PackageManagerForm:=TPackageManagerForm.Create(AOwner);
   try
@@ -532,6 +550,7 @@ begin
     PackageManagerForm.AutoSetupDB:=AAutoSetupDB;
     PackageManagerForm.HideIfAlreadyInstalled:=((Word(GetKeyState(VK_LSHIFT)) div 256)=0) and ((Word(GetKeyState(VK_RSHIFT)) div 256)=0);
     PackageManagerForm.ShowModal;
+    result:=PackageManagerForm.LanguageToActivate;
   finally
     PackageManagerForm.Free;
   end;

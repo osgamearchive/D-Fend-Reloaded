@@ -68,6 +68,9 @@ const NR_Author=1;
       NR_GlobalHelpHint=10057;
       NR_GlobalDefault=10058;
       NR_GlobalCustom=10059;
+      NR_GlobalBytes=10060;
+      NR_GlobalKBytes=10061;
+      NR_GlobalMBytes=10062;
 
       NR_LanguageNoVersion=10501;
       NR_LanguageOutdated=10502;
@@ -177,6 +180,7 @@ const NR_Author=1;
       NR_MessageNoCDDrive=20107;
       NR_MessageLoadingDataBase=20108;
       NR_MessageUserInterpreterNeededToExecuteFile=20109;
+      NR_MessageCouldNotActivateXML=20110;
 
       NR_MenuFile=30001;
       NR_MenuFileImport=30002;
@@ -233,29 +237,32 @@ const NR_Author=1;
       NR_MenuProfileAdd=33002;
       NR_MenuProfileAddScummVM=33003;
       NR_MenuProfileAddWindows=33004;
-      NR_MenuProfileAddFromTemplate=33005;
-      NR_MenuProfileAddWithWizard=33006;
-      NR_MenuProfileEdit=33007;
-      NR_MenuProfileCopy=33008;
-      NR_MenuProfileCopyTitle=33009;
-      NR_MenuProfileCopyPrompt=33010;
-      NR_MenuProfileCopyUpdateScreenshotFolder=33011;
-      NR_MenuProfileCopyRemoveDataFolderRecord=33012;
-      NR_MenuProfileDelete=33013;
-      NR_MenuProfileOpenFolder=33014;
-      NR_MenuProfileOpenCaptureFolder=33015;
-      NR_MenuProfileOpenDataFolder=33016;
-      NR_MenuProfileOpenFileInDataFolder=33017;
-      NR_MenuProfileMarkAsFavorite=33018;
-      NR_MenuProfileUnMarkAsFavorite=33019;
-      NR_MenuProfileCreateShortcut=33020;
-      NR_MenuProfileSearchGame=33021;
-      NR_MenuProfileSearchGameEditLinks=33022;
-      NR_MenuProfileDeinstall=33023;
-      NR_MenuProfileMakeInstaller=33024;
-      NR_MenuProfileMakeZipArchive=33025;
-      NR_MenuProfileViewConfFile=33026;
-      NR_MenuProfileViewIniFile=33027;
+      NR_MenuProfileAddOther=33005;
+      NR_MenuProfileAddOtherSelectTitle=33006;
+      NR_MenuProfileAddOtherSelectFilter=33007;
+      NR_MenuProfileAddFromTemplate=33008;
+      NR_MenuProfileAddWithWizard=33009;
+      NR_MenuProfileEdit=33010;
+      NR_MenuProfileCopy=33011;
+      NR_MenuProfileCopyTitle=33012;
+      NR_MenuProfileCopyPrompt=33013;
+      NR_MenuProfileCopyUpdateScreenshotFolder=33014;
+      NR_MenuProfileCopyRemoveDataFolderRecord=33015;
+      NR_MenuProfileDelete=33016;
+      NR_MenuProfileOpenFolder=33017;
+      NR_MenuProfileOpenCaptureFolder=33018;
+      NR_MenuProfileOpenDataFolder=33019;
+      NR_MenuProfileOpenFileInDataFolder=33020;
+      NR_MenuProfileMarkAsFavorite=33021;
+      NR_MenuProfileUnMarkAsFavorite=33022;
+      NR_MenuProfileCreateShortcut=33023;
+      NR_MenuProfileSearchGame=33024;
+      NR_MenuProfileSearchGameEditLinks=33025;
+      NR_MenuProfileDeinstall=33026;
+      NR_MenuProfileMakeInstaller=33027;
+      NR_MenuProfileMakeZipArchive=33028;
+      NR_MenuProfileViewConfFile=33029;
+      NR_MenuProfileViewIniFile=33030;
       NR_MenuExtras=34001;
       NR_MenuExtrasIconManager=34002;
       NR_MenuExtrasIconManagerCaption=34003;
@@ -722,9 +729,12 @@ const NR_Author=1;
       NR_SetupFormProfileEditorAutoSetScreenshotFolderOnlyWizard=47129;
       NR_SetupFormProfileEditorAutoSetScreenshotFolderAlways=47130;
       NR_SetupFormProfileEditorRenameProfFilesOnRenamingProfile=47131;
-      NR_SetupFormShowToolbar=47132;
-      NR_SetupFormShowToolbarCaptions=47133;
-      NR_SetupFormShowToolbarButtons=47134;
+      NR_SetupFormProfileEditorAutoAddMountings=47132;
+      NR_SetupFormProfileEditorAutoAddMountingsOnlyWizard=47133;
+      NR_SetupFormProfileEditorAutoAddMountingsAlways=47134;
+      NR_SetupFormShowToolbar=47135;
+      NR_SetupFormShowToolbarCaptions=47136;
+      NR_SetupFormShowToolbarButtons=47137;
 
       NR_SetupFormShowMenubar=47150;
 
@@ -831,6 +841,7 @@ const NR_Author=1;
       NR_SetupFormService3Confirmation=43705;
       NR_SetupFormService4=43706;
       NR_SetupFormService5=43707;
+      NR_SetupFormService6=43708;
       NR_SetupFormUpdate0=43801;
       NR_SetupFormUpdate1=43802;
       NR_SetupFormUpdate2=43803;
@@ -961,6 +972,19 @@ const NR_Author=1;
       NR_SetupFormImageScalingAlgorithmBSpline=44656;
       NR_SetupFormImageScalingAlgorithmLanczos3=44657;
       NR_SetupFormImageScalingAlgorithmMitchell=44658;
+
+      NR_SetupFormMoreEmulators=44700;
+      NR_SetupFormMoreEmulatorsLabel=44701;
+      NR_SetupFormMoreEmulatorsAdd=44702;
+      NR_SetupFormMoreEmulatorsDelete=44703;
+      NR_SetupFormMoreEmulatorsDeleteWarning=44704;
+      NR_SetupFormMoreEmulatorsName=44705;
+      NR_SetupFormMoreEmulatorsProgram=44706;
+      NR_SetupFormMoreEmulatorsProgramTitle=44707;
+      NR_SetupFormMoreEmulatorsProgramFilter=44708;
+      NR_SetupFormMoreEmulatorsParameters=44709;
+      NR_SetupFormMoreEmulatorsExtensions=44710;
+      NR_SetupFormMoreEmulatorsInfo=44711;
 
       NR_HistoryForm=44901;
       NR_HistoryGame=44902;
@@ -1195,6 +1219,7 @@ const NR_Author=1;
       NR_ChangeProfilesMountingChangeSettings=58013;
       NR_ChangeProfilesMountingChangeSettingsGlobal=58014;
       NR_ChangeProfilesMountingChangeSettingsLocal=58015;
+      NR_ChangeProfilesSectionInfo=58016;
 
       NR_GameName=60001;
       NR_GameSetup=60002;
@@ -1618,10 +1643,74 @@ const NR_Author=1;
       NR_SelectAutoSetupTemplateImportZip=95002;
       NR_SelectAutoSetupTemplateScanFolder=95003;
 
+      NR_PackageManager=96001;
+      NR_PackageManagerMenuUpdateLists=96002;
+      NR_PackageManagerMenuUpdateListsLocal=96003;
+      NR_PackageManagerMenuUpdateListsHint=96004;
+      NR_PackageManagerMenuRepositoriesList=96005;
+      NR_PackageManagerMenuRepositoriesListHint=96006;
+      NR_PackageManagerPageGames=96007;
+      NR_PackageManagerPageAutoSetups=96008;
+      NR_PackageManagerPageIcons=96009;
+      NR_PackageManagerPageIconSets=96010;
+      NR_PackageManagerPageLanguages=96011;
+      NR_PackageManagerPageExePackages=96012;
+      NR_PackageManagerPageExePackagesSelect=96013;
+      NR_PackageManagerAllListsEmpty=96014;
+      NR_PackageManagerDownloading=96015;
+      NR_PackageManagerDownloadSize=96016;
+      NR_PackageManagerPackageAlreadyDownloaded=96017;
+      NR_PackageManagerOldPackageAlreadyDownloaded=96018;
+      NR_PackageManagerPackageOnlyInCache=96019;
+      NR_PackageManagerDownloadFailed=96020;
+      NR_PackageManagerDownloadFailedUseOldVersion=96021;
+      NR_PackageManagerLanguageDownloaded=96022;
+      NR_PackageManagerIconSetDownloaded=96023;
+      NR_PackageManagerScanning=96024;
+      NR_PackageManagerFilterList=96025;
+      NR_PackageManagerNoFilter=96026;
+      NR_PackageManagerInstallGames=96027;
+      NR_PackageManagerInstallAutoSetups=96028;
+      NR_PackageManagerInstallIcons=96029;
+      NR_PackageManagerInstallIconSets=96030;
+      NR_PackageManagerInstallLanguages=96031;
+      NR_PackageManagerInstallPackage=96032;
+      NR_PackageManagerDeletePackage=96033;
+      NR_PackageManagerListLicense=96034;
+
+      NR_RepositoriesEditor=96100;
+      NR_RepositoriesEditorActivateSource=96101;
+      NR_RepositoriesEditorDeactivateSource=96102;
+      NR_RepositoriesEditorAddSource=96103;
+      NR_RepositoriesEditorAddSourceWarning=96104;
+      NR_RepositoriesEditorAddSourceCaption=96105;
+      NR_RepositoriesEditorEditSource=96106;
+      NR_RepositoriesEditorEditSourceCaption=96107;
+      NR_RepositoriesEditorRemoveSource=96108;
+      NR_RepositoriesEditorRemoveSourceConfirm=96109;
+      NR_RepositoriesEditorPopupActivateSource=96110;
+      NR_RepositoriesEditorPopupDeactivateSource=96111;
+      NR_RepositoriesEditorPopupAddSource=96112;
+      NR_RepositoriesEditorPopupEditSource=96113;
+      NR_RepositoriesEditorPopupRemoveSource=96114;
+      NR_RepositoriesEditorSourceOfficial=96115;
+      NR_RepositoriesEditorSourceUserDefined=96116;
+      NR_RepositoriesEditorColumnURL=96117;
+      NR_RepositoriesEditorColumnDescription=96118;
+      NR_RepositoriesEditorURL=96119;
+
+      NR_PackageCreator=96200;
+      NR_PackageCreatorOutputFile=96201;
+      NR_PackageCreatorOutputTitle=96202;
+      NR_PackageCreatorOutputFilter=96203;
+      NR_PackageCreatorOutputFileInfo=96204;
+
 Type TLanguageSetup=class(TBasePrgSetup)
   private
     Procedure SetupLanguageStrings1;
     Procedure SetupLanguageStrings2;
+    Function GetString2(Index : Integer) : String;
+    Procedure SetString2(Index : Integer; S : String);
   public
     Constructor Create(FileName : String =''; const MinimalInit : Boolean = False);
     Destructor Destroy; override;
@@ -1694,6 +1783,9 @@ Type TLanguageSetup=class(TBasePrgSetup)
     property HelpHint : String index NR_GlobalHelpHint read GetString write SetString;
     property Default : String index NR_GlobalDefault read GetString write SetString;
     property Custom : String index NR_GlobalCustom read GetString write SetString;
+    property Bytes : String index NR_GlobalBytes read GetString write SetString;
+    property KBytes : String index NR_GlobalKBytes read GetString write SetString;
+    property MBytes : String index NR_GlobalMBytes read GetString write SetString;
 
     property LanguageNoVersion : String index NR_LanguageNoVersion read GetString write SetString;
     property LanguageOutdated : String index NR_LanguageOutdated read GetString write SetString;
@@ -1804,6 +1896,7 @@ Type TLanguageSetup=class(TBasePrgSetup)
     property MessageNoCDDrive : String index NR_MessageNoCDDrive read GetString write SetString;
     property MessageLoadingDataBase : String index NR_MessageLoadingDataBase read GetString write SetString;
     property MessageUserInterpreterNeededToExecuteFile : String index NR_MessageUserInterpreterNeededToExecuteFile read GetString write SetString;
+    property MessageCouldNotActivateXML : String index NR_MessageCouldNotActivateXML read GetString write SetString;
 
     property MenuFile : String index NR_MenuFile read GetString write SetString;
     property MenuFileImport : String index NR_MenuFileImport read GetString write SetString;
@@ -1860,6 +1953,9 @@ Type TLanguageSetup=class(TBasePrgSetup)
     property MenuProfileAdd : String index NR_MenuProfileAdd read GetString write SetString;
     property MenuProfileAddScummVM : String index NR_MenuProfileAddScummVM read GetString write SetString;
     property MenuProfileAddWindows : String index NR_MenuProfileAddWindows read GetString write SetString;
+    property MenuProfileAddOther : String index NR_MenuProfileAddOther read GetString2 write SetString2;
+    property MenuProfileAddOtherSelectTitle : String index NR_MenuProfileAddOtherSelectTitle read GetString2 write SetString2;
+    property MenuProfileAddOtherSelectFilter : String index NR_MenuProfileAddOtherSelectFilter read GetString2 write SetString2;    
     property MenuProfileAddFromTemplate : String index NR_MenuProfileAddFromTemplate read GetString write SetString;
     property MenuProfileAddWithWizard : String index NR_MenuProfileAddWithWizard read GetString write SetString;
     property MenuProfileEdit : String index NR_MenuProfileEdit read GetString write SetString;
@@ -2352,6 +2448,9 @@ Type TLanguageSetup=class(TBasePrgSetup)
     property SetupFormProfileEditorAutoSetScreenshotFolderOnlyWizard : String index NR_SetupFormProfileEditorAutoSetScreenshotFolderOnlyWizard read GetString write SetString;
     property SetupFormProfileEditorAutoSetScreenshotFolderAlways : String index NR_SetupFormProfileEditorAutoSetScreenshotFolderAlways read GetString write SetString;
     property SetupFormProfileEditorRenameProfFilesOnRenamingProfile : String index NR_SetupFormProfileEditorRenameProfFilesOnRenamingProfile read GetString write SetString;
+    property SetupFormProfileEditorAutoAddMountings : String index NR_SetupFormProfileEditorAutoAddMountings read GetString write SetString;
+    property SetupFormProfileEditorAutoAddMountingsOnlyWizard : String index NR_SetupFormProfileEditorAutoAddMountingsOnlyWizard read GetString write SetString;
+    property SetupFormProfileEditorAutoAddMountingsAlways : String index NR_SetupFormProfileEditorAutoAddMountingsAlways read GetString write SetString;
     property SetupFormShowToolbar : String index NR_SetupFormShowToolbar read GetString write SetString;
     property SetupFormShowToolbarCaptions : String index NR_SetupFormShowToolbarCaptions read GetString write SetString;
     property SetupFormShowToolbarButtons : String index NR_SetupFormShowToolbarButtons read GetString write SetString;
@@ -2451,6 +2550,7 @@ Type TLanguageSetup=class(TBasePrgSetup)
     property SetupFormService3Confirmation : String index NR_SetupFormService3Confirmation read GetString write SetString;
     property SetupFormService4 : String index NR_SetupFormService4 read GetString write SetString;
     property SetupFormService5 : String index NR_SetupFormService5 read GetString write SetString;
+    property SetupFormService6 : String index NR_SetupFormService6 read GetString write SetString;
     property SetupFormUpdate0 : String index NR_SetupFormUpdate0 read GetString write SetString;
     property SetupFormUpdate1 : String index NR_SetupFormUpdate1 read GetString write SetString;
     property SetupFormUpdate2 : String index NR_SetupFormUpdate2 read GetString write SetString;
@@ -2581,6 +2681,19 @@ Type TLanguageSetup=class(TBasePrgSetup)
     property SetupFormImageScalingAlgorithmBSpline : String index NR_SetupFormImageScalingAlgorithmBSpline read GetString write SetString;
     property SetupFormImageScalingAlgorithmLanczos3 : String index NR_SetupFormImageScalingAlgorithmLanczos3 read GetString write SetString;
     property SetupFormImageScalingAlgorithmMitchell : String index NR_SetupFormImageScalingAlgorithmMitchell read GetString write SetString;
+
+    property SetupFormMoreEmulators : String index NR_SetupFormMoreEmulators read GetString2 write SetString2;
+    property SetupFormMoreEmulatorsLabel : String index NR_SetupFormMoreEmulatorsLabel read GetString2 write SetString2;
+    property SetupFormMoreEmulatorsAdd : String index NR_SetupFormMoreEmulatorsAdd read GetString2 write SetString2;
+    property SetupFormMoreEmulatorsDelete : String index NR_SetupFormMoreEmulatorsDelete read GetString2 write SetString2;
+    property SetupFormMoreEmulatorsDeleteWarning : String index NR_SetupFormMoreEmulatorsDeleteWarning read GetString2 write SetString2;
+    property SetupFormMoreEmulatorsName : String index NR_SetupFormMoreEmulatorsName read GetString2 write SetString2;
+    property SetupFormMoreEmulatorsProgram : String index NR_SetupFormMoreEmulatorsProgram read GetString2 write SetString2;
+    property SetupFormMoreEmulatorsProgramTitle : String index NR_SetupFormMoreEmulatorsProgramTitle read GetString2 write SetString2;
+    property SetupFormMoreEmulatorsProgramFilter : String index NR_SetupFormMoreEmulatorsProgramFilter read GetString2 write SetString2;
+    property SetupFormMoreEmulatorsParameters : String index NR_SetupFormMoreEmulatorsParameters read GetString2 write SetString2;
+    property SetupFormMoreEmulatorsExtensions : String index NR_SetupFormMoreEmulatorsExtensions read GetString2 write SetString2;
+    property SetupFormMoreEmulatorsInfo : String index NR_SetupFormMoreEmulatorsInfo read GetString2 write SetString2;
 
     property HistoryForm : String index NR_HistoryForm read GetString write SetString;
     property HistoryGame : String index NR_HistoryGame read GetString write SetString;
@@ -2816,6 +2929,7 @@ Type TLanguageSetup=class(TBasePrgSetup)
     property ChangeProfilesMountingChangeSettings : String index NR_ChangeProfilesMountingChangeSettings read GetString write SetString;
     property ChangeProfilesMountingChangeSettingsGlobal : String index NR_ChangeProfilesMountingChangeSettingsGlobal read GetString write SetString;
     property ChangeProfilesMountingChangeSettingsLocal : String index NR_ChangeProfilesMountingChangeSettingsLocal read GetString write SetString;
+    property ChangeProfilesSectionInfo : String index NR_ChangeProfilesSectionInfo read GetString write SetString;
 
     property GameName : String index NR_GameName read GetString write SetString;
     property GameSetup : String index NR_GameSetup read GetString write SetString;
@@ -3236,6 +3350,68 @@ Type TLanguageSetup=class(TBasePrgSetup)
     property SelectAutoSetupTemplate : String index NR_SelectAutoSetupTemplate read GetString write SetString;
     property SelectAutoSetupTemplateImportZip : String index NR_SelectAutoSetupTemplateImportZip read GetString write SetString;
     property SelectAutoSetupTemplateScanFolder : String index NR_SelectAutoSetupTemplateScanFolder read GetString write SetString;
+
+    property PackageManager : String index NR_PackageManager read GetString2 write SetString2;
+    property PackageManagerMenuUpdateLists : String index NR_PackageManagerMenuUpdateLists read GetString2 write SetString2;
+    property PackageManagerMenuUpdateListsLocal : String index NR_PackageManagerMenuUpdateListsLocal read GetString2 write SetString2;
+    property PackageManagerMenuUpdateListsHint : String index NR_PackageManagerMenuUpdateListsHint read GetString2 write SetString2;
+    property PackageManagerMenuRepositoriesList : String index NR_PackageManagerMenuRepositoriesList read GetString2 write SetString2;
+    property PackageManagerMenuRepositoriesListHint : String index NR_PackageManagerMenuRepositoriesListHint read GetString2 write SetString2;
+    property PackageManagerPageGames : String index NR_PackageManagerPageGames read GetString2 write SetString2;
+    property PackageManagerPageAutoSetups : String index NR_PackageManagerPageAutoSetups read GetString2 write SetString2;
+    property PackageManagerPageIcons : String index NR_PackageManagerPageIcons read GetString2 write SetString2;
+    property PackageManagerPageIconSets : String index NR_PackageManagerPageIconSets read GetString2 write SetString2;
+    property PackageManagerPageLanguages : String index NR_PackageManagerPageLanguages read GetString2 write SetString2;
+    property PackageManagerPageExePackages : String index NR_PackageManagerPageExePackages read GetString2 write SetString2;
+    property PackageManagerPageExePackagesSelect : String index NR_PackageManagerPageExePackagesSelect read GetString2 write SetString2;
+    property PackageManagerAllListsEmpty : String index NR_PackageManagerAllListsEmpty read GetString2 write SetString2;
+    property PackageManagerDownloading : String index NR_PackageManagerDownloading read GetString2 write SetString2;
+    property PackageManagerDownloadSize : String index NR_PackageManagerDownloadSize read GetString2 write SetString2;
+    property PackageManagerPackageAlreadyDownloaded : String index NR_PackageManagerPackageAlreadyDownloaded read GetString2 write SetString2;
+    property PackageManagerOldPackageAlreadyDownloaded : String index NR_PackageManagerOldPackageAlreadyDownloaded read GetString2 write SetString2;
+    property PackageManagerPackageOnlyInCache : String index NR_PackageManagerPackageOnlyInCache read GetString2 write SetString2;
+    property PackageManagerScanning : String index NR_PackageManagerScanning read GetString2 write SetString2;
+    property PackageManagerDownloadFailed : String index NR_PackageManagerDownloadFailed read GetString2 write SetString2;
+    property PackageManagerDownloadFailedUseOldVersion : String index NR_PackageManagerDownloadFailedUseOldVersion read GetString2 write SetString2;
+    property PackageManagerLanguageDownloaded : String index NR_PackageManagerLanguageDownloaded read GetString2 write SetString2;
+    property PackageManagerIconSetDownloaded : String index NR_PackageManagerIconSetDownloaded read GetString2 write SetString2;
+    property PackageManagerFilterList : String index NR_PackageManagerFilterList read GetString2 write SetString2;
+    property PackageManagerNoFilter : String index NR_PackageManagerNoFilter read GetString2 write SetString2;
+    property PackageManagerInstallGames : String index NR_PackageManagerInstallGames read GetString2 write SetString2;
+    property PackageManagerInstallAutoSetups : String index NR_PackageManagerInstallAutoSetups read GetString2 write SetString2;
+    property PackageManagerInstallIcons : String index NR_PackageManagerInstallIcons read GetString2 write SetString2;
+    property PackageManagerInstallIconSets : String index NR_PackageManagerInstallIconSets read GetString2 write SetString2;
+    property PackageManagerInstallLanguages : String index NR_PackageManagerInstallLanguages read GetString2 write SetString2;
+    property PackageManagerInstallPackage : String index NR_PackageManagerInstallPackage read GetString2 write SetString2;
+    property PackageManagerDeletePackage : String index NR_PackageManagerDeletePackage read GetString2 write SetString2;
+    property PackageManagerListLicense : String index NR_PackageManagerListLicense read GetString2 write SetString2;
+
+    property RepositoriesEditor : String index NR_RepositoriesEditor read GetString2 write SetString2;
+    property RepositoriesEditorActivateSource : String index NR_RepositoriesEditorActivateSource read GetString2 write SetString2;
+    property RepositoriesEditorDeactivateSource : String index NR_RepositoriesEditorDeactivateSource read GetString2 write SetString2;
+    property RepositoriesEditorAddSource : String index NR_RepositoriesEditorAddSource read GetString2 write SetString2;
+    property RepositoriesEditorAddSourceWarning : String index NR_RepositoriesEditorAddSourceWarning read GetString2 write SetString2;
+    property RepositoriesEditorAddSourceCaption : String index NR_RepositoriesEditorAddSourceCaption read GetString2 write SetString2;
+    property RepositoriesEditorEditSource : String index NR_RepositoriesEditorEditSource read GetString2 write SetString2;
+    property RepositoriesEditorEditSourceCaption : String index NR_RepositoriesEditorEditSourceCaption read GetString2 write SetString2;
+    property RepositoriesEditorRemoveSource : String index NR_RepositoriesEditorRemoveSource read GetString2 write SetString2;
+    property RepositoriesEditorRemoveSourceConfirm : String index NR_RepositoriesEditorRemoveSourceConfirm read GetString2 write SetString2;
+    property RepositoriesEditorPopupActivateSource : String index NR_RepositoriesEditorPopupActivateSource read GetString2 write SetString2;
+    property RepositoriesEditorPopupDeactivateSource : String index NR_RepositoriesEditorPopupDeactivateSource read GetString2 write SetString2;
+    property RepositoriesEditorPopupAddSource : String index NR_RepositoriesEditorPopupAddSource read GetString2 write SetString2;
+    property RepositoriesEditorPopupEditSource : String index NR_RepositoriesEditorPopupEditSource read GetString2 write SetString2;
+    property RepositoriesEditorPopupRemoveSource : String index NR_RepositoriesEditorPopupRemoveSource read GetString2 write SetString2;
+    property RepositoriesEditorSourceOfficial : String index NR_RepositoriesEditorSourceOfficial read GetString2 write SetString2;
+    property RepositoriesEditorSourceUserDefined : String index NR_RepositoriesEditorSourceUserDefined read GetString2 write SetString2;
+    property RepositoriesEditorColumnURL : String index NR_RepositoriesEditorColumnURL read GetString2 write SetString2;
+    property RepositoriesEditorColumnDescription : String index NR_RepositoriesEditorColumnDescription read GetString2 write SetString2;
+    property RepositoriesEditorURL : String index NR_RepositoriesEditorURL read GetString2 write SetString2;
+
+    property PackageCreator : String index NR_PackageCreator read GetString2 write SetString2;
+    property PackageCreatorOutputFile : String index NR_PackageCreatorOutputFile read GetString2 write SetString2;
+    property PackageCreatorOutputTitle : String index NR_PackageCreatorOutputTitle read GetString2 write SetString2;
+    property PackageCreatorOutputFilter : String index NR_PackageCreatorOutputFilter read GetString2 write SetString2;
+    property PackageCreatorOutputFileInfo : String index NR_PackageCreatorOutputFileInfo read GetString2 write SetString2;
   end;
 
 Function RemoveUnderline(const S : String) : String;
@@ -3254,6 +3430,7 @@ Function GetEnglishLanguageName(const S : String) : String;
 Function ExtGenreList(const St : TStringList) : TStringList; {original list will be freed !}
 Function ExtLanguageList(const St : TStringList) : TStringList; {original list will be freed !}
 Function GetLanguageList : TStringList;
+Function LanguageFileNameFromName(const Name : String) : String;
 Function FindLanguageInList(const Lang : String; const List : TStrings) : Integer;
 Function FindEnglishInList(const List : TStrings) : Integer;
 Function ShortLanguageName(const LongLanguageName : String) : String;
@@ -3369,6 +3546,9 @@ begin
   AddStringRec(NR_GlobalHelpHint,'Global','Help.Hint','Opens the online help.');
   AddStringRec(NR_GlobalDefault,'Global','Default','Default');
   AddStringRec(NR_GlobalCustom,'Global','Custom','Custom');
+  AddStringRec(NR_GlobalBytes,'Global','Bytes','Bytes');
+  AddStringRec(NR_GlobalKBytes,'Global','KBytels','KB');
+  AddStringRec(NR_GlobalMBytes,'Global','MBytes','MB');
 
   AddStringRec(NR_LanguageNoVersion,'LanguageInfo','NoVersionGiven','The chosen language file has no version information. Perhaps not all needed strings are available in this file.');
   AddStringRec(NR_LanguageOutdated,'LanguageInfo','Outdated','The chosen language file was made for D-Fend Reloaded %s. You are using version %s, this means there will be some untranslated strings in the program if you use this langauge file.');
@@ -3479,6 +3659,7 @@ begin
   AddStringRec(NR_MessageNoCDDrive,'Messages','NoCDDrive','Your system has not got any CD drive which could be mounted as drive %s.');
   AddStringRec(NR_MessageLoadingDataBase,'Messages','LoadingDataBase','Loading data base');
   AddStringRec(NR_MessageUserInterpreterNeededToExecuteFile,'Messages','UserInterpreterNeededToExecuteFile','The user defined interpreter %s is needed to execute the file %s but is not reachable.');
+  AddStringRec(NR_MessageCouldNotActivateXML,'Messages','CouldNotActivateXML','Could not activte the XML document %s.');
 
   AddStringRec(NR_MenuFile,'Menu','File','&File');
   AddStringRec(NR_MenuFileImport,'Menu','File.Import','Import');
@@ -3535,6 +3716,9 @@ begin
   AddStringRec(NR_MenuProfileAdd,'Menu','Profile.Add','&Add...');
   AddStringRec(NR_MenuProfileAddScummVM,'Menu','Profile.AddScummVM','Add &ScummVM profile...');
   AddStringRec(NR_MenuProfileAddWindows,'Menu','Profile.AddWindowsGame','Add&Windows game profile...');
+  {AddStringRec(NR_MenuProfileAddOther,'Menu','Profile.AddOtherPlatform','Add game for other platform');
+  AddStringRec(NR_MenuProfileAddOtherSelectTitle,'Menu','Profile.AddOtherPlatform.SelectTitle','Select data file to run');
+  AddStringRec(NR_MenuProfileAddOtherSelectFilter,'Menu','Profile.AddOtherPlatform.SelectFilter','%s data files (%s)|%s|All files (*.*)|*.*');}
   AddStringRec(NR_MenuProfileAddFromTemplate,'Menu','Profile.AddFromTemplate','Add from &template');
   AddStringRec(NR_MenuProfileAddWithWizard,'Menu','Profile.AddWithWizard','&Add with wizard...');
   AddStringRec(NR_MenuProfileEdit,'Menu','Profile.Edit','&Edit...');
@@ -4025,6 +4209,9 @@ begin
   AddStringRec(NR_SetupFormProfileEditorAutoSetScreenshotFolderOnlyWizard,'SetupForm','ProfileEditorAutoSetScreenshotFolder.OnlyWizard','Only when added via the profile wizard');
   AddStringRec(NR_SetupFormProfileEditorAutoSetScreenshotFolderAlways,'SetupForm','ProfileEditorAutoSetScreenshotFolder.Always','When added via the profile wizard and via the modern profile editor');
   AddStringRec(NR_SetupFormProfileEditorRenameProfFilesOnRenamingProfile,'SetupForm','ProfileEditorRenameProfFilesOnRenamingProfile','Rename profile file when renaming the profile automatically');
+  AddStringRec(NR_SetupFormProfileEditorAutoAddMountings,'SetupForm','ProfileEditorAutoAddMountings','Automatically add mounting records if needed');
+  AddStringRec(NR_SetupFormProfileEditorAutoAddMountingsOnlyWizard,'SetupForm','ProfileEditorAutoAddMountings.OnlyWizard','Only when added via the profile wizard');
+  AddStringRec(NR_SetupFormProfileEditorAutoAddMountingsAlways,'SetupForm','ProfileEditorAutoAddMountings.Always','When added via the profile wizard and via the modern profile editor');
   AddStringRec(NR_SetupFormShowToolbar,'SetupForm','Toolbar.Visible','Show toolbar');
   AddStringRec(NR_SetupFormShowToolbarCaptions,'SetupForm','Toolbar.CaptionsVisible','Show toolbar captions');
   AddStringRec(NR_SetupFormShowToolbarButtons,'SetupForm','Toolbar.VisibleButtons','Visible buttons:');
@@ -4129,6 +4316,7 @@ begin
   AddStringRec(NR_SetupFormService3Confirmation,'SetupForm','Service3Confirmation','Do you really want to overwrite the existing "DOSBox DOS" profile ?');
   AddStringRec(NR_SetupFormService4,'SetupForm','Service4','Restore default templates');
   AddStringRec(NR_SetupFormService5,'SetupForm','Service5','Calculate checksums for all profiles');
+  AddStringRec(NR_SetupFormService6,'SetupForm','Service6','Clear package cache and lists');
   AddStringRec(NR_SetupFormUpdate0,'SetupForm','Update0','Only manual update checks (Menu: Help|Check for updates)');
   AddStringRec(NR_SetupFormUpdate1,'SetupForm','Update1','Check once a week');
   AddStringRec(NR_SetupFormUpdate2,'SetupForm','Update2','Check once every day');
@@ -4260,6 +4448,19 @@ begin
   AddStringRec(NR_SetupFormImageScalingAlgorithmLanczos3,'SetupForm','ImageScaling.Algorithm.Lanczos3','Lanczos3');
   AddStringRec(NR_SetupFormImageScalingAlgorithmMitchell,'SetupForm','ImageScaling.Algorithm.Mitchell','Mitchell');
 
+  {AddStringRec(NR_SetupFormMoreEmulators,'SetupForm','MoreEmulators','Other emulators');
+  AddStringRec(NR_SetupFormMoreEmulatorsLabel,'SetupForm','MoreEmulators.Label','Windows based emulator');
+  AddStringRec(NR_SetupFormMoreEmulatorsAdd,'SetupForm','MoreEmulators.AddHint','Add emulator record');
+  AddStringRec(NR_SetupFormMoreEmulatorsDelete,'SetupForm','MoreEmulators.DeleteHint','Delete selected emulator record');
+  AddStringRec(NR_SetupFormMoreEmulatorsDeleteWarning,'SetupForm','MoreEmulators.DeleteWarning','Do you really want to delete the record for the emulator %s ?');
+  AddStringRec(NR_SetupFormMoreEmulatorsName,'SetupForm','MoreEmulators.Name','Name of the emulator');
+  AddStringRec(NR_SetupFormMoreEmulatorsProgram,'SetupForm','MoreEmulators.Program','Program file of the emulator');
+  AddStringRec(NR_SetupFormMoreEmulatorsProgramTitle,'SetupForm','MoreEmulators.Program.Title','Select emulator program file');
+  AddStringRec(NR_SetupFormMoreEmulatorsProgramFilter,'SetupForm','MoreEmulators.Program.Filter','All executables (*.exe)|*.exe|All files (*.*)|*.*');
+  AddStringRec(NR_SetupFormMoreEmulatorsParameters,'SetupForm','MoreEmulators.Parameters','Parameters (%s=name of the data file to run)');
+  AddStringRec(NR_SetupFormMoreEmulatorsExtensions,'SetupForm','MoreEmulators.Extensions','Extensions of the data files (use ; as separator)');
+  AddStringRec(NR_SetupFormMoreEmulatorsInfo,'SetupForm','MoreEmulators.Info','On this page you can define more Windows based emulators for running games of different platforms. The profiles made for this emulators are stored as Windows profiles.');}
+
   AddStringRec(NR_HistoryForm,'HistoryForm','Caption','History');
   AddStringRec(NR_HistoryGame,'HistoryForm','Game','Game');
   AddStringRec(NR_HistoryDate,'HistoryForm','Date','Date');
@@ -4267,7 +4468,10 @@ begin
   AddStringRec(NR_HistoryStarts,'HistoryForm','Starts','Number of starts');
   AddStringRec(NR_HistoryFirst,'HistoryForm','First','First run');
   AddStringRec(NR_HistoryLast,'HistoryForm','Last','Last run');
+end;
 
+Procedure TLanguageSetup.SetupLanguageStrings2;
+begin
   AddStringRec(NR_TemplateForm,'TemplateForm','Caption','Templates');
   AddStringRec(NR_TemplateFormAutoSetupCaption,'TemplateForm','AutoSetupCaption','Auto setup templates');
   AddStringRec(NR_TemplateFormAsProfile,'TemplateForm','Use.AsProfile','for a new &Profile');
@@ -4308,10 +4512,7 @@ begin
   AddStringRec(NR_UninstallSelectFormActionDeleteProgramDir,'DeinstallSelectGame','Actions.DeleteProgramDir','Delete profile record and program folder');
   AddStringRec(NR_UninstallSelectFormActionDeleteAllData,'DeinstallSelectGame','Actions.DeleteAllData','Delete profile record and all program folders');
   AddStringRec(NR_UninstallSelectFormActionAsk,'DeinstallSelectGame','Actions.Ask','Select components to delete for each program');
-end;
 
-Procedure TLanguageSetup.SetupLanguageStrings2;
-begin
   AddStringRec(NR_ViewImageForm,'ViewImageForm','Caption','View screenshot');
   AddStringRec(NR_ViewImageFormSaveTitle,'ViewImageForm','SaveDialog.Title','Save screenshot');
   AddStringRec(NR_ViewImageFormSaveFilter,'ViewImageForm','SaveDialog.Filter','JPEG image (*.jpeg)|*.jpeg;*.jpg|GIF image (*.gif)|*.gif|Windows BMP image (*.bmp)|*.bmp|Portable Network Graphics (*.png)|*.png|All files (*.*)|*.*');
@@ -4513,6 +4714,7 @@ begin
   AddStringRec(NR_ChangeProfilesMountingChangeSettings,'ChangeProfilesForm','MountingChangeSettings','Change mounting settings');
   AddStringRec(NR_ChangeProfilesMountingChangeSettingsGlobal,'ChangeProfilesForm','MountingChangeSettings.Global','Mount games base folder as drive C: (default)');
   AddStringRec(NR_ChangeProfilesMountingChangeSettingsLocal,'ChangeProfilesForm','MountingChangeSettings.Local','Only mount the folder where the game is stored as drive C:');
+  AddStringRec(NR_ChangeProfilesSectionInfo,'ChangeProfilesForm','SectionInfo','%d of %d settings selected for changing');
 
   AddStringRec(NR_GameName,'GameSetup','Name','Name');
   AddStringRec(NR_GameSetup,'GameSetup','Setup','Setup');
@@ -4941,12 +5143,164 @@ begin
   AddStringRec(NR_SelectAutoSetupTemplate,'SelectAutoSetupTemplate','Caption','Select auto setup template to use');
   AddStringRec(NR_SelectAutoSetupTemplateImportZip,'SelectAutoSetupTemplate','WhileImportingZip','There are multiple matching auto setup templates for the game. Please select which template should be used when adding this game.');
   AddStringRec(NR_SelectAutoSetupTemplateScanFolder,'SelectAutoSetupTemplate','WhileScanningFolder','There are multiple matching auto setup templates for the game located in %s. Please select which template should be used when adding this game.');
+
+  {
+  AddStringRec(NR_PackageManager,'PackageManager','Caption','Packages manager');
+  AddStringRec(NR_PackageManagerMenuUpdateLists,'PackageManager','Menu.UpdateLists','Update lists');
+  AddStringRec(NR_PackageManagerMenuUpdateListsLocal,'PackageManager','Menu.UpdateLists.Local','Please insert the disc containing %s into any drive connected to the computer and press "Ok" or press "Cancel" for skiping the update of this file.');
+  AddStringRec(NR_PackageManagerMenuUpdateListsHint,'PackageManager','Menu.UpdateLists.Hint','Updates the packages list from internet.');
+  AddStringRec(NR_PackageManagerMenuRepositoriesList,'PackageManager','Menu.RepositoriesList','Repositories list');
+  AddStringRec(NR_PackageManagerMenuRepositoriesListHint,'PackageManager','Menu.RepositoriesList.Hint','Edit the list of download repositories');
+  AddStringRec(NR_PackageManagerPageGames,'PackageManager','Page.Games','Games');
+  AddStringRec(NR_PackageManagerPageAutoSetups,'PackageManager','Page.AutoSetups','Auto setup templates');
+  AddStringRec(NR_PackageManagerPageIcons,'PackageManager','Page.Icons','Icons');
+  AddStringRec(NR_PackageManagerPageIconSets,'PackageManager','Page.IconSets','Icon sets');
+  AddStringRec(NR_PackageManagerPageLanguages,'PackageManager','Page.Languages','Language files');
+  AddStringRec(NR_PackageManagerPageExePackages,'PackageManager','Page.ExePackages','Multiple games packages');
+  AddStringRec(NR_PackageManagerPageExePackagesSelect,'PackageManager','Page.ExePackagesSelect','Selct games package');
+  AddStringRec(NR_PackageManagerAllListsEmpty,'PackageManager','AllListsEmpty','At the moment all lists are empty. You need to click "Update lists" to download the lists of available games, templates and language files.');
+  AddStringRec(NR_PackageManagerDownloading,'PackageManager','Download','Downloading');
+  AddStringRec(NR_PackageManagerDownloadSize,'PackageManager','Download.Size','Download size');
+  AddStringRec(NR_PackageManagerPackageAlreadyDownloaded,'PackageManager','Download.PackageAlreadyDownloaded','(This package has already been downloaded and is ready for installation.)');
+  AddStringRec(NR_PackageManagerOldPackageAlreadyDownloaded,'PackageManager','Download.OldPackageAlreadyDownloaded','(An older version of this package has already been downloaded. If you click on "Download and install" the newer version will be downloaded.)');
+  AddStringRec(NR_PackageManagerPackageOnlyInCache,'PackageManager','Download.PackageOnlyInCache','(This package is not available for download any more but has already been cached and is ready for installation.)');
+  AddStringRec(NR_PackageManagerDownloadFailed,'PackageManager','Download.Failed','The download of %s failed.');
+  AddStringRec(NR_PackageManagerDownloadFailedUseOldVersion,'PackageManager','Download.FailedUseOldVersion','The download failed. Do you want to install the old cached version of this package?');
+  AddStringRec(NR_PackageManagerLanguageDownloaded,'PackageManager','Download.Language','Language installation completed. You can activate the new language(s) from the "Language" page of the program options dialog.');
+  AddStringRec(NR_PackageManagerIconSetDownloaded,'PackageManager','Download.IconSet','Icon set installation complete. You can active the new icon set(s) from the "User interface" page of the program options dialog.');
+  AddStringRec(NR_PackageManagerScanning,'PackageManager','Scanning','Scanning directory');
+  AddStringRec(NR_PackageManagerFilterList,'PackageManager','FilterList','Filter list');
+  AddStringRec(NR_PackageManagerNoFilter,'PackageManager','FilterList.NoFilter','No filter');
+  AddStringRec(NR_PackageManagerInstallGames,'PackageManager','Install.Games','Download and install selected games');
+  AddStringRec(NR_PackageManagerInstallAutoSetups,'PackageManager','Install.AutoSetups','Download and install selected templates');
+  AddStringRec(NR_PackageManagerInstallIcons,'PackageManager','Install.Icons','Download and install selected icons');
+  AddStringRec(NR_PackageManagerInstallIconSets,'PackageManager','Install.IconSets','Download and install selected icon sets');
+  AddStringRec(NR_PackageManagerInstallLanguages,'PackageManager','Instal.Languages','Download and install selected languages');
+  AddStringRec(NR_PackageManagerInstallPackage,'PackageManager','Install.Packages','Download and install');
+  AddStringRec(NR_PackageManagerDeletePackage,'PackageManager','Install.Packages.Delete','Delete cached file');
+  AddStringRec(NR_PackageManagerListLicense,'PackageManager','License','License');
+
+  AddStringRec(NR_RepositoriesEditor,'RepositoriesEditor','Caption','User repositories editor');
+  AddStringRec(NR_RepositoriesEditorActivateSource,'RepositoriesEditor','ActivateSource','Activate source');
+  AddStringRec(NR_RepositoriesEditorDeactivateSource,'RepositoriesEditor','DeactivateSource','Deactivate source');
+  AddStringRec(NR_RepositoriesEditorAddSource,'RepositoriesEditor','AddSource','Add source');
+  AddStringRec(NR_RepositoriesEditorAddSourceWarning,'RepositoriesEditor','AddSource.Warning','Downloading data from untrusted sources might damage your system, so please only add download sources you really trust. Additionally please check if the files offered for download on the new source are legal to download.');
+  AddStringRec(NR_RepositoriesEditorAddSourceCaption,'RepositoriesEditor','AddSource.Caption','Add repository');
+  AddStringRec(NR_RepositoriesEditorEditSource,'RepositoriesEditor','EditSource','Edit source');
+  AddStringRec(NR_RepositoriesEditorEditSourceCaption,'RepositoriesEditor','EditSource.Caption','Edit repository');
+  AddStringRec(NR_RepositoriesEditorRemoveSource,'RepositoriesEditor','RemoveSource','Remove source');
+  AddStringRec(NR_RepositoriesEditorRemoveSourceConfirm,'RepositoriesEditor','RemoveSource.Confirm','Do you really want to remove the selected package source ?');
+  AddStringRec(NR_RepositoriesEditorPopupActivateSource,'RepositoriesEditor','Popup.ActivateSource','Activate source');
+  AddStringRec(NR_RepositoriesEditorPopupDeactivateSource,'RepositoriesEditor','Popup.DeactivateSource','Deactivate source');
+  AddStringRec(NR_RepositoriesEditorPopupAddSource,'RepositoriesEditor','Popup.AddSource','Add source');
+  AddStringRec(NR_RepositoriesEditorPopupEditSource,'RepositoriesEditor','Popup.EditSource','Edit source');
+  AddStringRec(NR_RepositoriesEditorPopupRemoveSource,'RepositoriesEditor','Popup.RemoveSource','Remove source');
+  AddStringRec(NR_RepositoriesEditorSourceOfficial,'RepositoriesEditor','Repositories.Official','Official repositories');
+  AddStringRec(NR_RepositoriesEditorSourceUserDefined,'RepositoriesEditor','Repositories.User','User-defined repositories');
+  AddStringRec(NR_RepositoriesEditorColumnURL,'RepositoriesEditor','Column.URL','Package list URL');
+  AddStringRec(NR_RepositoriesEditorColumnDescription,'RepositoriesEditor','Column.Description','Description');
+  AddStringRec(NR_RepositoriesEditorURL,'RepositoriesEditor','URL','URL or local path');
+
+  AddStringRec(NR_PackageCreator,'PackageCreator','Caption','Package list creator';
+  AddStringRec(NR_PackageCreatorOutputFile,'PackageCreator','OutputFile','Filename of the package list file');
+  AddStringRec(NR_PackageCreatorOutputTitle,'PackageCreator','OutputTitle','File name for new package list file');
+  AddStringRec(NR_PackageCreatorOutputFilter,'PackageCreator','OutputFilter','xml files (*.xml)|*.xml|All files (*.*)|*.*');
+  AddStringRec(NR_PackageCreatorOutputFileInfo,'PackageCreator','OutputFileInfo','All additionally needed files (like game package archive files) will be created in th directory of the package list file.');
+  }
 end;
 
 destructor TLanguageSetup.Destroy;
 begin
   StoreAllValues;
   inherited Destroy;
+end;
+
+Function TLanguageSetup.GetString2(Index : Integer) : String;
+begin
+  //... Will be removed in 0.9
+  result:='';
+  Case Index of
+    NR_MenuProfileAddOther : result:='Add game for other platform';
+    NR_MenuProfileAddOtherSelectTitle : result:='Select data file to run';
+    NR_MenuProfileAddOtherSelectFilter : result:='%s data files (%s)|%s|All files (*.*)|*.*';
+
+    NR_SetupFormMoreEmulators : result:='Other emulators';
+    NR_SetupFormMoreEmulatorsLabel : result:='Windows based emulator';
+    NR_SetupFormMoreEmulatorsAdd : result:='Add emulator record';
+    NR_SetupFormMoreEmulatorsDelete : result:='Delete selected emulator record';
+    NR_SetupFormMoreEmulatorsDeleteWarning : result:='Do you really want to delete the record for the emulator %s ?';
+    NR_SetupFormMoreEmulatorsName : result:='Name of the emulator';
+    NR_SetupFormMoreEmulatorsProgram : result:='Program file of the emulator';
+    NR_SetupFormMoreEmulatorsProgramTitle : result:='Select emulator program file';
+    NR_SetupFormMoreEmulatorsProgramFilter : result:='All executables (*.exe)|*.exe|All files (*.*)|*.*';
+    NR_SetupFormMoreEmulatorsParameters : result:='Parameters (%s=name of the data file to run)';
+    NR_SetupFormMoreEmulatorsExtensions : result:='Extensions of the data files (use ; as separator)';
+    NR_SetupFormMoreEmulatorsInfo : result:='On this page you can define more Windows based emulators for running games of different platforms. The profiles made for this emulators are stored as Windows profiles.';
+
+    NR_PackageManager : result:='Packages manager';
+    NR_PackageManagerMenuUpdateLists : result:='Update lists';
+    NR_PackageManagerMenuUpdateListsLocal : result:='Please insert the disc containing %s into any drive connected to the computer and press "Ok" or press "Cancel" for skiping the update of this file.';
+    NR_PackageManagerMenuUpdateListsHint : result:='Updates the packages list from internet.';
+    NR_PackageManagerMenuRepositoriesList : result:='Repositories list';
+    NR_PackageManagerMenuRepositoriesListHint : result:='Edit the list of download repositories';
+    NR_PackageManagerPageGames : result:='Games';
+    NR_PackageManagerPageAutoSetups : result:='Auto setup templates';
+    NR_PackageManagerPageIcons : result:='Icons';
+    NR_PackageManagerPageIconSets : result:='Icon sets';
+    NR_PackageManagerPageLanguages : result:='Language files';
+    NR_PackageManagerPageExePackages : result:='Multiple games packages';
+    NR_PackageManagerPageExePackagesSelect : result:='Selct games package';
+    NR_PackageManagerAllListsEmpty : result:='At the moment all lists are empty. You need to click "Update lists" to download the lists of available games, templates and language files.';
+    NR_PackageManagerDownloading : result:='Downloading';
+    NR_PackageManagerDownloadSize : result:='Download size';
+    NR_PackageManagerPackageAlreadyDownloaded : result:='(This package has already been downloaded and is ready for installation.)';
+    NR_PackageManagerOldPackageAlreadyDownloaded : result:='(An older version of this package has already been downloaded. If you click on "Download and install" the newer version will be downloaded.)';
+    NR_PackageManagerPackageOnlyInCache : result:='(This package is not available for download any more but has already been cached and is ready for installation.)';
+    NR_PackageManagerDownloadFailed : result:='The download of %s failed.';
+    NR_PackageManagerDownloadFailedUseOldVersion : result:='The download failed. Do you want to install the old cached version of this package?';
+    NR_PackageManagerScanning : result:='Scanning directory';
+    NR_PackageManagerLanguageDownloaded : result:='Language installation completed. You can activate the new language(s) from the "Language" page of the program options dialog.';
+    NR_PackageManagerIconSetDownloaded : result:='Icon set installation complete. You can active the new icon set(s) from the "User interface" page of the program options dialog.';
+    NR_PackageManagerFilterList : result:='Filter list';
+    NR_PackageManagerNoFilter : result:='No filter';
+    NR_PackageManagerInstallGames : result:='Download and install selected games';
+    NR_PackageManagerInstallAutoSetups : result:='Download and install selected templates';
+    NR_PackageManagerInstallIcons : result:='Download and install selected icons';
+    NR_PackageManagerInstallIconSets : result:='Download and install selected icon sets';
+    NR_PackageManagerInstallLanguages : result:='Download and install selected languages';
+    NR_PackageManagerInstallPackage : result:='Download and install';
+    NR_PackageManagerDeletePackage : result:='Delete cached file';
+    NR_PackageManagerListLicense : result:='License';
+    NR_RepositoriesEditor : result:='User repositories editor';
+    NR_RepositoriesEditorActivateSource : result:='Activate source';
+    NR_RepositoriesEditorDeactivateSource : result:='Deactivate source';
+    NR_RepositoriesEditorAddSource : result:='Add source';
+    NR_RepositoriesEditorAddSourceWarning : result:='Downloading data from untrusted sources might damage your system, so please only add download sources you really trust. Additionally please check if the files offered for download on the new source are legal to download.';
+    NR_RepositoriesEditorAddSourceCaption : result:='Add repository';
+    NR_RepositoriesEditorEditSource : result:='Edit source';
+    NR_RepositoriesEditorEditSourceCaption : result:='Edit repository';
+    NR_RepositoriesEditorRemoveSource : result:='Remove source';
+    NR_RepositoriesEditorRemoveSourceConfirm : result:='Do you really want to remove the selected package source ?';
+    NR_RepositoriesEditorPopupActivateSource : result:='Activate source';
+    NR_RepositoriesEditorPopupDeactivateSource : result:='Deactivate source';
+    NR_RepositoriesEditorPopupAddSource : result:='Add source';
+    NR_RepositoriesEditorPopupEditSource : result:='Edit source';
+    NR_RepositoriesEditorPopupRemoveSource : result:='Remove source';
+    NR_RepositoriesEditorSourceOfficial : result:='Official repositories';
+    NR_RepositoriesEditorSourceUserDefined : result:='User-defined repositories';
+    NR_RepositoriesEditorColumnURL : result:='Package list URL';
+    NR_RepositoriesEditorColumnDescription : result:='Description';
+    NR_RepositoriesEditorURL : result:='URL or local path';
+    NR_PackageCreator : result:='Package list creator';
+    NR_PackageCreatorOutputFile : result:='Filename of the package list file';
+    NR_PackageCreatorOutputTitle : result:='File name for new package list file';
+    NR_PackageCreatorOutputFilter : result:='xml files (*.xml)|*.xml|All files (*.*)|*.*';
+    NR_PackageCreatorOutputFileInfo : result:='All additionally needed files (like game package archive files) will be created in th directory of the package list file.';
+  End;
+end;
+
+Procedure TLanguageSetup.SetString2(Index : Integer; S : String);
+begin
 end;
 
 Function RemoveUnderline(const S : String) : String;
@@ -5214,7 +5568,7 @@ begin
   end;
 end;
 
-Procedure AddLanguages(const St : TStringList; const MaxVersionList : TList; const Dir : String);
+Procedure AddLanguages(const St, FileNames : TStringList; const MaxVersionList : TList; const Dir : String);
 Var I,NSIS,MaxVersion,Nr : Integer;
     Rec : TSearchRec;
     S : String;
@@ -5227,10 +5581,12 @@ begin
         Nr:=St.IndexOf(S);
         If Nr<0 then begin
           St.AddObject(S,TObject(NSIS));
+          If FileNames<>nil then FileNames.Add(Dir+LanguageSubDir+'\'+Rec.Name);
           MaxVersionList.Add(Pointer(MaxVersion));
         end else begin
           If MaxVersion>Integer(MaxVersionList[Nr]) then begin
             St[Nr]:=S; St.Objects[Nr]:=TObject(NSIS);
+            If FileNames<>nil then FileNames[Nr]:=Dir+LanguageSubDir+'\'+Rec.Name;
             MaxVersionList[Nr]:=Pointer(MaxVersion);
           end;
         end;
@@ -5248,10 +5604,33 @@ begin
   result:=TStringList.Create;
   MaxVersion:=TList.Create;
   try
-    AddLanguages(result,MaxVersion,PrgDataDir);
-    If PrgDataDir<>PrgDir then AddLanguages(result,MaxVersion,PrgDir);
+    AddLanguages(result,nil,MaxVersion,PrgDataDir);
+    If PrgDataDir<>PrgDir then AddLanguages(result,nil,MaxVersion,PrgDir);
   finally
     MaxVersion.Free;
+  end;
+end;
+
+Function LanguageFileNameFromName(const Name : String) : String;
+Var MaxVersion : TList;
+    Names, FileNames : TStringList;
+    I : Integer;
+begin
+  result:='';
+
+  Names:=TStringList.Create;
+  FileNames:=TStringList.Create;
+  MaxVersion:=TList.Create;
+  try
+    AddLanguages(Names,FileNames,MaxVersion,PrgDataDir);
+    If PrgDataDir<>PrgDir then AddLanguages(Names,FileNames,MaxVersion,PrgDir);
+
+    I:=Names.IndexOf(Name);
+    If I>=0 then result:=FileNames[I];
+  finally
+    MaxVersion.Free;
+    Names.Free;
+    FileNames.Free;
   end;
 end;
 

@@ -108,7 +108,7 @@ end;
 
 var UserIconLoader : TUserIconLoader;
 
-Procedure ListOfIconSets(const ShortName, LongName, Author : TStringList);
+Procedure ListOfIconSets(const ShortName, LongName, Author : TStringList); {LongName and Author can be nil}
 Function GetExampleImage(const ShortName : String) : TBitmap;
 
 implementation
@@ -124,8 +124,8 @@ begin
   Ini:=TIniFile.Create(Dir+IconSetsFolder+'\'+Sub+'\'+IconsConfFile);
   try
     ShortName.Add(Sub);
-    LongName.Add(Ini.ReadString('Information','Name',Sub));
-    Author.Add(Ini.ReadString('Information','Author',''));
+    If LongName<>nil then LongName.Add(Ini.ReadString('Information','Name',Sub));
+    If Author<>nil then Author.Add(Ini.ReadString('Information','Author',''));
   finally
     Ini.Free;
   end;
@@ -220,20 +220,22 @@ end;
 
 procedure TUserIconLoader.RegisterImageList(const ImageList: TImageList; const Name: String; const AddImages : Boolean);
 Var I : Integer;
+    PILRec : ^TImageListRec;
 begin
   I:=length(ImageListList);
   SetLength(ImageListList,I+1);
-  ImageListList[I].ImageList:=ImageList;
-  ImageListList[I].Name:=Name;
-  ImageListList[I].AddImages:=AddImages;
-  ImageListList[I].OriginalImageList:=TImageList.Create(nil);
-  ImageListList[I].OriginalImageList.AddImages(ImageList);
-  ImageListList[I].NeedReinit:=False;
-  ImageListList[I].ImageLoaded:=TList.Create;
+  PILRec:=@ImageListList[I];
+  PILRec^.ImageList:=ImageList;
+  PILRec^.Name:=Name;
+  PILRec^.AddImages:=AddImages;
+  PILRec^.OriginalImageList:=TImageList.Create(nil);
+  PILRec^.OriginalImageList.AddImages(ImageList);
+  PILRec^.NeedReinit:=False;
+  PILRec^.ImageLoaded:=TList.Create;
 
   If FIconsLoaded then begin
-    DirectLoad(ImageListList[I].ImageList,ImageListList[I].Name,ImageListList[I].AddImages);
-    ImageListList[I].NeedReinit:=True;
+    DirectLoad(PILRec^.ImageList,PILRec^.Name,PILRec^.AddImages);
+    PILRec^.NeedReinit:=True;
   end;
 end;
 
@@ -258,11 +260,19 @@ end;
 
 procedure TUserIconLoader.DirectLoad(const ImageList: TImageList; const Name: String; const AddImages : Boolean; const ImageLoaded : TList);
 Var Ini : TIniFile;
+    IL : TImageList;
 begin
   If FIconSetPath<>'' then begin
     Ini:=TIniFile.Create(FIconSetPath+IconsConfFile);
     try
-      LoadUserIconsForList(ImageList,Name,AddImages,ImageLoaded,Ini,FIconSetPath);
+      IL:=TImageList.Create(nil);
+      try
+        IL.Assign(ImageList);
+        LoadUserIconsForList(IL,Name,AddImages,ImageLoaded,Ini,FIconSetPath);
+        ImageList.Assign(IL);
+      finally
+        IL.Free;
+      end;
     finally
       Ini.Free;
     end;
@@ -348,19 +358,27 @@ end;
 Procedure TUserIconLoader.LoadUserIconsForList(const ImageList : TImageList; const IniSectionName : String; const AddImages : Boolean; const ImageLoaded : TList; const Ini : TIniFile; const RelBase : String);
 Var I,J : Integer;
     St : TStringList;
+    IL : TImageList;
 begin
   St:=TStringList.Create;
   try
-    Ini.ReadSection(IniSectionName,St);
-    For I:=0 to St.Count-1 do begin
-      if not TryStrToInt(St[I],J) then continue;
-      If J<1 then continue;
-      If J>ImageList.Count then begin
-        If not AddImages then continue;
-        AddEmptyImages(ImageList,ImageLoaded,J-1);
+    IL:=TImageList.Create(nil);
+    try
+      IL.Assign(ImageList);
+      Ini.ReadSection(IniSectionName,St);
+      For I:=0 to St.Count-1 do begin
+        if not TryStrToInt(St[I],J) then continue;
+        If J<1 then continue;
+        If J>IL.Count then begin
+          If not AddImages then continue;
+          AddEmptyImages(IL,ImageLoaded,J-1);
+        end;
+        LoadIconToImageList(IL,J-1,MakeExtAbsPath(Ini.ReadString(IniSectionName,IntToStr(J),''),RelBase));
+        If AddImages then ImageLoaded[J-1]:=Pointer(1);
       end;
-      LoadIconToImageList(ImageList,J-1,MakeExtAbsPath(Ini.ReadString(IniSectionName,IntToStr(J),''),RelBase));
-      If AddImages then ImageLoaded[J-1]:=Pointer(1);
+      ImageList.Assign(IL);
+    finally
+      IL.Free;
     end;
   finally
     St.Free;
@@ -385,7 +403,7 @@ begin
 
   For I:=0 to Length(ImageListList)-1 do If ImageListList[I].NeedReinit then begin
     ImageListList[I].ImageList.Clear;
-    If not ImageListList[I].AddImages then ImageListList[I].ImageList.AddImages(ImageListList[I].OriginalImageList);
+    If not ImageListList[I].AddImages then ImageListList[I].ImageList.Assign(ImageListList[I].OriginalImageList);
   end;
 
   If FIconSetPath<>'' then begin

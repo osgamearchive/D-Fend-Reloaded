@@ -182,8 +182,8 @@ begin
 
   If PrgSetup.ScanFolderUseFileName then PopupNameFilename.Checked:=True else PopupNameFoldername.Checked:=True;
 
-  AutoSetupDB:=TGameDB.Create(PrgDataDir+AutoSetupSubDir);
-  TemplateDB:=TGameDB.Create(PrgDataDir+TemplateSubDir);
+  AutoSetupDB:=TGameDB.Create(PrgDataDir+AutoSetupSubDir,False);
+  TemplateDB:=TGameDB.Create(PrgDataDir+TemplateSubDir,False);
 
   NewGames:=TList.Create;
 
@@ -614,6 +614,7 @@ begin
   end;
 
   If Trim(NewGame.ExeFile)<>'' then S:=ExtractFilePath(NewGame.ExeFile) else S:='';
+  If ExtUpperCase(Copy(Trim(S),1,7))='DOSBOX:' then S:='';
   St:=BuildGameDirMountData(G,S,'');
   try
     For I:=0 to 9 do G.Mount[I]:='';

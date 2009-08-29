@@ -392,7 +392,7 @@ end;
 
 Procedure FileAndFoldersFromDrives(const Game : TGame; var Files, Folders : TStringList);
 Var I,J : Integer;
-    S,T : String;
+    S,T,U : String;
     St,St2 : TStringList;
 begin
   Files:=TStringList.Create;
@@ -416,8 +416,17 @@ begin
       If (S='CDROMIMAGE') or (S='FLOPPYIMAGE') or (S='IMAGE') then begin
         {Image files}
         For J:=0 to St2.Count-1 do begin
-          T:=MakeAbsPath(St2[J],PrgSetup.BaseDir);
-          If FileExists(T) and (not FileInNormalList(Game,T)) then Files.Add(T);
+          U:=St2[J]; If (U<>'') and (U[1]='\') then U:=Copy(U,2,MaxInt);
+          T:=MakeAbsPath(U,PrgSetup.BaseDir);
+          If FileExists(T) and (not FileInNormalList(Game,T)) then begin
+            Files.Add(T);
+            If ExtUpperCase(ExtractFileExt(T))='.CUE' then begin
+              U:=ChangeFileExt(T,'.bin'); If FileExists(U) and (not FileInNormalList(Game,U)) then Files.Add(U);
+            end;
+            If ExtUpperCase(ExtractFileExt(T))='.BIN' then begin
+              U:=ChangeFileExt(T,'.cue'); If FileExists(U) and (not FileInNormalList(Game,U)) then Files.Add(U);
+            end;
+          end;
         end;
       end;
 

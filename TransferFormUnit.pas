@@ -337,11 +337,11 @@ begin
         If Copy(S,1,2)='.\' then NewSetup.WaveEncOgg:=MakeAbsPath(S,DestPrgDir);
         S:=MakeRelPath(PrgSetup.WaveEncMp3,PrgSetup.BaseDir);
         If Copy(S,1,2)='.\' then NewSetup.WaveEncMp3:=MakeAbsPath(S,DestPrgDir);
-        NewSetup.UserInterpretersPrograms.Clear;
-        For I:=0 to PrgSetup.UserInterpretersPrograms.Count-1 do begin
-          S:=MakeRelPath(PrgSetup.UserInterpretersPrograms[I],PrgSetup.BaseDir);
-          If Copy(S,1,2)<>'.\' then S:=PrgSetup.UserInterpretersPrograms[I];
-          NewSetup.UserInterpretersPrograms.Add(S);
+        NewSetup.DOSBoxBasedUserInterpretersPrograms.Clear;
+        For I:=0 to PrgSetup.DOSBoxBasedUserInterpretersPrograms.Count-1 do begin
+          S:=MakeRelPath(PrgSetup.DOSBoxBasedUserInterpretersPrograms[I],PrgSetup.BaseDir);
+          If Copy(S,1,2)<>'.\' then S:=PrgSetup.DOSBoxBasedUserInterpretersPrograms[I];
+          NewSetup.DOSBoxBasedUserInterpretersPrograms.Add(S);
         end;
 
         OperationMode:=omPortable;
