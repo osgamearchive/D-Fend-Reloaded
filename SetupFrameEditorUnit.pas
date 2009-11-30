@@ -24,7 +24,7 @@ type
   public
     { Public-Deklarationen }
     Function GetName : String;
-    Procedure InitGUIAndLoadSetup(InitData : TInitData);
+    Procedure InitGUIAndLoadSetup(var InitData : TInitData);
     Procedure BeforeChangeLanguage;
     Procedure LoadLanguage;
     Procedure DOSBoxDirChanged;
@@ -48,7 +48,7 @@ begin
   result:=LanguageSetup.SetupFormTextEditor;
 end;
 
-procedure TSetupFrameEditor.InitGUIAndLoadSetup(InitData: TInitData);
+procedure TSetupFrameEditor.InitGUIAndLoadSetup(var InitData: TInitData);
 Var S : String;
 begin
   NoFlicker(RadioButtonDefault);

@@ -30,6 +30,7 @@ type
     { Private-Deklarationen }
     Mounting : TStringList;
     ProfileExe, ProfileSetup, ProfileName : PString;
+    FGetFrame : TGetFrameFunction;
     Procedure LoadMountingList;
     function NextFreeDriveLetter: Char;
     Function UsedDriveLetters(const AllowedNr : Integer = -1) : String;
@@ -45,7 +46,8 @@ type
 implementation
 
 uses Math, VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgSetupUnit,
-     ProfileMountEditorFormUnit, HelpConsts, GameDBToolsUnit, IconLoaderUnit;
+     ProfileMountEditorFormUnit, HelpConsts, GameDBToolsUnit, IconLoaderUnit,
+     ModernProfileEditorBaseFrameUnit, PrgConsts;
 
 {$R *.dfm}
 
@@ -86,6 +88,8 @@ begin
   ProfileExe:=InitData.CurrentProfileExe;
   ProfileSetup:=InitData.CurrentProfileSetup;
   ProfileName:=InitData.CurrentProfileName;
+
+  FGetFrame:=InitData.GetFrame;
 
   HelpContext:=ID_ProfileEditDrives;
 end;
@@ -178,14 +182,20 @@ begin
 end;
 
 procedure TModernProfileEditorDrivesFrame.ButtonWork(Sender: TObject);
-Var S : String;
+Var S,InitialDir : String;
     I : Integer;
     St : TStringList;
+    F : TModernProfileEditorBaseFrame;
 begin
+  F:=FGetFrame(TModernProfileEditorBaseFrame) as TModernProfileEditorBaseFrame;
+  If F.GameRelPathCheckBox.Checked or (Trim(ProfileExe^)='')
+    then InitialDir:=MakeAbsPath(PrgSetup.GameDir,PrgSetup.BaseDir)
+    else InitialDir:=IncludeTrailingPathDelimiter(ExtractFilePath(ProfileExe^));
+
   Case (Sender as TComponent).Tag of
     0 : If Mounting.Count<10 then begin
           S:='';
-          if not ShowProfileMountEditorDialog(self,S,UsedDriveLetters,IncludeTrailingPathDelimiter(ExtractFilePath(ProfileExe^)),ProfileName^,NextFreeDriveLetter) then exit;
+          if not ShowProfileMountEditorDialog(self,S,UsedDriveLetters,InitialDir,ProfileName^,F,NextFreeDriveLetter) then exit;
           Mounting.Add(S);
           LoadMountingList;
           MountingListView.ItemIndex:=MountingListView.Items.Count-1;
@@ -194,7 +204,7 @@ begin
           I:=MountingListView.ItemIndex;
           If I<0 then exit;
           S:=Mounting[I];
-          if not ShowProfileMountEditorDialog(self,S,UsedDriveLetters(I),IncludeTrailingPathDelimiter(ExtractFilePath(ProfileExe^)),ProfileName^) then exit;
+          if not ShowProfileMountEditorDialog(self,S,UsedDriveLetters(I),InitialDir,ProfileName^,F) then exit;
           Mounting[I]:=S;
           LoadMountingList;
           MountingListView.ItemIndex:=I;
@@ -226,12 +236,12 @@ begin
           {Add game dir if needed}
           If (Mounting.Count<10) and (Trim(ProfileExe^)<>'') and (not CanReachFile(ProfileExe^)) and (ExtUpperCase(Copy(ProfileExe^,1,7))<>'DOSBOX:') then begin
             S:=IncludeTrailingPathDelimiter(MakeRelPath(ExtractFilePath(ProfileExe^),PrgSetup.BaseDir));
-            Mounting.Add(S+';DRIVE;'+NextFreeDriveLetter+';False;;105');
+            Mounting.Add(S+';DRIVE;'+NextFreeDriveLetter+';False;;'+IntToStr(DefaultFreeHDSize));
           end;
           {Add setup dir if needed}
           If (Mounting.Count<10) and (Trim(ProfileSetup^)<>'') and (not CanReachFile(ProfileSetup^)) and (ExtUpperCase(Copy(ProfileSetup^,1,7))<>'DOSBOX:') then begin
             S:=IncludeTrailingPathDelimiter(MakeRelPath(ExtractFilePath(ProfileSetup^),PrgSetup.BaseDir));
-            Mounting.Add(S+';DRIVE;'+NextFreeDriveLetter+';False;;105');
+            Mounting.Add(S+';DRIVE;'+NextFreeDriveLetter+';False;;'+IntToStr(DefaultFreeHDSize));
           end;
           LoadMountingList;
         end;

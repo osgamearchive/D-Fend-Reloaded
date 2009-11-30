@@ -114,6 +114,7 @@ end;
 
 procedure TModernProfileEditorDirectoryFrame.SetGame(const Game: TGame; const LoadFromTemplate: Boolean);
 Var St : TStringList;
+    I : Integer;
 begin
   If Trim(Game.CaptureFolder)<>''
     then ScreenshotFolderEdit.Text:=Game.CaptureFolder
@@ -124,10 +125,22 @@ begin
 
   DataFolderEdit.Text:=Game.DataDir;
 
-  St:=ValueToList(Game.ExtraFiles); try ExtraFilesListBox.Items.AddStrings(St); finally St.Free; end;
+  St:=ValueToList(Game.ExtraFiles);
+  try
+    I:=0; While I<St.Count do If Trim(St[I])='' then St.Delete(I) else inc(I);
+    ExtraFilesListBox.Items.AddStrings(St);
+  finally
+    St.Free;
+  end;
   If ExtraFilesListBox.Items.Count>0 then ExtraFilesListBox.ItemIndex:=0;
   ExtraFilesListBoxClick(nil);
-  St:=ValueToList(Game.ExtraDirs); try ExtraDirsListBox.Items.AddStrings(St); finally St.Free; end;
+  St:=ValueToList(Game.ExtraDirs);
+  try
+    I:=0; While I<St.Count do If Trim(St[I])='' then St.Delete(I) else inc(I);
+    ExtraDirsListBox.Items.AddStrings(St);
+  finally
+    St.Free;
+  end;
   If ExtraDirsListBox.Items.Count>0 then ExtraDirsListBox.ItemIndex:=0;
   ExtraDirsListBoxClick(nil);
 
@@ -171,6 +184,7 @@ begin
 end;
 
 procedure TModernProfileEditorDirectoryFrame.GetGame(const Game: TGame);
+Var I : Integer;
 begin
   If Timer.Enabled then begin
     Timer.Enabled:=False;
@@ -179,7 +193,9 @@ begin
 
   Game.CaptureFolder:=MakeRelPath(ScreenshotFolderEdit.Text,PrgSetup.BaseDir);
   Game.DataDir:=MakeRelPath(DataFolderEdit.Text,PrgSetup.BaseDir);
+  I:=0; While I<ExtraFilesListBox.Items.Count do If Trim(ExtraFilesListBox.Items[I])='' then ExtraFilesListBox.Items.Delete(I) else inc(I);
   Game.Extrafiles:=ListToValue(ExtraFilesListBox.Items);
+  I:=0; While I<ExtraDirsListBox.Items.Count do If Trim(ExtraDirsListBox.Items[I])='' then ExtraDirsListBox.Items.Delete(I) else inc(I);
   Game.ExtraDirs:=ListToValue(ExtraDirsListBox.Items);
 end;
 

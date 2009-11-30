@@ -108,7 +108,7 @@ begin
   end else begin
     try CompLicenseMemo.Lines.LoadFromFile(PrgDir+BinFolder+'\'+'LicenseComponents.txt'); except end;
   end;
-  CompLicenseMemo.Lines.Insert(0,'');
+  try CompLicenseMemo.Lines.Insert(0,''); except end;
 
   ChangeLogComboBox.Items.AddObject('D-Fend Reloaded',TObject(0));
   ChangeLogComboBox.Items.AddObject('DOSBox',TObject(1));
@@ -204,7 +204,7 @@ end;
 procedure TInfoForm.LicenseComboBoxChange(Sender: TObject);
 Var S : String;
 begin
-  LicenseMemo.Lines.Clear;
+  try LicenseMemo.Lines.Clear; except end;
   Case Integer(LicenseComboBox.Items.Objects[LicenseComboBox.ItemIndex]) of
     0 : If FileExists(PrgDir+BinFolder+'\'+'License.txt') then S:=PrgDir+BinFolder+'\'+'License.txt' else S:=PrgDir+'License.txt';
     1 : S:=IncludeTrailingPathDelimiter(PrgSetup.DOSBoxSettings[0].DosBoxDir)+'COPYING.txt';
@@ -218,7 +218,7 @@ end;
 procedure TInfoForm.ChangeLogComboBoxChange(Sender: TObject);
 Var S : String;
 begin
-  ChangeLogMemo.Lines.Clear;
+  try ChangeLogMemo.Lines.Clear; except end;
   Case Integer(ChangeLogComboBox.Items.Objects[ChangeLogComboBox.ItemIndex]) of
     0 : If FileExists(PrgDir+BinFolder+'\'+'ChangeLog.txt') then S:=PrgDir+BinFolder+'\'+'ChangeLog.txt' else S:=PrgDir+'ChangeLog.txt';
     1 : S:=IncludeTrailingPathDelimiter(PrgSetup.DOSBoxSettings[0].DosBoxDir)+'NEWS.txt';
@@ -227,7 +227,7 @@ begin
   If S<>'' then begin
      try ChangeLogMemo.Lines.LoadFromFile(S); except end;
   end;
-  ChangeLogMemo.Font.Name:='Courier New';
+  try ChangeLogMemo.Font.Name:='Courier New'; except end;
 end;
 
 procedure TInfoForm.TimerTimer(Sender: TObject);

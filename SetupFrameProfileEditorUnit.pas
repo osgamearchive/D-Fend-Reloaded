@@ -19,7 +19,7 @@ type
   public
     { Public-Deklarationen }
     Function GetName : String;
-    Procedure InitGUIAndLoadSetup(InitData : TInitData);
+    Procedure InitGUIAndLoadSetup(var InitData : TInitData);
     Procedure BeforeChangeLanguage;
     Procedure LoadLanguage;
     Procedure DOSBoxDirChanged;
@@ -42,7 +42,7 @@ begin
   result:=LanguageSetup.ProfileEditor;
 end;
 
-procedure TSetupFrameProfileEditor.InitGUIAndLoadSetup(InitData: TInitData);
+procedure TSetupFrameProfileEditor.InitGUIAndLoadSetup(var InitData: TInitData);
 begin
   NoFlicker(ReopenLastActiveProfileSheetCheckBox);
   NoFlicker(ProfileEditorDFendRadioButton);
@@ -86,7 +86,6 @@ end;
 
 procedure TSetupFrameProfileEditor.ShowFrame(const AdvencedMode: Boolean);
 begin
-  AutoAddMountingsRadioGroup.Visible:=PrgSetup.ActivateIncompleteFeatures;
 end;
 
 procedure TSetupFrameProfileEditor.HideFrame;

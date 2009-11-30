@@ -23,6 +23,7 @@ type
     procedure FormHide(Sender: TObject);
     procedure HelpButtonClick(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
     { Private-Deklarationen }
     ActivePage : Integer;
@@ -41,6 +42,7 @@ type
     Procedure SetActivePage(NewPage : Integer);
     Function CalcProfileName : String;
     Function CalcProfileNameFromFile : String;
+    Function DoubleProfileCheck(const GameFileName : String) : Boolean;
   public
     { Public-Deklarationen }
     GameDB : TGameDB;
@@ -91,11 +93,17 @@ begin
   If S='' then begin result:='Game'; exit; end;
 
   S:=ChangeFileExt(ExtractFileName(S),'');
-  For I:=1 to length(S) do If I=1
-    then S[I]:=ExtUpperCase(S[I])[1]
-    else S[I]:=ExtLowerCase(S[I])[1];
-
+  For I:=1 to length(S) do If S[I]<>' ' then begin
+    If I=1
+      then S[I]:=ExtUpperCase(S[I])[1]
+     else S[I]:=ExtLowerCase(S[I])[1];
+  end;
   result:=S;
+end;
+
+procedure TWizardForm.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  WizardBaseFrame.BeforeClose;
 end;
 
 procedure TWizardForm.FormCreate(Sender: TObject);
@@ -159,11 +167,11 @@ begin
 
   If Trim(ExeFile)<>'' then begin
     WizardPrgFileFrame.ProgramEdit.Text:=MakeRelPath(ExeFile,PrgSetup.BaseDir);
-    If WindowsExe then WizardBaseFrame.EmulationTypeRadioGroup.ItemIndex:=WizardBaseFrame.EmulationTypeRadioGroup.Items.Count-1;
-    WizardBaseFrame.EmulationTypeRadioGroup.Visible:=False;
-    WizardBaseFrame.ListScummGamesButton.Visible:=False;
+    If WindowsExe then WizardBaseFrame.EmulationType:=-3;
+    WizardBaseFrame.EmulationTypeComboBox.Enabled:=False;
+    WizardBaseFrame.ListScummGamesLabel.Visible:=False;
   end else begin
-    WizardBaseFrame.EmulationTypeRadioGroup.ItemIndex:=0;
+    WizardBaseFrame.EmulationTypeComboBox.ItemIndex:=0;
   end;
 
   SetActivePage(0);
@@ -181,10 +189,10 @@ begin
   Case ActivePage of
     0 : begin
           {Start page}
-          ScummVM:=(WizardBaseFrame.EmulationTypeRadioGroup.ItemIndex=1) and (WizardBaseFrame.EmulationTypeRadioGroup.Items.Count=3);
-          WindowsMode:=(WizardBaseFrame.EmulationTypeRadioGroup.ItemIndex=WizardBaseFrame.EmulationTypeRadioGroup.Items.Count-1);
+          ScummVM:=(WizardBaseFrame.EmulationType=-2);
+          WindowsMode:=(WizardBaseFrame.EmulationType=-3) or (WizardBaseFrame.EmulationType>=0);
           If ScummVM then WizardScummVMFrame.ShowScummVMFrame;
-          WizardMode:=WizardBaseFrame.WizardModeRadioGroup.ItemIndex;
+          WizardMode:=WizardBaseFrame.WizardModeComboBox.ItemIndex;
         end;
     1 : If NewPage=2 then begin
           {Progam file page -> next page (template or ScummVM settings)}
@@ -193,22 +201,25 @@ begin
               If MessageDlg(LanguageSetup.MessageNoGameFileNameWarning,mtConfirmation,[mbYes,mbNo],0)<>mrYes then exit;
             end;
             If WindowsMode then begin
-              If Trim(WizardPrgFileFrame.ProgramEdit.Text)<>'' then begin
-                S:=MakeAbsPath(WizardPrgFileFrame.ProgramEdit.Text,PrgSetup.BaseDir);
-                If IsDOSExe(S) then begin
-                  If MessageDlg(Format(LanguageSetup.MessageDOSExeEditWarning,[S]),mtConfirmation,[mbYes,mbNo],0)<>mrYes then exit;
+              If WizardBaseFrame.EmulationType<0 then begin
+                If Trim(WizardPrgFileFrame.ProgramEdit.Text)<>'' then begin
+                  S:=MakeAbsPath(WizardPrgFileFrame.ProgramEdit.Text,PrgSetup.BaseDir);
+                  If IsDOSExe(S) then begin
+                    If MessageDlg(Format(LanguageSetup.MessageDOSExeEditWarning,[S]),mtConfirmation,[mbYes,mbNo],0)<>mrYes then exit;
+                  end;
                 end;
-              end;
-              If Trim(WizardPrgFileFrame.SetupEdit.Text)<>'' then begin
-                S:=MakeAbsPath(WizardPrgFileFrame.SetupEdit.Text,PrgSetup.BaseDir);
-                If IsDOSExe(S) then begin
-                  If MessageDlg(Format(LanguageSetup.MessageDOSExeEditWarning,[S]),mtConfirmation,[mbYes,mbNo],0)<>mrYes then exit;
+                If Trim(WizardPrgFileFrame.SetupEdit.Text)<>'' then begin
+                  S:=MakeAbsPath(WizardPrgFileFrame.SetupEdit.Text,PrgSetup.BaseDir);
+                  If IsDOSExe(S) then begin
+                    If MessageDlg(Format(LanguageSetup.MessageDOSExeEditWarning,[S]),mtConfirmation,[mbYes,mbNo],0)<>mrYes then exit;
+                  end;
                 end;
               end;
               WizardGameInfoFrame.SetGameName(CalcProfileName,nil);
               NewPage:=3;
               If WizardMode<2 then DoOKButtonClick:=True;
             end else begin
+              If not DoubleProfileCheck(Trim(WizardPrgFileFrame.ProgramEdit.Text)) then exit;
               If Trim(WizardPrgFileFrame.ProgramEdit.Text)<>'' then begin
                 S:=MakeAbsPath(WizardPrgFileFrame.ProgramEdit.Text,PrgSetup.BaseDir);
                 If IsWindowsExe(S) then begin
@@ -229,6 +240,7 @@ begin
               end;
             end;
           end else begin
+            If not DoubleProfileCheck(Trim(WizardScummVMFrame.ProgramEdit.Text)) then exit;
             If Trim(WizardScummVMFrame.ProgramEdit.Text)='' then begin
               If MessageDlg(LanguageSetup.MessageNoGameFileNameWarning,mtConfirmation,[mbYes,mbNo],0)<>mrYes then exit;
             end;
@@ -261,6 +273,10 @@ begin
     WizardPrgFileFrame.GamesFolderEdit.Visible:=not WindowsMode;
     WizardPrgFileFrame.GamesFolderButton.Visible:=not WindowsMode;
     WizardPrgFileFrame.FolderInfoButton.Visible:=not WindowsMode;
+    WizardPrgFileFrame.OtherEmulator:=WizardBaseFrame.EmulationType;
+    If WindowsMode
+      then  WizardPrgFileFrame.InfoLabel.Caption:=LanguageSetup.WizardFormPage2InfoWindows
+      else WizardPrgFileFrame.InfoLabel.Caption:=LanguageSetup.WizardFormPage2Info;
   end;
   WizardScummVMFrame.Visible:=(NewPage=1) and ScummVM;
   WizardTemplateFrame.Visible:=(NewPage=2) and (not ScummVM);
@@ -325,10 +341,10 @@ begin
     WizardScummVMFrame.WriteDataToGame(Game);
   end
     else WizardPrgFileFrame.WriteDataToGame(Game);
-  WizardGameInfoFrame.WriteDataToGame(Game);
   If (Trim(Game.Name)='') and (WizardScummVMFrame.GameNameComboBox.ItemIndex>=0) then begin
     Game.Name:=CalcProfileName;
   end;
+  WizardGameInfoFrame.WriteDataToGame(Game);
 
   WizardFinishFrame.WriteDataToGame(Game);
   OpenEditorNow:=WizardFinishFrame.ProfileEditorCheckBox.Checked;
@@ -338,6 +354,23 @@ begin
   end;
   Game.LoadCache;
   Game.StoreAllValues;
+end;
+
+function TWizardForm.DoubleProfileCheck(const GameFileName: String): Boolean;
+Var I : Integer;
+    S,T : String;
+begin
+  result:=True;
+  If GameFileName='' then exit;
+  S:=ExtUpperCase(MakeRelPath(GameFileName,PrgSetup.BaseDir));
+  For I:=0 to GameDB.Count-1 do If not WindowsExeMode(GameDB[I]) then begin
+    T:=Trim(GameDB[I].GameExe);
+    If T='' then continue;
+    If S=ExtUpperCase(MakeRelPath(T,PrgSetup.BaseDir)) then begin
+      If MessageDlg(Format(LanguageSetup.WizardFormDoubleProfile,[GameDB[I].Name]),mtWarning,[mbYes,mbNo],0)<>mrYes then begin result:=False; exit; end;
+      break;
+    end;
+  end;
 end;
 
 procedure TWizardForm.HelpButtonClick(Sender: TObject);

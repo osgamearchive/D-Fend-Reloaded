@@ -12,7 +12,7 @@ procedure SetVistaFonts(const AHintWindow: THintWindow); overload;
 
 procedure SetVistaFontsOnly(const Font: TFont); overload;
 
-function IsWindowsVista: Boolean;
+var IsWindowsVista : Boolean;
 
 Procedure NoFlicker(const AWinControl : TWinControl);
 
@@ -68,7 +68,7 @@ begin
   end;
 end;
 
-function IsWindowsVista: Boolean;   
+function GetIsWindowsVista: Boolean;
 var VerInfo: TOSVersioninfo;
 begin
   VerInfo.dwOSVersionInfoSize:=SizeOf(TOSVersionInfo);
@@ -83,4 +83,6 @@ begin
   AWinControl.ControlStyle:=AWinControl.ControlStyle+[csOpaque]-[csParentBackground];
 end;
 
+initialization
+  IsWindowsVista:=GetIsWindowsVista;
 end.

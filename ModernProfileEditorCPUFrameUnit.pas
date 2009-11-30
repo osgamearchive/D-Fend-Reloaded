@@ -86,8 +86,13 @@ begin
 
   St:=ValueToList(InitData.GameDB.ConfOpt.CPUType,';,');
   try
-    CPUTypeComboBox.Items.Clear;
-    CPUTypeComboBox.Items.AddStrings(St);
+    CPUTypeComboBox.Items.BeginUpdate;
+    try
+      CPUTypeComboBox.Items.Clear;
+      CPUTypeComboBox.Items.AddStrings(St);
+    finally
+      CPUTypeComboBox.Items.EndUpdate;
+    end;
   finally
     St.Free;
   end;

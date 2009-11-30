@@ -21,7 +21,7 @@ type
   public
     { Public-Deklarationen }
     Function GetName : String;
-    Procedure InitGUIAndLoadSetup(InitData : TInitData);
+    Procedure InitGUIAndLoadSetup(var InitData : TInitData);
     Procedure BeforeChangeLanguage;
     Procedure LoadLanguage;
     Procedure DOSBoxDirChanged;
@@ -45,7 +45,7 @@ begin
   result:=LanguageSetup.SetupFormServiceSheet;
 end;
 
-procedure TSetupFrameService.InitGUIAndLoadSetup(InitData: TInitData);
+procedure TSetupFrameService.InitGUIAndLoadSetup(var InitData: TInitData);
 begin
   GameDB:=InitData.GameDB;
 
@@ -89,7 +89,7 @@ begin
   Service1Button.Visible:=AdvencedMode;
   Service2Button.Visible:=AdvencedMode;
   Service5Button.Visible:=AdvencedMode;
-  Service6Button.Visible:=AdvencedMode and PrgSetup.ActivateIncompleteFeatures;
+  Service6Button.Visible:=AdvencedMode;
 end;
 
 procedure TSetupFrameService.HideFrame;

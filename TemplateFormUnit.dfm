@@ -3,7 +3,7 @@ object TemplateForm: TTemplateForm
   Top = 0
   BorderIcons = [biSystemMenu, biMaximize]
   Caption = 'Vorlagen'
-  ClientHeight = 491
+  ClientHeight = 511
   ClientWidth = 705
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -24,7 +24,7 @@ object TemplateForm: TTemplateForm
     Left = 0
     Top = 52
     Width = 705
-    Height = 420
+    Height = 440
     ActivePage = TemplateTab
     Align = alClient
     TabOrder = 0
@@ -35,7 +35,7 @@ object TemplateForm: TTemplateForm
         Left = 0
         Top = 0
         Width = 697
-        Height = 392
+        Height = 412
         Align = alClient
         BorderStyle = bsNone
         Columns = <>
@@ -53,15 +53,11 @@ object TemplateForm: TTemplateForm
     object AutoSetupSheet: TTabSheet
       Caption = 'AutoSetupSheet'
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 372
       object ListView2: TListView
         Left = 0
         Top = 0
         Width = 697
-        Height = 392
+        Height = 412
         Align = alClient
         BorderStyle = bsNone
         Columns = <>
@@ -73,13 +69,12 @@ object TemplateForm: TTemplateForm
         OnDblClick = ListView2DblClick
         OnKeyDown = ListView2KeyDown
         OnSelectItem = ListView2SelectItem
-        ExplicitHeight = 372
       end
     end
   end
   object StatusBar: TStatusBar
     Left = 0
-    Top = 472
+    Top = 492
     Width = 705
     Height = 19
     Panels = <

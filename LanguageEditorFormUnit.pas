@@ -4,25 +4,31 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, Grids, StdCtrls, Buttons, ExtCtrls;
+  Dialogs, Grids, StdCtrls, Buttons, ExtCtrls, ComCtrls, Menus;
 
 type
   TLanguageEditorForm = class(TForm)
     Panel1: TPanel;
     CloseButton: TBitBtn;
     SectionComboBox: TComboBox;
-    InfoLabel: TLabel;
     Tab: TStringGrid;
+    StatusBar: TStatusBar;
+    ShowComboBox: TComboBox;
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure SectionComboBoxChange(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormResize(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure TabDrawCell(Sender: TObject; ACol, ARow: Integer; Rect: TRect;
+      State: TGridDrawState);
+    procedure ShowComboBoxChange(Sender: TObject);
+    procedure ComboBoxDropDown(Sender: TObject);
   private
     { Private-Deklarationen }
     DefaultLanguageFile : String;
     LastSection : Integer;
+    ViewMode : Integer;
     Procedure LoadSection(const Section : String);
     Procedure SaveSection(const Section : String);
   public
@@ -48,21 +54,29 @@ begin
   Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName);
 
   NoFlicker(CloseButton);
+  NoFlicker(ShowComboBox);
   NoFlicker(SectionComboBox);
   NoFlicker(Tab);
 
-  CloseButton.Caption:=LanguageSetup.Close;
   Caption:=LanguageSetup.LanguageEditorCaption;
+
+  CloseButton.Caption:=LanguageSetup.Close;
+
+  ShowComboBox.OnChange:=nil;
+  ShowComboBox.Items.Clear;
+  ShowComboBox.Items.Add(RemoveUnderline(LanguageSetup.LanguageEditorShowAll));
+  ShowComboBox.Items.Add(RemoveUnderline(LanguageSetup.LanguageEditorShowUntranslatedOnly));
+  ViewMode:=Min(1,Max(0,PrgSetup.LanguageEditorViewMode));
+  ShowComboBox.ItemIndex:=ViewMode;
+  ShowComboBox.OnChange:=ShowComboBoxChange;
 
   UserIconLoader.DialogImage(DI_Close,CloseButton);
 
   DefaultLanguageFile:=PrgDir+LanguageSubDir+'\English.ini';
   LastSection:=-1;
-end;
 
-procedure TLanguageEditorForm.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
-begin
-  If (Key=VK_F1) and (Shift=[]) then Application.HelpCommand(HELP_CONTEXT,ID_ExtrasLanguageEditor);
+  SetComboHint(ShowComboBox);
+  SetComboHint(SectionComboBox);
 end;
 
 procedure TLanguageEditorForm.FormShow(Sender: TObject);
@@ -74,8 +88,8 @@ begin
 
   {Init table}
   FormResize(Sender);
-  Tab.Cells[0,0]:='Identifier';
-  Tab.Cells[1,0]:='English';
+  Tab.Cells[0,0]:=LanguageSetup.LanguageEditorIdentifier;
+  Tab.Cells[1,0]:=LanguageSetup.LanguageEditorEnglish;
   Tab.Cells[2,0]:=ChangeFileExt(ExtractFileName(LanguageFile),'');
 
   {Init sections}
@@ -123,6 +137,20 @@ begin
   Tab.ColWidths[2]:=I*2 div 5;
 end;
 
+procedure TLanguageEditorForm.TabDrawCell(Sender: TObject; ACol, ARow: Integer; Rect: TRect; State: TGridDrawState);
+begin
+ if (ARow>0) and (ACol<2) then begin
+   Tab.Canvas.Brush.Color:=$F7F7F7;
+   Tab.Canvas.FillRect(Rect);
+   Tab.Canvas.TextRect(Rect, Rect.Left+2, Rect.Top+2, Tab.Cells[ACol, ARow]);
+ end
+end;
+
+procedure TLanguageEditorForm.ComboBoxDropDown(Sender: TObject);
+begin
+  SetComboDropDownDropDownWidth(Sender as TComboBox);
+end;
+
 procedure TLanguageEditorForm.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
   SectionComboBoxChange(Sender);
@@ -131,7 +159,7 @@ end;
 procedure TLanguageEditorForm.LoadSection(const Section: String);
 Var Ini1, Ini2 : TIniFile;
     St,St2,St3 : TStringList;
-    I,Untranslated : Integer;
+    I,J,Untranslated : Integer;
     S,T : String;
 begin
   Untranslated:=0;
@@ -146,15 +174,24 @@ begin
       St3.Clear; Ini2.ReadSection(Section,St3);
       For I:=0 to St3.Count-1 do If St2.IndexOf(ExtUpperCase(St3[I]))<0 then begin St2.Add(ExtUpperCase(St3[I])); St.Add(St3[I]); end;
 
-      Tab.RowCount:=Max(2,St.Count+1);
-      Tab.Cells[0,1]:=''; Tab.Cells[1,1]:=''; Tab.Cells[2,1]:='';
       For I:=0 to St.Count-1 do begin
-        Tab.Cells[0,I+1]:=St[I];
-        S:=Ini1.ReadString(Section,St[I],''); Tab.Cells[1,I+1]:=S;
+        S:=Ini1.ReadString(Section,St[I],'');
         If (ExtUpperCase(Section)='AUTHOR') and (ExtUpperCase(St[I])='NAME') then S:=LanguageSetup.NotSet;
-        T:=Ini2.ReadString(Section,St[I],S); Tab.Cells[2,I+1]:=T;
+        T:=Ini2.ReadString(Section,St[I],S);
         If S=T then inc(Untranslated);
       end;
+
+      If ViewMode=0 then Tab.RowCount:=Max(2,St.Count+1) else Tab.RowCount:=Max(2,Untranslated+1);
+      Tab.Cells[0,1]:=''; Tab.Cells[1,1]:=''; Tab.Cells[2,1]:='';
+      J:=1;
+      For I:=0 to St.Count-1 do begin
+        S:=Ini1.ReadString(Section,St[I],'');
+        If (ExtUpperCase(Section)='AUTHOR') and (ExtUpperCase(St[I])='NAME') then S:=LanguageSetup.NotSet;
+        T:=Ini2.ReadString(Section,St[I],S);
+        If (S<>T) and (ViewMode=1) then continue;
+        Tab.Cells[0,J]:=St[I]; Tab.Cells[2,J]:=T; Tab.Cells[1,J]:=S; inc(J);
+      end;
+      Tab.Enabled:=(J>1);
     finally
       St.Free;
       St2.Free;
@@ -163,9 +200,9 @@ begin
   finally Ini2.Free; end; finally Ini1.Free; end;
 
   Case Untranslated of
-    0 : InfoLabel.Caption:=LanguageSetup.LanguageEditorInfoAllTranslated;
-    1 : InfoLabel.Caption:=LanguageSetup.LanguageEditorInfoOneTranslationMissing;
-    else InfoLabel.Caption:=Format(LanguageSetup.LanguageEditorInfoTranslationsMissing,[Untranslated]);
+    0 : StatusBar.SimpleText:=LanguageSetup.LanguageEditorInfoAllTranslated;
+    1 : StatusBar.SimpleText:=LanguageSetup.LanguageEditorInfoOneTranslationMissing;
+    else StatusBar.SimpleText:=Format(LanguageSetup.LanguageEditorInfoTranslationsMissing,[Untranslated]);
   end;
 end;
 
@@ -188,6 +225,20 @@ begin
 
   LastSection:=SectionComboBox.ItemIndex;
   LoadSection(SectionComboBox.Items[LastSection]);
+
+  SetComboHint(ShowComboBox);
+  SetComboHint(SectionComboBox);
+end;
+
+procedure TLanguageEditorForm.ShowComboBoxChange(Sender: TObject);
+begin
+  ViewMode:=ShowComboBox.ItemIndex;
+  SectionComboBoxChange(Sender);
+end;
+
+procedure TLanguageEditorForm.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+begin
+  If (Key=VK_F1) and (Shift=[]) then Application.HelpCommand(HELP_CONTEXT,ID_ExtrasLanguageEditor);
 end;
 
 { global }

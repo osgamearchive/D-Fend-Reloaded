@@ -4,7 +4,7 @@ interface
 uses Classes, Math, GameDBUnit;
 
 Procedure BuildZipPackage(const AOwner : TComponent; const AGame : TGame; const AFileName : String);
-Function ImportZipPackage(const AOwner : TComponent; const AFileName : String; const AGameDB : TGameDB) : TGame;
+Function ImportZipPackage(const AOwner : TComponent; const AFileName : String; const AGameDB : TGameDB; const NoDialogIfAutoSetupIsAvailable : Boolean) : TGame;
 
 Function AdditionalDataMatching(const Folder : String; const Template : TGame) : Boolean;
 
@@ -13,6 +13,10 @@ Function GetTemplateFromFolder(const IsFolderScan : Boolean; Folder : String; co
 
 Procedure TempZipFilesStartCleanUp;
 
+Function OnlySubFolderCheck(const Dir : String) : String;
+
+Function CreateGameFromSimpleFolder(Dir : String; const GameDB : TGameDB; const ArchiveFileName : String; const NoDialogIfAutoSetupIsAvailable, DoNotCopyFolder : Boolean) : TGame;
+
 implementation
 
 uses Windows, SysUtils, Forms, Controls, Dialogs, ShellAPI, ShlObj, Messages,
@@ -20,20 +24,28 @@ uses Windows, SysUtils, Forms, Controls, Dialogs, ShellAPI, ShlObj, Messages,
      PrgConsts, UninstallFormUnit, ZipInfoFormUnit, DosBoxUnit, ScummVMUnit,
      HashCalc, ImportSelectTemplateFormUnit, SelectTemplateForZipImportFormUnit;
 
-Function CopyFileWithMsg(const Source, Dest : String; const ProcessMessages : Boolean) : Boolean;
+Function CopyFileWithMsg(const Source, Dest : String; const ProcessMessages, MoveFileToDestDir : Boolean) : Boolean;
 begin
   result:=ForceDirectories(ExtractFilePath(Dest));
   If result then begin If FileExists(Dest) then exit; end;
-  if result then result:=CopyFile(PChar(Source),PChar(Dest),False);
+  if result then begin
+    If MoveFileToDestDir then begin
+      result:=MoveFile(PChar(Source),PChar(Dest));
+      If not result then result:=CopyFile(PChar(Source),PChar(Dest),False);
+    end else begin
+      result:=CopyFile(PChar(Source),PChar(Dest),False);
+    end;
+  end;
   If ProcessMessages then Application.ProcessMessages;
   if not result then MessageDlg(Format(LanguageSetup.MessageCouldNotCopyFile,[Source,Dest]),mtError,[mbOK],0);
 end;
 
-Function CopyFolderWithMsg(Source, Dest : String; const ProcessMessages : Boolean; const NewGame : TGame = nil; const IgnoreProfConfInRootDir : Boolean = False) : Boolean;
+Function CopyFolderWithMsg(Source, Dest : String; const ProcessMessages, MoveFiles : Boolean; const NewGame : TGame = nil; const IgnoreProfConfInRootDir : Boolean = False) : Boolean;
 Var I : Integer;
     Rec : TSearchRec;
     S,T : String;
     B : Boolean;
+    StDirs1, StDirs2, StFiles : TStringList;
 begin
   result:=False;
 
@@ -47,54 +59,68 @@ begin
     exit;
   end;
 
-  I:=FindFirst(Source+'*.*',faAnyFile,Rec);
+  StDirs1:=TStringList.Create;
+  StDirs2:=TStringList.Create;
+  StFiles:=TStringList.Create;
   try
-    While I=0 do begin
-      If (Rec.Attr and faDirectory)<>0 then begin
-        If (Rec.Name<>'.') and (Rec.Name<>'..') then begin
-          B:=False;
-          If (NewGame<>nil) and DirectoryExists(Dest+Rec.Name) then begin
-            {Change path if destination capture or data folder already exists}
-            S:=IncludeTrailingPathDelimiter(ExtUpperCase(Dest+Rec.Name));
-            If IncludeTrailingPathDelimiter(ExtUpperCase(MakeAbsPath(NewGame.CaptureFolder,PrgSetup.BaseDir)))=S then begin
-              S:=IncludeTrailingPathDelimiter(Dest+Rec.Name);
-              I:=0;
-              While (not PrgSetup.IgnoreDirectoryCollisions) and DirectoryExists(IncludeTrailingPathDelimiter(S)) do begin
-                inc(I); S:=IncludeTrailingPathDelimiter(ExcludeTrailingPathDelimiter(Dest+Rec.Name)+IntToStr(I));
-              end;
-              If not CopyFolderWithMsg(Source+Rec.Name,S,ProcessMessages,NewGame) then exit;
-              NewGame.CaptureFolder:=MakeRelPath(S,PrgSetup.BaseDir,True); NewGame.StoreAllValues;
-              B:=True;
-            end else begin
-              If IncludeTrailingPathDelimiter(ExtUpperCase(MakeAbsPath(NewGame.DataDir,PrgSetup.BaseDir)))=S then begin
+    {Scan for files and folders}
+    I:=FindFirst(Source+'*.*',faAnyFile,Rec);
+    try
+      While I=0 do begin
+        If (Rec.Attr and faDirectory)<>0 then begin
+          If (Rec.Name<>'.') and (Rec.Name<>'..') then begin
+            B:=False;
+            If (NewGame<>nil) and DirectoryExists(Dest+Rec.Name) then begin
+              {Change path if destination capture or data folder already exists}
+              S:=IncludeTrailingPathDelimiter(ExtUpperCase(Dest+Rec.Name));
+              If IncludeTrailingPathDelimiter(ExtUpperCase(MakeAbsPath(NewGame.CaptureFolder,PrgSetup.BaseDir)))=S then begin
                 S:=IncludeTrailingPathDelimiter(Dest+Rec.Name);
                 I:=0;
                 While (not PrgSetup.IgnoreDirectoryCollisions) and DirectoryExists(IncludeTrailingPathDelimiter(S)) do begin
                   inc(I); S:=IncludeTrailingPathDelimiter(ExcludeTrailingPathDelimiter(Dest+Rec.Name)+IntToStr(I));
                 end;
-                If not CopyFolderWithMsg(Source+Rec.Name,S,ProcessMessages,NewGame) then exit;
-                NewGame.DataDir:=MakeRelPath(S,PrgSetup.BaseDir,True); NewGame.StoreAllValues;
+                StDirs1.Add(Source+Rec.Name); StDirs2.Add(S);
+                NewGame.CaptureFolder:=MakeRelPath(S,PrgSetup.BaseDir,True); NewGame.StoreAllValues;
                 B:=True;
+              end else begin
+                If IncludeTrailingPathDelimiter(ExtUpperCase(MakeAbsPath(NewGame.DataDir,PrgSetup.BaseDir)))=S then begin
+                  S:=IncludeTrailingPathDelimiter(Dest+Rec.Name);
+                  I:=0;
+                  While (not PrgSetup.IgnoreDirectoryCollisions) and DirectoryExists(IncludeTrailingPathDelimiter(S)) do begin
+                    inc(I); S:=IncludeTrailingPathDelimiter(ExcludeTrailingPathDelimiter(Dest+Rec.Name)+IntToStr(I));
+                  end;
+                  StDirs1.Add(Source+Rec.Name); StDirs2.Add(S);
+                  NewGame.DataDir:=MakeRelPath(S,PrgSetup.BaseDir,True); NewGame.StoreAllValues;
+                  B:=True;
+                end;
               end;
             end;
+            If not B then begin
+              StDirs1.Add(Source+Rec.Name); StDirs2.Add(Dest+Rec.Name);
+            end;
           end;
-          If not B then begin
-            If not CopyFolderWithMsg(Source+Rec.Name,Dest+Rec.Name,ProcessMessages,NewGame) then exit;
-          end;
+        end else begin
+          If IgnoreProfConfInRootDir then begin
+            T:=Trim(ExtUpperCase(Rec.Name)); S:=ExtractFileExt(T);
+            B:=(S<>'.CONF') and (S<>'.PROF') and (T<>'INSTALLREADME.TXT');
+          end else B:=True;
+          If B then StFiles.Add(Rec.Name);
         end;
-      end else begin
-        If IgnoreProfConfInRootDir then begin
-          T:=Trim(ExtUpperCase(Rec.Name)); S:=ExtractFileExt(T);
-          B:=(S<>'.CONF') and (S<>'.PROF') and (T<>'INSTALLREADME.TXT');
-        end else B:=True;
-        If B then begin
-          If not CopyFileWithMsg(Source+Rec.Name,Dest+Rec.Name,ProcessMessages) then exit;
-        end;
-      end;  
-      I:=FindNext(Rec);
+        I:=FindNext(Rec);
+      end;
+    finally
+      FindClose(Rec);
     end;
+
+    {Copy files}
+    For I:=0 to StFiles.Count-1 do If not CopyFileWithMsg(Source+StFiles[I],Dest+StFiles[I],ProcessMessages,MoveFiles) then exit;
+
+    {Copy subfolders}
+    For I:=0 to StDirs1.Count-1 do If not CopyFolderWithMsg(StDirs1[I],StDirs2[I],ProcessMessages,MoveFiles,NewGame) then exit;
   finally
-    FindClose(Rec);
+    StDirs1.Free;
+    StDirs2.Free;
+    StFiles.Free;
   end;
 
   result:=True;
@@ -152,7 +178,7 @@ begin
   Game.StoreAllValues;
 
   {prof file}
-  if not CopyFileWithMsg(Game.SetupFile,Dir+ExtractFileName(Game.SetupFile),ProcessMessages) then exit;
+  if not CopyFileWithMsg(Game.SetupFile,Dir+ExtractFileName(Game.SetupFile),ProcessMessages,False) then exit;
 
   {conf or ini file}
   S:=Dir+ChangeFileExt(ExtractFileName(Game.SetupFile),'.conf');
@@ -185,7 +211,7 @@ begin
         MessageDlg(Format(LanguageSetup.MessagePathNotRelative,[S,Game.Name,PrgSetup.BaseDir]),mtError,[mbOK],0);
         result:=False; exit;
       end;
-      if not CopyFolderWithMsg(MakeAbsPath(S,PrgSetup.BaseDir),MakeAbsPath(S,Dir),ProcessMessages) then exit;
+      if not CopyFolderWithMsg(MakeAbsPath(S,PrgSetup.BaseDir),MakeAbsPath(S,Dir),ProcessMessages,False) then exit;
     end;
 
     {ScummVM: Folder as zip file}
@@ -200,7 +226,7 @@ begin
       If (T<>'') and (T[1]='.') then Delete(T,1,1);
       If (T<>'') and (T[1]='\') then Delete(T,1,1);
       If (T<>'') and (T[length(T)]='\') then Delete(T,length(T),1);
-      if not CopyFileWithMsg(MakeAbsPath(S,PrgSetup.BaseDir),Dir+T+'\'+ExtractFileName(S),ProcessMessages) then exit;
+      if not CopyFileWithMsg(MakeAbsPath(S,PrgSetup.BaseDir),Dir+T+'\'+ExtractFileName(S),ProcessMessages,False) then exit;
     end;
     S:=Trim(Game.ScummVMSavePath);
     If S<>'' then begin
@@ -209,7 +235,7 @@ begin
         MessageDlg(Format(LanguageSetup.MessagePathNotRelative,[S,Game.Name,PrgSetup.BaseDir]),mtError,[mbOK],0);
         result:=False; exit;
       end;
-      if not CopyFolderWithMsg(MakeAbsPath(S,PrgSetup.BaseDir),MakeAbsPath(S,Dir),ProcessMessages) then exit;
+      if not CopyFolderWithMsg(MakeAbsPath(S,PrgSetup.BaseDir),MakeAbsPath(S,Dir),ProcessMessages,False) then exit;
     end;
   end else begin
 
@@ -224,7 +250,7 @@ begin
         MessageDlg(Format(LanguageSetup.MessagePathNotRelative,[S,Game.Name,PrgSetup.BaseDir]),mtError,[mbOK],0);
         result:=False; exit;
       end;
-      if not CopyFolderWithMsg(MakeAbsPath(S,PrgSetup.BaseDir),MakeAbsPath(S,Dir),ProcessMessages) then exit;
+      if not CopyFolderWithMsg(MakeAbsPath(S,PrgSetup.BaseDir),MakeAbsPath(S,Dir),ProcessMessages,False) then exit;
     end;
   end;
 
@@ -236,14 +262,14 @@ begin
       MessageDlg(Format(LanguageSetup.MessagePathNotRelative,[S,Game.Name,PrgSetup.BaseDir]),mtError,[mbOK],0);
       result:=False; exit;
     end;
-    if not CopyFolderWithMsg(MakeAbsPath(S,PrgSetup.BaseDir),MakeAbsPath(S,Dir),ProcessMessages) then exit;
+    if not CopyFolderWithMsg(MakeAbsPath(S,PrgSetup.BaseDir),MakeAbsPath(S,Dir),ProcessMessages,False) then exit;
   end;
 
   {Icon}
   S:=MakeAbsIconName(Game.Icon);
   If (S<>'') and FileExists(S) then begin
     If ExtractFilePath(Game.Icon)='' then begin
-      if not CopyFileWithMsg(S,Dir+IconsSubDir+'\'+Trim(Game.Icon),ProcessMessages) then exit;
+      if not CopyFileWithMsg(S,Dir+IconsSubDir+'\'+Trim(Game.Icon),ProcessMessages,False) then exit;
     end else begin
       S:=MakeRelPath(S,PrgSetup.BaseDir);
       If Copy(S,2,2)=':\' then begin
@@ -254,7 +280,7 @@ begin
       If (T<>'') and (T[1]='.') then Delete(T,1,1);
       If (T<>'') and (T[1]='\') then Delete(T,1,1);
       If (T<>'') and (T[length(T)]='\') then Delete(T,length(T),1);
-      if not CopyFileWithMsg(MakeAbsIconName(Game.Icon),Dir+T+'\'+ExtractFileName(Game.Icon),ProcessMessages) then exit;
+      if not CopyFileWithMsg(MakeAbsIconName(Game.Icon),Dir+T+'\'+ExtractFileName(Game.Icon),ProcessMessages,False) then exit;
     end;
   end;
 
@@ -266,7 +292,7 @@ begin
       MessageDlg(Format(LanguageSetup.MessagePathNotRelative,[S,Game.Name,PrgSetup.BaseDir]),mtError,[mbOK],0);
       result:=False; exit;
     end;
-    if not CopyFolderWithMsg(MakeAbsPath(S,PrgSetup.BaseDir),MakeAbsPath(S,Dir),ProcessMessages) then exit;
+    if not CopyFolderWithMsg(MakeAbsPath(S,PrgSetup.BaseDir),MakeAbsPath(S,Dir),ProcessMessages,False) then exit;
   end;
 
   {Extra files}
@@ -284,7 +310,7 @@ begin
         If (T<>'') and (T[1]='.') then Delete(T,1,1);
         If (T<>'') and (T[1]='\') then Delete(T,1,1);
         If (T<>'') and (T[length(T)]='\') then Delete(T,length(T),1);
-        if not CopyFileWithMsg(MakeAbsPath(S,PrgSetup.BaseDir),Dir+T+'\'+ExtractFileName(S),ProcessMessages) then exit;
+        if not CopyFileWithMsg(MakeAbsPath(S,PrgSetup.BaseDir),Dir+T+'\'+ExtractFileName(S),ProcessMessages,False) then exit;
       end;
     finally
       St.Free;
@@ -302,7 +328,7 @@ begin
           MessageDlg(Format(LanguageSetup.MessagePathNotRelative,[S,Game.Name,PrgSetup.BaseDir]),mtError,[mbOK],0);
           result:=False; exit;
         end;
-        if not CopyFolderWithMsg(MakeAbsPath(S,PrgSetup.BaseDir),MakeAbsPath(S,Dir),ProcessMessages) then exit;
+        if not CopyFolderWithMsg(MakeAbsPath(S,PrgSetup.BaseDir),MakeAbsPath(S,Dir),ProcessMessages,False) then exit;
       end;
     finally
       St.Free;
@@ -322,7 +348,7 @@ begin
       If (T<>'') and (T[1]='.') then Delete(T,1,1);
       If (T<>'') and (T[1]='\') then Delete(T,1,1);
       If (T<>'') and (T[length(T)]='\') then Delete(T,length(T),1);
-      if not CopyFileWithMsg(MakeAbsPath(S,PrgSetup.BaseDir),Dir+T+'\'+ExtractFileName(S),ProcessMessages) then exit;
+      if not CopyFileWithMsg(MakeAbsPath(S,PrgSetup.BaseDir),Dir+T+'\'+ExtractFileName(S),ProcessMessages,False) then exit;
     end;
     For I:=0 to Folders.Count-1 do begin
       S:=IncludeTrailingPathDelimiter(MakeRelPath(IncludeTrailingPathDelimiter(Folders[I]),PrgSetup.BaseDir,True));
@@ -330,7 +356,7 @@ begin
         MessageDlg(Format(LanguageSetup.MessagePathNotRelative,[S,Game.Name,PrgSetup.BaseDir]),mtError,[mbOK],0);
         result:=False; exit;
       end;
-      if not CopyFolderWithMsg(MakeAbsPath(S,PrgSetup.BaseDir),MakeAbsPath(S,Dir),ProcessMessages) then exit;
+      if not CopyFolderWithMsg(MakeAbsPath(S,PrgSetup.BaseDir),MakeAbsPath(S,Dir),ProcessMessages,False) then exit;
     end;
   finally
     Files.Free;
@@ -402,21 +428,30 @@ begin
 
   I:=FindFirst(Folder+'*.exe',faAnyFile,Rec);
   try
-    While I=0 do begin result.Add(Rec.Name); I:=FindNext(Rec); end;
+    While I=0 do begin
+      If (ExtUpperCase(Rec.Name)<>'DOS4GW.EXE') and (ExtUpperCase(Copy(Rec.Name,1,6))<>'README') then result.Add(Rec.Name);
+      I:=FindNext(Rec);
+    end;
   finally
     FindClose(Rec);
   end;
 
   I:=FindFirst(Folder+'*.com',faAnyFile,Rec);
   try
-    While I=0 do begin result.Add(Rec.Name); I:=FindNext(Rec); end;
+    While I=0 do begin
+      If ExtUpperCase(Copy(Rec.Name,1,6))<>'README' then result.Add(Rec.Name);
+      I:=FindNext(Rec);
+    end;
   finally
     FindClose(Rec);
   end;
 
   I:=FindFirst(Folder+'*.bat',faAnyFile,Rec);
   try
-    While I=0 do begin result.Add(Rec.Name); I:=FindNext(Rec); end;
+    While I=0 do begin
+      If ExtUpperCase(Copy(Rec.Name,1,6))<>'README' then result.Add(Rec.Name);
+      I:=FindNext(Rec);
+    end;
   finally
     FindClose(Rec);
   end;
@@ -484,7 +519,8 @@ begin
 
       For I:=0 to PrgFiles.Count-1 do If Integer(PrgFiles.Objects[I])=NewLevel then begin
         GameCheckSum:=GetMD5Sum(Folder+PrgFiles[I]);
-        For J:=0 to AutoSetupDB.Count-1 do If (AutoSetupDB[J].GameExeMD5<>'') and (AutoSetupDB[J].GameExeMD5=GameCheckSum) then begin
+        For J:=0 to AutoSetupDB.Count-1 do
+          If (AutoSetupDB[J].GameExeMD5<>'') and (AutoSetupDB[J].GameExeMD5=GameCheckSum) then begin
           result.AddObject(PrgFiles[I],TObject(J));
         end;
       end;
@@ -492,7 +528,7 @@ begin
     until False;
 
     {If there is more than one, use additional checksums}
-    If result.Count>0 then begin
+    If result.Count>1 then begin
       MatchByAdditionalData:=TList.Create;
       try
         B:=False;
@@ -595,22 +631,53 @@ begin
     FindClose(Rec);
   end;
 
-  If (Files=0) and (Folders=1) and (SubFolder<>'') then result:=IncludeTrailingPathDelimiter(IncludeTrailingPathDelimiter(Dir)+SubFolder);
+  If (Files=0) and (Folders=1) and (SubFolder<>'') then begin
+    result:=IncludeTrailingPathDelimiter(IncludeTrailingPathDelimiter(Dir)+SubFolder);
+    result:=OnlySubFolderCheck(result);
+  end;
 end;
 
-Function AddGameFromSimpleFolder(Dir : String; const GameDB, TemplateDB, AutoSetupDB : TGameDB; const ProfileName, ProfileFolder, FileToStart, SetupFileToStart : String; const TemplateNr : Integer) : TGame;
+Function AddGameFromSimpleFolder(Dir : String; const GameDB, TemplateDB, AutoSetupDB : TGameDB; const ProfileName, ProfileFolder, FileToStart, SetupFileToStart : String; const TemplateNr : Integer; const DoNotCopyFolder : Boolean) : TGame;
+const FileExts : Array[0..5] of String = ('ico','png','jpeg','jpg','gif','bmp');
 Var GameDir,NewGameFolder,S : String;
     I,J : Integer;
     Rec : TSearchRec;
     G : TGame;
+    B : Boolean;
+    Msg : tagMSG;
 begin
   result:=nil;
 
   {Create folder for new game}
   GameDir:=IncludeTrailingPathDelimiter(MakeAbsPath(PrgSetup.GameDir,PrgSetup.BaseDir));
-  NewGameFolder:=GetFolderForGame(GameDir,ProfileFolder);
-  ForceDirectories(GameDir+NewGameFolder);
-  if not CopyFolderWithMsg(Dir,GameDir+NewGameFolder,False) then exit;
+  If DoNotCopyFolder then begin
+    S:=ExtUpperCase(GameDir);
+    If ExtUpperCase(Copy(Dir,1,length(S)))=S then begin
+      NewGameFolder:=Copy(Dir,length(S)+1,MaxInt);
+      If (length(NewGameFolder)>0) and (NewGameFolder[length(NewGameFolder)]='\') then SetLength(NewGameFolder,length(NewGameFolder)-1);
+    end else begin
+      S:=Dir;
+      If (length(S)>0) and (S[length(S)]='\') then SetLength(S,length(S)-1);
+      I:=Pos('\',S); While I>0 do begin S:=Copy(S,I+1,MaxInt); I:=Pos('\',S); end;
+      NewGameFolder:=S;
+    end;
+  end else begin
+    NewGameFolder:=GetFolderForGame(GameDir,ProfileFolder);
+    ForceDirectories(GameDir+NewGameFolder);
+    B:=False;
+    If Application.MainForm<>nil then begin
+      B:=Application.MainForm.Enabled;
+     Application.MainForm.Enabled:=False;
+    end;
+    try
+      if not CopyFolderWithMsg(Dir,GameDir+NewGameFolder,True,True) then exit;
+    finally
+      If Application.MainForm<>nil then begin
+        While PeekMessage(Msg,Application.MainForm.Handle,WM_INPUT,WM_INPUT,1) do ;
+        Application.MainForm.Enabled:=B;
+      end;
+    end;
+  end;
 
   {Create game DB record}
   I:=GameDB.Add(ProfileName); result:=GameDB[I];
@@ -626,14 +693,26 @@ begin
   result.ProfileMode:='DOSBox';
   result.Name:=ProfileName;
   result.GameExe:=MakeRelPath(GameDir+NewGameFolder+'\'+FileToStart,PrgSetup.BaseDir);
-  If Trim(SetupFileToStart)<>'' then result.SetupExe:=MakeRelPath(GameDir+NewGameFolder+'\'+SetupFileToStart,PrgSetup.BaseDir);
+  result.GameExeMD5:=GetMD5Sum(MakeAbsPath(result.GameExe,PrgSetup.BaseDir));
+  If Trim(SetupFileToStart)<>'' then begin
+    result.SetupExe:=MakeRelPath(GameDir+NewGameFolder+'\'+SetupFileToStart,PrgSetup.BaseDir);
+    result.SetupExeMD5:=GetMD5Sum(MakeAbsPath(result.SetupExe,PrgSetup.BaseDir));
+  end else begin
+    result.SetupExe:='';
+    result.SetupExeMD5:='';
+  end;
 
   {Look for Icons in game folder}
-  J:=FindFirst(GameDir+NewGameFolder+'\*.ico',faAnyFile,Rec);
-  try
-    If J=0 then result.Icon:=MakeRelPath(GameDir+NewGameFolder+'\'+Rec.Name,PrgSetup.BaseDir);
-  finally
-    FindClose(Rec);
+  For I:=Low(FileExts) to High(FileExts) do begin
+    J:=FindFirst(GameDir+NewGameFolder+'\*.'+FileExts[I],faAnyFile,Rec);
+    try
+      If J=0 then begin
+        result.Icon:=MakeRelPath(GameDir+NewGameFolder+'\'+Rec.Name,PrgSetup.BaseDir);
+        break;
+      end;
+    finally
+      FindClose(Rec);
+    end;
   end;
 
   {Set capture directory}
@@ -649,7 +728,7 @@ begin
   result.LoadCache;
 end;
 
-Function CreateGameFromSimpleFolder(Dir : String; const GameDB : TGameDB; const ArchiveFileName : String) : TGame;
+Function CreateGameFromSimpleFolder(Dir : String; const GameDB : TGameDB; const ArchiveFileName : String; const NoDialogIfAutoSetupIsAvailable, DoNotCopyFolder : Boolean) : TGame;
 Var AutoSetupDB,TemplateDB : TGameDB;
     StartableFiles, AutoSetup : TStringList;
     Nr : Integer;
@@ -668,8 +747,8 @@ begin
     try
       TemplateDB:=TGameDB.Create(PrgDataDir+TemplateSubDir,False);
       try
-        If not ShowSelectTemplateForZipImportDialog(Application.MainForm,AutoSetupDB,TemplateDB,StartableFiles,AutoSetup,ArchiveFileName,ProfileName,FileToStart,SetupFileToStart,ProfileFolder,Nr) then exit;
-        result:=AddGameFromSimpleFolder(Dir,GameDB,TemplateDB,AutoSetupDB,ProfileName,ProfileFolder,FileToStart,SetupFileToStart,Nr);
+        If not ShowSelectTemplateForZipImportDialog(Application.MainForm,AutoSetupDB,TemplateDB,StartableFiles,AutoSetup,ArchiveFileName,ProfileName,FileToStart,SetupFileToStart,ProfileFolder,Nr,NoDialogIfAutoSetupIsAvailable,DoNotCopyFolder) then exit;
+        result:=AddGameFromSimpleFolder(Dir,GameDB,TemplateDB,AutoSetupDB,ProfileName,ProfileFolder,FileToStart,SetupFileToStart,Nr,DoNotCopyFolder);
         if result=nil then exit;
       finally
         TemplateDB.Free;
@@ -683,11 +762,36 @@ begin
   end;
 end;
 
+Function ProfileExistingCheck(const GameDB : TGameDB; const TempProfFile : String) : Boolean;
+Var TempProf : TGame;
+    I : Integer;
+begin
+  result:=False;
+
+  TempProf:=TGame.Create(TempProfFile);
+  try
+    TempProf.StoreConfigOnExit:=False;
+    I:=GameDB.IndexOf(TempProf.CacheName);
+    If I<0 then begin result:=True; exit; end;
+    Case MessageDlg(Format(LanguageSetup.MessageZipImportDuplicateWarning,[TempProf.CacheName]),mtWarning,[mbYes,mbNo,mbCancel],0) of
+      mrYes : result:=UninstallGame(Application.MainForm,GameDB,GameDB[I]);
+      mrNo : result:=True;
+      mrCancel : {nothing, keep result:=False;};
+    End;
+  finally
+    TempProf.Free;
+  end;
+end;
+
 Function CreateGameFromDFRPackageFolder(const Dir : String; const GameDB : TGameDB; const TempProfFile : String) : TGame;
 Var ProfFile : String;
     I : Integer;
+    B : Boolean;
+    Msg : tagMSG;
 begin
   result:=nil;
+
+  If not ProfileExistingCheck(GameDB,TempProfFile) then exit;
 
   {Add profile}
   ProfFile:=PrgDataDir+GameListSubDir+'\'+ExtractFileName(TempProfFile);
@@ -696,31 +800,43 @@ begin
     repeat inc(I); until not FileExists(ChangeFileExt(ProfFile,IntToStr(I)+'.prof'));
     ProfFile:=ChangeFileExt(ProfFile,IntToStr(I)+'.prof');
   end;
-  If not CopyFileWithMsg(TempProfFile,ProfFile,False) then exit;
+  If not CopyFileWithMsg(TempProfFile,ProfFile,False,True) then exit;
 
   result:=TGame.Create(ProfFile);
   GameDB.Add(result);
 
   {Add files}
-  CopyFolderWithMsg(Dir,PrgSetup.BaseDir,False,result,True);
+  B:=False;
+  If Application.MainForm<>nil then begin
+    B:=Application.MainForm.Enabled;
+   Application.MainForm.Enabled:=False;
+  end;
+  try
+    CopyFolderWithMsg(Dir,PrgSetup.BaseDir,True,True,result,True);
+  finally
+    If Application.MainForm<>nil then begin
+      While PeekMessage(Msg,Application.MainForm.Handle,WM_INPUT,WM_INPUT,1) do ;
+      Application.MainForm.Enabled:=B;
+    end;
+  end;
 end;
 
 
-Function CreateGameFromFolder(const Dir : String; const GameDB : TGameDB; const ArchivFileName : String) : TGame;
+Function CreateGameFromFolder(const Dir : String; const GameDB : TGameDB; const ArchivFileName : String; const NoDialogIfAutoSetupIsAvailable : Boolean) : TGame;
 Var TempProfFile : String;
 begin
   TempProfFile:=GetProfFileName(Dir);
 
   If TempProfFile='' then begin
     {Add simple zip archive}
-    result:=CreateGameFromSimpleFolder(Dir,GameDB,ArchivFileName);
+    result:=CreateGameFromSimpleFolder(Dir,GameDB,ArchivFileName,NoDialogIfAutoSetupIsAvailable,False);
   end else begin
     {Add normal zip package (with prof file)}
     result:=CreateGameFromDFRPackageFolder(Dir,GameDB,TempProfFile);
   end;
 end;
 
-Function ImportZipPackage(const AOwner : TComponent; const AFileName : String; const AGameDB : TGameDB) : TGame;
+Function ImportZipPackage(const AOwner : TComponent; const AFileName : String; const AGameDB : TGameDB; const NoDialogIfAutoSetupIsAvailable : Boolean) : TGame;
 Var Temp : String;
 begin
   result:=nil;
@@ -733,7 +849,7 @@ begin
 
   try
     if not ExtractZipFile(AOwner,AFileName,Temp) then exit;
-    result:=CreateGameFromFolder(Temp,AGameDB,AFileName);
+    result:=CreateGameFromFolder(Temp,AGameDB,AFileName,NoDialogIfAutoSetupIsAvailable);
     If result<>nil then begin
       result.StoreAllValues;
       result.LoadCache;

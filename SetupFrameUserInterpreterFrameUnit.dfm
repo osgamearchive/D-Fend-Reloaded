@@ -138,6 +138,16 @@ object SetupFrameUserInterpreterFrame: TSetupFrameUserInterpreterFrame
     ShowHint = True
     OnClick = ButtonWork
   end
+  object InfoLabel: TLabel
+    Left = 16
+    Top = 216
+    Width = 378
+    Height = 89
+    Anchors = [akLeft, akTop, akRight]
+    AutoSize = False
+    Caption = 'InfoLabel'
+    WordWrap = True
+  end
   object ComboBox: TComboBox
     Left = 16
     Top = 32
@@ -145,7 +155,7 @@ object SetupFrameUserInterpreterFrame: TSetupFrameUserInterpreterFrame
     Height = 21
     Style = csDropDownList
     Anchors = [akLeft, akTop, akRight]
-    ItemHeight = 13
+    ItemHeight = 0
     TabOrder = 0
     OnChange = ComboBoxChange
   end

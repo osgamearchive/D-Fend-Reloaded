@@ -4,13 +4,16 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, Buttons, StdCtrls, ExtCtrls, ComCtrls, ImgList, Grids, Menus;
+  Dialogs, Buttons, StdCtrls, ExtCtrls, ComCtrls, ImgList, Grids, Menus,
+  ModernProfileEditorBaseFrameUnit;
 
 Type TInfoData=record
   Data : String;
   UsedDriveLetters : String;
   DefaultInitialDir : String;
   ProfileFileName : String;
+  CloseRequest : TNotifyEvent;
+  BaseGameFrame : TModernProfileEditorBaseFrame;
 end;
 
 Type TProfileMountEditorFrame=interface
@@ -46,9 +49,11 @@ type
     LastVisible : Integer;
     FrameInfoRec : Array of TFrameInfoRec;
     Procedure AddFrame(const Frame : TFrame; const FrameI : TProfileMountEditorFrame);
+    Procedure CloseRequest(Sender : TObject);
   public
     { Public-Deklarationen }
     Data : String;
+    BaseGameFrame : TModernProfileEditorBaseFrame;
     UsedDriveLetters : String;
     DefaultInitialDir : String;
     ProfileFileName : String;
@@ -57,7 +62,7 @@ type
 var
   ProfileMountEditorForm: TProfileMountEditorForm;
 
-Function ShowProfileMountEditorDialog(const AOwner : TComponent; var AData : String; const AUsedDriveLetters : String; const ADefaultInitialDir : String; const AProfileFileName : String; const NextFreeDriveLetter : String ='' {for adding new drives}) : Boolean;
+Function ShowProfileMountEditorDialog(const AOwner : TComponent; var AData : String; const AUsedDriveLetters : String; const ADefaultInitialDir : String; const AProfileFileName : String; const Frame : TModernProfileEditorBaseFrame =nil; const NextFreeDriveLetter : String ='' {for adding new drives}) : Boolean;
 
 implementation
 
@@ -108,9 +113,12 @@ begin
 
   InfoData.Data:=Data;
   InfoData.UsedDriveLetters:=UsedDriveLetters;
+  InfoData.CloseRequest:=CloseRequest;
+  InfoData.BaseGameFrame:=BaseGameFrame;
   If ExtUpperCase(Copy(DefaultInitialDir,1,7))='DOSBOX:'
     then InfoData.DefaultInitialDir:=MakeAbsPath(PrgSetup.GameDir,PrgSetup.BaseDir)
-    else InfoData.DefaultInitialDir:=DefaultInitialDir;
+    else InfoData.DefaultInitialDir:=MakeAbsPath(DefaultInitialDir,PrgSetup.BaseDir);
+  If not DirectoryExists(InfoData.DefaultInitialDir) then InfoData.DefaultInitialDir:=MakeAbsPath(PrgSetup.GameDir,PrgSetup.BaseDir);
   InfoData.ProfileFileName:=ProfileFileName;
 
   If FrameI.Init(InfoData) then LastVisible:=I;
@@ -147,14 +155,20 @@ begin
   end;
   F:=TProfileMountEditorCDImageFrame.Create(self); AddFrame(F,TProfileMountEditorCDImageFrame(F));
   F:=TProfileMountEditorHDImageFrame.Create(self); AddFrame(F,TProfileMountEditorHDImageFrame(F));
-  If PrgSetup.AllowPhysFSUsage then begin
+  F:=TProfileMountEditorZipFrame.Create(self); AddFrame(F,TProfileMountEditorZipFrame(F));
+  If PrgSetup.AllowPhysFSUsage or (LastVisible=-1) then begin
     F:=TProfileMountEditorPhysFSFrame.Create(self); AddFrame(F,TProfileMountEditorPhysFSFrame(F));
   end;
-  F:=TProfileMountEditorZipFrame.Create(self); AddFrame(F,TProfileMountEditorZipFrame(F));
 
   I:=LastVisible; LastVisible:=-1;
   TypeComboBox.ItemIndex:=I;
   TypeComboBoxChange(Sender);
+end;
+
+procedure TProfileMountEditorForm.CloseRequest(Sender: TObject);
+begin
+  ModalResult:=mrOK;
+  OKButtonClick(Sender);
 end;
 
 procedure TProfileMountEditorForm.OKButtonClick(Sender: TObject);
@@ -193,7 +207,7 @@ end;
 
 { global }
 
-Function ShowProfileMountEditorDialog(const AOwner : TComponent; var AData : String; const AUsedDriveLetters : String; const ADefaultInitialDir : String; const AProfileFileName : String; const NextFreeDriveLetter : String) : Boolean;
+Function ShowProfileMountEditorDialog(const AOwner : TComponent; var AData : String; const AUsedDriveLetters : String; const ADefaultInitialDir : String; const AProfileFileName : String; const Frame : TModernProfileEditorBaseFrame; const NextFreeDriveLetter : String) : Boolean;
 Var S : String;
 begin
   If AData='' then begin
@@ -203,6 +217,7 @@ begin
   ProfileMountEditorForm:=TProfileMountEditorForm.Create(AOwner);
   try
     ProfileMountEditorForm.Data:=AData;
+    ProfileMountEditorForm.BaseGameFrame:=Frame;
     If Trim(ADefaultInitialDir)<>'\'
       then ProfileMountEditorForm.DefaultInitialDir:=ADefaultInitialDir
       else ProfileMountEditorForm.DefaultInitialDir:=PrgSetup.GameDir;

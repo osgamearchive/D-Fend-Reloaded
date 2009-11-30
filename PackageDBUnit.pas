@@ -3,33 +3,37 @@ interface
 
 uses Classes, XMLIntf, Forms;
 
-Type TDownloadData=class
+Type TPackageList=class;
+
+     TDownloadData=class
   protected
     FName, FURL, FPackageChecksum : String;
     FSize : Integer;
     FChecksumXMLName : String;
     FPackageFileURL : String;
+    FPackageList : TPackageList;
     Function CheckAttributes(const N : IXMLNode; const Attr : Array of String) : Boolean;
   public
-    Constructor Create(const APackageFileURL : String);
+    Constructor Create(const APackageList : TPackageList);
     Function LoadFromXMLNode(const N : IXMLNode) : Boolean; virtual;
     property Name : String read FName;
     property URL : String read FURL;
     property Size : Integer read FSize;
     property PackageChecksum : String read FPackageChecksum;
     property PackageFileURL : String read FPackageFileURL;
+    property PackageList : TPackageList read FPackageList;
 end;
 
-Type TDownloadIconData=class(TDownloadData)
+     TDownloadIconData=class(TDownloadData)
   public
-    Constructor Create(const APackageFileURL : String);
+    Constructor Create(const APackageList : TPackageList);
 end;
 
-Type TDownloadAutoSetupData=class(TDownloadData)
+     TDownloadAutoSetupData=class(TDownloadData)
   private
     FGenre, FDeveloper, FPublisher, FYear, FLanguage, FGameExeChecksum : String;
   public
-    Constructor Create(const APackageFileURL : String);
+    Constructor Create(const APackageList : TPackageList);
     Function LoadFromXMLNode(const N : IXMLNode) : Boolean; override;
     property Genre : String read FGenre;
     property Developer : String read FDeveloper;
@@ -39,52 +43,64 @@ Type TDownloadAutoSetupData=class(TDownloadData)
     property GameExeChecksum : String read FGameExeChecksum;
 end;
 
-Type TDownloadZipData=class(TDownloadAutoSetupData)
+     TDownloadZipData=class(TDownloadAutoSetupData)
   private
     FLicense : String;
+    FMetaLink : Boolean;
+    FAutoSetupForZipURL, FAutoSetupForZipURLMaxVersion : String;
   public
-    Constructor Create(const APackageFileURL : String);
+    Constructor Create(const APackageList : TPackageList);
     Function LoadFromXMLNode(const N : IXMLNode) : Boolean; override;
     property License : String read FLicense;
+    property MetaLink : Boolean read FMetaLink;
+    property AutoSetupForZipURL : String read FAutoSetupForZipURL;
+    property AutoSetupForZipURLMaxVersion : String read FAutoSetupForZipURLMaxVersion;
+
 end;
 
-Type TDownloadLanguageData=class(TDownloadData)
+     TDownloadLanguageData=class(TDownloadData)
   private
-    FMinVersion, FMaxVersion, FAuthor : String;
+    FDescription, FMinVersion, FMaxVersion, FAuthor : String;
   public
-    Constructor Create(const APackageFileURL : String);
+    Constructor Create(const APackageList : TPackageList);
     Function LoadFromXMLNode(const N : IXMLNode) : Boolean; override;
+    property Author : String read FAuthor;
     property MinVersion : String read FMinVersion;
     property MaxVersion : String read FMaxVersion;
-    property Author : String read FAuthor;
+    property Description : String read FDescription;
 end;
 
-Type TDownloadExeData=class(TDownloadData)
+     TDownloadExeData=class(TDownloadData)
   private
     FDescription : String;
   public
-    Constructor Create(const APackageFileURL : String);
+    Constructor Create(const APackageList : TPackageList);
     Function LoadFromXMLNode(const N : IXMLNode) : Boolean; override;
     property Description : String read FDescription;
 end;
 
-Type TDownloadIconSetData=class(TDownloadData)
+     TDownloadIconSetData=class(TDownloadData)
   private
     FMinVersion, FMaxVersion, FAuthor : String;
   public
-    Constructor Create(const APackageFileURL : String);
+    Constructor Create(const APackageList : TPackageList);
     Function LoadFromXMLNode(const N : IXMLNode) : Boolean; override;
     property MinVersion : String read FMinVersion;
     property MaxVersion : String read FMaxVersion;
     property Author : String read FAuthor;
 end;
 
-Type TPackageList=class
+     TProviderAction=(paNothing, paWriteInfoToProfile, paInfoDialog, paOpenURL);
+     TProviderActions=set of TProviderAction;
+
+     TPackageList=class
   private
     FUpdateDate : TDateTime;
     FName : String;
     FFileName, FURL : String;
     FGame, FAutoSetup, FLanguage, FExePackage, FIcon, FIconSet : TList;
+    FProviderName, FProviderText, FProviderURL, FReferer : String;
+    FProviderActions : TProviderActions;
     function GetCount(const Index: Integer): Integer;
     Function AddGame(const N : IXMLNode) : Boolean;
     Function AddAutoSetup(const N : IXMLNode) : Boolean;
@@ -92,6 +108,7 @@ Type TPackageList=class
     Function AddExePackage(const N : IXMLNode) : Boolean;
     Function AddIcon(const N : IXMLNode) : Boolean;
     Function AddIconSet(const N : IXMLNode) : Boolean;
+    Procedure SetProviderInfo(const N : IXMLNode);
     function GetAutoSetup(I: Integer): TDownloadAutoSetupData;
     function GetExePackage(I: Integer): TDownloadExeData;
     function GetGame(I: Integer): TDownloadZipData;
@@ -102,8 +119,9 @@ Type TPackageList=class
     Constructor Create(const AURL : String);
     Destructor Destroy; override;
     Procedure Clear;
-    Function LoadFromFile(const AFileName : String) : Boolean;
+    Function LoadFromFile(const AFileName : String; const AOrigFileName : String ='') : Boolean;
     property FileName : String read FFileName;
+    property URL : String read FURL;
     property Name : String read FName;
     property UpdateDate : TDateTime read FUpdateDate;
     property GamesCount : Integer index 0 read GetCount;
@@ -118,6 +136,11 @@ Type TPackageList=class
     property ExePackage[I : Integer] : TDownloadExeData read GetExePackage;
     property Icon[I : Integer] : TDownloadIconData read GetIcon;
     property IconSet[I : Integer] : TDownloadIconSetData read GetIconSet;
+    property ProviderName : String read FProviderName;
+    property ProviderText : String read FProviderText;
+    property ProviderURL : String read FProviderURL;
+    property Referer : String read FReferer;
+    property ProviderActions : TProviderActions read FProviderActions;
 end;
 
 Type TPackageListFile=class
@@ -138,13 +161,13 @@ Type TPackageListFile=class
     Constructor Create(const AIsMasterList : Boolean);
     Destructor Destroy; override;
     Procedure Clear;
-    Function LoadFromFile(const AFileName : String) : Boolean;
+    Function LoadFromFile(const AFileName : String; const AOrigFileName : String ='') : Boolean;
     Procedure SaveToFile(const ParentForm : TForm);
-    Procedure UpdateFromServer(const URL, TempFile : String);
+    Procedure UpdateFromServer(const URL, TempFile : String; const UpdateAnyway : Boolean);
     Procedure Add(const AURL : String; const AActive : Boolean);
     Procedure Delete(const Nr : Integer);
     property FileName : String read FFileName;
-    property UpdateDate : TDateTime read FUpdateDate;
+    property UpdateDate : TDateTime read FUpdateDate write FUpdateDate;
     property Count : Integer read GetCount;
     property URL[I : Integer] : String read GetURL write SetURL; default;
     property Active[I : Integer] : Boolean read GetActive write SetActive;
@@ -159,8 +182,8 @@ Type TPackageDB=class
     FDBDir : String;
     FOnDownload : TDownloadEvent;
     Function InitDBDir : Boolean;
-    Procedure InitPackageFiles(const MainFile, UserFile : TPackageListFile; const Update: Boolean);
-    Function InitPackageFile(const URL : String; const Update : Boolean) : TPackageList;
+    Procedure InitPackageFiles(const MainFile, UserFile : TPackageListFile; const Update, UpdateAll: Boolean);
+    Function InitPackageFile(const URL : String; const Update, UpdateAll : Boolean) : TPackageList;
     Function GetCount: Integer;
     Function GetPackageList(I: Integer): TPackageList;
     Function FileInUse(FileName : String) : Boolean;
@@ -168,7 +191,7 @@ Type TPackageDB=class
     Constructor Create;
     Destructor Destroy; override;
     Procedure Clear;
-    Procedure LoadDB(const Update : Boolean);
+    Procedure LoadDB(const Update, UpdateAll  : Boolean);
     property Count : Integer read GetCount;
     property List[I : Integer] : TPackageList read GetPackageList; default;
     property DBDir : String read FDBDir;
@@ -178,18 +201,19 @@ end;
 implementation
 
 uses Windows, SysUtils, Dialogs, XMLDom, XMLDoc, MSXMLDOM, PackageDBToolsUnit,
-     CommonTools, PrgConsts, PrgSetupUnit, LanguageSetupUnit;
+     CommonTools, PrgConsts, PrgSetupUnit, LanguageSetupUnit, GameDBToolsUnit;
 
 { TDownloadData }
 
-constructor TDownloadData.Create(const APackageFileURL : String);
+constructor TDownloadData.Create(const APackageList : TPackageList);
 begin
   inherited Create;
   FName:='';
   FURL:='';
   FPackageChecksum:='';
   FSize:=0;
-  FPackageFileURL:=APackageFileURL;
+  FPackageList:=APackageList;
+  FPackageFileURL:=FPackageList.URL;
 
   FChecksumXMLName:='PackageChecksum';
 end;
@@ -206,7 +230,7 @@ function TDownloadData.LoadFromXMLNode(const N: IXMLNode): Boolean;
 begin
   result:=False;
   if not CheckAttributes(N,['Name',FChecksumXMLName,'Size']) then exit;
-  FName:=N.Attributes['Name'];
+  FName:=DecodeHTMLSymbols(N.Attributes['Name']);
   FPackageChecksum:=N.Attributes[FChecksumXMLName];
   if not TryStrToInt(N.Attributes['Size'],FSize) then FSize:=0;
   FURL:=N.NodeValue; If (FURL='') then exit;
@@ -215,17 +239,17 @@ end;
 
 { TDownloadIconData }
 
-constructor TDownloadIconData.Create(const APackageFileURL : String);
+constructor TDownloadIconData.Create(const APackageList : TPackageList);
 begin
-  inherited Create(APackageFileURL);
+  inherited Create(APackageList);
   FChecksumXMLName:='FileChecksum';
 end;
 
 { TDownloadAutoSetupData }
 
-constructor TDownloadAutoSetupData.Create(const APackageFileURL : String);
+constructor TDownloadAutoSetupData.Create(const APackageList : TPackageList);
 begin
-  inherited Create(APackageFileURL);
+  inherited Create(APackageList);
   FGenre:='';
   FDeveloper:='';
   FPublisher:='';
@@ -238,38 +262,52 @@ begin
   result:=False;
   if not inherited LoadFromXMLNode(N) then exit;
   if not CheckAttributes(N,['Genre','Developer','Publisher','Year','Language']) then exit;
-  FGenre:=N.Attributes['Genre'];
-  FDeveloper:=N.Attributes['Developer'];
-  FPublisher:=N.Attributes['Publisher'];
-  FYear:=N.Attributes['Year'];
-  FLanguage:=N.Attributes['Language'];
+  FGenre:=DecodeHTMLSymbols(N.Attributes['Genre']);
+  FDeveloper:=DecodeHTMLSymbols(N.Attributes['Developer']);
+  FPublisher:=DecodeHTMLSymbols(N.Attributes['Publisher']);
+  FYear:=DecodeHTMLSymbols(N.Attributes['Year']);
+  FLanguage:=DecodeHTMLSymbols(N.Attributes['Language']);
   If N.HasAttribute('GameExeChecksum') then FGameExeChecksum:=N.Attributes['GameExeChecksum'] else FGameExeChecksum:='';
   result:=True;
 end;
 
 { TDownloadZipData }
 
-constructor TDownloadZipData.Create(const APackageFileURL : String);
+constructor TDownloadZipData.Create(const APackageList : TPackageList);
 begin
-  inherited Create(APackageFileURL);
+  inherited Create(APackageList);
   FLicense:='';
+  FMetaLink:=False;
+  FAutoSetupForZipURL:=''; FAutoSetupForZipURLMaxVersion:='';
 end;
 
 function TDownloadZipData.LoadFromXMLNode(const N: IXMLNode): Boolean;
+Var S : String;
 begin
   result:=False;
   if not inherited LoadFromXMLNode(N) then exit;
   if not CheckAttributes(N,['License']) then exit;
-  FLicense:=N.Attributes['License'];
+  FLicense:=DecodeHTMLSymbols(N.Attributes['License']);
+
+  If N.HasAttribute('MetaLink') then begin
+    S:=ExtUpperCase(N.Attributes['MetaLink']);
+    FMetaLink:=(S='YES') or (S='ON') or (S='TRUE');
+  end;
+
+  If N.HasAttribute('AutoSetupURL') then begin
+    FAutoSetupForZipURL:=N.Attributes['AutoSetupURL'];
+    If N.HasAttribute('AutoSetupURLMaxVersion') then FAutoSetupForZipURLMaxVersion:=N.Attributes['AutoSetupURLMaxVersion'];
+  end;
+
   result:=True;
 end;
 
 { TDownloadLanguage }
 
-constructor TDownloadLanguageData.Create(const APackageFileURL : String);
+constructor TDownloadLanguageData.Create(const APackageList : TPackageList);
 begin
-  inherited Create(APackageFileURL);
-  FMinVersion:=''; FMaxVersion:=''; FAuthor:='';
+  inherited Create(APackageList);
+  FMinVersion:=''; FMaxVersion:=''; FAuthor:=''; FDescription:='';
 end;
 
 function TDownloadLanguageData.LoadFromXMLNode(const N: IXMLNode): Boolean;
@@ -277,17 +315,18 @@ begin
   result:=False;
   if not inherited LoadFromXMLNode(N) then exit;
   If not CheckAttributes(N,['MinVersion','MaxVersion','Author']) then exit;
+  If N.HasAttribute('Description') then FDescription:=N.Attributes['Description'];
   FMinVersion:=N.Attributes['MinVersion'];
   FMaxVersion:=N.Attributes['MaxVersion'];
-  FAuthor:=N.Attributes['Author'];
+  FAuthor:=DecodeHTMLSymbols(N.Attributes['Author']);
   result:=True;
 end;
 
 { TDownloadExeData }
 
-constructor TDownloadExeData.Create(const APackageFileURL : String);
+constructor TDownloadExeData.Create(const APackageList : TPackageList);
 begin
-  inherited Create(APackageFileURL);
+  inherited Create(APackageList);
   FDescription:='';
 end;
 
@@ -296,15 +335,15 @@ begin
   result:=False;
   If not inherited LoadFromXMLNode(N) then exit;
   if not CheckAttributes(N,['Description']) then exit;
-  FDescription:=N.Attributes['Description'];
+  FDescription:=DecodeHTMLSymbols(N.Attributes['Description']);
   result:=True;
 end;
 
 { TDownloadIconSetData }
 
-constructor TDownloadIconSetData.Create(const APackageFileURL : String);
+constructor TDownloadIconSetData.Create(const APackageList : TPackageList);
 begin
-  inherited Create(APackageFileURL);
+  inherited Create(APackageList);
   FChecksumXMLName:='FileChecksum';
   FMinVersion:=''; FMaxVersion:=''; FAuthor:='';
 end;
@@ -316,7 +355,7 @@ begin
   If not CheckAttributes(N,['MinVersion','MaxVersion','Author']) then exit;
   FMinVersion:=N.Attributes['MinVersion'];
   FMaxVersion:=N.Attributes['MaxVersion'];
-  FAuthor:=N.Attributes['Author'];
+  FAuthor:=DecodeHTMLSymbols(N.Attributes['Author']);
   result:=True;
 end;
 
@@ -334,6 +373,11 @@ begin
   FExePackage:=TList.Create;
   FIcon:=TList.Create;
   FIconSet:=TList.Create;
+  FProviderName:='';
+  FProviderText:='';
+  FProviderURL:='';
+  FProviderActions:=[];
+  FReferer:='automatic';
 end;
 
 destructor TPackageList.Destroy;
@@ -361,8 +405,12 @@ begin
   FExePackage.Clear;
   For I:=0 to FIcon.Count-1 do TDownloadIconData(FIcon[I]).Free;
   FIcon.Clear;
-  For I:=0 to FIconSet.Count-1 do TDownloadIconData(FIconSet[I]).Free;
+  For I:=0 to FIconSet.Count-1 do TDownloadIconSetData(FIconSet[I]).Free;
   FIconSet.Clear;
+  FProviderName:='';
+  FProviderText:='';
+  FProviderURL:='';
+  FProviderActions:=[];
 end;
 
 function TPackageList.GetCount(const Index: Integer): Integer;
@@ -411,7 +459,7 @@ end;
 Function TPackageList.AddGame(const N : IXMLNode) : Boolean;
 Var DownloadZipData : TDownloadZipData;
 begin
-  DownloadZipData:=TDownloadZipData.Create(FURL);
+  DownloadZipData:=TDownloadZipData.Create(self);
   result:=DownloadZipData.LoadFromXMLNode(N);
   if result then FGame.Add(DownloadZipData) else DownloadZipData.Free;
 end;
@@ -419,7 +467,7 @@ end;
 Function TPackageList.AddAutoSetup(const N : IXMLNode) : Boolean;
 Var DownloadAutoSetupData : TDownloadAutoSetupData;
 begin
-  DownloadAutoSetupData:=TDownloadAutoSetupData.Create(FURL);
+  DownloadAutoSetupData:=TDownloadAutoSetupData.Create(self);
   result:=DownloadAutoSetupData.LoadFromXMLNode(N);
   if result then FAutoSetup.Add(DownloadAutoSetupData) else DownloadAutoSetupData.Free;
 end;
@@ -427,7 +475,7 @@ end;
 Function TPackageList.AddLanguage(const N : IXMLNode) : Boolean;
 Var DownloadLanguageData : TDownloadLanguageData;
 begin
-  DownloadLanguageData:=TDownloadLanguageData.Create(FURL);
+  DownloadLanguageData:=TDownloadLanguageData.Create(self);
   result:=DownloadLanguageData.LoadFromXMLNode(N);
   if result then FLanguage.Add(DownloadLanguageData) else DownloadLanguageData.Free;
 end;
@@ -435,7 +483,7 @@ end;
 Function TPackageList.AddExePackage(const N : IXMLNode) : Boolean;
 Var DownloadExeData : TDownloadExeData;
 begin
-  DownloadExeData:=TDownloadExeData.Create(FURL);
+  DownloadExeData:=TDownloadExeData.Create(self);
   result:=DownloadExeData.LoadFromXMLNode(N);
   if result then FExePackage.Add(DownloadExeData) else DownloadExeData.Free;
 end;
@@ -443,7 +491,7 @@ end;
 Function TPackageList.AddIcon(const N : IXMLNode) : Boolean;
 Var DownloadIconData : TDownloadIconData;
 begin
-  DownloadIconData:=TDownloadIconData.Create(FURL);
+  DownloadIconData:=TDownloadIconData.Create(self);
   result:=DownloadIconData.LoadFromXMLNode(N);
   if result then FIcon.Add(DownloadIconData) else DownloadIconData.Free;
 end;
@@ -451,12 +499,23 @@ end;
 Function TPackageList.AddIconSet(const N : IXMLNode) : Boolean;
 Var DownloadIconSetData : TDownloadIconSetData;
 begin
-  DownloadIconSetData:=TDownloadIconSetData.Create(FURL);
+  DownloadIconSetData:=TDownloadIconSetData.Create(self);
   result:=DownloadIconSetData.LoadFromXMLNode(N);
   if result then FIconSet.Add(DownloadIconSetData) else DownloadIconSetData.Free;
 end;
 
-function TPackageList.LoadFromFile(const AFileName: String): Boolean;
+Procedure TPackageList.SetProviderInfo(const N : IXMLNode);
+begin
+  If (N.HasAttribute('WriteToProfile')) and (Trim(ExtUpperCase(N.Attributes['WriteToProfile']))='YES') then FProviderActions:=FProviderActions+[paWriteInfoToProfile];
+  If (N.HasAttribute('Dialog')) and (Trim(ExtUpperCase(N.Attributes['Dialog']))='YES') then FProviderActions:=FProviderActions+[paInfoDialog];
+  If (N.HasAttribute('OpenURL')) and (Trim(ExtUpperCase(N.Attributes['OpenURL']))='YES') then FProviderActions:=FProviderActions+[paOpenURL];
+  If N.HasAttribute('Name') then FProviderName:=DecodeHTMLSymbols(N.Attributes['Name']);
+  If N.HasAttribute('Text') then FProviderText:=DecodeHTMLSymbols(N.Attributes['Text']);
+  If N.HasAttribute('URL') then FProviderURL:=N.Attributes['URL'];
+  If N.HasAttribute('Referer') then FReferer:=N.Attributes['Referer'];
+end;
+
+function TPackageList.LoadFromFile(const AFileName: String; const AOrigFileName : String): Boolean;
 Var XMLDoc : TXMLDocument;
     I : Integer;
     N : IXMLNode;
@@ -465,11 +524,11 @@ begin
   FFileName:=AFileName;
   Clear;
 
-  XMLDoc:=LoadXMLDoc(AFileName); if XMLDoc=nil then exit;
+  XMLDoc:=LoadXMLDoc(AFileName,AOrigFileName); if XMLDoc=nil then exit;
   try
     If XMLDoc.DocumentElement.NodeName<>'DFRPackagesFile' then exit;
     If not XMLDoc.DocumentElement.HasAttribute('Name') then exit;
-    FName:=XMLDoc.DocumentElement.Attributes['Name'];
+    FName:=DecodeHTMLSymbols(XMLDoc.DocumentElement.Attributes['Name']);
     If not XMLDoc.DocumentElement.HasAttribute('LastUpdateDate') then FUpdateDate:=0 else begin
       FUpdateDate:=DecodeUpdateDate(XMLDoc.DocumentElement.Attributes['LastUpdateDate']);
     end;
@@ -481,6 +540,7 @@ begin
       If N.NodeName='ExePackage' then AddExePackage(N);
       If N.NodeName='Icon' then AddIcon(N);
       If N.NodeName='IconSet' then AddIconSet(N);
+      If N.NodeName='Provider' then SetProviderInfo(N);
     end;
   finally
     XMLDoc.Free;
@@ -554,7 +614,7 @@ begin
   FActive.Delete(Nr);
 end;
 
-function TPackageListFile.LoadFromFile(const AFileName: String): Boolean;
+function TPackageListFile.LoadFromFile(const AFileName: String; const AOrigFileName : String): Boolean;
 Var XMLDoc : TXMLDocument;
     I : Integer;
 begin
@@ -562,7 +622,7 @@ begin
   FFileName:=AFileName;
   result:=False;
 
-  XMLDoc:=LoadXMLDoc(AFileName);
+  XMLDoc:=LoadXMLDoc(AFileName,AOrigFileName);
   try
     If (XMLDoc=nil) or (XMLDoc.DocumentElement.NodeName<>'DFRPackagesList') then exit;
     If not XMLDoc.DocumentElement.HasAttribute('LastUpdateDate') then FUpdateDate:=0 else begin
@@ -613,7 +673,7 @@ begin
   If FIsMasterList then SpecialSaveActiveState;
 end;
 
-Procedure TPackageListFile.UpdateFromServer(const URL, TempFile : String);
+Procedure TPackageListFile.UpdateFromServer(const URL, TempFile : String; const UpdateAnyway : Boolean);
 Var TempMainFile : TPackageListFile;
 begin
   if not DownloadFile(URL,TempFile) then exit;
@@ -621,7 +681,7 @@ begin
   TempMainFile:=TPackageListFile.Create(FIsMasterList);
   try
     if not TempMainFile.LoadFromFile(TempFile) then exit;
-    If TempMainFile.UpdateDate<=UpdateDate then exit;
+    If (TempMainFile.UpdateDate<=UpdateDate) and (not UpdateAnyway) then exit;
     Clear;
     ExtDeleteFile(FileName,ftTemp);
     RenameFile(TempFile,FileName);
@@ -727,11 +787,11 @@ begin
   result:=True;
 end;
 
-function TPackageDB.InitPackageFile(const URL: String; const Update: Boolean): TPackageList;
+function TPackageDB.InitPackageFile(const URL: String; const Update, UpdateAll: Boolean): TPackageList;
 Var TempList : TPackageList;
 begin
   result:=TPackageList.Create(URL);
-  result.LoadFromFile(DBDir+ExtractFileNameFromURL(URL));
+  result.LoadFromFile(DBDir+ExtractFileNameFromURL(URL,'.xml'));
 
   If not Update then exit;
 
@@ -739,15 +799,15 @@ begin
 
   TempList:=TPackageList.Create(URL);
   try
-    if not TempList.LoadFromFile(DBDir+PackageDBTempFile) then exit;
-    If TempList.UpdateDate<=result.UpdateDate then exit;
+    if not TempList.LoadFromFile(DBDir+PackageDBTempFile,DBDir+ExtractFileNameFromURL(URL,'.xml')) then exit;
+    If (TempList.UpdateDate<=result.UpdateDate) and (not UpdateAll) then exit;
 
     result.Free;
     FreeAndNil(TempList);
-    ExtDeleteFile(DBDir+ExtractFileNameFromURL(URL),ftTemp);
-    RenameFile(DBDir+PackageDBTempFile,DBDir+ExtractFileNameFromURL(URL));
+    ExtDeleteFile(DBDir+ExtractFileNameFromURL(URL,'.xml'),ftTemp);
+    RenameFile(DBDir+PackageDBTempFile,DBDir+ExtractFileNameFromURL(URL,'.xml'));
     result:=TPackageList.Create(URL);
-    result.LoadFromFile(DBDir+ExtractFileNameFromURL(URL));
+    result.LoadFromFile(DBDir+ExtractFileNameFromURL(URL,'.xml'));
   finally
     TempList.Free;
     ExtDeleteFile(DBDir+PackageDBTempFile,ftTemp);
@@ -767,7 +827,7 @@ begin
   result:=False;
 end;
 
-procedure TPackageDB.InitPackageFiles(const MainFile, UserFile: TPackageListFile; const Update: Boolean);
+procedure TPackageDB.InitPackageFiles(const MainFile, UserFile: TPackageListFile; const Update, UpdateAll: Boolean);
 Var I,C1,C2 : Integer;
     P : TPackageList;
     Rec : TSearchRec;
@@ -783,14 +843,14 @@ begin
 
     For I:=0 to MainFile.Count-1 do If MainFile.Active[I] then begin
       If Assigned(FOnDownload) then FOnDownload(self,I,C1+C2,dsProgress,ContinueDownload);
-      P:=InitPackageFile(MainFile[I],Update);
+      P:=InitPackageFile(MainFile[I],Update,UpdateAll);
       If P<>nil then FPackageList.Add(P);
       If not ContinueDownload then break;
     end;
     If ContinueDownload then For I:=0 to UserFile.Count-1 do If UserFile.Active[I] then begin
       ContinueDownload:=True;
       If Assigned(FOnDownload) then FOnDownload(self,C1+I,C1+C2,dsProgress,ContinueDownload);
-      P:=InitPackageFile(UserFile[I],Update);
+      P:=InitPackageFile(UserFile[I],Update,UpdateAll);
       If P<>nil then FPackageList.Add(P);
     end;
   finally
@@ -811,7 +871,7 @@ begin
   end;
 end;
 
-procedure TPackageDB.LoadDB(const Update: Boolean);
+procedure TPackageDB.LoadDB(const Update, UpdateAll : Boolean);
 Var MainFile, UserFile : TPackageListFile;
 begin
   Clear;
@@ -820,11 +880,11 @@ begin
   MainFile:=TPackageListFile.Create(True);
   try
     MainFile.LoadFromFile(DBDir+PackageDBMainFile);
-    If Update then MainFile.UpdateFromServer(PackageDBMainFileURL,DBDir+PackageDBTempFile);
+    If Update then MainFile.UpdateFromServer(Format(PackageDBMainFileURL,[GetNormalFileVersionAsString]),DBDir+PackageDBTempFile,UpdateAll);
     UserFile:=TPackageListFile.Create(False);
     try
       UserFile.LoadFromFile(DBDir+PackageDBUserFile);
-      InitPackageFiles(MainFile,UserFile,Update);
+      InitPackageFiles(MainFile,UserFile,Update,UpdateAll);
     finally
       UserFile.Free;
     end;

@@ -189,7 +189,7 @@ type
 var
   ProfileEditorForm: TProfileEditorForm;
 
-Function EditGameProfil(const AOwner : TComponent; const AGameDB : TGameDB; var AGame : TGame; const ADefaultGame : TGame; const ASearchLinkFile : TLinkFile; const ADeleteOnExit : TStringList; const ANewExeFile : String; const GameList : TList = nil) : Boolean;
+Function EditGameProfil(const AOwner : TComponent; const AGameDB : TGameDB; var AGame : TGame; const ADefaultGame : TGame; const ASearchLinkFile : TLinkFile; const ADeleteOnExit : TStringList; const ANewProfileName, ANewExeFile : String; const GameList : TList = nil) : Boolean;
 Function EditGameTemplate(const AOwner : TComponent; const AGameDB : TGameDB; var AGame : TGame; const ADefaultGame : TGame; const ASearchLinkFile : TLinkFile; const ADeleteOnExit : TStringList; const GameList : TList = nil; const TemplateType : TList = nil) : Boolean;
 
 implementation
@@ -861,9 +861,21 @@ begin
       ValueFromIndex[9]:=IntToStr(Game.LoadFixMemory);
       If Game.CaptureFolder<>'' then ValueFromIndex[10]:=Game.CaptureFolder else ValueFromIndex[10]:=IncludeTrailingPathDelimiter(PrgSetup.CaptureDir);
     end;
-    St:=ValueToList(Game.ExtraFiles); try ExtraFilesListBox.Items.AddStrings(St); finally St.Free; end;
+    St:=ValueToList(Game.ExtraFiles);
+    try
+      I:=0; While I<St.Count do If Trim(St[I])='' then St.Delete(I) else inc(I);
+      ExtraFilesListBox.Items.AddStrings(St);
+    finally
+      St.Free;
+    end;
     If ExtraFilesListBox.Items.Count>0 then ExtraFilesListBox.ItemIndex:=0;
-    St:=ValueToList(Game.ExtraDirs); try ExtraDirsListBox.Items.AddStrings(St); finally St.Free; end;
+    St:=ValueToList(Game.ExtraDirs);
+    try
+      I:=0; While I<St.Count do If Trim(St[I])='' then St.Delete(I) else inc(I);
+      ExtraDirsListBox.Items.AddStrings(St);
+    finally
+      St.Free;
+    end;
     If ExtraDirsListBox.Items.Count>0 then ExtraDirsListBox.ItemIndex:=0;
   end;
   ExtraDirsListBoxClick(nil);
@@ -1109,7 +1121,7 @@ begin
     end;
     with SoundSBValueListEditor.Strings do begin
       If Game.SBType<>'' then ValueFromIndex[0]:=Game.SBType;
-      ValueFromIndex[1]:=IntToStr(Game.SBBase);
+      ValueFromIndex[1]:=Game.SBBase;
       ValueFromIndex[2]:=IntToStr(Game.SBIRQ);
       ValueFromIndex[3]:=IntToStr(Game.SBDMA);
       ValueFromIndex[4]:=IntToStr(Game.SBHDMA);
@@ -1119,7 +1131,7 @@ begin
     end;
     with SoundGUSValueListEditor.Strings do begin
       If Game.GUS then ValueFromIndex[0]:=RemoveUnderline(LanguageSetup.Yes) else ValueFromIndex[0]:=RemoveUnderline(LanguageSetup.No);
-      ValueFromIndex[1]:=IntToStr(Game.GUSBase);
+      ValueFromIndex[1]:=Game.GUSBase;
       ValueFromIndex[2]:=IntToStr(Game.GUSIRQ);
       ValueFromIndex[3]:=IntToStr(Game.GUSDMA);
       ValueFromIndex[4]:=IntToStr(Game.GUSRate);
@@ -1389,7 +1401,7 @@ begin
 
   S1:=SoundSBValueListEditor.Strings.ValueFromIndex[1];
   If not TryStrToInt(Trim(S1),I) then begin
-    If Game<>nil then S2:=IntToStr(Game.SBBase) else S2:=IntToStr(DefaultValueReaderGame.SBBase);
+    If Game<>nil then S2:=Game.SBBase else S2:=DefaultValueReaderGame.SBBase;
     If MessageDlg(Format(LanguageSetup.MessageInvalidValue,[S1,LanguageSetup.ProfileEditorSoundSBAddress,S2]),mtWarning,[mbYes,mbNo],0)<>mrYes then begin
       PageControl.ActivePageIndex:=5; exit;
     end;
@@ -1589,7 +1601,7 @@ begin
   end;
   with SoundSBValueListEditor.Strings do begin
     Game.SBType:=ValueFromIndex[0];
-    try Game.SBBase:=StrToInt(Trim(ValueFromIndex[1])); except end;
+    Game.SBBase:=Trim(ValueFromIndex[1]);
     try Game.SBIRQ:=StrToInt(Trim(ValueFromIndex[2])); except end;
     try Game.SBDMA:=StrToInt(Trim(ValueFromIndex[3])); except end;
     try Game.SBHDMA:=StrToInt(Trim(ValueFromIndex[4])); except end;
@@ -1599,7 +1611,7 @@ begin
   end;
   with SoundGUSValueListEditor.Strings do begin
     Game.GUS:=(ValueFromIndex[0]=RemoveUnderline(LanguageSetup.Yes));
-    Game.GUSBase:=StrToInt(Trim(ValueFromIndex[1]));
+    Game.GUSBase:=Trim(ValueFromIndex[1]);
     Game.GUSIRQ:=StrToInt(Trim(ValueFromIndex[2]));
     Game.GUSDMA:=StrToInt(Trim(ValueFromIndex[3]));
     Game.GUSRate:=StrToInt(Trim(ValueFromIndex[4]));
@@ -1763,7 +1775,7 @@ begin
             then T:=PrgSetup.GameDir
             else T:=ProfileSettingsValueListEditor.Strings.ValueFromIndex[2];
           U:=ProfileSettingsValueListEditor.Strings.ValueFromIndex[0];
-          if not ShowProfileMountEditorDialog(self,S,UsedDriveLetters,IncludeTrailingPathDelimiter(ExtractFilePath(T)),U,NextFreeDriveLetter) then exit;
+          if not ShowProfileMountEditorDialog(self,S,UsedDriveLetters,IncludeTrailingPathDelimiter(ExtractFilePath(T)),U,nil,NextFreeDriveLetter) then exit;
           Mounting.Add(S);
           LoadMountingList;
           MountingListView.ItemIndex:=MountingListView.Items.Count-1;
@@ -1988,12 +2000,12 @@ begin
     3 : begin
           If ProfileSettingsValueListEditor.Strings.ValueFromIndex[3]=RemoveUnderline(LanguageSetup.Yes) then exit;
           S:=ProfileSettingsValueListEditor.Strings.ValueFromIndex[2];
-          If SelectProgramFile(S,ProfileSettingsValueListEditor.Strings.ValueFromIndex[2],ProfileSettingsValueListEditor.Strings.ValueFromIndex[4],False,self) then ProfileSettingsValueListEditor.Strings.ValueFromIndex[2]:=S;
+          If SelectProgramFile(S,ProfileSettingsValueListEditor.Strings.ValueFromIndex[2],ProfileSettingsValueListEditor.Strings.ValueFromIndex[4],False,-1,self) then ProfileSettingsValueListEditor.Strings.ValueFromIndex[2]:=S;
         end;
     6 : begin
           If ProfileSettingsValueListEditor.Strings.ValueFromIndex[6]=RemoveUnderline(LanguageSetup.Yes) then exit;
           S:=ProfileSettingsValueListEditor.Strings.ValueFromIndex[4];
-          If SelectProgramFile(S,ProfileSettingsValueListEditor.Strings.ValueFromIndex[4],ProfileSettingsValueListEditor.Strings.ValueFromIndex[2],False,self) then ProfileSettingsValueListEditor.Strings.ValueFromIndex[4]:=S;
+          If SelectProgramFile(S,ProfileSettingsValueListEditor.Strings.ValueFromIndex[4],ProfileSettingsValueListEditor.Strings.ValueFromIndex[2],False,-1,self) then ProfileSettingsValueListEditor.Strings.ValueFromIndex[4]:=S;
         end;
    11 : begin
           S:=PrgSetup.BaseDir;
@@ -2172,13 +2184,13 @@ end;
 
 { global }
 
-Function EditGameProfilInt(const AOwner : TComponent; const AGameDB : TGameDB; var AGame : TGame; const ADefaultGame : TGame; const ASearchLinkFile : TLinkFile; const ADeleteOnExit : TStringList; const PrevButton, NextButton, RestorePos : Boolean; const EditingTemplate : Boolean; const ANewExeFile : String; const HideGameInfoPage : Boolean) : Integer;
+Function EditGameProfilInt(const AOwner : TComponent; const AGameDB : TGameDB; var AGame : TGame; const ADefaultGame : TGame; const ASearchLinkFile : TLinkFile; const ADeleteOnExit : TStringList; const PrevButton, NextButton, RestorePos : Boolean; const EditingTemplate : Boolean; const ANewProfileName, ANewExeFile : String; const HideGameInfoPage : Boolean) : Integer;
 Var D : Double;
     S : String;
     I : Integer;
 begin
   If ScummVMMode(AGame) or ScummVMMode(ADefaultGame) or WindowsExeMode(AGame) or WindowsExeMode(ADefaultGame) then begin
-    result:=ModernProfileEditorFormUnit.EditGameProfilInt(AOwner,AGameDB,AGame,ADefaultGame,ASearchLinkFile,ADeleteOnExit,PrevButton,NextButton,RestorePos,EditingTemplate,ANewExeFile,HideGameInfoPage);
+    result:=ModernProfileEditorFormUnit.EditGameProfilInt(AOwner,AGameDB,AGame,ADefaultGame,ASearchLinkFile,ADeleteOnExit,PrevButton,NextButton,RestorePos,EditingTemplate,ANewProfileName,ANewExeFile,HideGameInfoPage);
     exit;
   end;
 
@@ -2216,10 +2228,10 @@ begin
   end;
 end;
 
-Function EditGameProfil(const AOwner : TComponent; const AGameDB : TGameDB; var AGame : TGame; const ADefaultGame : TGame; const ASearchLinkFile : TLinkFile; const ADeleteOnExit : TStringList; const ANewExeFile : String; const GameList : TList = nil) : Boolean;
+Function EditGameProfil(const AOwner : TComponent; const AGameDB : TGameDB; var AGame : TGame; const ADefaultGame : TGame; const ASearchLinkFile : TLinkFile; const ADeleteOnExit : TStringList; const ANewProfileName, ANewExeFile : String; const GameList : TList = nil) : Boolean;
 Var I,J : Integer;
     PrevButton,NextButton,RestorePos : Boolean;
-    S : String;
+    S,T : String;
 begin
   I:=0; RestorePos:=False;
   repeat
@@ -2239,8 +2251,8 @@ begin
       NextButton:=(J>=0) and (J<GameList.Count-1);
       PrevButton:=(J>0);
     end;
-    If (GameList=nil) or (GameList.Count=0) then S:=ANewExeFile else S:='';
-    I:=EditGameProfilInt(AOwner,AGameDB,AGame,ADefaultGame,ASearchLinkFile,ADeleteOnExit,PrevButton,NextButton,RestorePos,False,S,False);
+    If (GameList=nil) or (GameList.Count=0) then begin S:=ANewProfileName; T:=ANewExeFile; end else begin S:=''; T:=''; end;
+    I:=EditGameProfilInt(AOwner,AGameDB,AGame,ADefaultGame,ASearchLinkFile,ADeleteOnExit,PrevButton,NextButton,RestorePos,False,S,T,False);
     RestorePos:=True;
   until (I=0) or (I=-2);
   result:=(I<>-2);
@@ -2279,7 +2291,7 @@ begin
 
     If TemplateMode=2 then AGame.ProfileMode:='ScummVM';
     try
-      I:=EditGameProfilInt(AOwner,AGameDB,AGame,ADefaultGame,ASearchLinkFile,ADeleteOnExit,PrevButton,NextButton,RestorePos,True,'',TemplateMode<>0);
+      I:=EditGameProfilInt(AOwner,AGameDB,AGame,ADefaultGame,ASearchLinkFile,ADeleteOnExit,PrevButton,NextButton,RestorePos,True,'','',TemplateMode<>0);
     finally
       If TemplateMode=2 then AGame.ProfileMode:='DOSBox';
     end;

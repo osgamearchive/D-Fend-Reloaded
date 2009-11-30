@@ -84,7 +84,7 @@ end;
 procedure TModernProfileEditorGUSFrame.SetGame(const Game: TGame; const LoadFromTemplate: Boolean);
 begin
   ActivateGUSCheckBox.Checked:=Game.GUS;
-  SetComboBox(AddressComboBox,IntToStr(Game.GUSBase),'240');
+  SetComboBox(AddressComboBox,Game.GUSBase,'240');
   SetComboBox(SampleRateComboBox,IntToStr(Game.GUSRate),'22050');
   SetComboBox(Interrupt1ComboBox,IntToStr(Game.GUSIRQ),'5');
   SetComboBox(DMA1ComboBox,IntToStr(Game.GUSDMA),'1');
@@ -94,7 +94,7 @@ end;
 procedure TModernProfileEditorGUSFrame.GetGame(const Game: TGame);
 begin
   Game.GUS:=ActivateGUSCheckBox.Checked;
-  try Game.GUSBase:=StrtoInt(AddressComboBox.Text); except end;
+  Game.GUSBase:=AddressComboBox.Text;
   try Game.GUSRate:=StrtoInt(SampleRateComboBox.Text); except end;
   try Game.GUSIRQ:=StrtoInt(Interrupt1ComboBox.Text); except end;
   try Game.GUSDMA:=StrtoInt(DMA1ComboBox.Text); except end;

@@ -27,7 +27,7 @@ type
     { Public-Deklarationen }
     Destructor Destroy; override;
     Function GetName : String;
-    Procedure InitGUIAndLoadSetup(InitData : TInitData);
+    Procedure InitGUIAndLoadSetup(var InitData : TInitData);
     Procedure BeforeChangeLanguage;
     Procedure LoadLanguage;
     Procedure DOSBoxDirChanged;
@@ -59,7 +59,7 @@ begin
   result:=LanguageSetup.SetupFormGUI;
 end;
 
-procedure TSetupFrameSurface.InitGUIAndLoadSetup(InitData: TInitData);
+procedure TSetupFrameSurface.InitGUIAndLoadSetup(var InitData: TInitData);
 Var I : Integer;
     S : String;
 begin
@@ -71,7 +71,7 @@ begin
   ShortName:=TStringList.Create;
   LongName:=TStringList.Create;
   Author:=TStringList.Create;
-  ListOfIconSets(ShortName,LongName,Author);
+  ListOfIconSets(ShortName,LongName,Author,nil);
   IconSetListbox.Items.AddStrings(LongName);
   If IconSetListbox.Items.Count>0 then IconSetListbox.ItemIndex:=0;
   S:=ExtUpperCase(PrgSetup.IconSet);

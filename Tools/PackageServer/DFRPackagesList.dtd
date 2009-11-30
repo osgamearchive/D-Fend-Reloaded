@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
-<!ELEMENT DFRPackagesList (DFRPackageFile)+>
+<!ELEMENT DFRPackagesList (DFRPackagesFile)+>
 <!ATTLIST DFRPackagesList
 	LastUpdateDate CDATA #REQUIRED
 >

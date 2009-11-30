@@ -38,7 +38,8 @@ Function ShowExpandImageDialog(const AOwner : TComponent) : Boolean;
 implementation
 
 uses ShellAPI, VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgSetupUnit,
-     GameDBUnit, DOSBoxUnit, ImageTools, HelpConsts, IconLoaderUnit;
+     GameDBUnit, DOSBoxUnit, ImageTools, HelpConsts, IconLoaderUnit,
+     DOSBoxTempUnit, PrgConsts;
 
 {$R *.dfm}
 
@@ -126,8 +127,7 @@ begin
 end;
 
 function TExpandImageForm.ExpandImage(const FileName, Dir: String; const ImageType : Integer): Boolean;
-Var DefaultGame, TempGame : TGame;
-    TempGameFileName : String;
+Var TempGame : TTempGame;
     FreeDOS : String;
     St : TStringList;
 begin
@@ -140,39 +140,30 @@ begin
     exit;
   end;
 
-  TempGameFileName:=TempDir+'TempDOSBox.prof';
-  TempGame:=TGame.Create(TempGameFileName);
+  TempGame:=TTempGame.Create;
   try
-    DefaultGame:=TGame.Create(PrgSetup);
-    try TempGame.AssignFrom(DefaultGame); finally DefaultGame.Free; end;
-
-    TempGame.Autoexec:='';
-    TempGame.AutoexecOverridegamestart:=True;
-    TempGame.AutoexecOverrideMount:=False;
-    TempGame.AutoexecBootImage:='';
-
-    TempGame.NrOfMounts:=3;
-    TempGame.Mount0:=FreeDOS+';DRIVE;C;False;;105';
+    TempGame.Game.NrOfMounts:=3;
+    TempGame.Game.Mount0:=FreeDOS+';DRIVE;C;False;;'+IntToStr(DefaultFreeHDSize);
     Case ImageType of
-      0 : TempGame.Mount1:=FileName+';FLOPPYIMAGE;A;;;';
-      1 : TempGame.Mount1:=FileName+';IMAGE;A;;;512,63,16,'+GetGeometryFromFile(FileName);
-      2 : TempGame.Mount1:=FileName+';CDROMIMAGE;A;;;';
+      0 : TempGame.Game.Mount1:=FileName+';FLOPPYIMAGE;A;;;';
+      1 : TempGame.Game.Mount1:=FileName+';IMAGE;A;;;512,63,16,'+GetGeometryFromFile(FileName);
+      2 : TempGame.Game.Mount1:=FileName+';CDROMIMAGE;A;;;';
     end;
-    TempGame.Mount2:=Dir+';DRIVE;D;False;;1000';
+    TempGame.Game.Mount2:=Dir+';DRIVE;D;False;;1000';
 
     St:=TStringList.Create;
     try
       St.Add('C:\4DOS.COM /C COPY A:\*.* D:\ /S');
       St.Add('exit');
-      TempGame.Autoexec:=StringListToString(St);
+      TempGame.Game.Autoexec:=StringListToString(St);
     finally
       St.Free;
     end;
 
-    TempGame.StoreAllValues;
-    RunCommand(TempGame,'',True);
+    TempGame.Game.StoreAllValues;
+    RunCommand(TempGame.Game,'',True);
   finally
-    TempGame.Free;
+    TempGame.Game.Free;
   end;
 
   result:=True;

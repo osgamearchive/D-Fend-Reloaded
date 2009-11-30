@@ -24,7 +24,7 @@ object ModernProfileEditorGameInfoFrame: TModernProfileEditorGameInfoFrame
   end
   object DelButton: TSpeedButton
     Left = 593
-    Top = 219
+    Top = 224
     Width = 23
     Height = 22
     Anchors = [akTop, akRight]
@@ -48,7 +48,7 @@ object ModernProfileEditorGameInfoFrame: TModernProfileEditorGameInfoFrame
   end
   object AddButton: TSpeedButton
     Left = 564
-    Top = 219
+    Top = 224
     Width = 23
     Height = 22
     Anchors = [akTop, akRight]
@@ -70,36 +70,44 @@ object ModernProfileEditorGameInfoFrame: TModernProfileEditorGameInfoFrame
     ShowHint = True
     OnClick = AddButtonClick
   end
+  object MultiValueInfoLabel: TLabel
+    Left = 12
+    Top = 21
+    Width = 250
+    Height = 13
+    Caption = 'You can enter multiple values per key divided by ";".'
+  end
   object GameInfoValueListEditor: TValueListEditor
     Left = 12
-    Top = 16
+    Top = 40
     Width = 605
     Height = 145
     Anchors = [akLeft, akTop, akRight]
     Strings.Strings = (
       '=')
-    TabOrder = 0
+    TabOrder = 1
     ColWidths = (
       150
       449)
   end
   object FavouriteCheckBox: TCheckBox
-    Left = 12
-    Top = 200
-    Width = 605
+    Left = 467
+    Top = 21
+    Width = 149
     Height = 17
+    Anchors = [akTop, akRight]
     Caption = 'FavouriteCheckBox'
-    TabOrder = 1
+    TabOrder = 0
   end
   object NotesMemo: TRichEdit
     Left = 12
-    Top = 392
+    Top = 390
     Width = 605
-    Height = 145
+    Height = 150
     Anchors = [akLeft, akTop, akRight, akBottom]
     PlainText = True
     ScrollBars = ssBoth
-    TabOrder = 2
+    TabOrder = 4
   end
   object Tab: TStringGrid
     Left = 12
@@ -113,40 +121,61 @@ object ModernProfileEditorGameInfoFrame: TModernProfileEditorGameInfoFrame
     Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goEditing, goAlwaysShowEditor, goThumbTracking]
     TabOrder = 3
   end
-  object Panel1: TPanel
+  object ToolBarPanel: TPanel
     Left = 12
-    Top = 162
-    Width = 605
+    Top = 186
+    Width = 604
     Height = 30
+    Anchors = [akLeft, akTop, akRight]
     BevelOuter = bvNone
-    TabOrder = 4
+    TabOrder = 2
     object ToolBar: TToolBar
       Left = 0
       Top = 0
-      Width = 605
-      Height = 29
+      Width = 604
+      Height = 30
+      AutoSize = True
       ButtonHeight = 30
-      ButtonWidth = 140
+      ButtonWidth = 166
       Caption = 'ToolBar'
       Images = ImageList
       List = True
       ShowCaptions = True
       TabOrder = 0
+      Wrapable = False
       object SearchGameButton: TToolButton
         Tag = 2
         Left = 0
         Top = 0
+        AutoSize = True
         Caption = 'Search for game at ...'
         DropdownMenu = SearchPopupMenu
         ImageIndex = 0
         Style = tbsDropDown
         OnClick = SearchClick
       end
+      object ToolButton1: TToolButton
+        Left = 159
+        Top = 0
+        Width = 8
+        Caption = 'ToolButton1'
+        ImageIndex = 1
+        Style = tbsSeparator
+      end
+      object DownloadDataButton: TToolButton
+        Tag = 3
+        Left = 167
+        Top = 0
+        AutoSize = True
+        Caption = 'Download game information'
+        ImageIndex = 0
+        OnClick = SearchClick
+      end
     end
   end
   object ImageList: TImageList
     Left = 568
-    Top = 24
+    Top = 48
     Bitmap = {
       494C010102000400040010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000001000000001002000000000000010
@@ -290,7 +319,7 @@ object ModernProfileEditorGameInfoFrame: TModernProfileEditorGameInfoFrame
   object SearchPopupMenu: TPopupMenu
     Images = ImageList
     Left = 536
-    Top = 24
+    Top = 48
   end
   object AddUserDataPopupMenu: TPopupMenu
     Left = 528

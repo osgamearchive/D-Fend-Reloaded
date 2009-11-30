@@ -15,7 +15,7 @@ type
   public
     { Public-Deklarationen }
     Function GetName : String;
-    Procedure InitGUIAndLoadSetup(InitData : TInitData);
+    Procedure InitGUIAndLoadSetup(var InitData : TInitData);
     Procedure BeforeChangeLanguage;
     Procedure LoadLanguage;
     Procedure DOSBoxDirChanged;
@@ -38,7 +38,7 @@ begin
   result:=LanguageSetup.SetupFormGeneralSheet;
 end;
 
-procedure TSetupFrameBase.InitGUIAndLoadSetup(InitData : TInitData);
+procedure TSetupFrameBase.InitGUIAndLoadSetup(var InitData : TInitData);
 begin
   NoFlicker(MinimizeToTrayCheckBox);
   NoFlicker(StartWithWindowsCheckBox);

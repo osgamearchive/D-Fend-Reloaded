@@ -34,10 +34,12 @@ type
     FullscreenInfoLabel: TLabel;
     PixelShaderComboBox: TComboBox;
     PixelShaderLabel: TLabel;
+    procedure PixelShaderComboBoxChange(Sender: TObject);
   private
     { Private-Deklarationen }
     ProfileDOSBoxInstallation : PString;
     LastPixelShader : String;
+    PixelShaderChanged :  Boolean;
     Function GetDOSBoxDir : String;
     Procedure ShowFrame(Sender : TObject);
   public
@@ -77,9 +79,14 @@ begin
   NoFlicker(TextModeLinesRadioGroup);
 
   WindowResolutionLabel.Caption:=LanguageSetup.GameWindowResolution;
-  St:=ValueToList(InitData.GameDB.ConfOpt.Resolution,';,'); try WindowResolutionComboBox.Items.AddStrings(St); finally St.Free; end;
   FullscreenResolutionLabel.Caption:=LanguageSetup.GameFullscreenResolution;
-  St:=ValueToList(InitData.GameDB.ConfOpt.Resolution,';,'); try FullscreenResolutionComboBox.Items.AddStrings(St); finally St.Free; end;
+  St:=ValueToList(InitData.GameDB.ConfOpt.Resolution,';,');
+  try
+    WindowResolutionComboBox.Items.AddStrings(St);
+    FullscreenResolutionComboBox.Items.AddStrings(St);
+  finally
+    St.Free;
+  end;
   StartFullscreenCheckBox.Caption:=LanguageSetup.GameStartFullscreen;
   FullscreenInfoLabel.Caption:='('+LanguageSetup.GameStartFullscreenInfo+')';
   DoublebufferingCheckBox.Caption:=LanguageSetup.GameUseDoublebuffering;
@@ -112,6 +119,11 @@ begin
   AddDefaultValueHint(ScaleComboBox);
 
   HelpContext:=ID_ProfileEditGraphics;
+end;
+
+procedure TModernProfileEditorGraphicsFrame.PixelShaderComboBoxChange(Sender: TObject);
+begin
+  PixelShaderChanged:=True;
 end;
 
 procedure TModernProfileEditorGraphicsFrame.SetGame(const Game: TGame; const LoadFromTemplate: Boolean);
@@ -187,6 +199,8 @@ begin
     50 : TextModeLinesRadioGroup.ItemIndex:=2;
     else TextModeLinesRadioGroup.ItemIndex:=0;
   end;
+
+  PixelShaderChanged:=LoadFromTemplate;
 end;
 
 function TModernProfileEditorGraphicsFrame.GetDOSBoxDir: String;
@@ -234,6 +248,8 @@ begin
   For I:=0 to PixelShaderComboBox.Items.Count-1 do If Trim(ExtUpperCase(PixelShaderComboBox.Items[I]))=S then begin
     PixelShaderComboBox.ItemIndex:=I; break;
   end;
+
+  PixelShaderChanged:=False;
 end;
 
 procedure TModernProfileEditorGraphicsFrame.GetGame(const Game: TGame);
@@ -250,7 +266,7 @@ begin
   Game.Render:=RenderComboBox.Text;
   Game.VideoCard:=VideoCardComboBox.Text;
 
-  Game.PixelShader:=PixelShaderComboBox.Text;
+  If PixelShaderChanged then Game.PixelShader:=PixelShaderComboBox.Text;
 
   If PrgSetup.AllowVGAChipsetSettings then begin
     Game.VGAChipset:=VGAChipsetComboBox.Text;

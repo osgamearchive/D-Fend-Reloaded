@@ -137,8 +137,8 @@ implementation
 uses VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgConsts,
      ProfileEditorFormUnit, PrgSetupUnit, TemplateSelectProfileFormUnit,
      ModernProfileEditorFormUnit, SelectProfilesFormUnit,
-     EditMultipleProfilesFormUnit, HelpConsts, IconLoaderUnit, WaitFormUnit,
-     StatisticsFormUnit, MultipleProfilesEditorFormUnit;
+     HelpConsts, IconLoaderUnit, WaitFormUnit, StatisticsFormUnit,
+     MultipleProfilesEditorFormUnit;
 
 {$R *.dfm}
 
@@ -258,7 +258,7 @@ begin
   UserIconLoader.DialogImage(DI_Add,ImageList,3);
   UserIconLoader.DialogImage(DI_Edit,ImageList,4);
   UserIconLoader.DialogImage(DI_Clear,ImageList,5);
-  UserIconLoader.DialogImage(DI_Help,ImageList,6);
+  UserIconLoader.DialogImage(DI_ToolbarHelp,ImageList,6);
 
   InitListViewForGamesList(ListView,True);
   InitListViewForGamesList(ListView2,True);
@@ -690,11 +690,7 @@ begin
         end;
    16 : begin
           {Template: Multi edit}
-          If PrgSetup.ActivateIncompleteFeatures and (((GetKeyState(VK_LSHIFT) and $F0)<>0) or ((GetKeyState(VK_RSHIFT) and $F0)<>0)) then begin
-            If not ShowMultipleProfilesEditorDialog(self,TemplateDB,True) then exit;
-          end else begin
-            If not ShowEditMultipleProfilesDialog(self,TemplateDB,True) then exit;
-          end;
+          If not ShowMultipleProfilesEditorDialog(self,TemplateDB,True) then exit;
           If ListView.Selected=nil then begin G:=nil; GName:=''; end else begin
             G:=TGame(ListView.Selected.Data);
             If G=DefaultTemplate then begin G:=nil; GName:=ListView.Selected.Caption; end else GName:='';
@@ -704,11 +700,7 @@ begin
         end;
    17 : begin
           {AutoSetup: Multi edit}
-          If PrgSetup.ActivateIncompleteFeatures and (((GetKeyState(VK_LSHIFT) and $F0)<>0) or ((GetKeyState(VK_RSHIFT) and $F0)<>0)) then begin
-            If not ShowMultipleProfilesEditorDialog(self,AutoSetupDB,True) then exit;
-          end else begin
-            If not ShowEditMultipleProfilesDialog(self,AutoSetupDB,True) then exit;
-          end;
+          If not ShowMultipleProfilesEditorDialog(self,AutoSetupDB,True) then exit;
           If ListView2.Selected=nil then G:=nil else G:=TGame(ListView2.Selected.Data);
           LoadList2;
           SelectGame2(G);
@@ -753,9 +745,9 @@ begin
     If TemplateForm.TemplateScummVM then TemplateForm.Template.ProfileMode:='ScummVM';
     try
       If PrgSetup.DFendStyleProfileEditor and (not TemplateForm.TemplateScummVM) then begin
-        EditGameProfil(AOwner,AGameDB,result,TemplateForm.Template,ASearchLinkFile,ADeleteOnExit,'');
+        EditGameProfil(AOwner,AGameDB,result,TemplateForm.Template,ASearchLinkFile,ADeleteOnExit,'','');
       end else begin
-        ModernEditGameProfil(AOwner,AGameDB,result,TemplateForm.Template,ASearchLinkFile,ADeleteOnExit,'');
+        ModernEditGameProfil(AOwner,AGameDB,result,TemplateForm.Template,ASearchLinkFile,ADeleteOnExit,'','');
       end;
     finally
       If TemplateForm.TemplateScummVM then TemplateForm.Template.ProfileMode:='DOSBox';

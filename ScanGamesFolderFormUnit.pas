@@ -68,7 +68,7 @@ type
     { Private-Deklarationen }
     NewGames : TList;
     AutoSetupDB, TemplateDB : TGameDB;
-    LastSelcted, LastTemplateType : Integer;
+    LastSelected, LastTemplateType : Integer;
     JustUpdating : Boolean;
     Procedure Clear;
     Procedure SetColWidths;
@@ -91,9 +91,9 @@ Function ShowScanGamesFolderResultsDialog(const AOwner : TComponent; const AGame
 
 implementation
 
-uses ShellAPI, Math, CommonTools, PrgSetupUnit, LanguageSetupUnit, VistaToolsUnit,
-     HelpConsts, PrgConsts, WaitFormUnit, ZipPackageUnit, IconLoaderUnit,
-     GameDBToolsUnit;
+uses ShellAPI, Math, CommonTools, PrgSetupUnit, LanguageSetupUnit,
+     VistaToolsUnit, HelpConsts, PrgConsts, WaitFormUnit, ZipPackageUnit,
+     IconLoaderUnit, GameDBToolsUnit, HashCalc;
 
 {$R *.dfm}
 
@@ -188,7 +188,7 @@ begin
   NewGames:=TList.Create;
 
   GamesAdded:=False;
-  LastSelcted:=-1; JustUpdating:=False;
+  LastSelected:=-1; JustUpdating:=False;
 end;
 
 procedure TScanGamesFolderForm.FormShow(Sender: TObject);
@@ -199,7 +199,7 @@ end;
 procedure TScanGamesFolderForm.FormDestroy(Sender: TObject);
 Var I : Integer;
 begin
-  LastSelcted:=-1;
+  LastSelected:=-1;
   PrgSetup.ScanFolderUseFileName:=PopupNameFilename.Checked;
   AutoSetupDB.Free;
   TemplateDB.Free;
@@ -276,7 +276,7 @@ end;
 procedure TScanGamesFolderForm.Clear;
 Var I : Integer;
 begin
-  LastSelcted:=-1;
+  LastSelected:=-1;
 
   For I:=0 to NewGames.Count-1 do TNewGame(NewGames[I]).Free;
   NewGames.Clear;
@@ -318,11 +318,11 @@ end;
 procedure TScanGamesFolderForm.UpdateListRec(Sender : TObject);
 Var NewGame : TNewGame;
 begin
-  If (LastSelcted<0) or JustUpdating then exit;
+  If (LastSelected<0) or JustUpdating then exit;
 
-  NewGame:=TNewGame(NewGames[LastSelcted]);
+  NewGame:=TNewGame(NewGames[LastSelected]);
   NewGame.Name:=ProfileNameEdit.Text;
-  List.Items[LastSelcted].Caption:=ProfileNameEdit.Text;
+  List.Items[LastSelected].Caption:=ProfileNameEdit.Text;
   If Template1ComboBox.ItemIndex=2 then begin
     {(Matching) auto setup}
     NewGame.SelectedTemplate:=Integer(Template2ComboBox.Items.Objects[Template2ComboBox.ItemIndex]);
@@ -330,7 +330,7 @@ begin
   end else begin
     If Template1ComboBox.ItemIndex=1 then begin
       {(Not matching) auto setup template}
-      NewGame.SelectedTemplate:=Template2ComboBox.ItemIndex;
+      If Template2ComboBox.ItemIndex<0 then NewGame.SelectedTemplate:=-1 else NewGame.SelectedTemplate:=Integer(Template2ComboBox.Items.Objects[Template2ComboBox.ItemIndex]);
       NewGame.ExeFile:=IncludeTrailingPathDelimiter(ExtractFilePath(NewGame.ExeFile))+ProgramFileComboBox.Text;
     end else begin
       {User template}
@@ -338,21 +338,21 @@ begin
       NewGame.ExeFile:=IncludeTrailingPathDelimiter(ExtractFilePath(NewGame.ExeFile))+ProgramFileComboBox.Text;
     end;
   end;
-  List.Items[LastSelcted].SubItems[1]:=ExtractFileName(NewGame.ExeFile);
-  If NewGame.SelectedTemplate>=0 then List.Items[LastSelcted].SubItems[2]:=AutoSetupDB[NewGame.SelectedTemplate].CacheName else begin
-    If NewGame.SelectedTemplate=-1 then List.Items[LastSelcted].SubItems[2]:=LanguageSetup.TemplateFormDefault else List.Items[LastSelcted].SubItems[2]:=TemplateDB[-NewGame.SelectedTemplate-2].CacheName;
+  List.Items[LastSelected].SubItems[1]:=ExtractFileName(NewGame.ExeFile);
+  If NewGame.SelectedTemplate>=0 then List.Items[LastSelected].SubItems[2]:=AutoSetupDB[NewGame.SelectedTemplate].CacheName else begin
+    If NewGame.SelectedTemplate=-1 then List.Items[LastSelected].SubItems[2]:=LanguageSetup.TemplateFormDefault else List.Items[LastSelected].SubItems[2]:=TemplateDB[-NewGame.SelectedTemplate-2].CacheName;
   end;
 end;
 
 procedure TScanGamesFolderForm.ListChange(Sender: TObject; Item: TListItem; Change: TItemChange);
 Var NewGame : TNewGame;
 begin
-  If LastSelcted>=0 then UpdateListRec(Sender);
+  If LastSelected>=0 then UpdateListRec(Sender);
 
-  LastSelcted:=List.ItemIndex;
+  LastSelected:=List.ItemIndex;
   EditPanel.Visible:=(List.ItemIndex>=0);
   If List.ItemIndex<0 then exit;
-  NewGame:=TNewGame(NewGames[LastSelcted]);
+  NewGame:=TNewGame(NewGames[LastSelected]);
 
   JustUpdating:=True;
   try
@@ -418,11 +418,13 @@ begin
       Template2ComboBox.Items.BeginUpdate;
       try
         Template2ComboBox.Items.Clear;
-        For I:=0 to AutoSetupDB.Count-1 do Template2ComboBox.Items.Add(AutoSetupDB[I].CacheName);
+        For I:=0 to AutoSetupDB.Count-1 do If Template2ComboBox.Items.IndexOf(AutoSetupDB[I].CacheName)<0 then Template2ComboBox.Items.AddObject(AutoSetupDB[I].CacheName,TObject(I));
       finally
         Template2ComboBox.Items.EndUpdate;
       end;
-      Template2ComboBox.ItemIndex:=Max(0,Min(Template2ComboBox.Items.Count-1,NewGame.SelectedTemplate));
+      I:=-1;
+      For J:=0 to Template2ComboBox.Items.Count-1 do If Integer(Template2ComboBox.Items.Objects[J])=NewGame.SelectedTemplate then begin I:=J; break; end;
+      Template2ComboBox.ItemIndex:=Max(0,Min(Template2ComboBox.Items.Count-1,I));
       exit;
     end;
 
@@ -540,7 +542,7 @@ begin
     If Trim(GameDB[I].ExtraDirs)<>'' then begin
       St:=ValueToList(GameDB[I].ExtraDirs);
       try
-        For J:=0 to St.Count-1 do begin
+        For J:=0 to St.Count-1 do If Trim(St[J])<>'' then begin
           S:=ExtUpperCase(MakeAbsPath(St[J],PrgSetup.BaseDir));
           If Copy(S,1,length(T))=T then exit;
         end;
@@ -601,6 +603,14 @@ begin
       G.AssignFrom(AutoSetupDB[NewGame.SelectedTemplate]);
     end;
     G.GameExe:=MakeRelPath(NewGame.ExeFile,PrgSetup.BaseDir);
+    G.GameExeMD5:=GetMD5Sum(MakeAbsPath(G.GameExe,PrgSetup.BaseDir));
+    If (Trim(G.SetupExe)<>'') and FileExists(IncludeTrailingPathDelimiter(ExtractFilePath(MakeAbsPath(G.GameExe,PrgSetup.BaseDir)))+ExtractFileName(G.SetupExe)) then begin
+      G.SetupExe:=MakeRelPath(IncludeTrailingPathDelimiter(ExtractFilePath(MakeAbsPath(G.GameExe,PrgSetup.BaseDir)))+ExtractFileName(G.SetupExe),PrgSetup.BaseDir);
+      G.SetupExeMD5:=GetMD5Sum(MakeAbsPath(G.SetupExe,PrgSetup.BaseDir));
+    end else begin
+      G.SetupExe:='';
+      G.SetupExeMD5:='';
+    end;
   end else begin
     If NewGame.SelectedTemplate=-1 then begin
       {Default template}

@@ -19,13 +19,15 @@ type
     NotesMemo: TRichEdit;
     AddButton: TSpeedButton;
     DelButton: TSpeedButton;
-    Panel1: TPanel;
+    ToolBarPanel: TPanel;
     ToolBar: TToolBar;
     SearchGameButton: TToolButton;
     SearchPopupMenu: TPopupMenu;
     ImageList: TImageList;
     BaseName: TLabeledEdit;
     AddUserDataPopupMenu: TPopupMenu;
+    ToolButton1: TToolButton;
+    DownloadDataButton: TToolButton;
     procedure AddButtonClick(Sender: TObject);
     procedure DelButtonClick(Sender: TObject);
     procedure SearchClick(Sender: TObject);
@@ -33,6 +35,7 @@ type
     { Private-Deklarationen }
     LinkFile : TLinkFile;
     GameDB : TGameDB;
+    TempCaptureDir : String;
     Procedure LoadLinks;
     Procedure TabListForCell(ACol, ARow: Integer; var UseDropdownListForCell : Boolean);
     Procedure TabGetListForCell(ACol, ARow: Integer; DropdownListForCell : TStrings);
@@ -46,7 +49,8 @@ type
 implementation
 
 uses VistaToolsUnit, LanguageSetupUnit, CommonTools, ClassExtensions,
-     IconLoaderUnit, TextEditPopupUnit;
+     IconLoaderUnit, TextEditPopupUnit, DataReaderFormUnit, GameDBToolsUnit,
+     PrgSetupUnit;
 
 {$R *.dfm}
 
@@ -85,7 +89,9 @@ begin
     St:=ExtLanguageList(GetCustomLanguageName(AGameDB.GetLanguageList)); try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
     Strings.Add(LanguageSetup.GameWWW+'=');
   end;
+  DownloadDataButton.Caption:=LanguageSetup.DataReaderButton;  
   FavouriteCheckBox.Caption:=LanguageSetup.GameFavorite;
+  FavouriteCheckBox.Left:=GameInfoValueListEditor.Left+GameInfoValueListEditor.Width-Application.MainForm.Canvas.TextWidth(FavouriteCheckBox.Caption)-20;
 
   UserDefinedDataLabel.Caption:=LanguageSetup.ProfileEditorUserdefinedInfo+':';
 
@@ -114,6 +120,7 @@ begin
   UserIconLoader.DialogImage(DI_Edit,ImageList,1);
 
   GameDB:=AGameDB;
+  TempCaptureDir:='';
 end;
 
 procedure TWizardGameInfoFrame.LoadLinks;
@@ -124,6 +131,7 @@ begin
 end;
 
 procedure TWizardGameInfoFrame.SearchClick(Sender: TObject);
+Var Genre,Developer,Publisher,Year,Internet : String;
 begin
   Case (Sender as TComponent).Tag of
     0 : begin
@@ -132,6 +140,16 @@ begin
         end;
     1 : If LinkFile.EditFile(False) then LoadLinks;
     2 : OpenLink(LinkFile.Link[0],'<GAMENAME>',BaseName.Text);
+    3 : begin
+          TempCaptureDir:=TempDir+'DFR-TempCapture\'; ForceDirectories(TempCaptureDir);
+          If ShowDataReaderDialog(self,BaseName.Text,Genre,Developer,Publisher,Year,Internet,TempCaptureDir) then with GameInfoValueListEditor.Strings do begin
+            If Genre<>'' then ValueFromIndex[0]:=Genre;
+            If Developer<>'' then ValueFromIndex[1]:=Developer;
+            If Publisher<>'' then ValueFromIndex[2]:=Publisher;
+            If Year<>'' then ValueFromIndex[3]:=Year;
+            If (Internet<>'') and (Trim(ValueFromIndex[5])='') then ValueFromIndex[5]:=Internet;
+          end;
+        end;
   end;
 end;
 
@@ -269,6 +287,15 @@ begin
   end;
 
   Game.Notes:=StringListToString(NotesMemo.Lines);
+
+  If TempCaptureDir<>'' then begin
+    If Trim(Game.CaptureFolder)<>'' then begin
+      S:=MakeAbsPath(Game.CaptureFolder,PrgSetup.BaseDir);
+      ForceDirectories(S);
+      CopyFiles(TempCaptureDir,S,False,True);
+    end;
+    ExtDeleteFolder(TempCaptureDir,ftTemp);
+  end;
 end;
 
 Procedure TWizardGameInfoFrame.TabListForCell(ACol, ARow: Integer; var UseDropdownListForCell : Boolean);

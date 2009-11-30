@@ -63,7 +63,12 @@ begin
   BlockSizeLabel.Caption:=LanguageSetup.ProfileEditorSoundBlockSize;
   St:=ValueToList(InitData.GameDB.ConfOpt.Blocksize,';,'); try BlockSizeComboBox.Items.AddStrings(St); finally St.Free; end;
   PreBufferLabel.Caption:=LanguageSetup.ProfileEditorSoundPrebuffer;
-  with PreBufferComboBox.Items do begin Add('1'); Add('5'); Add('10'); Add('15'); Add('20'); Add('25'); Add('30'); end;
+  PreBufferComboBox.Items.BeginUpdate;
+  try
+    with PreBufferComboBox.Items do begin Add('1'); Add('5'); Add('10'); Add('15'); Add('20'); Add('25'); Add('30'); end;
+  finally
+    PreBufferComboBox.Items.EndUpdate;
+  end;
 
   ActivatePCSpeakerCheckBox.Caption:=LanguageSetup.ProfileEditorSoundMiscEnablePCSpeaker;
   PCSpeakerSampleRateLabel.Caption:=LanguageSetup.ProfileEditorSoundMiscPCSpeakerRate;

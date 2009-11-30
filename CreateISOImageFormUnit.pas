@@ -158,7 +158,22 @@ Function ShowCreateISOImageDialog(const AOwner : TComponent; var AFileName : Str
 Var ReadResult : TReadDataResult;
     S : String;
     ADrive : Char;
+    C : Char;
+    B : Boolean;
 begin
+  result:=False;
+  B:=False;
+  If AFloppyMode then begin
+    For C:='A' to 'Z' do If GetDriveType(PChar(C+':\'))=DRIVE_REMOVABLE then begin B:=True; break; end;
+  end else begin
+    For C:='A' to 'Z' do If GetDriveType(PChar(C+':\'))=DRIVE_CDROM then begin B:=True; break; end;
+  end;
+  If not B then begin
+    If AFloppyMode then S:=LanguageSetup.MessageNoFloppyDrive else S:=LanguageSetup.MessageNoCDDrive;
+    MessageDlg(S,mtError,[mbOk],0);
+    exit;
+  end;
+
   CreateISOImageForm:=TCreateISOImageForm.Create(AOwner);
   try
     CreateISOImageForm.FloppyMode:=AFloppyMode;
@@ -193,7 +208,16 @@ Function ShowWriteIMGImageDialog(const AOwner : TComponent; const ImageFileName 
 Var ReadResult : TReadDataResult;
     S, AFileName : String;
     ADrive : Char;
+    C : Char;
+    B : Boolean;
 begin
+  result:=False;
+  B:=False; For C:='A' to 'Z' do If GetDriveType(PChar(C+':\'))=DRIVE_REMOVABLE then begin B:=True; break; end;
+  If not B then begin
+    MessageDlg(LanguageSetup.MessageNoFloppyDrive,mtError,[mbOk],0);
+    exit;
+  end;
+
   CreateISOImageForm:=TCreateISOImageForm.Create(AOwner);
   try
     CreateISOImageForm.FloppyMode:=True;

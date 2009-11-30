@@ -1,7 +1,6 @@
 unit GameDBUnit;
 interface
 
-{DEFINE LargeListTest}
 {DEFINE SpeedTest}
 
 uses Classes, CommonComponents;
@@ -55,217 +54,217 @@ end;
 
 const NR_Name=1;
 
-      NR_Icon=101;
-      NR_GameExe=102;
-      NR_GameExeMD5=103;
-      NR_SetupExe=104;
-      NR_SetupExeMD5=105;
-      NR_GameParameters=106;
-      NR_SetupParameters=107;
-      NR_LoadFix=108;
-      NR_LoadFixMemory=109;
-      NR_CaptureFolder=110;
-      NR_ExtraDirs=111;
-      NR_ExtraFiles=112;
-      NR_LastModification=113;
-      NR_ScreenshotListScreenshot=114;
+      NR_Icon=11;
+      NR_GameExe=12;
+      NR_GameExeMD5=13;
+      NR_SetupExe=14;
+      NR_SetupExeMD5=15;
+      NR_GameParameters=16;
+      NR_SetupParameters=17;
+      NR_LoadFix=18;
+      NR_LoadFixMemory=19;
+      NR_CaptureFolder=20;
+      NR_ExtraDirs=21;
+      NR_ExtraFiles=22;
+      NR_LastModification=23;
+      NR_ScreenshotListScreenshot=24;
 
-      NR_ExtraPrgFile=120; {120-130}
+      NR_ExtraPrgFile=30; {30-39}
 
-      NR_Genre=201;
-      NR_Developer=202;
-      NR_Publisher=203;
-      NR_Year=204;
-      NR_DataDir=205;
-      NR_Favorite=206;
-      NR_Notes=207;
-      NR_WWW=208;
-      NR_Language=209;
-      NR_UserInfo=210;
+      NR_Genre=51;
+      NR_Developer=52;
+      NR_Publisher=53;
+      NR_Year=54;
+      NR_DataDir=55;
+      NR_Favorite=56;
+      NR_Notes=57;
+      NR_WWW=58;
+      NR_Language=59;
+      NR_UserInfo=60;
 
-      NR_CloseDosBoxAfterGameExit=301;
-      NR_StartFullscreen=302;
-      NR_AutoLockMouse=303;
-      NR_Force2ButtonMouseMode=304;
-      NR_SwapMouseButtons=305;
-      NR_UseDoublebuffering=306;
-      NR_AspectCorrection=307;
-      NR_UseScanCodes=308;
-      NR_MouseSensitivity=309;
-      NR_Render=310;
-      NR_WindowResolution=311;
-      NR_FullscreenResolution=312;
-      NR_Scale=313;
-      NR_TextModeLines=314;
-      NR_Priority=315;
-      NR_CustomDOSBoxDir=316;
-      NR_CustomKeyMappingFile=317;
-      NR_CustomDOSBoxLanguage=318;
+      NR_CloseDosBoxAfterGameExit=71;
+      NR_StartFullscreen=72;
+      NR_AutoLockMouse=73;
+      NR_Force2ButtonMouseMode=74;
+      NR_SwapMouseButtons=75;
+      NR_UseDoublebuffering=76;
+      NR_AspectCorrection=77;
+      NR_UseScanCodes=78;
+      NR_MouseSensitivity=79;
+      NR_Render=80;
+      NR_WindowResolution=81;
+      NR_FullscreenResolution=82;
+      NR_Scale=83;
+      NR_TextModeLines=84;
+      NR_Priority=85;
+      NR_CustomDOSBoxDir=86;
+      NR_CustomKeyMappingFile=87;
+      NR_CustomDOSBoxLanguage=88;
 
-      NR_Memory=401;
-      NR_XMS=402;
-      NR_EMS=403;
-      NR_UMB=404;
-      NR_Core=405;
-      NR_Cycles=406;
-      NR_CyclesUp=407;
-      NR_CyclesDown=408;
-      NR_CPUType=409;
-      NR_FrameSkip=410;
-      NR_VideoCard=411;
-      NR_KeyboardLayout=412;
-      NR_Codepage=413;
-      NR_Serial1=414;
-      NR_Serial2=415;
-      NR_Serial3=416;
-      NR_Serial4=417;
-      NR_IPX=418;
-      NR_IPXType=419;
-      NR_IPXAddress=420;
-      NR_IPXPort=421;
-      NR_Use4DOS=422;
-      NR_UseDOS32A=423;
-      NR_ReportedDOSVersion=424;
-      NR_NumLockStatus=425;
-      NR_CapsLockStatus=426;
-      NR_ScrollLockStatus=427;
-      NR_VGAChipset=428;
-      NR_VideoRam=429;
-      NR_GlideEmulation=430;
-      NR_PixelShader=431;
+      NR_Memory=101;
+      NR_XMS=102;
+      NR_EMS=103;
+      NR_UMB=104;
+      NR_Core=105;
+      NR_Cycles=106;
+      NR_CyclesUp=107;
+      NR_CyclesDown=108;
+      NR_CPUType=109;
+      NR_FrameSkip=110;
+      NR_VideoCard=111;
+      NR_KeyboardLayout=112;
+      NR_Codepage=113;
+      NR_Serial1=114;
+      NR_Serial2=115;
+      NR_Serial3=116;
+      NR_Serial4=117;
+      NR_IPX=118;
+      NR_IPXType=119;
+      NR_IPXAddress=120;
+      NR_IPXPort=121;
+      NR_Use4DOS=122;
+      NR_UseDOS32A=123;
+      NR_ReportedDOSVersion=124;
+      NR_NumLockStatus=125;
+      NR_CapsLockStatus=126;
+      NR_ScrollLockStatus=127;
+      NR_VGAChipset=128;
+      NR_VideoRam=129;
+      NR_GlideEmulation=130;
+      NR_PixelShader=131;
 
-      NR_EnablePrinterEmulation=451;
-      NR_PrinterResolution=452;
-      NR_PaperWidth=453;
-      NR_PaperHeight=454;
-      NR_PrinterOutputFormat=455;
-      NR_PrinterMultiPage=456;
+      NR_EnablePrinterEmulation=151;
+      NR_PrinterResolution=152;
+      NR_PaperWidth=153;
+      NR_PaperHeight=154;
+      NR_PrinterOutputFormat=155;
+      NR_PrinterMultiPage=156;
 
-      NR_NrOfMounts=501;
-      NR_Mount0=502;
-      NR_Mount1=503;
-      NR_Mount2=504;
-      NR_Mount3=505;
-      NR_Mount4=506;
-      NR_Mount5=507;
-      NR_Mount6=508;
-      NR_Mount7=509;
-      NR_Mount8=510;
-      NR_Mount9=511;
-      NR_AutoMountCDs=512;
-      NR_SecureMode=513;
+      NR_NrOfMounts=181;
+      NR_Mount0=182;
+      NR_Mount1=183;
+      NR_Mount2=184;
+      NR_Mount3=185;
+      NR_Mount4=186;
+      NR_Mount5=187;
+      NR_Mount6=188;
+      NR_Mount7=189;
+      NR_Mount8=190;
+      NR_Mount9=191;
+      NR_AutoMountCDs=192;
+      NR_SecureMode=193;
 
-      NR_MixerNosound=601;
-      NR_MixerRate=602;
-      NR_MixerBlocksize=603;
-      NR_MixerPrebuffer=604;
-      NR_MixerVolumeMasterLeft=605;
-      NR_MixerVolumeMasterRight=606;
-      NR_MixerVolumeDisneyLeft=607;
-      NR_MixerVolumeDisneyRight=608;
-      NR_MixerVolumeSpeakerLeft=609;
-      NR_MixerVolumeSpeakerRight=610;
-      NR_MixerVolumeGUSLeft=611;
-      NR_MixerVolumeGUSRight=612;
-      NR_MixerVolumeSBLeft=613;
-      NR_MixerVolumeSBRight=614;
-      NR_MixerVolumeFMLeft=615;
-      NR_MixerVolumeFMRight=616;
-      NR_MixerVolumeCDLeft=617;
-      NR_MixerVolumeCDRight=618;
+      NR_MixerNosound=201;
+      NR_MixerRate=202;
+      NR_MixerBlocksize=203;
+      NR_MixerPrebuffer=204;
+      NR_MixerVolumeMasterLeft=205;
+      NR_MixerVolumeMasterRight=206;
+      NR_MixerVolumeDisneyLeft=207;
+      NR_MixerVolumeDisneyRight=208;
+      NR_MixerVolumeSpeakerLeft=209;
+      NR_MixerVolumeSpeakerRight=210;
+      NR_MixerVolumeGUSLeft=211;
+      NR_MixerVolumeGUSRight=212;
+      NR_MixerVolumeSBLeft=213;
+      NR_MixerVolumeSBRight=214;
+      NR_MixerVolumeFMLeft=215;
+      NR_MixerVolumeFMRight=216;
+      NR_MixerVolumeCDLeft=217;
+      NR_MixerVolumeCDRight=218;
 
-      NR_SBType=701;
-      NR_SBBase=702;
-      NR_SBIRQ=703;
-      NR_SBDMA=704;
-      NR_SBHDMA=705;
-      NR_SBMixer=706;
-      NR_SBOplMode=707;
-      NR_SBOplRate=708;
-      NR_SBOplEmu=709;
-      NR_GUS=801;
-      NR_GUSRate=802;
-      NR_GUSBase=803;
-      NR_GUSIRQ=804;
-      NR_GUSDMA=805;
-      NR_GUSUltraDir=806;
-      NR_MIDIType=901;
-      NR_MIDIDevice=902;
-      NR_MIDIConfig=903;
-      NR_SpeakerPC=1001;
-      NR_SpeakerRate=1002;
-      NR_SpeakerTandy=1003;
-      NR_SpeakerTandyRate=1004;
-      NR_SpeakerDisney=1005;
-      NR_JoystickType=1006;
-      NR_JoystickTimed=1007;
-      NR_JoystickAutoFire=1008;
-      NR_JoystickSwap34=1009;
-      NR_JoystickButtonwrap=1010;
+      NR_SBType=231;
+      NR_SBBase=232;
+      NR_SBIRQ=233;
+      NR_SBDMA=234;
+      NR_SBHDMA=235;
+      NR_SBMixer=236;
+      NR_SBOplMode=237;
+      NR_SBOplRate=238;
+      NR_SBOplEmu=239;
+      NR_GUS=251;
+      NR_GUSRate=252;
+      NR_GUSBase=253;
+      NR_GUSIRQ=254;
+      NR_GUSDMA=255;
+      NR_GUSUltraDir=256;
+      NR_MIDIType=271;
+      NR_MIDIDevice=272;
+      NR_MIDIConfig=273;
+      NR_SpeakerPC=281;
+      NR_SpeakerRate=282;
+      NR_SpeakerTandy=283;
+      NR_SpeakerTandyRate=284;
+      NR_SpeakerDisney=285;
+      NR_JoystickType=286;
+      NR_JoystickTimed=287;
+      NR_JoystickAutoFire=288;
+      NR_JoystickSwap34=289;
+      NR_JoystickButtonwrap=290;
 
-      NR_Autoexec=1101;
-      NR_AutoexecOverridegamestart=1102;
-      NR_AutoexecOverrideMount=1103;
-      NR_AutoexecBootImage=1104;
-      NR_AutoexecFinalization=1105;
+      NR_Autoexec=301;
+      NR_AutoexecOverridegamestart=302;
+      NR_AutoexecOverrideMount=303;
+      NR_AutoexecBootImage=304;
+      NR_AutoexecFinalization=305;
 
-      NR_CustomSettings=1201;
-      NR_Environment=1202;
+      NR_CustomSettings=311;
+      NR_Environment=312;
 
-      NR_LastOpenTab=1301;
-      NR_LastOpenTabModern=1302;
+      NR_LastOpenTab=321;
+      NR_LastOpenTabModern=322;
 
-      NR_ProfileMode=1351;
+      NR_ProfileMode=331;
 
-      NR_ScummVMGame=1401;
-      NR_ScummVMPath=1402;
-      NR_ScummVMZip=1403;
-      NR_ScummVMFilter=1404;
-      NR_ScummVMRenderMode=1405;
-      NR_ScummVMAutosave=1406;
-      NR_ScummVMLanguage=1407;
-      NR_ScummVMMusicVolume=1408;
-      NR_ScummVMSpeechVolume=1409;
-      NR_ScummVMSFXVolume=1410;
-      NR_ScummVMMIDIGain=1411;
-      NR_ScummVMSampleRate=1412;
-      NR_ScummVMMusicDriver=1413;
-      NR_ScummVMNativeMT32=1414;
-      NR_ScummVMEnableGS=1415;
-      NR_ScummVMMultiMIDI=1416;
-      NR_ScummVMTalkSpeed=1417;
-      NR_ScummVMSpeechMute=1418;
-      NR_ScummVMSubtitles=1419;
-      NR_ScummVMSavePath=1420;
-      NR_ScummVMConfirmExit=1421;
-      NR_ScummVMCDROM=1422;
-      NR_ScummVMJoystickNum=1423;
-      NR_ScummVMAltIntro=1424;
-      NR_ScummVMGFXDetails=1425;
-      NR_ScummVMMusicMute=1426;
-      NR_ScummVMObjectLabels=1427;
-      NR_ScummVMReverseStereo=1428;
-      NR_ScummVMSFXMute=1429;
-      NR_ScummVMWalkspeed=1430;
-      NR_ScummVMExtraPath=1431;
-      NR_ScummVMPlatform=1432;
+      NR_ScummVMGame=341;
+      NR_ScummVMPath=342;
+      NR_ScummVMZip=343;
+      NR_ScummVMFilter=344;
+      NR_ScummVMRenderMode=345;
+      NR_ScummVMAutosave=346;
+      NR_ScummVMLanguage=347;
+      NR_ScummVMMusicVolume=348;
+      NR_ScummVMSpeechVolume=349;
+      NR_ScummVMSFXVolume=350;
+      NR_ScummVMMIDIGain=351;
+      NR_ScummVMSampleRate=352;
+      NR_ScummVMMusicDriver=353;
+      NR_ScummVMNativeMT32=354;
+      NR_ScummVMEnableGS=355;
+      NR_ScummVMMultiMIDI=356;
+      NR_ScummVMTalkSpeed=357;
+      NR_ScummVMSpeechMute=358;
+      NR_ScummVMSubtitles=359;
+      NR_ScummVMSavePath=360;
+      NR_ScummVMConfirmExit=361;
+      NR_ScummVMCDROM=362;
+      NR_ScummVMJoystickNum=363;
+      NR_ScummVMAltIntro=364;
+      NR_ScummVMGFXDetails=365;
+      NR_ScummVMMusicMute=366;
+      NR_ScummVMObjectLabels=367;
+      NR_ScummVMReverseStereo=368;
+      NR_ScummVMSFXMute=369;
+      NR_ScummVMWalkspeed=370;
+      NR_ScummVMExtraPath=371;
+      NR_ScummVMPlatform=372;
 
-      NR_CommandBeforeExecution=1450;
-      NR_CommandAfterExecution=1451;
-      NR_CommandBeforeExecutionWait=1452;
-      NR_CommandBeforeExecutionMinimized=1453;
-      NR_CommandAfterExecutionMinimized=1454;
+      NR_CommandBeforeExecution=390;
+      NR_CommandAfterExecution=391;
+      NR_CommandBeforeExecutionWait=392;
+      NR_CommandBeforeExecutionMinimized=393;
+      NR_CommandAfterExecutionMinimized=394;
 
-      NR_AddtionalChecksumFile1=1500;
-      NR_AddtionalChecksumFile1Checksum=1501;
-      NR_AddtionalChecksumFile2=1502;
-      NR_AddtionalChecksumFile2Checksum=1503;
-      NR_AddtionalChecksumFile3=1504;
-      NR_AddtionalChecksumFile3Checksum=1505;
-      NR_AddtionalChecksumFile4=1506;
-      NR_AddtionalChecksumFile4Checksum=1507;
-      NR_AddtionalChecksumFile5=1508;
-      NR_AddtionalChecksumFile5Checksum=1509;
+      NR_AddtionalChecksumFile1=400;
+      NR_AddtionalChecksumFile1Checksum=401;
+      NR_AddtionalChecksumFile2=402;
+      NR_AddtionalChecksumFile2Checksum=403;
+      NR_AddtionalChecksumFile3=404;
+      NR_AddtionalChecksumFile3Checksum=405;
+      NR_AddtionalChecksumFile4=406;
+      NR_AddtionalChecksumFile4Checksum=407;
+      NR_AddtionalChecksumFile5=408;
+      NR_AddtionalChecksumFile5Checksum=409;
 
 
 const ScummVMSettings : Array[0..31] of Integer =(
@@ -302,7 +301,6 @@ Type TGameDB=class;
     Constructor CreateDelayed(const ASetupFile : String; const ATimeStampCheck : Boolean);
     Constructor Create(const ABasePrgSetup : TBasePrgSetup); overload;
     Destructor Destroy; override;
-    Procedure DelayedLoad;
     Procedure UpdateFile; override;
 
     Procedure LoadCache;
@@ -434,7 +432,7 @@ Type TGameDB=class;
     property MixerVolumeCDLeft : Integer index NR_MixerVolumeCDLeft read GetInteger write SetInteger;
     property MixerVolumeCDRight : Integer index NR_MixerVolumeCDRight read GetInteger write SetInteger;
     property SBType : String index NR_SBType read GetString write SetString;
-    property SBBase : Integer index NR_SBBase read GetInteger write SetInteger;
+    property SBBase : String index NR_SBBase read GetString write SetString;
     property SBIRQ : Integer index NR_SBIRQ read GetInteger write SetInteger;
     property SBDMA : Integer index NR_SBDMA read GetInteger write SetInteger;
     property SBHDMA : Integer index NR_SBHDMA read GetInteger write SetInteger;
@@ -444,7 +442,7 @@ Type TGameDB=class;
     property SBOplEmu : String index NR_SBOplEmu read GetString write SetString;
     property GUS : Boolean index NR_GUS read GetBoolean write SetBoolean;
     property GUSRate : Integer index NR_GUSRate read GetInteger write SetInteger;
-    property GUSBase : Integer index NR_GUSBase read GetInteger write SetInteger;
+    property GUSBase : String index NR_GUSBase read GetString write SetString;
     property GUSIRQ : Integer index NR_GUSIRQ read GetInteger write SetInteger;
     property GUSDMA : Integer index NR_GUSDMA read GetInteger write SetInteger;
     property GUSUltraDir : String index NR_GUSUltraDir read GetString write SetString;
@@ -535,14 +533,25 @@ end;
     FOnChanged : TNotifyEvent;
     FConfOpt : TConfOpt;
     FCreateConfFilesOnSave : Boolean;
+    BinLoadCache : TMemoryStream;
+    BinLoadCacheOffset : Integer;
+    BinLoadCacheIndex : Array['A'..'Z'] of TStringList;
+    BinLoadCacheIndexLastIndex : Array['A'..'Z'] of Integer;
+    BinLoadCacheIndexRest : TStringList;
+    BinLoadCacheIndexRestLastIndex : Integer;
     Procedure LoadList;
     Procedure GameChanged(Sender : TObject);
-    Function LoadGameFromFile(const FileName : String; const NoInit : Boolean) : Boolean;
+    Procedure LoadGameFromFile(const FileName : String; const DOSFileDate : Integer);
     Function MakePROFFileName(const AName, ADir : String; const CheckExistingFiles : Boolean) : String;
     function GetGame(I: Integer): TGame;
     function GetCount: Integer;
     Procedure DeleteOldFiles;
     Function GetProfilesListFromDrive : TStringList;
+    Procedure StoreBinCache;
+    Procedure InitLoadBinCache;
+    Procedure DoneLoadBinCache;
+    Procedure BurnLoadBinCache;
+    Function GetLoadBinCacheOffset(const FileName : String; const DOSFileDate : Integer) : Boolean;
   public
     Constructor Create(const ADir : String; const ATimeStampCheck : Boolean = True);
     Destructor Destroy; override;
@@ -646,7 +655,7 @@ Const DefaultValuesResolution='original,320x200,320x240,640x432,640x480,720x480,
 
 implementation
 
-uses Windows, SysUtils, Messages, Forms, Dialogs, CommonTools, PrgConsts,
+uses Windows, SysUtils, Messages, Forms, Dialogs, Math, CommonTools, PrgConsts,
      PrgSetupUnit, LanguageSetupUnit, GameDBToolsUnit, WaitFormUnit, DOSBoxUnit;
 
 { TConfOpt }
@@ -696,6 +705,8 @@ begin
   AddStringRec(38,'ScummVMLanguages','value',DefaultValuesScummVMLanguages);
   AddStringRec(39,'CPUType','value',DefaultValuesCPUType);
   AddStringRec(40,'SBOplEmu','value',DefaultValuesOplEmu);
+
+  CacheAllStrings;
 end;
 
 destructor TConfOpt.Destroy;
@@ -718,12 +729,6 @@ Constructor TGame.CreateDelayed(const ASetupFile : String; const ATimeStampCheck
 begin
   If ATimeStampCheck then inherited Create(ASetupFile) else inherited CreateNoTimeStampCheck(ASetupFile);
   FGameDB:=nil;
-end;
-
-Procedure TGame.DelayedLoad;
-begin
-  InitData;
-  LoadCache;
 end;
 
 constructor TGame.Create(const ABasePrgSetup: TBasePrgSetup);
@@ -871,7 +876,7 @@ begin
   AddIntegerRec(NR_MixerVolumeCDLeft,'mixer','VolumeCDLeft',100);
   AddIntegerRec(NR_MixerVolumeCDRight,'mixer','VolumeCDRight',100);
   AddStringRec(NR_SBType,'sblaster','sbtype','sb16');
-  AddIntegerRec(NR_SBBase,'sblaster','sbbase',220);
+  AddStringRec(NR_SBBase,'sblaster','sbbase','220');
   AddIntegerRec(NR_SBIRQ,'sblaster','irq',7);
   AddIntegerRec(NR_SBDMA,'sblaster','dma',1);
   AddIntegerRec(NR_SBHDMA,'sblaster','hdma',5);
@@ -881,7 +886,7 @@ begin
   AddStringRec(NR_SBOplEmu,'sblaster','oplemu','default');
   AddBooleanRec(NR_GUS,'gus','gus',true);
   AddIntegerRec(NR_GUSRate,'gus','gusrate',22050);
-  AddIntegerRec(NR_GUSBase,'gus','gusbase',240);
+  AddStringRec(NR_GUSBase,'gus','gusbase','240');
   AddIntegerRec(NR_GUSIRQ,'gus','irq1',5);
   AddIntegerRec(NR_GUSDMA,'gus','dma1',1);
   AddStringRec(NR_GUSUltraDir,'gus','ultradir','C:\ULTRASND');
@@ -1082,6 +1087,7 @@ begin
   FCreateConfFilesOnSave:=False;
   FGameList:=TList.Create;
   FConfOpt:=TConfOpt.Create;
+  If ATimeStampCheck then FConfOpt.CacheAllStrings;
   FDir:=IncludeTrailingPathDelimiter(ADir);
   FTimeStampCheck:=ATimeStampCheck;
   B:=False;
@@ -1102,6 +1108,9 @@ end;
 
 destructor TGameDB.Destroy;
 begin
+  If PrgSetup.BinaryCache then begin
+    If FGameList.Count>20 then StoreBinCache else DeleteFile(FDir+CacheFile);
+  end;
   Clear;
   FGameList.Free;
   FConfOpt.Free;
@@ -1115,22 +1124,30 @@ begin
   FGameList.Clear;
 end;
 
-function TGameDB.LoadGameFromFile(const FileName: String; const NoInit : Boolean): Boolean;
+Procedure TGameDB.LoadGameFromFile(const FileName: String; const DOSFileDate : Integer);
 Var Game : TGame;
 begin
-  result:=FileExists(FileName);
-  if not result then exit;
-
-  If NoInit then begin
+  If PrgSetup.BinaryCache and GetLoadBinCacheOffset(FileName,DOSFileDate) then begin
     Game:=TGame.CreateDelayed(FileName,FTimeStampCheck);
+    try
+      Game.InitData;
+      Game.LoadFromStream(BinLoadCache);
+      Game.LoadCache;
+    except
+      Game.Free;
+      Game:=TGame.Create(FileName);
+      BurnLoadBinCache;
+    end;
+    If Game.GameExeMD5='' then begin
+      Game.Free;
+      Game:=TGame.Create(FileName);
+    end;
   end else begin
     Game:=TGame.Create(FileName);
-    Game.OnChanged:=GameChanged;
-    Game.GameDB:=self;
-    If Game.Cycles='Max' then Game.Cycles:='max';
-    If Game.Cycles='Auto' then Game.Cycles:='auto';
   end;
-  
+
+  Game.OnChanged:=GameChanged;
+  Game.GameDB:=self;
   FGameList.Add(Game);
 end;
 
@@ -1143,7 +1160,7 @@ begin
   I:=FindFirst(FDir+'*.prof',faAnyFile,Rec);
   try
     while I=0 do begin
-      If (Rec.Attr and faDirectory)=0 then result.Add(Rec.Name);
+      If (Rec.Attr and faDirectory)=0 then result.AddObject(Rec.Name,TObject(Rec.Time));
       I:=FindNext(Rec);
     end;
   finally
@@ -1151,117 +1168,47 @@ begin
   end;
 end;
 
-Type TLoadThread=class(TThread)
-  private
-    FGameDB : TGameDB;
-    FFrom, FTo : Integer;
-  protected
-    Procedure Execute; override;
-  public
-    Constructor Create(const AGameDB : TGameDB; const AFrom, ATo : Integer);
-end;
-
-Constructor TLoadThread.Create(const AGameDB : TGameDB; const AFrom, ATo : Integer);
-begin
-  inherited Create(True);
-  FGameDB:=AGameDB;
-  FFrom:=AFrom;
-  FTo:=ATo;
-  Resume;
-end;
-
-Procedure TLoadThread.Execute;
-Var I : Integer;
-    G : TGame;
-begin
-  For I:=FFrom to FTo do begin
-    G:=FGameDB[I];
-    G.DelayedLoad;
-    G.OnChanged:=FGameDB.GameChanged;
-    G.GameDB:=FGameDB;
-    If G.Cycles='Max' then G.Cycles:='max';
-    If G.Cycles='Auto' then G.Cycles:='auto';
-  end;
-end;
-
 procedure TGameDB.LoadList;
-Var I{$IFDEF LargeListTest},J{$ENDIF},C : Integer;
+Var I : Integer;
     List : TStringList;
-    T : Array[0..15] of TLoadThread;
-    A : Array[0..15] of THandle;
-    {$IFDEF SpeedTest}C1,C2,C3 : Cardinal;{$ENDIF}
-    G : TGame;
+    {$IFDEF SpeedTest}C0,{$ENDIF}C1,C2 : Cardinal;
 begin
   Clear;
   ForceDirectories(FDir);
 
+  If PrgSetup.BinaryCache then InitLoadBinCache;
+
+  {$IFDEF SpeedTest}C0:=GetTickCount; {$ENDIF}
   List:=GetProfilesListFromDrive;
-  try
-    If List.Count>100 then begin
-      {$IFDEF SpeedTest}C1:=GetTickCount;{$ENDIF}
+  WaitForm:=nil;
 
-      {Step 1: Create game list records}
-      WaitForm:=CreateWaitForm(nil,LanguageSetup.MessageLoadingDataBase,List.Count);
-      try
-        FGameList.Capacity:=List.Count{$IFDEF LargeListTest}*10{$ENDIF};
+    try
+      FGameList.Capacity:=List.Count;
+      C1:=GetTickCount;
 
-        For I:=0 to List.Count-1 do begin
-          If (I mod 25)=0 then WaitForm.Step(I);
-          {$IFDEF LargeListTest}
-            If FDir=PrgDataDir+GameListSubDir+'\' then begin
-              For J:=1 to 10 do LoadGameFromFile(FDir+List[I],True);
-            end else begin
-              LoadGameFromFile(FDir+List[I],True);
-            end;
-          {$ELSE}
-            LoadGameFromFile(FDir+List[I],True);
-          {$ENDIF}
-          If (I mod 10)=0 then Application.ProcessMessages;
-        end;
-      finally
-        FreeAndNil(WaitForm);
-      end;
-
-      {$IFDEF SpeedTest}C2:=GetTickCount;{$ENDIF}
-
-      {Step 2: Load data}
-      C:=CPUCount;
-      If C>1 then begin
-        {Multi threaded}
-        For I:=0 to C-1 do begin
-          T[I]:=TLoadThread.Create(self,I*Count div C,((I+1)*Count div C)-1);
-          A[I]:=T[I].Handle;
-        end;
-        repeat
-          if WaitForMultipleObjects(C,@A[0],True,100)=WAIT_OBJECT_0 then break;
-          Application.ProcessMessages;
-        until False;
-        For I:=0 to C-1 do T[I].Free;
-      end else begin
-        {Single threaded}
-        For I:=0 to FGameList.Count-1 do begin
-          G:=TGame(FGameList[I]);
-          G.DelayedLoad;
-          G.OnChanged:=GameChanged;
-          G.GameDB:=self;
-          If G.Cycles='Max' then G.Cycles:='max';
-          If G.Cycles='Auto' then G.Cycles:='auto';
-        end;
-      end;
-
-      {$IFDEF SpeedTest}C3:=GetTickCount; ShowMessage(IntToStr(C2-C1)+#13+IntToStr(C3-C2)+#13+FDir);{$ENDIF}
-
-    end else begin
-
-      For I:=0 to List.Count-1 do begin
-        LoadGameFromFile(FDir+List[I],False);
+      For I:=0 to Min(List.Count,100)-1 do begin
+        LoadGameFromFile(FDir+List[I],Integer(List.Objects[I]));
         If (I mod 10)=0 then Application.ProcessMessages;
       end;
 
-    end;
+      If List.Count>100 then begin
+        C2:=GetTickCount;
+        If Integer(C2-C1)*List.Count div 100>150 then WaitForm:=CreateWaitForm(nil,LanguageSetup.MessageLoadingDataBase,List.Count);
+        For I:=100 to List.Count-1 do begin
+          If (WaitForm<>nil) and ((I mod 25)=0) then WaitForm.Step(I);
+          LoadGameFromFile(FDir+List[I],Integer(List.Objects[I]));
+          If (I mod 10)=0 then Application.ProcessMessages;
+        end;
+      end;
+
+      {$IFDEF SpeedTest}C2:=GetTickCount; If List.Count>100 then ShowMessage(IntToStr(C1-C0)+#13+IntToStr(C2-C1)+#13+FDir);{$ENDIF}
+
   finally
     List.Free;
+    If Assigned(WaitForm) then FreeAndNil(WaitForm);
   end;
+
+  If PrgSetup.BinaryCache then DoneLoadBinCache;
 
   If Application.MainForm<>nil then ForceForegroundWindow(Application.MainForm.Handle);
 end;
@@ -1401,171 +1348,173 @@ begin
   end;
 end;
 
-function TGameDB.GetGenreList(WithDefaultProfile : Boolean; const HideWindowsProfiles : Boolean): TStringList;
+Function GetList(const St : TStringList) : TStringList;
 Var StUpper : TStringList;
-    I : Integer;
-    S : String;
+    I,J : Integer;
+    S,T : String;
 begin
   result:=TStringList.Create;
   StUpper:=TStringList.Create;
   try
-    For I:=0 to FGameList.Count-1 do If WithDefaultProfile or (TGame(FGameList[I]).Name<>DosBoxDOSProfile) then begin
-      If HideWindowsProfiles and WindowsExeMode(TGame(FGameList[I])) then continue;
-      S:=ExtUpperCase(TGame(FGameList[I]).CacheGenre);
-      If StUpper.IndexOf(S)<0 then begin
-        StUpper.Add(S);
-        S:=TGame(FGameList[I]).CacheGenre; If Trim(S)='' then S:=LanguageSetup.NotSet;
-        result.Add(S);
+    For I:=0 to St.Count-1 do begin
+      S:=Trim(St[I]);
+      If S='' then S:=LanguageSetup.NotSet;
+      while S<>'' do begin
+        J:=Pos(';',S);
+        If J>0 then begin
+          T:=Trim(Copy(S,1,J-1));
+          S:=Trim(Copy(S,J+1,MaxInt));
+        end else begin
+          T:=S; S:='';
+        end;
+        If StUpper.IndexOf(ExtUpperCase(T))<0 then begin
+          result.Add(T);
+          StUpper.Add(ExtUpperCase(T));
+        end;
       end;
     end;
   finally
     StUpper.Free;
   end;
   result.Sort;
+end;
+
+function TGameDB.GetGenreList(WithDefaultProfile : Boolean; const HideWindowsProfiles : Boolean): TStringList;
+Var I : Integer;
+    St : TStringList;
+begin
+  St:=TStringList.Create;
+  try
+    For I:=0 to FGameList.Count-1 do If WithDefaultProfile or (TGame(FGameList[I]).Name<>DosBoxDOSProfile) then begin
+      If HideWindowsProfiles and WindowsExeMode(TGame(FGameList[I])) then continue;
+      St.Add(TGame(FGameList[I]).CacheGenre);
+    end;
+    result:=GetList(St);
+  finally
+    St.Free;
+  end;
 end;
 
 function TGameDB.GetDeveloperList(WithDefaultProfile : Boolean; const HideWindowsProfiles : Boolean): TStringList;
-Var StUpper : TStringList;
-    I : Integer;
-    S : String;
+Var I : Integer;
+    St : TStringList;
 begin
-  result:=TStringList.Create;
-  StUpper:=TStringList.Create;
+  St:=TStringList.Create;
   try
     For I:=0 to FGameList.Count-1 do If WithDefaultProfile or (TGame(FGameList[I]).Name<>DosBoxDOSProfile) then begin
       If HideWindowsProfiles and WindowsExeMode(TGame(FGameList[I])) then continue;
-      S:=ExtUpperCase(TGame(FGameList[I]).CacheDeveloper);
-      If StUpper.IndexOf(S)<0 then begin
-        StUpper.Add(S);
-        S:=TGame(FGameList[I]).CacheDeveloper; If Trim(S)='' then S:=LanguageSetup.NotSet;
-        result.Add(S);
-      end;
+      St.Add(TGame(FGameList[I]).CacheDeveloper);
     end;
+    result:=GetList(St);
   finally
-    StUpper.Free;
+    St.Free;
   end;
-  result.Sort;
 end;
 
 function TGameDB.GetPublisherList(WithDefaultProfile : Boolean; const HideWindowsProfiles : Boolean): TStringList;
-Var StUpper : TStringList;
-    I : Integer;
-    S : String;
+Var I : Integer;
+    St : TStringList;
 begin
-  result:=TStringList.Create;
-  StUpper:=TStringList.Create;
+  St:=TStringList.Create;
   try
     For I:=0 to FGameList.Count-1 do If WithDefaultProfile or (TGame(FGameList[I]).Name<>DosBoxDOSProfile) then begin
       If HideWindowsProfiles and WindowsExeMode(TGame(FGameList[I])) then continue;
-      S:=ExtUpperCase(TGame(FGameList[I]).CachePublisher);
-      If StUpper.IndexOf(S)<0 then begin
-        StUpper.Add(S);
-        S:=TGame(FGameList[I]).CachePublisher; If Trim(S)='' then S:=LanguageSetup.NotSet;
-        result.Add(S);
-      end;
+      St.Add(TGame(FGameList[I]).CachePublisher);
     end;
+    result:=GetList(St);
   finally
-    StUpper.Free;
+    St.Free;
   end;
-  result.Sort;
 end;
 
 function TGameDB.GetYearList(WithDefaultProfile : Boolean; const HideWindowsProfiles : Boolean): TStringList;
-Var StUpper : TStringList;
-    I : Integer;
-    S : String;
+Var I : Integer;
+    St : TStringList;
 begin
-  result:=TStringList.Create;
-  StUpper:=TStringList.Create;
+  St:=TStringList.Create;
   try
     For I:=0 to FGameList.Count-1 do If WithDefaultProfile or (TGame(FGameList[I]).Name<>DosBoxDOSProfile) then begin
       If HideWindowsProfiles and WindowsExeMode(TGame(FGameList[I])) then continue;
-      S:=ExtUpperCase(TGame(FGameList[I]).CacheYear);
-      If Trim(S)='' then S:=LanguageSetup.NotSet;
-      If StUpper.IndexOf(S)<0 then begin
-        StUpper.Add(S);
-        S:=TGame(FGameList[I]).CacheYear; If Trim(S)='' then S:=LanguageSetup.NotSet;
-        result.Add(S);
-      end;
+      St.Add(TGame(FGameList[I]).CacheYear);
     end;
+    result:=GetList(St);
   finally
-    StUpper.Free;
+    St.Free;
   end;
-  result.Sort;
 end;
 
 function TGameDB.GetLanguageList(WithDefaultProfile : Boolean; const HideWindowsProfiles : Boolean): TStringList;
-Var StUpper : TStringList;
-    I : Integer;
-    S : String;
+Var I : Integer;
+    St : TStringList;
 begin
-  result:=TStringList.Create;
-  StUpper:=TStringList.Create;
+  St:=TStringList.Create;
   try
     For I:=0 to FGameList.Count-1 do If WithDefaultProfile or (TGame(FGameList[I]).Name<>DosBoxDOSProfile) then begin
       If HideWindowsProfiles and WindowsExeMode(TGame(FGameList[I])) then continue;
-      S:=ExtUpperCase(TGame(FGameList[I]).CacheLanguage);
-      If Trim(S)='' then S:=LanguageSetup.NotSet;
-      If StUpper.IndexOf(S)<0 then begin
-        StUpper.Add(S);
-        S:=TGame(FGameList[I]).CacheLanguage; If Trim(S)='' then S:=LanguageSetup.NotSet;
-        result.Add(S);
-      end;
+      St.Add(TGame(FGameList[I]).CacheLanguage);
     end;
+    result:=GetList(St);
   finally
-    StUpper.Free;
+    St.Free;
   end;
-  result.Sort;
 end;
 
 Function TGameDB.GetWWWList(WithDefaultProfile : Boolean =True; const HideWindowsProfiles : Boolean = False) : TStringList;
-Var StUpper : TStringList;
-    I : Integer;
-    S : String;
+Var I : Integer;
+    St : TStringList;
 begin
-  result:=TStringList.Create;
-  StUpper:=TStringList.Create;
+  St:=TStringList.Create;
   try
     For I:=0 to FGameList.Count-1 do If WithDefaultProfile or (TGame(FGameList[I]).Name<>DosBoxDOSProfile) then begin
       If HideWindowsProfiles and WindowsExeMode(TGame(FGameList[I])) then continue;
-      S:=ExtUpperCase(TGame(FGameList[I]).WWW);
-      If Trim(S)='' then continue;
-      If StUpper.IndexOf(S)<0 then begin
-        StUpper.Add(S);
-        S:=TGame(FGameList[I]).WWW;
-        result.Add(S);
-      end;
+      St.Add(TGame(FGameList[I]).WWW);
     end;
+    result:=GetList(St);
   finally
-    StUpper.Free;
+    St.Free;
   end;
-  result.Sort;
 end;
 
 Function TGameDB.GetKeyValueList(const Key : String; WithDefaultProfile : Boolean =True) : TStringList;
-Var StUpper,St : TStringList;
+Var StUpper,St,St2 : TStringList;
     I,J,K : Integer;
     S,T,KeyUpper,Val : String;
 begin
   result:=TStringList.Create;
   StUpper:=TStringList.Create;
+  St:=TStringList.Create;
+  KeyUpper:=ExtUpperCase(Key);
   try
-    KeyUpper:=Trim(ExtUpperCase(Key)); If KeyUpper='' then exit;
     For I:=0 to FGameList.Count-1 do If WithDefaultProfile or (TGame(FGameList[I]).Name<>DosBoxDOSProfile) then begin
-      St:=StringToStringList(TGame(FGameList[I]).CacheUserInfo);
+
+      St2:=StringToStringList(TGame(FGameList[I]).CacheUserInfo);
       try
         Val:='';
-        For K:=0 to St.Count-1 do begin
-          S:=St[K]; J:=Pos('=',S); If J=0 then T:='' else begin T:=Trim(Copy(S,J+1,MaxInt)); S:=Trim(Copy(S,1,J-1)); end;
+        For K:=0 to St2.Count-1 do begin
+          S:=St2[K]; J:=Pos('=',S); If J=0 then T:='' else begin T:=Trim(Copy(S,J+1,MaxInt)); S:=Trim(Copy(S,1,J-1)); end;
           If Trim(ExtUpperCase(S))=KeyUpper then begin Val:=Trim(T); break; end;
         end;
         If Val='' then Val:=LanguageSetup.NotSet;
-        If StUpper.IndexOf(ExtUpperCase(Val))<0 then begin StUpper.Add(ExtUpperCase(Val)); result.Add(Val); end;
+        S:=Val;
+        while S<>'' do begin
+          J:=Pos(';',S);
+          If J>0 then begin
+            T:=Trim(Copy(S,1,J-1));
+            S:=Trim(Copy(S,J+1,MaxInt));
+          end else begin
+            T:=S; S:='';
+          end;
+          If StUpper.IndexOf(ExtUpperCase(T))<0 then begin
+            result.Add(T);
+            StUpper.Add(ExtUpperCase(T));
+          end;
+        end;
       finally
-        St.Free;
+        St2.Free;
       end;
     end;
   finally
+    St.Free;
     StUpper.Free;
   end;
   result.Sort;
@@ -1614,6 +1563,174 @@ procedure TGameDB.LoadCache;
 Var I : Integer;
 begin
   For I:=0 to FGameList.Count-1 do TGame(FGameList[I]).LoadCache;
+end;
+
+Procedure TGameDB.StoreBinCache;
+Var St,StFinal : TMemoryStream;
+    Index : Array['A'..'Z'] of TStringList;
+    IndexRest : TStringList;
+    I,J : Integer;
+    W : Word;
+    G : TGame;
+    C : Char;
+    S : String;
+begin
+  St:=TMemoryStream.Create;
+  IndexRest:=TStringList.Create;
+  For C:='A' to 'Z' do Index[C]:=TStringList.Create;
+  try
+    {Store game data to temporary stream}
+    For I:=0 to FGameList.Count-1 do begin
+      G:=TGame(FGameList[I]);
+      S:=ExtractFileName(G.SetupFile);
+      S:=ExtUpperCase(S);
+      If S<>'' then C:=S[1] else C:=' ';
+      J:=St.Position;
+      If (C>='A') and (C<='Z') then
+      Index[C].AddObject(S,TObject(J)) else IndexRest.AddObject(S,TObject(J));
+      J:=GetDOSFileDate(G.SetupFile);
+      St.WriteBuffer(J,SizeOf(Integer));
+      G.SaveToStream(St);
+    end;
+
+    {Store to output file}
+    StFinal:=TMemoryStream.Create;
+    try
+      {Write ID}
+      StFinal.WriteBuffer(CacheVersionString[1],length(CacheVersionString));
+      StFinal.WriteBuffer(CacheInfoString[1],length(CacheInfoString));
+
+      {Write index}
+      For C:='A' to 'Z' do begin
+        I:=Index[C].Count; StFinal.WriteBuffer(I,SizeOf(Integer));
+        For I:=0 to Index[C].Count-1 do begin
+          S:=ChangeFileExt(Index[C][I],'');
+          W:=length(S); StFinal.WriteBuffer(W,SizeOf(Word)); StFinal.WriteBuffer(S[1],W);
+          J:=Integer(Index[C].Objects[I]); StFinal.WriteBuffer(J,SizeOf(Integer));
+        end;
+      end;
+      I:=IndexRest.Count; StFinal.WriteBuffer(I,SizeOf(Integer));
+      For I:=0 to IndexRest.Count-1 do begin
+        S:=ChangeFileExt(IndexRest[I],'');
+        W:=length(S); StFinal.WriteBuffer(W,SizeOf(Word)); StFinal.WriteBuffer(S[1],W);
+        J:=Integer(IndexRest.Objects[I]); StFinal.WriteBuffer(J,SizeOf(Integer));
+      end;
+
+      {Write data}
+      StFinal.CopyFrom(St,0);
+
+      StFinal.SaveToFile(FDir+CacheFile);
+    finally
+      StFinal.Free;
+    end;
+  finally
+    IndexRest.Free;
+    For C:='A' to 'Z' do Index[C].Free;
+    St.Free;
+  end;
+end;
+
+Procedure TGameDB.InitLoadBinCache;
+Var C : Char;
+    S : String;
+    I,J,K : Integer;
+    W : Word;
+begin
+  BinLoadCache:=TMemoryStream.Create;
+  For C:='A' to 'Z' do BinLoadCacheIndex[C]:=TStringList.Create;
+  BinLoadCacheIndexRest:=TStringList.Create;
+  BinLoadCacheOffset:=0;
+
+  If not FileExists(FDir+CacheFile) then exit;
+  try BinLoadCache.LoadFromFile(FDir+CacheFile); except exit; end;
+
+  try
+    SetLength(S,length(CacheVersionString));
+    BinLoadCache.ReadBuffer(S[1],length(S));
+    If S<>CacheVersionString then exit;
+  except exit; end;
+  BinLoadCache.Position:=BinLoadCache.Position+length(CacheInfoString);
+
+  try
+    For C:='A' to 'Z' do begin
+      BinLoadCache.ReadBuffer(I,SizeOf(Integer));
+      For J:=0 to I-1 do begin
+        BinLoadCache.ReadBuffer(W,SizeOf(Word));
+        SetLength(S,W); BinLoadCache.ReadBuffer(S[1],W);
+        BinLoadCache.ReadBuffer(K,SizeOf(Integer));
+        BinLoadCacheIndex[C].AddObject(S,TObject(K));
+      end;
+    end;
+    BinLoadCache.ReadBuffer(I,SizeOf(Integer));
+    For J:=0 to I-1 do begin
+      BinLoadCache.ReadBuffer(W,SizeOf(Word));
+      SetLength(S,W); BinLoadCache.ReadBuffer(S[1],W);
+      BinLoadCache.ReadBuffer(K,SizeOf(Integer));
+      BinLoadCacheIndexRest.AddObject(S,TObject(K));
+    end;
+  except
+    BurnLoadBinCache;
+  end;
+
+  BinLoadCacheOffset:=BinLoadCache.Position;
+end;
+
+Procedure TGameDB.DoneLoadBinCache;
+Var C : Char;
+begin
+  BinLoadCache.Free;
+  For C:='A' to 'Z' do BinLoadCacheIndex[C].Free;
+  BinLoadCacheIndexRest.Free;
+end;
+
+Procedure TGameDB.BurnLoadBinCache;
+Var C : Char;
+begin
+  If FileExists(FDir+CacheFile) then DeleteFile(FDir+CacheFile);
+  For C:='A' to 'Z' do BinLoadCacheIndex[C].Clear;
+  BinLoadCacheIndexRest.Clear;
+end;
+
+Function TGameDB.GetLoadBinCacheOffset(const FileName : String; const DOSFileDate : Integer) : Boolean;
+Var S : String;
+    C : Char;
+    I,J : Integer;
+begin
+  result:=False;
+
+  try
+    S:=ExtUpperCase(ChangeFileExt(ExtractFileName(FileName),''));
+    If S<>'' then C:=S[1] else C:=' ';
+
+    If (C>='A') and (C<='Z') then begin
+      I:=-1;
+      If (BinLoadCacheIndexLastIndex[C]>0) and (BinLoadCacheIndexLastIndex[C]<BinLoadCacheIndex[C].Count-1) then begin
+        If BinLoadCacheIndex[C][BinLoadCacheIndexLastIndex[C]+1]=S then I:=BinLoadCacheIndexLastIndex[C]+1;
+      end;
+      If I<0 then I:=BinLoadCacheIndex[C].IndexOf(S);
+      If I<0 then exit;
+      BinLoadCacheIndexLastIndex[C]:=I;
+      J:=Integer(BinLoadCacheIndex[C].Objects[I]);
+    end else begin
+      I:=-1;
+      If (BinLoadCacheIndexRestLastIndex>0) and (BinLoadCacheIndexRestLastIndex<BinLoadCacheIndexRest.Count-1) then begin
+        If BinLoadCacheIndexRest[BinLoadCacheIndexRestLastIndex+1]=S then I:=BinLoadCacheIndexRestLastIndex+1;
+      end;
+      If I<0 then I:=BinLoadCacheIndexRest.IndexOf(S);
+      If I<0 then exit;
+      BinLoadCacheIndexRestLastIndex:=I;
+      J:=Integer(BinLoadCacheIndexRest.Objects[I]);
+    end;
+
+    BinLoadCache.Position:=BinLoadCacheOffset+J;
+
+    BinLoadCache.ReadBuffer(I,SizeOf(Integer));
+    if I<>DOSFileDate then exit;
+  except
+    exit;
+  end;
+
+  result:=True;
 end;
 
 initialization

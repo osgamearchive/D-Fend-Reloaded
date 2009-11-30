@@ -62,6 +62,7 @@ object TransferForm: TTransferForm
     Height = 25
     Caption = 'SelectAllButton'
     TabOrder = 1
+    OnClick = SelectButtonClick
   end
   object SelectNoneButton: TBitBtn
     Tag = 1

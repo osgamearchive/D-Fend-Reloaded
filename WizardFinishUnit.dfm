@@ -29,17 +29,17 @@ object WizardFinishFrame: TWizardFinishFrame
     Shape = bsBottomLine
   end
   object DriveSetupLabel: TLabel
-    Left = 16
+    Left = 8
     Top = 93
     Width = 153
     Height = 13
     Caption = 'Aktuell konfigurierte Laufwerke:'
   end
   object ProfileEditorLabel: TLabel
-    Left = 32
-    Top = 438
-    Width = 545
-    Height = 67
+    Left = 8
+    Top = 448
+    Width = 569
+    Height = 65
     Anchors = [akLeft, akRight, akBottom]
     AutoSize = False
     Caption = 
@@ -53,9 +53,9 @@ object WizardFinishFrame: TWizardFinishFrame
     WordWrap = True
   end
   object MountingListView: TListView
-    Left = 16
+    Left = 8
     Top = 112
-    Width = 561
+    Width = 569
     Height = 246
     Anchors = [akLeft, akTop, akRight, akBottom]
     Columns = <>
@@ -67,7 +67,7 @@ object WizardFinishFrame: TWizardFinishFrame
     OnKeyDown = MountingListViewKeyDown
   end
   object ProfileEditorCheckBox: TCheckBox
-    Left = 16
+    Left = 8
     Top = 415
     Width = 561
     Height = 17
@@ -76,7 +76,7 @@ object WizardFinishFrame: TWizardFinishFrame
     TabOrder = 1
   end
   object MountingAddButton: TBitBtn
-    Left = 16
+    Left = 8
     Top = 364
     Width = 98
     Height = 25
@@ -101,7 +101,7 @@ object WizardFinishFrame: TWizardFinishFrame
   end
   object MountingEditButton: TBitBtn
     Tag = 1
-    Left = 120
+    Left = 112
     Top = 364
     Width = 98
     Height = 25
@@ -126,7 +126,7 @@ object WizardFinishFrame: TWizardFinishFrame
   end
   object MountingDelButton: TBitBtn
     Tag = 2
-    Left = 224
+    Left = 216
     Top = 364
     Width = 98
     Height = 25
@@ -151,7 +151,7 @@ object WizardFinishFrame: TWizardFinishFrame
   end
   object MountingDeleteAllButton: TBitBtn
     Tag = 3
-    Left = 328
+    Left = 320
     Top = 364
     Width = 98
     Height = 25
@@ -162,9 +162,9 @@ object WizardFinishFrame: TWizardFinishFrame
   end
   object MountingAutoCreateButton: TBitBtn
     Tag = 4
-    Left = 432
+    Left = 424
     Top = 364
-    Width = 101
+    Width = 153
     Height = 25
     Anchors = [akLeft, akBottom]
     Caption = 'Autom. erstellen'

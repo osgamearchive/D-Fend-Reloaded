@@ -16,6 +16,7 @@
 <h1>Version history</h1>
 
 <p class="small">
+  <a href="#ver090">Version 0.9.0 (12/02/2009)</a><br />
   <a href="#ver082">Version 0.8.2 (08/31/2009)</a><br />
   <a href="#ver081">Version 0.8.1 (08/10/2009)</a><br />
   <a href="#ver080">Version 0.8.0 (07/28/2009)</a><br />
@@ -33,6 +34,47 @@
   <a href="#ver011">Version 0.1.1 (12/18/2007)</a><br />
   <a href="#ver010">Version 0.1.0 (11/08/2007)</a>
 </p>
+
+<a onclick="Work('ver090')" name="ver090" href="#"><h2>&raquo; Version 0.9.0 (12/02/2009)</h2></a>
+<div id="ver090">
+<ul>
+  <li>Example games packages, language files, icon sets etc. can be downloaded from the D-Fend Reloaded homepage via the import menu now.</li>
+  <li>Via the new "Tools" button in the profiles editor you can reset any page of a profile to any template.</li>
+  <li>Ability to add games for other emulators as Windows profiles (calling the emulator program file with the game data file as parameter).</li>
+  <li>From the game information page of the profile editor and the profile wizard game information (including a cover image) can be loaded from mobygames.com directly now.</li>
+  <li>Faster loading of the profile and the auto setup template files.</li>
+  <li>Now you can optionally enter multiple values per game info field (like genre, language etc.).</li>
+  <li>Normal drive mounts can be converted into archiv file mounts and vice versa right from the mounting dialog. The commands to run the game will also be changed automatically if needed.</li>
+  <li>You can drag links from your browser to the D-Fend Reloaded program window now. D-Fend Reloaded will download and importthe zip file behind the link.</li>
+  <li>All captured screenshots, sounds and videos can be renamed from the context menu to have an uniform name scheme.</li>
+  <li>D-Fend Reloaded will warn the user when importing an archive file with a name of an existing profile and will prevent overwriting existing games directory subdirectories when importing plain archive files.</li>
+  <li>When adding new profiles via the profile editor needed mounting records can be added automatically now. (This was already done when adding profiles via the wizard.)</li>
+  <li>In the multiple profiles editor sections can be collapsed and expanded (like in a tree structure) to make it more clear.</li>
+  <li>Now image files can be used as game icons, too.</li>
+  <li>The algorithm used for scaling images (like screenshots) can be selected from the program options dialog now.</li>
+  <li>D-Fend Reloaded can optionally create conf files for all profiles in the games list automatically.</li>
+  <li>The floppy and harddisk image creator now can make harddisk images and floppy disk images of all sizes bootable.</li>
+  <li>The make disk image from folder content function now is able to create harddisk images, too.</li>
+  <li>When creating disk images optionally disk management utilities and a text editor can be added to the image.</li>
+  <li>When creating bootable disk images optionally a memory manager can be added to the image. Also not only the selected keyboard layout is used on the image but also the codepage.</li>
+  <li>Some improvements to the language editor.</li>
+  <li>Added *.ima to the file selection dialog when selecting an image file for mounting or for extracting.</li>
+  <li>About 300 new auto setup templates for automatic identification of even more games.</li>
+  <li>Two more sites have been added to the list of game information sites (TheLegacy.de and KultPower.de).</li>
+  <li>The time needed on first program start for initializing the user data has been improved.</li>
+  <li>The profile editor and the program options dialog will open a bit faster.</li>
+  <li>Some smaller improvements to the new profile wizard.</li>
+  <li>[Fix] Extra directories and extra files records (see directories page of the profile editor) got damaged when using the "Convert absolute to relative paths" function in the program options dialog.</li>
+  <li>[Fix] When importing a plain archive file with multiple executable files in it and with a matching auto setup template sometimes the wrong executable file was selected.</li>
+  <li>[Fix] The main window hotkeys were enabled while template editor was open.</li>
+  <li>[Fix] Access violation then trying to add a game with a space in the filename via the profile wizard.</li>
+  <li>[Fix] The "Run game with current configuration" from the profile editor dialog did not work with ScummVM and Windows game profiles.</li>
+  <li>[Fix] When setting the SoundBlaser or the Gravis UltraSound base address to a hexadecimal address containing letters the selected address was not stored.</li>
+  <li>[Fix] Erroneous window behaviour when using "Run game with current configuration" from the profile editor dialog or when creating bootdisk images when "Minimize when DOSBox start" was active.</li>
+  <li>[Fix] keybrd2.sys and keybrd3.sys needed for some languages missing on bootdisks.</li>
+  <li>[Fix] Wrong error message "No game file selected" when adding a profile for booting an image file.</li>
+</ul>
+</div>
 
 <a onclick="Work('ver082')" name="ver082" href="#"><h2>&raquo; Version 0.8.2 (08/31/2009)</h2></a>
 <div id="ver082">

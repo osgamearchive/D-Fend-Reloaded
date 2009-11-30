@@ -31,21 +31,21 @@ object WizardGameInfoFrame: TWizardGameInfoFrame
   end
   object UserDefinedDataLabel: TLabel
     Left = 8
-    Top = 341
+    Top = 331
     Width = 107
     Height = 13
     Caption = 'UserDefinedDataLabel'
   end
   object NotesLabel: TLabel
     Left = 8
-    Top = 421
+    Top = 427
     Width = 69
     Height = 13
     Caption = 'Bemerkungen:'
   end
   object AddButton: TSpeedButton
-    Left = 529
-    Top = 327
+    Left = 531
+    Top = 324
     Width = 23
     Height = 22
     Anchors = [akTop, akRight]
@@ -68,8 +68,8 @@ object WizardGameInfoFrame: TWizardGameInfoFrame
     OnClick = AddButtonClick
   end
   object DelButton: TSpeedButton
-    Left = 558
-    Top = 327
+    Left = 556
+    Top = 324
     Width = 23
     Height = 22
     Anchors = [akTop, akRight]
@@ -93,66 +93,71 @@ object WizardGameInfoFrame: TWizardGameInfoFrame
   end
   object GameInfoValueListEditor: TValueListEditor
     Left = 8
-    Top = 128
+    Top = 144
     Width = 571
     Height = 145
     Anchors = [akLeft, akTop, akRight]
     Strings.Strings = (
       '=')
-    TabOrder = 1
+    TabOrder = 2
     ColWidths = (
       150
       415)
   end
   object FavouriteCheckBox: TCheckBox
-    Left = 8
-    Top = 314
-    Width = 505
-    Height = 17
+    Left = 440
+    Top = 123
+    Width = 139
+    Height = 21
+    Anchors = [akTop, akRight]
     Caption = 'FavouriteCheckBox'
-    TabOrder = 2
+    TabOrder = 1
   end
   object Tab: TStringGrid
     Left = 8
-    Top = 355
+    Top = 347
     Width = 571
-    Height = 60
+    Height = 70
     Anchors = [akLeft, akTop, akRight]
     ColCount = 2
     FixedCols = 0
     RowCount = 2
     Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goEditing, goAlwaysShowEditor, goThumbTracking]
-    TabOrder = 3
+    TabOrder = 4
   end
   object NotesMemo: TRichEdit
     Left = 8
-    Top = 440
+    Top = 442
     Width = 571
-    Height = 57
+    Height = 55
     Anchors = [akLeft, akTop, akRight, akBottom]
     PlainText = True
     ScrollBars = ssBoth
-    TabOrder = 4
-  end
-  object Panel1: TPanel
-    Left = 8
-    Top = 274
-    Width = 605
-    Height = 30
-    BevelOuter = bvNone
     TabOrder = 5
+  end
+  object ToolBarPanel: TPanel
+    Left = 8
+    Top = 290
+    Width = 571
+    Height = 30
+    Anchors = [akLeft, akTop, akRight]
+    BevelOuter = bvNone
+    TabOrder = 3
     object ToolBar: TToolBar
       Left = 0
       Top = 0
-      Width = 605
+      Width = 571
       Height = 29
       ButtonHeight = 30
-      ButtonWidth = 140
+      ButtonWidth = 166
       Caption = 'ToolBar'
       Images = ImageList
       List = True
       ShowCaptions = True
       TabOrder = 0
+      Wrapable = False
+      ExplicitTop = 22
+      ExplicitWidth = 409
       object SearchGameButton: TToolButton
         Tag = 2
         Left = 0
@@ -161,6 +166,22 @@ object WizardGameInfoFrame: TWizardGameInfoFrame
         DropdownMenu = SearchPopupMenu
         ImageIndex = 0
         Style = tbsDropDown
+        OnClick = SearchClick
+      end
+      object ToolButton1: TToolButton
+        Left = 181
+        Top = 0
+        Width = 8
+        Caption = 'ToolButton1'
+        ImageIndex = 1
+        Style = tbsSeparator
+      end
+      object DownloadDataButton: TToolButton
+        Tag = 3
+        Left = 189
+        Top = 0
+        Caption = 'Download game information'
+        ImageIndex = 0
         OnClick = SearchClick
       end
     end
@@ -178,11 +199,11 @@ object WizardGameInfoFrame: TWizardGameInfoFrame
   end
   object SearchPopupMenu: TPopupMenu
     Images = ImageList
-    Left = 514
+    Left = 346
     Top = 120
   end
   object ImageList: TImageList
-    Left = 546
+    Left = 378
     Top = 120
     Bitmap = {
       494C010102000400040010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
@@ -325,7 +346,7 @@ object WizardGameInfoFrame: TWizardGameInfoFrame
       000000000000}
   end
   object AddUserDataPopupMenu: TPopupMenu
-    Left = 496
-    Top = 320
+    Left = 541
+    Top = 352
   end
 end

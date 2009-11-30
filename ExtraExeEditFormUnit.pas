@@ -86,7 +86,7 @@ procedure TExtraExeEditForm.ListEditButtonClick(Sender: TObject);
 Var S : String;
 begin
   S:=MakeAbsPath(List.Strings.ValueFromIndex[List.Row-1],PrgSetup.BaseDir);
-  If SelectProgramFile(S,GameExe,SetupExe,WindowsMode,self) then List.Strings.ValueFromIndex[List.Row-1]:=S;
+  If SelectProgramFile(S,GameExe,SetupExe,WindowsMode,-1,self) then List.Strings.ValueFromIndex[List.Row-1]:=S;
 end;
 
 procedure TExtraExeEditForm.OKButtonClick(Sender: TObject);

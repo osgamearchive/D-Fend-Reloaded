@@ -61,6 +61,8 @@ Function ExtractZipFile(const AOwner : TComponent; const AZipFile, ADestFolder :
 Function CreateZipFile(const AOwner : TComponent; const AZipFile, ADestFolder : String; const DeleteMode : TDeleteMode = dmNo; const CompressStrength : TCompressStrength = MAXIMUM) : Boolean;
 Function AddToZipFile(const AOwner : TComponent; const AZipFile, ADestFolder : String; const DeleteMode : TDeleteMode = dmNo; const CompressStrength : TCompressStrength = MAXIMUM) : Boolean;
 
+Function ExtractZipDrive(const AOwner : TComponent; const AZipFile, AZipAddFolder, ADestFolder : String) : Boolean;
+
 Function CheckExtensionsList(Extensions : String) : String;
 Function ExtensionInList(Extension, List : String) : Boolean;
 
@@ -70,7 +72,8 @@ Function GetCompressStrengthFromPrgSetup : TCompressStrength;
 
 implementation
 
-uses Math, LanguageSetupUnit, PrgSetupUnit, CommonTools, DOSBoxUnit, PrgConsts;
+uses Math, LanguageSetupUnit, PrgSetupUnit, CommonTools, DOSBoxUnit, PrgConsts,
+     GameDBToolsUnit;
 
 {$R *.dfm}
 
@@ -534,6 +537,29 @@ begin
   If (DeleteMode<>dmNo) and (DeleteMode<>dmNoNoWarning)
     then result:=ZipDialogWork(AOwner,AZipFile,ADestFolder,zmAddAndDelete,CompressStrength,DeleteMode)
     else result:=ZipDialogWork(AOwner,AZipFile,ADestFolder,zmAdd,CompressStrength,DeleteMode);
+end;
+
+Function ExtractZipDrive(const AOwner : TComponent; const AZipFile, AZipAddFolder, ADestFolder : String) : Boolean;
+begin
+  If AZipAddFolder=ADestFolder then begin
+    {DestFolder->TempFolder}
+    result:=ExtDeleteFolder(TempDir+ZipTempDir,ftTemp); if not result then exit;
+    ForceDirectories(TempDir+ZipTempDir);
+    try
+      CopyFiles(ADestFolder,TempDir+ZipTempDir,True,True);
+      {ZipFile+TempFolder -> DestFolder}
+      result:=ExtractZipFile(AOwner,AZipFile,ADestFolder); if not result then exit;
+      result:=CopyFiles(TempDir+ZipTempDir,ADestFolder,True,True);
+    finally
+      {Delete TempFolder}
+      ExtDeleteFolder(TempDir+ZipTempDir,ftTemp);
+    end;
+  end else begin
+    {ZipFile+ZipAddFolder -> DestFolder}
+    result:=ExtractZipFile(AOwner,AZipFile,ADestFolder);
+    if not result then exit;
+    result:=CopyFiles(AZipAddFolder,ADestFolder,True,True);
+  end;
 end;
 
 Function CheckExtension(Extension : String) : String;

@@ -26,7 +26,6 @@ uses
   TemplateSelectProfileFormUnit in 'TemplateSelectProfileFormUnit.pas' {TemplateSelectProfileForm},
   WizardFormUnit in 'WizardFormUnit.pas' {WizardForm},
   CreateShortcutFormUnit in 'CreateShortcutFormUnit.pas' {CreateShortcutForm},
-  DiskImageToolsUnit in 'DiskImageToolsUnit.pas',
   CreateImageUnit in 'CreateImageUnit.pas' {CreateImageForm},
   InfoFormUnit in 'InfoFormUnit.pas' {InfoForm},
   TransferFormUnit in 'TransferFormUnit.pas' {TransferForm},
@@ -168,7 +167,6 @@ uses
   pngimage in 'Components\pngimage\pngimage.pas',
   CreateShortcutsFormUnit in 'CreateShortcutsFormUnit.pas' {CreateShortcutsForm},
   SetupFrameGameListIconModeAppearanceUnit in 'SetupFrameGameListIconModeAppearanceUnit.pas' {SetupFrameGameListIconModeAppearance: TFrame},
-  EditMultipleProfilesFormUnit in 'EditMultipleProfilesFormUnit.pas' {EditMultipleProfilesForm},
   ImportSelectTemplateFormUnit in 'ImportSelectTemplateFormUnit.pas' {ImportSelectTemplateForm},
   Resample in 'Resample.pas',
   ImageStretch in 'ImageStretch.pas',
@@ -193,7 +191,21 @@ uses
   SetupFrameImageScalingUnit in 'SetupFrameImageScalingUnit.pas' {SetupFrameImageScaling: TFrame},
   SelectAutoSetupFormUnit in 'SelectAutoSetupFormUnit.pas' {SelectAutoSetupForm},
   MultipleProfilesEditorFormUnit in 'MultipleProfilesEditorFormUnit.pas' {MultipleProfilesEditorForm},
-  SetupFrameMoreEmulatorsUnit in 'SetupFrameMoreEmulatorsUnit.pas' {SetupFrameMoreEmulators: TFrame};
+  SetupFrameMoreEmulatorsUnit in 'SetupFrameMoreEmulatorsUnit.pas' {SetupFrameMoreEmulators: TFrame},
+  InstallationSupportFormUnit in 'InstallationSupportFormUnit.pas' {InstallationSupportForm},
+  CreateImageToolsUnit in 'CreateImageToolsUnit.pas',
+  RenameAllScreenshotsFormUnit in 'RenameAllScreenshotsFormUnit.pas' {RenameAllScreenshotsForm},
+  DOSBoxTempUnit in 'DOSBoxTempUnit.pas',
+  InternetDataWaitFormUnit in 'InternetDataWaitFormUnit.pas' {InternetDataWaitForm},
+  DataReaderFormUnit in 'DataReaderFormUnit.pas' {DataReaderForm},
+  ProviderFormUnit in 'ProviderFormUnit.pas' {ProviderForm},
+  PackageManagerRepositoriesEditURLFormUnit in 'PackageManagerRepositoriesEditURLFormUnit.pas' {PackageManagerRepositoriesEditURLForm},
+  DataReaderConfigUnit in 'DataReaderConfigUnit.pas',
+  DataReaderToolsUnit in 'DataReaderToolsUnit.pas',
+  DataReaderUnit in 'DataReaderUnit.pas',
+  InstallationRunFormUnit in 'InstallationRunFormUnit.pas' {InstallationRunForm},
+  MakeBootImageFromProfileFormUnit in 'MakeBootImageFromProfileFormUnit.pas' {MakeBootImageFromProfileForm},
+  SetupFrameAutomaticConfigurationUnit in 'SetupFrameAutomaticConfigurationUnit.pas' {SetupFrameAutomaticConfiguration: TFrame};
 
 {$R *.res}
 

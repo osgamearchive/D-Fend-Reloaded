@@ -1,7 +1,7 @@
 unit ImageCacheUnit;
 interface
 
-uses Classes, Graphics;
+uses Classes, Windows, Graphics;
 
 Type TImageData=class
   private
@@ -12,7 +12,8 @@ Type TImageData=class
     Constructor Create;
     Destructor Destroy; override;
     Function LoadPicture(const AFileName : String) : Boolean;
-    Function LoadIcon(const AFileName : String) : Boolean;
+    Function LoadIcon(const AFileName : String) : Boolean; overload;
+    Function LoadIcon(const AIcon : TIcon; const AFileName : String) : Boolean; overload;
     property Picture : TPicture read FPicture;
     property Icon : TIcon read FIcon;
     property Path : String read FPath;
@@ -21,6 +22,7 @@ end;
 Type TImageCache=class
   private
     FImageList : TStringList;
+    Function LoadImageAsIcon(const AFileName: String): Integer;
     Function LoadPicture(const AFileName : String) : Integer;
     Function LoadIcon(const AFileName : String) : Integer;
     Function FindFile(const AFileName : String) : Integer;
@@ -37,7 +39,7 @@ var IconCache : TImageCache = nil;
 
 implementation
 
-uses Windows, SysUtils, ShellAPI, CommonTools;
+uses SysUtils, Controls, ShellAPI, CommonTools, ImageStretch;
 
 { TImageData }
 
@@ -56,26 +58,16 @@ begin
 end;
 
 function TImageData.LoadIcon(const AFileName: String): Boolean;
-Var FileInfo: SHFILEINFO;
-    I : Integer;
 begin
-  result:=False;
-  If not FileExists(AFileName) then exit;
+  FIcon:=LoadIconFromExeFile(AFileName);
+  result:=(FIcon<>nil);
+  if result then FPath:=IncludeTrailingPathDelimiter(ExtUpperCase(ExtractFilePath(AFileName)));
+end;
+
+Function TImageData.LoadIcon(const AIcon : TIcon; const AFileName : String) : Boolean;
+begin
   FIcon:=TIcon.Create;
-  try
-    If ExtUpperCase(ExtractFileExt(AFileName))='.EXE' then begin
-      If SHGetFileInfo(PChar(AFileName), 0, FileInfo, SizeOf(FileInfo), SHGFI_ICON or SHGFI_LARGEICON)<>0 then FIcon.Handle:=FileInfo.hIcon;
-    end else begin
-      I:=16;
-      while I<=256 do begin
-        FIcon.Handle:=LoadImage(0,PChar(AFileName),IMAGE_ICON,I,I,LR_LOADFROMFILE);
-        I:=I*2;
-      end;
-    end;
-  except
-    FreeAndNil(FIcon);
-    exit;
-  end;
+  FIcon.Assign(AIcon);
   FPath:=IncludeTrailingPathDelimiter(ExtUpperCase(ExtractFilePath(AFileName)));
   result:=True;
 end;
@@ -106,9 +98,31 @@ begin
   inherited Destroy;
 end;
 
+Function TImageCache.LoadImageAsIcon(const AFileName: String): Integer;
+Var AImageData : TImageData;
+    I : TIcon;
+begin
+  result:=-1;
+  I:=LoadImageAsIconFromFile(AFileName); If I=nil then exit;
+  try
+    AImageData:=TImageData.Create;
+    if not AImageData.LoadIcon(I,AFileName) then begin AImageData.Free; exit; end;
+    result:=FImageList.AddObject(ExtUpperCase(ExtractFileName(AFileName)),AImageData);
+  finally
+    I.Free;
+  end;
+end;
+
 function TImageCache.LoadIcon(const AFileName: String): Integer;
 Var AImageData : TImageData;
+    Ext : String;
 begin
+  Ext:=ExtUpperCase(ExtractFileExt(AFileName));
+  If (Ext<>'.ICO') and (Ext<>'.EXE') then begin
+    result:=LoadImageAsIcon(AFileName);
+    exit;
+  end;
+
   result:=-1;
   AImageData:=TImageData.Create;
   if not AImageData.LoadIcon(AFileName) then begin AImageData.Free; exit; end;

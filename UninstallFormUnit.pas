@@ -281,7 +281,7 @@ begin
 
     St:=ValueToList(GameDB[I].ExtraDirs);
     try
-      For J:=0 to St.Count-1 do If SameDir(St[J]) then exit;
+      For J:=0 to St.Count-1 do If (Trim(St[J])<>'') and SameDir(St[J]) then exit;
     finally
       St.Free;
     end;

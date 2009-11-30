@@ -2,9 +2,11 @@ object LanguageEditorForm: TLanguageEditorForm
   Left = 0
   Top = 0
   Caption = 'Language editor'
-  ClientHeight = 549
-  ClientWidth = 724
+  ClientHeight = 539
+  ClientWidth = 659
   Color = clBtnFace
+  Constraints.MinHeight = 250
+  Constraints.MinWidth = 500
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
@@ -23,50 +25,66 @@ object LanguageEditorForm: TLanguageEditorForm
   object Panel1: TPanel
     Left = 0
     Top = 0
-    Width = 724
-    Height = 41
+    Width = 659
+    Height = 32
     Align = alTop
     BevelOuter = bvNone
     TabOrder = 0
-    DesignSize = (
-      724
-      41)
-    object InfoLabel: TLabel
-      Left = 168
-      Top = 16
-      Width = 45
-      Height = 13
-      Caption = 'InfoLabel'
-    end
     object CloseButton: TBitBtn
-      Left = 631
-      Top = 9
-      Width = 83
+      Left = 4
+      Top = 4
+      Width = 97
       Height = 25
-      Anchors = [akTop, akRight]
       TabOrder = 0
       Kind = bkClose
     end
     object SectionComboBox: TComboBox
-      Left = 8
-      Top = 11
-      Width = 145
+      Left = 304
+      Top = 5
+      Width = 169
       Height = 21
       Style = csDropDownList
-      ItemHeight = 0
-      TabOrder = 1
+      ItemHeight = 13
+      TabOrder = 2
       OnChange = SectionComboBoxChange
+      OnDropDown = ComboBoxDropDown
+    end
+    object ShowComboBox: TComboBox
+      Left = 120
+      Top = 5
+      Width = 169
+      Height = 21
+      Style = csDropDownList
+      ItemHeight = 13
+      TabOrder = 1
+      OnChange = ShowComboBoxChange
+      OnDropDown = ComboBoxDropDown
     end
   end
   object Tab: TStringGrid
     Left = 0
-    Top = 41
-    Width = 724
-    Height = 508
+    Top = 32
+    Width = 659
+    Height = 488
     Align = alClient
     ColCount = 3
     FixedCols = 2
     Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goColSizing, goEditing, goAlwaysShowEditor, goThumbTracking]
     TabOrder = 1
+    OnDrawCell = TabDrawCell
+    RowHeights = (
+      24
+      24
+      24
+      24
+      24)
+  end
+  object StatusBar: TStatusBar
+    Left = 0
+    Top = 520
+    Width = 659
+    Height = 19
+    Panels = <>
+    SimplePanel = True
   end
 end

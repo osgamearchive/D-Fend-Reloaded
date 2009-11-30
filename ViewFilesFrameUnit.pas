@@ -588,7 +588,7 @@ begin
           MessageDlg(Format(LanguageSetup.MessageCouldNotCreateDir,[S]),mtError,[mbOK],0);
           exit;
         end;
-        If not CopyFiles(FileName,S,True) then begin
+        If not CopyFiles(FileName,S,True,True) then begin
           MessageDlg(Format(LanguageSetup.MessageCouldNotCopyFiles,[FileName,S]),mtError,[mbOK],0);
           exit;
         end;
@@ -623,7 +623,7 @@ begin
           MessageDlg(Format(LanguageSetup.MessageCouldNotCreateDir,[S]),mtError,[mbOK],0);
           exit;
         end;
-        If not CopyFiles(FileName,S,True) then begin
+        If not CopyFiles(FileName,S,True,True) then begin
           MessageDlg(Format(LanguageSetup.MessageCouldNotCopyFiles,[FileName,S]),mtError,[mbOK],0);
           exit;
         end;

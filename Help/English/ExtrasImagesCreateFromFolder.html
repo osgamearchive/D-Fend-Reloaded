@@ -26,27 +26,45 @@ folder.
 </p>
 
 <ul class="big">
-  <li><b>Make floppy image bootable</b><br />
+  <li><b>Image type</b><br />
+  From this box you can choose whether to create a floppy or a harddisk
+  image. Floppy images will be 1.44MB sized, harddisk images will be sized
+  to be big enough for the files to be copied to the image (plus 5MB).
+  </li>
+  <li><b>Make image bootable</b><br />
   If this option is activated, D-Fend Reloaded will transfer the
-  FreeDOS boot files to the floppy image and will create a
+  FreeDOS boot files to the disk image and will create a
   bootsector for making it bootable. (For using this option
   you will need to have FreeDOS installed. You can configurate
   the path a you FreeDOS installation on the
   <a href="FileOptionsFreeDOS.html">FreeDOS</a> page of
   the <a href="FileOptions.html">program options</a> dialog.)
   </li>
-  <li><b>Use DOSBox default keyboard layout on bootdisk</b><br />
+  <li><b>Use DOSBox default keyboard layout</b><br />
   If this option is activated, D-Fend Reloaded will also transfer
-  the keyboard driver to the bootdisk and will add a line to the
-  <tt>autoexec.bat</tt> file of the bootdisk to activate the
+  the keyboard driver to the disk image and will add a line to the
+  <tt>autoexec.bat</tt> file to activate the
   keyboard layout which is defined as default for the current
   D-Fend Reloaded program language.
   </li>
-  <li><b>Include mouse driver on bootdisk</b><br />
+  <li><b>Include mouse driver</b><br />
   If this option is activated, D-Fend Reloaded will transfer
-  the mouse driver to the bootdisk and will add a line to the
-  <tt>autoexec.bat</tt> file of the bootdisk to activate it.
-  </li> 
+  the mouse driver to the disk image and will add a line to the
+  <tt>autoexec.bat</tt> file to activate it.
+  </li>
+  <li><b>Use memory manager on disk image</b><br />
+  If this option is activated, the memory management tools <tt>himem</tt>
+  and <tt>emm386</tt> will be copied to the disk image and activated,
+  so there is more free conventional memory for running programs.
+  </li>
+  <li><b>Add disk management utilities</b><br />
+  If this option is activated, utilities for creating partitions,
+  formating and checking drives will be added to the disk image.
+  </li>
+  <li><b>Add text editor</b><br />
+  If this option is activated, a text editor will be transfered
+  to the image.
+  </li>
   <li><b>Write image file to real floppy after creation</b><br />
   If this option is activated, the floppy image will be written
   to a real floppy disk after creation.  

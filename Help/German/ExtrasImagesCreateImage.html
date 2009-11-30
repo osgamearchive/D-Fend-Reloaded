@@ -27,15 +27,16 @@ erstellen. Diese Imagedateien k&ouml;nnen dann &uuml;ber die
 <a href="ProfileEdit.html">Profileditor</a>-Dialogs als Laufwerke in DOSBox eingebunden werden.
 </p>
 
-<h3>Diskettenimages</h3>
+<h3>Diskettenimages / Festplattenimages</h3>
 
 <p>
-Auf dieser Dialogseite k&ouml;nnen Sie Diskettenimages jedes denkbaren Diskettentyps
-erstellen. Daf&uuml;r k&ouml;nnen Sie entweder aus dem Auswahlfeld "Disketten-Typ"
-einen der vordefinierten Diskettentypen auswh&auml;len oder aber &uuml;ber die darunter
-befindlichen Felder den Diskettentyp frei definieren.
+Über die beiden Registerreiter am oberen Fensterrand können Sie auswählen, ob ein Disketten-
+oder ein Festplattenimage erstellt werden soll. Bei Diskettenimages können Sie den Diskettentyp
+oder manuell die Anzahl an Spuren, Köpfen und Sektoren pro Spur angeben. Bei Festplattenimages
+kann die Größe im MB angegeben werden.
 </p>
 
+<h3>Optionen</h3>
 <ul class="big">
   <li><b>Imagedatei im NTFS-Dateisystem komprimieren</b><br />
   Wenn diese Option aktiviert ist, wird das Image als komprimierte
@@ -46,56 +47,41 @@ befindlichen Felder den Diskettentyp frei definieren.
   Windows-Festplattentreiber, d.h. Sie k&ouml;nnen mit der komprimierten
   Datei normal arbeiten, ohne ein (De-)Kompressionsprogramm verweden zu m&uuml;ssen.
   </li>
-  <li><b>Diskettenimage bootf&auml;hig machen</b><br />
+  <li><b>Image bootf&auml;hig machen</b><br />
   Wenn diese Option aktiviert ist, &uuml;bertr&auml;gt D-Fend Reloaded die
-  FreeDOS Boot-Dateien auf das Diskettenimage und erstellt einen
-  Bootsektor auf dem Diskettenimage, welches es bootf&auml;hig macht.
+  FreeDOS Boot-Dateien auf das Image und erstellt einen
+  Bootsektor auf dem Image, welches es bootf&auml;hig macht.
   (Um diese Option verwenden zu k&ouml;nnen, muss FreeDOS installiert und
   der Pfad zu FreeDOS auf der Dialogseite
   <a href="FileOptionsFreeDOS.html">FreeDOS</a> des
   the <a href="FileOptions.html">Programmeinstellungen</a>-Dialogs
   eingetragen sein.)
   </li>
-  <li><b>Die DOSBox-Tastaturbelegung auf der Bootdiskette verwenden</b><br />
+  <li><b>Die DOSBox-Tastaturbelegung verwenden</b><br />
   Wenn diese Option aktiviert ist, &uuml;bertr&auml;gt D-Fend Reloaded
-  den FreeDOS-Tastaturtreiber auf die Bootdiskette und f&uuml;gt eine Zeile
-  in die <tt>autoexec.bat</tt>-Datei auf der Bootdiskette ein,
+  den FreeDOS-Tastaturtreiber in das Image und f&uuml;gt eine Zeile
+  in die <tt>autoexec.bat</tt>-Datei ein,
   um das Tastaturlayout, welche in der in D-Fend Reloaded gew&auml;hlten
   Sprachdatei definiert ist, zu aktivieren.
-  </li>
-  <li><b>Maustreiber auf der Bootdisk einbinden</b><br />
-  Wenn diese Option aktiviert ist, &uuml;bertr&auml;gt D-Fend Reloaded
-  den FreeDOS-Maustreiber auf die Bootdiskette und f&uuml;gt eine Zeile
-  in die <tt>autoexec.bat</tt>-Datei auf der Bootdiskette ein, um ihn
-  beim Starten des Diskettenimages zu aktivieren.
   </li>  
-</ul>
-
-<h3>Festplattenimages</h3>
-
-<p>
-From this dialog page you can create hard disk images of any size.
-D-Fend Reloaded will choose the right drive geometry automatically for you.
-</p>
-
-<ul class="big">
-  <li><b>Imagedatei im NTFS-Dateisystem komprimieren</b><br />
-  Wenn diese Option aktiviert ist, wird das Image als komprimierte
-  Datei gespeichert. Dies bedeutet, dass die Datei nur soviel Platz
-  auf dem Datentr&auml;ger belegt, wie wirklich zum Speichern der in
-  dem Image abgelegten Dateien notwenidg ist. Die leeren Sektoren innerhalb
-  des Images belegen fast keinen Platz. Die Kompression erfolgt durch den
-  Windows-Festplattentreiber, d.h. Sie k&ouml;nnen mit der komprimierten
-  Datei normal arbeiten, ohne ein (De-)Kompressionsprogramm verweden zu m&uuml;ssen.
+  <li><b>Maustreiber einbinden</b><br />
+  Wenn diese Option aktiviert ist, &uuml;bertr&auml;gt D-Fend Reloaded
+  den FreeDOS-Maustreiber in das Image und f&uuml;gt eine Zeile
+  in die <tt>autoexec.bat</tt>-Datei ein, um ihn
+  beim Starten des Images zu aktivieren.
   </li>
-  <li><b>Typ der Imagedatei</b><br />
-  Da vorformatierte Festplatten-Images in DOSBox nicht bootf&auml;hig
-  gemacht werden k&ouml;nnen, k&ouml;nnen Sie in dieser Auswahlbox optional
-  angeben, dass ein leeres, unformartiertes Festplatten-Image erstellt werden
-  soll. In diesem Fall m&uuml;ssen Sie in DOSBox von einem bootf&auml;higen
-  Diskettenimage booten und das neu erststellte Festplatten-Image partitionieren
-  und formatieren. (Diese dazu auch die Beschreibung zum Erstellen von bootf&auml;higen
-  Festplatten-Images in den <a href="FAQ.html#FAQ10">FAQs</a>.)
+  <li><b>Speichermanager verwenden</b><br />
+  Ist diese Option aktiviert, so werden die Speicherverwaltungsprogramme
+  <tt>himem</tt> und <tt>emm386</tt> auf das Image kopiert und aktiviert,
+  so dass mehr konventioneller Speicher zur Ausführung von Anwendungen
+  zur Verfügung steht.
+  </li>
+  <li><b>Datenträger-Verwaltungsprogramme hinzufügen</b><br />
+  Wenn diese Option aktiviert ist, werden Programme zum partitionieren,
+  formatieren und prüfen von Datenträgern in das Image kopiert.
+  </li>
+  <li><b>Texteditor hinzufügen</b><br />
+  Wenn diese Option aktiviert ist, wird ein Texteditor mit in das Image kopiert.
   </li>
 </ul>
 

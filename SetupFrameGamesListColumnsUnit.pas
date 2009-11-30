@@ -27,7 +27,7 @@ type
     { Public-Deklarationen }
     Destructor Destroy; override;
     Function GetName : String;
-    Procedure InitGUIAndLoadSetup(InitData : TInitData);
+    Procedure InitGUIAndLoadSetup(var InitData : TInitData);
     Procedure BeforeChangeLanguage;
     Procedure LoadLanguage;
     Procedure DOSBoxDirChanged;
@@ -57,7 +57,7 @@ begin
   result:=LanguageSetup.SetupFormListViewSheet1;
 end;
 
-procedure TSetupFrameGamesListColumns.InitGUIAndLoadSetup(InitData: TInitData);
+procedure TSetupFrameGamesListColumns.InitGUIAndLoadSetup(var InitData: TInitData);
 Var ColOrder,ColVisible,ColVisibleUser : String;
     I,J,Nr : Integer;
     B : Boolean;

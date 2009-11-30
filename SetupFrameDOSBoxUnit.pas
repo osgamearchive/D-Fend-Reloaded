@@ -47,7 +47,7 @@ type
   public
     { Public-Deklarationen }
     Function GetName : String;
-    Procedure InitGUIAndLoadSetup(InitData : TInitData);
+    Procedure InitGUIAndLoadSetup(var InitData : TInitData);
     Procedure BeforeChangeLanguage;
     Procedure LoadLanguage;
     Procedure DOSBoxDirChanged;
@@ -71,7 +71,7 @@ begin
   result:=LanguageSetup.SetupFormDosBoxSheet;
 end;
 
-procedure TSetupFrameDOSBox.InitGUIAndLoadSetup(InitData: TInitData);
+procedure TSetupFrameDOSBox.InitGUIAndLoadSetup(var InitData: TInitData);
 Var I : Integer;
 begin
   PDosBoxDir:=InitData.PDosBoxDir;
@@ -171,7 +171,6 @@ begin
   MoreSettingsButton.Visible:=AdvencedMode;
   GlobalGroupBox.Visible:=AdvencedMode;
   CreateConfFilesCheckBox.Enabled:=(OperationMode<>omPortable);
-  CreateConfFilesCheckBox.Visible:=PrgSetup.ActivateIncompleteFeatures;
 
   If AdvencedMode then begin
     DOSBoxDownloadURLInfo.Top:=GlobalGroupBox.Top+GlobalGroupBox.Height+10;

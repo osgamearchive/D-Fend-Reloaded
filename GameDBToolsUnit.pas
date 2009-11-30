@@ -48,15 +48,21 @@ Procedure ReplaceAbsoluteDirs(const GameDB : TGameDB);
 Function BuildDefaultDosProfile(const GameDB : TGameDB; const CopyFiles : Boolean = True) : TGame;
 Procedure BuildDefaultProfile;
 Procedure ReBuildTemplates;
-Function CopyFiles(Source, Dest : String; const OverwriteExistingFiles : Boolean) : Boolean;
+Function CopyFiles(Source, Dest : String; const OverwriteExistingFiles, ProcessMessages : Boolean) : Boolean;
 Procedure UpdateUserDataFolderAndSettingsAfterUpgrade(const GameDB : TGameDB);
 Procedure UpdateSettingsFilesLocation;
+
+Var FreeDOSInitThreadRunning : Boolean = False;
 
 { Extras }
 
 Procedure ExportGamesList(const GameDB : TGameDB; const FileName : String);
 Procedure EditDefaultProfile(const AOwner : TComponent; const GameDB : TGameDB; const ASearchLinkFile : TLinkFile; const ADeleteOnExit : TStringList);
 Procedure CreateConfFilesForProfiles(const GameDB : TGameDB; const Dir : String);
+
+Function EncodeUserHTMLSymbolsOnly(const S : String) : String;
+Function EncodeHTMLSymbols(const S : String) : String;
+Function DecodeHTMLSymbols(const S : String) : String;
 
 { History }
 
@@ -100,6 +106,7 @@ Function WindowsExeMode(const Game : TGame) : Boolean;
 { CheckDB }
 
 Function CheckGameDB(const GameDB : TGameDB) : TStringList;
+Function CheckDoubleChecksums(const AutoSetupDB : TGameDB) : TStringList;
 
 { DOSBox versions }
 
@@ -111,7 +118,7 @@ Procedure OpenConfigurationFile(const Game : TGame; const DeleteOnExit : TString
 
 { Program file selection }
 
-Function SelectProgramFile(var FileName : String; const HintFirstFile, HintSecondFile : String; const WindowsMode : Boolean; const Owner : TComponent) : Boolean;
+Function SelectProgramFile(var FileName : String; const HintFirstFile, HintSecondFile : String; const WindowsMode : Boolean; const OtherEmulator : Integer; const Owner : TComponent) : Boolean;
 
 { Change mounting settings in templates }
 
@@ -124,7 +131,7 @@ uses Windows, SysUtils, Forms, Dialogs, Graphics, ShellAPI, ShlObj, IniFiles,
      Math, PNGImage, JPEG, GIFImage, CommonTools, LanguageSetupUnit, PrgConsts,
      PrgSetupUnit, ProfileEditorFormUnit, ModernProfileEditorFormUnit, HashCalc,
      SmallWaitFormUnit, ChecksumFormUnit, WaitFormUnit, ImageCacheUnit,
-     DosBoxUnit, ScummVMUnit, ImageStretch;
+     DosBoxUnit, ScummVMUnit, ImageStretch, MainUnit;
 
 Procedure AddTypeSelector(const ATreeView : TTreeView; const Name : String; const St : TStringList);
 Var N,N2 : TTreeNode;
@@ -451,7 +458,7 @@ Procedure BuildSelectPopupMenu(const Popup : TPopupMenu; const GameDB : TGameDB;
 Var MenuSelect, MenuUnselect : TMenuItem;
     St : TStringList;
     I,J,K,Nr : Integer;
-    S,T,SUpper : String;
+    S,T,U,SUpper : String;
     UserData : Array of TUserDataRecord;
 begin
   { Base settings }
@@ -506,6 +513,7 @@ begin
           T:=Trim(Copy(S,Pos('=',S)+1,MaxInt));
           S:=Trim(Copy(S,1,Pos('=',S)-1));
           If (S='') or (T='') then continue;
+
           SUpper:=ExtUpperCase(S);
           Nr:=-1;
           For K:=0 to length(UserData)-1 do If UserData[K].NameUpper=SUpper then begin Nr:=K; break; end;
@@ -515,9 +523,19 @@ begin
             UserData[Nr].Values:=TStringList.Create;
             UserData[Nr].ValuesUpper:=TStringList.Create;
           end;
-          If UserData[Nr].ValuesUpper.IndexOf(ExtUpperCase(T))<0 then begin
-            UserData[Nr].Values.Add(T);
-            UserData[Nr].ValuesUpper.Add(ExtUpperCase(T));
+          K:=Pos(';',T);
+          While T<>'' do begin
+            If K>0 then begin
+              U:=Trim(Copy(T,1,K-1));
+              T:=Trim(Copy(T,K+1,MaxInt));
+            end else begin
+              U:=T; T:='';
+            end;
+            If UserData[Nr].ValuesUpper.IndexOf(ExtUpperCase(U))<0 then begin
+              UserData[Nr].Values.Add(U);
+              UserData[Nr].ValuesUpper.Add(ExtUpperCase(U));
+            end;
+            K:=Pos(';',T);
           end;
         end;
       finally
@@ -878,7 +896,9 @@ begin
         ScaleGraphicToImageList(Icon,AListViewIconImageList,True);
       end else begin
         If Icon.Width>=AListViewIconImageList.Width then begin
+          I:=AListViewIconImageList.Count;
           AListViewIconImageList.AddIcon(Icon);
+          If AListViewIconImageList.Count=I then ScaleGraphicToImageList(Icon,AListViewIconImageList,False);
         end else begin
           ScaleGraphicToImageList(Icon,AListViewIconImageList,False);
         end;
@@ -978,6 +998,29 @@ begin
   AddGamesToList(AListView,AListViewImageList,AListViewIconImageList,AImageList,GameDB,nil,Group,SubGroup,SearchString,ShowExtraInfo,SortBy,ReverseOrder,HideScummVMProfiles,HideWindowsProfiles,HideDefaultProfile,ScreenshotViewMode);
 end;
 
+Function GroupMatch(const GameGroupUpper, SelectedGroupUpper : String) : Boolean;
+Var I : Integer;
+    S : String;
+begin
+  result:=True;
+  If GameGroupUpper=SelectedGroupUpper then exit;
+
+  S:=GameGroupUpper;
+  I:=Pos(';',S);
+  If I<>0 then While S<>'' do begin
+    If I>0 then begin
+      If Trim(Copy(S,1,I-1))=SelectedGroupUpper then exit;
+      S:=Trim(Copy(S,I+1,MaxInt));
+    end else begin
+      If Trim(S)=SelectedGroupUpper then exit;
+      break;
+    end;
+    I:=Pos(';',S);
+  end;
+
+  result:=False;
+end;
+
 Procedure AddGamesToList(const AListView : TListView; const AListViewImageList, AListViewIconImageList, AImageList : TImageList; const GameDB : TGameDB; const Game : TGame; const Group, SubGroup, SearchString : String; const ShowExtraInfo : Boolean; const SortBy : TSortListBy; const ReverseOrder, HideScummVMProfiles, HideWindowsProfiles, HideDefaultProfile,  ScreenshotViewMode : Boolean); overload;
 Var I,J,K,Nr,ItemsUsed : Integer;
     GroupUpper, SubGroupUpper, SearchStringUpper : String;
@@ -1035,7 +1078,7 @@ begin
 
   List:=TList.Create;
   try
-    {Select game to add}
+    {Select games to add}
     SearchStringUpper:=ExtUpperCase(Trim(SearchString));
     If SubGroup='' then begin
       B:=(Group=LanguageSetup.GameFavorites);
@@ -1067,11 +1110,11 @@ begin
         If HideDefaultProfile and (GameDB[I].Name=DosBoxDOSProfile) then continue;
         B:=False;
         Case Nr of
-          0 : B:=(ExtUpperCase(GetCustomGenreName(GameDB[I].CacheGenre))=SubGroupUpper);
-          1 : B:=(GameDB[I].CacheDeveloperUpper=SubGroupUpper);
-          2 : B:=(GameDB[I].CachePublisherUpper=SubGroupUpper);
-          3 : B:=(GameDB[I].CacheYearUpper=SubGroupUpper);
-          4 : B:=(ExtUpperCase(GetCustomLanguageName(GameDB[I].CacheLanguage))=SubGroupUpper);
+          0 : B:=GroupMatch(ExtUpperCase(GetCustomGenreName(GameDB[I].CacheGenre)),SubGroupUpper);
+          1 : B:=GroupMatch(GameDB[I].CacheDeveloperUpper,SubGroupUpper);
+          2 : B:=GroupMatch(GameDB[I].CachePublisherUpper,SubGroupUpper);
+          3 : B:=GroupMatch(GameDB[I].CacheYearUpper,SubGroupUpper);
+          4 : B:=GroupMatch(ExtUpperCase(GetCustomLanguageName(GameDB[I].CacheLanguage)),SubGroupUpper);
           5 : begin
                 If (SubGroupUpper=EmType1) then B:=DOSBoxMode(GameDB[I]);
                 If (SubGroupUpper=EmType2) then B:=ScummVMMode(GameDB[I]);
@@ -1083,7 +1126,7 @@ begin
                 try
                   For J:=0 to St2.Count-1 do begin
                     S:=St2[J]; K:=Pos('=',S); If K=0 then T:='' else begin T:=Trim(Copy(S,K+1,MaxInt)); S:=Trim(Copy(S,1,K-1)); end;
-                    If Trim(ExtUpperCase(S))=GroupUpper then begin B:=(Trim(ExtUpperCase(T))=SubGroupUpper); break; end;
+                    If Trim(ExtUpperCase(S))=GroupUpper then begin B:=GroupMatch(Trim(ExtUpperCase(T)),SubGroupUpper); break; end;
                   end;
                 finally
                   St2.Free;
@@ -1126,7 +1169,7 @@ begin
         end;
         St.Sort;
 
-        {Add games to List}
+        {Add games to list}
         ItemsUsed:=0;
         If Trim(PrgSetup.ValueForNotSet)='' then T:=LanguageSetup.NotSet else T:=Trim(PrgSetup.ValueForNotSet);
         AListView.Items.BeginUpdate;
@@ -1680,16 +1723,18 @@ begin
 
     St:=ValueToList(G.ExtraFiles);
     try
-      For J:=0 to St.Count-1 do G.ExtraFiles:=RemoveBackslash(MakeRelPath(St[J],PrgSetup.BaseDir));
-      G.ExtraFiles:=StringListToString(St);
+      For J:=0 to St.Count-1 do St[J]:=RemoveBackslash(MakeRelPath(St[J],PrgSetup.BaseDir));
+      J:=0; while J<St.Count do If Trim(St[J])='' then St.Delete(J) else inc(J);
+      G.ExtraFiles:=ListToValue(St);
     finally
       St.Free;
     end;
 
     St:=ValueToList(G.ExtraDirs);
     try
-      For J:=0 to St.Count-1 do G.ExtraDirs:=RemoveBackslash(MakeRelPath(St[J],PrgSetup.BaseDir,True));
-      G.ExtraDirs:=StringListToString(St);
+      For J:=0 to St.Count-1 do St[J]:=RemoveBackslash(MakeRelPath(St[J],PrgSetup.BaseDir,True));
+      J:=0; while J<St.Count do If Trim(St[J])='' then St.Delete(J) else inc(J);
+      G.ExtraDirs:=ListToValue(St);
     finally
       St.Free;
     end;
@@ -1717,9 +1762,10 @@ begin
   end;
 end;
 
-Function CopyFiles(Source, Dest : String; const OverwriteExistingFiles : Boolean) : Boolean;
+Function CopyFiles(Source, Dest : String; const OverwriteExistingFiles, ProcessMessages : Boolean) : Boolean;
 Var I : Integer;
     Rec : TSearchRec;
+    Files, Folders : TStringList;
 begin
   result:=False;
 
@@ -1727,27 +1773,39 @@ begin
   Dest:=IncludeTrailingPathDelimiter(Dest);
   if not ForceDirectories(Dest) then exit;
 
-  I:=FindFirst(Source+'*.*',faAnyFile,Rec);
+  Files:=TStringList.Create;
+  Folders:=TStringList.Create;
   try
-    while I=0 do begin
-      If (Rec.Attr and faDirectory)<>0 then begin
-        If (Rec.Name<>'.') and (Rec.Name<>'..') then begin
-          If not CopyFiles(Source+Rec.Name,Dest+Rec.Name,OverwriteExistingFiles) then exit;
-        end;
-      end else begin
-        Application.ProcessMessages;
-        If OverwriteExistingFiles then begin
-          if not CopyFile(PChar(Source+Rec.Name),PChar(Dest+Rec.Name),False) then exit;
+    I:=FindFirst(Source+'*.*',faAnyFile,Rec);
+    try
+      while I=0 do begin
+        If (Rec.Attr and faDirectory)<>0 then begin
+          If (Rec.Name<>'.') and (Rec.Name<>'..') then Folders.Add(Rec.Name);
         end else begin
-          If not FileExists(Dest+Rec.Name) then begin
-            if not CopyFile(PChar(Source+Rec.Name),PChar(Dest+Rec.Name),False) then exit;
-          end;
+          If ProcessMessages and (Files.Count mod 20 =0) then Application.ProcessMessages;
+          Files.Add(Rec.Name);
+        end;
+        I:=FindNext(Rec);
+      end;
+    finally
+      FindClose(Rec);
+    end;
+
+    For I:=0 to Files.Count-1 do begin
+      If ProcessMessages then Application.ProcessMessages;
+      If OverwriteExistingFiles then begin
+        if not CopyFile(PChar(Source+Files[I]),PChar(Dest+Files[I]),False) then exit;
+      end else begin
+        If not FileExists(Dest+Files[I]) then begin
+          if not CopyFile(PChar(Source+Files[I]),PChar(Dest+Files[I]),False) then exit;
         end;
       end;
-      I:=FindNext(Rec);
     end;
+
+    For I:=0 to Folders.Count-1 do If not CopyFiles(Source+Folders[I],Dest+Folders[I],OverwriteExistingFiles,ProcessMessages) then exit;
   finally
-    FindClose(Rec);
+    Files.Free;
+    Folders.Free;
   end;
 
   result:=True;
@@ -1757,6 +1815,7 @@ Procedure UpdateUserDataFolderAndSettingsAfterUpgrade(const GameDB : TGameDB);
 Var Source : String;
     I : Integer;
     DB : TGameDB;
+    B : Boolean;
 begin
   {Copy new and changed NewUserData files to DataDir}
   If PrgDataDir<>PrgDir then begin
@@ -1780,30 +1839,46 @@ begin
     end;
 
     {Add new auto setup templates}
-    CopyFiles(PrgDir+NewUserDataSubDir+'\'+AutoSetupSubDir,PrgDataDir+AutoSetupSubDir,False); {False = do not overwrite existing file}
+    CopyFiles(PrgDir+NewUserDataSubDir+'\'+AutoSetupSubDir,PrgDataDir+AutoSetupSubDir,False,True); {False = do not overwrite existing file}
 
     {Update DozZip}
     Source:=PrgDir+NewUserDataSubDir+'\DOSZIP\';
-    If DirectoryExists(Source) then CopyFiles(Source,IncludeTrailingPathDelimiter(PrgSetup.GameDir)+'DOSZIP\',True);
+    If DirectoryExists(Source) then CopyFiles(Source,IncludeTrailingPathDelimiter(PrgSetup.GameDir)+'DOSZIP\',True,True);
   end;
 
   {Update video card default values}
   GameDB.ConfOpt.Video:=DefaultValuesVideo;
   GameDB.ConfOpt.StoreAllValues;
 
+  {Update game DB: Max->max, Auto->auto}
+  For I:=0 to GameDB.Count-1 do begin
+    B:=False;
+    If GameDB[I].Cycles='Max' then begin GameDB[I].Cycles:='max'; B:=True; end;
+    If GameDB[I].Cycles='Auto' then begin GameDB[I].Cycles:='auto'; B:=True; end;
+    If B then GameDB[I].StoreAllValues;
+  end;
+
   {Update templates and auto setup template: vga->svga_s3}
   DB:=TGameDB.Create(PrgDataDir+TemplateSubDir,False);
   try
-    For I:=0 to DB.Count-1 do If Trim(ExtUpperCase(DB[I].VideoCard))='VGA' then begin
-      DB[I].VideoCard:='vga_s3'; DB[I].StoreAllValues;
+    For I:=0 to DB.Count-1 do begin
+      B:=False;
+      If Trim(ExtUpperCase(DB[I].VideoCard))='VGA' then begin DB[I].VideoCard:='vga_s3'; B:=True; end;
+      If DB[I].Cycles='Max' then DB[I].Cycles:='max';
+      If DB[I].Cycles='Auto' then DB[I].Cycles:='auto';
+      If B then DB[I].StoreAllValues;
     end;
   finally
     DB.Free;
   end;
   DB:=TGameDB.Create(PrgDataDir+AutoSetupSubDir,False);
   try
-    For I:=0 to DB.Count-1 do If Trim(ExtUpperCase(DB[I].VideoCard))='VGA' then begin
-      DB[I].VideoCard:='vga_s3'; DB[I].StoreAllValues;
+    For I:=0 to DB.Count-1 do begin
+      B:=False;
+      If Trim(ExtUpperCase(DB[I].VideoCard))='VGA' then begin DB[I].VideoCard:='vga_s3'; B:=True; end;
+      If DB[I].Cycles='Max' then DB[I].Cycles:='max';
+      If DB[I].Cycles='Auto' then DB[I].Cycles:='auto';
+      If B then DB[I].StoreAllValues;
     end;
   finally
     DB.Free;
@@ -1871,27 +1946,53 @@ begin
   MoveDataFile(NSIInstallerHelpFile);
 end;
 
-Function RestoreFREEDOSFolder : Boolean;
+Function RestoreFREEDOSFolder(const ShowWaitForm : Boolean) : Boolean;
 Var Source1, Source2, Dest1, Dest2 : String;
     B1, B2 : Boolean;
 begin
   result:=True;
 
-  Source1:=PrgDir+NewUserDataSubDir+'\FREEDOS';
-  Source2:=PrgDir+NewUserDataSubDir+'\DOSZIP';
-  Dest1:=IncludeTrailingPathDelimiter(PrgSetup.GameDir)+'FREEDOS';
-  Dest2:=IncludeTrailingPathDelimiter(PrgSetup.GameDir)+'DOSZIP';
-  B1:=DirectoryExists(Source1){ and not DirectoryExists(Dest1) - always copy, overwrite/update dest files};
-  B2:=DirectoryExists(Source2){ and not DirectoryExists(Dest2) - always copy, overwrite/update dest files};
+  Source1:=PrgDir+NewUserDataSubDir+'\DOSZIP';
+  Source2:=PrgDir+NewUserDataSubDir+'\FREEDOS';
+  Dest1:=IncludeTrailingPathDelimiter(PrgSetup.GameDir)+'DOSZIP';
+  Dest2:=IncludeTrailingPathDelimiter(PrgSetup.GameDir)+'FREEDOS';
+  B1:=DirectoryExists(Source1);
+  B2:=DirectoryExists(Source2);
 
   If B1 or B2 then begin
-    LoadAndShowSmallWaitForm(LanguageSetup.SetupFormService3WaitInfo);
+    If ShowWaitForm then LoadAndShowSmallWaitForm(LanguageSetup.SetupFormService3WaitInfo);
     try
-      If B1 then result:=CopyFiles(Source1,Dest1,True);
-      If B2 then result:=CopyFiles(Source2,Dest2,True);
+      If B1 then result:=CopyFiles(Source1,Dest1,True,ShowWaitForm);
+      If B2 then result:=CopyFiles(Source2,Dest2,True,ShowWaitForm);
     finally
-      FreeSmallWaitForm;
+      If ShowWaitForm then FreeSmallWaitForm;
     end;
+  end;
+end;
+
+Type TRestoreFreeDOSFolderThread=class(TThread)
+  protected
+    Procedure Execute; override;
+  public
+    Constructor Create;
+end;
+
+Constructor TRestoreFreeDOSFolderThread.Create;
+begin
+  inherited Create(True);
+  FreeOnTerminate:=True;
+  Resume;
+end;
+
+Procedure TRestoreFreeDOSFolderThread.Execute;
+begin
+  FreeDOSInitThreadRunning:=True;
+  try
+    SetThreadPriority(GetCurrentThread,THREAD_PRIORITY_BELOW_NORMAL);
+    While not MainWindowShowComplete do Sleep(100);
+    RestoreFREEDOSFolder(False);
+  finally
+    FreeDOSInitThreadRunning:=False;
   end;
 end;
 
@@ -1991,7 +2092,7 @@ begin
     CopyFile(PChar(PrgDir+NewUserDataSubDir+'\'+IconsConfFile),PChar(PrgDataDir+SettingsFolder+'\'+IconsConfFile),True);
   end;
 
-  If CopyFiles then RestoreFREEDOSFolder;
+  If CopyFiles then TRestoreFreeDOSFolderThread.Create;
 end;
 
 Procedure BuildDefaultProfile;
@@ -2158,19 +2259,12 @@ begin
   end;
 end;
 
-Function EncodeHTMLSymbols(const S : String) : String;
-Procedure Replace(const C : Char; const T : String);
-Var I,J : Integer;
-begin
-  I:=Pos(C,result);
-  while I>0 do begin J:=I+1; result:=Copy(result,1,I-1)+T+Copy(result,I+1,MaxInt); I:=Pos(C,Copy(result,J,MaxInt))-(J-1); end;
-end;
+Function EncodeUserHTMLSymbolsOnly(const S : String) : String;
 Var I : Integer;
     St : TStringList;
     A,B : String;
 begin
   result:=S;
-  Replace('&','&amp;'); {must be the first, otherweise "ä" -> "&auml;" -> "&amp;auml;" will happen}
 
   St:=ValueToList(LanguageSetup.CharsetHTMLTranslate,',');
   try
@@ -2179,7 +2273,86 @@ begin
       A:=St[2*I]; If length(A)=0 then continue;
       B:=St[2*I+1]; If (B<>'') and (B[length(B)]<>';') then B:=B+';';
       If (A[1]='&') or (ExtUpperCase(B)='&AMP;') then continue;
-      Replace(A[1],B);
+      result:=Replace(result,A[1],B);
+    end;
+  finally
+    St.Free;
+  end;
+end;
+
+Function EncodeHTMLSymbols(const S : String) : String;
+{Var I : Integer;
+    A : String;}
+begin
+  result:=S;
+  result:=Replace(result,'&','&amp;'); {must be the first, otherweise "ä" -> "&auml;" -> "&amp;auml;" will happen}
+  result:=Replace(result,'<','&lt;');
+  result:=Replace(result,'>','&gt;');
+  result:=Replace(result,'"','&quot;');
+  result:=Replace(result,'''','&apos;');
+  result:=EncodeUserHTMLSymbolsOnly(result);
+
+  {I:=1;
+  While I<=length(result) do begin
+    If (ord(result[I])>=32) and (ord(result[I])<=127) then begin inc(I); continue; end;
+    A:='&#'+IntToStr(ord(result[I]))+';';
+    result:=copy(result,1,I-1)+A+copy(result,I+1,MaxInt);
+    inc(I,length(A));
+  end;}
+end;
+
+Function TryStrToHex(const S : String; var Hex : Integer) : Boolean;
+Var I : Integer;
+begin
+  result:=False;
+  Hex:=0;
+  For I:=1 to length(S) do begin
+    Hex:=Hex*16;
+    Case UpCase(S[I]) of
+      '0'..'9' : Hex:=Hex+(ord(S[I])-ord('0'));
+      'A'..'F' : Hex:=Hex+(ord(UpCase(S[I]))-ord('A')+10);
+      else exit;
+    End;
+  end;
+  result:=True;
+end;
+
+Function DecodeHTMLSymbols(const S : String) : String;
+Var I,J,K : Integer;
+    St : TStringList;
+    A,B : String;
+begin
+  result:=S;
+  result:=Replace(result,'&amp;','&');
+  result:=Replace(result,'&lt;','<');
+  result:=Replace(result,'&gt;','>');
+  result:=Replace(result,'&quot;','"');
+  result:=Replace(result,'&apos;','''');
+
+  I:=1;
+  While I<length(result)-1 do begin
+    If (result[I]='&') and (result[I+1]='#') then begin
+      If (I<length(result)-2) and (result[I+2]='x') then begin
+        {Hex number}
+        J:=0; while (I+3+J<length(result)) and (result[I+3+J]<>';') do inc(J);
+        If (J>=1) and (J<=3) and TryStrToHex(Copy(result,I+3,J),K) then result:=copy(result,1,I-1)+chr(K)+copy(result,I+3+J);
+      end else begin
+        {Decimal number}
+        J:=0; while (I+2+J<length(result)) and (result[I+2+J]<>';') do inc(J);
+        If (J>=1) and (J<=2) and TryStrToInt(Copy(result,I+3,J),K) then result:=copy(result,1,I-1)+chr(K)+copy(result,I+2+J);
+      end;
+    end;
+    inc(I);
+  end;
+
+  St:=ValueToList(LanguageSetup.CharsetHTMLTranslate,',');
+  try
+    If St.Count mod 2=1 then St.Add(St[St.Count-1]);
+    For I:=0 to (St.Count div 2)-1 do begin
+      A:=St[2*I]; If length(A)=0 then continue;
+      B:=St[2*I+1]; If (B<>'') and (B[length(B)]<>';') then B:=B+';';
+      If (A[1]='&') or (ExtUpperCase(B)='&AMP;') then continue;
+      result:=Replace(result,B,A[1]);
     end;
   finally
     St.Free;
@@ -2721,7 +2894,7 @@ begin
     AGame.MixerPrebuffer:=Ini.ReadInteger('mixer','prebuffer',10);
 
     AGame.SBType:=Ini.ReadString('sblaster','sbtype','sb16');
-    AGame.SBBase:=Ini.ReadInteger('sblaster','sbbase',220);
+    AGame.SBBase:=Ini.ReadString('sblaster','sbbase','220');
     AGame.SBIRQ:=Ini.ReadInteger('sblaster','irq',7);
     AGame.SBDMA:=Ini.ReadInteger('sblaster','dma',1);
     AGame.SBHDMA:=Ini.ReadInteger('sblaster','hdma',5);
@@ -2731,7 +2904,7 @@ begin
 
     AGame.GUS:=StrToBool(INI.ReadString('gus','gus','true'));
     AGame.GUSRate:=Ini.ReadInteger('gus','gusrate',22050);
-    AGame.GUSBase:=Ini.ReadInteger('gus','gusbase',240);
+    AGame.GUSBase:=Ini.ReadString('gus','gusbase','240');
     AGame.GUSIRQ:=Ini.ReadInteger('gus','irg1',5);
     AGame.GUSDMA:=Ini.ReadInteger('gus','dma1',3);
     AGame.GUSUltraDir:=Ini.ReadString('gus','ultradir','C:\ULTRASND');
@@ -3138,6 +3311,70 @@ begin
   end;
 end;
 
+Function ExtendedChecksumCompare(const A1,A2 : TGame) : Boolean;
+Var St1, St1c, St2, St2c : TStringList;
+    I,J : Integer;
+begin
+  result:=False;
+
+  St1:=TStringList.Create;
+  St1c:=TStringList.Create;
+  St2:=TStringList.Create;
+  St2c:=TStringList.Create;
+  try
+    If A1.AddtionalChecksumFile1<>'' then begin St1.Add(ExtUpperCase(A1.AddtionalChecksumFile1)); St1c.Add(A1.AddtionalChecksumFile1Checksum); end;
+    If A1.AddtionalChecksumFile2<>'' then begin St1.Add(ExtUpperCase(A1.AddtionalChecksumFile2)); St1c.Add(A1.AddtionalChecksumFile2Checksum); end;
+    If A1.AddtionalChecksumFile3<>'' then begin St1.Add(ExtUpperCase(A1.AddtionalChecksumFile3)); St1c.Add(A1.AddtionalChecksumFile3Checksum); end;
+    If A1.AddtionalChecksumFile4<>'' then begin St1.Add(ExtUpperCase(A1.AddtionalChecksumFile4)); St1c.Add(A1.AddtionalChecksumFile4Checksum); end;
+    If A1.AddtionalChecksumFile5<>'' then begin St1.Add(ExtUpperCase(A1.AddtionalChecksumFile5)); St1c.Add(A1.AddtionalChecksumFile5Checksum); end;
+    If A2.AddtionalChecksumFile1<>'' then begin St2.Add(ExtUpperCase(A2.AddtionalChecksumFile1)); St2c.Add(A2.AddtionalChecksumFile1Checksum); end;
+    If A2.AddtionalChecksumFile2<>'' then begin St2.Add(ExtUpperCase(A2.AddtionalChecksumFile2)); St2c.Add(A2.AddtionalChecksumFile2Checksum); end;
+    If A2.AddtionalChecksumFile3<>'' then begin St2.Add(ExtUpperCase(A2.AddtionalChecksumFile3)); St2c.Add(A2.AddtionalChecksumFile3Checksum); end;
+    If A2.AddtionalChecksumFile4<>'' then begin St2.Add(ExtUpperCase(A2.AddtionalChecksumFile4)); St2c.Add(A2.AddtionalChecksumFile4Checksum); end;
+    If A2.AddtionalChecksumFile5<>'' then begin St2.Add(ExtUpperCase(A2.AddtionalChecksumFile5)); St2c.Add(A2.AddtionalChecksumFile5Checksum); end;
+
+    For I:=0 to St1.Count-1 do begin
+      J:=St2.IndexOf(St1[I]);
+      If (J>=0) and (St1c[I]<>St2c[J]) then begin result:=True; exit; end;
+    end;
+
+  finally
+    St1.Free;
+    St1c.Free;
+    St2.Free;
+    St2c.Free;
+  end;
+end;
+
+Function CheckDoubleChecksums(const AutoSetupDB : TGameDB) : TStringList;
+Var I,J : Integer;
+    Names, Sums : TStringList;
+    S : String;
+begin
+  result:=TStringList.Create;
+
+  Names:=TStringList.Create;
+  Sums:=TStringList.Create;
+  try
+    For I:=0 to AutoSetupDB.Count-1 do begin
+
+      S:=Trim(ExtUpperCase(AutoSetupDB[I].GameExe));
+      If Trim(S)='' then continue;
+      J:=Names.IndexOf(S);
+      If J<0 then begin
+        Names.AddObject(S,TObject(I));
+        Sums.Add(AutoSetupDB[I].GameExeMD5);
+      end else begin
+        If (Sums[J]=AutoSetupDB[I].GameExeMD5) and (not ExtendedChecksumCompare(AutoSetupDB[Integer(Names.Objects[J])],AutoSetupDB[I])) then
+          result.Add(AutoSetupDB[Integer(Names.Objects[J])].CacheName+' <-> '+AutoSetupDB[I].CacheName);
+      end;
+    end;
+  finally
+    Names.Free;
+    Sums.Free;
+  end;
+end;
+
 Function GetDOSBoxNr(const Game : TGame) : Integer;
 Var I : Integer;
     S : String;
@@ -3179,7 +3416,7 @@ begin
   If DeleteOnExit.IndexOf(S)<0 then DeleteOnExit.Add(S);
 end;
 
-Function SelectProgramFile(var FileName : String; const HintFirstFile, HintSecondFile : String; const WindowsMode : Boolean; const Owner : TComponent) : Boolean;
+Function SelectProgramFile(var FileName : String; const HintFirstFile, HintSecondFile : String; const WindowsMode : Boolean; const OtherEmulator : Integer; const Owner : TComponent) : Boolean;
 Var S,S1,S2,S3,T,U : String;
     OpenDialog : TOpenDialog;
     St,St2 : TStringList;
@@ -3188,38 +3425,63 @@ begin
   result:=False;
   OpenDialog:=TOpenDialog.Create(Owner);
   try
-    OpenDialog.DefaultExt:='exe';
-    OpenDialog.Title:=LanguageSetup.ProfileEditorEXEDialog;
-    If (Trim(PrgSetup.QBasic)<>'') and FileExists(Trim(PrgSetup.QBasic)) and (not WindowsMode) then S:=LanguageSetup.ProfileEditorEXEFilterWithBasic else S:=LanguageSetup.ProfileEditorEXEFilter;
-
-    S1:=''; S2:=''; S3:='';
-    If not WindowsMode then begin
-      St:=TStringList.Create;
-      try
-        For I:=0 to Min(PrgSetup.DOSBoxBasedUserInterpretersPrograms.Count,PrgSetup.DOSBoxBasedUserInterpretersExtensions.Count)-1 do begin
-          St2:=ValueToList(PrgSetup.DOSBoxBasedUserInterpretersExtensions[I]);
-          try
-            T:=''; U:='';
-            For J:=0 to St2.Count-1 do begin
-              If St.IndexOf(ExtUpperCase(St2[J]))<0 then begin
-                St2.Add(ExtUpperCase(St2[J]));
-                S1:=S1+', *.'+ExtLowerCase(St2[J]);
-                S2:=S2+';*.'+ExtLowerCase(St2[J]);
-              end;
-              If T='' then T:='*.'+ExtLowerCase(St2[J]) else T:=T+', *.'+ExtLowerCase(St2[J]);
-              If U='' then U:='*.'+ExtLowerCase(St2[J]) else U:=U+';*.'+ExtLowerCase(St2[J]);
-            end;
-            S3:=S3+'|'+ChangeFileExt(ExtractFileName(PrgSetup.DOSBoxBasedUserInterpretersPrograms[I]),'')+' ('+T+')|'+U;
-          finally
-            St2.Free;
-          end;
-        end;
-      finally
-        St.Free;
+    {Filter, DefaultExt and Title}
+    If WindowsMode and (OtherEmulator>=0) then begin
+      OpenDialog.Title:=LanguageSetup.MenuProfileAddOtherSelectTitle;
+      OpenDialog.DefaultExt:='';
+      If (PrgSetup.WindowsBasedEmulatorsNames.Count<=OtherEmulator) or (PrgSetup.WindowsBasedEmulatorsPrograms.Count<=OtherEmulator) or (PrgSetup.WindowsBasedEmulatorsParameters.Count<=OtherEmulator) or  (PrgSetup.WindowsBasedEmulatorsExtensions.Count<=OtherEmulator) then exit;
+      S:=Trim(PrgSetup.WindowsBasedEmulatorsExtensions[OtherEmulator]);
+      While S<>'' do begin
+       I:=Pos(';',S);
+       If T<>'' then T:=T+', ';
+       If U<>'' then U:=U+';';
+       If I=0 then begin
+         If OpenDialog.DefaultExt='' then OpenDialog.DefaultExt:=Trim(S);
+         T:=T+'*.'+Trim(S);
+         U:=U+'*.'+Trim(S);
+         S:='';
+       end else begin
+         If OpenDialog.DefaultExt='' then OpenDialog.DefaultExt:=Trim(Copy(S,1,I-1));
+         T:=T+'*.'+Trim(Copy(S,1,I-1));
+         U:=U+'*.'+Trim(Copy(S,1,I-1));
+         S:=Trim(Copy(S,I+1,MaxInt));
+       end;
       end;
+      OpenDialog.Filter:=Format(LanguageSetup.MenuProfileAddOtherSelectFilter,[PrgSetup.WindowsBasedEmulatorsNames[OtherEmulator],T,U]);
+    end else begin
+      OpenDialog.DefaultExt:='exe';
+      OpenDialog.Title:=LanguageSetup.ProfileEditorEXEDialog;
+      If (Trim(PrgSetup.QBasic)<>'') and FileExists(Trim(PrgSetup.QBasic)) and (not WindowsMode) then S:=LanguageSetup.ProfileEditorEXEFilterWithBasic else S:=LanguageSetup.ProfileEditorEXEFilter;
+      S1:=''; S2:=''; S3:='';
+      If not WindowsMode then begin
+        St:=TStringList.Create;
+        try
+          For I:=0 to Min(PrgSetup.DOSBoxBasedUserInterpretersPrograms.Count,PrgSetup.DOSBoxBasedUserInterpretersExtensions.Count)-1 do begin
+            St2:=ValueToList(PrgSetup.DOSBoxBasedUserInterpretersExtensions[I]);
+            try
+              T:=''; U:='';
+              For J:=0 to St2.Count-1 do begin
+                If St.IndexOf(ExtUpperCase(St2[J]))<0 then begin
+                  St2.Add(ExtUpperCase(St2[J]));
+                  S1:=S1+', *.'+ExtLowerCase(St2[J]);
+                  S2:=S2+';*.'+ExtLowerCase(St2[J]);
+                end;
+                If T='' then T:='*.'+ExtLowerCase(St2[J]) else T:=T+', *.'+ExtLowerCase(St2[J]);
+                If U='' then U:='*.'+ExtLowerCase(St2[J]) else U:=U+';*.'+ExtLowerCase(St2[J]);
+              end;
+              S3:=S3+'|'+ChangeFileExt(ExtractFileName(PrgSetup.DOSBoxBasedUserInterpretersPrograms[I]),'')+' ('+T+')|'+U;
+            finally
+              St2.Free;
+            end;
+          end;
+        finally
+          St.Free;
+        end;
+      end;
+      OpenDialog.Filter:=Format(S,[S1,S2,S3]);
     end;
-    OpenDialog.Filter:=Format(S,[S1,S2,S3]);
 
+    {InitialDir}
     S:='';
     If FileName<>'' then begin S:=ExtractFilePath(MakeAbsPath(FileName,PrgSetup.BaseDir)); end;
     If (S='') and (Trim(HintFirstFile)<>'') then S:=ExtractFilePath(MakeAbsPath(HintFirstFile,PrgSetup.BaseDir));
@@ -3229,6 +3491,7 @@ begin
     If S='' then S:=PrgSetup.BaseDir;
     OpenDialog.InitialDir:=S;
 
+    {Run}
     if not OpenDialog.Execute then exit;
 
     S:=MakeRelPath(OpenDialog.FileName,PrgSetup.BaseDir);
@@ -3326,7 +3589,7 @@ begin
       St.Free;
     end;
   end;
-  if not B then result.Add(MakeRelPath(PrgSetup.GameDir,PrgSetup.BaseDir,True)+';DRIVE;'+NextFreeDriveLetter(result)+';False;;105');
+  if not B then result.Add(MakeRelPath(PrgSetup.GameDir,PrgSetup.BaseDir,True)+';DRIVE;'+NextFreeDriveLetter(result)+';False;;'+IntToStr(DefaultFreeHDSize));
 
   {Add program file and setup file dir}
   If ProgrammFileDir<>'' then AddPrgDir(result,ProgrammFileDir);
@@ -3356,11 +3619,12 @@ begin
       St.Free;
     end;
   end;
-  if not B then Mounting.Add(MakeRelPath(PrgSetup.GameDir,PrgSetup.BaseDir,True)+';DRIVE;'+NextFreeDriveLetter(Mounting)+';False;;105');
+  if not B then Mounting.Add(MakeRelPath(PrgSetup.GameDir,PrgSetup.BaseDir,True)+';DRIVE;'+NextFreeDriveLetter(Mounting)+';False;;'+IntToStr(DefaultFreeHDSize));
 
   {Add program file and setup file dir}
   If ProgrammFileDir<>'' then AddPrgDir(Mounting,ProgrammFileDir);
   If SetupFileDir<>'' then AddPrgDir(Mounting,SetupFileDir);
 end;
+
 
 end.

@@ -105,7 +105,7 @@ end;
 procedure TModernProfileEditorSoundBlasterFrame.SetGame(const Game: TGame; const LoadFromTemplate: Boolean);
 begin
   SetComboBox(TypeComboBox,Game.SBType,'sb16');
-  SetComboBox(AddressComboBox,IntToStr(Game.SBBase),'220');
+  SetComboBox(AddressComboBox,Game.SBBase,'220');
   SetComboBox(InterruptComboBox,IntToStr(Game.SBIRQ),'7');
   SetComboBox(DMAComboBox,IntToStr(Game.SBDMA),'1');
   SetComboBox(HDMAComboBox,IntToStr(Game.SBHDMA),'5');
@@ -118,7 +118,7 @@ end;
 procedure TModernProfileEditorSoundBlasterFrame.GetGame(const Game: TGame);
 begin
   Game.SBType:=TypeComboBox.Text;
-  try Game.SBBase:=StrToInt(AddressComboBox.Text); except end;
+  try Game.SBBase:=AddressComboBox.Text; except end;
   try Game.SBIRQ:=StrToInt(InterruptComboBox.Text); except end;
   try Game.SBDMA:=StrToInt(DMAComboBox.Text); except end;
   try Game.SBHDMA:=StrToInt(HDMAComboBox.Text); except end;

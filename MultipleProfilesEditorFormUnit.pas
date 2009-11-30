@@ -302,9 +302,8 @@ begin
   UserIconLoader.DialogImage(DI_Cancel,CancelButton);
   UserIconLoader.DialogImage(DI_Help,HelpButton);
   UserIconLoader.DialogImage(DI_SelectFolder,ImageList,0);
-  //... Complete ImagesList customization in 0.9
-  {UserIconLoader.DialogImage(DI_Expand,ImageList,1);
-  UserIconLoader.DialogImage(DI_Collapse,ImageList,2);}
+  UserIconLoader.DialogImage(DI_Expand,ImageList,1);
+  UserIconLoader.DialogImage(DI_Collapse,ImageList,2);
 
   BuildCheckList(ListBox,GameDB,False,False);
   BuildSelectPopupMenu(PopupMenu,GameDB,SelectButtonClick,False);
@@ -1003,7 +1002,7 @@ begin
 
       {SoundBlaster}
       If ValueActive(8101) then G.SBType:=GetComboText;
-      If ValueActive(8102) then begin try J:=StrToInt(GetComboText); except J:=220; end; G.SBBase:=J; end;
+      If ValueActive(8102) then G.SBBase:=GetComboText;
       If ValueActive(8103) then begin try J:=StrToInt(GetComboText); except J:=7; end; G.SBIRQ:=J; end;
       If ValueActive(8104) then begin try J:=StrToInt(GetComboText); except J:=1; end; G.SBDMA:=J; end;
       If ValueActive(8105) then begin try J:=StrToInt(GetComboText); except J:=5; end; G.SBHDMA:=J; end;
@@ -1014,7 +1013,7 @@ begin
 
       {GUS}
       If ValueActive(8201) then G.GUS:=GetYesNo;
-      If ValueActive(8202) then begin try J:=StrToInt(GetComboText); except J:=240; end; G.GUSBase:=J; end;
+      If ValueActive(8202) then G.GUSBase:=GetComboText;
       If ValueActive(8203) then begin try J:=StrToInt(GetComboText); except J:=22050; end; G.GUSRate:=J; end;
       If ValueActive(8204) then begin try J:=StrToInt(GetComboText); except J:=5; end; G.GUSIRQ:=J; end;
       If ValueActive(8205) then begin try J:=StrToInt(GetComboText); except J:=1; end; G.GUSDMA:=J; end;

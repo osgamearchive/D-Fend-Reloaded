@@ -1,7 +1,7 @@
 unit ClassExtensions;
 interface
 
-uses Windows, Classes, Messages, ComCtrls, Controls, Forms, Grids;
+uses Windows, Classes, Messages, ComCtrls, Controls, Forms, Grids, StdCtrls;
 
 Type TTreeViewAcceptingFiles=class(TTreeView)
   private
@@ -43,10 +43,17 @@ Type TStringGridEx=class(TStringGrid)
     property OnGetListForCell : TGetListForCellEvent read FOnGetListForCell write FOnGetListForCell;
 end;
 
+Type TListBoxAcceptingFiles=class(TListBox)
+  private
+    procedure WMDropFiles(var Message: TWMDROPFILES); message WM_DROPFILES;
+  public
+    Procedure ActivateAcceptFiles;
+end;
+
 Type TWinControlClass=class of TWinControl;
 Type TWinControlTypeChangeMethod=(ctcmDangerousMagic, ctcmStoreAndRestore, ctcmCopyProperties);
 
-Function NewWinControlType(const OldControl : TWinControl; const NewControlClass : TWinControlClass; const ChangeMethod : TWinControlTypeChangeMethod) : TWinControl; 
+Function NewWinControlType(const OldControl : TWinControl; const NewControlClass : TWinControlClass; const ChangeMethod : TWinControlTypeChangeMethod) : TWinControl;
 
 implementation
 
@@ -315,6 +322,36 @@ begin
   B:=False;
   If Assigned(FOnListForCell) then FOnListForCell(ACol,ARow,B);
   If B then result:=esPickList else result:=esSimple;
+end;
+
+{ TListBoxAcceptingFiles }
+
+procedure TListBoxAcceptingFiles.ActivateAcceptFiles;
+begin
+  DragAcceptFiles(Handle,True);
+end;
+
+procedure TListBoxAcceptingFiles.WMDropFiles(var Message: TWMDROPFILES);
+var FileCount : longint;
+    S : String;
+    I : Integer;
+    St : TStringList;
+    P : TPoint;
+begin
+  FileCount:=DragQueryFile(Message.Drop,$FFFFFFFF,nil,0);
+  DragQueryPoint(Message.Drop,P);
+  St:=TStringList.Create;
+  try
+    For I:=0 to FileCount-1 do begin
+      SetLength(S,520);
+      DragQueryFile(Message.Drop,I,PChar(S),512);
+      SetLength(S,StrLen(PChar(S)));
+      St.Add(S);
+    end;
+    If Assigned(OnDragDrop) then OnDragDrop(self,St,P.X,P.Y);
+  finally
+    St.Free;
+  end;
 end;
 
 end.

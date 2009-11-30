@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
-<!ELEMENT DFRPackagesFile (Game | AutoSetup | Language | ExePackage | Icon | IconSet)+>
+<!ELEMENT DFRPackagesFile (Game | AutoSetup | Language | ExePackage | Icon | IconSet | Provider)+>
 <!ATTLIST DFRPackagesFile
 	Name CDATA #REQUIRED
 	LastUpdateDate CDATA #REQUIRED
@@ -15,8 +15,12 @@
 	Year CDATA #REQUIRED
 	Language CDATA #REQUIRED
 	License CDATA #REQUIRED
-	FileChecksum CDATA #REQUIRED
+	PackageChecksum CDATA #REQUIRED
+	GameExeChecksum CDATA #REQUIRED
 	Size CDATA #REQUIRED
+	MetaLink CDATA #IMPLIED
+	AutoSetupURL CDATA #IMPLIED
+	AutoSetupURLMaxVersion CDATA #IMPLIED
 >
 
 <!ELEMENT AutoSetup (#PCDATA)>
@@ -27,17 +31,18 @@
 	Publisher CDATA #REQUIRED
 	Year CDATA #REQUIRED
 	Language CDATA #REQUIRED
-	FileChecksum CDATA #REQUIRED
+	PackageChecksum CDATA #REQUIRED
 	Size CDATA #REQUIRED
 >
 
 <!ELEMENT Language (#PCDATA)>
 <!ATTLIST Language
 	Name CDATA #REQUIRED
+	Description CDATA #IMPLIED
 	MinVersion CDATA #REQUIRED
 	MaxVersion CDATA #REQUIRED
 	Author CDATA #REQUIRED
-	FileChecksum CDATA #REQUIRED
+	PackageChecksum CDATA #REQUIRED
 	Size CDATA #REQUIRED
 >
 
@@ -45,7 +50,7 @@
 <!ATTLIST ExePackage
 	Name CDATA #REQUIRED
 	Description CDATA #REQUIRED
-	FileChecksum CDATA #REQUIRED
+	PackageChecksum CDATA #REQUIRED
 	Size CDATA #REQUIRED
 >
 
@@ -64,4 +69,15 @@
 	Author CDATA #REQUIRED
 	FileChecksum CDATA #REQUIRED
 	Size CDATA #REQUIRED
+>
+
+<!ELEMENT Provider EMPTY>
+<!ATTLIST Provider
+    Name CDATA #IMPLIED
+	Text CDATA #IMPLIED
+	URL CDATA #IMPLIED
+	WriteToProfile (yes|no) #IMPLIED
+	Dialog (yes|no) #IMPLIED
+	OpenURL (yes|no) #IMPLIED
+	Referer CDATA #IMPLIED
 >

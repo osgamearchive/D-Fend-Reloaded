@@ -1052,7 +1052,7 @@ object ProfileEditorForm: TProfileEditorForm
         Left = 16
         Top = 96
         Width = 505
-        Height = 181
+        Height = 169
         ActivePage = AutoexecSheet1
         Anchors = [akLeft, akTop, akRight, akBottom]
         TabOrder = 2
@@ -1065,12 +1065,13 @@ object ProfileEditorForm: TProfileEditorForm
           ExplicitHeight = 0
           object Panel1: TPanel
             Left = 0
-            Top = 140
+            Top = 114
             Width = 497
             Height = 29
             Align = alBottom
             BevelOuter = bvNone
             TabOrder = 1
+            ExplicitTop = 140
             object AutoexecClearButton: TBitBtn
               Tag = 10
               Left = 0
@@ -1148,7 +1149,7 @@ object ProfileEditorForm: TProfileEditorForm
             Left = 0
             Top = 0
             Width = 497
-            Height = 140
+            Height = 114
             Align = alClient
             PlainText = True
             ScrollBars = ssBoth
@@ -1165,12 +1166,13 @@ object ProfileEditorForm: TProfileEditorForm
           ExplicitHeight = 0
           object Panel12: TPanel
             Left = 0
-            Top = 140
+            Top = 114
             Width = 497
             Height = 29
             Align = alBottom
             BevelOuter = bvNone
             TabOrder = 1
+            ExplicitTop = 140
             object FinalizationClearButton: TBitBtn
               Tag = 24
               Left = 0
@@ -1248,7 +1250,7 @@ object ProfileEditorForm: TProfileEditorForm
             Left = 0
             Top = 0
             Width = 497
-            Height = 140
+            Height = 114
             Align = alClient
             PlainText = True
             ScrollBars = ssBoth

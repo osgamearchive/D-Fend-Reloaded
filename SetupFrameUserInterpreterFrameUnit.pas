@@ -19,6 +19,7 @@ type
     ExtensionsEdit: TLabeledEdit;
     ProgramButton: TSpeedButton;
     OpenDialog: TOpenDialog;
+    InfoLabel: TLabel;
     procedure ComboBoxChange(Sender: TObject);
     procedure ButtonWork(Sender: TObject);
     procedure ProgramEditChange(Sender: TObject);
@@ -32,7 +33,7 @@ type
     { Public-Deklarationen }
     Destructor Destroy; override;
     Function GetName : String;
-    Procedure InitGUIAndLoadSetup(InitData : TInitData);
+    Procedure InitGUIAndLoadSetup(var InitData : TInitData);
     Procedure BeforeChangeLanguage;
     Procedure LoadLanguage;
     Procedure DOSBoxDirChanged;
@@ -64,7 +65,7 @@ begin
   result:=LanguageSetup.SetupFormUserDefinedInterpreters;
 end;
 
-procedure TSetupFrameUserInterpreterFrame.InitGUIAndLoadSetup(InitData: TInitData);
+procedure TSetupFrameUserInterpreterFrame.InitGUIAndLoadSetup(var InitData: TInitData);
 begin
   Programs:=TStringList.Create;
   Extensions:=TStringList.Create;
@@ -106,6 +107,7 @@ begin
   ProgramEdit.EditLabel.Caption:=LanguageSetup.SetupFormUserDefinedInterpretersProgram;
   ParametersEdit.EditLabel.Caption:=LanguageSetup.SetupFormUserDefinedInterpretersParameters;
   ExtensionsEdit.EditLabel.Caption:=LanguageSetup.SetupFormUserDefinedInterpretersExtensions;
+  InfoLabel.Caption:=LanguageSetup.SetupFormUserDefinedInterpretersInfo;
 end;
 
 procedure TSetupFrameUserInterpreterFrame.BeforeChangeLanguage;

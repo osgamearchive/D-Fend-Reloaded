@@ -1,41 +1,22 @@
 <?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
 <!DOCTYPE DFRPackagesFile SYSTEM "http://dfendreloaded.sourceforge.net/Packages/DFRPackagesFile.dtd">
 
-<DFRPackagesFile Name="Official addons (languages and auto setup templates) for D-Fend Reloaded" LastUpdateDate="08/21/2009">
+<DFRPackagesFile Name="Official addons (languages, icon sets etc.) for D-Fend Reloaded" LastUpdateDate="11/19/2009">
   <Language
-    Name="(Test) Dummy language"
-	MinVersion="0.8.0"
+    Name="French"
+	Description="An improved version of the French language file for the 0.8.x series."
+    MinVersion="0.8.0"
+    MaxVersion="0.8.10"
+    Author="Sylvain St-Amand / Christophe Bertrand (soft.translator at free.fr,http://soft.translator.free.fr)"
+    PackageChecksum="240CC7744EB3BA27C3B0CD0D806902F7"
+    Size="100083">Addons/French.ini</Language>
+	
+  <Language
+    Name="Polish"
+	Description="An updated Polish language file for the 0.9 pre-releases (0.8.9 to 0.8.13)."
+	MinVersion="0.8.9"
 	MaxVersion="0.8.99"
-	Author="Alexander Herzog"
-	PackageChecksum="5F023856B1A61A8A7736AE15073D66E5"
-	Size="81226">DummyLang.ini</Language>
-  <AutoSetup
-    Name="(Test) Airbus A320"
-	Genre="Flightsimulation"
-	Developer="Thalion Software"
-	Publisher="Thalion Software"
-	Year="1992"
-	Language="English"
-	PackageChecksum="A987EA321FD81257CDC9561415D97000"
-	Size="3000">Airbus_A320.prof</AutoSetup>
-  <AutoSetup
-    Name="(Test) Atomix"
-	Genre="Puzzle"
-	Developer="Softtouch"
-	Publisher="Thalion Software"
-	Year="1990"
-	Language="English"
-	PackageChecksum="A3CC65A673D5A3A2084424034082054E"
- 	Size="2508">Atomix.prof</AutoSetup>
-  <Icon
-    Name="(Test) Testicon"
-    FileChecksum="D8E07FE5052501166B19D2F5A73D6193"
-    Size="138607">NewDFR.ico</Icon>
-  <IconSet
-    Name="(Test) Test-Icon-Set"
-	FileChecksum="-"
-	MinVersion="0.8.0"
-	MaxVersion="0.8.99"
-	Author="nobody"
-	Size="48665">TestSet.zip</IconSet>
+	Author="Adam Sosnowski (oolie@wp.pl)"
+	PackageChecksum="5D84270E945C7E5306DC08DF7A316282"
+	Size="97162">Addons/Polish.ini</Language>
 </DFRPackagesFile>

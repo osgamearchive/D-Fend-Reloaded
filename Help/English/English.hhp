@@ -55,6 +55,7 @@ FileOptionsAppearanceTree.html
 FileOptionsAppearanceScreenshots.html
 FileOptionsProfileEditor.html
 FileOptionsDefaultValues.html
+FileOptionsAutomaticConfiguration.html
 FileOptionsDOSBox.html
 FileOptionsDOSBoxCVSFeatures.html
 FileOptionsFreeDOS.html
@@ -92,6 +93,7 @@ ProfileAddScummVM.html
 ProfileAddWindows.html
 ProfileAddFromTemplate.html
 ProfileWithWizard.html
+ProfileAddFromMedia.html
 ProfileEdit.html
 ProfileEditProfile.html
 ProfileEditAdditionalChecksums.html
@@ -146,6 +148,7 @@ ExtrasImagesCreateImage.html
 ExtrasImagesCreateImageFromCD.html
 ExtrasImagesExtractToFolder.html
 ExtrasImagesCreateFromFolder.html
+ExtrasImagesCreateFromProfile.html
 ExtrasScanGamesFolder.html
 ExtrasEditMultipleProfiles.html
 ExtrasUninstallMultipleGames.html
@@ -212,6 +215,7 @@ GPL3.html
 #define FileOptionsUserInterpreters 1131
 #define FileOptionsImageScaling 1132
 #define FileOptionsOtherEmulators 1133
+#define FileOptionsAutomaticConfiguration 1134
 
 #define ViewQuickStarter 1501
 
@@ -230,6 +234,7 @@ GPL3.html
 #define ProfileMarkAsFavorite 2013
 #define ProfileCreateShortCut 2014
 #define ProfileSearchGame 2015
+#define ProfileAddFromMedia 2016
 
 #define ProfileEdit 2100
 #define ProfileEditProfile 2101
@@ -276,6 +281,7 @@ GPL3.html
 #define ExtrasCheckProfiles 3017
 #define ExtrasCreateShortcuts 3018
 #define ExtrasLanguageEditor 3019
+#define ExtrasImagesCreateFromProfile 3020
 
 #define HelpForum 4001
 #define HelpStatistics 4003

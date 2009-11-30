@@ -132,7 +132,8 @@ end;
 
 
 procedure TIconManagerForm.LoadIcons;
-Var I : Integer;
+const FileExts : Array[0..5] of String = ('ico','png','jpeg','jpg','gif','bmp');
+Var I,J : Integer;
     Rec : TSearchRec;
     L : TListItem;
     Icon : TIcon;
@@ -145,26 +146,38 @@ begin
   try
     ListView.Items.Clear;
     ImageList.Clear;
+    ListView.SortType:=stNone;
 
-    I:=FindFirst(Dir+'*.ico',faAnyFile,Rec);
-    try
-      while I=0 do begin
-        Icon:=TIcon.Create;
-        try
-          B:=True; try Icon.LoadFromFile(Dir+Rec.Name); except B:=False; end;
-          If B then ImageList.AddIcon(Icon);
-        finally
-          Icon.Free;
+    For J:=Low(FileExts) to High(FileExts) do begin
+      I:=FindFirst(Dir+'*.'+FileExts[J],faAnyFile,Rec);
+      try
+        while I=0 do begin
+          B:=True;
+          try
+            If J=Low(FileExts) then begin
+              Icon:=TIcon.Create;
+              Icon.LoadFromFile(Dir+Rec.Name);
+            end else begin
+              Icon:=LoadImageAsIconFromFile(Dir+Rec.Name);
+            end;
+          except
+            B:=False;
+          end;
+          try
+            If B and (Icon<>nil) then begin
+              ImageList.AddIcon(Icon);
+              ListView.AddItem(Rec.Name,nil);
+              L:=ListView.Items[ListView.Items.Count-1];
+              L.ImageIndex:=ImageList.Count-1;
+            end;
+          finally
+            If (Icon<>nil) then FreeAndNil(Icon);
+          end;
+          I:=FindNext(Rec);
         end;
-        If B then begin
-          ListView.AddItem(Rec.Name,nil);
-          L:=ListView.Items[ListView.Items.Count-1];
-          L.ImageIndex:=ImageList.Count-1;
-        end;
-        I:=FindNext(Rec);
+      finally
+        FindClose(Rec);
       end;
-    finally
-      FindClose(Rec);
     end;
 
     If ExtractFilePath(Trim(LastIcon))='' then begin
@@ -178,6 +191,8 @@ begin
       CustomIconEdit.Text:=LastIcon;
     end;
 
+
+    ListView.SortType:=stText;
   finally
     ListView.Items.EndUpdate;
   end;

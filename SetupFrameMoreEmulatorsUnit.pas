@@ -34,7 +34,7 @@ type
     { Public-Deklarationen }
     Destructor Destroy; override;
     Function GetName : String;
-    Procedure InitGUIAndLoadSetup(InitData : TInitData);
+    Procedure InitGUIAndLoadSetup(var InitData : TInitData);
     Procedure BeforeChangeLanguage;
     Procedure LoadLanguage;
     Procedure DOSBoxDirChanged;
@@ -67,7 +67,7 @@ begin
   result:=LanguageSetup.SetupFormMoreEmulators;
 end;
 
-procedure TSetupFrameMoreEmulators.InitGUIAndLoadSetup(InitData: TInitData);
+procedure TSetupFrameMoreEmulators.InitGUIAndLoadSetup(var InitData: TInitData);
 begin
   Names:=TStringList.Create;
   Programs:=TStringList.Create;
@@ -170,7 +170,9 @@ end;
 procedure TSetupFrameMoreEmulators.ComboBoxChange(Sender: TObject);
 begin
   If LastItem>=0 then begin
-    Names[LastItem]:=Trim(NameEdit.Text);
+    If Trim(NameEdit.Text)<>''
+      then Names[LastItem]:=Trim(NameEdit.Text)
+      else Names[LastItem]:=Trim(ChangeFileExt(ExtractFileName(ProgramEdit.Text),''));
     Programs[LastItem]:=Trim(ProgramEdit.Text);
     Parameters[LastItem]:=Trim(ParametersEdit.Text);
     Extensions[LastItem]:=Trim(ExtensionsEdit.Text);
@@ -216,7 +218,7 @@ begin
     0 : begin
           Names.Add('');
           Programs.Add('');
-          Parameters.Add('%s');
+          Parameters.Add('"%s"');
           Extensions.Add('');
           ComboBox.ItemIndex:=-1; ComboBoxChange(Sender);
           LoadList;
@@ -261,7 +263,10 @@ begin
           OpenDialog.Title:=LanguageSetup.SetupFormMoreEmulatorsProgramTitle;
           OpenDialog.Filter:=LanguageSetup.SetupFormMoreEmulatorsProgramFilter;
           If S<>'' then OpenDialog.InitialDir:=S;
-          If OpenDialog.Execute then ProgramEdit.Text:=MakeRelPath(OpenDialog.FileName,PrgSetup.BaseDir);
+          If OpenDialog.Execute then begin
+            ProgramEdit.Text:=MakeRelPath(OpenDialog.FileName,PrgSetup.BaseDir);
+            If Trim(NameEdit.Text)='' then NameEdit.Text:=ChangeFileExt(ExtractFileName(ProgramEdit.Text),'');
+          end;
         end;
   end;
 end;

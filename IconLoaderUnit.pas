@@ -67,6 +67,9 @@ const DI_OK=0;
       DI_CloseX=59;
       DI_Tools=60;
       DI_DOSBox=61;
+      DI_Activate=62;
+      DI_Expand=63;
+      DI_Collapse=64;
 
 Type TImageListRec=record
   ImageList, OriginalImageList : TImageList;
@@ -88,6 +91,7 @@ Type TUserIconLoader=class
     Procedure LoadUserIconsForList(const ImageList : TImageList; const IniSectionName : String; const AddImages : Boolean; const ImageLoaded : TList; const Ini : TIniFile; const RelBase : String);
     Procedure AddEmptyImages(const ImageList : TImageList; const ImageLoaded : TList; const MaxNr : Integer);
     procedure SetIconSet(const Value: String);
+    Function GetButtonBitmap(const ImageList : TImageList; const ImageListLoaded : TList;  const Nr : Integer) : TBitmap;
     Function GetDialogButtonBitmap(const Nr : Integer) : TBitmap;
     Function IsImageEmpty(const B : TBitmap) : Boolean;
     Function GetOriginalOfMainIconList : TImageList; {for use in GetExampleImage}
@@ -96,7 +100,8 @@ Type TUserIconLoader=class
     Destructor Destroy; override;
     Procedure RegisterImageList(const ImageList : TImageList; const Name : String; const AddImages : Boolean = False);
     Procedure UnRegisterImageList(const ImageList : TImageList);
-    Procedure DirectLoad(const ImageList : TImageList; const Name : String; const AddImages : Boolean = False; const ImageLoaded : TList = nil);
+    Procedure DirectLoad(const ImageList : TImageList; const Name : String; const AddImages : Boolean = False; const ImageLoaded : TList = nil); overload;
+    Procedure DirectLoad(const Name : String; Nr : Integer; const BitBtn : TBitBtn); overload;
     Procedure LoadIcons;
     Procedure DialogImage(const Nr : Integer; const SpeedButton : TSpeedButton); overload;
     Procedure DialogImage(const Nr : Integer; const BitBtn : TBitBtn); overload;
@@ -108,7 +113,7 @@ end;
 
 var UserIconLoader : TUserIconLoader;
 
-Procedure ListOfIconSets(const ShortName, LongName, Author : TStringList); {LongName and Author can be nil}
+Procedure ListOfIconSets(const ShortName, LongName, Author, FolderName : TStringList); {LongName, Author and FolderName can be nil}
 Function GetExampleImage(const ShortName : String) : TBitmap;
 
 implementation
@@ -117,7 +122,7 @@ uses SysUtils, CommonTools, PrgSetupUnit, PrgConsts;
 
 { global }
 
-Procedure ListOfIconSets(const ShortName, LongName, Author : TStringList);
+Procedure ListOfIconSets(const ShortName, LongName, Author, FolderName : TStringList);
 Procedure AddRec(const Dir, Sub : String);
 Var Ini : TIniFile;
 begin
@@ -126,6 +131,7 @@ begin
     ShortName.Add(Sub);
     If LongName<>nil then LongName.Add(Ini.ReadString('Information','Name',Sub));
     If Author<>nil then Author.Add(Ini.ReadString('Information','Author',''));
+    If FolderName<>nil then FolderName.Add(Dir+IconSetsFolder+'\'+Sub+'\');
   finally
     Ini.Free;
   end;
@@ -286,6 +292,29 @@ begin
   end;
 end;
 
+Procedure TUserIconLoader.DirectLoad(const Name : String; Nr : Integer; const BitBtn : TBitBtn);
+Var ImageList : TImageList;
+    B : TBitmap;
+    List : TList;
+begin
+  ImageList:=TImageList.Create(nil);
+  List:=TList.Create;
+  try
+    DirectLoad(ImageList,Name,True,List);
+    If (Nr<0) or (NR>=ImageList.Count) then exit;
+    B:=GetButtonBitmap(ImageList,List,Nr);
+    If B=nil then exit;
+    try
+      If not IsImageEmpty(B) then BitBtn.Glyph:=B;
+    finally
+      B.Free;
+    end;
+  finally
+    ImageList.Free;
+    List.Free;
+  end;
+end;
+
 Procedure TUserIconLoader.AddEmptyImages(const ImageList : TImageList; const ImageLoaded : TList; const MaxNr : Integer);
 Var B : TBitmap;
 begin
@@ -301,6 +330,7 @@ begin
 end;
 
 Function TUserIconLoader.CreateMask(const B : TBitmap) : TBitmap;
+Type TIntegerArray=Array[0..MaxInt div 4-1] of Integer;
 Var C : TColor;
     X,Y : Integer;
     Can1,Can2 : TCanvas;
@@ -308,8 +338,8 @@ begin
   result:=TBitmap.Create;
   result.SetSize(B.Width,B.Height);
   Can1:=B.Canvas;
-  Can2:=result.Canvas;
   C:=Can1.Pixels[0,B.Height-1];
+  Can2:=result.Canvas;
   For X:=0 to B.Width-1 do For Y:=0 to B.Height-1 do If Can1.Pixels[X,Y]=C then Can2.Pixels[X,Y]:=$FFFFFF else Can2.Pixels[X,Y]:=clGray;
 end;
 
@@ -340,7 +370,7 @@ begin
         try
           B2:=CreateMask(B);
           try
-            ImageList.Replace(Nr,B,B2);
+            If (B.Width=ImageList.Width) and (B.Height=ImageList.Height) then ImageList.Replace(Nr,B,B2);
           finally
             B2.Free;
           end;
@@ -431,21 +461,21 @@ begin
   FIconsLoaded:=True;
 end;
 
-Function TUserIconLoader.GetDialogButtonBitmap(const Nr : Integer) : TBitmap;
+Function TUserIconLoader.GetButtonBitmap(const ImageList : TImageList; const ImageListLoaded : TList; const Nr : Integer) : TBitmap;
 Var B1,B2 : TBitmap;
 begin
   result:=nil;
-  If (Nr<0) or (Nr>=DialogImageList.Count) then exit;
-  If (Nr>=DialogImageLoaded.Count) or (Integer(DialogImageLoaded[Nr])=0) then exit;
+  If (Nr<0) or (Nr>=ImageList.Count) then exit;
+  If (Nr>=ImageListLoaded.Count) or (Integer(ImageListLoaded[Nr])=0) then exit;
 
   B1:=TBitmap.Create;
   try
-    B1.Width:=DialogImageList.Width; B1.Height:=DialogImageList.Height;
-    DialogImageList.GetBitmap(Nr,B1);
+    B1.Width:=ImageList.Width; B1.Height:=ImageList.Height;
+    ImageList.GetBitmap(Nr,B1);
     B2:=CreateMask(B1);
     try
       result:=TBitmap.Create;
-      result.Width:=2*B1.Width; result.Height:=B1.Height;
+      result.SetSize(2*B1.Width,B1.Height);
       result.PixelFormat:=pf8bit;
       result.Canvas.Draw(0,0,B1);
       result.Canvas.Draw(16,0,B2);
@@ -457,14 +487,20 @@ begin
   end;
 end;
 
+Function TUserIconLoader.GetDialogButtonBitmap(const Nr : Integer) : TBitmap;
+begin
+  result:=GetButtonBitmap(DialogImageList,DialogImageLoaded,Nr);
+end;
+
 Type TByteArray=Array[0..MaxInt-1] of Byte;
 
 function TUserIconLoader.IsImageEmpty(const B: TBitmap) : Boolean;
-Var I,J : Integer;
+Var I,J,X,Y : Integer;
 begin
   result:=False;
-  For I:=0 to B.Height-1 do begin
-    For J:=0 to (B.Width div 2)-1 do If TByteArray(B.ScanLine[I]^)[J]<>0 then exit;
+  Y:=B.Height; X:=B.Width div 2;
+  For I:=0 to Y-1 do begin
+    For J:=0 to X-1 do If TByteArray(B.ScanLine[I]^)[J]<>0 then exit;
     For J:=B.Width div 2 to B.Width-1 do If TByteArray(B.ScanLine[I]^)[J]<>255 then exit;
   end;
   result:=True;

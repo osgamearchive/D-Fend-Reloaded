@@ -29,7 +29,7 @@ type
     { Public-Deklarationen }
     Destructor Destroy; override;
     Function GetName : String;
-    Procedure InitGUIAndLoadSetup(InitData : TInitData);
+    Procedure InitGUIAndLoadSetup(var InitData : TInitData);
     Procedure BeforeChangeLanguage;
     Procedure LoadLanguage;
     Procedure DOSBoxDirChanged;
@@ -62,7 +62,7 @@ begin
   result:=LanguageSetup.SetupFormGamesListTranslations;
 end;
 
-procedure TSetupFrameCustomLanguageStrings.InitGUIAndLoadSetup(InitData: TInitData);
+procedure TSetupFrameCustomLanguageStrings.InitGUIAndLoadSetup(var InitData: TInitData);
 begin
   NoFlicker(TypeComboBox);
   NoFlicker(Tab);

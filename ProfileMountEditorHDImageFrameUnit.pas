@@ -115,7 +115,7 @@ end;
 procedure TProfileMountEditorHDImageFrame.ImageButtonClick(Sender: TObject);
 Var s : String;
 begin
-  If Trim(ImageEdit.Text)='' then S:=InfoData.DefaultInitialDir else S:=ImageEdit.Text;
+  If Trim(ImageEdit.Text)='' then S:=PrgSetup.BaseDir else S:=ImageEdit.Text;
   S:=MakeAbsPath(S,PrgSetup.BaseDir);
   OpenDialog.DefaultExt:='img';
   OpenDialog.InitialDir:=ExtractFilePath(S);

@@ -1,5 +1,90 @@
 D-Fend Reloaded Changelog
 
+Version 0.9.0 (12/02/2009)
+==========================
+- Example games packages, language files, icon sets etc. can be downloaded from
+  the D-Fend Reloaded homepage via the import menu now. 
+- Via the new "Tools" button in the profiles editor you can reset any page of a
+  profile to any template.
+- Ability to add games for other emulators as Windows profiles (calling the
+  emulator program file with the game data file as parameter).
+- From the game information page of the profile editor and the profile wizard
+  game information (including a cover image) can be loaded from mobygames.com
+  directly now.
+- Faster loading of the profile and the auto setup template files.
+- Now you can optionally enter multiple values per game info field (like genre,
+  language etc.).
+- Normal drive mounts can be converted into archiv file mounts and vice versa
+  right from the mounting dialog. The commands to run the game will also be
+  changed automatically if needed.
+- You can drag links from your browser to the D-Fend Reloaded program window
+  now. D-Fend Reloaded will download and importthe zip file behind the link.
+- All captured screenshots, sounds and videos can be renamed from the context
+  menu to have an uniform name scheme.
+- D-Fend Reloaded will warn the user when importing an archive file with a name
+  of an existing profile and will prevent overwriting existing games directory
+  subdirectories when importing plain archive files.
+- When adding new profiles via the profile editor needed mounting records can
+  be added automatically now. (This was already done when adding profiles via
+  the wizard.)
+- In the multiple profiles editor sections can be collapsed and expanded (like
+  in a tree structure) to make it more clear.
+- Now image files can be used as game icons, too.
+- The algorithm used for scaling images (like screenshots) can be selected from
+  the program options dialog now.
+- D-Fend Reloaded can optionally create conf files for all profiles in the
+  games list automatically.
+- The floppy and harddisk image creator now can make harddisk images and floppy
+  disk images of all sizes bootable.
+- The make disk image from folder content function now is able to create
+  harddisk images, too.
+- When creating disk images optionally disk management utilities and a text
+  editor can be added to the image.
+- When creating bootable disk images optionally a memory manager can be added
+  to the image. Also not only the selected keyboard layout is used on the image
+  but also the codepage.
+- Some improvements to the language editor.
+- Added *.ima to the file selection dialog when selecting an image file
+  for mounting or for extracting.
+- About 300 new auto setup templates for automatic identification of even more
+  games.
+- Updated DOSZip from 1.31 to 1.37.
+- Two more sites have been added to the list of game information sites
+  (TheLegacy.de and KultPower.de).
+- The time needed on first program start for initializing the user data has
+  been improved.
+- The profile editor and the program options dialog will open a bit faster.
+- Some smaller improvements to the new profile wizard.
+- [Fix] Extra directories and extra files records (see directories page of the
+  profile editor) got damaged when using the "Convert absolute to relative 
+  paths" function in the program options dialog.
+- [Fix] When importing a plain archive file with multiple executable files
+  in it and with a matching auto setup template sometimes the wrong executable
+  file was selected.
+- [Fix] The main window hotkeys were enabled while template editor was open.
+- [Fix] Access violation then trying to add a game with a space in the filename
+  via the profile wizard.
+- [Fix] Starting games with folders mounted as CD drives failed on systems with
+  no physical CD drive.
+- [Fix] The "Run game with current configuration" from the profile editor
+  dialog did not work with ScummVM and Windows game profiles.
+- [Fix] When setting the SoundBlaser or the Gravis UltraSound base address to
+  a hexadecimal address containing letters the selected address was not stored.
+- [Fix] Erroneous window behaviour when using "Run game with current
+  configuration" from the profile editor dialog or when creating bootdisk
+  images when "Minimize when DOSBox start" was active.
+- [Fix] keybrd2.sys and keybrd3.sys needed for some languages missing on 
+  bootdisks.
+- [Fix] The select all button in the transfer programs dialog did not work.
+- [Fix] The game list hotkeys (like return, insert etc.) were not disabled when
+  entering the notes field.
+- [Fix] Wrong error message "No game file selected" when adding a profile for
+  booting an image file.
+- [Fix] Access violation if you press and hold down the F9 key.
+- [Fix] Changed the default value for virtual free space on mounted drives from
+  the DOSBox 0.72 default 105 MB to the  DOSBox 0.73 default 250 MB.
+
+
 Version 0.8.2 (08/31/2009)
 ==========================
 - Faster program start.

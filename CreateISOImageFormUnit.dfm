@@ -68,7 +68,7 @@ object CreateISOImageForm: TCreateISOImageForm
     Width = 77
     Height = 21
     Style = csDropDownList
-    ItemHeight = 13
+    ItemHeight = 0
     TabOrder = 3
   end
   object FileNameEdit: TLabeledEdit

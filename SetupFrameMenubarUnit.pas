@@ -12,10 +12,12 @@ type
     ShowMenubarLabel: TLabel;
   private
     { Private-Deklarationen }
+    FGetFrame : TGetFrameFunction;
+    Procedure CloseCheck(var CloseOK : Boolean);
   public
     { Public-Deklarationen }
     Function GetName : String;
-    Procedure InitGUIAndLoadSetup(InitData : TInitData);
+    Procedure InitGUIAndLoadSetup(var InitData : TInitData);
     Procedure BeforeChangeLanguage;
     Procedure LoadLanguage;
     Procedure DOSBoxDirChanged;
@@ -28,7 +30,7 @@ type
 implementation
 
 uses LanguageSetupUnit, VistaToolsUnit, PrgSetupUnit, CommonTools,
-     HelpConsts;
+     HelpConsts, SetupFrameToolbarUnit;
 
 {$R *.dfm}
 
@@ -39,11 +41,14 @@ begin
   result:=LanguageSetup.SetupFormShowMenubar;
 end;
 
-procedure TSetupFrameMenubar.InitGUIAndLoadSetup(InitData: TInitData);
+procedure TSetupFrameMenubar.InitGUIAndLoadSetup(var InitData: TInitData);
 begin
   NoFlicker(ShowMenubarCheckBox);
 
   ShowMenubarCheckBox.Checked:=PrgSetup.ShowMainMenu;
+
+  InitData.CloseCheckEvent:=CloseCheck;
+  FGetFrame:=InitData.GetFrame;
 end;
 
 procedure TSetupFrameMenubar.BeforeChangeLanguage;
@@ -73,6 +78,18 @@ end;
 procedure TSetupFrameMenubar.RestoreDefaults;
 begin
   ShowMenubarCheckBox.Checked:=True;
+end;
+
+Procedure TSetupFrameMenubar.CloseCheck(var CloseOK : Boolean);
+Var F : TSetupFrameToolbar;
+begin
+  If not ShowMenubarCheckBox.Checked then begin
+    F:=FGetFrame(TSetupFrameToolbar) as TSetupFrameToolbar;
+    if not F.ShowToolbarCheckBox.Checked then begin
+      MessageDlg(LanguageSetup.SetupFormShowMenubarError,mtError,[mbOK],0);
+      CloseOK:=False;
+    end;
+  end;
 end;
 
 procedure TSetupFrameMenubar.SaveSetup;

@@ -5,9 +5,27 @@ KBytels=KB
 MBytes=MB
 
 [Messages]
-CouldNotActivateXML=Could not activte the XML document %s.
+CouldNotActivateXML=Could not activate the XML document %s.
+ZipImportDuplicateWarning=The game from the archive to import is named %s. There is already a profile with this name in the games list. Do you want to uninstall this game before importing the archive file? (If you click "No" a new profile entry is created but the directories of the old and the new profile might get mixed up. It is recommended to uninstall to old profile.)
+
+[Menu]
+File.Import.Zip.DestinationFolder.Warning=Already existing
+File.Import.Download=Download packages...
+File.Export.PackageList=Create package list file...
+CHANGED: Profile.Add=&Add DOSBox profile...
+Profile.AddOtherPlatform=Add game for other platform
+Profile.AddOtherPlatform.BasedGame=%s-based game...
+Profile.AddOtherPlatform.BasedGameDialog=%s-based game
+Profile.AddOtherPlatform.SelectTitle=Select data file to run
+Profile.AddOtherPlatform.SelectFilter=%s data files (%s)|%s|All files (*.*)|*.*
+CHANGED: Extras.IconManager.Filter=Icon and image files (*.ico,*.png,*.jpeg,*.jpg,*.gif,*.bmp)|*.ico;*.png;*.jpeg;*.jpg;*.gif;*.bmp|Icon files (*.ico)|*.ico|All files (*.*)|*.*
+ScreenshotPopup.RenameAll=Rename all...
+
+[TrayIconMenu]
+Add=Add DOSBox profile...
 
 [ProfileEditorForm]
+MultipleValuesInfo=You can enter multiple values per key divided by ";".
 Tools=Tools
 Tools.Run=Run game with current configuration
 Tools.ResetAllPagesConfirm=Do you really want to reset all pages?
@@ -21,12 +39,31 @@ Tools.ResetToAutoSetup.Page=Select auto setup template and reset this page...
 Tools.ResetToAutoSetup.AllPages=Select auto setup template and reset all pages...
 Tools.ResetToAutoSetup.Select=Select auto setup template
 
+[ProfileMountingForm]
+CHANGED: FileFilter=Image files (*.iso,*.img,*.ima,*.cue)|*.iso;*.img;*.ima;*.cue|All files (*.*)|*.*
+CHANGED: FileFilterImgOnly=Image files (*.img,*.ima)|*.img;*.ima|All files (*.*)|*.*
+ZipRepack.NormalMount=Make normal drive from this mount
+ZipRepack.NormalMount.Hint=This function will extract the archive file and convert the mount into a normal directory mount
+ZipRepack.NormalMount.Here=Extract files to selected folder
+ZipRepack.NormalMount.GamesDir=Extract files to subdirectory of the games folder
+ZipRepack.NormalMount.WorkCaption=Extract archive file
+ZipRepack.NormalMount.WorkLabel=Please enter a name for the games folder subdirectory to be created:
+ZipRepack.NormalMount.Confirmation=If you continue the content of the archive file %s will be extracted to %s. The commands to run the game will be changed automatically if needed. The archive file will not be deleted. Do you want to continue?
+ZipRepack.FromNormalMount=Make archive file drive from this mount
+ZipRepack.FromNormalMount.Hint=This function compress the game directory to an archive file and will mount this file instead of the chosen folderwill extract the archive file and convert the mount into a normal directory mount
+ZipRepack.FromNormalMount.SaveTitle=Archive file to store folder content to
+ZipRepack.FromNormalMount.ErrorGameDir=Cannot pack the whole games directory into an archive file.
+ZipRepack.FromNormalMount.Confirmation=If you continue the content of the folder %s will be stored in the archive file %s and the folder will be deleted. The commands to run the game will be changed automatically if needed. Do you want to continue?
+
 [SetupForm]
 ProfileEditorAutoAddMountings=Automatically add mounting records if needed
 ProfileEditorAutoAddMountings.OnlyWizard=Only when added via the profile wizard
 ProfileEditorAutoAddMountings.Always=When added via the profile wizard and via the modern profile editor
+Toolbar.VisibleButtons.Error=You cannot turn off all toolbar buttons.
+Menubar.Error=You cannot turn the menubar and the toolbar at the same time.
 Service6=Clear package cache and lists
 AlwaysCreateConfFiles=Always create conf files for all profiles (off: only when starting DOSBox)
+UserDefinedInterpreters.Info=On this page you can define DOS programs running inside DOSBox used for executing special data files. The profiles made for this interpreters are stored as DOSBox profiles.
 ImageScaling=Image scaling
 ImageScaling.Label=Algorithm used for scaling images
 ImageScaling.Algorithm.Box=Box
@@ -36,6 +73,146 @@ ImageScaling.Algorithm.Bell=Bell
 ImageScaling.Algorithm.BSpline=B-spline
 ImageScaling.Algorithm.Lanczos3=Lanczos3
 ImageScaling.Algorithm.Mitchell=Mitchell
+MoreEmulators=Other emulators
+MoreEmulators.Label=Windows based emulator
+MoreEmulators.AddHint=Add emulator record
+MoreEmulators.DeleteHint=Delete selected emulator record
+MoreEmulators.DeleteWarning=Do you really want to delete the record for the emulator %s ?
+MoreEmulators.Name=Name of the emulator
+MoreEmulators.Program=Program file of the emulator
+MoreEmulators.Program.Title=Select emulator program file
+MoreEmulators.Program.Filter=All executables (*.exe)|*.exe|All files (*.*)|*.*
+MoreEmulators.Parameters=Parameters (%s=name of the data file to run)
+MoreEmulators.Extensions=Extensions of the data files (use ; as separator)
+MoreEmulators.Info=On this page you can define more Windows based emulators for running games of different platforms. The profiles made for this emulators are stored as Windows profiles.
+
+[WizardForm]
+Page2InfoWindows=Please setup where the game or program file you want to start is located.
+DataFolder.AutomaticButton=Choose data folder name from profile name automatically
+DoubleProfile=There is already a profile named %s for this game file in the games list. Do you really want to create a second profile for the same game?
+
+[CreateImageForm]
+CHANGED: MakeFloppyBootable=Make image bootable
+CHANGED: MakeFloppyBootable.WithKeyboardDriver=Use DOSBox default keyboard layout
+CHANGED: MakeFloppyBootable.WithMouseDriver=Include mouse driver
+MakeFloppyBootable.WithMemoryManager=Use memory manager on disk image
+MakeFloppyBootable.WithDiskUtilities=Add disk management utilities
+MakeFloppyBootable.WithEdit=Add text editor
 
 [ChangeProfilesForm]
 SectionInfo=%d of %d settings selected for changing
+
+[LanguageEditor]
+Show=Show
+Show.All=Show &all entries
+Show.UntranslatedOnly=Show &untranslated entries only
+
+[ExtractImage]
+CHANGED: ImageFile.DialogFilter=All images (*.img,*.ima,*.iso,*.cue)|*.img;*.ima;*.iso;*.cue|IMG images (*.img,*.ima)|*.img;*.ima|ISO images (*.iso)|*.iso|CUE images (*.cue)|*.cue|All files (*.*)|*.*
+
+[FirstRunWizard]
+CHANGED: MainFormInfoBar=To add a new game to D-Fend Reloaded just drop the archive file containing the game to the program window or copy the game to a subfolder of the games folder (see Extras|Open games folder) and add it via the wizard (Profiles|Add with wizard) or scan the games folder for new games (Extras|Scan games folder for new games). You can also download and install some shareware and freeware games directly from the internet (File|Import|Download packages). Also see the online help on how to add a game (Help|Adding games).
+
+[ImageFromFolder]
+ImageType=Image type
+ImageType.Floppy=Floppy disk image
+ImageType.Harddisk=Harddisk image
+NotEnoughSpace=There is not enough space on the disk image to copy the selected files. (%d kb are needed, but only %d kb available.)
+
+[PackageManager]
+Caption=Packages manager
+Menu.UpdateLists=Update lists
+Menu.UpdateLists.Local=Please insert the disc containing %s into any drive connected to the computer and press "Ok" or press "Cancel" for skiping the update of this file.
+Menu.UpdateLists.Hint=Updates the packages list from internet.
+Menu.RepositoriesList=Repositories list
+Menu.RepositoriesList.Hint=Edit the list of download repositories
+Page.Games=Games
+Page.AutoSetups=Auto setup templates
+Page.Icons=Icons
+Page.IconSets=Icon sets
+Page.Languages=Language files
+Page.ExePackages=Multiple games packages
+Page.ExePackagesSelect=Select games package
+AllListsEmpty=At the moment all lists are empty. You need to click "Update lists" to download the lists of available games, templates and language files.
+Download=Downloading
+Download.Size=Download size
+Download.PackageAlreadyDownloaded=(This package has already been downloaded and is ready for installation.)
+Download.OldPackageAlreadyDownloaded=(An older version of this package has already been downloaded. If you click on "Download and install" the newer version will be downloaded.)
+Download.PackageOnlyInCache=(This package is not available for download any more but has already been cached and is ready for installation.)
+Download.Failed=The download of %s failed.
+Download.FailedUseOldVersion=The download failed. Do you want to install the old cached version of this package?
+Download.Language=Language installation completed. You can activate the new language(s) from the "Language" page of the program options dialog.
+Download.SingleLanguage=Do you want to activate the downloaded language immediately?
+Download.IconSet=Icon set installation complete. You can active the new icon set(s) from the "User interface" page of the program options dialog.
+Scanning=Scanning directory
+FilterList=Filter list
+FilterList.NoFilter=No filter
+Install.Games=Download and install selected games
+Install.AutoSetups=Download and install selected templates
+Install.Icons=Download and install selected icons
+Install.IconSets=Download and install selected icon sets
+Instal.Languages=Download and install selected languages
+Install.Packages=Download and install
+Install.Packages.Delete=Delete cached file
+License=License
+Provider.Caption=Download provider
+Provider.Files=The files you are going to download
+Provider.Provider=are provided by
+Provider.Information=Provider information
+Provider.Homepage=Provider homepage
+Provider.ProfileString=This game is provided by %s.
+
+[RepositoriesEditor]
+Caption=User repositories editor
+ActivateSource=Activate source
+DeactivateSource=Deactivate source
+AddSource=Add source
+AddSource.Warning=Downloading data from untrusted sources might damage your system, so please only add download sources you really trust. Additionally please check if the files offered for download on the new source are legal to download.
+AddSource.Caption=Add repository
+EditSource=Edit source
+EditSource.Caption=Edit repository
+RemoveSource=Remove source
+RemoveSource.Confirm=Do you really want to remove the selected package source ?
+Popup.ActivateSource=Activate source
+Popup.DeactivateSource=Deactivate source
+Popup.AddSource=Add source
+Popup.EditSource=Edit source
+Popup.RemoveSource=Remove source
+Repositories.Official=Official repositories
+Repositories.User=User-defined repositories
+Column.URL=Package list URL
+Column.Description=Description
+URL=URL
+URL.Paste=Paste URL from clipboard
+LocalFile=Local file
+LocalFile.Title=Filename of the package list file
+LocalFile.Filter=xml files (*.xml)|*.xml|All files (*.*)|*.*
+
+[PackageCreator]
+Caption=Package list creator
+Description=Package description
+OutputFile=Filename of the package list file
+OutputTitle=Filename for new package list file
+OutputFilter=xml files (*.xml)|*.xml|All files (*.*)|*.*
+OutputFileInfo=All additionally needed files (like game package archive files) will be created in the directory of the package list file.
+
+[RenameAll]
+Screenshots=Rename all screenshots
+Sounds=Rename all sounds
+Videos=Rename all videos
+Scheme=Use "%P" for the name of the profile, "%N" for the number and "%E" for the extension.
+PlaceholderError=There has to be the %s placeholder in the rename expression string.
+NoFiles=There are no files in the folder %s to be renamed.
+ThisProfile=Rename all files in the selected profile
+AllProfiles=Rename all files in all profiles
+
+[DataReader]  
+Caption=Read game data
+Button=Download game information
+SearchResults=Search results
+NoGameSelected=No game name selected
+CoverCheckbox=Download cover and store it in the capture folder
+InsertButton=Insert
+Download.Caption=Reciving data
+Download.Info=Loading data from %s, please wait...
+Download.Error=Error reading data from %s

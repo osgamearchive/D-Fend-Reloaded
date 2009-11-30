@@ -38,13 +38,30 @@ const DosBoxFileName='DOSBOX.EXE';
 
       PackageDBSubFolder='Settings\Packages';
       PackageDBCacheSubFolder='Settings\Packages\Cache';
-      PackageDBMainFileURL='http:/'+'/dfendreloaded.sourceforge.net/Packages/DFR.xml';
+      PackageDBMainFileURL='http:/'+'/dfendreloaded.sourceforge.net/Packages/DFR.xml?version=%s';
       PackageDBTempFile='DFRTemp.xml';
       PackageDBMainFile='DFR.xml';
       PackageDBUserFile='User.xml';
       PackageDBCacheFile='Cache.xml';
 
+      CacheVersionString='DFRCacheFile-FileVersion=001';
+      CacheInfoString=#13+#13+'This is just a cache file for the profiles in the current directory. You can'+#13+
+                      'ignore or delete this file. D-Fend Reloaded will only load data from this file'+#13+
+                      'if the .prof file on disk has not changed. If you delete or change one of the'+#13+
+                      '.prof files manually the cache will not be used for this profile. So just'+#13+
+                      'ignore this file, you can still do what ever you want in this folder. This'+#13+
+                      'cache will never mess up your database.'+#13+#13+
+                      'You can turn off the creation of this cache files by setting "BinaryCache=0" in'+#13+
+                      'the [ProgramSets] section of the DFend.ini.'+#13+#13+#13+
+                      '===Start of binary cache==='+#13;
+      CacheFile='Cache.dfr';
+
+      DataReaderUpdateURL='http:/'+'/dfendreloaded.sourceforge.net/DataReader/DataReader.xml';
+      DataReaderConfigFile='DataReader.xml';      
+
       MinSupportedDOSBoxVersion=0.73;
+
+      DefaultFreeHDSize=250;
 
 var MainSetupFile : String;
     OperationModeConfig : String;

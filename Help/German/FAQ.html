@@ -26,9 +26,8 @@
   7. <a href="#FAQ07">Gibt es einen einfachen Weg, eine neue Sprachdatei auf Rechtschreibfehler zu &uuml;berpr&uuml;fen ?</a><br />
   8. <a href="#FAQ08">Wo ist der "Standardvorlage bearbeiten... (F5)"-Men&uuml;punkt hin ?</a><br />
   9. <a href="#FAQ09">Kann D-Fend Reloaded in Wine unter Linux verwendet werden ?</a><br />
-  10. <a href="#FAQ10">Wie lassen sich bootf&auml;hige HD-Images erstellen ?</a><br />
-  11. <a href="#FAQ11">Ich habe Tastaturprobleme, die sich mit dem DOSBox Keymapper nicht l&ouml;sen lassen.</a><br />
-  12. <a href="#FAQ12">Ich erhalte einen Fehler, wenn ich versuche den DOSBox Videocodec zu installieren.</a><br />
+  10. <a href="#FAQ10">Ich habe Tastaturprobleme, die sich mit dem DOSBox Keymapper nicht l&ouml;sen lassen.</a><br />
+  11. <a href="#FAQ11">Ich erhalte einen Fehler, wenn ich versuche den DOSBox Videocodec zu installieren.</a><br />
 </p>
 
 <a onclick="Work('FAQ01')" name="FAQ01" href="#"><h2>&raquo; Wie funktioniert die Update-&Uuml;berpr&uuml;fung ?</h2></a>
@@ -292,28 +291,8 @@ und es k&ouml;nnen Ihnen, nach eigenem Geschmack "-" oder "/" vorangestellt werd
 </p>
 </div>
 
-<a onclick="Work('FAQ10')" name="FAQ10" href="#"><h2>&raquo; Wie lassen sich bootf&auml;hige HD-Images erstellen ?</h2></a>
+<a onclick="Work('FAQ10')" name="FAQ10" href="#"><h2>&raquo; Ich habe Tastaturprobleme, die sich mit dem DOSBox Keymapper nicht l&ouml;sen lassen.</h2></a>
 <div id="FAQ10"><p>	
-Leider funktioniert der "Sys"-Befehl von der normalen DOSBox-Umgebung aus auf Festplatten-Images
-&uuml;berhaupt nicht. Der "Sys"-Befehl kann, so lange nicht eine benutzerdefinierte DOS-Version
-innerhalb von DOSBox gebootet wurde, nicht schreibend auf den Bootsektor der virtuellen
-Festplatte zugreifen. Daher muss eine richtige DOS-Version (FreeDOS oder MS-DOS) innerhalb
-von DOSBox gebootet werden. Das n&auml;chste Problem ergibt sich dadurch, dass die "Sys"-Befehle
-von sowohl MS-DOS als auch FreeDOS mit Images, die mit mkdosfs.exe erstellt wurden (dem Standardprogramm
-zum Erstellen von Images innerhalb D-Fend Reloaded), nicht umgehen k&ouml;nnen und diese nur zerst&ouml;ren.
-D.h. als Startpunkt muss ein komplett leeres Image erstellt werden (Option "Leere Imagedatei erstellen,
-die mit FDisk partitioniert werden muss" im Image-Erstelldialog). Dieses Image muss dann als Laufwerk
-"2" gemounted werden und von einer MS-DOS Bootdiskette gebootet werden (der FreeDOS-"Sys"-Befehl
-funktioniert leider auch nicht mit diesen Images). In der MS-DOS Umgebung kann nun mit FDisk eine
-prim&auml;re Partition erstellt werden und diese nach einem erneuten Booten per
-"Format C: /s" formatiert werden. Das Festplatten-Image kann nun sowohl als normales DOSBox-Laufwerk
-eingebunden werden (um es zu bef&uuml;llen) als auch davon gebootet werden (in dem es als
-Laufwerk "2" gemountet wird).
-</p>
-</div>
-
-<a onclick="Work('FAQ11')" name="FAQ11" href="#"><h2>&raquo; Ich habe Tastaturprobleme, die sich mit dem DOSBox Keymapper nicht l&ouml;sen lassen.</h2></a>
-<div id="FAQ11"><p>	
 Als ersten Schritten sollten Sie den SDL-Videotreiber auf "Win DIB" auf der DOSBox-Seite 
 des Programmeinstellungen-Dialogs umstellen. Wenn Sie danach immer noch Tastaturprobleme
 haben (insbesondere wenn es Tasten gibt, die vom Keymapper &uuml;berhaupt nicht erkannt werden,
@@ -341,8 +320,8 @@ beeintr&auml;chtigen. (Siehe auch <a href="http://forums.logitech.com/logitech/b
 </p>
 </div>
 
-<a onclick="Work('FAQ12')" name="FAQ12" href="#"><h2>&raquo; Ich erhalte einen Fehler, wenn ich versuche den DOSBox Videocodec zu installieren.</h2></a>
-<div id="FAQ12"><p>	
+<a onclick="Work('FAQ11')" name="FAQ11" href="#"><h2>&raquo; Ich erhalte einen Fehler, wenn ich versuche den DOSBox Videocodec zu installieren.</h2></a>
+<div id="FAQ11"><p>	
 Um den DOSBox Videocodec installieren zu k&ouml;nnen, werden Admin-Rechte ben&ouml;tigt.
 Unter Windows XP arbeiten die meisten Anwender stets als Administratoren, so dass Sie den
 Codec in diesem Fall einfach vom Startmen&uuml; aus installieren k&ouml;nnen. Unter

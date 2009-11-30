@@ -3,10 +3,11 @@ interface
 
 uses Classes, XMLDoc, XMLIntf;
 
-Function LoadXMLDoc(const FileName : String; var XMLDoc : TXMLDocument) : String; overload;
-Function LoadXMLDoc(const FileName : String) : TXMLDocument; overload;
+Function LoadXMLDoc(const FileName : String; var XMLDoc : TXMLDocument; const OrigFileName : String ='') : String; overload;
+Function LoadXMLDoc(const FileName : String; const OrigFileName : String ='') : TXMLDocument; overload;
 
-Procedure SaveXMLDoc(const Doc : IXMLDocument; const Lines : Array of String; const Datei : String; const Standalone : Boolean);
+Function SaveXMLDoc(const Doc : IXMLDocument; const Lines : Array of String; const Standalone : Boolean) : TStringList; overload;
+Procedure SaveXMLDoc(const Doc : IXMLDocument; const Lines : Array of String; const Datei : String; const Standalone : Boolean); overload;
 
 Function DecodeUpdateDate(S : String) : TDateTime;
 Function EncodeUpdateDate(const Date : TDateTime) : String;
@@ -16,7 +17,7 @@ function DownloadFile(const URL, FileName: String): Boolean; overload;
 
 Function GetNiceFileSize(const Size : Integer) : String;
 
-Function ExtractFileNameFromURL(const URL : String) : String;
+Function ExtractFileNameFromURL(const URL, DefaultExtension : String) : String;
 Function URLFileNameFromFileName(const FileName : String) : String;
 Function ReplaceBRs(const S : String) : String;
 
@@ -27,12 +28,15 @@ implementation
 uses Windows, SysUtils, Forms, Dialogs, Controls, IdHTTP, LanguageSetupUnit,
      CommonTools, PrgConsts, PrgSetupUnit;
 
-Function LoadXMLDoc(const FileName : String; var XMLDoc : TXMLDocument) : String;
+Function LoadXMLDoc(const FileName : String; var XMLDoc : TXMLDocument; const OrigFileName : String) : String;
 Var MSt : TMemoryStream;
+    ErrorFileName : String;
 begin
   result:=''; XMLDoc:=nil;
 
   if not FileExists(FileName) then exit;
+
+  If Trim(OrigFileName)='' then ErrorFileName:=FileName else ErrorFileName:=OrigFileName;
 
   XMLDoc:=TXMLDocument.Create(Application.MainForm);
 
@@ -41,49 +45,64 @@ begin
     try
       MSt.LoadFromFile(FileName);
     except
-      result:=Format(LanguageSetup.MessageCouldNotOpenFile,[FileName]);
+      result:=Format(LanguageSetup.MessageCouldNotOpenFile,[ErrorFileName]);
       FreeAndNil(XMLDoc);
       exit;
     end;
-    XMLDoc.LoadFromStream(MSt);
+    try
+      XMLDoc.LoadFromStream(MSt);
+    except
+      result:=Format(LanguageSetup.MessageCouldNotActivateXML,[ErrorFileName]);
+      FreeAndNil(XMLDoc);
+      exit;
+    end;
   finally
     MSt.Free;
   end;
   XMLDoc.FileName:=FileName;
 
   If not XMLDoc.Active then begin
-    result:=Format(LanguageSetup.MessageCouldNotActivateXML,[FileName]);
+    result:=Format(LanguageSetup.MessageCouldNotActivateXML,[ErrorFileName]);
     FreeAndNil(XMLDoc);
     exit;
   end;
 end;
 
-Function LoadXMLDoc(const FileName : String) : TXMLDocument;
+Function LoadXMLDoc(const FileName : String; const OrigFileName : String) : TXMLDocument;
 Var S : String;
 begin
-  S:=LoadXMLDoc(FileName,result);
+  S:=LoadXMLDoc(FileName,result,OrigFileName);
   If S<>'' then MessageDlg(S,mtError,[mbOk],0);
 end;
 
-Procedure SaveXMLDoc(const Doc : IXMLDocument; const Lines : Array of String; const Datei : String; const Standalone : Boolean);
-Var St : TStringList;
-    S : String;
+Function SaveXMLDoc(const Doc : IXMLDocument; const Lines : Array of String; const Standalone : Boolean) : TStringList;
+Var S : String;
     X : Integer;
 begin
   Doc.Version:='1.0';
   If Standalone then Doc.StandAlone:='yes' else Doc.StandAlone:='no';
-  Doc.Encoding:='ISO-8859-1';
+  Doc.Encoding:='UTF-8'; {ISO-8859-1}
   Doc.NodeIndentStr:='  ';
+  Doc.Options:=Doc.Options+[doNodeAutoIndent];
 
   Doc.SaveToXML(S);
-  S:=FormatXMLData(S);
-  St:=TStringList.Create;
   try
-    St.Text:=S;
-    If Standalone
-      then St[0]:='<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>'
-      else St[0]:='<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>';
-    For X:=Low(Lines) to High(Lines) do St.Insert(1+X-Low(Lines),Lines[X]);
+    S:=FormatXMLData(S);
+  except end;
+  result:=TStringList.Create;
+
+  result.Text:=S;
+  If Standalone
+    then result[0]:='<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+    else result[0]:='<?xml version="1.0" encoding="UTF-8" standalone="no"?>';
+  For X:=Low(Lines) to High(Lines) do result.Insert(1+X-Low(Lines),Lines[X]);
+end;
+
+Procedure SaveXMLDoc(const Doc : IXMLDocument; const Lines : Array of String; const Datei : String; const Standalone : Boolean);
+Var St : TStringList;
+begin
+  St:=SaveXMLDoc(Doc,Lines,Standalone);
+  try
     St.SaveToFile(Datei);
   finally
     St.Free;
@@ -140,7 +159,7 @@ end;
 
 Function GetFileFromAnyDrive(const Path : String) : TMemoryStream;
 Var C : Char;
-    I : Integer;
+    I, SaveErrorMode : Integer;
 begin
   result:=nil;
   If (length(Path)<2) or (Path[2]<>':') then exit;
@@ -148,15 +167,20 @@ begin
   For C:='A' to 'Z' do begin
     I:=GetDriveType(PChar(C+':\'));
     If (I<>DRIVE_REMOVABLE) and (I<>DRIVE_FIXED) and (I<>DRIVE_CDROM) and (I<>DRIVE_RAMDISK) then continue;
-    If FileExists(C+Copy(Path,2,MaxInt)) then begin
-      result:=TMemoryStream.Create;
-      try
-        result.LoadFromFile(C+Copy(Path,2,MaxInt));
-        result.Position:=0;
-        exit;
-      except
-        FreeAndNil(result);
+    SaveErrorMode:=SetErrorMode(SEM_FAILCRITICALERRORS);
+    try
+      If FileExists(C+Copy(Path,2,MaxInt)) then begin
+        result:=TMemoryStream.Create;
+        try
+          result.LoadFromFile(C+Copy(Path,2,MaxInt));
+          result.Position:=0;
+          exit;
+        except
+          FreeAndNil(result);
+        end;
       end;
+    finally
+      SetErrorMode(SaveErrorMode);
     end;
   end;
 end;
@@ -205,19 +229,10 @@ begin
   result:=IntToStr(Size div 1024 div 1024)+' '+LanguageSetup.MBytes;
 end;
 
-Function Replace(const S, FromStr, ToStr : String) : String;
+Function ExtractFileNameFromURL(const URL, DefaultExtension : String) : String;
+const Exts : Array[0..6] of String = ('.EXE','.ZIP','.7Z','.ICO','.INI','.PROF','.XML');
 Var I : Integer;
-begin
-  result:=S;
-  I:=Pos(FromStr,result);
-  while I>0 do begin
-    result:=Copy(result,1,I-1)+ToStr+Copy(result,I+length(FromStr),MaxInt);
-    I:=Pos(FromStr,result);
-  end;
-end;
-
-Function ExtractFileNameFromURL(const URL : String) : String;
-{Var I : Integer;}
+    S : String;
 begin
   result:=URL;
 
@@ -229,10 +244,16 @@ begin
   end else begin
     result:=Replace(result,':','-');
     result:=Replace(result,'\','-');
+    result:=Replace(result,'%20',' ');
     If ExtUpperCase(Copy(result,length(result)-3,4))='.XML' then result:=Trim(Copy(result,1,length(result)-4));
   end;
 
   result:=MakeFileSysOKFolderName(result);
+
+  S:=ExtUpperCase(ExtractFileExt(ExtractFileName(result)));
+  For I:=Low(Exts) to High(Exts) do If S=Exts[I] then exit;
+  If S=ExtUpperCase(DefaultExtension) then exit;
+  result:=result+DefaultExtension;
 end;
 
 Function URLFileNameFromFileName(const FileName : String) : String;

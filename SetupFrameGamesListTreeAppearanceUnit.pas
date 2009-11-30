@@ -32,7 +32,7 @@ type
   public
     { Public-Deklarationen }
     Function GetName : String;
-    Procedure InitGUIAndLoadSetup(InitData : TInitData);
+    Procedure InitGUIAndLoadSetup(var InitData : TInitData);
     Procedure BeforeChangeLanguage;
     Procedure LoadLanguage;
     Procedure DOSBoxDirChanged;
@@ -56,7 +56,7 @@ begin
   result:=LanguageSetup.SetupFormListViewSheet3;
 end;
 
-procedure TSetupFrameGamesListTreeAppearance.InitGUIAndLoadSetup(InitData: TInitData);
+procedure TSetupFrameGamesListTreeAppearance.InitGUIAndLoadSetup(var InitData: TInitData);
 Var S : String;
     C : TColor;
     St : TStringList;
@@ -205,8 +205,12 @@ begin
 end;
 
 procedure TSetupFrameGamesListTreeAppearance.PopupMenuWork(Sender: TObject);
+Var I : Integer;
 begin
   TreeViewGroupsEdit.Lines.Add(RemoveUnderline((Sender as TMenuItem).Caption));
+
+  I:=0;
+  while I<TreeViewGroupsEdit.Lines.Count do If Trim(TreeViewGroupsEdit.Lines[I])='' then TreeViewGroupsEdit.Lines.Delete(I) else inc(I);
 end;
 
 end.

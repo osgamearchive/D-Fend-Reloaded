@@ -17,12 +17,15 @@ type
     UserDefinedDataLabel: TLabel;
     DelButton: TSpeedButton;
     AddButton: TSpeedButton;
-    Panel1: TPanel;
+    ToolBarPanel: TPanel;
     ToolBar: TToolBar;
     SearchGameButton: TToolButton;
     ImageList: TImageList;
     SearchPopupMenu: TPopupMenu;
     AddUserDataPopupMenu: TPopupMenu;
+    MultiValueInfoLabel: TLabel;
+    ToolButton1: TToolButton;
+    DownloadDataButton: TToolButton;
     procedure FrameResize(Sender: TObject);
     procedure AddButtonClick(Sender: TObject);
     procedure DelButtonClick(Sender: TObject);
@@ -30,7 +33,7 @@ type
   private
     { Private-Deklarationen }
     LinkFile : TLinkFile;
-    PProfileName : PString;
+    PProfileName,PCaptureDir : PString;
     GameDB : TGameDB;
     Procedure LoadLinks;
     Procedure TabListForCell(ACol, ARow: Integer; var UseDropdownListForCell : Boolean);
@@ -45,7 +48,8 @@ type
 implementation
 
 uses LanguageSetupUnit, VistaToolsUnit, CommonTools, HelpConsts,
-     ClassExtensions, IconLoaderUnit, TextEditPopupUnit;
+     ClassExtensions, IconLoaderUnit, TextEditPopupUnit, DataReaderFormUnit,
+     PrgSetupUnit;
 
 {$R *.dfm}
 
@@ -54,8 +58,6 @@ uses LanguageSetupUnit, VistaToolsUnit, CommonTools, HelpConsts,
 procedure TModernProfileEditorGameInfoFrame.InitGUI(var InitData : TModernProfileEditorInitData);
 Var St : TStringList;
 begin
-  InitData.AllowDefaultValueReset:=False;
-
   NoFlicker(GameInfoValueListEditor);
   NoFlicker(FavouriteCheckBox);
   NoFlicker(Tab);
@@ -85,7 +87,11 @@ begin
     St:=ExtLanguageList(GetCustomLanguageName(InitData.GameDB.GetLanguageList)); try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
     Strings.Add(LanguageSetup.GameWWW+'=');
   end;
+  DownloadDataButton.Caption:=LanguageSetup.DataReaderButton;
   FavouriteCheckBox.Caption:=LanguageSetup.GameFavorite;
+  FavouriteCheckBox.Left:=GameInfoValueListEditor.Left+GameInfoValueListEditor.Width-Application.MainForm.Canvas.TextWidth(FavouriteCheckBox.Caption)-20;
+
+  MultiValueInfoLabel.Caption:=LanguageSetup.ProfileEditorMultipleValuesInfo;
 
   UserDefinedDataLabel.Caption:=LanguageSetup.ProfileEditorUserdefinedInfo+':';
 
@@ -108,6 +114,7 @@ begin
   UserIconLoader.DialogImage(DI_Delete,DelButton);
 
   PProfileName:=InitData.CurrentProfileName;
+  PCaptureDir:=InitData.CurrentCaptureDir;
   LinkFile:=InitData.SearchLinkFile;
   GameDB:=InitData.GameDB;
 
@@ -124,6 +131,7 @@ begin
 end;
 
 procedure TModernProfileEditorGameInfoFrame.SearchClick(Sender: TObject);
+Var S,Genre,Developer,Publisher,Year,Internet : String;
 begin
   Case (Sender as TComponent).Tag of
     0 : begin
@@ -132,6 +140,16 @@ begin
         end;
     1 : If LinkFile.EditFile(False) then LoadLinks;
     2 : OpenLink(LinkFile.Link[0],'<GAMENAME>',PProfileName^);
+    3 : begin
+          If Trim(PCaptureDir^)='' then S:='' else S:=MakeAbsPath(PCaptureDir^,PrgSetup.BaseDir);
+          If ShowDataReaderDialog(self,PProfileName^,Genre,Developer,Publisher,Year,Internet,S) then with GameInfoValueListEditor.Strings do begin
+            If Genre<>'' then ValueFromIndex[0]:=Genre;
+            If Developer<>'' then ValueFromIndex[1]:=Developer;
+            If Publisher<>'' then ValueFromIndex[2]:=Publisher;
+            If Year<>'' then ValueFromIndex[3]:=Year;
+            If (Internet<>'') and (Trim(ValueFromIndex[5])='') then ValueFromIndex[5]:=Internet;
+          end;
+        end;
   end;
 end;
 
@@ -146,12 +164,12 @@ begin
   end;
 
   with GameInfoValueListEditor.Strings do begin
-    If Game.Genre<>'' then ValueFromIndex[0]:=GetCustomGenreName(Game.Genre);
-    If Game.Developer<>'' then ValueFromIndex[1]:=Game.Developer;
-    If Game.Publisher<>'' then ValueFromIndex[2]:=Game.Publisher;
-    If Game.Year<>'' then ValueFromIndex[3]:=Game.Year;
-    If Game.Language<>'' then ValueFromIndex[4]:=GetCustomLanguageName(Game.Language);
-    If Game.WWW<>'' then ValueFromIndex[5]:=Game.WWW;
+    If Game.Genre<>'' then ValueFromIndex[0]:=GetCustomGenreName(Game.Genre) else GameInfoValueListEditor.Strings[0]:=GameInfoValueListEditor.Strings.Names[0]+'=';
+    If Game.Developer<>'' then ValueFromIndex[1]:=Game.Developer else GameInfoValueListEditor.Strings[1]:=GameInfoValueListEditor.Strings.Names[1]+'=';
+    If Game.Publisher<>'' then ValueFromIndex[2]:=Game.Publisher else GameInfoValueListEditor.Strings[2]:=GameInfoValueListEditor.Strings.Names[2]+'=';
+    If Game.Year<>'' then ValueFromIndex[3]:=Game.Year else GameInfoValueListEditor.Strings[3]:=GameInfoValueListEditor.Strings.Names[3]+'=';
+    If Game.Language<>'' then ValueFromIndex[4]:=GetCustomLanguageName(Game.Language) else GameInfoValueListEditor.Strings[4]:=GameInfoValueListEditor.Strings.Names[4]+'=';
+    If Game.WWW<>'' then ValueFromIndex[5]:=Game.WWW else GameInfoValueListEditor.Strings[5]:=GameInfoValueListEditor.Strings.Names[5]+'=';
   end;
   FavouriteCheckBox.Checked:=Game.Favorite;
 
@@ -166,6 +184,9 @@ begin
         Tab.Cells[0,I+1]:=S;
         Tab.Cells[1,I+1]:=T;
       end;
+    end else begin
+      Tab.RowCount:=2;
+      Tab.Cells[0,1]:=''; Tab.Cells[1,1]:='';
     end;
   finally
     St.Free;

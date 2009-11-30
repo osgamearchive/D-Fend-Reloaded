@@ -27,7 +27,7 @@
     <Borland.Personality>Delphi.Personality</Borland.Personality>
     <Borland.ProjectType />
     <BorlandProject>
-<BorlandProject><Delphi.Personality><Parameters><Parameters Name="UseLauncher">False</Parameters><Parameters Name="LoadAllSymbols">True</Parameters><Parameters Name="LoadUnspecifiedSymbols">False</Parameters></Parameters><VersionInfo><VersionInfo Name="IncludeVerInfo">True</VersionInfo><VersionInfo Name="AutoIncBuild">False</VersionInfo><VersionInfo Name="MajorVer">0</VersionInfo><VersionInfo Name="MinorVer">8</VersionInfo><VersionInfo Name="Release">2</VersionInfo><VersionInfo Name="Build">33</VersionInfo><VersionInfo Name="Debug">False</VersionInfo><VersionInfo Name="PreRelease">False</VersionInfo><VersionInfo Name="Special">False</VersionInfo><VersionInfo Name="Private">False</VersionInfo><VersionInfo Name="DLL">False</VersionInfo><VersionInfo Name="Locale">1031</VersionInfo><VersionInfo Name="CodePage">1252</VersionInfo></VersionInfo><VersionInfoKeys><VersionInfoKeys Name="CompanyName"></VersionInfoKeys><VersionInfoKeys Name="FileDescription">D-Fend Reloaded</VersionInfoKeys><VersionInfoKeys Name="FileVersion">0.8.2.33</VersionInfoKeys><VersionInfoKeys Name="InternalName">D-Fend Reloaded</VersionInfoKeys><VersionInfoKeys Name="LegalCopyright">Alexander Herzog</VersionInfoKeys><VersionInfoKeys Name="LegalTrademarks"></VersionInfoKeys><VersionInfoKeys Name="OriginalFilename">DFend.exe</VersionInfoKeys><VersionInfoKeys Name="ProductName">D-Fend Reloaded</VersionInfoKeys><VersionInfoKeys Name="ProductVersion">1.0.0.0</VersionInfoKeys><VersionInfoKeys Name="Comments">GPL v3</VersionInfoKeys></VersionInfoKeys><Source><Source Name="MainSource">DFend.dpr</Source></Source></Delphi.Personality><ModelSupport>False</ModelSupport></BorlandProject></BorlandProject>
+<BorlandProject><Delphi.Personality><Parameters><Parameters Name="UseLauncher">False</Parameters><Parameters Name="LoadAllSymbols">True</Parameters><Parameters Name="LoadUnspecifiedSymbols">False</Parameters></Parameters><VersionInfo><VersionInfo Name="IncludeVerInfo">True</VersionInfo><VersionInfo Name="AutoIncBuild">False</VersionInfo><VersionInfo Name="MajorVer">0</VersionInfo><VersionInfo Name="MinorVer">9</VersionInfo><VersionInfo Name="Release">0</VersionInfo><VersionInfo Name="Build">39</VersionInfo><VersionInfo Name="Debug">False</VersionInfo><VersionInfo Name="PreRelease">False</VersionInfo><VersionInfo Name="Special">False</VersionInfo><VersionInfo Name="Private">False</VersionInfo><VersionInfo Name="DLL">False</VersionInfo><VersionInfo Name="Locale">1031</VersionInfo><VersionInfo Name="CodePage">1252</VersionInfo></VersionInfo><VersionInfoKeys><VersionInfoKeys Name="CompanyName"></VersionInfoKeys><VersionInfoKeys Name="FileDescription">D-Fend Reloaded</VersionInfoKeys><VersionInfoKeys Name="FileVersion">0.9.0.39</VersionInfoKeys><VersionInfoKeys Name="InternalName">D-Fend Reloaded</VersionInfoKeys><VersionInfoKeys Name="LegalCopyright">Alexander Herzog</VersionInfoKeys><VersionInfoKeys Name="LegalTrademarks"></VersionInfoKeys><VersionInfoKeys Name="OriginalFilename">DFend.exe</VersionInfoKeys><VersionInfoKeys Name="ProductName">D-Fend Reloaded</VersionInfoKeys><VersionInfoKeys Name="ProductVersion">1.0.0.0</VersionInfoKeys><VersionInfoKeys Name="Comments">GPL v3</VersionInfoKeys></VersionInfoKeys><Source><Source Name="MainSource">DFend.dpr</Source></Source></Delphi.Personality><ModelSupport>False</ModelSupport></BorlandProject></BorlandProject>
   </ProjectExtensions>
   <Import Project="$(MSBuildBinPath)\Borland.Delphi.Targets" />
   <ItemGroup>
@@ -63,6 +63,7 @@
     <DCCReference Include="CreateConfFormUnit.pas">
       <Form>CreateConfForm</Form>
     </DCCReference>
+    <DCCReference Include="CreateImageToolsUnit.pas" />
     <DCCReference Include="CreateImageUnit.pas">
       <Form>CreateImageForm</Form>
     </DCCReference>
@@ -78,9 +79,15 @@
     <DCCReference Include="CreateXMLFormUnit.pas">
       <Form>CreateXMLForm</Form>
     </DCCReference>
-    <DCCReference Include="DiskImageToolsUnit.pas" />
+    <DCCReference Include="DataReaderConfigUnit.pas" />
+    <DCCReference Include="DataReaderFormUnit.pas">
+      <Form>DataReaderForm</Form>
+    </DCCReference>
+    <DCCReference Include="DataReaderToolsUnit.pas" />
+    <DCCReference Include="DataReaderUnit.pas" />
     <DCCReference Include="DOSBoxCountUnit.pas" />
     <DCCReference Include="DOSBoxShortNameUnit.pas" />
+    <DCCReference Include="DOSBoxTempUnit.pas" />
     <DCCReference Include="DosBoxUnit.pas" />
     <DCCReference Include="DownloadWaitFormUnit.pas">
       <Form>DownloadWaitForm</Form>
@@ -90,9 +97,6 @@
     </DCCReference>
     <DCCReference Include="DriveReadFormUnit.pas">
       <Form>DriveReadForm</Form>
-    </DCCReference>
-    <DCCReference Include="EditMultipleProfilesFormUnit.pas">
-      <Form>EditMultipleProfilesForm</Form>
     </DCCReference>
     <DCCReference Include="ExpandImageFormUnit.pas">
       <Form>ExpandImageForm</Form>
@@ -130,6 +134,15 @@
     <DCCReference Include="InfoFormUnit.pas">
       <Form>InfoForm</Form>
     </DCCReference>
+    <DCCReference Include="InstallationRunFormUnit.pas">
+      <Form>InstallationRunForm</Form>
+    </DCCReference>
+    <DCCReference Include="InstallationSupportFormUnit.pas">
+      <Form>InstallationSupportForm</Form>
+    </DCCReference>
+    <DCCReference Include="InternetDataWaitFormUnit.pas">
+      <Form>InternetDataWaitForm</Form>
+    </DCCReference>
     <DCCReference Include="LanguageEditorFormUnit.pas">
       <Form>LanguageEditorForm</Form>
     </DCCReference>
@@ -147,6 +160,9 @@
     <DCCReference Include="ListViewImageUnit.pas" />
     <DCCReference Include="MainUnit.pas">
       <Form>DFendReloadedMainForm</Form>
+    </DCCReference>
+    <DCCReference Include="MakeBootImageFromProfileFormUnit.pas">
+      <Form>MakeBootImageFromProfileForm</Form>
     </DCCReference>
     <DCCReference Include="MiniRunFormUnit.pas">
       <Form>MiniRunForm</Form>
@@ -263,6 +279,9 @@
     <DCCReference Include="PackageManagerRepositoriesEditFormUnit.pas">
       <Form>PackageManagerRepositoriesEditForm</Form>
     </DCCReference>
+    <DCCReference Include="PackageManagerRepositoriesEditURLFormUnit.pas">
+      <Form>PackageManagerRepositoriesEditURLForm</Form>
+    </DCCReference>
     <DCCReference Include="PackageManagerToolsUnit.pas" />
     <DCCReference Include="PlaySoundFormUnit.pas">
       <Form>PlaySoundForm</Form>
@@ -305,10 +324,16 @@
     <DCCReference Include="ProfileMountEditorZipFrameUnit.pas">
       <Form>ProfileMountEditorZipFrame</Form>
     </DCCReference>
+    <DCCReference Include="ProviderFormUnit.pas">
+      <Form>ProviderForm</Form>
+    </DCCReference>
     <DCCReference Include="QuickStartFormUnit.pas">
       <Form>QuickStartForm</Form>
     </DCCReference>
     <DCCReference Include="ReadDriveUnit.pas" />
+    <DCCReference Include="RenameAllScreenshotsFormUnit.pas">
+      <Form>RenameAllScreenshotsForm</Form>
+    </DCCReference>
     <DCCReference Include="Resample.pas" />
     <DCCReference Include="ResHookUnit.pas" />
     <DCCReference Include="RunPrgManagerUnit.pas" />
@@ -341,6 +366,9 @@
     </DCCReference>
     <DCCReference Include="SetupFormUnit.pas">
       <Form>SetupForm</Form>
+    </DCCReference>
+    <DCCReference Include="SetupFrameAutomaticConfigurationUnit.pas">
+      <Form>SetupFrameAutomaticConfiguration</Form>
     </DCCReference>
     <DCCReference Include="SetupFrameBaseUnit.pas">
       <Form>SetupFrameBase</Form>

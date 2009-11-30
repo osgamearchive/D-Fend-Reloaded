@@ -20,7 +20,7 @@ type
   public
     { Public-Deklarationen }
     Function GetName : String;
-    Procedure InitGUIAndLoadSetup(InitData : TInitData);
+    Procedure InitGUIAndLoadSetup(var InitData : TInitData);
     Procedure BeforeChangeLanguage;
     Procedure LoadLanguage;
     Procedure DOSBoxDirChanged;
@@ -43,7 +43,7 @@ begin
   result:=LanguageSetup.SetupFormSecuritySheet;
 end;
 
-procedure TSetupFrameSecurity.InitGUIAndLoadSetup(InitData: TInitData);
+procedure TSetupFrameSecurity.InitGUIAndLoadSetup(var InitData: TInitData);
 Var S : String;
 begin
   AskBeforeDeleteCheckBox.Checked:=PrgSetup.AskBeforeDelete;

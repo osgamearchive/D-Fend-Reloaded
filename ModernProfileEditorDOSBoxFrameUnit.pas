@@ -35,7 +35,7 @@ type
   private
     { Private-Deklarationen }
     DosBoxLang : TStringList;
-    ProfileName,ProfileExe,ProfileSetup,ProfileDOSBoxInstallation : PString;
+    ProfileName,ProfileExe,ProfileSetup,ProfileDOSBoxInstallation,ProfileCaptureDir : PString;
     FOnProfileNameChange : TTextEvent;
     Procedure UpdateLanguageList;
     Procedure SelectInLanguageList(const LangName : String);
@@ -132,6 +132,7 @@ begin
   ProfileExe:=InitData.CurrentProfileExe;
   ProfileSetup:=InitData.CurrentProfileSetup;
   ProfileDOSBoxInstallation:=InitData.CurrentDOSBoxInstallation;
+  ProfileCaptureDir:=InitData.CurrentCaptureDir;
   FOnProfileNameChange:=InitData.OnProfileNameChange;
 
   HelpContext:=ID_ProfileEditDOSBox;
@@ -221,10 +222,10 @@ Var Save,DosBoxDir : String;
 begin
   If DefaultDOSBoxInstallationRadioButton.Checked then begin
     DosBoxDir:=IncludeTrailingPathDelimiter(PrgSetup.DOSBoxSettings[DOSBoxInstallationComboBox.ItemIndex].DosBoxDir);
-    FOnProfileNameChange(self,ProfileName^,ProfileExe^,ProfileSetup^,'','',PrgSetup.DOSBoxSettings[DOSBoxInstallationComboBox.ItemIndex].Name);
+    FOnProfileNameChange(self,ProfileName^,ProfileExe^,ProfileSetup^,'','',PrgSetup.DOSBoxSettings[DOSBoxInstallationComboBox.ItemIndex].Name,ProfileCaptureDir^);
   end else begin
     DosBoxDir:=IncludeTrailingPathDelimiter(CustomDOSBoxInstallationEdit.Text);
-    FOnProfileNameChange(self,ProfileName^,ProfileExe^,ProfileSetup^,'','',CustomDOSBoxInstallationEdit.Text);
+    FOnProfileNameChange(self,ProfileName^,ProfileExe^,ProfileSetup^,'','',CustomDOSBoxInstallationEdit.Text,ProfileCaptureDir^);
   end;
 
   If UserLanguageComboBox.ItemIndex>=0 then Save:=UserLanguageComboBox.Items[UserLanguageComboBox.ItemIndex] else Save:='';

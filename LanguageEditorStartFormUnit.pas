@@ -73,6 +73,7 @@ end;
 { global }
 
 Function ShowLanguageEditorStartDialog(const AOwner : TComponent; var LanguageFile : String; const NewOnly : Boolean) : Boolean;
+Var DataLanguageFile : String;
 begin
   LanguageFile:='';
 
@@ -91,7 +92,13 @@ begin
         LanguageFile:=PrgDataDir+LanguageSubDir+'\'+LanguageEditorStartForm.LanguageNameEdit.Text+'.ini';
       end;
       If (PrgDir<>PrgDataDir) and (ExtUpperCase(PrgDir)=ExtUpperCase(Copy(LanguageFile,1,length(PrgDir)))) then begin
-        result:=(MessageDlg(LanguageSetup.LanguageEditorPrgDirWarning,mtWarning,[mbYes,mbNo],0)=mrYes);
+        DataLanguageFile:=PrgDataDir+LanguageSubDir+'\'+ExtractFileName(LanguageFile);
+        If not FileExists(DataLanguageFile) then begin
+          ForceDirectories(ExtractFilePath(DataLanguageFile));
+          CopyFile(PChar(LanguageFile),PChar(DataLanguageFile),True);
+        end;
+        LoadLanguage(ExtractFileName(DataLanguageFile));
+        LanguageFile:=DataLanguageFile;
       end;
     end;
   finally

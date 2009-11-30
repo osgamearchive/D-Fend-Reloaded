@@ -95,6 +95,10 @@ begin
 
   BaseDirEdit.EditLabel.Caption:=LanguageSetup.SetupFormBaseDir;
   BaseDirEdit.Text:=PrgSetup.BaseDir;
+
+  PrgDirEdit.Color:=clBtnFace;
+  PrgDataDirEdit.Color:=clBtnFace;
+  BaseDirEdit.Color:=clBtnFace;
 end;
 
 procedure TOperationModeInfoForm.HelpButtonClick(Sender: TObject);

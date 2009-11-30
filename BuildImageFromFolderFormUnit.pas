@@ -15,19 +15,26 @@ type
     FileNameButton: TSpeedButton;
     FolderButton: TSpeedButton;
     MakeBootableCheckBox: TCheckBox;
-    MakeBootableWithKeyboardDriverCheckBox: TCheckBox;
+    AddKeyboardDriverCheckBox: TCheckBox;
     SaveDialog: TSaveDialog;
     WriteToFloppyCheckBox: TCheckBox;
-    MakeBootableWithMouseDriverCheckBox: TCheckBox;
+    AddMouseDriverCheckBox: TCheckBox;
     HelpButton: TBitBtn;
+    AddFormatCheckBox: TCheckBox;
+    AddEditCheckbox: TCheckBox;
+    ImageTypeGroupBox: TRadioGroup;
+    MemoryManagerCheckBox: TCheckBox;
     procedure FormCreate(Sender: TObject);
     procedure ButtonWork(Sender: TObject);
     procedure OKButtonClick(Sender: TObject);
     procedure MakeBootableCheckBoxClick(Sender: TObject);
     procedure HelpButtonClick(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure ImageTypeGroupBoxClick(Sender: TObject);
+    procedure FormShow(Sender: TObject);
   private
     { Private-Deklarationen }
+    FloppyDriveAvailable : Boolean;
   public
     { Public-Deklarationen }
   end;
@@ -40,23 +47,31 @@ Function ShowBuildImageFromFolderDialog(const AOwner : TComponent) : Boolean;
 implementation
 
 Uses VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgSetupUnit,
-     CreateISOImageFormUnit, GameDBUnit, DOSBoxUnit, PrgConsts, CreateImageUnit,
+     CreateISOImageFormUnit, GameDBUnit, DOSBoxUnit, PrgConsts, CreateImageToolsUnit,
      HelpConsts, IconLoaderUnit;
 
 {$R *.dfm}
 
 procedure TBuildImageFromFolderForm.FormCreate(Sender: TObject);
+Var C : Char;
 begin
   SetVistaFonts(self);
   Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName);
+
   Caption:=LanguageSetup.ImageFromFolderCaption;
   FolderEdit.EditLabel.Caption:=LanguageSetup.ImageFromFolderSourceFolder;
   FolderButton.Hint:=LanguageSetup.ChooseFolder;
   FileNameEdit.EditLabel.Caption:=LanguageSetup.ImageFromFolderImageFile;
   FileNamebutton.Hint:=LanguageSetup.ChooseFile;
+  ImageTypeGroupBox.Caption:=LanguageSetup.ImageFromFolderImageType;
+  ImageTypeGroupBox.Items[0]:=LanguageSetup.ImageFromFolderImageTypeFloppy;
+  ImageTypeGroupBox.Items[1]:=LanguageSetup.ImageFromFolderImageTypeHarddisk;
   MakeBootableCheckBox.Caption:=LanguageSetup.CreateImageFormMakeFloppyBootable;
-  MakeBootableWithKeyboardDriverCheckBox.Caption:=LanguageSetup.CreateImageFormMakeFloppyBootableWithKeyboardDriver;
-  MakeBootableWithMouseDriverCheckBox.Caption:=LanguageSetup.CreateImageFormMakeFloppyBootableWithMouseDriver;
+  AddKeyboardDriverCheckBox.Caption:=LanguageSetup.CreateImageFormMakeFloppyBootableWithKeyboardDriver;
+  AddMouseDriverCheckBox.Caption:=LanguageSetup.CreateImageFormMakeFloppyBootableWithMouseDriver;
+  MemoryManagerCheckBox.Caption:=LanguageSetup.CreateImageFormMakeFloppyBootableWithMemoryManager;
+  AddFormatCheckBox.Caption:=LanguageSetup.CreateImageFormMakeFloppyBootableWithFormat;
+  AddEditCheckbox.Caption:=LanguageSetup.CreateImageFormMakeFloppyBootableWithEdit;
   WriteToFloppyCheckBox.Caption:=LanguageSetup.ImageFromFolderWriteToFloppy;
   OKButton.Caption:=LanguageSetup.OK;
   CancelButton.Caption:=LanguageSetup.Cancel;
@@ -69,6 +84,14 @@ begin
   UserIconLoader.DialogImage(DI_Help,HelpButton);
   UserIconLoader.DialogImage(DI_SelectFolder,FolderButton);
   UserIconLoader.DialogImage(DI_SelectFile,FileNameButton);
+
+  FloppyDriveAvailable:=False;
+  For C:='A' to 'Z' do If GetDriveType(PChar(C+':\'))=DRIVE_REMOVABLE then begin FloppyDriveAvailable:=True; break; end;
+end;
+
+procedure TBuildImageFromFolderForm.FormShow(Sender: TObject);
+begin
+  ImageTypeGroupBoxClick(Sender);
 end;
 
 procedure TBuildImageFromFolderForm.ButtonWork(Sender: TObject);
@@ -89,14 +112,23 @@ begin
   end;
 end;
 
+procedure TBuildImageFromFolderForm.ImageTypeGroupBoxClick(Sender: TObject);
+begin
+  WriteToFloppyCheckBox.Enabled:=(ImageTypeGroupBox.ItemIndex=0) and FloppyDriveAvailable;
+end;
+
 procedure TBuildImageFromFolderForm.MakeBootableCheckBoxClick(Sender: TObject);
 begin
-  MakeBootableWithKeyboardDriverCheckBox.Enabled:=MakeBootableCheckBox.Checked;
-  MakeBootableWithMouseDriverCheckBox.Enabled:=MakeBootableCheckBox.Checked;
+  AddKeyboardDriverCheckBox.Enabled:=MakeBootableCheckBox.Checked;
+  AddMouseDriverCheckBox.Enabled:=MakeBootableCheckBox.Checked;
+  MemoryManagerCheckBox.Enabled:=MakeBootableCheckBox.Checked;
 end;
 
 procedure TBuildImageFromFolderForm.OKButtonClick(Sender: TObject);
 Var FileName, Dir, FreeDOS : String;
+    Upgrades : TDiskImageCreatorUpgrades;
+    Size : Integer;
+    St : TStringList;
 begin
   FreeDOS:=Trim(PrgSetup.PathToFREEDOS);
   If FreeDOS<>'' then FreeDOS:=IncludeTrailingPathDelimiter(MakeAbsPath(FreeDOS,PrgSetup.BaseDir));
@@ -121,16 +153,38 @@ begin
     MessageDlg(LanguageSetup.MessageNoFileName,mtError,[mbOk],0);
     ModalResult:=mrNone; exit;
   end;
+  If ExtractFileExt(FileName)='' then FileName:=FileName+'.img';
   FileName:=MakeAbsPath(FileName,PrgSetup.BaseDir);
 
-  If not BuildStandardFloppyImage(FileName) then begin
-    ModalResult:=mrNone;
-    exit;
-  end;
+  Upgrades:=[dicuCopyFolder];
+  If MakeBootableCheckBox.Enabled and MakeBootableCheckBox.Checked then Upgrades:=Upgrades+[dicuMakeBootable];
+  If AddKeyboardDriverCheckBox.Enabled and AddKeyboardDriverCheckBox.Checked then Upgrades:=Upgrades+[dicuKeyboardDriver];
+  If AddMouseDriverCheckBox.Enabled and AddMouseDriverCheckBox.Checked then Upgrades:=Upgrades+[dicuMouseDriver];
+  If MemoryManagerCheckBox.Enabled and MemoryManagerCheckBox.Checked then Upgrades:=Upgrades+[dicuMemoryManager];
+  If AddFormatCheckBox.Enabled and AddFormatCheckBox.Checked then Upgrades:=Upgrades+[dicuDiskTools];
+  If AddEditCheckbox.Enabled and AddEditCheckbox.Checked then Upgrades:=Upgrades+[dicuEditor];
 
-  if not MakeFloppyBootable(FileName,MakeBootableCheckBox.Checked,MakeBootableWithKeyboardDriverCheckBox.Checked,MakeBootableWithMouseDriverCheckBox.Checked,Dir) then begin
-    ModalResult:=mrNone;
-    exit;
+  St:=TStringList.Create;
+  try
+    St.Add(Dir);
+    Size:=DiskImageCreatorUpgradeSize(ImageTypeGroupBox.ItemIndex=1,Upgrades,St);
+    If ImageTypeGroupBox.ItemIndex=0 then begin
+      If Size>1457664 then begin
+        MessageDlg(Format(LanguageSetup.ImageFromFolderNotEnoughSpace,[Size div 1024,1457664 div 1024]),mtError,[mbOk],0);
+        ModalResult:=mrNone; exit;
+      end;
+      If not DiskImageCreator(FileName) then begin ModalResult:=mrNone; exit; end;
+    end else begin
+      Size:=(Size div 1024 div 1024)+1+5;
+      If not DiskImageCreator(Size,FileName,False,True) then begin ModalResult:=mrNone; exit; end;
+    end;
+
+    if not DiskImageCreatorUpgrade(FileName,ImageTypeGroupBox.ItemIndex=1,Upgrades,St) then begin
+      ModalResult:=mrNone;
+      exit;
+    end;
+  finally
+    St.Free;
   end;
 end;
 
@@ -151,7 +205,7 @@ begin
   BuildImageFromFolderForm:=TBuildImageFromFolderForm.Create(AOwner);
   try
     result:=(BuildImageFromFolderForm.ShowModal=mrOK);
-    if result and BuildImageFromFolderForm.WriteToFloppyCheckBox.Checked then begin
+    if result and BuildImageFromFolderForm.WriteToFloppyCheckBox.Checked and BuildImageFromFolderForm.WriteToFloppyCheckBox.Enabled then begin
       result:=ShowWriteIMGImageDialog(AOwner,BuildImageFromFolderForm.FileNameEdit.Text);
     end;
   finally

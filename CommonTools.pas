@@ -8,7 +8,7 @@ Function ExtLowerCase(const S : String) : String;
 
 Function StrToFloatEx(S : String) : Double;
 
-Function ValueToList(Value : String; Divider : String = ';') : TStringList;
+Function ValueToList(Value : String; const Divider : String = ';') : TStringList;
 Function ListToValue(const St : TStrings; Divider : Char =';') : String;
 
 Function StringToStringList(S : String) : TStringList; {"[13][10]" as Divider}
@@ -48,12 +48,15 @@ Function OldDOSBoxVersion(const Version : String) : Boolean;
 Procedure DOSBoxOutdatedWarning(const DOSBoxPath : String);
 
 Function GetFileDate(const FileName : String) : TDateTime;
+Function GetDosFileDate(const FileName : String) : Integer;
 Function GetFileDateAsString : String;
 
 Procedure CreateLink(const TargetName, Parameters, LinkFile, IconFile, Description : String);
 Procedure SetStartWithWindows(const Enabled : Boolean);
 
+function LoadIconFromExeFile(const AFileName: String): TIcon;
 Function LoadImageFromFile(const FileName : String) : TPicture;
+Function LoadImageAsIconFromFile(const FileName : String) : TIcon;
 Procedure SaveImageToFile(const Picture : TPicture; const FileName : String); overload;
 Procedure SaveImageToFile(const OldFileName, NewFileName : String); overload;
 
@@ -80,6 +83,7 @@ Function OpenMediaFile(const SetupString, FileName : String) : Boolean; {true=re
 Function FileSizeToStr(const Size : Int64) : String;
 
 Function BaseDirSecuriryCheck(const DirToDelete : String) : Boolean;
+Function BaseDirSecuriryCheckOnly(const DirToDelete : String) : Boolean; {no error dialog, just check}
 
 Type TDeleteFileType=(ftQuickStart=0,ftTemp=1,ftProfile=2,ftUninstall=3,ftDataViewer=4,ftMediaViewer=5,ftZipOperation=6);
 Function ExtDeleteFile(const FileName : String; const FileType : TDeleteFileType; const AllowContinueNext : Boolean; var ContinueNext : Boolean; const DeletePrgSetupRecord : String ='') : Boolean; overload;
@@ -96,6 +100,9 @@ Function DeleteFileToRecycleBinNoWarning(const FileName : String) : Boolean;
 
 Function CompareFiles(const File1, File2 : String) : Boolean; {True=files match}
 
+Type TRenameFiles=(rfScreenshots,rfSounds,rfVideos);
+Function RenameAllFiles(const Folder, Expression, GameName : String; const RenameFiles : TRenameFiles; const ShowNoFilesInfo : Boolean) : Boolean;
+
 Function ForceForegroundWindow(Wnd:HWND):Boolean;
 
 Function CPUCount : Integer;
@@ -106,7 +113,7 @@ implementation
 
 uses SysUtils, Forms, ShellAPI, ShlObj, ActiveX, Messages, Dialogs, Math,
      Controls, ComObj, Registry, JPEG, GIFImage, PNGImage, LanguageSetupUnit,
-     PrgSetupUnit, PrgConsts;
+     PrgSetupUnit, PrgConsts, ImageStretch;
 
 Function ExtUpperCase(const S : String) : String;
 Var I,J : Integer;
@@ -143,21 +150,25 @@ begin
   result:=StrToFloat(S);
 end;
 
-Function ValueToList(Value : String; Divider : String) : TStringList;
+Function ValueToList(Value : String; const Divider : String) : TStringList;
 Var I,J : Integer;
 begin
   result:=TStringList.Create;
   Value:=Trim(Value);
   while Value<>'' do begin
-    I:=Pos(Divider[1],Value);
+
+    {I:=Pos(Divider[1],Value);
     For J:=2 to length(Divider) do If I=0 then I:=Pos(Divider[J],Value) else begin
       If Pos(Divider[J],Value)>0 then I:=Min(I,Pos(Divider[J],Value));
-    end;
+    end;}
+    I:=0;
+    For J:=1 to length(Value) do If Pos(Value[J],Divider)<>0 then begin I:=J; break; end;
+
     If I>0 then begin
       result.Add(Trim(Copy(Value,1,I-1)));
       Value:=Trim(Copy(Value,I+1,MaxInt));
     end else begin
-      result.Add(Trim(Value));
+      result.Add(Value);
       Value:='';
     end;
   end;
@@ -208,9 +219,21 @@ end;
 
 Function Replace(const S, FromSub, ToSub : String) : String;
 Var I : Integer;
+    Text : String;
 begin
-  I:=Pos(FromSub,S);
-  if I=0 then result:=S else result:=Copy(S,1,I-1)+ToSub+Copy(S,I+length(FromSub),MaxInt);
+  Text:=S; result:='';
+  I:=Pos(FromSub,Text);
+  while I>0 do begin
+    If (ToSub<>'') and (FromSub=ToSub[1]) and (Copy(Text,I,length(ToSub))=ToSub) then begin
+      result:=result+Copy(Text,1,I+length(ToSub)-1);
+      Text:=Copy(Text,I+length(ToSub),MaxInt);
+    end else begin
+      result:=result+Copy(Text,1,I-1)+ToSub;
+      Text:=Copy(Text,I+length(FromSub),MaxInt);
+    end;
+    I:=Pos(FromSub,Text);
+  end;
+  result:=result+Text;
 end;
 
 Type TByteArray=Array[0..MaxInt-1] of Byte;
@@ -278,7 +301,7 @@ begin
     If (length(Path)>=length(Rel)) and (ExtUpperCase(Copy(Path,1,length(Rel)))=ExtUpperCase(Rel)) then
       Path:='.\'+Copy(Path,length(Rel)+1,MaxInt);
   end;
-  If Path='.\' then Path:='';
+  If (Path='.\') or (Path='\') then Path:='';
   result:=Path+FileName;
 
   if NoEmptyRelPath and (result='') then result:='.\';
@@ -295,6 +318,7 @@ begin
 
   Path:=Trim(Path);
   If Copy(Path,1,2)='.\' then Path:=Trim(Copy(Path,3,MaxInt));
+  If Copy(Path,1,1)='\' then Path:=Trim(Copy(Path,2,MaxInt));
 
   result:=Rel+Path;
 end;
@@ -942,20 +966,21 @@ end;
 
 Function GetFileDate(const FileName : String) : TDateTime;
 Var hFile : THandle;
-    CreationTime, AccessTime, WriteTime : TFileTime;
-    SystemTime : TSystemTime;
 begin
   result:=0;
 
   hFile:=CreateFile(PChar(FileName),GENERIC_READ,FILE_SHARE_DELETE or FILE_SHARE_READ or FILE_SHARE_WRITE,nil,OPEN_EXISTING,0,0);
   if hFile=INVALID_HANDLE_VALUE then exit;
   try
-    if not GetFileTime(hFile,@CreationTime,@AccessTime,@WriteTime) then exit;
-    if not FileTimeToSystemTime(CreationTime,SystemTime) then exit;
-    result:=SystemTimeToDateTime(SystemTime);
+    result:=FileDateToDateTime(FileGetDate(hFile));
   finally
     CloseHandle(hFile);
   end;
+end;
+
+Function GetDosFileDate(const FileName : String) : Integer;
+begin
+  result:=DateTimeToFileDate(GetFileDate(FileName));
 end;
 
 Function GetFileDateAsString : String;
@@ -1123,6 +1148,34 @@ begin
   end;
 end;
 
+function LoadIconFromExeFile(const AFileName: String): TIcon;
+Var FileInfo: SHFILEINFO;
+    I : Integer;
+    Handle : THandle;
+    OK : Boolean;
+begin
+  result:=nil;
+  If not FileExists(AFileName) then exit;
+
+  result:=TIcon.Create;
+  try
+    If ExtUpperCase(ExtractFileExt(AFileName))='.EXE' then begin
+      If SHGetFileInfo(PChar(AFileName), 0, FileInfo, SizeOf(FileInfo), SHGFI_ICON or SHGFI_LARGEICON)<>0 then result.Handle:=FileInfo.hIcon;
+    end else begin
+      I:=16; OK:=False;
+      while I<=256 do begin
+        Handle:=LoadImage(0,PChar(AFileName),IMAGE_ICON,I,I,LR_LOADFROMFILE);
+        If Handle<>0 then begin result.Handle:=Handle; OK:=True; end;
+        I:=I*2;
+      end;
+      If not OK then FreeAndNil(result);
+    end;
+  except
+    FreeAndNil(result);
+    exit;
+  end;
+end;
+
 Function LoadImageFromFile(const FileName : String) : TPicture;
 Var Ext : String;
     GIFImage : TGIFImage;
@@ -1147,6 +1200,41 @@ begin
     result.LoadFromFile(FileName);
   except
     If result<>nil then FreeAndNil(result);
+  end;
+end;
+
+Function LoadImageAsIconFromFile(const FileName : String) : TIcon;
+Var P : TPicture;
+    IL : TImageList;
+    C : TColor;
+    B : TBitmap;
+begin
+  result:=nil;
+
+  If ExtUpperCase(ExtractFileExt(FileName))='.EXE' then begin result:=LoadIconFromExeFile(FileName); exit; end;
+
+  P:=LoadImageFromFile(FileName); If P=nil then exit;
+  try
+    IL:=TImageList.Create(nil);
+    IL.Width:=256; IL.Height:=256;
+    try
+      B:=TBitmap.Create;
+      try
+        B.SetSize(IL.Width,IL.Height);
+        ScaleImage(P,B);
+        C:=B.Canvas.Pixels[0,B.Height-1];
+        IL.AddMasked(B,C);
+
+        result:=TIcon.Create;
+        IL.GetIcon(0,result);
+      finally
+        B.Free;
+      end;
+    finally
+      IL.Free;
+    end;
+  finally
+    P.Free;
   end;
 end;
 
@@ -1584,17 +1672,20 @@ begin
 end;
 
 Function BaseDirSecuriryCheck(const DirToDelete : String) : Boolean;
+begin
+  result:=BaseDirSecuriryCheckOnly(DirToDelete);
+  If not result then MessageDlg(Format(LanguageSetup.MessageDeleteErrorProtection,[IncludeTrailingPathDelimiter(DirToDelete)]),mtError,[mbOk],0);
+end;
+
+Function BaseDirSecuriryCheckOnly(const DirToDelete : String) : Boolean;
 Var S, Folder : String;
 begin
   result:=True;
   If not PrgSetup.DeleteOnlyInBaseDir then exit;
-
-  if not DirectoryExists(Folder) then exit;
-
   Folder:=IncludeTrailingPathDelimiter(DirToDelete);
+  if not DirectoryExists(Folder) then exit;
   S:=ShortName(PrgSetup.BaseDir);
   If ExtUpperCase(Copy(ShortName(Folder),1,length(S)))=ExtUpperCase(S) then exit;
-  MessageDlg(Format(LanguageSetup.MessageDeleteErrorProtection,[Folder]),mtError,[mbOk],0);
   result:=False;
 end;
 
@@ -2038,6 +2129,91 @@ begin
     FSt1.Free;
   end;
   result:=True;
+end;
+
+Function GetFileList(const Folder : String; const Exts : Array of String) : TStringList;
+Var Rec : TSearchRec;
+    I,J : Integer;
+begin
+  result:=TStringList.Create;
+
+  For I:=Low(Exts) to High(Exts) do begin
+    J:=FindFirst(IncludeTrailingPathDelimiter(Folder)+'*.'+Exts[I],faAnyFile,Rec);
+    try
+      While J=0 do begin
+        If (Rec.Attr and faDirectory)=0 then result.Add(Rec.Name);
+        J:=FindNext(Rec);
+      end;
+    finally
+      FindClose(Rec);
+    end;
+  end;
+
+  result.Sort;
+end;
+
+Function RenameAllFiles(const Folder, Expression, GameName : String; const RenameFiles : TRenameFiles; const ShowNoFilesInfo : Boolean) : Boolean;
+const RequiredPlaceholders : Array[0..1] of String = ('%N','%E');
+      ScreenshotExts : Array[0..4] of String = ('jpg','jpeg','png','gif','bmp');
+      SoundsExts : Array[0..4] of String = ('wav','mp3','ogg','mid','midi');
+      VideosExts : Array[0..4] of String = ('avi','mpeg','mpg','wmv','asf');
+Var I,J : Integer;
+    St : TStringList;
+    Template,NewName,Nr,Ext,Dir,S : String;
+begin
+  result:=False;
+  Dir:=IncludeTrailingPathDelimiter(Folder);
+
+  {Expression ok?}
+  For I:=Low(RequiredPlaceholders) to High(RequiredPlaceholders) do if Pos(RequiredPlaceholders[I],Expression)=0 then begin
+    MessageDlg(Format(LanguageSetup.RenameAllPlaceholderError,[RequiredPlaceholders[I]]),mtError,[mbOK],0);
+    exit;
+  end;
+
+  {Create list of files to rename}
+  Case RenameFiles of
+    rfScreenshots : St:=GetFileList(Dir,ScreenshotExts);
+    rfSounds : St:=GetFileList(Dir,SoundsExts);
+    rfVideos : St:=GetFileList(Dir,VideosExts);
+    else exit;
+  End;
+
+  {Process files}
+  result:=True;
+  try
+    If St.Count=0 then begin
+      If ShowNoFilesInfo then MessageDlg(Format(LanguageSetup.RenameAllNoFiles,[Folder]),mtInformation,[mbOK],0);
+      exit;
+    end;
+    Template:=Expression;
+    I:=Pos('%P',Template); If I>0 then Template:=Copy(Template,1,I-1)+MakeFileSysOKFolderName(GameName)+Copy(Template,I+2,MaxInt);
+
+    For I:=0 to St.Count-1 do begin
+      NewName:=Template;
+      Ext:=ExtractFileExt(St[I]); If (Ext<>'') and (Ext[1]='.') then Ext:=Copy(Ext,2,MaxInt);
+      Nr:=IntToStr(I+1); while length(Nr)<Round(Ceil(Log10(St.Count+1))) do Nr:='0'+Nr;
+      J:=Pos('%N',NewName); If J>0 then NewName:=Copy(NewName,1,J-1)+Nr+Copy(NewName,J+2,MaxInt);
+      J:=Pos('%E',NewName); If J>0 then NewName:=Copy(NewName,1,J-1)+Ext+Copy(NewName,J+2,MaxInt);
+
+      {File has already correct name?}
+      If St[I]=NewName then continue;
+
+      {File with new name already existing?}
+      For J:=I+1 to St.Count-1 do begin
+        If ExtUpperCase(NewName)=ExtUpperCase(St[J]) then begin
+          S:=ExtractFileExt(St[J]); If S='' then S:='.';
+          S:=Copy(St[J],1,length(St[J])-length(S))+'_'+IntToStr(J+1)+S;
+          RenameFile(Dir+St[J],Dir+S);
+          St[J]:=S;
+        end;
+      end;
+
+      {Rename file}
+      RenameFile(Dir+St[I],Dir+NewName);
+    end;
+  finally
+    St.Free;
+  end;
 end;
 
 { This method was discovered by user DRON from www.delphikingdom.com site }

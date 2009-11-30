@@ -20,7 +20,7 @@ type
   public
     { Public-Deklarationen }
     Function GetName : String;
-    Procedure InitGUIAndLoadSetup(InitData : TInitData);
+    Procedure InitGUIAndLoadSetup(var InitData : TInitData);
     Procedure BeforeChangeLanguage;
     Procedure LoadLanguage;
     Procedure DOSBoxDirChanged;
@@ -43,7 +43,7 @@ begin
   result:=LanguageSetup.SetupFormListViewSheet2b;
 end;
 
-procedure TSetupFrameGamesListScreenshotModeAppearance.InitGUIAndLoadSetup(InitData: TInitData);
+procedure TSetupFrameGamesListScreenshotModeAppearance.InitGUIAndLoadSetup(var InitData: TInitData);
 begin
   NoFlicker(WidthEdit);
   NoFlicker(HeightEdit);

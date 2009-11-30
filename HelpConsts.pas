@@ -49,6 +49,7 @@ const ID_Index=1;
       ID_FileOptionsUserInterpreters=1131;
       ID_FileOptionsImageScaling=1132;
       ID_FileOptionsMoreEmulator=1133;
+      ID_FileOptionsAutomaticConfiguration=1134;
 
       ID_ViewQuickStarter=1501;
 
@@ -67,6 +68,7 @@ const ID_Index=1;
       ID_ProfileMarkAsFavorite=2013;
       ID_ProfileCreateShortCut=2014;
       ID_ProfileSearchGame=2015;
+      ID_ProfileInstallationSupport=2016;
 
       ID_FileEdit=2100;
       ID_ProfileEditProfile=2101;
@@ -113,6 +115,7 @@ const ID_Index=1;
       ID_ExtrasCheckProfiles=3017;
       ID_ExtrasCreateShortcuts=3018;
       ID_ExtrasLanguageEditor=3019;
+      ID_ExtrasImageFromProfile=3020;
 
       ID_HelpForum=4001;
       ID_HelpStatistics=4003;

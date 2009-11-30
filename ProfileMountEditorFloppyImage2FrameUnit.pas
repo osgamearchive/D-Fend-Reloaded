@@ -152,7 +152,7 @@ begin
     MessageDlg(LanguageSetup.MessageNoImageSelected,mtError,[mbOK],0);
     exit;
   end;
-  If Trim(FloppyImageTab.Cells[0,FloppyImageTab.Row])='' then S:=InfoData.DefaultInitialDir else S:=FloppyImageTab.Cells[0,FloppyImageTab.Row];
+  If Trim(FloppyImageTab.Cells[0,FloppyImageTab.Row])='' then S:=PrgSetup.BaseDir else S:=FloppyImageTab.Cells[0,FloppyImageTab.Row];
   S:=MakeAbsPath(S,PrgSetup.BaseDir);
   OpenDialog.DefaultExt:='iso';
   OpenDialog.InitialDir:=ExtractFilePath(S);

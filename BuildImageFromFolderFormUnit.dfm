@@ -3,7 +3,7 @@ object BuildImageFromFolderForm: TBuildImageFromFolderForm
   Top = 0
   BorderStyle = bsDialog
   Caption = 'Imagedatei von Ordnerinhalt erstellen'
-  ClientHeight = 244
+  ClientHeight = 377
   ClientWidth = 493
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -16,6 +16,10 @@ object BuildImageFromFolderForm: TBuildImageFromFolderForm
   Position = poOwnerFormCenter
   OnCreate = FormCreate
   OnKeyDown = FormKeyDown
+  OnShow = FormShow
+  DesignSize = (
+    493
+    377)
   PixelsPerInch = 96
   TextHeight = 13
   object FileNameButton: TSpeedButton
@@ -67,19 +71,21 @@ object BuildImageFromFolderForm: TBuildImageFromFolderForm
   end
   object OKButton: TBitBtn
     Left = 8
-    Top = 211
+    Top = 346
     Width = 97
     Height = 25
-    TabOrder = 6
+    Anchors = [akLeft, akBottom]
+    TabOrder = 10
     OnClick = OKButtonClick
     Kind = bkOK
   end
   object CancelButton: TBitBtn
     Left = 120
-    Top = 211
+    Top = 346
     Width = 97
     Height = 25
-    TabOrder = 7
+    Anchors = [akLeft, akBottom]
+    TabOrder = 11
     Kind = bkCancel
   end
   object FolderEdit: TLabeledEdit
@@ -104,51 +110,89 @@ object BuildImageFromFolderForm: TBuildImageFromFolderForm
   end
   object MakeBootableCheckBox: TCheckBox
     Left = 8
-    Top = 112
+    Top = 176
     Width = 478
     Height = 17
-    Caption = 'Diskettenimage bootf'#228'hig machen'
-    TabOrder = 2
+    Caption = 'Make floppy image bootable'
+    TabOrder = 3
     OnClick = MakeBootableCheckBoxClick
   end
-  object MakeBootableWithKeyboardDriverCheckBox: TCheckBox
+  object AddKeyboardDriverCheckBox: TCheckBox
     Left = 8
-    Top = 135
+    Top = 199
     Width = 478
     Height = 17
-    Caption = 'Tastaturtreiber einbinden'
+    Caption = 'Use DOSBox default keyboard layout on bootdisk'
     Enabled = False
-    TabOrder = 3
+    TabOrder = 4
   end
   object WriteToFloppyCheckBox: TCheckBox
     Left = 8
-    Top = 181
+    Top = 314
     Width = 478
     Height = 17
     Caption = 'Fertiges Image auf reale Diskette schreiben'
-    TabOrder = 5
+    TabOrder = 9
   end
-  object MakeBootableWithMouseDriverCheckBox: TCheckBox
+  object AddMouseDriverCheckBox: TCheckBox
     Left = 8
-    Top = 158
+    Top = 222
     Width = 477
     Height = 17
     Caption = 'Include mouse driver on bootdisk'
     Enabled = False
-    TabOrder = 4
+    TabOrder = 5
   end
   object HelpButton: TBitBtn
     Left = 232
-    Top = 211
+    Top = 346
     Width = 97
     Height = 25
-    TabOrder = 8
+    Anchors = [akLeft, akBottom]
+    TabOrder = 12
     OnClick = HelpButtonClick
     Kind = bkHelp
   end
+  object AddFormatCheckBox: TCheckBox
+    Left = 8
+    Top = 268
+    Width = 516
+    Height = 17
+    Caption = 'Add disk management utilities'
+    TabOrder = 7
+  end
+  object AddEditCheckbox: TCheckBox
+    Left = 8
+    Top = 291
+    Width = 477
+    Height = 17
+    Caption = 'Add text editor'
+    TabOrder = 8
+  end
+  object ImageTypeGroupBox: TRadioGroup
+    Left = 8
+    Top = 99
+    Width = 449
+    Height = 62
+    Caption = 'Image type'
+    ItemIndex = 0
+    Items.Strings = (
+      'Floppy disk image'
+      'Harddisk image')
+    TabOrder = 2
+    OnClick = ImageTypeGroupBoxClick
+  end
+  object MemoryManagerCheckBox: TCheckBox
+    Left = 8
+    Top = 245
+    Width = 477
+    Height = 17
+    Caption = 'Use memory manager on disk image'
+    TabOrder = 6
+  end
   object SaveDialog: TSaveDialog
     DefaultExt = 'img'
-    Left = 272
-    Top = 170
+    Left = 416
+    Top = 10
   end
 end

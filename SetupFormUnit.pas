@@ -6,19 +6,25 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, ComCtrls, ExtCtrls, StdCtrls, Buttons, ImgList, Menus, GameDBUnit;
 
+Type TFrameClass=class of TFrame; 
+
 Type TSimpleEvent=Procedure of object;
      TOpenLanguageEditorEvent=Procedure(const Mode : Integer) of object;
+     TCloseCheckEvent=Procedure(var CloseOK : Boolean) of object;
+     TGetFrameFunction=Function(const FrameClass : TFrameClass) : TFrame of object;
 
 Type TInitData=record
   BeforeLanguageChangeNotify, LanguageChangeNotify, DosBoxDirChangeNotify : TSimpleEvent;
   PDosBoxDir, PBaseDir, PDOSBoxLang : PString;
   GameDB : TGameDB;
   OpenLanguageEditorEvent : TOpenLanguageEditorEvent;
+  CloseCheckEvent : TCloseCheckEvent;
+  GetFrame : TGetFrameFunction;
 end;
 
 Type ISetupFrame=interface
   Function GetName : String;
-  Procedure InitGUIAndLoadSetup(InitData : TInitData);
+  Procedure InitGUIAndLoadSetup(var InitData : TInitData);
   Procedure BeforeChangeLanguage;
   Procedure LoadLanguage;
   Procedure DOSBoxDirChanged;
@@ -35,6 +41,7 @@ Type TFrameRecord=record
   ParentFrame : TFrame;
   ImageIndex : Integer;
   IsEmpty : Boolean;
+  CloseCheckEvent : TCloseCheckEvent;
 end;
 
 Type TOpenMode=(omNormal, omLanguage, omTreeList, omToolbar, omIconSet);
@@ -78,6 +85,8 @@ type
     Procedure OpenLanguageEditor(const Mode : Integer);
     Function FindNodeFromFrame(const F : TFrame) : TTreeNode;
     Procedure PopupClick(Sender : TObject);
+    Procedure SelectFrame(const Nr : Integer);
+    Function GetFrame(const FrameClass : TFrameClass) : TFrame;
   public
     { Public-Deklarationen }
     OpenMode : TOpenMode;
@@ -110,7 +119,8 @@ uses Math, VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgSetupUnit,
      SetupFrameEditorUnit, SetupFrameViewerUnit, SetupFrameWindowsGamesUnit,
      SetupFrameZipPrgsUnit, SetupFrameCustomLanguageStringsUnit,
      SetupFrameGameListIconModeAppearanceUnit, SetupFrameUserInterpreterFrameUnit,
-     SetupFrameImageScalingUnit, SetupFrameMoreEmulatorsUnit;
+     SetupFrameImageScalingUnit, SetupFrameMoreEmulatorsUnit,
+     SetupFrameAutomaticConfigurationUnit;
 
 {$R *.dfm}
 
@@ -163,33 +173,51 @@ begin
   If Tree.Selected<>nil then Tree.Selected.MakeVisible;
 end;
 
+function TSetupForm.GetFrame(const FrameClass: TFrameClass): TFrame;
+Var I : Integer;
+begin
+  result:=nil;
+  For I:=0 to length(Frames)-1 do If Frames[I].Frame is FrameClass then begin result:=Frames[I].Frame; exit; end;
+end;
+
 Procedure TSetupForm.AddTreeNode(const ParentFrame, NewFrame : TFrame; NewFrameInterface : ISetupFrame; const AdvencedModeOnly : Boolean; const ImageIndex : Integer; const IsEmpty : Boolean);
 Var C : Integer;
     InitData : TInitData;
 begin
+  with InitData do begin
+    LanguageChangeNotify:=LoadLanguage;
+    DosBoxDirChangeNotify:=DOSBoxDirChanged;
+    OpenLanguageEditorEvent:=OpenLanguageEditor;
+    PDosBoxDir:=@InternalDOSBoxDir;
+    PDOSBoxLang:=@InternalDOSBoxLang;
+    PBaseDir:=@InternalBaseDir;
+    CloseCheckEvent:=nil;
+  end;
   InitData.BeforeLanguageChangeNotify:=BeforeChangeLanguage;
-  InitData.LanguageChangeNotify:=LoadLanguage;
-  InitData.DosBoxDirChangeNotify:=DOSBoxDirChanged;
-  InitData.OpenLanguageEditorEvent:=OpenLanguageEditor;
-  InitData.PDosBoxDir:=@InternalDOSBoxDir;
-  InitData.PDOSBoxLang:=@InternalDOSBoxLang;
-  InitData.PBaseDir:=@InternalBaseDir;
   InitData.GameDB:=GameDB;
+  InitData.GetFrame:=GetFrame;
 
   C:=length(Frames);
-  NewFrame.Parent:=RightPanel; NewFrame.Align:=alClient; NewFrame.Visible:=False;
-  NewFrame.Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName);
+  with NewFrame do begin
+    Visible:=False;
+    Parent:=RightPanel;
+    Align:=alClient;
+    Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName);
+    DoubleBuffered:=True;
+  end;
   SetLength(Frames,C+1);
-  Frames[C].Frame:=NewFrame;
-  Frames[C].IFrame:=NewFrameInterface;
+  with Frames[C] do begin
+    Frame:=NewFrame;
+    IFrame:=NewFrameInterface;
+  end;
   Frames[C].AdvencedModeOnly:=AdvencedModeOnly;
   Frames[C].ParentFrame:=ParentFrame;
   Frames[C].ImageIndex:=ImageIndex;
   Frames[C].IsEmpty:=IsEmpty;
-  NewFrame.DoubleBuffered:=True;
-  NewFrame.Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName);
+
   try
     NewFrameInterface.InitGUIAndLoadSetup(InitData);
+    Frames[C].CloseCheckEvent:=InitData.CloseCheckEvent;
   except
     on E : Exception do MessageDlg(E.Message,mtError,[mbOk],0);
   end;
@@ -215,12 +243,13 @@ begin
   F:=TSetupFrameGamesListScreenshotModeAppearance.Create(self); AddTreeNode(Root2,F,TSetupFrameGamesListScreenshotModeAppearance(F),True,20);
   F:=TSetupFrameGameListIconModeAppearance.Create(self); AddTreeNode(Root2,F,TSetupFrameGameListIconModeAppearance(F),True,21);
   F:=TSetupFrameGamesListScreenshotAppearance.Create(self); AddTreeNode(Root,F,TSetupFrameGamesListScreenshotAppearance(F),True,18);
-  If PrgSetup.ActivateIncompleteFeatures then begin
-    F:=TSetupFrameImageScaling.Create(self); AddTreeNode(Root,F,TSetupFrameImageScaling(F),True,18);
-  end;
+  F:=TSetupFrameImageScaling.Create(self); AddTreeNode(Root,F,TSetupFrameImageScaling(F),True,18);
 
   F:=TSetupFrameProfileEditor.Create(self); AddTreeNode(nil,F,TSetupFrameProfileEditor(F),True,8); Root:=F;
   F:=TSetupFrameDefaultValues.Create(self); AddTreeNode(Root,F,TSetupFrameDefaultValues(F),True,6);
+  If PrgSetup.ActivateIncompleteFeatures then begin
+    F:=TSetupFrameAutomaticConfiguration.Create(self); AddTreeNode(Root,F,TSetupFrameAutomaticConfiguration(F),True,24);
+  end;
 
   F:=TSetupFramePrograms.Create(self); AddTreeNode(nil,F,TSetupFramePrograms(F),False,0,True); Root:=F;
   F:=TSetupFrameDOSBox.Create(self); AddTreeNode(Root,F,TSetupFrameDOSBox(F),False,4); Root2:=F;
@@ -229,9 +258,7 @@ begin
   F:=TSetupFrameQBasic.Create(self); AddTreeNode(Root,F,TSetupFrameQBasic(F),False,11);
   F:=TSetupFrameUserInterpreterFrame.Create(self); AddTreeNode(Root,F,TSetupFrameUserInterpreterFrame(F),True,23);
   F:=TSetupFrameScummVM.Create(self); AddTreeNode(Root,F,TSetupFrameScummVM(F),False,10);
-  If PrgSetup.ActivateIncompleteFeatures then begin
-    F:=TSetupFrameMoreEmulators.Create(self); AddTreeNode(Root,F,TSetupFrameMoreEmulators(F),True,23);
-  end;
+  F:=TSetupFrameMoreEmulators.Create(self); AddTreeNode(Root,F,TSetupFrameMoreEmulators(F),True,23);
   F:=TSetupFrameWaveEncoder.Create(self); AddTreeNode(Root,F,TSetupFrameWaveEncoder(F),False,9,False);
   F:=TSetupFrameZipPrgs.Create(self); AddTreeNode(Root,F,TSetupFrameZipPrgs(F),True,16,False);
   F:=TSetupFrameEditor.Create(self); AddTreeNode(Root,F,TSetupFrameEditor(F),True,17,False);
@@ -330,6 +357,15 @@ begin
   If Tree.Selected<>nil then Tree.Selected.MakeVisible;
 end;
 
+Procedure TSetupForm.SelectFrame(const Nr : Integer);
+begin
+  If Nr=-1 then TopPanel.Caption:='' else begin
+    Frames[Nr].Frame.Visible:=True;
+    Frames[Nr].IFrame.ShowFrame(SetAdvanced or (ModeComboBox.ItemIndex=1));
+    TopPanel.Caption:=' '+Frames[Nr].IFrame.GetName;
+  end;
+end;
+
 procedure TSetupForm.TreeChange(Sender: TObject; Node: TTreeNode);
 begin
   If (Tree.Selected<>nil) and (Integer(Tree.Selected.Data)=VisibleFrame) then exit;
@@ -341,11 +377,7 @@ begin
 
   If Tree.Selected=nil then VisibleFrame:=-1 else VisibleFrame:=Integer(Tree.Selected.Data);
 
-  If VisibleFrame=-1 then TopPanel.Caption:='' else begin
-    Frames[VisibleFrame].Frame.Visible:=True;
-    Frames[VisibleFrame].IFrame.ShowFrame(SetAdvanced or (ModeComboBox.ItemIndex=1));
-    TopPanel.Caption:=' '+Frames[VisibleFrame].IFrame.GetName;
-  end;
+  SelectFrame(VisibleFrame);
 end;
 
 procedure TSetupForm.PopupClick(Sender: TObject);
@@ -410,9 +442,22 @@ begin
 end;
 
 procedure TSetupForm.OKButtonClick(Sender: TObject);
-Var I : Integer;
+Var I,J : Integer;
+    B : Boolean;
 begin
-  If VisibleFrame>=0 then Frames[VisibleFrame].IFrame.HideFrame;
+  If VisibleFrame>=0 then begin
+    Frames[VisibleFrame].IFrame.HideFrame;
+    Frames[VisibleFrame].Frame.Visible:=False;
+  end;
+
+  For I:=0 to length(Frames)-1 do If Assigned(Frames[I].CloseCheckEvent) then begin
+    B:=True; Frames[I].CloseCheckEvent(B); If not B then begin
+      SelectFrame(I);
+      For J:=0 to Tree.Items.Count-1 do If Integer(Tree.Items[J].Data)=I then begin Tree.Selected:=Tree.Items[I]; break; end;
+      ModalResult:=mrNone; exit;
+    end;
+  end;
+
   If not SetAdvanced then PrgSetup.EasySetupMode:=(ModeComboBox.ItemIndex=0);
   For I:=0 to length(Frames)-1 do Frames[I].IFrame.SaveSetup;
 end;

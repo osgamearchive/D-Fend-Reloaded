@@ -1,0 +1,23 @@
+[Messages]
+ReadWrite.NoFloppyDrive=There is no floppy drive connected to your System.
+ReadWrite.NoCDDrive=There is no CD drive connected to your System.
+
+[Menu]
+Extras.TransferProfiles=&Transfer programs...
+
+[ProfileMountingForm]
+ZipRepack.FromNormalMount.SecurityError=The folder %s is outside the D-Fend Reloaded directory structure. For security reasons it is not allowed to pack and delete folders outside the base directory.
+
+[UpdateCheck]
+UpdateDownloadFailed.StringBeforeURL=Cannot access
+UpdateDownloadFailed.StringAfterURL=
+SingleInstanceMessage=The update checker is already running. Please wait for the update checker to finish before starting it again.
+
+[LanguageEditor]
+Table.Identifier=Identifier
+Table.English=English
+
+[PackageManager]
+License=
+Description=Description
+Author=Author

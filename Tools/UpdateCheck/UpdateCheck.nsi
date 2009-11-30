@@ -81,6 +81,8 @@ Function ReadSetupFile
   
   !insertmacro ReadLine $MessageCannotFindFile
   !insertmacro ReadLine $MessageDownloadFailed
+  !insertmacro ReadLine $MessageDownloadFailedBeforeURL
+  !insertmacro ReadLine $MessageDownloadFailedAfterURL
   !insertmacro ReadLine $MessageDownload1
   !insertmacro ReadLine $MessageDownload2
   !insertmacro ReadLine $MessageDownload3

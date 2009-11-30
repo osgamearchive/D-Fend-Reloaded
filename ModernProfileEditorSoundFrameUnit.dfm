@@ -64,7 +64,7 @@ object ModernProfileEditorSoundFrame: TModernProfileEditorSoundFrame
       Width = 82
       Height = 21
       Style = csDropDownList
-      ItemHeight = 0
+      ItemHeight = 13
       TabOrder = 0
     end
     object BlockSizeComboBox: TComboBox
@@ -72,7 +72,7 @@ object ModernProfileEditorSoundFrame: TModernProfileEditorSoundFrame
       Top = 51
       Width = 82
       Height = 21
-      ItemHeight = 0
+      ItemHeight = 13
       TabOrder = 1
     end
     object PreBufferComboBox: TComboBox
@@ -80,7 +80,7 @@ object ModernProfileEditorSoundFrame: TModernProfileEditorSoundFrame
       Top = 51
       Width = 82
       Height = 21
-      ItemHeight = 0
+      ItemHeight = 13
       TabOrder = 2
     end
   end
@@ -99,7 +99,7 @@ object ModernProfileEditorSoundFrame: TModernProfileEditorSoundFrame
     Width = 82
     Height = 21
     Style = csDropDownList
-    ItemHeight = 0
+    ItemHeight = 13
     TabOrder = 3
   end
   object TandyRadioGroup: TRadioGroup
@@ -120,7 +120,7 @@ object ModernProfileEditorSoundFrame: TModernProfileEditorSoundFrame
     Width = 82
     Height = 21
     Style = csDropDownList
-    ItemHeight = 0
+    ItemHeight = 13
     TabOrder = 5
   end
   object ActivateDisneyCheckBox: TCheckBox

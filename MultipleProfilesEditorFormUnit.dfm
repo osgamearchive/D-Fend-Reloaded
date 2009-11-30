@@ -28,12 +28,16 @@ object MultipleProfilesEditorForm: TMultipleProfilesEditorForm
     Top = 0
     Width = 645
     Height = 390
-    ActivePage = TabSheet2
+    ActivePage = TabSheet1
     Align = alTop
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 0
     object TabSheet1: TTabSheet
       Caption = 'TabSheet1'
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       DesignSize = (
         637
         362)
@@ -89,6 +93,10 @@ object MultipleProfilesEditorForm: TMultipleProfilesEditorForm
     object TabSheet2: TTabSheet
       Caption = 'TabSheet2'
       ImageIndex = 1
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object ScrollBox: TScrollBox
         Left = 0
         Top = 0
@@ -142,7 +150,7 @@ object MultipleProfilesEditorForm: TMultipleProfilesEditorForm
     Left = 464
     Top = 392
     Bitmap = {
-      494C010103000400040010001000FFFFFFFFFF00FFFFFFFFFFFFFFFF424D3600
+      494C010103000400040010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000001000000001002000000000000010
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -278,6 +286,7 @@ object MultipleProfilesEditorForm: TMultipleProfilesEditorForm
       FFFFBFFDBFFD0000FFFFBE7DBFFD0000C00FBE7DBFFD00008007BE7DBFFD0000
       8003BE7DBFFD00008001A005A00500008001A005A0050000800FBE7DBFFD0000
       800FBE7DBFFD0000801FBE7DBFFD0000C0FFBE7DBFFD0000C0FFBFFDBFFD0000
-      FFFF800180010000FFFFFFFFFFFF0000}
+      FFFF800180010000FFFFFFFFFFFF000000000000000000000000000000000000
+      000000000000}
   end
 end

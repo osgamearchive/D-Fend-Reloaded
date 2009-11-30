@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, 
-  Dialogs, SetupFormUnit, Buttons, StdCtrls, ExtCtrls;
+  Dialogs, Buttons, StdCtrls, ExtCtrls, SetupFormUnit;
 
 type
   TSetupFrameFreeDOS = class(TFrame, ISetupFrame)
@@ -21,7 +21,7 @@ type
   public
     { Public-Deklarationen }
     Function GetName : String;
-    Procedure InitGUIAndLoadSetup(InitData : TInitData);
+    Procedure InitGUIAndLoadSetup(var InitData : TInitData);
     Procedure BeforeChangeLanguage;
     Procedure LoadLanguage;
     Procedure DOSBoxDirChanged;
@@ -45,7 +45,7 @@ begin
   result:=LanguageSetup.SetupFormFreeDOS;
 end;
 
-procedure TSetupFrameFreeDOS.InitGUIAndLoadSetup(InitData: TInitData);
+procedure TSetupFrameFreeDOS.InitGUIAndLoadSetup(var InitData: TInitData);
 begin
   PBaseDir:=InitData.PBaseDir;
 

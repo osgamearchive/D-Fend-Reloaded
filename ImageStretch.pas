@@ -7,6 +7,8 @@ uses Graphics;
 
 Function ScaleImage(const SourcePic : TPicture; const Factor : Double) : TBitmap; overload;
 Procedure ScaleImage(const Source, Dest : TBitmap; const DestW, DestH : Integer; const UseFiltering : Boolean = True); overload;
+Procedure ScaleImage(const Source, Dest : TBitmap; const UseFiltering : Boolean = True); overload;
+Procedure ScaleImage(const Source : TPicture; const Dest : TBitmap; const UseFiltering : Boolean = True); overload;
 
 implementation
 
@@ -99,6 +101,25 @@ begin
     Dest.Canvas.StretchDraw(Rect(W div 2,H div 2,Dest.Width-(W div 2),Dest.Height-(H div 2)),TempDest);
   finally
     TempDest.Free;
+  end;
+end;
+
+Procedure ScaleImage(const Source, Dest : TBitmap; const UseFiltering : Boolean);
+begin
+  ScaleImage(Source,Dest,Dest.Width,Dest.Height,UseFiltering);
+end;
+
+
+Procedure ScaleImage(const Source : TPicture; const Dest : TBitmap; const UseFiltering : Boolean);
+Var Temp : TBitmap;
+begin
+  Temp:=TBitmap.Create;
+  try
+    Temp.SetSize(Source.Width,Source.Height);
+    Temp.Canvas.Draw(0,0,Source.Graphic);
+    ScaleImage(Temp,Dest,UseFiltering);
+  finally
+    Temp.Free;
   end;
 end;
 

@@ -117,7 +117,7 @@ end;
 procedure TProfileMountEditorFloppyImage1Frame.FloppyImageButtonClick(Sender: TObject);
 Var S : String;
 begin
-  If Trim(FloppyImageEdit.Text)='' then S:=InfoData.DefaultInitialDir else S:=FloppyImageEdit.Text;
+  If Trim(FloppyImageEdit.Text)='' then S:=PrgSetup.BaseDir else S:=FloppyImageEdit.Text;
   S:=MakeAbsPath(S,PrgSetup.BaseDir);
   OpenDialog.DefaultExt:='img';
   OpenDialog.InitialDir:=ExtractFilePath(S);

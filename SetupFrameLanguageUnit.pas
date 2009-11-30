@@ -39,7 +39,7 @@ type
     Constructor Create(AOwner: TComponent); override;
     Destructor Destroy; override;
     Function GetName : String;
-    Procedure InitGUIAndLoadSetup(InitData : TInitData);
+    Procedure InitGUIAndLoadSetup(var InitData : TInitData);
     Procedure BeforeChangeLanguage;
     Procedure LoadLanguage;
     Procedure DOSBoxDirChanged;
@@ -76,7 +76,7 @@ begin
   result:=LanguageSetup.SetupFormLanguageSheet;
 end;
 
-procedure TSetupFrameLanguage.InitGUIAndLoadSetup(InitData: TInitData);
+procedure TSetupFrameLanguage.InitGUIAndLoadSetup(var InitData: TInitData);
 Var St : TStringList;
     I,J : Integer;
     S : String;

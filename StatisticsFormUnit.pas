@@ -59,22 +59,34 @@ end;
 
 { global }
 
+Function GetFileCount(const Mask : String) : Integer;
+Var I : Integer;
+    Rec : TSearchRec;
+begin
+  result:=0;
+
+  I:=FindFirst(Mask,faAnyFile,Rec);
+  try
+    while I=0 do begin inc(result); I:=FindNext(Rec); end;
+  finally
+    FindClose(Rec);
+  end;
+end;
+
 Function GetNumberOfIcons: Integer;
 Var Dir : String;
-    I : Integer;
-    Rec : TSearchRec;
 begin
   result:=0;
 
   Dir:=IncludeTrailingPathDelimiter(PrgDataDir+IconsSubDir);
   if not DirectoryExists(Dir) then exit;
 
-  I:=FindFirst(Dir+'*.ico',faAnyFile,Rec);
-  try
-    while I=0 do begin inc(result); I:=FindNext(Rec); end;
-  finally
-    FindClose(Rec);
-  end;
+  inc(result,GetFileCount(Dir+'*.ico'));
+  inc(result,GetFileCount(Dir+'*.png'));
+  inc(result,GetFileCount(Dir+'*.jpeg'));
+  inc(result,GetFileCount(Dir+'*.jpg'));
+  inc(result,GetFileCount(Dir+'*.gif'));
+  inc(result,GetFileCount(Dir+'*.bmp'));
 end;
 
 Procedure BuildStatistics(const GameDB : TGameDB; const St : TStringList);

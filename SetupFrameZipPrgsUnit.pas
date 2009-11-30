@@ -41,7 +41,7 @@ type
   public
     { Public-Deklarationen }
     Function GetName : String;
-    Procedure InitGUIAndLoadSetup(InitData : TInitData);
+    Procedure InitGUIAndLoadSetup(var InitData : TInitData);
     Procedure BeforeChangeLanguage;
     Procedure LoadLanguage;
     Procedure DOSBoxDirChanged;
@@ -77,7 +77,7 @@ begin
   result:=LanguageSetup.SetupFormExternalPackers;
 end;
 
-procedure TSetupFrameZipPrgs.InitGUIAndLoadSetup(InitData: TInitData);
+procedure TSetupFrameZipPrgs.InitGUIAndLoadSetup(var InitData: TInitData);
 Var I : Integer;
 begin
   NoFlicker(SelectComboBox);

@@ -136,7 +136,7 @@ begin
     MessageDlg(LanguageSetup.MessageNoImageSelected,mtError,[mbOK],0);
     exit;
   end;
-  If Trim(CDROMImageTab.Cells[0,CDROMImageTab.Row])='' then S:=InfoData.DefaultInitialDir else S:=CDROMImageTab.Cells[0,CDROMImageTab.Row];
+  If Trim(CDROMImageTab.Cells[0,CDROMImageTab.Row])='' then S:=PrgSetup.BaseDir else S:=CDROMImageTab.Cells[0,CDROMImageTab.Row];
   S:=MakeAbsPath(S,PrgSetup.BaseDir);
   OpenDialog.DefaultExt:='iso';
   OpenDialog.InitialDir:=ExtractFilePath(S);

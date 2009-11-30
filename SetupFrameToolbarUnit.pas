@@ -25,10 +25,11 @@ type
   private
     { Private-Deklarationen }
     PBaseDir : PString;
+    Procedure CloseCheck(var CloseOK : Boolean);
   public
     { Public-Deklarationen }
     Function GetName : String;
-    Procedure InitGUIAndLoadSetup(InitData : TInitData);
+    Procedure InitGUIAndLoadSetup(var InitData : TInitData);
     Procedure BeforeChangeLanguage;
     Procedure LoadLanguage;
     Procedure DOSBoxDirChanged;
@@ -52,7 +53,7 @@ begin
   result:=LanguageSetup.SetupFormToolbar;
 end;
 
-procedure TSetupFrameToolbar.InitGUIAndLoadSetup(InitData: TInitData);
+procedure TSetupFrameToolbar.InitGUIAndLoadSetup(var InitData: TInitData);
 Var I : Integer;
 begin
   NoFlicker(ShowToolbarCheckBox);
@@ -82,11 +83,9 @@ begin
   ToolbarImageEdit.Text:=PrgSetup.ToolbarBackground;
   ToolbarFontSizeEdit.Value:=PrgSetup.ToolbarFontSize;
 
-  UserIconLoader.DialogImage(DI_SelectFile,ToolbarImageButton);
-end;
+  InitData.CloseCheckEvent:=CloseCheck;
 
-procedure TSetupFrameToolbar.BeforeChangeLanguage;
-begin
+  UserIconLoader.DialogImage(DI_SelectFile,ToolbarImageButton);
 end;
 
 procedure TSetupFrameToolbar.LoadLanguage;
@@ -145,6 +144,19 @@ begin
   ToolbarImageCheckBox.Checked:=False;
   ToolbarImageEdit.Text:='';
   ToolbarFontSizeEdit.Value:=9;
+end;
+
+procedure TSetupFrameToolbar.BeforeChangeLanguage;
+begin
+
+end;
+
+Procedure TSetupFrameToolbar.CloseCheck(var CloseOK : Boolean);
+Var I : Integer;
+begin
+  For I:=0 to ButtonsListBox.Count-1 do If ButtonsListBox.Checked[I] then exit;
+  MessageDlg(LanguageSetup.SetupFormShowToolbarButtonsError,mtError,[mbOK],0);
+  CloseOK:=False;
 end;
 
 procedure TSetupFrameToolbar.SaveSetup;

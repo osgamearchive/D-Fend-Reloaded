@@ -154,7 +154,7 @@ object ProfileMountEditorZipFrame: TProfileMountEditorZipFrame
     Min = 10
     PageSize = 10
     Frequency = 100
-    Position = 105
+    Position = 10
     TabOrder = 2
     OnChange = ZipFolderFreeSpaceTrackbarChange
   end
@@ -171,7 +171,7 @@ object ProfileMountEditorZipFrame: TProfileMountEditorZipFrame
   end
   object RepackTypeComboBox: TComboBox
     Left = 16
-    Top = 243
+    Top = 240
     Width = 273
     Height = 21
     Style = csDropDownList
@@ -184,9 +184,50 @@ object ProfileMountEditorZipFrame: TProfileMountEditorZipFrame
       'Delete files in folder'
       'Delete files in folder and folder')
   end
+  object MakeNormalDriveButton: TBitBtn
+    Left = 16
+    Top = 274
+    Width = 297
+    Height = 25
+    Hint = 
+      'This function will extract the archive file and convert the moun' +
+      't into a normal directory mount'
+    Caption = 'Make normal drive from this mount'
+    ParentShowHint = False
+    ShowHint = True
+    TabOrder = 5
+    OnClick = MakeNormalDriveButtonClick
+    Glyph.Data = {
+      76010000424D7601000000000000760000002800000020000000100000000100
+      04000000000000010000120B0000120B00001000000000000000000000000000
+      800000800000008080008000000080008000808000007F7F7F00BFBFBF000000
+      FF0000FF000000FFFF00FF000000FF00FF00FFFF0000FFFFFF00333333333333
+      3333333333333333333333333333333333333333333333333333333333333333
+      33333FFFFFFFFFFFFFFF000000000000000077777777777777770F7777777777
+      77707F3F3333333333370F988888888888707F733FFFFFFFF3370F8800000000
+      88707F337777777733370F888888888888707F333FFFFFFFF3370F8800000000
+      88707F337777777733370F888888888888707F333333333333370F8888888888
+      88707F333333333333370FFFFFFFFFFFFFF07FFFFFFFFFFFFFF7000000000000
+      0000777777777777777733333333333333333333333333333333333333333333
+      3333333333333333333333333333333333333333333333333333}
+    NumGlyphs = 2
+  end
   object OpenDialog: TOpenDialog
     DefaultExt = 'iso'
     Left = 224
     Top = 150
+  end
+  object PopupMenu: TPopupMenu
+    Left = 320
+    Top = 272
+    object PopupExtractHere: TMenuItem
+      Caption = 'Extract files to selected folder'
+      OnClick = MakeNormalDriveButtonClick
+    end
+    object PopupExtractInGamesFolder: TMenuItem
+      Tag = 1
+      Caption = 'Extract files to subdirectory of the games folder'
+      OnClick = MakeNormalDriveButtonClick
+    end
   end
 end

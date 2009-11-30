@@ -49,7 +49,6 @@ type
     DBDir : String;
     MainPackageList, UserPackageList : TPackageListFile;
     JustLoading : Boolean;
-    AlreadyWarned : Boolean;
     Procedure LoadLists;
     Function GetDescription(const URL : String) : String;
   public
@@ -64,7 +63,8 @@ Function ShowPackageManagerRepositoriesEditDialog(const AOwner : TComponent) : B
 implementation
 
 uses Math, CommonTools, PrgSetupUnit, VistaToolsUnit, LanguageSetupUnit,
-     IconLoaderUnit, HelpConsts, PrgConsts, PackageDBToolsUnit;
+     IconLoaderUnit, HelpConsts, PrgConsts, PackageDBToolsUnit,
+     PackageManagerRepositoriesEditURLFormUnit;
 
 {$R *.dfm}
 
@@ -74,7 +74,6 @@ begin
   Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName);
 
   JustLoading:=False;
-  AlreadyWarned:=False;
 
   Caption:=LanguageSetup.RepositoriesEditor;
   ActivateButton.Caption:=LanguageSetup.RepositoriesEditorActivateSource;
@@ -91,7 +90,7 @@ begin
   CancelButton.Caption:=LanguageSetup.Cancel;
   HelpButton.Caption:=LanguageSetup.Help;
 
-  //... Complete ImagesList customization in 0.9
+  UserIconLoader.DialogImage(DI_Activate,ImageList,0);
   UserIconLoader.DialogImage(DI_Add,ImageList,1);
   UserIconLoader.DialogImage(DI_Edit,ImageList,2);
   UserIconLoader.DialogImage(DI_Delete,ImageList,3);
@@ -104,6 +103,7 @@ begin
 
   MainPackageList:=TPackageListFile.Create(True);
   MainPackageList.LoadFromFile(DBDir+PackageDBMainFile);
+  If MainPackageList.Count=0 then MainPackageList.UpdateFromServer(Format(PackageDBMainFileURL,[GetNormalFileVersionAsString]),DBDir+PackageDBTempFile,False);
 
   UserPackageList:=TPackageListFile.Create(False);
   UserPackageList.LoadFromFile(DBDir+PackageDBUserFile);
@@ -124,8 +124,8 @@ end;
 procedure TPackageManagerRepositoriesEditForm.FormDestroy(Sender: TObject);
 begin
   JustLoading:=True;
-  MainPackageList.Free;
-  UserPackageList.Free;
+  FreeAndNil(MainPackageList);
+  FreeAndNil(UserPackageList);
 end;
 
 Function TPackageManagerRepositoriesEditForm.GetDescription(const URL : String) : String;
@@ -134,8 +134,15 @@ Var PackageList : TPackageList;
 begin
   result:='';
 
-  FileName:=DBDir+ExtractFileNameFromURL(URL);
-  If not FileExists(FileName) then exit;
+  FileName:=DBDir+ExtractFileNameFromURL(URL,'.xml');
+  If not FileExists(FileName) then begin
+    If (ExtUpperCase(Copy(URL,1,4))<>'HTTP') and (FileExists(URL) or FileExists(Replace(URL,'%20',' '))) then begin
+      If FileExists(URL) then CopyFile(PChar(URL),PChar(FileName),True) else CopyFile(PChar(Replace(URL,'%20',' ')),PChar(FileName),True);
+      If not FileExists(FileName) then exit;
+    end else begin
+      exit;
+    end;
+  end;
 
   PackageList:=TPackageList.Create(URL);
   try
@@ -208,6 +215,8 @@ end;
 
 procedure TPackageManagerRepositoriesEditForm.ListViewChange(Sender: TObject; Item: TListItem; Change: TItemChange);
 begin
+  If (MainPackageList=nil) or (UserPackageList=nil) then exit;
+
   If (not JustLoading) and (Item<>nil) and (Change=ctState) then begin
     If Item.Owner=ListView1.Items
       then MainPackageList.Active[Integer(Item.Data)]:=Item.Checked
@@ -247,8 +256,6 @@ begin
   end;
 
   PopupActivate.Enabled:=ActivateButton.Enabled;
-  AddButton.Enabled:=(PageControl.ActivePageIndex=1);
-  PopupAdd.Enabled:=(PageControl.ActivePageIndex=1);
   EditButton.Enabled:=(PageControl.ActivePageIndex=1) and (ListView.Selected<>nil);
   PopupEdit.Enabled:=(PageControl.ActivePageIndex=1) and (ListView.Selected<>nil);
   RemoveButton.Enabled:=(PageControl.ActivePageIndex=1) and (ListView.Selected<>nil);
@@ -270,7 +277,7 @@ begin
             ListView1.Selected.Checked:=not ListView1.Selected.Checked;
             I:=Integer(ListView1.Selected.Data);
             MainPackageList.Active[I]:=not MainPackageList.Active[I];
-            ListViewChange(self,ListView.Selected,ctState);
+            ListViewChange(self,ListView1.Selected,ctState);
           end;
         end else begin
           If ListView.Selected<>nil then begin
@@ -280,13 +287,10 @@ begin
             ListViewChange(self,ListView.Selected,ctState);
           end;
         end;
-    1 : If PageControl.ActivePageIndex=1 then begin
-          If not AlreadyWarned then begin
-            MessageDlg(LanguageSetup.RepositoriesEditorAddSourceWarning,mtWarning,[mbOk],0);
-            AlreadyWarned:=True;
-          end;
+    1 : begin
+          PageControl.ActivePageIndex:=1;
           S:='';
-          If not InputQuery(LanguageSetup.RepositoriesEditorAddSourceCaption,LanguageSetup.RepositoriesEditorURL,S) then exit;
+          if not ShowPackageManagerRepositoriesEditURLDialog(self,S) then exit;
           UserPackageList.Add(S,True);
           LoadLists;
           ListView.Selected:=ListView.Items[ListView.Items.Count-1];
@@ -294,7 +298,7 @@ begin
     2 : If (PageControl.ActivePageIndex=1) and (ListView.Selected<>nil) then begin
           I:=Integer(ListView.Selected.Data);
           S:=UserPackageList.URL[I];
-          If not InputQuery(LanguageSetup.RepositoriesEditorEditSourceCaption,LanguageSetup.RepositoriesEditorURL,S) then exit;
+          if not ShowPackageManagerRepositoriesEditURLDialog(self,S) then exit;
           UserPackageList.URL[I]:=S;
           ListView.Selected.Caption:=S;
           ListView.Selected.SubItems[0]:=GetDescription(S);
@@ -302,7 +306,7 @@ begin
     3 : If (PageControl.ActivePageIndex=1) and (ListView.Selected<>nil) then begin
           If MessageDlg(LanguageSetup.RepositoriesEditorRemoveSourceConfirm,mtConfirmation,[mbYes,mbNo],0)<>mrYes then exit;
           I:=ListView.ItemIndex;
-          S:=DBDir+ExtractFileNameFromURL(UserPackageList.URL[Integer(ListView.Selected.Data)]);
+          S:=DBDir+ExtractFileNameFromURL(UserPackageList.URL[Integer(ListView.Selected.Data)],'.xml');
           If FileExists(S) then ExtDeleteFile(S,ftTemp);
           UserPackageList.Delete(Integer(ListView.Selected.Data));
           LoadLists;
@@ -330,6 +334,7 @@ end;
 procedure TPackageManagerRepositoriesEditForm.OKButtonClick(Sender: TObject);
 begin
   MainPackageList.SaveToFile(self);
+  UserPackageList.UpdateDate:=Now;
   UserPackageList.SaveToFile(self);
 end;
 

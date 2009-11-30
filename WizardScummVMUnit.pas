@@ -72,7 +72,7 @@ begin
 
   UserIconLoader.DialogImage(DI_SelectFolder,ProgramButton);
   UserIconLoader.DialogImage(DI_SelectFolder,GamesFolderButton);
-  UserIconLoader.DialogImage(DI_Help,FolderInfoButton);
+  UserIconLoader.DialogImage(DI_ToolbarHelp,FolderInfoButton);
   UserIconLoader.DialogImage(DI_SelectFolder,DataFolderButton);
   UserIconLoader.DialogImage(DI_SelectFolder,BaseDataFolderButton);
   UserIconLoader.DialogImage(DI_Down,DataFolderShowButton);

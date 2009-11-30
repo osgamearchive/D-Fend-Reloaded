@@ -73,7 +73,7 @@ object ModernProfileEditorGraphicsFrame: TModernProfileEditorGraphicsFrame
     Width = 145
     Height = 21
     Style = csDropDownList
-    ItemHeight = 0
+    ItemHeight = 13
     TabOrder = 0
   end
   object FullscreenResolutionComboBox: TComboBox
@@ -82,7 +82,7 @@ object ModernProfileEditorGraphicsFrame: TModernProfileEditorGraphicsFrame
     Width = 145
     Height = 21
     Style = csDropDownList
-    ItemHeight = 0
+    ItemHeight = 13
     TabOrder = 1
   end
   object StartFullscreenCheckBox: TCheckBox
@@ -118,7 +118,7 @@ object ModernProfileEditorGraphicsFrame: TModernProfileEditorGraphicsFrame
     Width = 145
     Height = 21
     Style = csDropDownList
-    ItemHeight = 0
+    ItemHeight = 13
     TabOrder = 6
   end
   object VideoCardComboBox: TComboBox
@@ -127,7 +127,7 @@ object ModernProfileEditorGraphicsFrame: TModernProfileEditorGraphicsFrame
     Width = 145
     Height = 21
     Style = csDropDownList
-    ItemHeight = 0
+    ItemHeight = 13
     TabOrder = 7
   end
   object ScaleComboBox: TComboBox
@@ -136,7 +136,7 @@ object ModernProfileEditorGraphicsFrame: TModernProfileEditorGraphicsFrame
     Width = 369
     Height = 21
     Style = csDropDownList
-    ItemHeight = 0
+    ItemHeight = 13
     TabOrder = 8
   end
   object FrameSkipEdit: TSpinEdit
@@ -215,7 +215,7 @@ object ModernProfileEditorGraphicsFrame: TModernProfileEditorGraphicsFrame
       Width = 145
       Height = 21
       Style = csDropDownList
-      ItemHeight = 0
+      ItemHeight = 13
       TabOrder = 0
     end
     object VideoRamComboBox: TComboBox
@@ -224,7 +224,7 @@ object ModernProfileEditorGraphicsFrame: TModernProfileEditorGraphicsFrame
       Width = 145
       Height = 21
       Style = csDropDownList
-      ItemHeight = 0
+      ItemHeight = 13
       TabOrder = 1
     end
   end
@@ -234,8 +234,9 @@ object ModernProfileEditorGraphicsFrame: TModernProfileEditorGraphicsFrame
     Width = 145
     Height = 21
     Style = csDropDownList
-    ItemHeight = 0
+    ItemHeight = 13
     TabOrder = 12
     Visible = False
+    OnChange = PixelShaderComboBoxChange
   end
 end

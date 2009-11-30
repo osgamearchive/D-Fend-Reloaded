@@ -18,7 +18,10 @@ Type ConfigRec=record
 end;
 
 Type TConfigRecArray=Array of ConfigRec;
+     PConfigRecArray=^TConfigRecArray;
      TConfigIndexArray=Array of Integer;
+
+Type TConfigType=(ctBoolean,ctInteger,ctString);
 
 Type TFileChangeStatus=(fcsNoChange,fcsChanged,fcsDeleted);
 
@@ -36,8 +39,12 @@ Type TBasePrgSetup=class
     FChanged : Boolean;
     Procedure ClearLists;
     Function IndexOf(const Nr : Integer; const List : TConfigRecArray; var Index : TConfigIndexArray) : Integer; inline;
-    Procedure AddRec(const Nr : Integer; const Section, Key : String; const Default : Variant; var List : TConfigRecArray);
+    Function AddRec(const Nr : Integer; const Section, Key : String; var List : TConfigRecArray) : Integer; inline;
     Procedure ReadStringFromINI(const I : Integer);
+    Procedure LoadBinConfig(const St : TStream; const PConfig : PConfigRecArray; const ConfigType : TConfigType);
+    Procedure StoreBinConfig(const St : TStream; const PConfig : PConfigRecArray; const ConfigType : TConfigType);
+    Procedure LoadIniNow; inline;
+    Function GetIni : TMemIniFile;
   protected
     Procedure AddBooleanRec(const Nr : Integer; const Section, Key : String; const Default : Boolean);
     Procedure AddIntegerRec(const Nr : Integer; const Section, Key : String; const Default : Integer);
@@ -62,12 +69,15 @@ Type TBasePrgSetup=class
     Procedure RenameINI(const NewFile : String); virtual;
     Procedure SetChanged;
     function GetString(const Index: Integer): String; inline;
+    Procedure LoadFromStream(const St : TStream); virtual;
+    Procedure SaveToStream(const St : TStream); virtual;
+    Procedure CacheAllStrings;
     property SetupFile : String read FSetupFile;
     property FirstRun : Boolean read FFirstRun;
     property StoreConfigOnExit : Boolean read FStoreConfigOnExit write FStoreConfigOnExit;
     property OnChanged : TNotifyEvent read FOnChanged write FOnChanged;
     property OwnINI : Boolean read FOwnINI;
-    property MemIni : TMemIniFile read Ini;
+    property MemIni : TMemIniFile read GetIni;
 end;
 
 implementation
@@ -100,7 +110,7 @@ begin
   FFirstRun:=not FileExists(ASetupFile);
   FOwnINI:=True;
   If ASetupFile<>'' then begin
-    Ini:=TMemIniFile.Create(ASetupFile);
+    Ini:=nil;
     CheckAndUpdateTimeStamp;
   end else begin
     Ini:=nil; FOwnIni:=False;
@@ -117,7 +127,7 @@ begin
   FFirstRun:=not FileExists(ASetupFile);
   FOwnINI:=True;
   If ASetupFile<>'' then begin
-    Ini:=TMemIniFile.Create(ASetupFile);
+    Ini:=nil;
   end else begin
     Ini:=nil; FOwnIni:=False;
   end;
@@ -130,7 +140,7 @@ begin
   inherited Create;
   FOwnINI:=False;
   FFirstRun:=False;
-  Ini:=ABasePrgSetup.Ini;
+  Ini:=ABasePrgSetup.MemIni;
   ClearLists;
   FStoreConfigOnExit:=True;
   FChanged:=False;
@@ -140,40 +150,46 @@ destructor TBasePrgSetup.Destroy;
 Var St,St2 : TStringList;
     I : Integer;
 begin
-  If OwnINI then begin
-
-    St:=TStringList.Create;
-    St2:=TStringList.Create;
-    try
-      Ini.ReadSections(St);
-      For I:=0 to St.Count-1 do begin
-        St2.Clear;
-        Ini.ReadSection(St[I],St2);
-        If St2.Count=0 then Ini.EraseSection(St[I]);
+  If FChanged and FStoreConfigOnExit then begin
+    LoadIniNow;
+    If OwnINI then begin
+      St:=TStringList.Create;
+      St2:=TStringList.Create;
+      try
+        Ini.ReadSections(St);
+        For I:=0 to St.Count-1 do begin
+          St2.Clear;
+          Ini.ReadSection(St[I],St2);
+          If St2.Count=0 then Ini.EraseSection(St[I]);
+        end;
+      finally
+        St.Free;
+        St2.Free;
       end;
-    finally
-      St.Free;
-      St2.Free;
     end;
-
     try
-      If FStoreConfigOnExit then begin
+      If Ini<>nil then begin
         ForceDirectories(ExtractFilePath(Ini.FileName));
-        If FChanged then UpdateFile;
-      end;
-    except end;
-    ClearLists;
-    Ini.Free;
-  end else begin
-    try
-      If FStoreConfigOnExit and (Ini<>nil) then begin
-        ForceDirectories(ExtractFilePath(Ini.FileName));
-        If FChanged then UpdateFile;
+        UpdateFile;
       end;
     except end;
   end;
-  
+
+  If FOwnINI and (Ini<>nil) then Ini.Free;
+
   inherited Destroy;
+end;
+
+Procedure TBasePrgSetup.LoadIniNow;
+begin
+  If (Ini=nil) and FOwnINI then
+    Ini:=TMemIniFile.Create(FSetupFile);
+end;
+
+Function TBasePrgSetup.GetIni : TMemIniFile;
+begin
+  LoadIniNow;
+  result:=Ini;
 end;
 
 function TBasePrgSetup.CheckAndUpdateTimeStamp: TFileChangeStatus;
@@ -191,7 +207,7 @@ end;
 Procedure TBasePrgSetup.ReloadINI;
 Var I : Integer;
 begin
-  Ini.Free;
+  If Ini<>nil then Ini.Free;
   Ini:=TMemIniFile.Create(FSetupFile);
   for I:=0 to length(BooleanList)-1 do BooleanList[I].Cached:=False;
   for I:=0 to length(IntegerList)-1 do IntegerList[I].Cached:=False;
@@ -200,12 +216,13 @@ end;
 
 procedure TBasePrgSetup.RenameINI(const NewFile: String);
 begin
+  LoadIniNow;
   Ini.UpdateFile;
   Ini.Free;
   If FSetupFile<>NewFile then begin
     if RenameFile(FSetupFile,NewFile) then FSetupFile:=NewFile;
   end;
-  Ini:=TMemIniFile.Create(FSetupFile); 
+  Ini:=TMemIniFile.Create(FSetupFile);
 end;
 
 procedure TBasePrgSetup.ClearLists;
@@ -217,7 +234,7 @@ end;
 
 procedure TBasePrgSetup.AssignFrom(const ABasePrgSetup: TBasePrgSetup);
 begin
-  AssignFromPartially(ABasePrgSetup,[]); 
+  AssignFromPartially(ABasePrgSetup,[]);
 end;
 
 Procedure TBasePrgSetup.AssignFromPartially(const ABasePrgSetup : TBasePrgSetup; const SettingsToKeep : Array of Integer);
@@ -250,11 +267,11 @@ begin
 end;
 
 Function TBasePrgSetup.IndexOf(const Nr : Integer; const List : TConfigRecArray; var Index : TConfigIndexArray) : Integer;
-Var I,J : Integer;
+Var I : Integer;
 begin
   If length(Index)=0 then begin
-    J:=0; For I:=0 to length(List)-1 do J:=Max(J,List[I].Nr);
-    SetLength(Index,J+1);
+    {List is sorted J:=0; For I:=0 to length(List)-1 do J:=Max(J,List[I].Nr); SetLength(Index,J+1);}
+    SetLength(Index,List[length(List)-1].Nr+1);
     For I:=0 to length(Index)-1 do Index[I]:=-1;
     For I:=0 to length(List)-1 do Index[List[I].Nr]:=I;
   end;
@@ -264,6 +281,7 @@ end;
 procedure TBasePrgSetup.StoreAllValues;
 Var I : Integer;
 begin
+  LoadIniNow;
   if Ini=nil then exit;
 
   For I:=0 to length(BooleanList)-1 do
@@ -283,6 +301,7 @@ end;
 
 procedure TBasePrgSetup.UpdateFile;
 begin
+  LoadIniNow;
   try ForceDirectories(ExtractFilePath(Ini.FileName)); Ini.UpdateFile; except end; {Language Files may be read only in program foldes}
 end;
 
@@ -304,46 +323,45 @@ begin
   CheckAndUpdateTimeStamp;
 end;
 
-procedure TBasePrgSetup.AddRec(const Nr: Integer; const Section, Key: String; const Default : Variant; var List: TConfigRecArray);
+function TBasePrgSetup.AddRec(const Nr: Integer; const Section, Key: String; var List: TConfigRecArray) : Integer;
 Var I,J : Integer;
 begin
-  I:=length(List);
-  SetLength(List,I+1);
+  result:=length(List);
+  SetLength(List,result+1);
 
-  J:=length(List)-1;
-  For I:=0 to length(List)-2 do begin
-    {$IFDEF DoubleNumberCheck}
+  J:=result;
+  {$IFDEF DoubleNumberCheck}
+  For I:=0 to result-1 do begin
     If (J=length(List)-1) and (Nr<List[I].Nr) then J:=I;
-    If Nr=List[I].Nr then ShowMessage('Double use of nr '+IntToStr(Nr)); 
-    {$ELSE}
-    If Nr<List[I].Nr then begin J:=I; break; end;
-    {$ENDIF}
+    If Nr=List[I].Nr then ShowMessage('Double use of nr '+IntToStr(Nr));
   end;
-
-  For I:=length(List)-2 downto J do List[I+1]:=List[I];
+  For I:=result-1 downto J do List[I+1]:=List[I];
+  {$ELSE}
+  If Nr<List[result-1].Nr then begin
+    For I:=0 to result-1 do If Nr<List[I].Nr then begin J:=I; break; end;
+    For I:=result-1 downto J do List[I+1]:=List[I];
+  end;
+  {$ENDIF}
 
   List[J].Nr:=Nr;
   List[J].Section:=Section;
   List[J].Key:=Key;
   List[J].Cached:=False;
-  If VarIsType(Default,varBoolean) then begin List[J].DefaultBool:=Default; end;
-  If VarIsType(Default,varInteger) then begin List[J].DefaultInteger:=Default; end;
-  If VarIsType(Default,varString) then begin List[J].DefaultString:=Default; end;
 end;
 
 procedure TBasePrgSetup.AddBooleanRec(const Nr: Integer; const Section, Key: String; const Default : Boolean);
 begin
-  AddRec(Nr,Section,Key,Default,BooleanList);
+  BooleanList[AddRec(Nr,Section,Key,BooleanList)].DefaultBool:=Default;
 end;
 
 procedure TBasePrgSetup.AddIntegerRec(const Nr: Integer; const Section, Key: String; const Default : Integer);
 begin
-  AddRec(Nr,Section,Key,Default,IntegerList);
+  IntegerList[AddRec(Nr,Section,Key,IntegerList)].DefaultInteger:=Default;
 end;
 
 procedure TBasePrgSetup.AddStringRec(const Nr: Integer; const Section, Key: String; const Default : String);
 begin
-  AddRec(Nr,Section,Key,Default,StringList);
+  StringList[AddRec(Nr,Section,Key,StringList)].DefaultString:=Default;
 end;
 
 function TBasePrgSetup.GetBoolean(const Index: Integer): Boolean;
@@ -357,6 +375,7 @@ begin
     If Cached then begin result:=CacheValueBool; exit; end;
 
     If DefaultBool then S:='true' else S:='false';
+    LoadIniNow;
     If Ini<>nil then S:=Trim(ExtUpperCase(Ini.ReadString(Section,Key,S)));
     B:=False; result:=False;
     If (S='0') or (S='FALSE') then begin result:=False; B:=True; end;
@@ -376,6 +395,7 @@ begin
   if I<0 then begin result:=0; exit; end;
   with IntegerList[I] do begin
     If Cached then begin result:=CacheValueInteger; exit; end;
+    LoadIniNow;
     If Ini<>nil then result:=Ini.ReadInteger(Section,Key,DefaultInteger) else result:=DefaultInteger;
     Cached:=True;
     CacheValueInteger:=result;
@@ -384,6 +404,7 @@ end;
 
 Procedure TBasePrgSetup.ReadStringFromINI(const I : Integer);
 begin
+  LoadIniNow;
   with StringList[I] do begin
     Cached:=True;
     if Ini<>nil then CacheValueString:=Ini.ReadString(Section,Key,DefaultString) else CacheValueString:=DefaultString;
@@ -412,6 +433,7 @@ begin
   I:=IndexOf(Index,BooleanList,BooleanIndex);
   if I<0 then exit;
   with BooleanList[I] do begin
+    LoadIniNow;
     If DefaultBool=Value then Ini.DeleteKey(Section,Key) else Ini.WriteBool(Section,Key,Value);
     Cached:=True;
     CacheValueBool:=Value;
@@ -425,6 +447,7 @@ begin
   I:=IndexOf(Index,IntegerList,IntegerIndex);
   if I<0 then exit;
   with IntegerList[I] do begin
+    LoadIniNow;
     If DefaultInteger=Value then Ini.DeleteKey(Section,Key) else Ini.WriteInteger(Section,Key,Value);
     Cached:=True;
     CacheValueInteger:=Value;
@@ -438,11 +461,70 @@ begin
   I:=IndexOf(Index,StringList,StringIndex);
   if I<0 then exit;
   with StringList[I] do begin
+    LoadIniNow;
     If DefaultString=Value then Ini.DeleteKey(Section,Key) else Ini.WriteString(Section,Key,Value);
     Cached:=True;
     CacheValueString:=Value;
     FChanged:=True;
   end;
+end;
+
+Procedure TBasePrgSetup.CacheAllStrings;
+Var I : Integer;
+begin
+  For I:=0 to length(StringList)-1 do if not StringList[I].Cached then ReadStringFromINI(I);
+end;
+
+Procedure TBasePrgSetup.LoadBinConfig(const St : TStream; const PConfig : PConfigRecArray; const ConfigType : TConfigType);
+Var I,J : Integer;
+begin
+  For I:=0 to length(PConfig^)-1 do begin
+    Case ConfigType of
+      ctBoolean : St.ReadBuffer(PConfig^[I].CacheValueBool,SizeOf(Boolean));
+      ctInteger : St.ReadBuffer(PConfig^[I].CacheValueInteger,SizeOf(Integer));
+      ctString : begin
+                   St.ReadBuffer(J,SizeOf(Integer));
+                   SetLength(PConfig^[I].CacheValueString,J); St.ReadBuffer(PConfig^[I].CacheValueString[1],J);
+                 end;
+    end;
+    PConfig^[I].Cached:=True;
+  end;
+end;
+
+Procedure TBasePrgSetup.StoreBinConfig(const St : TStream; const PConfig : PConfigRecArray; const ConfigType : TConfigType);
+Var I,J : Integer;
+begin
+  For I:=0 to length(PConfig^)-1 do Case ConfigType of
+    ctBoolean : begin
+                  If not PConfig^[I].Cached then GetBoolean(PConfig^[I].Nr);
+                  St.WriteBuffer(PConfig^[I].CacheValueBool,SizeOf(Boolean));
+                end;
+    ctInteger : begin
+                  If not PConfig^[I].Cached then GetInteger(PConfig^[I].Nr);
+                  St.WriteBuffer(PConfig^[I].CacheValueInteger,SizeOf(Integer));
+                end;
+    ctString : begin
+                 If not PConfig^[I].Cached then GetString(PConfig^[I].Nr);
+                 J:=Length(PConfig^[I].CacheValueString); St.WriteBuffer(J,SizeOf(Integer)); St.WriteBuffer(PConfig^[I].CacheValueString[1],J);
+               end;
+  end;
+end;
+
+Procedure TBasePrgSetup.LoadFromStream(const St : TStream);
+begin
+  LoadBinConfig(St,@BooleanList,ctBoolean);
+  LoadBinConfig(St,@IntegerList,ctInteger);
+  LoadBinConfig(St,@StringList,ctString);
+  St.ReadBuffer(FLastTimeStamp,SizeOf(FLastTimeStamp));
+  FChanged:=False;
+end;
+
+Procedure TBasePrgSetup.SaveToStream(const St : TStream);
+begin
+  StoreBinConfig(St,@BooleanList,ctBoolean);
+  StoreBinConfig(St,@IntegerList,ctInteger);
+  StoreBinConfig(St,@StringList,ctString);
+  St.WriteBuffer(FLastTimeStamp,SizeOf(FLastTimeStamp));
 end;
 
 end.

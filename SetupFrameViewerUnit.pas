@@ -36,7 +36,7 @@ type
   public
     { Public-Deklarationen }
     Function GetName : String;
-    Procedure InitGUIAndLoadSetup(InitData : TInitData);
+    Procedure InitGUIAndLoadSetup(var InitData : TInitData);
     Procedure BeforeChangeLanguage;
     Procedure LoadLanguage;
     Procedure DOSBoxDirChanged;
@@ -60,7 +60,7 @@ begin
   result:=LanguageSetup.SetupFormTextMediaViewer;
 end;
 
-procedure TSetupFrameViewer.InitGUIAndLoadSetup(InitData: TInitData);
+procedure TSetupFrameViewer.InitGUIAndLoadSetup(var InitData: TInitData);
 Var S : String;
 begin
   NoFlicker(ImagesGroupBox);

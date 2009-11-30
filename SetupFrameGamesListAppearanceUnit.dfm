@@ -221,7 +221,7 @@ object SetupFrameGamesListAppearance: TSetupFrameGamesListAppearance
     MaxValue = 100
     MinValue = 1
     TabOrder = 11
-    Value = 0
+    Value = 1
   end
   object ImageOpenDialog: TOpenDialog
     DefaultExt = 'jpeg'

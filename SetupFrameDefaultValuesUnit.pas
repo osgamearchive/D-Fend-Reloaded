@@ -29,7 +29,7 @@ type
     Constructor Create(AOwner : TComponent); override;
     Destructor Destroy; override;
     Function GetName : String;
-    Procedure InitGUIAndLoadSetup(InitData : TInitData);
+    Procedure InitGUIAndLoadSetup(var InitData : TInitData);
     Procedure BeforeChangeLanguage;
     Procedure LoadLanguage;
     Procedure DOSBoxDirChanged;
@@ -66,7 +66,7 @@ begin
   result:=LanguageSetup.SetupFormDefaultValueSheet;
 end;
 
-procedure TSetupFrameDefaultValues.InitGUIAndLoadSetup(InitData: TInitData);
+procedure TSetupFrameDefaultValues.InitGUIAndLoadSetup(var InitData: TInitData);
 begin
   GameDB:=InitData.GameDB;
 

@@ -4,7 +4,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, 
-  Dialogs, ComCtrls, StdCtrls, Buttons, ExtCtrls, ProfileMountEditorFormUnit;
+  Dialogs, ComCtrls, StdCtrls, Buttons, ExtCtrls, ProfileMountEditorFormUnit,
+  Menus;
 
 type
   TProfileMountEditorDriveFrame = class(TFrame, TProfileMountEditorFrame)
@@ -15,12 +16,18 @@ type
     FolderDriveLetterWarningLabel: TLabel;
     FolderFreeSpaceLabel: TLabel;
     FolderFreeSpaceTrackBar: TTrackBar;
+    MakeZipDriveButton: TBitBtn;
+    SaveDialog: TSaveDialog;
     procedure FolderFreeSpaceTrackBarChange(Sender: TObject);
     procedure FolderButtonClick(Sender: TObject);
     procedure FolderDriveLetterComboBoxChange(Sender: TObject);
+    procedure MakeZipDriveButtonClick(Sender: TObject);
   private
     { Private-Deklarationen }
     InfoData : TInfoData;
+    SpecialSettings : String;
+    Function SelectZip : String;
+    function UpdateGameExe(const OldPath, DriveLetter : String; var Name: String): Boolean;
   public
     { Public-Deklarationen }
     Function Init(const AInfoData : TInfoData) : Boolean;
@@ -31,7 +38,8 @@ type
 
 implementation
 
-uses LanguageSetupUnit, CommonTools, PrgSetupUnit, IconLoaderUnit;
+uses LanguageSetupUnit, CommonTools, PrgSetupUnit, IconLoaderUnit,
+     ModernProfileEditorBaseFrameUnit, ZipInfoFormUnit, PrgConsts;
 
 {$R *.dfm}
 
@@ -44,6 +52,9 @@ Var C : Char;
     I : Integer;
 begin
   InfoData:=AInfoData;
+  SpecialSettings:='';
+
+  FolderFreeSpaceTrackBar.Position:=DefaultFreeHDSize;
 
   FolderEdit.EditLabel.Caption:=LanguageSetup.ProfileMountingFolder;
   FolderDriveLetterLabel.Caption:=LanguageSetup.ProfileMountingLetter;
@@ -59,7 +70,12 @@ begin
     FolderDriveLetterComboBox.Items.EndUpdate;
   end;
 
+  MakeZipDriveButton.Caption:=LanguageSetup.ProfileMountingZipMakeFromNormalMount;
+  MakeZipDriveButton.Hint:=LanguageSetup.ProfileMountingZipMakeFromNormalMountHint;
+  MakeZipDriveButton.Visible:=(InfoData.BaseGameFrame<>nil) and (not InfoData.BaseGameFrame.GameRelPathCheckBox.Checked);
+
   UserIconLoader.DialogImage(DI_SelectFolder,FolderButton);
+  UserIconLoader.DirectLoad('ModernProfileEditor',4,MakeZipDriveButton);
 
   St:=ValueToList(InfoData.Data);
   try
@@ -97,6 +113,8 @@ end;
 Function TProfileMountEditorDriveFrame.Done : String;
 Var S : String;
 begin
+  If SpecialSettings<>'' then begin result:=SpecialSettings; exit; end;
+
   result:='';
 
   {RealFolder;DRIVE;Letter;False;;FreeSpace}
@@ -105,7 +123,7 @@ begin
     If MessageDlg(LanguageSetup.MessageRootDirMountWaring,mtWarning,[mbYes,mbNo],0)<>mrYes then exit;
   end;
   result:=MakeRelPath(FolderEdit.Text,PrgSetup.BaseDir)+';Drive;'+FolderDriveLetterComboBox.Text+';False;;';
-  If FolderFreeSpaceTrackBar.Position<>105 then result:=result+IntToStr(FolderFreeSpaceTrackBar.Position);
+  If FolderFreeSpaceTrackBar.Position<>DefaultFreeHDSize then result:=result+IntToStr(FolderFreeSpaceTrackBar.Position);
 end;
 
 function TProfileMountEditorDriveFrame.GetName: String;
@@ -130,6 +148,109 @@ end;
 procedure TProfileMountEditorDriveFrame.FolderFreeSpaceTrackBarChange(Sender: TObject);
 begin
   FolderFreeSpaceLabel.Caption:=Format(LanguageSetup.ProfileMountingFreeSpace,[FolderFreeSpaceTrackbar.Position]);
+end;
+
+function TProfileMountEditorDriveFrame.SelectZip: String;
+begin
+  result:='';
+
+  SaveDialog.InitialDir:=PrgSetup.BaseDir;
+  SaveDialog.Title:=LanguageSetup.ProfileMountingZipMakeFromNormalMountSaveTitle;
+  SaveDialog.Filter:=ProcessFileNameFilter(LanguageSetup.ProfileMountingZipFileFilter2,LanguageSetup.ProfileMountingZipFileFilter2ArchiveFiles);
+
+  if not SaveDialog.Execute then exit;
+  If FileExists(SaveDialog.FileName) then begin
+    If MessageDlg(Format(LanguageSetup.MessageConfirmationOverwriteFile,[SaveDialog.FileName]),mtWarning,[mbYes,mbNo],0)<>mrYes then exit;
+  end;
+  result:=SaveDialog.FileName;
+end;
+
+function TProfileMountEditorDriveFrame.UpdateGameExe(const OldPath, DriveLetter : String; var Name: String): Boolean;
+Var Old,S : String;
+begin
+  Old:=IncludeTrailingPathDelimiter(MakeAbsPath(OldPath,PrgSetup.BaseDir));
+  S:=IncludeTrailingPathDelimiter(MakeAbsPath(ExtractFilePath(Name),PrgSetup.BaseDir));
+  result:=(ExtUpperCase(Copy(S,1,length(Old)))=ExtUpperCase(Old)); If not result then exit;
+  Name:=DriveLetter+':\'+Copy(S,length(Old)+1)+ExtractFileName(Name);
+end;
+
+procedure TProfileMountEditorDriveFrame.MakeZipDriveButtonClick(Sender: TObject);
+Var F : TModernProfileEditorBaseFrame;
+    ThisGameDir,MountDir,ZipFile,S,T : String;
+    I,J : Integer;
+begin
+  If (Trim(FolderEdit.Text)='') or (Trim(FolderEdit.Text)='\') then begin
+    MessageDlg(LanguageSetup.MessageNoFolderName,mtError,[mbOK],0);
+    exit;
+  end;
+
+  F:=InfoData.BaseGameFrame;
+
+  MountDir:=IncludeTrailingPathDelimiter(MakeAbsPath(FolderEdit.Text,PrgSetup.BaseDir));
+
+  If (Trim(F.GameExeEdit.Text)='') or F.GameRelPathCheckBox.Checked then ThisGameDir:='' else ThisGameDir:=IncludeTrailingPathDelimiter(MakeAbsPath(ExtractFilePath(F.GameExeEdit.Text),PrgSetup.BaseDir));
+
+  If (ThisGameDir='') or (ExtUpperCase(Copy(ThisGameDir,1,length(MountDir)))<>ExtUpperCase(MountDir)) then begin
+    {Pack entry folder; no hints from game file, no game file changing}
+    If ExtUpperCase(MountDir)=ExtUpperCase(IncludeTrailingPathDelimiter(MakeAbsPath(PrgSetup.GameDir,PrgSetup.BaseDir))) then begin
+      MessageDlg(LanguageSetup.ProfileMountingZipMakeFromNormalMountErrorGameDir,mtError,[mbOK],0);
+      exit;
+    end;
+    ZipFile:=SelectZip; If ZipFile='' then exit;
+    If not BaseDirSecuriryCheckOnly(MountDir) then begin
+      MessageDlg(Format(LanguageSetup.ProfileMountingZipMakeFromNormalMountSecurityError,[MountDir]),mtError,[mbOK],0);
+      exit;
+    end;
+    If MessageDlg(Format(LanguageSetup.ProfileMountingZipMakeFromNormalMountConfirmation,[MountDir,ZipFile]),mtConfirmation,[mbYes,mbNo],0)<>mrYes then exit;
+    if not CreateZipFile(self,ZipFile,MountDir,dmFolder,GetCompressStrengthFromPrgSetup) then exit;
+    {RealFolder$ZipFile;ZIP;Letter;False;;FreeSpace;DeleteMode(no;files;folder)}
+    SpecialSettings:=MakeRelPath(MountDir,PrgSetup.BaseDir)+'$'+MakeRelPath(ZipFile,PrgSetup.BaseDir)+';ZIP;'+FolderDriveLetterComboBox.Text+';False;;'+IntToStr(FolderFreeSpaceTrackBar.Position)+';folder';
+    InfoData.CloseRequest(self);
+    exit;
+  end;
+
+  {Pack game folder (=folder of GameExe), change game file path}
+  If ExtUpperCase(ThisGameDir)=ExtUpperCase(IncludeTrailingPathDelimiter(MakeAbsPath(PrgSetup.GameDir,PrgSetup.BaseDir))) then begin
+    MessageDlg(LanguageSetup.ProfileMountingZipMakeFromNormalMountErrorGameDir,mtError,[mbOK],0);
+    exit;
+  end;
+  ZipFile:=SelectZip;
+  If not BaseDirSecuriryCheckOnly(ThisGameDir) then begin
+    MessageDlg(Format(LanguageSetup.ProfileMountingZipMakeFromNormalMountSecurityError,[ThisGameDir]),mtError,[mbOK],0);
+    exit;
+  end;
+  If MessageDlg(Format(LanguageSetup.ProfileMountingZipMakeFromNormalMountConfirmation,[ThisGameDir,ZipFile]),mtConfirmation,[mbYes,mbNo],0)<>mrYes then exit;
+  if not CreateZipFile(self,ZipFile,ThisGameDir,dmFolder,GetCompressStrengthFromPrgSetup) then exit;
+
+  S:=F.GameExeEdit.Text;
+  If UpdateGameExe(ThisGameDir,FolderDriveLetterComboBox.Text,S) then begin
+    F.GameExeEdit.Text:=S;
+    F.GameRelPathCheckBox.Checked:=True;
+  end;
+
+  If (Trim(F.SetupExeEdit.Text)='') or F.SetupRelPathCheckBox.Checked then S:='' else S:=IncludeTrailingPathDelimiter(MakeAbsPath(ExtractFilePath(F.SetupExeEdit.Text),PrgSetup.BaseDir));
+  If ExtUpperCase(Copy(S,1,length(MountDir)))=ExtUpperCase(MountDir) then begin
+    S:=F.SetupExeEdit.Text;
+    If UpdateGameExe(ThisGameDir,FolderDriveLetterComboBox.Text,S) then begin
+      F.SetupExeEdit.Text:=S;
+      F.SetupRelPathCheckBox.Checked:=True;
+    end;
+  end;
+
+  For I:=0 to F.ExtraExeFiles.Count-1 do begin
+    S:=F.ExtraExeFiles[I];
+    J:=Pos(';',S);
+    If J>0 then begin
+      T:=Copy(S,J+1,MaxInt);
+      If UpdateGameExe(ThisGameDir,FolderDriveLetterComboBox.Text,T) then S:=Copy(S,1,J)+'DOSBOX:'+T;
+    end;
+    F.ExtraExeFiles[I]:=S;
+  end;
+
+  {RealFolder$ZipFile;ZIP;Letter;False;;FreeSpace;DeleteMode(no;files;folder)}
+  SpecialSettings:=MakeRelPath(ThisGameDir,PrgSetup.BaseDir)+'$'+MakeRelPath(ZipFile,PrgSetup.BaseDir)+';ZIP;'+FolderDriveLetterComboBox.Text+';False;;'+IntToStr(FolderFreeSpaceTrackBar.Position)+';folder';
+  InfoData.CloseRequest(self);
+  exit;
 end;
 
 end.

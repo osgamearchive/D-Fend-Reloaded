@@ -27,12 +27,13 @@ This images can be mounted as drives inside DOSBox via the
 <a href="ProfileEdit.html">profile editor</a>.
 </p>
 
-<h3>Floppy image</h3>
+<h3>Floppy image / hard disk images</h3>
 
 <p>
-From this dialog page you can create every possible floppy disk image type.
-From the "Disk type" dropdown box you can select the most common disk types.
-The disk images will be formated and ready to use inside DOSBox.
+From the tabs at the top of the dialog you can choose whether to create a floppy or
+a hard disk image. On floppy images you can choose a floppy format or select the
+tracks, heads and sectors per track manually. On hard disk images you can select
+the size in MB.
 </p>
 
 <ul class="big">
@@ -44,52 +45,34 @@ The disk images will be formated and ready to use inside DOSBox.
   Windows disk drivers so use can handle this file like a normal
   file without needing to use a (de-)compression program.
   </li>
-  <li><b>Make floppy image bootable</b><br />
+  <li><b>Make image bootable</b><br />
   If this option is activated, D-Fend Reloaded will transfer the
-  FreeDOS boot files to the floppy image and will create a
+  FreeDOS boot files to the disk image and will create a
   bootsector for making it bootable. (For using this option
   you will need to have FreeDOS installed. You can configurate
   the path a you FreeDOS installation on the
   <a href="FileOptionsFreeDOS.html">FreeDOS</a> page of
   the <a href="FileOptions.html">program options</a> dialog.)
   </li>
-  <li><b>Use DOSBox default keyboard layout on bootdisk</b><br />
+  <li><b>Use DOSBox default keyboard layout</b><br />
   If this option is activated, D-Fend Reloaded will also transfer
-  the keyboard driver to the bootdisk and will add a line to the
-  <tt>autoexec.bat</tt> file of the bootdisk to activate the
+  the keyboard driver to the disk image and will add a line to the
+  <tt>autoexec.bat</tt> file to activate the
   keyboard layout which is defined as default for the current
   D-Fend Reloaded program language.
   </li>
-  <li><b>Include mouse driver on bootdisk</b><br />
+  <li><b>Include mouse driver</b><br />
   If this option is activated, D-Fend Reloaded will transfer
-  the mouse driver to the bootdisk and will add a line to the
-  <tt>autoexec.bat</tt> file of the bootdisk to activate it.
-  </li>  
-</ul>
-
-<h3>Hard disk image</h3>
-
-<p>
-From this dialog page you can create hard disk images of any size.
-D-Fend Reloaded will choose the right drive geometry automatically for you.
-</p>
-
-<ul class="big">
-  <li><b>Compress image in NTFS file system</b><br />
-  If this option is activated, the image file will be stored as
-  a compressed file. This means the file will only use the amount of
-  disk space it really needs to store the files inside it and not
-  for every empty sector. The compression will be done by the
-  Windows disk drivers so use can handle this file like a normal
-  file without needing to use a (de-)compression program.
+  the mouse driver to the disk image and will add a line to the
+  <tt>autoexec.bat</tt> file to activate it.
   </li>
-  <li><b>Image type</b><br />
-  Because preformated hard disk images cannot be made bootable
-  inside DOSBox you can choose to create a plain, unformated
-  hard disk image. In this case you will need to boot from
-  a bootable floppy disk and create a partition on the hard disk
-  using fdisk. (See also the <a href="FAQ.html#FAQ10">FAQ</a> for
-  a description how to create bootable hard disk images.)
+  <li><b>Add disk management utilities</b><br />
+  If this option is activated, utilities for creating partitions,
+  formating and checking drives will be added to the disk image.
+  </li>
+  <li><b>Add text editor</b><br />
+  If this option is activated, a text editor will be transfered
+  to the image.
   </li>
 </ul>
 

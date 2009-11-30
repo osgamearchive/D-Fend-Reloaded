@@ -69,7 +69,7 @@ object ScanGamesFolderForm: TScanGamesFolderForm
       Width = 206
       Height = 21
       Style = csDropDownList
-      ItemHeight = 0
+      ItemHeight = 13
       TabOrder = 1
       OnChange = Template1ComboBoxChange
       OnDropDown = ComboBoxDropDown
@@ -80,7 +80,7 @@ object ScanGamesFolderForm: TScanGamesFolderForm
       Width = 206
       Height = 21
       Style = csDropDownList
-      ItemHeight = 0
+      ItemHeight = 13
       TabOrder = 2
       OnChange = UpdateListRec
       OnDropDown = ComboBoxDropDown
@@ -91,7 +91,7 @@ object ScanGamesFolderForm: TScanGamesFolderForm
       Width = 206
       Height = 21
       Style = csDropDownList
-      ItemHeight = 0
+      ItemHeight = 13
       TabOrder = 3
       OnChange = UpdateListRec
       OnDropDown = ComboBoxDropDown

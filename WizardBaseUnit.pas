@@ -11,18 +11,23 @@ type
   TWizardBaseFrame = class(TFrame)
     InfoLabel: TLabel;
     Bevel: TBevel;
-    EmulationTypeRadioGroup: TRadioGroup;
-    ListScummGamesButton: TBitBtn;
-    ShowInfoButton: TBitBtn;
-    WizardModeRadioGroup: TRadioGroup;
+    EmulationTypeLabel: TLabel;
+    EmulationTypeComboBox: TComboBox;
+    WizardModeLabel: TLabel;
+    WizardModeComboBox: TComboBox;
+    ListScummGamesLabel: TLabel;
+    ShowInfoLabel: TLabel;
     procedure ButtonWork(Sender: TObject);
   private
     { Private-Deklarationen }
+    Function GetEmulationType : Integer;
+    Procedure SetEmulationType(I : Integer);
   public
     { Public-Deklarationen }
-    Destructor Destroy; override;
+    Procedure BeforeClose;
     Procedure Init(const GameDB : TGameDB);
     Procedure WriteDataToGame(const Game : TGame);
+    property EmulationType : Integer read GetEmulationType write SetEmulationType;
   end;
 
 implementation
@@ -34,46 +39,67 @@ uses Math, VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgConsts,
 
 { TWizardBaseFrame }
 
-Destructor TWizardBaseFrame.Destroy;
+procedure TWizardBaseFrame.BeforeClose;
 begin
-  PrgSetup.LastWizardMode:=WizardModeRadioGroup.ItemIndex;
-  inherited Destroy;
+  PrgSetup.LastWizardMode:=WizardModeComboBox.ItemIndex;
 end;
 
 procedure TWizardBaseFrame.Init(const GameDB : TGameDB);
+Var I : Integer;
 begin
   SetVistaFonts(self);
 
   InfoLabel.Font.Style:=[fsBold];
   InfoLabel.Caption:=LanguageSetup.WizardFormPage1Info;
-  EmulationTypeRadioGroup.Caption:=LanguageSetup.WizardFormEmulationType;
-  EmulationTypeRadioGroup.Items[0]:=LanguageSetup.WizardFormEmulationTypeDOSBox;
-  EmulationTypeRadioGroup.Items[1]:=LanguageSetup.WizardFormEmulationTypeScummVM;
-  EmulationTypeRadioGroup.Items[2]:=LanguageSetup.WizardFormEmulationTypeWindows;
-  ListScummGamesButton.Caption:=LanguageSetup.WizardFormEmulationTypeListScummVMGames;
-  ShowInfoButton.Caption:=LanguageSetup.WizardFormMainInfo;
-  WizardModeRadioGroup.Caption:=LanguageSetup.WizardFormWizardMode;
-  WizardModeRadioGroup.Items[0]:=LanguageSetup.WizardFormWizardModeAlwaysAutomatically;
-  WizardModeRadioGroup.Items[1]:=LanguageSetup.WizardFormWizardModeAutomaticallyIfAutoSetupTemplateExists;
-  WizardModeRadioGroup.Items[2]:=LanguageSetup.WizardFormWizardModeAlwaysAllPages;
+  EmulationTypeLabel.Caption:=LanguageSetup.WizardFormEmulationType;
+  EmulationTypeComboBox.Items[0]:=LanguageSetup.WizardFormEmulationTypeDOSBox;
+  EmulationTypeComboBox.Items[1]:=LanguageSetup.WizardFormEmulationTypeScummVM;
+  EmulationTypeComboBox.Items[2]:=LanguageSetup.WizardFormEmulationTypeWindows;
+  EmulationTypeComboBox.Items.Objects[0]:=TObject(-1);
+  EmulationTypeComboBox.Items.Objects[1]:=TObject(-2);
+  EmulationTypeComboBox.Items.Objects[2]:=TObject(-3);
+  ListScummGamesLabel.Caption:=LanguageSetup.WizardFormEmulationTypeListScummVMGames;
+  ShowInfoLabel.Caption:=LanguageSetup.WizardFormMainInfo;
+  WizardModeLabel.Caption:=LanguageSetup.WizardFormWizardMode;
+  WizardModeComboBox.Items[0]:=LanguageSetup.WizardFormWizardModeAlwaysAutomatically;
+  WizardModeComboBox.Items[1]:=LanguageSetup.WizardFormWizardModeAutomaticallyIfAutoSetupTemplateExists;
+  WizardModeComboBox.Items[2]:=LanguageSetup.WizardFormWizardModeAlwaysAllPages;
 
-  If Trim(PrgSetup.ScummVMPath)='' then EmulationTypeRadioGroup.Items.Delete(1);
-  ListScummGamesButton.Visible:=(Trim(PrgSetup.ScummVMPath)<>'');
-  If not ListScummGamesButton.Visible then begin
-    ShowInfoButton.Top:=ListScummGamesButton.Top;
+  For I:=0 to PrgSetup.WindowsBasedEmulatorsNames.Count-1 do
+    EmulationTypeComboBox.Items.AddObject(Format(LanguageSetup.MenuProfileAddOtherBasedGameDialog,[PrgSetup.WindowsBasedEmulatorsNames[I]]),TObject(I));
+  EmulationTypeComboBox.ItemIndex:=0;
+  WizardModeComboBox.ItemIndex:=Max(0,Min(2,PrgSetup.LastWizardMode));
+
+  If Trim(PrgSetup.ScummVMPath)='' then EmulationTypeComboBox.Items.Delete(1);
+  ListScummGamesLabel.Visible:=(Trim(PrgSetup.ScummVMPath)<>'');
+  If not ListScummGamesLabel.Visible then begin
+    ShowInfoLabel.Top:=ListScummGamesLabel.Top;
   end;
 
-  WizardModeRadioGroup.ItemIndex:=Max(0,Min(2,PrgSetup.LastWizardMode));
+  with ListScummGamesLabel.Font do begin Color:=clBlue; Style:=[fsUnderline]; end;
+  ListScummGamesLabel.Cursor:=crHandPoint;
+  with ShowInfoLabel.Font do begin Color:=clBlue; Style:=[fsUnderline]; end;
+  ShowInfoLabel.Cursor:=crHandPoint;
+end;
 
-  UserIconLoader.DialogImage(DI_Table,ListScummGamesButton);
-  UserIconLoader.DialogImage(DI_Help,ShowInfoButton);
+Function TWizardBaseFrame.GetEmulationType : Integer;
+begin
+  If EmulationTypeComboBox.ItemIndex<0 then result:=-1 else result:=Integer(EmulationTypeComboBox.Items.Objects[EmulationTypeComboBox.ItemIndex]);
+end;
+
+Procedure TWizardBaseFrame.SetEmulationType(I : Integer);
+Var J : Integer;
+begin
+  For J:=0 to EmulationTypeComboBox.Items.Count-1 do If Integer(EmulationTypeComboBox.Items.Objects[J])=I then begin
+    EmulationTypeComboBox.ItemIndex:=J; break;
+  end;
 end;
 
 procedure TWizardBaseFrame.WriteDataToGame(const Game: TGame);
 Var S : String;
     I : Integer;
 begin
-  If EmulationTypeRadioGroup.ItemIndex=0 then begin
+  If (EmulationType=-1) or (EmulationType=-2) then begin
     S:=IncludeTrailingPathDelimiter(PrgSetup.CaptureDir)+MakeFileSysOKFolderName(Game.Name)+'\';
     I:=0;
     While (not PrgSetup.IgnoreDirectoryCollisions) and DirectoryExists(MakeAbsPath(S,PrgSetup.BaseDir)) do begin

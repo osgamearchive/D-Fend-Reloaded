@@ -25,13 +25,16 @@ type
     DataFolderShowButton: TBitBtn;
     FolderInfoButton2: TSpeedButton;
     DataFolderAutomaticCheckBox: TCheckBox;
+    DataFolderAutomaticButton: TBitBtn;
     procedure ButtonWork(Sender: TObject);
     procedure FolderInfoButtonClick(Sender: TObject);
     procedure DataFolderShowButtonClick(Sender: TObject);
+    procedure DataFolderAutomaticButtonClick(Sender: TObject);
   private
     { Private-Deklarationen }
   public
     { Public-Deklarationen }
+    OtherEmulator : Integer;
     Procedure Init(const GameDB : TGameDB);
     Procedure WriteDataToGame(const Game : TGame);
   end;
@@ -66,6 +69,7 @@ begin
   DataFolderButton.Hint:=LanguageSetup.ChooseFolder;
   BaseDataFolderEdit.EditLabel.Caption:=LanguageSetup.WizardFormBaseDataFolder;
   BaseDataFolderButton.Caption:=LanguageSetup.WizardFormExplorer;
+  DataFolderAutomaticButton.Caption:=LanguageSetup.WizardFormDataFolderAutomaticButton;
 
   GamesFolderEdit.Text:=PrgSetup.GameDir;
   BaseDataFolderEdit.Text:=PrgSetup.DataDir;
@@ -73,11 +77,12 @@ begin
   UserIconLoader.DialogImage(DI_SelectFile,ProgramButton);
   UserIconLoader.DialogImage(DI_SelectFile,SetupButton);
   UserIconLoader.DialogImage(DI_SelectFolder,GamesFolderButton);
-  UserIconLoader.DialogImage(DI_Help,FolderInfoButton);
+  UserIconLoader.DialogImage(DI_ToolbarHelp,FolderInfoButton);
   UserIconLoader.DialogImage(DI_SelectFolder,DataFolderButton);
   UserIconLoader.DialogImage(DI_SelectFolder,BaseDataFolderButton);
-  UserIconLoader.DialogImage(DI_Help,FolderInfoButton2);
+  UserIconLoader.DialogImage(DI_ToolbarHelp,FolderInfoButton2);
   UserIconLoader.DialogImage(DI_Down,DataFolderShowButton);
+  UserIconLoader.DialogImage(DI_Up,DataFolderAutomaticButton);
 
   GamesFolderEdit.Color:=Color;
   BaseDataFolderEdit.Color:=Color;
@@ -90,11 +95,11 @@ begin
     0 : ShellExecute(Handle,'explore',PChar(GamesFolderEdit.Text),nil,PChar(GamesFolderEdit.Text),SW_SHOW);
     1 : begin
           S:=MakeAbsPath(ProgramEdit.Text,PrgSetup.BaseDir);
-          If SelectProgramFile(S,ProgramEdit.Text,SetupEdit.Text,GamesFolderEdit.Visible=False,self) then ProgramEdit.Text:=S;
+          If SelectProgramFile(S,ProgramEdit.Text,SetupEdit.Text,GamesFolderEdit.Visible=False,OtherEmulator,self) then ProgramEdit.Text:=S;
         end;
     2 : begin
           S:=MakeAbsPath(SetupEdit.Text,PrgSetup.BaseDir);
-          If SelectProgramFile(S,SetupEdit.Text,ProgramEdit.Text,GamesFolderEdit.Visible=False,self) then SetupEdit.Text:=S;
+          If SelectProgramFile(S,SetupEdit.Text,ProgramEdit.Text,GamesFolderEdit.Visible=False,OtherEmulator,self) then SetupEdit.Text:=S;
         end;
     3 : ShellExecute(Handle,'explore',PChar(BaseDataFolderEdit.Text),nil,PChar(BaseDataFolderEdit.Text),SW_SHOW);
     4 : begin
@@ -112,8 +117,22 @@ procedure TWizardPrgFileFrame.WriteDataToGame(const Game: TGame);
 Var I : Integer;
     S,T : String;
 begin
-  Game.GameExe:=ProgramEdit.Text;
-  Game.SetupExe:=SetupEdit.Text;
+  If (not GamesFolderEdit.Visible) and (OtherEmulator>=0) then begin
+    If Trim(ProgramEdit.Text)='' then begin Game.GameExe:=''; Game.GameParameters:=''; end else begin
+      Game.GameExe:=PrgSetup.WindowsBasedEmulatorsPrograms[OtherEmulator];
+      Game.GameParameters:=Format(PrgSetup.WindowsBasedEmulatorsParameters[OtherEmulator],[ProgramEdit.Text]);
+    end;
+    If Trim(SetupEdit.Text)='' then begin Game.SetupExe:=''; Game.SetupParameters:=''; end else begin
+      Game.SetupExe:=PrgSetup.WindowsBasedEmulatorsPrograms[OtherEmulator];
+      Game.SetupParameters:=Format(PrgSetup.WindowsBasedEmulatorsParameters[OtherEmulator],[SetupEdit.Text]);
+    end;
+  end else begin
+    Game.GameExe:=ProgramEdit.Text;
+    Game.SetupExe:=SetupEdit.Text;
+  end;
+
+  If DataFolderButton.Visible and (Trim(DataFolderEdit.Text)='') then DataFolderButton.Visible:=False;
+
   If DataFolderButton.Visible then begin
     Game.DataDir:=MakeRelPath(DataFolderEdit.Text,PrgSetup.BaseDir);
   end else begin
@@ -151,7 +170,22 @@ begin
   DataFolderEdit.Visible:=True;
   DataFolderButton.Visible:=True;
   FolderInfoButton2.Visible:=True;
+  DataFolderAutomaticButton.Visible:=True;
 end;
 
+procedure TWizardPrgFileFrame.DataFolderAutomaticButtonClick(Sender: TObject);
+begin
+  DataFolderShowButton.Visible:=True;
+  DataFolderAutomaticCheckBox.Visible:=True;
+  DataFolderAutomaticCheckBox.Checked:=True;
+
+  BaseInfoLabel3.Visible:=False;
+  BaseDataFolderEdit.Visible:=False;
+  BaseDataFolderButton.Visible:=False;
+  DataFolderEdit.Visible:=False;
+  DataFolderButton.Visible:=False;
+  FolderInfoButton2.Visible:=False;
+  DataFolderAutomaticButton.Visible:=False;
+end;
 
 end.

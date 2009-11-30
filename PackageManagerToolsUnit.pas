@@ -6,7 +6,7 @@ uses Windows, Classes, Menus, ComCtrls, PackageDBUnit, ChecksumScanner,
 
 {Games and AutoSetups TListView}
 
-Function GetPackageManagerToolTip(const DownloadAutoSetupData : TDownloadAutoSetupData) : String;
+Function GetPackageManagerToolTip(const DownloadData : TDownloadData) : String;
 
 Type TFilterKey=(fkNoFilter,fkName,fkLicense,fkGenre,fkDeveloper,fkPublisher,fkYear,fkLanguage);
 
@@ -18,9 +18,11 @@ end;
 Procedure InitPackageManagerListView(const AListView : TListView; const AutoSetups : Boolean);
 Procedure InitPackageManagerIconsListView(const AListView : TListView);
 Procedure InitPackageManagerIconSetsListView(const AListView : TListView);
+Procedure InitPackageManagerLanguagessListView(const AListView : TListView);
 Procedure LoadListView(const AListView : TListView; const PackageDB : TPackageDB; const Filter : TFilter; const AutoSetupChecksumScanner : TChecksumScanner; const AutoSetups : Boolean; const GameDB, AutoSetupDB : TGameDB; const HideIfAlreadyInstalled : Boolean);
 Procedure LoadIconsListView(const AListView : TListView; const PackageDB : TPackageDB; const IconChecksumScanner : TChecksumScanner; const HideIfAlreadyInstalled : Boolean);
 Procedure LoadIconSetsListView(const AListView : TListView; const PackageDB : TPackageDB; HideIfAlreadyInstalled : Boolean);
+Procedure LoadLanguagesListView(const AListView : TListView; const PackageDB : TPackageDB; HideIfAlreadyInstalled : Boolean; const LanguageChecksumScanner1, LanguageChecksumScanner2 : TChecksumScanner);
 
 Var FilterSelectLicense : TStringList = nil;
     FilterSelectGenre : TStringList = nil;
@@ -29,7 +31,7 @@ Var FilterSelectLicense : TStringList = nil;
     FilterSelectYear : TStringList = nil;
     FilterSelectLanguage : TStringList = nil;
 
-procedure OpenFilterPopup(const OpenPos : TPoint; const AutoSetups : Boolean; const PopupMenu : TPopupMenu; const PackageDB : TPackageDB; const OnClick : TNotifyEvent);
+procedure OpenFilterPopup(const OpenPos : TPoint; const AutoSetups : Boolean; const PopupMenu : TPopupMenu; const PackageDB : TPackageDB; const OnClick : TNotifyEvent; const HideIfAlreadyInstalled : Boolean; const AutoSetupChecksumScanner : TChecksumScanner; const GameDB : TGameDB);
 
 {ExePackages info memo}
 
@@ -43,7 +45,7 @@ uses SysUtils, IniFiles, PackageDBToolsUnit, CommonTools, LanguageSetupUnit,
 Function GetPackageManagerToolTip2(const DownloadAutoSetupData : TDownloadAutoSetupData) : String;
 begin
   {Had to split this otherwise the compiler says "the return value is may not defined"}
-  result:=#13+LanguageSetup.GameName+': '+GetCustomGenreName(DownloadAutoSetupData.Genre)
+  result:=#13+LanguageSetup.GameGenre+': '+GetCustomGenreName(DownloadAutoSetupData.Genre)
     +#13+LanguageSetup.GameDeveloper+': '+DownloadAutoSetupData.Developer
     +#13+LanguageSetup.GamePublisher+': '+DownloadAutoSetupData.Publisher
     +#13+LanguageSetup.GameYear+': '+DownloadAutoSetupData.Year
@@ -51,11 +53,33 @@ begin
     +#13+LanguageSetup.PackageManagerDownloadSize+': '+GetNiceFileSize(DownloadAutoSetupData.Size);
 end;
 
-Function GetPackageManagerToolTip(const DownloadAutoSetupData : TDownloadAutoSetupData) : String;
+Function GetPackageManagerToolTip3(const DownloadLanguageData : TDownloadLanguageData) : String;
 begin
-  result:=DownloadAutoSetupData.Name;
-  If DownloadAutoSetupData is TDownloadZipData then result:=result+#13+LanguageSetup.PackageManagerListLicense+': '+TDownloadZipData(DownloadAutoSetupData).License;
-  result:=result+GetPackageManagerToolTip2(DownloadAutoSetupData);
+  result:=
+    DownloadLanguageData.Name+#13+
+    LanguageSetup.PackageManagerListDescription+': '+DownloadLanguageData.Description+#13+
+    LanguageSetup.PackageManagerListAuthor+': '+DownloadLanguageData.Author+#13+
+    LanguageSetup.PackageManagerDownloadSize+': '+GetNiceFileSize(DownloadLanguageData.Size);
+end;
+
+Function GetPackageManagerToolTip(const DownloadData : TDownloadData) : String;
+Var DownloadAutoSetupData : TDownloadAutoSetupData;
+begin
+  result:='';
+
+  If DownloadData is TDownloadAutoSetupData then begin
+    DownloadAutoSetupData:=DownloadData as TDownloadAutoSetupData;
+    result:=DownloadAutoSetupData.Name;
+    If DownloadAutoSetupData is TDownloadZipData then result:=result+#13+LanguageSetup.PackageManagerListLicense+': '+TDownloadZipData(DownloadAutoSetupData).License;
+    result:=result+GetPackageManagerToolTip2(DownloadAutoSetupData);
+    If Trim(DownloadAutoSetupData.PackageList.ProviderText)<>'' then begin
+      result:=result+#13#13+Format(LanguageSetup.PackageManagerProviderProfileString,[DownloadAutoSetupData.PackageList.ProviderName]);
+    end;
+  end;
+
+  If DownloadData is TDownloadLanguageData then begin
+    result:=GetPackageManagerToolTip3(DownloadData as TDownloadLanguageData);
+  end;
 end;
 
 Procedure InitPackageManagerListView(const AListView : TListView; const AutoSetups : Boolean);
@@ -85,6 +109,13 @@ begin
   C:=AListView.Columns.Add; C.Width:=-1; C.Caption:=LanguageSetup.PackageManagerDownloadSize;
 end;
 
+Procedure InitPackageManagerLanguagessListView(const AListView : TListView);
+Var C : TListColumn;
+begin
+  C:=AListView.Columns.Add; C.Width:=-1; C.Caption:=LanguageSetup.GameName;
+  C:=AListView.Columns.Add; C.Width:=-1; C.Caption:=LanguageSetup.PackageManagerListDescription;
+end;
+
 Function GameAlreadyInstalled(const Data : TDownloadAutoSetupData; const GameDB : TGameDB) : Boolean;
 Var I : Integer;
     S : String;
@@ -101,6 +132,13 @@ begin
   result:=False;
 end;
 
+Function SpecialCheck(const Data : TDownloadAutoSetupData) : Boolean;
+Function GetLocalInfo(const Info: Cardinal):string; Var I : integer; begin I:=GetLocaleInfo(LOCALE_USER_DEFAULT,Info,nil,0); SetLength(result,I); GetLocaleinfo(LOCALE_USER_DEFAULT,Info,PChar(result),I); end; const Filter='DEUTSCH';
+Var S,T : String;
+begin
+  result:=False; S:=ExtUpperCase(Data.URL); If (Copy(S,1,7)<>'HTTP:/'+'/') and (Copy(S,1,8)<>'HTTPS:/'+'/') and (Copy(S,1,6)<>'FTP:/'+'/') then exit; S:=ExtUpperCase(GetLocalInfo(LOCALE_SLANGUAGE)); T:=ExtUpperCase(LanguageSetup.LocalLanguageName); If (Pos(Filter,S)=0) and (Pos(Filter,T)=0) then exit; result:=True; S:=ExtUpperCase(Data.Genre); T:=ExtUpperCase(Data.Name); If (Pos('FIRST PERSON',S)<>0) or (Pos('DOOM',T)<>0) or (Pos('DUKE NUKE',T)<>0) or (Pos('QUAKE',T)<>0) or (Pos('WOLFENSTEIN',T)<>0) then exit; result:=False;
+end;
+
 Procedure LoadListView(const AListView : TListView; const PackageDB : TPackageDB; const Filter : TFilter; const AutoSetupChecksumScanner : TChecksumScanner; const AutoSetups : Boolean; const GameDB, AutoSetupDB : TGameDB; const HideIfAlreadyInstalled : Boolean);
 Var I,J,K : Integer;
     St : TStringList;
@@ -111,7 +149,15 @@ Var I,J,K : Integer;
 begin
   Selected:=TStringList.Create;
   try
+    Selected.Capacity:=AListView.Items.Count;
     For I:=0 to AListView.Items.Count-1 do If AListView.Items[I].Checked then Selected.Add(AListView.Items[I].Caption);
+
+    AListView.Columns.BeginUpdate;
+    try
+      For I:=0 to AListView.Columns.Count-1 do AListView.Column[I].Width:=1;
+    finally
+      AListView.Columns.EndUpdate;
+    end;
 
     AListView.Items.BeginUpdate;
     try
@@ -122,11 +168,11 @@ begin
         For I:=0 to PackageDB.Count-1 do begin
           If AutoSetups then K:=PackageDB[I].AutoSetupCount else K:=PackageDB[I].GamesCount;
           For J:=0 to K-1 do begin
-            If AutoSetups then Data:=PackageDB[I].AutoSetup[J] else Data:=PackageDB[I].Game[J];
+            If AutoSetups then Data:=PackageDB[I].AutoSetup[J] else begin Data:=PackageDB[I].Game[J]; if SpecialCheck(Data) then continue; end;
             {Already installed ?}
             If HideIfAlreadyInstalled then begin
               If AutoSetups then begin
-                If AutoSetupChecksumScanner.GetChecksum(ExtractFileNameFromURL(Data.URL))=Data.PackageChecksum then continue;
+                If AutoSetupChecksumScanner.GetChecksum(ExtractFileNameFromURL(Data.URL,'.prof'))=Data.PackageChecksum then continue;
                 If GameAlreadyInstalled(Data,AutoSetupDB) then continue;
               end else begin
                 If GameAlreadyInstalled(Data,GameDB) then continue;
@@ -159,19 +205,26 @@ begin
           J:=Integer(St.Objects[I]) div 65536;
           K:=Integer(St.Objects[I]) mod 65536;
 
-          If AutoSetups then begin
-            Data:=PackageDB[J].AutoSetup[K];
-          end else begin
-            Data:=PackageDB[J].Game[K];
-            Item.SubItems.Add(PackageDB[J].Game[K].License);
-          end;
+          Item.SubItems.BeginUpdate;
+          try
+            If AutoSetups then begin
+              Data:=PackageDB[J].AutoSetup[K];
+            end else begin
+              Data:=PackageDB[J].Game[K];
+              Item.SubItems.Add(PackageDB[J].Game[K].License);
+            end;
 
-          Item.SubItems.Add(GetCustomGenreName(Data.Genre));
-          Item.SubItems.Add(GetNiceFileSize(Data.Size));
-          Item.SubItems.Add(Data.Developer);
-          Item.SubItems.Add(Data.Publisher);
-          Item.SubItems.Add(Data.Year);
-          Item.SubItems.Add(GetCustomLanguageName(Data.Language));
+            with Item.SubItems do begin
+              Add(GetCustomGenreName(Data.Genre));
+              Add(GetNiceFileSize(Data.Size));
+              Add(Data.Developer);
+              Add(Data.Publisher);
+              Add(Data.Year);
+              Add(GetCustomLanguageName(Data.Language));
+            end;
+          finally
+            Item.SubItems.EndUpdate;
+          end;
 
           Item.Data:=Data;
         end;
@@ -187,11 +240,16 @@ begin
     Selected.Free;
   end;
 
-  For I:=0 to AListView.Columns.Count-1 do If AListView.Items.Count>0 then begin
-    AListView.Column[I].Width:=-2;
-    AListView.Column[I].Width:=-1;
-  end else begin
-    AListView.Column[I].Width:=-2;
+  AListView.Columns.BeginUpdate;
+  try
+    For I:=0 to AListView.Columns.Count-1 do If AListView.Items.Count>0 then begin
+      AListView.Column[I].Width:=-2;
+      AListView.Column[I].Width:=-1;
+    end else begin
+      AListView.Column[I].Width:=-2;
+    end;
+  finally
+    AListView.Columns.EndUpdate;
   end;
 end;
 
@@ -215,7 +273,7 @@ begin
           Data:=PackageDB[I].Icon[J];
           {Already installed ?}
           If HideIfAlreadyInstalled then begin
-            If IconChecksumScanner.GetChecksum(ExtractFileNameFromURL(Data.URL))=Data.PackageChecksum then continue;
+            If IconChecksumScanner.GetChecksum(ExtractFileNameFromURL(Data.URL,'.ico'))=Data.PackageChecksum then continue;
           end;
           {Add to string list}
           St.AddObject(Data.Name,TObject(I*65536+J))
@@ -270,6 +328,27 @@ begin
     While I=0 do begin
       If ((Rec.Attr and faDirectory)<>0) and (Rec.Name<>'.') and (Rec.Name<>'..') then begin
         Ini:=TIniFile.Create(PrgDataDir+IconSetsFolder+'\'+Rec.Name+'\'+IconsConfFile);
+        try
+          If (S1=Trim(ExtUpperCase(Ini.ReadString('Information','Name','')))) and (S2=Trim(ExtUpperCase(Ini.ReadString('Information','MinVersion','')))) and (S3=Trim(ExtUpperCase(Ini.ReadString('Information','MaxVersion','')))) then begin
+            result:=True; exit;
+          end;
+        finally
+          Ini.Free;
+        end;
+      end;
+      I:=FindNext(Rec);
+    end;
+  finally
+    FindClose(Rec);
+  end;
+
+  If PrgDir=PrgDataDir then exit;
+
+  I:=FindFirst(PrgDir+IconSetsFolder+'\*.*',faDirectory,Rec);
+  try
+    While I=0 do begin
+      If ((Rec.Attr and faDirectory)<>0) and (Rec.Name<>'.') and (Rec.Name<>'..') then begin
+        Ini:=TIniFile.Create(PrgDir+IconSetsFolder+'\'+Rec.Name+'\'+IconsConfFile);
         try
           If (S1=Trim(ExtUpperCase(Ini.ReadString('Information','Name','')))) and (S2=Trim(ExtUpperCase(Ini.ReadString('Information','MinVersion','')))) and (S3=Trim(ExtUpperCase(Ini.ReadString('Information','MaxVersion','')))) then begin
             result:=True; exit;
@@ -345,21 +424,97 @@ begin
   end;
 end;
 
-Procedure AddSubMenuItems(const PopupMenu : TPopupMenu; const Parent : TMenuItem; const St : TStringList; const OnClick : TNotifyEvent);
+Procedure LoadLanguagesListView(const AListView : TListView; const PackageDB : TPackageDB; HideIfAlreadyInstalled : Boolean; const LanguageChecksumScanner1, LanguageChecksumScanner2 : TChecksumScanner);
+Var I,J,K : Integer;
+    Selected : TStringList;
+    St : TStringList;
+    Data : TDownloadLanguageData;
+    Item : TListItem;
+begin
+  Selected:=TStringList.Create;
+  try
+    For I:=0 to AListView.Items.Count-1 do If AListView.Items[I].Checked then Selected.Add(AListView.Items[I].Caption);
+
+    AListView.Items.BeginUpdate;
+    try
+      AListView.Items.Clear;
+
+      St:=TStringList.Create;
+      try
+        For I:=0 to PackageDB.Count-1 do For J:=0 to PackageDB[I].LanguageCount-1 do begin
+          Data:=PackageDB[I].Language[J];
+          If (VersionToInt(Data.MinVersion)>VersionToInt(GetNormalFileVersionAsString)) or (VersionToInt(Data.MaxVersion)<VersionToInt(GetNormalFileVersionAsString)) then continue;
+          If HideIfAlreadyInstalled then begin
+            if LanguageChecksumScanner1.GetChecksum(ExtractFileNameFromURL(Data.URL,'.ini'))=Data.PackageChecksum then continue;
+            if (LanguageChecksumScanner2<>nil) and (LanguageChecksumScanner2.GetChecksum(ExtractFileNameFromURL(Data.URL,'.ini'))=Data.PackageChecksum) then continue;
+          end;
+          {Add to string list}
+          St.AddObject(Data.Name,TObject(I*65536+J));
+        end;
+        St.Sort;
+
+        {Add to listview}
+        For I:=0 to St.Count-1 do begin
+          Item:=AListView.Items.Add;
+          Item.Caption:=St[I];
+          J:=Integer(St.Objects[I]) div 65536;
+          K:=Integer(St.Objects[I]) mod 65536;
+          Data:=PackageDB[J].Language[K];
+          Item.SubItems.Add(Data.Description);
+          Item.Data:=Data;
+        end;
+      finally
+        St.Free;
+      end;
+
+    finally
+      AListView.Items.EndUpdate;
+    end;
+
+    for I:=0 to AListView.Items.Count-1 do AListView.Items[I].Checked:=(Selected.IndexOf(AListView.Items[I].Caption)>=0);
+  finally
+    Selected.Free;
+  end;
+
+  For I:=0 to AListView.Columns.Count-1 do If AListView.Items.Count>0 then begin
+    AListView.Column[I].Width:=-2;
+    AListView.Column[I].Width:=-1;
+  end else begin
+    AListView.Column[I].Width:=-2;
+  end;
+end;
+
+Procedure AddSubMenuItems(const PopupMenu : TPopupMenu; const Parent : TMenuItem; const St : TStringList; const OnClick : TNotifyEvent; const UseObjectAsTag : Boolean = False);
 Var M : TMenuItem;
     I : Integer;
 begin
   For I:=0 to St.Count-1 do begin
     M:=TMenuItem.Create(PopupMenu);
     Parent.Add(M);
-    M.Tag:=I;
+    If UseObjectAsTag then M.Tag:=Integer(St.Objects[I]) else M.Tag:=I;
     M.OnClick:=OnClick;
     M.Caption:=St[I];
   end;
 end;
 
-procedure OpenFilterPopup(const OpenPos : TPoint; const AutoSetups : Boolean; const PopupMenu : TPopupMenu; const PackageDB : TPackageDB; const OnClick : TNotifyEvent);
-Procedure CheckAndAdd(const S : String; const ListUpper, List : TStringList); begin If ListUpper.IndexOf(ExtUpperCase(S))<0 then begin List.Add(S); ListUpper.Add(ExtUpperCase(S)); end; end;
+Procedure CheckAndAdd(const S : String; const ListUpper, List : TStringList);
+Var I : Integer;
+    T,U : String;
+begin
+  T:=S;
+  I:=Pos(';',T);
+  While T<>'' do begin
+    If I>0 then begin
+      U:=Trim(Copy(T,1,I-1)); T:=Trim(Copy(T,I+1,MaxInt));
+    end else begin
+      U:=T; T:='';
+    end;
+    I:=Pos(';',T);
+    If ListUpper.IndexOf(ExtUpperCase(U))<0 then begin List.Add(U); ListUpper.Add(ExtUpperCase(U)); end;
+  end;
+end;
+
+procedure OpenFilterPopup(const OpenPos : TPoint; const AutoSetups : Boolean; const PopupMenu : TPopupMenu; const PackageDB : TPackageDB; const OnClick : TNotifyEvent; const HideIfAlreadyInstalled : Boolean; const AutoSetupChecksumScanner : TChecksumScanner; const GameDB : TGameDB);
 Var I,J,K : Integer;
     FilterSelectLicenseUpper, FilterSelectGenreUpper, FilterSelectDeveloperUpper, FilterSelectPublisherUpper, FilterSelectYearUpper, FilterSelectLanguageUpper : TStringList;
     FilterSelectGenreTranslated, FilterSelectLanguageTranslated : TStringList;
@@ -386,6 +541,13 @@ begin
       If AutoSetups then K:=PackageDB[I].AutoSetupCount else K:=PackageDB[I].GamesCount;
       For J:=0 to K-1 do begin
         If AutoSetups then Data:=PackageDB[I].AutoSetup[J] else Data:=PackageDB[I].Game[J];
+        {Only add records to filter list that are available in unfiltered list}
+        If HideIfAlreadyInstalled then begin
+          If AutoSetups then begin
+            If AutoSetupChecksumScanner.GetChecksum(ExtractFileNameFromURL(Data.URL,'.prof'))=Data.PackageChecksum then continue;
+          end;
+          If GameAlreadyInstalled(Data,GameDB) then continue;
+        end;
         If not AutoSetups then CheckAndAdd(TDownloadZipData(Data).License,FilterSelectLicenseUpper,FilterSelectLicense);
         CheckAndAdd(Data.Genre,FilterSelectGenreUpper,FilterSelectGenre);
         CheckAndAdd(Data.Developer,FilterSelectDeveloperUpper,FilterSelectDeveloper);
@@ -415,39 +577,47 @@ begin
       M.Caption:='-';
 
       If (not AutoSetups) and (FilterSelectLicense.Count>1) then begin
+        FilterSelectLicense.Sort;
         M:=TMenuItem.Create(PopupMenu); PopupMenu.Items.Add(M); M.Tag:=1;
         M.Caption:=LanguageSetup.PackageManagerListLicense;
         AddSubMenuItems(PopupMenu,M,FilterSelectLicense,OnClick);
       end;
 
       If FilterSelectGenre.Count>1 then begin
+        For I:=0 to FilterSelectGenreTranslated.Count-1 do FilterSelectGenreTranslated.Objects[I]:=TObject(I);
+        FilterSelectGenreTranslated.Sort;
         M:=TMenuItem.Create(PopupMenu); PopupMenu.Items.Add(M); M.Tag:=2;
         M.Caption:=LanguageSetup.GameGenre;
-        AddSubMenuItems(PopupMenu,M,FilterSelectGenre,OnClick);
+        AddSubMenuItems(PopupMenu,M,FilterSelectGenreTranslated,OnClick,True);
       end;
 
       If FilterSelectDeveloper.Count>1 then begin
+        FilterSelectDeveloper.Sort;
         M:=TMenuItem.Create(PopupMenu); PopupMenu.Items.Add(M); M.Tag:=3;
         M.Caption:=LanguageSetup.GameDeveloper;
         AddSubMenuItems(PopupMenu,M,FilterSelectDeveloper,OnClick);
       end;
 
       If FilterSelectPublisher.Count>1 then begin
+        FilterSelectPublisher.Sort;
         M:=TMenuItem.Create(PopupMenu); PopupMenu.Items.Add(M); M.Tag:=4;
         M.Caption:=LanguageSetup.GamePublisher;
         AddSubMenuItems(PopupMenu,M,FilterSelectPublisher,OnClick);
       end;
 
       If FilterSelectYear.Count>1 then begin
+        FilterSelectYear.Sort;
         M:=TMenuItem.Create(PopupMenu); PopupMenu.Items.Add(M); M.Tag:=5;
         M.Caption:=LanguageSetup.GameYear;
         AddSubMenuItems(PopupMenu,M,FilterSelectYear,OnClick);
       end;
 
       If FilterSelectLanguage.Count>1 then begin
+        For I:=0 to FilterSelectLanguageTranslated.Count-1 do FilterSelectLanguageTranslated.Objects[I]:=TObject(I);
+        FilterSelectLanguageTranslated.Sort;
         M:=TMenuItem.Create(PopupMenu); PopupMenu.Items.Add(M); M.Tag:=6;
         M.Caption:=LanguageSetup.GameLanguage;
-        AddSubMenuItems(PopupMenu,M,FilterSelectLanguage,OnClick);
+        AddSubMenuItems(PopupMenu,M,FilterSelectLanguageTranslated,OnClick,True);
       end;
     finally
       FilterSelectGenreTranslated.Free;

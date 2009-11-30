@@ -34,7 +34,7 @@ type
   public
     { Public-Deklarationen }
     Function GetName : String;
-    Procedure InitGUIAndLoadSetup(InitData : TInitData);
+    Procedure InitGUIAndLoadSetup(var InitData : TInitData);
     Procedure BeforeChangeLanguage;
     Procedure LoadLanguage;
     Procedure DOSBoxDirChanged;
@@ -57,7 +57,7 @@ begin
   result:=LanguageSetup.SetupFormDosBoxCVSSheet;
 end;
 
-procedure TSetupFrameDOSBoxExt.InitGUIAndLoadSetup(InitData: TInitData);
+procedure TSetupFrameDOSBoxExt.InitGUIAndLoadSetup(var InitData: TInitData);
 Var I : Integer;
 begin
   GameDB:=InitData.GameDB;

@@ -2,6 +2,8 @@ Var DefaultParameter
 
 Var MessageCannotFindFile
 Var MessageDownloadFailed
+Var MessageDownloadFailedBeforeURL
+Var MessageDownloadFailedAfterURL
 Var MessageDownload1
 Var MessageDownload2
 Var MessageDownload3
@@ -52,6 +54,10 @@ Function DownloadFile ; Downloads from top of stack to second stack filename; th
   CheckDownload:
   Pop $R0
   StrCmp $R0 "OK" DownloadOK
+  StrCmp $R0 "SendRequest Error" NotAvailable ShowErrorMessage
+  NotAvailable:
+  StrCpy $R0 "$MessageDownloadFailedBeforeURL $R1 $MessageDownloadFailedAfterURL"
+  ShowErrorMessage:
   ;MessageBox MB_OK "$MessageDownloadFailed: $R0"
   messagebox::show MB_SETFOREGROUND|MB_DEFBUTTON1|MB_TOPMOST "D-Fend Reloaded Update Checker" "" "$MessageDownloadFailed: $R0" $MessageBoxOK
   Quit

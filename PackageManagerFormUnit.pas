@@ -30,7 +30,6 @@ type
     ExePackagesMemo: TRichEdit;
     LanguagePanel: TPanel;
     LanguageButton: TBitBtn;
-    LanguageListBox: TCheckListBox;
     ToolButton5: TToolButton;
     HelpButton: TToolButton;
     InfoPanel: TPanel;
@@ -53,6 +52,7 @@ type
     IconSetsPanel: TPanel;
     IconSetsButton: TBitBtn;
     IconSetsListView: TListView;
+    LanguagesListView: TListView;
     procedure ButtonWork(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -73,10 +73,12 @@ type
     { Private-Deklarationen }
     PackageDB : TPackageDB;
     PackageDBCache : TPackageDBCache;
-    LanguageChecksumScanner1, LanguageChecksumScanner2, AutoSetupChecksumScanner, IconChecksumScanner : TChecksumScanner;
+    LanguageChecksumScanner1, LanguageChecksumScanner2 : TLanguageFileChecksumScanner;
+    AutoSetupChecksumScanner, IconChecksumScanner : TChecksumScanner;
     GamesFilter, AutoSetupFilter : TFilter;
     Procedure LoadLists;
     Procedure PackageDBDownload(Sender : TObject; const Progress, Size : Integer; const Status : TDownloadStatus; var ContinueDownload : Boolean);
+    Procedure ProviderAction(const Data : Array of TDownloadData);
   public
     { Public-Deklarationen }
     GameDB, AutoSetupDB : TGameDB;
@@ -89,12 +91,14 @@ var
 
 Function ShowPackageManagerDialog(const AOwner : TComponent; const AGameDB, AAutoSetupDB : TGameDB) : String; {result=language file to activate}
 
+Function DonwloadAndInstall(const Owner : TComponent; const URL : String; const GameDB : TGameDB) : TGame;
+
 implementation
 
 uses ShellAPI, IniFiles, PackageDBToolsUnit, CommonTools, PrgConsts,
      DownloadWaitFormUnit, PrgSetupUnit, VistaToolsUnit, LanguageSetupUnit,
      ZipPackageUnit, IconLoaderUnit, HelpConsts, ZipInfoFormUnit,
-     PackageManagerRepositoriesEditFormUnit;
+     PackageManagerRepositoriesEditFormUnit, ProviderFormUnit, HashCalc;
 
 {$R *.dfm}
 
@@ -105,6 +109,14 @@ begin
 
   HideIfAlreadyInstalled:=True;
   LanguageToActivate:='';
+
+  NoFlicker(PageControl);
+  NoFlicker(GamesListView);
+  NoFlicker(AutoSetupListView);
+  NoFlicker(IconsListView);
+  NoFlicker(IconSetsListView);
+  NoFlicker(LanguagesListView);
+  NoFlicker(ExePackagesListBox);
 
   Caption:=LanguageSetup.PackageManager;
   CloseButton.Caption:=LanguageSetup.Close;
@@ -123,11 +135,7 @@ begin
   TabSheet3.Caption:=LanguageSetup.PackageManagerPageLanguages;
   TabSheet4.Caption:=LanguageSetup.PackageManagerPageExePackages;
 
-  //... Complete ImagesList customization for tabsheets in 0.9
-  UserIconLoader.DialogImage(DI_CloseWindow,ImageList,0);
-  UserIconLoader.DialogImage(DI_Update,ImageList,2);
-  UserIconLoader.DialogImage(DI_Edit,ImageList,1);
-  UserIconLoader.DialogImage(DI_ToolbarHelp,ImageList,3);
+  UserIconLoader.DirectLoad(ImageList,'PackageManager');
 
   GamesFilterButton.Caption:=LanguageSetup.PackageManagerFilterList;
   GamesButton.Caption:=LanguageSetup.PackageManagerInstallGames;
@@ -154,19 +162,37 @@ begin
   InitPackageManagerListView(AutoSetupListView,True);
   InitPackageManagerIconsListView(IconsListView);
   InitPackageManagerIconSetsListView(IconSetsListView);
+  InitPackageManagerLanguagessListView(LanguagesListView);
 end;
 
 procedure TPackageManagerForm.FormShow(Sender: TObject);
+Var DoUpdateCheck : Boolean;
 begin
   PackageDB:=TPackageDB.Create;
-  PackageDB.LoadDB(False);
+  PackageDB.LoadDB(False,False);
   PackageDB.OnDownload:=PackageDBDownload;
   PackageDBCache:=TPackageDBCache.Create;
 
-  LanguageChecksumScanner1:=TChecksumScanner.Create(PrgDir+LanguageSubDir,False,nil);
-  LanguageChecksumScanner2:=TChecksumScanner.Create(PrgDataDir+LanguageSubDir,False,nil);
-  AutoSetupChecksumScanner:=TChecksumScanner.Create(PrgDataDir+AutoSetupSubDir,True,Owner);
-  IconChecksumScanner:=TChecksumScanner.Create(PrgDataDir+IconsSubDir,False,nil);
+  LanguageChecksumScanner1:=TLanguageFileChecksumScanner.Create(PrgDir+LanguageSubDir,False,nil);
+  If PrgDir=PrgDataDir then begin
+    LanguageChecksumScanner2:=nil;
+  end else begin
+    LanguageChecksumScanner2:=TLanguageFileChecksumScanner.Create(PrgDataDir+LanguageSubDir,False,nil);
+  end;
+  AutoSetupChecksumScanner:=TChecksumScanner.Create(PrgDataDir+AutoSetupSubDir,'*.prof',True,Owner);
+  IconChecksumScanner:=TChecksumScanner.Create(PrgDataDir+IconsSubDir,'*.*',False,Owner);
+
+  DoUpdateCheck:=False;
+  Case PrgSetup.PackageListsCheckForUpdates of
+    0 : DoUpdateCheck:=False;
+    1 : DoUpdateCheck:=(Round(Int(Date))>=PrgSetup.LastDataReaderUpdateCheck+7);
+    2 : DoUpdateCheck:=(Round(Int(Date))>=PrgSetup.LastDataReaderUpdateCheck+1);
+    3 : DoUpdateCheck:=True;
+  End;
+  If DoUpdateCheck then begin
+    PackageDB.LoadDB(True,False);
+    PrgSetup.LastPackageListeUpdateCheck:=Round(Int(Date));
+  end;
 
   LoadLists;
 end;
@@ -176,7 +202,7 @@ begin
   PackageDB.Free;
   PackageDBCache.Free;
   LanguageChecksumScanner1.Free;
-  LanguageChecksumScanner2.Free;
+  If LanguageChecksumScanner2<>nil then LanguageChecksumScanner2.Free;
   AutoSetupChecksumScanner.Free;
   IconChecksumScanner.Free;
 end;
@@ -204,21 +230,8 @@ begin
   IconSetsButton.Enabled:=(IconSetsListView.Items.Count>0);
 
   {Language files list}
-  LanguageListBox.Items.Clear;
-  St:=TStringList.Create;
-  try
-    For I:=0 to PackageDB.Count-1 do For J:=0 to PackageDB.List[I].LanguageCount-1 do begin
-      If (VersionToInt(PackageDB.List[I].Language[J].MinVersion)>VersionToInt(GetNormalFileVersionAsString)) or (VersionToInt(PackageDB.List[I].Language[J].MaxVersion)<VersionToInt(GetNormalFileVersionAsString)) then continue;
-      If (not HideIfAlreadyInstalled) or (LanguageChecksumScanner1.GetChecksum(ExtractFileNameFromURL(PackageDB.List[I].Language[J].URL))<>PackageDB.List[I].Language[J].PackageChecksum) and (LanguageChecksumScanner2.GetChecksum(ExtractFileNameFromURL(PackageDB.List[I].Language[J].URL))<>PackageDB.List[I].Language[J].PackageChecksum) then begin
-        St.AddObject(PackageDB.List[I].Language[J].Name+' ('+ LanguageSetup.InfoFormLanguageAuthor+': '+PackageDB.List[I].Language[J].Author+')',PackageDB.List[I].Language[J]);
-      end;
-    end;
-    St.Sort;
-    LanguageListBox.Items.AddStrings(St);
-  finally
-    St.Free;
-  end;
-  LanguageButton.Enabled:=(LanguageListBox.Items.Count>0);
+  LoadLanguagesListView(LanguagesListView,PackageDB,HideIfAlreadyInstalled,LanguageChecksumScanner1,LanguageChecksumScanner2);
+  LanguageButton.Enabled:=(LanguagesListView.Items.Count>0);
 
   {Multiple games pacakges list}
   ExePackagesListBox.Items.Clear;
@@ -240,7 +253,7 @@ begin
   InfoLabel.Caption:=LanguageSetup.PackageManagerAllListsEmpty;
   InfoPanel.Visible:=False;
   For I:=0 to PackageDB.Count-1 do
-    If PackageDB.List[I].GamesCount+PackageDB.List[I].AutoSetupCount+PackageDB.List[I].LanguageCount+PackageDB.List[I].ExePackageCount>0 then exit;
+    If PackageDB.List[I].GamesCount+PackageDB.List[I].AutoSetupCount+PackageDB.List[I].LanguageCount+PackageDB.List[I].ExePackageCount+PackageDB.List[I].IconCount+PackageDB.List[I].IconSetCount>0 then exit;
   InfoPanel.Visible:=True;
 end;
 
@@ -248,16 +261,65 @@ procedure TPackageManagerForm.ListViewInfoTip(Sender: TObject; Item: TListItem; 
 begin
   InfoTip:='';
   If (Item=nil) or (Item.Data=nil) then exit;
-  InfoTip:=GetPackageManagerToolTip(TDownloadAutoSetupData(Item.Data));
+  InfoTip:=GetPackageManagerToolTip(TDownloadData(Item.Data));
 end;
 
 Procedure TPackageManagerForm.PackageDBDownload(Sender : TObject; const Progress, Size : Integer; const Status : TDownloadStatus; var ContinueDownload : Boolean);
 begin
   Case Status of
     dsStart : begin Enabled:=False; InitDownloadWaitForm(self,Size); end;
-    dsProgress : ContinueDownload:=StepDownloadWaitForm(Progress);
+    dsProgress : begin
+                   If DownloadWaitForm.ProgressBar.Max=1 then DownloadWaitForm.ProgressBar.Max:=Size;
+                   ContinueDownload:=StepDownloadWaitForm(Progress);
+                 end;
     dsDone : begin Enabled:=True; DoneDownloadWaitForm; end;
   End;
+end;
+
+Type TPackageInfo=record
+  PackageList : TPackageList;
+  DownloadData : Array of String;
+end;
+
+Function FileNameOnly(const S : String) : String;
+Var I : Integer;
+begin
+  result:=S;
+  I:=Pos('/',result); While I>0 do begin result:=Copy(result,I+1,MaxInt); I:=Pos('/',result); end;
+  I:=Pos('\',result); While I>0 do begin result:=Copy(result,I+1,MaxInt); I:=Pos('\',result); end;
+end;
+
+procedure TPackageManagerForm.ProviderAction(const Data: array of TDownloadData);
+Var I,J,K : Integer;
+    InfoURL, InfoDialog : Array of TPackageInfo;
+    St : TStringList;
+begin
+  For I:=low(Data) to high(Data) do begin
+    If paInfoDialog in Data[I].PackageList.ProviderActions then begin
+      K:=-1; For J:=0 to length(InfoDialog)-1 do If InfoDialog[J].PackageList=Data[I].PackageList then begin K:=J; break; end;
+      If K<0 then begin K:=length(InfoDialog); SetLength(InfoDialog,K+1); InfoDialog[K].PackageList:=Data[I].PackageList; end;
+      J:=length(InfoDialog[K].DownloadData); SetLength(InfoDialog[K].DownloadData,J+1); InfoDialog[K].DownloadData[J]:=FileNameOnly(Data[I].Name);
+    end;
+    If paOpenURL in Data[I].PackageList.ProviderActions then begin
+      K:=-1; For J:=0 to length(InfoURL)-1 do If InfoURL[J].PackageList=Data[I].PackageList then begin K:=J; break; end;
+      If K<0 then begin K:=length(InfoURL); SetLength(InfoURL,K+1); InfoURL[K].PackageList:=Data[I].PackageList; end;
+      J:=length(InfoURL[K].DownloadData); SetLength(InfoURL[K].DownloadData,J+1); InfoURL[K].DownloadData[J]:=FileNameOnly(Data[I].Name);
+    end;
+  end;
+
+  For I:=0 to length(InfoURL)-1 do ShellExecute(Handle,'open',PChar(InfoURL[I].PackageList.ProviderURL),nil,nil,SW_SHOW);
+
+  If length(InfoDialog)=0 then exit;
+
+  For I:=0 to length(InfoDialog)-1 do begin
+    St:=TStringList.Create;
+    try
+      For J:=0 to length(InfoDialog[I].DownloadData)-1 do St.Add(InfoDialog[I].DownloadData[J]);
+      ShowProviderDialog(self,St,InfoDialog[I].PackageList.ProviderName,InfoDialog[I].PackageList.ProviderText,InfoDialog[I].PackageList.ProviderURL);
+    finally
+      St.Free;
+    end;
+  end;
 end;
 
 procedure TPackageManagerForm.ButtonWork(Sender: TObject);
@@ -265,11 +327,12 @@ begin
   Case (Sender as TComponent).Tag of
     0 : Close;
     1 : begin
-          PackageDB.LoadDB(True);
+          PackageDB.LoadDB(True,((Word(GetKeyState(VK_LSHIFT)) div 256)<>0) or ((Word(GetKeyState(VK_RSHIFT)) div 256)<>0));
+          PrgSetup.LastPackageListeUpdateCheck:=Round(Int(Date));
           LoadLists;
         end;
     2 : If ShowPackageManagerRepositoriesEditDialog(self) then begin
-          PackageDB.LoadDB(True);
+          PackageDB.LoadDB(True,False);
           LoadLists;
         end;
     3 : Application.HelpCommand(HELP_CONTEXT,ID_FileImportDownload);
@@ -283,6 +346,7 @@ Var P : TPoint;
     Key : TFilterKey;
     S : String;
     Filter : ^TFilter;
+    DB : TGameDB;
 begin
   If Sender is TMenuItem then begin
     Nr:=(Sender as TComponent).Tag;
@@ -303,52 +367,120 @@ begin
       else LoadListView(GamesListView,PackageDB,GamesFilter,AutoSetupChecksumScanner,False,GameDB,AutoSetupDB,HideIfAlreadyInstalled);
   end else begin
     P:=(Sender as TControl).Parent.ClientToScreen(Point((Sender as TControl).Left+5,(Sender as TControl).Top+5));
-    OpenFilterPopup(P,(Sender as TControl).Tag=1,FilterPopupMenu,PackageDB,FilterClick);
+    If (Sender as TControl).Tag=1 then DB:=AutoSetupDB else DB:=GameDB;
+    OpenFilterPopup(P,(Sender as TControl).Tag=1,FilterPopupMenu,PackageDB,FilterClick,HideIfAlreadyInstalled,AutoSetupChecksumScanner,DB);
   end;
 end;
 
 procedure TPackageManagerForm.GamesButtonClick(Sender: TObject);
-Var I : Integer;
-    DownloadZipData : TDownloadZipData;
+Var I,J : Integer;
+    DownloadZipData : Array of TDownloadData;
     FileName : String;
+    G : TGame;
+    B : Boolean;
 begin
+  Enabled:=False;
   try
     For I:=0 to GamesListView.Items.Count-1 do If GamesListView.Items[I].Checked then begin
-      DownloadZipData:=TDownloadZipData(GamesListView.Items[I].Data);
-      FileName:=ExtractFileNameFromURL(DownloadZipData.URL);
-      If not DownloadFile(self,DownloadZipData.Size,DownloadZipData.PackageFileURL,DownloadZipData.URL,PackageDB.DBDir+FileName) then continue;
+      J:=length(DownloadZipData); SetLength(DownloadZipData,J+1);
+      DownloadZipData[J]:=TDownloadZipData(GamesListView.Items[I].Data);
+    end;
+    ProviderAction(DownloadZipData);
+    For I:=0 to length(DownloadZipData)-1 do begin
+      FileName:=ExtractFileNameFromURL(DownloadZipData[I].URL,'.zip');
+
+      If TDownloadZipData(DownloadZipData[I]).MetaLink then begin
+        B:=MetaLinkDownload(self,DownloadZipData[I].Size,DownloadZipData[I].PackageFileURL,DownloadZipData[I].URL,DownloadZipData[I].PackageList.Referer,PackageDB.DBDir+FileName);
+      end else begin
+        B:=DownloadFileWithDialog(self,DownloadZipData[I].Size,DownloadZipData[I].PackageFileURL,DownloadZipData[I].URL,DownloadZipData[I].PackageList.Referer,PackageDB.DBDir+FileName);
+      end;
+      If not B then begin
+        MessageDlg(Format(LanguageSetup.PackageManagerDownloadFailed,[DownloadZipData[I].URL]),mtError,[mbOK],0);
+        continue;
+      end;
+
+      If Trim(TDownloadZipData(DownloadZipData[I]).AutoSetupForZipURL)<>'' then begin
+        If Trim(TDownloadZipData(DownloadZipData[I]).AutoSetupForZipURLMaxVersion)<>'' then begin
+          try
+            B:=VersionToInt(GetNormalFileVersionAsString)<=VersionToInt(TDownloadZipData(DownloadZipData[I]).AutoSetupForZipURLMaxVersion);
+          except
+            B:=True;
+          end;
+        end else begin
+          B:=True;
+        end;
+        If B then begin
+          if not DownloadFileWithDialog(self,0,DownloadZipData[I].PackageFileURL,TDownloadZipData(DownloadZipData[I]).AutoSetupForZipURL,DownloadZipData[I].PackageList.Referer,PackageDB.DBDir+'DFRTemp.prof') then begin
+            MessageDlg(Format(LanguageSetup.PackageManagerDownloadFailed,[TDownloadZipData(DownloadZipData[I]).AutoSetupForZipURL]),mtError,[mbOK],0);
+            continue;
+          end;
+        end;
+        try
+          If not AutoSetupChecksumScanner.ChecksumInList(GetMD5Sum(PackageDB.DBDir+'DFRTemp.prof')) then begin
+            J:=AutoSetupDB.Add(DownloadZipData[I].Name);
+            G:=TGame.Create(PackageDB.DBDir+'DFRTemp.prof');
+            try
+              AutoSetupDB[J].AssignFrom(G);
+            finally
+              G.Free;
+            end;
+            AutoSetupChecksumScanner.ReScan;
+          end;
+        finally
+          ExtDeleteFile(PackageDB.DBDir+'DFRTemp.prof',ftTemp);
+        end;
+      end;
+
       try
-        ImportZipPackage(self,PackageDB.DBDir+FileName,GameDB);
+        G:=ImportZipPackage(self,PackageDB.DBDir+FileName,GameDB,True);
+        If G<>nil then begin
+          WriteMetaInformationToProfile(G,TDownloadZipData(DownloadZipData[I]));
+          If paWriteInfoToProfile in DownloadZipData[I].PackageList.ProviderActions then begin
+            WriteProverInfoToProfile(G,DownloadZipData[I].PackageList.ProviderName,DownloadZipData[I].PackageList.ProviderURL);
+          end;
+        end;
       finally
-        ExtDeleteFile(PackageDB.DBDir+FileName,ftUninstall);
+        ExtDeleteFile(PackageDB.DBDir+FileName,ftTemp);
       end;
     end;
   finally
+    Enabled:=True;
     LoadLists;
   end;
 end;
 
 procedure TPackageManagerForm.AutoSetupButtonClick(Sender: TObject);
 Var I,J : Integer;
-    DownloadAutoSetupData : TDownloadAutoSetupData;
+    DownloadAutoSetupData : Array of TDownloadData;
     FileName : String;
     G,G2 : TGame;
 begin
+  Enabled:=False;
   try
     For I:=0 to AutoSetupListView.Items.Count-1 do If AutoSetupListView.Items[I].Checked then begin
-      DownloadAutoSetupData:=TDownloadAutoSetupData(AutoSetupListView.Items[I].Data);
-      FileName:=ExtractFileNameFromURL(DownloadAutoSetupData.URL);
-      If not DownloadFile(self,DownloadAutoSetupData.Size,DownloadAutoSetupData.PackageFileURL,DownloadAutoSetupData.URL,PackageDB.DBDir+FileName) then continue;
+      J:=length(DownloadAutoSetupData); SetLength(DownloadAutoSetupData,J+1);
+      DownloadAutoSetupData[J]:=TDownloadAutoSetupData(AutoSetupListView.Items[I].Data);
+    end;
+    ProviderAction(DownloadAutoSetupData);
+    For I:=0 to length(DownloadAutoSetupData)-1 do begin
+      FileName:=ExtractFileNameFromURL(DownloadAutoSetupData[I].URL,'.prof');
+      If not DownloadFileWithDialog(self,DownloadAutoSetupData[I].Size,DownloadAutoSetupData[I].PackageFileURL,DownloadAutoSetupData[I].URL,DownloadAutoSetupData[I].PackageList.Referer,PackageDB.DBDir+FileName) then begin
+        MessageDlg(Format(LanguageSetup.PackageManagerDownloadFailed,[DownloadAutoSetupData[I].URL]),mtError,[mbOK],0);
+        continue;
+      end;
       ForceDirectories(PrgDataDir+AutoSetupSubDir+'\');
       If FileExists(PrgDataDir+AutoSetupSubDir+'\'+FileName) then begin
         G:=TGame.Create(PackageDB.DBDir+FileName);
         try
-          J:=AutoSetupDB.Add(DownloadAutoSetupData.Name); G2:=AutoSetupDB[J];
+          J:=AutoSetupDB.Add(DownloadAutoSetupData[I].Name); G2:=AutoSetupDB[J];
           G2.AssignFrom(G);
+          WriteMetaInformationToProfile(G2,TDownloadAutoSetupData(DownloadAutoSetupData[I]));
+          If paWriteInfoToProfile in DownloadAutoSetupData[I].PackageList.ProviderActions then begin
+            WriteProverInfoToProfile(G2,DownloadAutoSetupData[I].PackageList.ProviderName,DownloadAutoSetupData[I].PackageList.ProviderURL);          end;
         finally
           G.Free;
         end;
-        ExtDeleteFile(PackageDB.DBDir+FileName,ftUninstall);
+        ExtDeleteFile(PackageDB.DBDir+FileName,ftTemp);
       end else begin
         MoveFile(PChar(PackageDB.DBDir+FileName),PChar(PrgDataDir+AutoSetupSubDir+'\'+FileName));
         G:=TGame.Create(PrgDataDir+AutoSetupSubDir+'\'+FileName);
@@ -356,95 +488,123 @@ begin
       end;
     end;
   finally
+    Enabled:=True;
     AutoSetupChecksumScanner.ReScan;
     LoadLists;
   end;
 end;
 
 procedure TPackageManagerForm.IconsButtonClick(Sender: TObject);
-Var I : Integer;
-    DownloadIconData : TDownloadIconData;
+Var I,J : Integer;
+    DownloadIconData : Array of TDownloadData;
     FileName : String;
 begin
+  Enabled:=False;
   try
     For I:=0 to IconsListView.Items.Count-1 do If IconsListView.Items[I].Checked then begin
-      DownloadIconData:=TDownloadIconData(IconsListView.Items[I].Data);
-      FileName:=ExtractFileNameFromURL(DownloadIconData.URL);
-      If DownloadFile(self,DownloadIconData.Size,DownloadIconData.PackageFileURL,DownloadIconData.URL,PackageDB.DBDir+FileName) then begin
+      J:=length(DownloadIconData); SetLength(DownloadIconData,J+1);
+      DownloadIconData[J]:=TDownloadIconData(IconsListView.Items[I].Data);
+    end;
+    ProviderAction(DownloadIconData);
+    For I:=0 to length(DownloadIconData)-1 do begin
+      FileName:=ExtractFileNameFromURL(DownloadIconData[I].URL,'.ico');
+      If DownloadFileWithDialog(self,DownloadIconData[I].Size,DownloadIconData[I].PackageFileURL,DownloadIconData[I].URL,DownloadIconData[I].PackageList.Referer,PackageDB.DBDir+FileName) then begin
         ForceDirectories(PrgDataDir+IconsSubDir+'\');
-        If FileExists(PrgDataDir+IconsSubDir+'\'+FileName) then ExtDeleteFile(PrgDataDir+IconsSubDir+'\'+FileName,ftUninstall);
+        If FileExists(PrgDataDir+IconsSubDir+'\'+FileName) then ExtDeleteFile(PrgDataDir+IconsSubDir+'\'+FileName,ftTemp);
         MoveFile(PChar(PackageDB.DBDir+FileName),PChar(PrgDataDir+IconsSubDir+'\'+FileName));
+      end else begin
+        MessageDlg(Format(LanguageSetup.PackageManagerDownloadFailed,[DownloadIconData[I].URL]),mtError,[mbOK],0);
       end;
     end;
   finally
+    Enabled:=True;
     IconChecksumScanner.ReScan;
     LoadLists;
   end;
 end;
 
 procedure TPackageManagerForm.IconSetsButtonClick(Sender: TObject);
-Var I : Integer;
-    DownloadIconSetData : TDownloadIconSetData;
+Var I,J : Integer;
+    DownloadIconSetData : Array of TDownloadData;
     FileName, DestDir : String;
     B : Boolean;
     Ini : TIniFile;
 begin
+  Enabled:=False;
   try
     B:=False;
     For I:=0 to IconSetsListView.Items.Count-1 do If IconSetsListView.Items[I].Checked then begin
-      DownloadIconSetData:=TDownloadIconSetData(IconSetsListView.Items[I].Data);
-      FileName:=ExtractFileNameFromURL(DownloadIconSetData.URL);
-      If DownloadFile(self,DownloadIconSetData.Size,DownloadIconSetData.PackageFileURL,DownloadIconSetData.URL,PackageDB.DBDir+FileName) then begin
+      J:=length(DownloadIconSetData); SetLength(DownloadIconSetData,J+1);
+      DownloadIconSetData[J]:=TDownloadIconSetData(IconSetsListView.Items[I].Data);
+    end;
+    ProviderAction(DownloadIconSetData);
+    For I:=0 to length(DownloadIconSetData)-1 do begin
+      FileName:=ExtractFileNameFromURL(DownloadIconSetData[I].URL,'.zip');
+      If DownloadFileWithDialog(self,DownloadIconSetData[I].Size,DownloadIconSetData[I].PackageFileURL,DownloadIconSetData[I].URL,DownloadIconSetData[I].PackageList.Referer,PackageDB.DBDir+FileName) then begin
         B:=True;
         ForceDirectories(PrgDataDir+IconSetsFolder+'\');
-        DestDir:=PrgDataDir+IconSetsFolder+'\'+MakeFileSysOKFolderName(DownloadIconSetData.Name);
+        DestDir:=PrgDataDir+IconSetsFolder+'\'+ChangeFileExt(FileName,'');
+        J:=0; While DirectoryExists(DestDir) do begin
+          inc(J); DestDir:=PrgDataDir+IconSetsFolder+'\'+ChangeFileExt(FileName,'')+IntToStr(J);
+        end;
         ForceDirectories(DestDir);
         ExtractZipFile(self,PackageDB.DBDir+FileName,DestDir);
         DeleteFile(PackageDB.DBDir+FileName);
 
         Ini:=TIniFile.Create(IncludeTrailingPathDelimiter(DestDir)+IconsConfFile);
         try
-          Ini.WriteString('Information','Name',DownloadIconSetData.Name);
-          Ini.WriteString('Information','MinVersion',DownloadIconSetData.MinVersion);
-          Ini.WriteString('Information','MaxVersion',DownloadIconSetData.MaxVersion);
+          Ini.WriteString('Information','Name',DownloadIconSetData[I].Name);
+          Ini.WriteString('Information','MinVersion',TDownloadIconSetData(DownloadIconSetData[I]).MinVersion);
+          Ini.WriteString('Information','MaxVersion',TDownloadIconSetData(DownloadIconSetData[I]).MaxVersion);
         finally
           Ini.Free;
         end;
+      end else begin
+        MessageDlg(Format(LanguageSetup.PackageManagerDownloadFailed,[DownloadIconSetData[I].URL]),mtError,[mbOK],0);
       end;
     end;
     If B then MessageDlg(LanguageSetup.PackageManagerIconSetDownloaded,mtInformation,[mbOK],0);
   finally
+    Enabled:=True;
     LoadLists;
   end;
 end;
 
 procedure TPackageManagerForm.LanguageButtonClick(Sender: TObject);
-Var DownloadLanguageData : TDownloadLanguageData;
+Var DownloadLanguageData : Array of TDownloadData;
     FileName,DestLangFile : String;
-    I,C : Integer;
+    I,J,C : Integer;
     Ini : TIniFile;
 begin
+  Enabled:=False;
   try
     C:=0; DestLangFile:='';
-    For I:=0 to LanguageListBox.Items.Count-1 do If LanguageListBox.Checked[I] then begin
-      DownloadLanguageData:=TDownloadLanguageData(LanguageListBox.Items.Objects[I]);
-      FileName:=ExtractFileNameFromURL(DownloadLanguageData.URL);
-      If DownloadFile(self,DownloadLanguageData.Size,DownloadLanguageData.PackageFileURL,DownloadLanguageData.URL,PackageDB.DBDir+FileName) then begin
+    For I:=0 to LanguagesListView.Items.Count-1 do If LanguagesListView.Items[I].Checked then begin
+      J:=length(DownloadLanguageData); SetLength(DownloadLanguageData,J+1);
+      DownloadLanguageData[J]:=TDownloadLanguageData(LanguagesListView.Items[I].Data);
+    end;
+    ProviderAction(DownloadLanguageData);
+    For I:=0 to length(DownloadLanguageData)-1 do begin
+      FileName:=ExtractFileNameFromURL(DownloadLanguageData[I].URL,'.ini');
+      If DownloadFileWithDialog(self,DownloadLanguageData[I].Size,DownloadLanguageData[I].PackageFileURL,DownloadLanguageData[I].URL,DownloadLanguageData[I].PackageList.Referer,PackageDB.DBDir+FileName) then begin
         inc(C);
         ForceDirectories(PrgDataDir+LanguageSubDir+'\');
         DestLangFile:=PrgDataDir+LanguageSubDir+'\'+FileName;
-        If FileExists(DestLangFile) then ExtDeleteFile(DestLangFile,ftUninstall);
+        If FileExists(DestLangFile) then ExtDeleteFile(DestLangFile,ftTemp);
         MoveFile(PChar(PackageDB.DBDir+FileName),PChar(DestLangFile));
         Ini:=TIniFile.Create(DestLangFile);
         try
-          Ini.WriteString('LanguageFileInfo','MaxVersion',DownloadLanguageData.MaxVersion);
+          Ini.WriteString('LanguageFileInfo','MaxVersion',TDownloadLanguageData(DownloadLanguageData[I]).MaxVersion);
+          Ini.WriteString('LanguageFileInfo','DownloadChecksum',DownloadLanguageData[I].PackageChecksum);
         finally
           Ini.Free;
         end;
+      end else begin
+        MessageDlg(Format(LanguageSetup.PackageManagerDownloadFailed,[DownloadLanguageData[I].URL]),mtError,[mbOK],0);
       end;
     end;
     If C=1 then begin
-      If MessageDlg('Do you want to activate the downloaded language immediately?',mtConfirmation,[mbYes,mbNo],0)=mrYes then begin
+      If MessageDlg(LanguageSetup.PackageManagerLanguageDownloadedSingle,mtConfirmation,[mbYes,mbNo],0)=mrYes then begin
         LanguageToActivate:=DestLangFile;
         Close;
         exit;
@@ -452,8 +612,9 @@ begin
     end;
     If C>0 then MessageDlg(LanguageSetup.PackageManagerLanguageDownloaded,mtInformation,[mbOK],0);
   finally
+    Enabled:=True;
     LanguageChecksumScanner1.ReScan;
-    LanguageChecksumScanner2.ReScan;
+    If LanguageChecksumScanner2<>nil then LanguageChecksumScanner2.ReScan;
     LoadLists;
   end;
 end;
@@ -483,6 +644,7 @@ end;
 
 procedure TPackageManagerForm.ExePackagesButtonClick(Sender: TObject);
 Var DownloadExeData : TDownloadExeData;
+    Data : Array of TDownloadData;
     FileName : String;
     CachedPackage : TCachedPackage;
     OldChecksum : String;
@@ -498,12 +660,16 @@ begin
   end;
 
   DownloadExeData:=TDownloadExeData(ExePackagesListBox.Items.Objects[ExePackagesListBox.ItemIndex]);
+
+  SetLength(Data,1); Data[0]:=DownloadExeData;
+  ProviderAction(Data);
+
   OldChecksum:=PackageDBCache.FindChecksum(DownloadExeData.Name);
-  FileName:=ExtractFileNameFromURL(DownloadExeData.URL);
+  FileName:=ExtractFileNameFromURL(DownloadExeData.URL,'.exe');
   If DownloadExeData.PackageChecksum<>OldChecksum then begin
     Enabled:=False;
     try
-      OK:=DownloadFile(self,DownloadExeData.Size,DownloadExeData.PackageFileURL,DownloadExeData.URL,PackageDB.DBDir+FileName);
+      OK:=DownloadFileWithDialog(self,DownloadExeData.Size,DownloadExeData.PackageFileURL,DownloadExeData.URL,DownloadExeData.PackageList.Referer,PackageDB.DBDir+FileName);
     finally
       Enabled:=True;
     end;
@@ -530,8 +696,15 @@ begin
 end;
 
 procedure TPackageManagerForm.ExePackagesDelButtonClick(Sender: TObject);
+Var O : TObject;
 begin
-  PackageDBCache.DelCache(TCachedPackage(ExePackagesListBox.Items.Objects[ExePackagesListBox.ItemIndex]));
+  If ExePackagesListBox.ItemIndex<0 then exit;
+  O:=ExePackagesListBox.Items.Objects[ExePackagesListBox.ItemIndex];
+  If O is TCachedPackage then PackageDBCache.DelCache(TCachedPackage(O));
+  If O is TDownloadExeData then begin
+    O:=PackageDBCache.FindPackage(TDownloadExeData(O).Name);
+    PackageDBCache.DelCache(TCachedPackage(O));
+  end;
   LoadLists;
 end;
 
@@ -553,6 +726,28 @@ begin
     result:=PackageManagerForm.LanguageToActivate;
   finally
     PackageManagerForm.Free;
+  end;
+end;
+
+Function DonwloadAndInstall(const Owner : TComponent; const URL : String; const GameDB : TGameDB) : TGame;
+Var B : Boolean;
+    TempFile : String;
+begin
+  result:=nil;
+  TempFile:=TempDir+ChangeFileExt(MakeFileSysOKFolderName(URL),'.zip');
+  If Pos('METALINK.PHP',ExtUpperCase(URL))>0 then begin
+    B:=MetaLinkDownload(Owner,0,'',URL,'automatic',TempFile);
+  end else begin
+    B:=DownloadFileWithDialog(Owner,0,'',URL,'automatic',TempFile);
+  end;
+  If not B then begin
+    MessageDlg(Format(LanguageSetup.PackageManagerDownloadFailed,[URL]),mtError,[mbOK],0);
+    exit;
+  end;
+  try
+    result:=ImportZipPackage(Owner,TempFile,GameDB,False);
+  finally
+    ExtDeleteFile(TempFile,ftTemp);
   end;
 end;
 

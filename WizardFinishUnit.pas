@@ -176,7 +176,7 @@ begin
   Case (Sender as TComponent).Tag of
     0 : If Mounting.Count<10 then begin
           S:='';
-          if not ShowProfileMountEditorDialog(self,S,UsedDriveLetters,IncludeTrailingPathDelimiter(ExtractFilePath(CurrentGameFile)),CurrentGameName,NextFreeDriveLetter) then exit;
+          if not ShowProfileMountEditorDialog(self,S,UsedDriveLetters,IncludeTrailingPathDelimiter(ExtractFilePath(CurrentGameFile)),CurrentGameName,nil,NextFreeDriveLetter) then exit;
           Mounting.Add(S);
           LoadMountingList;
           MountingListView.ItemIndex:=MountingListView.Items.Count-1;

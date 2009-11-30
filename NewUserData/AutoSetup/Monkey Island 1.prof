@@ -61,7 +61,7 @@ Language=German
 UserInfo=
 
 [sdl]
-fullscreen=0
+fullscreen=1
 autolock=0
 fulldouble=0
 usecancodes=1

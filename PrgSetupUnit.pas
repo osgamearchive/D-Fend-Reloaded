@@ -143,6 +143,7 @@ Type TPrgSetup=class(TBasePrgSetup)
     property ColumnWidthsNoExtraInfoMode : String index 37 read GetString write SetString;
     property CaptureDir : String index 38 read GetString write SetString;
     property IconSet : String index 39 read GetString write SetString;
+    property RenameAllExpression : String index 40 read GetString write SetString;
 
     property LinuxRemap[DriveLetter : Char] : String read GetDriveLetter write SetDriveLetter;
 
@@ -228,7 +229,10 @@ Type TPrgSetup=class(TBasePrgSetup)
     property IgnoreDirectoryCollisions : Boolean index 70 read GetBoolean write SetBoolean;
     property CreateConfFilesForProfiles : Boolean index 71 read GetBoolean write SetBoolean;
     property AddMountingDataAutomatically : Boolean index 72 read GetBoolean write SetBoolean;
-    property ActivateIncompleteFeatures : Boolean index 73 read GetBoolean write SetBoolean;
+    property BinaryCache : Boolean index 73 read GetBoolean write SetBoolean;
+    property ImportZipWithoutDialogIfPossible : Boolean index 74 read GetBoolean write SetBoolean;
+    property DOSBoxStartLogging : Boolean index 75 read GetBoolean write SetBoolean;
+    property ActivateIncompleteFeatures : Boolean index 76 read GetBoolean write SetBoolean;
 
     property MainLeft : Integer index 0 read GetInteger write SetInteger;
     property MainTop : Integer index 1 read GetInteger write SetInteger;
@@ -259,6 +263,11 @@ Type TPrgSetup=class(TBasePrgSetup)
     property ImageFilter : Integer index 26 read GetInteger write SetInteger;
     property NoteLinesInTooltips : Integer index 27 read GetInteger write SetInteger;
     property PreviewerCategory : Integer index 28 read GetInteger write SetInteger;
+    property LanguageEditorViewMode : Integer index 29 read GetInteger write SetInteger;
+    property LastDataReaderUpdateCheck : Integer index 30 read GetInteger write SetInteger;
+    property DataReaderCheckForUpdates : Integer index 31 read GetInteger write SetInteger;
+    property PackageListsCheckForUpdates : Integer index 32 read GetInteger write SetInteger;
+    property LastPackageListeUpdateCheck : Integer index 33 read GetInteger write SetInteger;
 
     property DOSBoxSettingsCount : Integer index 0 read GetListCount;
     property DOSBoxSettings[I : Integer] : TDOSBoxSetting read GetDOSBoxSettings;
@@ -614,6 +623,7 @@ begin
   AddStringRec(37,'ProgramSets','ColumnWidthsNoExtraInfoMode','');
   AddStringRec(38,'ProgramSets','CaptureDefaultPath','.\'+CaptureSubDir+'\');
   AddStringRec(39,'ProgramSets','IconSet','Modern');
+  AddStringRec(40,'ProgramSets','RenameAllExpression','%P_%N.%E');
 
   For I:=0 to 25 do AddStringRec(450+I,'WineSupport',chr(ord('A')+I),'');
 
@@ -700,8 +710,11 @@ begin
   AddBooleanRec(69,'ProgramSets','ShowMainMenu',True);
   AddBooleanRec(70,'ProgramSets','IgnoreDirectoryCollisions',False);
   AddBooleanRec(71,'ProgramSets','CreateConfFilesForProfiles',False);
-  AddBooleanRec(72,'ProgramSets','AddMountingDataAutomatically',False); //... Will be true by default in 0.9
-  AddBooleanRec(73,'ProgramSets','ActivateIncompleteFeatures',False);
+  AddBooleanRec(72,'ProgramSets','AddMountingDataAutomatically',True);
+  AddBooleanRec(73,'ProgramSets','BinaryCache',True);
+  AddBooleanRec(74,'ProgramSets','ImportZipWithoutDialogIfPossible',False); // will be true in 1.0, because 1.0 wll have a setup option for this
+  AddBooleanRec(75,'ProgramSets','DOSBoxStartLogging',False);
+  AddBooleanRec(76,'ProgramSets','ActivateIncompleteFeatures',False);
 
   AddIntegerRec(0,'ProgramSets','MainLeft',-1);
   AddIntegerRec(1,'ProgramSets','MainTop',-1);
@@ -732,6 +745,11 @@ begin
   AddIntegerRec(26,'ProgramSets','ImageFilter',6);
   AddIntegerRec(27,'ProgramSets','NoteLinesInTooltips',5);
   AddIntegerRec(28,'ProgramSets','PreviewerCategory',0);
+  AddIntegerRec(29,'ProgramSets','LanguageEditorViewMode',0);
+  AddIntegerRec(30,'ProgramSets','LastDataReaderUpdateCheck',0);
+  AddIntegerRec(31,'ProgramSets','DataReaderCheckForUpdates',1);
+  AddIntegerRec(32,'ProgramSets','PackageListsCheckForUpdates',0);
+  AddIntegerRec(33,'ProgramSets','LastPackageListeUpdateCheck',0);
 end;
 
 Procedure TPrgSetup.InitDirs;

@@ -26,29 +26,48 @@ Ordners auf der Festplatte erstellen.
 </p>
 
 <ul class="big">
-  <li><b>Diskettenimage bootf&auml;hig machen</b><br />
+  <li><b>Imagetype</b><br />
+  In dieser Box können Sie auswählen, ob ein Disketten- oder ein
+  Festplattenimage angelegt werden soll. Diskettenimages sind 1,44MB
+  groß, Festplattenimages werden automatisch an die Größe der zu kopierenden
+  Dateien angepasst (wobei zusätzlich 5MB freier Platz einkalkuliert werden).
+  </li>
+  <li><b>Image bootf&auml;hig machen</b><br />
   Wenn diese Option aktiviert ist, &uuml;bertr&auml;gt D-Fend Reloaded die
-  FreeDOS Boot-Dateien auf das Diskettenimage und erstellt einen
-  Bootsektor auf dem Diskettenimage, welches es bootf&auml;hig macht.
+  FreeDOS Boot-Dateien auf das Image und erstellt einen
+  Bootsektor auf dem Image, welches es bootf&auml;hig macht.
   (Um diese Option verwenden zu k&ouml;nnen, muss FreeDOS installiert und
   der Pfad zu FreeDOS auf der Dialogseite
   <a href="FileOptionsFreeDOS.html">FreeDOS</a> des
   the <a href="FileOptions.html">Programmeinstellungen</a>-Dialogs
   eingetragen sein.)
   </li>
-  <li><b>Die DOSBox-Tastaturbelegung auf der Bootdiskette verwenden</b><br />
+  <li><b>Die DOSBox-Tastaturbelegung verwenden</b><br />
   Wenn diese Option aktiviert ist, &uuml;bertr&auml;gt D-Fend Reloaded
-  den FreeDOS-Tastaturtreiber auf die Bootdiskette und f&uuml;gt eine Zeile
-  in die <tt>autoexec.bat</tt>-Datei auf der Bootdiskette ein,
+  den FreeDOS-Tastaturtreiber in das Image und f&uuml;gt eine Zeile
+  in die <tt>autoexec.bat</tt>-Datei ein,
   um das Tastaturlayout, welche in der in D-Fend Reloaded gew&auml;hlten
   Sprachdatei definiert ist, zu aktivieren.
   </li>
-  <li><b>Maustreiber auf der Bootdisk einbinden</b><br />
+  <li><b>Maustreiber einbinden</b><br />
   Wenn diese Option aktiviert ist, &uuml;bertr&auml;gt D-Fend Reloaded
-  den FreeDOS-Maustreiber auf die Bootdiskette und f&uuml;gt eine Zeile
-  in die <tt>autoexec.bat</tt>-Datei auf der Bootdiskette ein, um ihn
-  beim Starten des Diskettenimages zu aktivieren.
-  </li>  
+  den FreeDOS-Maustreiber in das Image und f&uuml;gt eine Zeile
+  in die <tt>autoexec.bat</tt>-Datei ein, um ihn
+  beim Starten des Images zu aktivieren.
+  </li>
+  <li><b>Speichermanager verwenden</b><br />
+  Ist diese Option aktiviert, so werden die Speicherverwaltungsprogramme
+  <tt>himem</tt> und <tt>emm386</tt> auf das Image kopiert und aktiviert,
+  so dass mehr konventioneller Speicher zur Ausführung von Anwendungen
+  zur Verfügung steht.
+  </li>
+  <li><b>Datenträger-Verwaltungsprogramme hinzufügen</b><br />
+  Wenn diese Option aktiviert ist, werden Programme zum partitionieren,
+  formatieren und prüfen von Datenträgern in das Image kopiert.
+  </li>
+  <li><b>Texteditor hinzufügen</b><br />
+  Wenn diese Option aktiviert ist, wird ein Texteditor mit in das Image kopiert.
+  </li>
   <li><b>Fertiges Image auf reale Diskette schreiben</b><br />
   Wenn diese Option aktiviert ist, wird das Diskettenimage
   nach seiner Erstellung auf eine reale Diskette geschrieben.

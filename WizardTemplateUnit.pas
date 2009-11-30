@@ -122,11 +122,11 @@ begin
   OKButton.Caption:=LanguageSetup.OK;
   OperationModeInfoButton.Caption:=LanguageSetup.WizardFormOperationModeInfo;
 
-  UserIconLoader.DialogImage(DI_Help,HelpButton);
-  UserIconLoader.DialogImage(DI_Help,SpeedButton1);
-  UserIconLoader.DialogImage(DI_Help,SpeedButton2);
-  UserIconLoader.DialogImage(DI_Help,SpeedButton3);
-  UserIconLoader.DialogImage(DI_Help,SpeedButton4);
+  UserIconLoader.DialogImage(DI_ToolbarHelp,HelpButton);
+  UserIconLoader.DialogImage(DI_ToolbarHelp,SpeedButton1);
+  UserIconLoader.DialogImage(DI_ToolbarHelp,SpeedButton2);
+  UserIconLoader.DialogImage(DI_ToolbarHelp,SpeedButton3);
+  UserIconLoader.DialogImage(DI_ToolbarHelp,SpeedButton4);
 end;
 
 procedure TWizardTemplateFrame.Done;
@@ -152,7 +152,7 @@ begin
   ListType:=TList.Create;
   try
     CompleteMatch:=False;
-    For I:=0 to AutoSetupDB.Count-1 do begin
+    If GameFileShort<>'' then For I:=0 to AutoSetupDB.Count-1 do begin
       If Trim(ExtUpperCase(ExtractFileName(AutoSetupDB[I].GameExe)))<>GameFileShort then continue;
       ListNr.Add(Pointer(I));
       ListType.Add(Pointer(0));

@@ -117,13 +117,14 @@ type
 
 var
   QuickStartForm: TQuickStartForm = nil;
+  JustShowingOrHidingQuickStartForm : Boolean = False;
 
 implementation
 
 uses ShellAPI, Math, CommonTools, VistaToolsUnit, LanguageSetupUnit,
      PrgSetupUnit, PrgConsts, DOSBoxUnit, HelpConsts, IconLoaderUnit,
      ViewImageFormUnit, PlaySoundFormUnit, PlayVideoFormUnit, GameDBToolsUnit,
-     ClassExtensions;
+     ClassExtensions, DOSBoxTempUnit;
 
 {$R *.dfm}
 
@@ -139,7 +140,7 @@ Type TFileTypeInfo=record
   Options : TFileTypeOptionsSet;
 end;
 
-const FileTypes : Array[0..51] of TFileTypeInfo=
+const FileTypes : Array[0..52] of TFileTypeInfo=
   ((Ext: '.EXE'; NameID: NR_QuickStarterColumnsTypeDOS; ImageIndex: 9; OpenType: otDOSBox; Options: [ftCanMakeProfileOf,ftDOSExe, ftRunWithParameters]),
    (Ext: '.EXE'; NameID: NR_QuickStarterColumnsTypeWindows; ImageIndex: 10; OpenType: otOpen; Options: [ftCanMakeProfileOf,ftWindowsExe, ftRunWithParameters]),
    (Ext: '.COM'; NameID: NR_QuickStarterColumnsTypeDOS; ImageIndex: 9; OpenType: otDOSBox; Options: [ftCanMakeProfileOf, ftRunWithParameters]),
@@ -198,6 +199,7 @@ const FileTypes : Array[0..51] of TFileTypeInfo=
    (Ext: '.ARC'; NameID: NR_QuickStarterColumnsTypeArchive; ImageIndex: 13; OpenType: otOpen; Options: []),
 
    (Ext: '.IMG'; NameID: NR_QuickStarterColumnsTypeHDImage; ImageIndex: 7; OpenType: otOpen; Options: []),
+   (Ext: '.IMA'; NameID: NR_QuickStarterColumnsTypeHDImage; ImageIndex: 7; OpenType: otOpen; Options: []),
 
    (Ext: '.ISO'; NameID: NR_QuickStarterColumnsTypeISOImage; ImageIndex: 15; OpenType: otOpen; Options: []),
 
@@ -996,18 +998,19 @@ begin
 end;
 
 procedure TQuickStartForm.OpenDOSBox(const Path, FileName, Parameters: String);
-Var TempGame, DefaultTemplate : TGame;
+Var TempGame : TTempGame;
+    DefaultTemplate : TGame;
     TemplateDB : TGameDB;
 begin
   if TemplateComboBox.ItemIndex<0 then exit;
 
-  TempGame:=TGame.Create(TempDir+'TempGameRec.prof');
+  TempGame:=TTempGame.Create;
   try
     If TemplateComboBox.ItemIndex=0 then begin
       {Default template}
       DefaultTemplate:=TGame.Create(PrgSetup);
       try
-        TempGame.AssignFrom(DefaultTemplate);
+        TempGame.Game.AssignFrom(DefaultTemplate);
       finally
         DefaultTemplate.Free;
       end;
@@ -1015,30 +1018,30 @@ begin
       {Template from DB}
       TemplateDB:=TGameDB.Create(PrgDataDir+TemplateSubDir,False);
       try
-        TempGame.AssignFrom(TemplateDB[TemplateComboBox.ItemIndex+1]);
+        TempGame.Game.AssignFrom(TemplateDB[TemplateComboBox.ItemIndex+1]);
       finally
         TemplateDB.Free;
       end;
     end;
 
-    TempGame.StartFullscreen:=(SetupComboBox1.ItemIndex=0);
-    TempGame.CloseDosBoxAfterGameExit:=(SetupComboBox2.ItemIndex=0);
-    If Trim(Parameters)<>'' then TempGame.GameParameters:=Trim(Parameters);
+    TempGame.Game.StartFullscreen:=(SetupComboBox1.ItemIndex=0);
+    TempGame.Game.CloseDosBoxAfterGameExit:=(SetupComboBox2.ItemIndex=0);
+    If Trim(Parameters)<>'' then TempGame.Game.GameParameters:=Trim(Parameters);
 
-    CheckPathAvialableInProfile(TempGame,Path);
+    CheckPathAvialableInProfile(TempGame.Game,Path);
 
     If FileName='' then begin
-      TempGame.CloseDosBoxAfterGameExit:=False;
-      AddAutoexecCDCommands(TempGame,Path);
+      TempGame.Game.CloseDosBoxAfterGameExit:=False;
+      AddAutoexecCDCommands(TempGame.Game,Path);
     end;
 
-    TempGame.GameExe:=FileName;
+    TempGame.Game.GameExe:=FileName;
 
-    RunGame(TempGame);
+    RunGame(TempGame.Game);
   finally
+    Sleep(100);
     TempGame.Free;
   end;
-  ExtDeleteFile(TempDir+'TempGameRec.prof',ftTemp);
 end;
 
 Function MakePathShort(const S : String) : String;
@@ -1149,7 +1152,7 @@ begin
           MessageDlg(Format(LanguageSetup.MessageCouldNotCreateDir,[S]),mtError,[mbOK],0);
           exit;
         end;
-        If not CopyFiles(FileName,S,True) then begin
+        If not CopyFiles(FileName,S,True,True) then begin
           MessageDlg(Format(LanguageSetup.MessageCouldNotCopyFiles,[FileName,S]),mtError,[mbOK],0);
           exit;
         end;
@@ -1190,7 +1193,7 @@ begin
           MessageDlg(Format(LanguageSetup.MessageCouldNotCreateDir,[S]),mtError,[mbOK],0);
           exit;
         end;
-        If not CopyFiles(FileName,S,True) then begin
+        If not CopyFiles(FileName,S,True,True) then begin
           MessageDlg(Format(LanguageSetup.MessageCouldNotCopyFiles,[FileName,S]),mtError,[mbOK],0);
           exit;
         end;

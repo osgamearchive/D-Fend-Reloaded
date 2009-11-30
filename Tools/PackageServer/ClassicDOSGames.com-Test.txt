@@ -1,0 +1,19 @@
+Done:
+- Adventure
+- Ball and paddle
+- Pinball
+- Platform
+- Race
+- Strategy
+- Simulation
+
+Todo:
+- 3D Shooter
+- Card and board games
+- Educational
+- Fighting
+- Game Creation
+- Puzzle
+- RPG
+- Shooter
+- Sports

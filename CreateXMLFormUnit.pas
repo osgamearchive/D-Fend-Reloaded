@@ -49,20 +49,20 @@ begin
   SetVistaFonts(self);
   Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName);
 
-  //Caption:=LanguageSetup.CreateConfForm;
-  //InfoLabel.Caption:=LanguageSetup.CreateConfFormInfo;
+  {Caption:=LanguageSetup.CreateConfForm;
+  InfoLabel.Caption:=LanguageSetup.CreateConfFormInfo;}
   InfoLabel.Caption:='Please select the profiles for which shall be included to the xml file:';
   SelectAllButton.Caption:=LanguageSetup.All;
   SelectNoneButton.Caption:=LanguageSetup.None;
   SelectGenreButton.Caption:=LanguageSetup.GameBy;
-  //FileTypeRadioGroup
-  //FileEdit.EditLabel.Caption:=LanguageSetup.CreateConfFormSelectFolder;
+  {FileTypeRadioGroup
+  FileEdit.EditLabel.Caption:=LanguageSetup.CreateConfFormSelectFolder;}
   SelectFileButton.Hint:=LanguageSetup.ChooseFile;
   OKButton.Caption:=LanguageSetup.OK;
   CancelButton.Caption:=LanguageSetup.Cancel;
 
-  //SaveDialog.Caption:=LanguageSetup.
-  //SaveDialog.Filter:=LanguageSetup.
+  {SaveDialog.Caption:=LanguageSetup.
+  SaveDialog.Filter:=LanguageSetup.}
   UserIconLoader.DialogImage(DI_SelectFile,SelectFileButton);
   UserIconLoader.DialogImage(DI_OK,OKButton);
   UserIconLoader.DialogImage(DI_Cancel,CancelButton);

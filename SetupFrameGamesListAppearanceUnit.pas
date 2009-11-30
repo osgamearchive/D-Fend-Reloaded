@@ -42,7 +42,7 @@ type
   public
     { Public-Deklarationen }
     Function GetName : String;
-    Procedure InitGUIAndLoadSetup(InitData : TInitData);
+    Procedure InitGUIAndLoadSetup(var InitData : TInitData);
     Procedure BeforeChangeLanguage;
     Procedure LoadLanguage;
     Procedure DOSBoxDirChanged;
@@ -66,7 +66,7 @@ begin
   result:=LanguageSetup.SetupFormListViewSheet2;
 end;
 
-procedure TSetupFrameGamesListAppearance.InitGUIAndLoadSetup(InitData: TInitData);
+procedure TSetupFrameGamesListAppearance.InitGUIAndLoadSetup(var InitData: TInitData);
 Var S : String;
     C : TColor;
 begin

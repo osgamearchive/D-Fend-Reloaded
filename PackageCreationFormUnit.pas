@@ -20,7 +20,6 @@ type
     TabSheet3: TTabSheet;
     TabSheet4: TTabSheet;
     TabSheet5: TTabSheet;
-    ImageList: TImageList;
     TabSheet6: TTabSheet;
     OutputFileEdit: TLabeledEdit;
     OutputFileButton: TSpeedButton;
@@ -57,6 +56,16 @@ type
     AutoSetupListView: TListView;
     DummyImageList1: TImageList;
     DummyImageList2: TImageList;
+    ImageList: TImageList;
+    DescriptionEdit: TLabeledEdit;
+    ToolsButton: TBitBtn;
+    ToolsPopupMenu: TPopupMenu;
+    ToolsMenuFileChecksum: TMenuItem;
+    ToolsMenuMakePackageFromPlainZips: TMenuItem;
+    Makepackagefilefromplainzipfilesandaddautosetuptemplates1: TMenuItem;
+    Makepackagefilefromautosetuptemplates1: TMenuItem;
+    N1: TMenuItem;
+    N2: TMenuItem;
     procedure FormShow(Sender: TObject);
     procedure HelpButtonClick(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -70,14 +79,21 @@ type
     procedure GamesListViewColumnClick(Sender: TObject; Column: TListColumn);
     procedure AutoSetupListViewColumnClick(Sender: TObject;
       Column: TListColumn);
+    procedure ToolsButtonClick(Sender: TObject);
+    procedure ToolsMenuWork(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
   private
     { Private-Deklarationen }
     ListSortGames, ListSortAutoSetups : TSortListBy;
     ListSortGamesReverse, ListSortAutoSetupsReverse : Boolean;
+    IconSetFolderNames : TStringList;
     Procedure LoadLists;
     Procedure LoadGamesList;
     Procedure LoadAutoSetupsList;
     Function CreatePackageFile(const OutputDir : String) : TStringList;
+    Function CreatePackageFileForPlainZips(const OutputDir : String; const AddAutoSetups : Boolean) : TStringList;
+    Function CreatePackageFileForAutoSetupTemplates(const OutputDir : String) : TStringList;
   public
     { Public-Deklarationen }
     GameDB, AutoSetupDB : TGameDB;
@@ -90,11 +106,16 @@ Function ShowPackageCreationDialog(const AOwner : TComponent; const AGameDB : TG
 
 implementation
 
-uses ShlObj, Math, CommonTools, LanguageSetupUnit, VistaToolsUnit,
-     HelpConsts, PrgSetupUnit, PrgConsts, PackageBuilderUnit, IconLoaderUnit,
-     ZipPackageUnit, ZipInfoFormUnit,  MainUnit;
+uses ShlObj, Math, ClipBrd, XMLDoc, CommonTools, LanguageSetupUnit,
+     VistaToolsUnit, HelpConsts, PrgSetupUnit, PrgConsts, PackageBuilderUnit,
+     IconLoaderUnit, ZipPackageUnit, ZipInfoFormUnit, HashCalc, MainUnit;
 
 {$R *.dfm}
+
+procedure TPackageCreationForm.FormCreate(Sender: TObject);
+begin
+  IconSetFolderNames:=TStringList.CreatE;
+end;
 
 procedure TPackageCreationForm.FormShow(Sender: TObject);
 begin
@@ -110,14 +131,16 @@ begin
   OKButton.Caption:=LanguageSetup.OK;
   CancelButton.Caption:=LanguageSetup.Cancel;
   HelpButton.Caption:=LanguageSetup.Help;
+  ToolsButton.Caption:=LanguageSetup.ProfileEditorTools;
 
   TabSheet1.Caption:=LanguageSetup.PackageManagerPageGames;
   TabSheet2.Caption:=LanguageSetup.PackageManagerPageAutoSetups;
   TabSheet3.Caption:=LanguageSetup.PackageManagerPageIcons;
-  TabSheet5.Caption:=LanguageSetup.PackageManagerPageIconSets;
+  TabSheet6.Caption:=LanguageSetup.PackageManagerPageIconSets;
   TabSheet4.Caption:=LanguageSetup.PackageManagerPageLanguages;
   TabSheet5.Caption:=LanguageSetup.PackageManagerPageExePackages;
 
+  DescriptionEdit.EditLabel.Caption:=LanguageSetup.PackageCreatorDescription;
   OutputFileEdit.EditLabel.Caption:=LanguageSetup.PackageCreatorOutputFile;
   OutputFileButton.Hint:=LanguageSetup.ChooseFile;
   InfoLabel.Caption:=LanguageSetup.PackageCreatorOutputFileInfo;
@@ -138,10 +161,12 @@ begin
   PackagesEditButton.Caption:=LanguageSetup.Edit;
   PackagesDelButton.Caption:=LanguageSetup.Del;
 
+  UserIconLoader.DirectLoad(ImageList,'PackageManager');
   UserIconLoader.DialogImage(DI_Add,PackagesAddButton);
   UserIconLoader.DialogImage(DI_Edit,PackagesEditButton);
   UserIconLoader.DialogImage(DI_Delete,PackagesDelButton);
   UserIconLoader.DialogImage(DI_SelectFolder,OutputFileButton);
+  UserIconLoader.DialogImage(DI_Tools,ToolsButton);
 
   OpenDialog.Title:=LanguageSetup.PackageManagerPageExePackagesSelect;
   OpenDialog.Filter:=LanguageSetup.BuildInstallerDestFileFilter;
@@ -154,10 +179,18 @@ begin
   InitListViewForGamesList(GamesListView,True);
   InitListViewForGamesList(AutoSetupListView,True);
   LoadLists;
+
+  ToolsButton.Visible:=((GetKeyState(VK_LSHIFT) div 32)<>0) or ((GetKeyState(VK_RSHIFT) div 32)<>0);
+end;
+
+procedure TPackageCreationForm.FormDestroy(Sender: TObject);
+begin
+  IconSetFolderNames.Free;
 end;
 
 procedure TPackageCreationForm.LoadLists;
-Var I : Integer;
+const FileExts : Array[0..5] of String = ('ico','png','jpeg','jpg','gif','bmp');
+Var I,J : Integer;
     Rec : TSearchRec;
     L : TListItem;
     Icon : TIcon;
@@ -174,23 +207,31 @@ begin
   {Icons}
   IconsListView.Items.BeginUpdate;
   try
-    I:=FindFirst(PrgDataDir+IconsSubDir+'\*.ico',faAnyFile,Rec);
-    try While I=0 do begin
-      If (Rec.Attr and faDirectory)=0 then begin
-        L:=IconsListView.Items.Add; L.Caption:=Rec.Name;
-        Icon:=TIcon.Create;
-        try Icon.LoadFromFile(PrgDataDir+IconsSubDir+'\'+Rec.Name); IconsImageList.AddIcon(Icon); L.ImageIndex:=IconsImageList.Count-1; except end;
-        Icon.Free;
-      end;
-      I:=FindNext(Rec);
-    end; finally FindClose(Rec); end;
+    For J:=Low(FileExts) to High(FileExts) do begin
+      I:=FindFirst(PrgDataDir+IconsSubDir+'\*.'+FileExts[J],faAnyFile,Rec);
+      try While I=0 do begin
+        If (Rec.Attr and faDirectory)=0 then begin
+          L:=IconsListView.Items.Add; L.Caption:=Rec.Name;
+          If J=0 then begin
+            Icon:=TIcon.Create;
+            try Icon.LoadFromFile(PrgDataDir+IconsSubDir+'\'+Rec.Name); IconsImageList.AddIcon(Icon); L.ImageIndex:=IconsImageList.Count-1; except end;
+          end else begin
+            Icon:=LoadImageAsIconFromFile(PrgDataDir+IconsSubDir+'\'+Rec.Name);
+            If Icon<>nil then begin IconsImageList.AddIcon(Icon); L.ImageIndex:=IconsImageList.Count-1; end;
+          end;
+          If Icon<>nil then FreeAndNil(Icon);
+        end;
+        I:=FindNext(Rec);
+      end; finally FindClose(Rec); end;
+    end;
   finally IconsListView.Items.EndUpdate; end;
   If IconsListView.Items.Count>0 then begin IconsListView.Column[0].Width:=-2; IconsListView.Column[0].Width:=-1; end else IconsListView.Column[0].Width:=-2;
 
   {IconSets}
   St:=TStringList.Create; St2:=TStringList.Create;
   try
-    ListOfIconSets(St,St2,nil);
+    IconSetFolderNames.Clear;
+    ListOfIconSets(St,St2,nil,IconSetFolderNames);
     IconSetsListBox.Items.AddStrings(St2);
   finally
     St.Free; St2.Free;
@@ -323,103 +364,147 @@ begin
   OutputFileEdit.Text:=SaveDialog.FileName;
 end;
 
-Function IconSetFolderFromName(const Name : String) : String;
-Var St,St2 : TStringList;
-    I : Integer;
-    S : String;
-begin
-  result:='';
-  St:=TStringList.Create;
-  St2:=TStringList.Create;
-  try
-    ListOfIconSets(St,St2,nil);
-    I:=St2.IndexOf(Name); If I<0 then exit;
-    S:=St[I];
-
-    If DirectoryExists(PrgDataDir+IconSetsFolder+'\'+S) then begin result:=PrgDataDir+IconSetsFolder+'\'+S; exit; end;
-    If PrgDir=PrgDataDir then exit;
-    If DirectoryExists(PrgDir+IconSetsFolder+'\'+S) then result:=PrgDir+IconSetsFolder+'\'+S;
-  finally
-    St.Free;
-    St2.Free;
-  end;
-end;
-
 Function TPackageCreationForm.CreatePackageFile(const OutputDir : String) : TStringList;
 Function CopyWithWithMsg(const Source, Dest : String) : Boolean;
 begin
   result:=CopyFile(PChar(Source),PChar(Dest),False);
   if not result then MessageDlg(Format(LanguageSetup.MessageCouldNotCopyFile,[Source,Dest]),mtError,[mbOK],0);
 end;
-Var I : Integer;
+Var I,J : Integer;
     S,T : String;
     G : TGame;
+    Doc : TXMLDocument;
 begin
-  result:=AddPackageDataHeader;
+  result:=nil;
+  Doc:=AddPackageDataHeader(self,DescriptionEdit.Text); If Doc=nil then exit;
+  try
+    {Games}
+    For I:=0 to GamesListView.Items.Count-1 do If GamesListView.Items[I].Checked then begin
+      G:=TGame(GamesListView.Items[I].Data);
+      S:=OutputDir+ChangeFileExt(ExtractFileName(G.SetupFile),'.zip');
+      BuildZipPackage(self,G,S);
+      if not AddPackageDataZip(Doc,G,S) then exit;
+    end;
 
-  {Games}
-  For I:=0 to GamesListView.Items.Count-1 do If GamesListView.Items[I].Checked then begin
-    G:=TGame(GamesListView.Items[I].Data);
-    S:=OutputDir+ChangeFileExt(ExtractFileName(G.SetupFile),'.zip');
-    BuildZipPackage(self,G,S);
-    if not AddPackageDataZip(result,G,S) then begin FreeAndNil(result); exit; end;
+    {AutoSetup}
+    For I:=0 to AutoSetupListView.Items.Count-1 do If AutoSetupListView.Items[I].Checked then begin
+      S:=TGame(AutoSetupListView.Items[I].Data).SetupFile;
+      T:=OutputDir+ExtractFileName(S);
+      If not CopyWithWithMsg(S,T) then begin FreeAndNil(result); exit; end;
+      if not AddPackageDataAutoSetup(Doc,T) then exit;
+    end;
+
+    {Icons}
+    For I:=0 to IconsListView.Items.Count-1 do If IconsListView.Items[I].Checked then begin
+      S:=PrgDataDir+IconsSubDir+'\'+IconsListView.Items[I].Caption;
+      T:=OutputDir+IconsListView.Items[I].Caption;
+      If not CopyWithWithMsg(S,T) then begin FreeAndNil(result); exit; end;
+      if not AddPackageDataIcon(Doc,T) then exit;
+    end;
+
+    {IconSets}
+    For I:=0 to IconSetsListBox.Items.Count-1 do If IconSetsListBox.Checked[I] then begin
+      S:=IconSetFolderNames[I];
+      T:=S; If (T<>'') and (T[length(T)]='\') then SetLength(T,length(T)-1);
+      J:=Pos('\',T); While J>0 do begin T:=Copy(T,J+1,MaxInt); J:=Pos('\',T); end;
+      T:=OutputDir+T+'.zip';
+      if not CreateZipFile(self,T,S,dmNo,GetCompressStrengthFromPrgSetup) then exit;
+      if not AddPackageDataIconSet(Doc,IncludeTrailingPathDelimiter(S)+IconsConfFile,T) then exit;
+    end;
+
+    {Language files}
+    For I:=0 to LanguageFilesListBox.Items.Count-1 do If LanguageFilesListBox.Checked[I] then begin
+      S:=LanguageFileNameFromName(LanguageFilesListBox.Items[I]); If S='' then continue;
+      T:=OutputDir+ExtractFileName(S);
+      If not CopyWithWithMsg(S,T) then begin FreeAndNil(result); exit; end;
+      If not AddPackageDataLanguage(Doc,T) then begin FreeAndNil(result); exit; end;
+    end;
+
+    {Games packages}
+    For I:=0 to PackagesListBox.Items.Count-1 do begin
+      If not AddPackageDataExe(Doc,PackagesListBox.Items[I]) then begin FreeAndNil(result); exit; end;
+    end;
+
+    result:=AddPackageDataFooter(Doc);
+  finally
+    Doc.Free;
   end;
+end;
 
-  {AutoSetup}
-  For I:=0 to AutoSetupListView.Items.Count-1 do If AutoSetupListView.Items[I].Checked then begin
-    S:=TGame(AutoSetupListView.Items[I].Data).SetupFile;
-    T:=OutputDir+ExtractFileName(S);
-    If not CopyWithWithMsg(S,T) then begin FreeAndNil(result); exit; end;
-    if not AddPackageDataAutoSetup(result,T) then begin FreeAndNil(result); exit; end;
+Function TPackageCreationForm.CreatePackageFileForPlainZips(const OutputDir : String; const AddAutoSetups : Boolean) : TStringList;
+Var Rec : TSearchRec;
+    I : Integer;
+    Doc : TXMLDocument;
+begin
+  result:=nil;
+  if not DirectoryExists(OutputDir) then exit;
+  Doc:=AddPackageDataHeader(self,DescriptionEdit.Text); If Doc=nil then exit;
+  try
+    I:=FindFirst(IncludeTrailingPathDelimiter(OutputDir)+'*.zip',faAnyFile,Rec);
+    try
+      While I=0 do begin
+        If (Rec.Attr and faDirectory)=0 then begin
+          If not AddPackageDataPlainZip(Doc,IncludeTrailingPathDelimiter(OutputDir)+Rec.Name,AutoSetupDB,self,AddAutoSetups) then begin FreeAndNil(result); exit; end;
+        end;
+        I:=FindNext(Rec);
+      end;
+    finally
+      FindClose(Rec);
+    end;
+
+    result:=AddPackageDataFooter(Doc);
+  finally
+    Doc.Free;
   end;
+end;
 
-  {Icons}
-  For I:=0 to IconsListView.Items.Count-1 do If IconsListView.Items[I].Checked then begin
-    S:=PrgDataDir+IconsSubDir+'\'+IconsListView.Items[I].Caption;
-    T:=OutputDir+IconsListView.Items[I].Caption;
-    If not CopyWithWithMsg(S,T) then begin FreeAndNil(result); exit; end;
-    if not AddPackageDataIcon(result,T) then begin FreeAndNil(result); exit; end;
+Function TPackageCreationForm.CreatePackageFileForAutoSetupTemplates(const OutputDir : String) : TStringList;
+Var Rec : TSearchRec;
+    I : Integer;
+    Doc : TXMLDocument;
+begin
+  result:=nil;
+  if not DirectoryExists(OutputDir) then exit;
+  Doc:=AddPackageDataHeader(self,DescriptionEdit.Text); If Doc=nil then exit;
+  try
+    I:=FindFirst(IncludeTrailingPathDelimiter(OutputDir)+'*.prof',faAnyFile,Rec);
+    try
+      While I=0 do begin
+        If (Rec.Attr and faDirectory)=0 then begin
+          If not AddPackageDataAutoSetup(Doc,IncludeTrailingPathDelimiter(OutputDir)+Rec.Name) then begin FreeAndNil(result); exit; end;
+        end;
+        I:=FindNext(Rec);
+      end;
+    finally
+      FindClose(Rec);
+    end;
+
+    result:=AddPackageDataFooter(Doc);
+  finally
+    Doc.Free;
   end;
-
-  {IconSets}
-  For I:=0 to IconSetsListBox.Items.Count-1 do If IconSetsListBox.Checked[I] then begin
-    S:=IconSetFolderFromName(IconSetsListBox.Items[I]); If S='' then continue;
-    T:=OutputDir+MakeFileSysOKFolderName(IconSetsListBox.Items[I])+'.zip';
-    if not CreateZipFile(self,T,S,dmNo,GetCompressStrengthFromPrgSetup) then exit;
-    if not AddPackageDataIconSet(result,S+IconsConfFile,T) then begin FreeAndNil(result); exit; end;
-  end;
-
-  {Language files}
-  For I:=0 to LanguageFilesListBox.Items.Count-1 do If LanguageFilesListBox.Checked[I] then begin
-    S:=LanguageFileNameFromName(LanguageFilesListBox.Items[I]); If S='' then continue;
-    T:=OutputDir+ExtractFileName(S);
-    If not CopyWithWithMsg(S,T) then begin FreeAndNil(result); exit; end;
-    If not AddPackageDataLanguage(result,T) then begin FreeAndNil(result); exit; end;
-  end;
-
-  {Games packages}
-  For I:=0 to PackagesListBox.Items.Count-1 do begin
-    If not AddPackageDataExe(result,PackagesListBox.Items[I]) then begin FreeAndNil(result); exit; end;
-  end;
-
-  AddPackageDataFooter(result);
 end;
 
 procedure TPackageCreationForm.OKButtonClick(Sender: TObject);
 Var St : TStringList;
+    OutputFile : String;
 begin
-  If Trim(OutputFileEdit.Text)='' then begin
+  OutputFile:=OutputFileEdit.Text;
+
+  If Trim(OutputFile)='' then begin
     MessageDlg(LanguageSetup.MessageNoFileName,mtError,[mbOK],0);
     ModalResult:=mrNone; exit;
   end;
+  OutputFile:=MakeAbsPath(OutputFile,GetSpecialFolder(Handle,CSIDL_DESKTOPDIRECTORY));
+  If ExtractFileExt(OutputFile)='' then OutputFile:=OutputFile+'.xml';
 
-  St:=CreatePackageFile(IncludeTrailingPathDelimiter(ExtractFilePath(OutputFileEdit.Text)));
+  St:=CreatePackageFile(IncludeTrailingPathDelimiter(ExtractFilePath(OutputFile)));
   If St=nil then exit;
   try
     try
-      St.SaveToFile(OutputFileEdit.Text);
+      St.SaveToFile(OutputFile);
     except
-      MessageDlg(Format(LanguageSetup.MessageCouldNotSaveFile,[OutputFileEdit.Text]),mtError,[mbOK],0);
+      MessageDlg(Format(LanguageSetup.MessageCouldNotSaveFile,[OutputFile]),mtError,[mbOK],0);
       ModalResult:=mrNone; exit;
     end;
   finally
@@ -430,6 +515,59 @@ end;
 procedure TPackageCreationForm.HelpButtonClick(Sender: TObject);
 begin
   Application.HelpCommand(HELP_CONTEXT,ID_FileExportPackageListCreator); 
+end;
+
+procedure TPackageCreationForm.ToolsButtonClick(Sender: TObject);
+Var P : TPoint;
+begin
+  P:=ClientToScreen(Point(ToolsButton.Left,ToolsButton.Top));
+  ToolsPopupMenu.Popup(P.X+5,P.Y+5);
+end;
+
+procedure TPackageCreationForm.ToolsMenuWork(Sender: TObject);
+Var Dialog : TOpenDialog;
+    St : TStringList;
+    OutputFile : String;
+begin
+  Case (Sender as TComponent).Tag of
+    0 : begin
+          Dialog:=TOpenDialog.Create(self);
+          try
+            Dialog.Title:=LanguageSetup.ChooseFile;
+            Dialog.Filter:='All files (*.*)|*.*';
+            If not Dialog.Execute then exit;
+            Clipboard.AsText:=GetMD5Sum(Dialog.FileName);
+          finally
+            Dialog.Free;
+          end;
+        end;
+    1,2 : begin
+          OutputFile:=OutputFileEdit.Text;
+          If Trim(OutputFile)='' then begin MessageDlg(LanguageSetup.MessageNoFileName,mtError,[mbOK],0); exit; end;
+          OutputFile:=MakeAbsPath(OutputFile,GetSpecialFolder(Handle,CSIDL_DESKTOPDIRECTORY));
+          St:=CreatePackageFileForPlainZips(IncludeTrailingPathDelimiter(ExtractFilePath(OutputFile)),(Sender as TComponent).Tag=2);
+          If St=nil then exit;
+          try
+            try St.SaveToFile(OutputFile); except MessageDlg(Format(LanguageSetup.MessageCouldNotSaveFile,[OutputFile]),mtError,[mbOK],0); exit; end;
+          finally
+            St.Free;
+          end;
+          Close;
+        end;
+    3 : begin
+          OutputFile:=OutputFileEdit.Text;
+          If Trim(OutputFile)='' then begin MessageDlg(LanguageSetup.MessageNoFileName,mtError,[mbOK],0); exit; end;
+          OutputFile:=MakeAbsPath(OutputFile,GetSpecialFolder(Handle,CSIDL_DESKTOPDIRECTORY));
+          St:=CreatePackageFileForAutoSetupTemplates(IncludeTrailingPathDelimiter(ExtractFilePath(OutputFile)));
+          If St=nil then exit;
+          try
+            try St.SaveToFile(OutputFile); except MessageDlg(Format(LanguageSetup.MessageCouldNotSaveFile,[OutputFile]),mtError,[mbOK],0); exit; end;
+          finally
+            St.Free;
+          end;
+          Close;
+        end;
+  end;
 end;
 
 procedure TPackageCreationForm.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);

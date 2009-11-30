@@ -25,9 +25,8 @@
   7. <a href="#FAQ07">Is there an easy way of spell checking my new language file ?</a><br />
   8. <a href="#FAQ08">Where has the "Edit default profile... (F5)" menu item gone ?</a><br />
   9. <a href="#FAQ09">Can I use D-Fend Reloaded in Wine under Linux ?</a><br />
-  10. <a href="#FAQ10">I can't get create a bootable HD image. Any ideas ?</a><br />
-  11. <a href="#FAQ11">I have keyboard problems the DOSBox keymapper cannot fix.</a><br />
-  12. <a href="#FAQ12">I get an error message when I try to install the DOSBox movie codec.</a><br />
+  10. <a href="#FAQ10">I have keyboard problems the DOSBox keymapper cannot fix.</a><br />
+  11. <a href="#FAQ11">I get an error message when I try to install the DOSBox movie codec.</a><br />
 </p>
 
 <a onclick="Work('FAQ01')" name="FAQ01" href="#"><h2>&raquo; How does the update checker operate ?</h2></a>
@@ -270,27 +269,8 @@ will also be recognized).
 </p>
 </div>
 
-<a onclick="Work('FAQ10')" name="FAQ10" href="#"><h2>&raquo; I can't get create a bootable HD image. Any ideas ?</h2></a>
+<a onclick="Work('FAQ10')" name="FAQ10" href="#"><h2>&raquo; I have keyboard problems the DOSBox keymapper cannot fix.</h2></a>
 <div id="FAQ10"><p>	
-Trying to run a "Sys" on an image file while running in the normal DOSBox
-environment (not booted any custom OS inside DOSBox) will not work at all.
-The "Sys" command will not be able to write to the boot sector of the image.
-So you have to boot some custom DOS inside DOSBox. The next problem is running
-a (FreeDOS or MSDOS) "Sys" command on a drive created by mkdosfs.exe (the
-image file creator used by D-Fend Reloaded) will result in a not anymore
-readable image file. You have to start with a completely blank image file. To
-create such an image file choose "Create plain empty file" in the image creator
-dialog. Mount this image as driveletter "2" and boot from a MSDOS bootdisk
-(the FreeDOS "Sys" command will not work on this images even this way).
-Call fdisk to create a primary partition on the image. Boot again from the
-MSDOS bootdisk and call "format C: /S". Now you should have  have an image
-file accessable by DOSBox (by simply mounting it the normal way) which is also
-bootable (when mounting it as driveletter "2").
-</p>
-</div>
-
-<a onclick="Work('FAQ11')" name="FAQ11" href="#"><h2>&raquo; I have keyboard problems the DOSBox keymapper cannot fix.</h2></a>
-<div id="FAQ11"><p>	
 First of all try setting the SDL video driver to "Win DIB" in the DOSBox
 section of the D-Fend Reloaded setup dialog. If you still experience keyboard
 problems (in particular keys not recogniced by the keymapper, even more in
@@ -320,8 +300,8 @@ keyboard or your remote control. (See also <a href="http://forums.logitech.com/l
 </p>
 </div>
 
-<a onclick="Work('FAQ12')" name="FAQ12" href="#"><h2>&raquo; I get an error message when I try to install the DOSBox movie codec.</h2></a>
-<div id="FAQ12"><p>	
+<a onclick="Work('FAQ11')" name="FAQ11" href="#"><h2>&raquo; I get an error message when I try to install the DOSBox movie codec.</h2></a>
+<div id="FAQ11"><p>	
 To install a video codec you need admin rights on your system. On Windows XP
 most user always have admin rights and so can install the codec directly from
 the start menu. Under Windows Vista you need to give a program admin rights
