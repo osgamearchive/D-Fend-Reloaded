@@ -25,6 +25,7 @@ LangString LANGNAME_GamesFolder ${LANG_RUSSIAN} "Папка игр"
 LangString LANGNAME_GameDataFolder ${LANG_RUSSIAN} "Папка данных и документов"
 LangString LANGNAME_Deinstall ${LANG_RUSSIAN} "только удаление"
 LangString LANGNAME_ConfirmDelUserData ${LANG_RUSSIAN} "Хотите ли вы также удалить папку данных и настроек $DataInstDir ?"
+LangString LANGNAME_ConfirmDelPrgDir ${LANG_RUSSIAN} "There are some files not created by the D-Fend Reloaded installer in the installation directory. Do you want to remove the folder $INSTDIR anyway?" ; New !
 
 LangString LANGNAME_NoInstallationFound ${LANG_RUSSIAN} "В указанной папке не обнаружено установленного D-Fend Reloaded , обновление невозможно."
 

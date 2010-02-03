@@ -27,7 +27,7 @@ object WizardBaseFrame: TWizardBaseFrame
   end
   object EmulationTypeLabel: TLabel
     Left = 8
-    Top = 88
+    Top = 87
     Width = 95
     Height = 13
     Caption = 'EmulationTypeLabel'
@@ -35,7 +35,7 @@ object WizardBaseFrame: TWizardBaseFrame
   end
   object WizardModeLabel: TLabel
     Left = 8
-    Top = 149
+    Top = 148
     Width = 84
     Height = 13
     Caption = 'WizardModeLabel'

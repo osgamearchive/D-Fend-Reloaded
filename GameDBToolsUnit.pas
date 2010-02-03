@@ -49,7 +49,7 @@ Function BuildDefaultDosProfile(const GameDB : TGameDB; const CopyFiles : Boolea
 Procedure BuildDefaultProfile;
 Procedure ReBuildTemplates;
 Function CopyFiles(Source, Dest : String; const OverwriteExistingFiles, ProcessMessages : Boolean) : Boolean;
-Procedure UpdateUserDataFolderAndSettingsAfterUpgrade(const GameDB : TGameDB);
+Procedure UpdateUserDataFolderAndSettingsAfterUpgrade(const GameDB : TGameDB; const LastVersion : Integer);
 Procedure UpdateSettingsFilesLocation;
 
 Var FreeDOSInitThreadRunning : Boolean = False;
@@ -88,6 +88,8 @@ Procedure ProfileEditorOpenCheck(const AGame : TGame);
 Procedure ProfileEditorCloseCheck(const AGame : TGame; const NewGameExe, NewSetupExe : String);
 Function RunCheck(const AGame : TGame; const RunSetup : Boolean; const RunExtraFile : Integer = -1) : Boolean;
 Procedure CreateCheckSumsForAllGames(const AGameDB : TGameDB);
+Type TFolderType=(ftCapture,ftGameData);
+Procedure CreateFoldersForAllGames(const AGameDB : TGameDB; const FolderType : TFolderType);
 
 Type T5StringArray=Array[0..4] of String;
 Function GetAdditionalChecksumData(const AGame : TGame; Path : String; DataNeeded : Integer; var Files, Checksums : T5StringArray) : Integer;
@@ -132,6 +134,8 @@ uses Windows, SysUtils, Forms, Dialogs, Graphics, ShellAPI, ShlObj, IniFiles,
      PrgSetupUnit, ProfileEditorFormUnit, ModernProfileEditorFormUnit, HashCalc,
      SmallWaitFormUnit, ChecksumFormUnit, WaitFormUnit, ImageCacheUnit,
      DosBoxUnit, ScummVMUnit, ImageStretch, MainUnit;
+
+Function GroupMatch(const GameGroupUpper, SelectedGroupUpper : String) : Boolean; forward;
 
 Procedure AddTypeSelector(const ATreeView : TTreeView; const Name : String; const St : TStringList);
 Var N,N2 : TTreeNode;
@@ -574,7 +578,7 @@ begin
       If J=0 then continue;
       T:=Trim(Copy(S,J+1,MaxInt));
       S:=Trim(Copy(S,1,J-1));
-      If (S=Key) and (T=Value) then begin result:=True; exit; end;
+      If (S=Key) and GroupMatch(T,Value) then begin result:=True; exit; end;
     end;
   finally
     St.Free;
@@ -616,7 +620,7 @@ begin
             end;
       end;
       S:=Trim(S);
-      If ExtUpperCase(S)<>CategoryValue then continue;
+      If not GroupMatch(ExtUpperCase(S),CategoryValue) then continue;
     end;
     CheckListBox.Checked[I]:=Select;
   end;
@@ -1811,25 +1815,47 @@ begin
   result:=True;
 end;
 
-Procedure UpdateUserDataFolderAndSettingsAfterUpgrade(const GameDB : TGameDB);
+Procedure UpdateTemplate(const G : TGame; const LastVersion : Integer);
+Var B : Boolean;
+begin
+  B:=False;
+  If LastVersion<900 then begin
+    If Trim(ExtUpperCase(G.VideoCard))='VGA' then begin G.VideoCard:='vga_s3'; B:=True; end;
+    If G.Cycles='Max' then begin G.Cycles:='max'; B:=True; end;
+    If G.Cycles='Auto' then begin G.Cycles:='auto'; B:=True; end;
+  end;
+  If LastVersion<910 then begin
+    If G.MixerRate=22050 then begin G.MixerRate:=44100; B:=True; end;
+    If G.SBOplRate=22050 then begin G.SBOplRate:=44100; B:=True; end;
+    If G.SpeakerRate=22050 then begin G.SpeakerRate:=44100; B:=True; end;
+    If G.SpeakerTandyRate=22050 then begin G.SpeakerTandyRate:=44100; B:=True; end;
+    If G.JoystickButtonwrap then begin G.JoystickButtonwrap:=False; B:=True; end;
+  end;
+  If B then G.StoreAllValues;
+end;
+
+Procedure UpdateUserDataFolderAndSettingsAfterUpgrade(const GameDB : TGameDB; const LastVersion : Integer);
 Var Source : String;
     I : Integer;
     DB : TGameDB;
+    G : TGame;
     B : Boolean;
 begin
   {Copy new and changed NewUserData files to DataDir}
   If PrgDataDir<>PrgDir then begin
 
-    {Update installer package base script}
-    If FileExists(PrgDir+NSIInstallerHelpFile) then begin
-      CopyFile(PChar(PrgDir+NSIInstallerHelpFile),PChar(PrgDataDir+SettingsFolder+'\'+NSIInstallerHelpFile),False); {False = overwrite existing file}
-    end else begin
-      If FileExists(PrgDir+BinFolder+'\'+NSIInstallerHelpFile) then begin
-        CopyFile(PChar(PrgDir+BinFolder+'\'+NSIInstallerHelpFile),PChar(PrgDataDir+SettingsFolder+'\'+NSIInstallerHelpFile),False); {False = overwrite existing file}
+    {Update installer package base script (only if upgrade from below 9.0)}
+    If LastVersion<900 then begin
+      If FileExists(PrgDir+NSIInstallerHelpFile) then begin
+        CopyFile(PChar(PrgDir+NSIInstallerHelpFile),PChar(PrgDataDir+SettingsFolder+'\'+NSIInstallerHelpFile),False); {False = overwrite existing file}
+      end else begin
+        If FileExists(PrgDir+BinFolder+'\'+NSIInstallerHelpFile) then begin
+          CopyFile(PChar(PrgDir+BinFolder+'\'+NSIInstallerHelpFile),PChar(PrgDataDir+SettingsFolder+'\'+NSIInstallerHelpFile),False); {False = overwrite existing file}
+        end;
       end;
     end;
 
-    {Copy Icons.ini to settings folder}
+    {Copy Icons.ini to settings folder (always)}
     If FileExists(PrgDir+NewUserDataSubDir+'\'+IconsConfFile) then begin
       If FileExists(PrgDataDir+SettingsFolder+'\'+IconsConfFile) then begin
         If FileExists(PrgDataDir+SettingsFolder+'\'+ChangeFileExt(IconsConfFile,'.old')) then DeleteFile(PrgDataDir+SettingsFolder+'\'+ChangeFileExt(IconsConfFile,'.old'));
@@ -1838,68 +1864,67 @@ begin
       CopyFile(PChar(PrgDir+NewUserDataSubDir+'\'+IconsConfFile),PChar(PrgDataDir+SettingsFolder+'\'+IconsConfFile),True);
     end;
 
-    {Add new auto setup templates}
+    {Add new auto setup templates (always)}
     CopyFiles(PrgDir+NewUserDataSubDir+'\'+AutoSetupSubDir,PrgDataDir+AutoSetupSubDir,False,True); {False = do not overwrite existing file}
 
-    {Update DozZip}
-    Source:=PrgDir+NewUserDataSubDir+'\DOSZIP\';
-    If DirectoryExists(Source) then CopyFiles(Source,IncludeTrailingPathDelimiter(PrgSetup.GameDir)+'DOSZIP\',True,True);
+    {Update DozZip (only if upgrade from below 9.1)}
+    If LastVersion<901 then begin
+      Source:=PrgDir+NewUserDataSubDir+'\DOSZIP\';
+      If DirectoryExists(Source) then CopyFiles(Source,IncludeTrailingPathDelimiter(PrgSetup.GameDir)+'DOSZIP\',True,True);
+    end;
   end;
 
-  {Update video card default values}
-  GameDB.ConfOpt.Video:=DefaultValuesVideo;
-  GameDB.ConfOpt.StoreAllValues;
-
-  {Update game DB: Max->max, Auto->auto}
-  For I:=0 to GameDB.Count-1 do begin
-    B:=False;
-    If GameDB[I].Cycles='Max' then begin GameDB[I].Cycles:='max'; B:=True; end;
-    If GameDB[I].Cycles='Auto' then begin GameDB[I].Cycles:='auto'; B:=True; end;
-    If B then GameDB[I].StoreAllValues;
+  {Update game DB: Max->max, Auto->auto (only if upgrade from below 9.0)}
+  If LastVersion<900 then begin
+    For I:=0 to GameDB.Count-1 do begin
+      B:=False;
+      If GameDB[I].Cycles='Max' then begin GameDB[I].Cycles:='max'; B:=True; end;
+      If GameDB[I].Cycles='Auto' then begin GameDB[I].Cycles:='auto'; B:=True; end;
+      If B then begin GameDB[I].StoreAllValues; GameDB[I].LoadCache; end;
+    end;
   end;
 
-  {Update templates and auto setup template: vga->svga_s3}
+  {Update templates and auto setup template (see UpdateTemplate)}
   DB:=TGameDB.Create(PrgDataDir+TemplateSubDir,False);
   try
-    For I:=0 to DB.Count-1 do begin
-      B:=False;
-      If Trim(ExtUpperCase(DB[I].VideoCard))='VGA' then begin DB[I].VideoCard:='vga_s3'; B:=True; end;
-      If DB[I].Cycles='Max' then DB[I].Cycles:='max';
-      If DB[I].Cycles='Auto' then DB[I].Cycles:='auto';
-      If B then DB[I].StoreAllValues;
-    end;
+    For I:=0 to DB.Count-1 do UpdateTemplate(DB[I],LastVersion);
   finally
     DB.Free;
   end;
   DB:=TGameDB.Create(PrgDataDir+AutoSetupSubDir,False);
   try
-    For I:=0 to DB.Count-1 do begin
-      B:=False;
-      If Trim(ExtUpperCase(DB[I].VideoCard))='VGA' then begin DB[I].VideoCard:='vga_s3'; B:=True; end;
-      If DB[I].Cycles='Max' then DB[I].Cycles:='max';
-      If DB[I].Cycles='Auto' then DB[I].Cycles:='auto';
-      If B then DB[I].StoreAllValues;
-    end;
+    For I:=0 to DB.Count-1 do UpdateTemplate(DB[I],LastVersion);
   finally
     DB.Free;
   end;
+  G:=TGame.Create(PrgSetup);
+  try
+    UpdateTemplate(G,LastVersion);
+  finally
+    G.Free;
+  end;
 
-  {Change year from 2007 to 2009 and "multilingual" to "Multilingual" in "DOSBox DOS" profile}
+  {Change year from 2007 to 2009 and "multilingual" to "Multilingual" in "DOSBox DOS" profile (always / only if upgrade from below 9.0)}
+  {//... Change year from 2007 or 2009 to 2010 and "multilingual" to "Multilingual" in "DOSBox DOS" profile (always / only if upgrade from below 9.0)}
   I:=GameDB.IndexOf(DosBoxDOSProfile);
-  If (I>0) and (GameDB[I].CacheYear='2007') then begin
-    GameDB[I].Year:='2009'; GameDB[I].StoreAllValues; GameDB[I].LoadCache;
+  If (I>0) and ((GameDB[I].CacheYear='2007') {or (GameDB[I].CacheYear='2009')}) then begin
+    GameDB[I].Year:='2009'; {'2010';} GameDB[I].StoreAllValues; GameDB[I].LoadCache;
   end;
-  If (I>0) and (GameDB[I].CacheLanguage='multilingual') then begin
-    GameDB[I].Language:='Multilingual'; GameDB[I].StoreAllValues; GameDB[I].LoadCache;
+  If LastVersion<900 then begin
+    If (I>0) and (GameDB[I].CacheLanguage='multilingual') then begin
+      GameDB[I].Language:='Multilingual'; GameDB[I].StoreAllValues; GameDB[I].LoadCache;
+    end;
   end;
 
-  {Update settings in ConfOpt.dat}
-  If VersionToInt(PrgSetup.DFendVersion)<800 then begin
-    GameDB.ConfOpt.Resolution:=DefaultValuesResolution;
-    GameDB.ConfOpt.Scale:=DefaultValuesScale;
+  {Update settings in ConfOpt.dat (only if upgrade from below 0.9.1, 0.9.0, 0.8.1 or 0.8.0)}
+  If LastVersion<901 then begin
+    GameDB.ConfOpt.KeyboardLayout:=DefaultValuesKeyboardLayout;
+    GameDB.ConfOpt.Codepage:=DefaultValuesCodepage;
+  end;
+  If LastVersion<900 then begin
     GameDB.ConfOpt.Video:=DefaultValuesVideo;
   end;
-  If VersionToInt(PrgSetup.DFendVersion)<801 then begin
+  If LastVersion<801 then begin
     GameDB.ConfOpt.Joysticks:=DefaultValuesJoysticks;
     GameDB.ConfOpt.GUSRate:=DefaultValuesGUSRate;
     GameDB.ConfOpt.OPLRate:=DefaultValuesOPLRate;
@@ -1913,7 +1938,11 @@ begin
     GameDB.ConfOpt.HDMA:=DefaultValuesHDMA;
     GameDB.ConfOpt.Memory:=DefaultValuesMemory;
   end;
-
+  If LastVersion<800 then begin
+    GameDB.ConfOpt.Resolution:=DefaultValuesResolution;
+    GameDB.ConfOpt.Scale:=DefaultValuesScale;
+    GameDB.ConfOpt.Video:=DefaultValuesVideo;
+  end;
   GameDB.ConfOpt.StoreAllValues;
 end;
 
@@ -3085,6 +3114,49 @@ begin
     For I:=0 to AGameDB.Count-1 do begin
       CreateGameCheckSum(AGameDB[I],False);
       CreateSetupCheckSum(AGameDB[I],False);
+      StepProgressWindow;
+    end;
+  finally
+    DoneProgressWindow;
+  end;
+end;
+
+Function CreateUniqueFolder(const GameName, ShortFolderName, BaseDir : String) : String;
+Var S : String;
+    I : Integer;
+begin
+  result:='';
+
+  If Trim(ShortFolderName)<>'' then begin
+    S:=MakeAbsPath(ShortFolderName,PrgSetup.BaseDir);
+    If not DirectoryExists(S) then ForceDirectories(S);
+    exit;
+  end;
+
+  S:=MakeAbsPath(IncludeTrailingPathDelimiter(BaseDir)+MakeFileSysOKFolderName(GameName)+'\',PrgSetup.BaseDir);
+  I:=0;
+  While DirectoryExists(S) do begin
+    inc(I);
+    S:=MakeRelPath(IncludeTrailingPathDelimiter(BaseDir)+MakeFileSysOKFolderName(GameName)+IntToStr(I)+'\',PrgSetup.BaseDir);
+  end;
+  ForceDirectories(S);
+  result:=MakeRelPath(S,PrgSetup.BaseDir);  
+end;
+
+Procedure CreateFoldersForAllGames(const AGameDB : TGameDB; const FolderType : TFolderType);
+Var I : Integer;
+    S,T : String;
+begin
+  InitProgressWindow(Application.MainForm,AGameDB.Count);
+  try
+    If FolderType=ftCapture then T:=PrgSetup.CaptureDir else T:=PrgSetup.DataDir; 
+    For I:=0 to AGameDB.Count-1 do begin
+      If FolderType=ftCapture then S:=AGameDB[I].CaptureFolder else S:=AGameDB[I].DataDir;
+      S:=CreateUniqueFolder(AGameDB[I].Name,S,T);
+      If S<>'' then begin
+        If FolderType=ftCapture then AGameDB[I].CaptureFolder:=S else AGameDB[I].DataDir:=S;
+        AGameDB[I].StoreAllValues;
+      end;
       StepProgressWindow;
     end;
   finally

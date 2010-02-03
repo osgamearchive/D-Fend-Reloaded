@@ -112,9 +112,14 @@ begin
     ModalResult:=mrNone; exit;
   end;
 
-  For I:=0 to ListBox.Items.Count-1 do If ListBox.Checked[I] then begin
-    G:=TGame(ListBox.Items.Objects[I]);
-    BuildZipPackage(self,G,Dir+ChangeFileExt(ExtractFileName(G.SetupFile),'.zip'));
+  Enabled:=False;
+  try
+    For I:=0 to ListBox.Items.Count-1 do If ListBox.Checked[I] then begin
+      G:=TGame(ListBox.Items.Objects[I]);
+      BuildZipPackage(self,G,Dir+ChangeFileExt(ExtractFileName(G.SetupFile),'.zip'));
+    end;
+  finally
+    Enabled:=True;
   end;
 end;
 

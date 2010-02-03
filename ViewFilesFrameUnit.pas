@@ -426,6 +426,8 @@ begin
       S:=GetCurrentPath+List.Selected.Caption;
       ListUseInScreenshotList.Checked:=((Trim(ExtUpperCase(S))=Trim(ExtUpperCase(MakeAbsPath(Game.ScreenshotListScreenshot,PrgSetup.BaseDir)))));
     end;
+  end else begin
+    ListUseInScreenshotList.Visible:=False;
   end;
 end;
 

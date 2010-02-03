@@ -25,6 +25,7 @@ LangString LANGNAME_GamesFolder ${LANG_POLISH} "Folder gier"
 LangString LANGNAME_GameDataFolder ${LANG_POLISH} "Folder instrukcji"
 LangString LANGNAME_Deinstall ${LANG_POLISH} "odinstaluj"
 LangString LANGNAME_ConfirmDelUserData ${LANG_POLISH} "Czy chcesz równie¿ usun¹æ folder danych $DataInstDir ?"
+LangString LANGNAME_ConfirmDelPrgDir ${LANG_POLISH} "There are some files not created by the D-Fend Reloaded installer in the installation directory. Do you want to remove the folder $INSTDIR anyway?" ; New !
 
 LangString LANGNAME_NoInstallationFound ${LANG_POLISH} "W podanym folderze nie ma instalacji D-Fend Reloaded, która mog³aby byæ uaktualniona."
 

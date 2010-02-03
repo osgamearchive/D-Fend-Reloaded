@@ -134,7 +134,7 @@ Var PackageList : TPackageList;
 begin
   result:='';
 
-  FileName:=DBDir+ExtractFileNameFromURL(URL,'.xml');
+  FileName:=DBDir+ExtractFileNameFromURL(URL,'.xml',False);
   If not FileExists(FileName) then begin
     If (ExtUpperCase(Copy(URL,1,4))<>'HTTP') and (FileExists(URL) or FileExists(Replace(URL,'%20',' '))) then begin
       If FileExists(URL) then CopyFile(PChar(URL),PChar(FileName),True) else CopyFile(PChar(Replace(URL,'%20',' ')),PChar(FileName),True);
@@ -306,7 +306,7 @@ begin
     3 : If (PageControl.ActivePageIndex=1) and (ListView.Selected<>nil) then begin
           If MessageDlg(LanguageSetup.RepositoriesEditorRemoveSourceConfirm,mtConfirmation,[mbYes,mbNo],0)<>mrYes then exit;
           I:=ListView.ItemIndex;
-          S:=DBDir+ExtractFileNameFromURL(UserPackageList.URL[Integer(ListView.Selected.Data)],'.xml');
+          S:=DBDir+ExtractFileNameFromURL(UserPackageList.URL[Integer(ListView.Selected.Data)],'.xml',False);
           If FileExists(S) then ExtDeleteFile(S,ftTemp);
           UserPackageList.Delete(Integer(ListView.Selected.Data));
           LoadLists;

@@ -69,6 +69,7 @@ const ID_Index=1;
       ID_ProfileCreateShortCut=2014;
       ID_ProfileSearchGame=2015;
       ID_ProfileInstallationSupport=2016;
+      ID_ProfileCheating=2017;
 
       ID_FileEdit=2100;
       ID_ProfileEditProfile=2101;
@@ -116,6 +117,8 @@ const ID_Index=1;
       ID_ExtrasCreateShortcuts=3018;
       ID_ExtrasLanguageEditor=3019;
       ID_ExtrasImageFromProfile=3020;
+      ID_ExtrasEditCheatDB=3021;
+      ID_ExtrasSearchAddress=3022;
 
       ID_HelpForum=4001;
       ID_HelpStatistics=4003;

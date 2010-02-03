@@ -113,7 +113,6 @@ printoutput=ps
 
 [mixer]
 nosound=0
-rate=22050
 blocksize=2048
 prebuffer=10
 VolumeMasterLeft=100
@@ -130,6 +129,7 @@ VolumeFMLeft=100
 VolumeFMRight=100
 VolumeCDLeft=100
 VolumeCDRight=100
+rate=44100
 
 [sblaster]
 mixer=1
@@ -137,10 +137,10 @@ sbbase=220
 irq=7
 dma=1
 hdma=5
-oplrate=22050
 sbtype=sb16
 oplmode=auto
 oplemu=default
+oplrate=44100
 
 [gus]
 gus=1
@@ -155,9 +155,9 @@ ultradir=C:\ULTRASND
 [speaker]
 pcspeaker=1
 disney=1
-pcrate=22050
-tandyrate=22050
 tandy=auto
+pcrate=44100
+tandyrate=44100
 
 [joystick]
 timed=0

@@ -239,6 +239,14 @@ Section "$(LANGNAME_DFendReloaded)" ID_DFend
   ; not changed File "..\DOSBox\zmbv\README.txt"
 
   SetOutPath "$INSTDIR\DOSBox"
+  File "..\DosBoxLang\Readme-0.73-German.txt"
+  File "..\DosBoxLang\German.dosbox.conf"
+  File "..\DosBoxLang\German.lng"
+  File "..\DosBoxLang\Polish.dosbox.conf"
+  File "..\DosBoxLang\Polish.lng"
+  File "..\DosBoxLang\Readme-0.73-Italian.txt"
+  File "..\DosBoxLang\Italian.dosbox.conf"
+  File "..\DosBoxLang\Italian.lng"
   File "..\DosBoxLang\Russian.lng"
   File "..\DosBoxLang\Readme-0.73-Russian.txt"
   File "..\DosBoxLang\Russian.dosbox.conf"
@@ -253,6 +261,8 @@ Section "$(LANGNAME_DFendReloaded)" ID_DFend
   File "..\DosBoxLang\Portuguese.dosbox.conf"
   File "..\DosBoxLang\Turkish.lng"
   File "..\DosBoxLang\Readme-0.72-Persian.rtf"
+  
+  File "..\NewUserData\FREEDOS\CPI\*.*"
   
   NoDOSBoxUpdate:
 SectionEnd

@@ -205,7 +205,15 @@ uses
   DataReaderUnit in 'DataReaderUnit.pas',
   InstallationRunFormUnit in 'InstallationRunFormUnit.pas' {InstallationRunForm},
   MakeBootImageFromProfileFormUnit in 'MakeBootImageFromProfileFormUnit.pas' {MakeBootImageFromProfileForm},
-  SetupFrameAutomaticConfigurationUnit in 'SetupFrameAutomaticConfigurationUnit.pas' {SetupFrameAutomaticConfiguration: TFrame};
+  SetupFrameAutomaticConfigurationUnit in 'SetupFrameAutomaticConfigurationUnit.pas' {SetupFrameAutomaticConfiguration: TFrame},
+  CheatDBUnit in 'CheatDBUnit.pas',
+  CheatApplyFormUnit in 'CheatApplyFormUnit.pas' {CheatApplyForm},
+  CheatDBEditFormUnit in 'CheatDBEditFormUnit.pas' {CheatDBEditForm},
+  CheatDBInternalPrivateerPositionUnit in 'CheatDBInternalPrivateerPositionUnit.pas' {CheatDBInternalPrivateerPositionForm},
+  CheatDBInternalUnit in 'CheatDBInternalUnit.pas',
+  CheatDBToolsUnit in 'CheatDBToolsUnit.pas',
+  CheatDBSearchUnit in 'CheatDBSearchUnit.pas',
+  CheatSearchFormUnit in 'CheatSearchFormUnit.pas' {CheatSearchForm};
 
 {$R *.res}
 

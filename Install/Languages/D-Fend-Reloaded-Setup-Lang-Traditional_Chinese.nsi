@@ -25,6 +25,7 @@ LangString LANGNAME_GamesFolder ${LANG_TRADCHINESE} "遊戲資料夾"
 LangString LANGNAME_GameDataFolder ${LANG_TRADCHINESE} "手冊資料夾"
 LangString LANGNAME_Deinstall ${LANG_TRADCHINESE} "刪除"
 LangString LANGNAME_ConfirmDelUserData ${LANG_TRADCHINESE} "您想同時也刪除數據資料夾 $DataInstDir ?"
+LangString LANGNAME_ConfirmDelPrgDir ${LANG_TRADCHINESE} "There are some files not created by the D-Fend Reloaded installer in the installation directory. Do you want to remove the folder $INSTDIR anyway?" ; New !
 
 LangString LANGNAME_NoInstallationFound ${LANG_TRADCHINESE} "所選擇的資料夾中沒有 D-Fend Reloaded 能進行更新。"
 

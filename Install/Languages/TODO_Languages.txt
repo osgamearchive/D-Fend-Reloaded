@@ -1,0 +1,4 @@
+New: LANGNAME_ConfirmDelPrgDir
+Extended: LANGNAME_WelcomeText
+
+In 1.0 add to MUI_DIRECTORYPAGE_TEXT_TOP: "It is strongly recommended to install D-Fend Reloaded in a separate directory, not together with other programs in the same directory."

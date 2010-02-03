@@ -21,13 +21,38 @@ object ModernProfileEditorMIDIFrame: TModernProfileEditorMIDIFrame
     Height = 13
     Caption = 'DeviceLabel'
   end
+  object MIDISelectLabel1: TLabel
+    Left = 255
+    Top = 179
+    Width = 473
+    Height = 41
+    Anchors = [akLeft, akTop, akRight]
+    AutoSize = False
+    Caption = 
+      'If no device is selected, the Windows default MIDI device will b' +
+      'e used.'
+    WordWrap = True
+  end
+  object MIDISelectLabel2: TLabel
+    Left = 24
+    Top = 313
+    Width = 713
+    Height = 32
+    Anchors = [akLeft, akTop, akRight]
+    AutoSize = False
+    Caption = 
+      'Clicking a device from the list will add it to the additionally ' +
+      'MIDI settings field.'
+    Visible = False
+    WordWrap = True
+  end
   object TypeComboBox: TComboBox
     Left = 24
     Top = 43
     Width = 145
     Height = 21
     Style = csDropDownList
-    ItemHeight = 0
+    ItemHeight = 13
     TabOrder = 0
   end
   object DeviceComboBox: TComboBox
@@ -36,7 +61,7 @@ object ModernProfileEditorMIDIFrame: TModernProfileEditorMIDIFrame
     Width = 145
     Height = 21
     Style = csDropDownList
-    ItemHeight = 0
+    ItemHeight = 13
     TabOrder = 1
   end
   object AdditionalSettingsEdit: TLabeledEdit
@@ -49,5 +74,24 @@ object ModernProfileEditorMIDIFrame: TModernProfileEditorMIDIFrame
     EditLabel.Height = 13
     EditLabel.Caption = 'AdditionalSettingsEdit'
     TabOrder = 2
+  end
+  object MIDISelectButton: TButton
+    Left = 24
+    Top = 179
+    Width = 225
+    Height = 25
+    Caption = 'Select MIDI device from device manager'
+    TabOrder = 3
+    OnClick = MIDISelectButtonClick
+  end
+  object MIDISelectListBox: TListBox
+    Left = 24
+    Top = 210
+    Width = 225
+    Height = 97
+    ItemHeight = 13
+    TabOrder = 4
+    Visible = False
+    OnClick = MIDISelectListBoxClick
   end
 end

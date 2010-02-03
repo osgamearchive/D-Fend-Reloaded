@@ -90,7 +90,7 @@ begin
 end;
 
 Function AvoidSomeNames(const St : TStringList; const SetupNumber : Integer) : String;
-const Avoid : Array[1..13] of String = ('README','DECIDE','CATALOG','LIST','LHARC','ARJ','UNARJ','UNZIP','HELPME','ORDER','DEALERS','ULTRAMID','PRINTME');
+const Avoid : Array[1..14] of String = ('README','DECIDE','CATALOG','LIST','LHARC','ARJ','UNARJ','UNZIP','HELPME','ORDER','DEALERS','ULTRAMID','PRINTME','UNIVBE');
 var I,J : Integer;
     OK : Boolean;
     S : String;
@@ -146,7 +146,7 @@ begin
           Nr:=-1;
           For I:=0 to PrgFiles.Count-1 do begin
             S:=ExtUpperCase(ChangeFileExt(PrgFiles[I],''));
-            If (S='SETUP') or (S='CONFIG') or (S='SETSOUND') or (S='SETSND') or (S='SETBLAST') then begin Nr:=I; break; end;
+            If (S='SETUP') or (S='CONFIG') or (S='SETSOUND') or (S='SETSND') or (S='SETBLAST') or (S='XINSTALL') then begin Nr:=I; break; end;
           end;
           If Nr<0 then begin
             For I:=0 to PrgFiles.Count-1 do begin

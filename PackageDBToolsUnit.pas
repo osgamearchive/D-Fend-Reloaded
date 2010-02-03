@@ -17,7 +17,7 @@ function DownloadFile(const URL, FileName: String): Boolean; overload;
 
 Function GetNiceFileSize(const Size : Integer) : String;
 
-Function ExtractFileNameFromURL(const URL, DefaultExtension : String) : String;
+Function ExtractFileNameFromURL(const URL, DefaultExtension : String; const RemoveDirs : Boolean) : String;
 Function URLFileNameFromFileName(const FileName : String) : String;
 Function ReplaceBRs(const S : String) : String;
 
@@ -229,17 +229,20 @@ begin
   result:=IntToStr(Size div 1024 div 1024)+' '+LanguageSetup.MBytes;
 end;
 
-Function ExtractFileNameFromURL(const URL, DefaultExtension : String) : String;
+Function ExtractFileNameFromURL(const URL, DefaultExtension : String; const RemoveDirs : Boolean) : String;
 const Exts : Array[0..6] of String = ('.EXE','.ZIP','.7Z','.ICO','.INI','.PROF','.XML');
 Var I : Integer;
     S : String;
 begin
   result:=URL;
 
-  If ExtUpperCase(Copy(URL,1,7))='HTTP:/'+'/' then begin
-    result:=Copy(result,8,MaxInt);
-    {I:=Pos('/',result); while I>0 do begin result:=Copy(result,I+1,MaxInt); I:=Pos('/',result); end;}
-    result:=Replace(result,'/','-');
+  If (ExtUpperCase(Copy(URL,1,7))='HTTP:/'+'/') or (Pos('/',URL)>0) then begin
+    If ExtUpperCase(Copy(URL,1,7))='HTTP:/'+'/' then result:=Copy(result,8,MaxInt);
+    If RemoveDirs then begin
+      I:=Pos('/',result); while I>0 do begin result:=Copy(result,I+1,MaxInt); I:=Pos('/',result); end;
+    end else begin
+      result:=Replace(result,'/','-');
+    end;
     result:=Replace(result,'%20',' ');
   end else begin
     result:=Replace(result,':','-');

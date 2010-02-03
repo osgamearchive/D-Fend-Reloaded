@@ -3,9 +3,13 @@ Done:
 - Ball and paddle
 - Pinball
 - Platform
+- Puzzle
 - Race
-- Strategy
+- RPG
+- Shooter
 - Simulation
+- Sports
+- Strategy
 
 Todo:
 - 3D Shooter
@@ -13,7 +17,3 @@ Todo:
 - Educational
 - Fighting
 - Game Creation
-- Puzzle
-- RPG
-- Shooter
-- Sports

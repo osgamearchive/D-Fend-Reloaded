@@ -847,6 +847,7 @@ begin
     If (S='') or (S='DEFAULT') then S:=LanguageSetup.GameKeyboardCodepageDefault;
   end;
 
+  If ExtUpperCase(T)='NONE' then T:='none'; {DOSBox keyb accepts GR and gr but not NONE}
   St.Add('keyb '+T+' '+S{+' > nul'}); {no "> nul" to display possible error message if layout and codepage do not match}
 
   { Reported DOS version }
@@ -1190,11 +1191,16 @@ begin
   result.Add('umb='+BoolToStr(Game.UMB));
 
   T:=Trim(ExtUpperCase(Game.KeyboardLayout));
-  If (T='') or (T='DEFAULT') then T:=LanguageSetup.GameKeyboardLayoutDefault;
+  If (T='') or (T='DEFAULT') then begin
+    DOSBoxNr:=Max(0,GetDOSBoxNr(Game));
+    T:=Trim(ExtUpperCase(PrgSetup.DOSBoxSettings[DOSBoxNr].KeyboardLayout));
+    If (T='') or (T='DEFAULT') then T:=LanguageSetup.GameKeyboardLayoutDefault;
+  end;
   If Pos('(',T)>0 then begin
     S:=Copy(T,Pos('(',T)+1,MaxInt);
     If Pos(')',S)>0 then begin S:=Trim(Copy(S,1,Pos(')',S)-1)); If S<>'' then T:=S; end;
   end;
+  If ExtUpperCase(T)='NONE' then T:='none'; {DOSBox keyb accepts GR and gr but not NONE}
   result.Add('keyboardlayout='+T); {setting keyboard layout here and via keyb command in autoexec; if keyb in autoexec fails due to wrong codepade, keyboard layout will be right anyway}  
 
   {keyboardlayout can't handle layout+codepage -> moved to autoexec as keyb command

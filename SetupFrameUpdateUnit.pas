@@ -166,13 +166,13 @@ begin
     1 : begin
           I:=PrgSetup.DataReaderCheckForUpdates;
           try
+            PrgSetup.DataReaderCheckForUpdates:=3;
             DataReader:=TDataReader.Create;
             try
               ShowDataReaderInternetConfigWaitDialog(Owner,DataReader,LanguageSetup.DataReaderDownloadCaption,LanguageSetup.DataReaderDownloadInfo,LanguageSetup.DataReaderDownloadError);
             finally
               DataReader.Free;
             end;
-            PrgSetup.DataReaderCheckForUpdates:=3;
           finally
             PrgSetup.DataReaderCheckForUpdates:=I;
           end;

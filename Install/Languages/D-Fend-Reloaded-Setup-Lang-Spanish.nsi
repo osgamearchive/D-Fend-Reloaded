@@ -25,6 +25,7 @@ LangString LANGNAME_GamesFolder ${LANG_SPANISH} "Carpeta de juegos"
 LangString LANGNAME_GameDataFolder ${LANG_SPANISH} "Carpeta de manuales"
 LangString LANGNAME_Deinstall ${LANG_SPANISH} "desinstalar"
 LangString LANGNAME_ConfirmDelUserData ${LANG_SPANISH} "¿También desea eliminar la carpeta de datos $DataInstDir?"
+LangString LANGNAME_ConfirmDelPrgDir ${LANG_SPANISH} "There are some files not created by the D-Fend Reloaded installer in the installation directory. Do you want to remove the folder $INSTDIR anyway?" ; New !
 
 LangString LANGNAME_NoInstallationFound ${LANG_SPANISH} "No existe en esta carpeta ninguna instalación previa de D-Fend Reloaded que pueda ser actualizada."
 

@@ -57,7 +57,10 @@ const DosBoxFileName='DOSBOX.EXE';
       CacheFile='Cache.dfr';
 
       DataReaderUpdateURL='http:/'+'/dfendreloaded.sourceforge.net/DataReader/DataReader.xml';
-      DataReaderConfigFile='DataReader.xml';      
+      DataReaderConfigFile='DataReader.xml';
+
+      CheatDBFile='Cheats.xml';
+      CheatDBSearchSubFolder='Settings\AddressSearch'; 
 
       MinSupportedDOSBoxVersion=0.73;
 

@@ -146,22 +146,24 @@ Var I,J,K : Integer;
     Data : TDownloadAutoSetupData;
     S : String;
     Selected : TStringList;
+    Ver : Integer;
 begin
+  Ver:=VersionToInt(GetNormalFileVersionAsString);
   Selected:=TStringList.Create;
   try
     Selected.Capacity:=AListView.Items.Count;
     For I:=0 to AListView.Items.Count-1 do If AListView.Items[I].Checked then Selected.Add(AListView.Items[I].Caption);
 
-    AListView.Columns.BeginUpdate;
-    try
-      For I:=0 to AListView.Columns.Count-1 do AListView.Column[I].Width:=1;
-    finally
-      AListView.Columns.EndUpdate;
-    end;
-
     AListView.Items.BeginUpdate;
     try
       AListView.Items.Clear;
+
+      AListView.Columns.BeginUpdate;
+      try
+        For I:=0 to AListView.Columns.Count-1 do AListView.Column[I].Width:=1;
+      finally
+        AListView.Columns.EndUpdate;
+      end;
 
       St:=TStringList.Create;
       try
@@ -172,8 +174,11 @@ begin
             {Already installed ?}
             If HideIfAlreadyInstalled then begin
               If AutoSetups then begin
-                If AutoSetupChecksumScanner.GetChecksum(ExtractFileNameFromURL(Data.URL,'.prof'))=Data.PackageChecksum then continue;
+                If AutoSetupChecksumScanner.GetChecksum(ExtractFileNameFromURL(Data.URL,'.prof',True))=Data.PackageChecksum then continue;
                 If GameAlreadyInstalled(Data,AutoSetupDB) then continue;
+                If Trim(Data.MaxVersion)<>'' then begin
+                  If VersionToInt(Data.MaxVersion)<Ver then continue;
+                end;
               end else begin
                 If GameAlreadyInstalled(Data,GameDB) then continue;
               end;
@@ -251,6 +256,8 @@ begin
   finally
     AListView.Columns.EndUpdate;
   end;
+
+  AListView.Invalidate;
 end;
 
 Procedure LoadIconsListView(const AListView : TListView; const PackageDB : TPackageDB; const IconChecksumScanner : TChecksumScanner; const HideIfAlreadyInstalled : Boolean);
@@ -273,7 +280,7 @@ begin
           Data:=PackageDB[I].Icon[J];
           {Already installed ?}
           If HideIfAlreadyInstalled then begin
-            If IconChecksumScanner.GetChecksum(ExtractFileNameFromURL(Data.URL,'.ico'))=Data.PackageChecksum then continue;
+            If IconChecksumScanner.GetChecksum(ExtractFileNameFromURL(Data.URL,'.ico',True))=Data.PackageChecksum then continue;
           end;
           {Add to string list}
           St.AddObject(Data.Name,TObject(I*65536+J))
@@ -445,8 +452,8 @@ begin
           Data:=PackageDB[I].Language[J];
           If (VersionToInt(Data.MinVersion)>VersionToInt(GetNormalFileVersionAsString)) or (VersionToInt(Data.MaxVersion)<VersionToInt(GetNormalFileVersionAsString)) then continue;
           If HideIfAlreadyInstalled then begin
-            if LanguageChecksumScanner1.GetChecksum(ExtractFileNameFromURL(Data.URL,'.ini'))=Data.PackageChecksum then continue;
-            if (LanguageChecksumScanner2<>nil) and (LanguageChecksumScanner2.GetChecksum(ExtractFileNameFromURL(Data.URL,'.ini'))=Data.PackageChecksum) then continue;
+            if LanguageChecksumScanner1.GetChecksum(ExtractFileNameFromURL(Data.URL,'.ini',True))=Data.PackageChecksum then continue;
+            if (LanguageChecksumScanner2<>nil) and (LanguageChecksumScanner2.GetChecksum(ExtractFileNameFromURL(Data.URL,'.ini',True))=Data.PackageChecksum) then continue;
           end;
           {Add to string list}
           St.AddObject(Data.Name,TObject(I*65536+J));
@@ -544,7 +551,7 @@ begin
         {Only add records to filter list that are available in unfiltered list}
         If HideIfAlreadyInstalled then begin
           If AutoSetups then begin
-            If AutoSetupChecksumScanner.GetChecksum(ExtractFileNameFromURL(Data.URL,'.prof'))=Data.PackageChecksum then continue;
+            If AutoSetupChecksumScanner.GetChecksum(ExtractFileNameFromURL(Data.URL,'.prof',True))=Data.PackageChecksum then continue;
           end;
           If GameAlreadyInstalled(Data,GameDB) then continue;
         end;

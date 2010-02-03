@@ -133,6 +133,10 @@ object PackageManagerRepositoriesEditForm: TPackageManagerRepositoriesEditForm
     OnChange = PageControlChange
     object TabSheet1: TTabSheet
       Caption = 'Official repositories'
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object ListView1: TListView
         Left = 0
         Top = 0
@@ -153,6 +157,10 @@ object PackageManagerRepositoriesEditForm: TPackageManagerRepositoriesEditForm
     object TabSheet2: TTabSheet
       Caption = 'User-defined repositories'
       ImageIndex = 1
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object ListView: TListView
         Left = 0
         Top = 0

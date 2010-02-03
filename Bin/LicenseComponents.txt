@@ -44,8 +44,8 @@ OggEnc v2.84 (libvorbis 1.2.0)
 (c) 2000-2005 Michael Smith & portions by John Edwards
 (http://www.vorbis.com/)
 
-Doszip Commander 1.31
-(c) 1996-2009 Hjort Nidudsson
+Doszip Commander 1.41
+(c) 1996-2010 Hjort Nidudsson
 (http://sourceforge.net/projects/doszip)
 
 Dr.SAGURA Media Player

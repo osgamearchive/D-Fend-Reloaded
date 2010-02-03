@@ -3,7 +3,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
   Top = 0
   ActiveControl = TreeView
   Caption = 'D-Fend Reloaded'
-  ClientHeight = 758
+  ClientHeight = 658
   ClientWidth = 774
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -4360,7 +4360,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
   object Splitter: TSplitter
     Left = 169
     Top = 24
-    Height = 612
+    Height = 512
     ResizeStyle = rsUpdate
     OnMoved = FormResize
     ExplicitLeft = 224
@@ -4371,7 +4371,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
     Left = 0
     Top = 24
     Width = 169
-    Height = 612
+    Height = 512
     Align = alLeft
     Constraints.MinWidth = 50
     HideSelection = False
@@ -4382,7 +4382,6 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
     TabOrder = 0
     OnChange = TreeViewChange
     OnDragDrop = MainDragDrop
-    ExplicitHeight = 592
   end
   object CoolBar: TCoolBar
     Left = 0
@@ -4519,14 +4518,13 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
     Left = 172
     Top = 24
     Width = 602
-    Height = 612
+    Height = 512
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 2
-    ExplicitHeight = 592
     object Splitter1: TSplitter
       Left = 0
-      Top = 409
+      Top = 309
       Width = 602
       Height = 3
       Cursor = crVSplit
@@ -4539,7 +4537,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
       Left = 0
       Top = 0
       Width = 602
-      Height = 409
+      Height = 309
       Align = alClient
       Columns = <>
       HideSelection = False
@@ -4558,14 +4556,14 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
       OnDragDrop = MainDragDrop
       OnInfoTip = ListViewInfoTip
       OnSelectItem = ListViewSelectItem
-      ExplicitHeight = 389
+      ExplicitHeight = 289
     end
     object CapturePageControl: TPageControl
       Left = 0
-      Top = 412
+      Top = 312
       Width = 602
       Height = 200
-      ActivePage = GameNotesPanel
+      ActivePage = CaptureScreenshotsTab
       Align = alBottom
       Constraints.MinHeight = 50
       Images = ImageList
@@ -4573,10 +4571,13 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
       TabOrder = 1
       Visible = False
       OnChange = CapturePageControlChange
-      ExplicitTop = 392
       object CaptureScreenshotsTab: TTabSheet
         Caption = 'Screenshots'
         ImageIndex = 35
+        ExplicitLeft = 0
+        ExplicitTop = 0
+        ExplicitWidth = 0
+        ExplicitHeight = 0
         object ScreenshotListView: TListView
           Left = 0
           Top = 17
@@ -4609,6 +4610,10 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
       object CaptureSoundTab: TTabSheet
         Caption = 'Sounds'
         ImageIndex = 33
+        ExplicitLeft = 0
+        ExplicitTop = 0
+        ExplicitWidth = 0
+        ExplicitHeight = 0
         object SoundListView: TListView
           Left = 0
           Top = 17
@@ -4644,6 +4649,10 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
       object CaptureVideoTab: TTabSheet
         Caption = 'Videos'
         ImageIndex = 38
+        ExplicitLeft = 0
+        ExplicitTop = 0
+        ExplicitWidth = 0
+        ExplicitHeight = 0
         object VideoListView: TListView
           Left = 0
           Top = 17
@@ -4758,12 +4767,16 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
       object DataFilesTab: TTabSheet
         Caption = 'Data folder'
         ImageIndex = 13
+        ExplicitLeft = 0
+        ExplicitTop = 0
+        ExplicitWidth = 0
+        ExplicitHeight = 0
       end
     end
   end
   object ZipInfoPanel: TPanel
     Left = 0
-    Top = 636
+    Top = 536
     Width = 774
     Height = 40
     Align = alBottom
@@ -4773,7 +4786,6 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
     TabOrder = 3
     Visible = False
     OnDblClick = ZipInfoPanelDblClick
-    ExplicitTop = 616
     DesignSize = (
       774
       40)
@@ -4791,7 +4803,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
   end
   object FirstRunInfoPanel: TPanel
     Left = 0
-    Top = 676
+    Top = 576
     Width = 774
     Height = 82
     Align = alBottom
@@ -4801,7 +4813,6 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
     TabOrder = 4
     Visible = False
     OnDblClick = ZipInfoPanelDblClick
-    ExplicitTop = 656
     DesignSize = (
       774
       82)
@@ -6887,6 +6898,11 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
       object MenuProfileSearchGame: TMenuItem
         Caption = 'Search game'
       end
+      object MenuProfileCheating: TMenuItem
+        Tag = 4021
+        Caption = 'Cheat saved game...'
+        OnClick = MenuWork
+      end
     end
     object MenuExtras: TMenuItem
       Caption = '&Extras'
@@ -6914,6 +6930,24 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
         Caption = '&Templates...'
         ShortCut = 115
         OnClick = MenuWork
+      end
+      object MenuExtrasCheating: TMenuItem
+        Caption = 'Cheating'
+        object MenuExtrasCheatingApply: TMenuItem
+          Tag = 5022
+          Caption = '&Apply cheat to saved game...'
+          OnClick = MenuWork
+        end
+        object MenuExtrasCheatingEdit: TMenuItem
+          Tag = 5023
+          Caption = '&Edit cheats data base...'
+          OnClick = MenuWork
+        end
+        object MenuExtrasCheatingSearch: TMenuItem
+          Tag = 5024
+          Caption = '&Search for address in saved game...'
+          OnClick = MenuWork
+        end
       end
       object N1: TMenuItem
         Caption = '-'
@@ -7311,6 +7345,11 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
     end
     object PopupSearchGame: TMenuItem
       Caption = 'Search game'
+    end
+    object PopupCheating: TMenuItem
+      Tag = 4021
+      Caption = 'Cheat saved game...'
+      OnClick = MenuWork
     end
     object N19: TMenuItem
       Caption = '-'

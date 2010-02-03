@@ -140,6 +140,7 @@ FunctionEnd
 !macro LanguageSetup
   !insertmacro MUI_LANGUAGE "English"
 
+  !insertmacro MUI_LANGUAGE "PortugueseBR"
   !insertmacro MUI_LANGUAGE "Danish"
   !insertmacro MUI_LANGUAGE "Dutch"
   !insertmacro MUI_LANGUAGE "French"
@@ -150,7 +151,9 @@ FunctionEnd
   !insertmacro MUI_LANGUAGE "SimpChinese"
   !insertmacro MUI_LANGUAGE "Spanish"
   !insertmacro MUI_LANGUAGE "TradChinese"
+  !insertmacro MUI_LANGUAGE "Turkish"
 
+  !include "Languages\D-Fend-Reloaded-Setup-Lang-BrazilianPortuguese.nsi"
   !include "Languages\D-Fend-Reloaded-Setup-Lang-Danish.nsi"
   !include "Languages\D-Fend-Reloaded-Setup-Lang-Dutch.nsi"
   !include "Languages\D-Fend-Reloaded-Setup-Lang-English.nsi"
@@ -162,6 +165,7 @@ FunctionEnd
   !include "Languages\D-Fend-Reloaded-Setup-Lang-Simplified_Chinese.nsi"
   !include "Languages\D-Fend-Reloaded-Setup-Lang-Spanish.nsi"
   !include "Languages\D-Fend-Reloaded-Setup-Lang-Traditional_Chinese.nsi"
+  !include "Languages\D-Fend-Reloaded-Setup-Lang-Turkish.nsi"
 !macroend
 
 
@@ -217,8 +221,33 @@ FunctionEnd
     DelUserData:  
     RmDir /r $DataInstDir  
     UninstallUserDataEnd:
-
-    RmDir /r $INSTDIR
+	
+    RmDir /r $INSTDIR\Bin
+	RmDir /r $INSTDIR\DOSBox
+	RmDir /r $INSTDIR\IconSets
+	RmDir /r $INSTDIR\Lang
+	RmDir /r $INSTDIR\NewUserData
+	Delete $INSTDIR\DFend.dat
+	Delete $INSTDIR\DFend.exe
+	Delete $INSTDIR\Readme_OperationMode.txt
+	Delete $INSTDIR\Uninstall.exe
+    Delete $INSTDIR\ConfOpt.dat
+    Delete $INSTDIR\ScummVM.dat
+    Delete $INSTDIR\History.dat
+    Delete $INSTDIR\Icons.ini  
+    Delete $INSTDIR\DFend.ini
+    Delete $INSTDIR\Links.txt;
+    Delete $INSTDIR\SearchLinks.txt
+    Delete "$INSTDIR\D-Fend Reloaded DataInstaller.nsi"
+	
+    Push "$INSTDIR"
+    Call un.isEmptyDir
+    Pop $0
+    StrCmp $0 1 RemoveInstDir
+	MessageBox MB_YESNO "$(LANGNAME_ConfirmDelPrgDir)" IDYES RemoveInstDir IDNO RemoveInstDirDone
+	RemoveInstDir:
+	RmDir /r $INSTDIR
+	RemoveInstDirDone:
   
     StrCmp $1 "PORTABLEMODE" NoUninstallFromStartMenu
 	
@@ -345,4 +374,32 @@ Function .onVerifyInstDir
   Abort
   
   DirCheckOK:
+FunctionEnd
+
+
+
+; Check if directory is empty
+; ============================================================
+Function un.isEmptyDir
+  # Stack ->                    # Stack: <directory>
+  Exch $0                       # Stack: $0
+  Push $1                       # Stack: $1, $0
+  FindFirst $0 $1 "$0\*.*"
+  strcmp $1 "." 0 _notempty
+    FindNext $0 $1
+    strcmp $1 ".." 0 _notempty
+      ClearErrors
+      FindNext $0 $1
+      IfErrors 0 _notempty
+        FindClose $0
+        Pop $1                  # Stack: $0
+        StrCpy $0 1
+        Exch $0                 # Stack: 1 (true)
+        goto _end
+     _notempty:
+       FindClose $0
+       Pop $1                   # Stack: $0
+       StrCpy $0 0
+       Exch $0                  # Stack: 0 (false)
+  _end:
 FunctionEnd

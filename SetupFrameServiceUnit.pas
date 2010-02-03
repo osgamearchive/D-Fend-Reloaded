@@ -14,6 +14,8 @@ type
     Service2Button: TBitBtn;
     Service5Button: TBitBtn;
     Service6Button: TBitBtn;
+    Service7Button: TBitBtn;
+    Service8Button: TBitBtn;
     procedure ButtonWork(Sender: TObject);
   private
     { Private-Deklarationen }
@@ -62,6 +64,8 @@ begin
   UserIconLoader.DialogImage(DI_Folders,Service2Button);
   UserIconLoader.DialogImage(DI_Calculator,Service5Button);
   UserIconLoader.DialogImage(DI_Delete,Service6Button);
+  UserIconLoader.DialogImage(DI_Folders,Service7Button);
+  UserIconLoader.DialogImage(DI_Folders,Service8Button);
 end;
 
 procedure TSetupFrameService.BeforeChangeLanguage;
@@ -76,6 +80,8 @@ begin
   Service4Button.Caption:=LanguageSetup.SetupFormService4;
   Service5Button.Caption:=LanguageSetup.SetupFormService5;
   Service6Button.Caption:=LanguageSetup.SetupFormService6;
+  Service7Button.Caption:=LanguageSetup.SetupFormService7;
+  Service8Button.Caption:=LanguageSetup.SetupFormService8;
 
   HelpContext:=ID_FileOptionsService;
 end;
@@ -90,6 +96,8 @@ begin
   Service2Button.Visible:=AdvencedMode;
   Service5Button.Visible:=AdvencedMode;
   Service6Button.Visible:=AdvencedMode;
+  Service7Button.Visible:=AdvencedMode and PrgSetup.ActivateIncompleteFeatures;
+  Service8Button.Visible:=AdvencedMode and PrgSetup.ActivateIncompleteFeatures;
 end;
 
 procedure TSetupFrameService.HideFrame;
@@ -129,6 +137,8 @@ begin
         end;
     4 : CreateCheckSumsForAllGames(GameDB);
     5 : ClearPackageCache;
+    6 : CreateFoldersForAllGames(GameDB,ftCapture);
+    7 : CreateFoldersForAllGames(GameDB,ftGameData);
   end;
 end;
 

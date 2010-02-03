@@ -24,6 +24,7 @@ type
     DeveloperLabel: TLabel;
     PublisherLabel: TLabel;
     YearLabel: TLabel;
+    SearchTypeCheckBox: TCheckBox;
     procedure FormShow(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -31,6 +32,7 @@ type
     procedure ListBoxClick(Sender: TObject);
     procedure InsertButtonClick(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure SearchTypeCheckBoxClick(Sender: TObject);
   private
     { Private-Deklarationen }
     GenreSt, DeveloperSt, PublisherSt, YearSt, CoverSt : TStringList;
@@ -85,6 +87,8 @@ begin
   Caption:=LanguageSetup.DataReader;
   GameNameEdit.EditLabel.Caption:=LanguageSetup.GameName;
   SearchButton.Caption:=LanguageSetup.Search;
+  SearchTypeCheckBox.Caption:=LanguageSetup.DataReaderSearchForDOSGames;
+  SearchTypeCheckBox.Visible:=PrgSetup.ActivateIncompleteFeatures;
   SearchResultsLabel.Caption:=LanguageSetup.DataReaderSearchResults;
   GameDataBox.Caption:=LanguageSetup.DataReaderNoSearchResults;
   GenreCheckBox.Caption:=LanguageSetup.GameGenre;
@@ -96,12 +100,13 @@ begin
   InsertButton.Caption:=LanguageSetup.DataReaderInsert;
   CancelButton.Caption:=LanguageSetup.Cancel;
 
-
   UserIconLoader.DialogImage(DI_FindFile,SearchButton);
   UserIconLoader.DialogImage(DI_OK,InsertButton);
   UserIconLoader.DialogImage(DI_Cancel,CancelButton);
 
-  If Trim(GameNameEdit.Text)<>'' then SearchButtonClick(Sender);
+  SearchTypeCheckBox.Checked:=not PrgSetup.DataReaderAllPlatforms;
+
+  If Trim(GameNameEdit.Text)<>'' then SearchButtonClick(Sender) else ListBoxClick(Sender);
   ShowCompleted:=True;
 end;
 
@@ -142,7 +147,10 @@ begin
     Enabled:=False;
     try
       If ShowCompleted then O:=self else O:=Owner;
-      If not ShowDataReaderInternetListWaitDialog(O,DataReader,GameNameEdit.Text,LanguageSetup.DataReaderDownloadCaption,LanguageSetup.DataReaderDownloadInfo,LanguageSetup.DataReaderDownloadError) then exit;
+      If not ShowDataReaderInternetListWaitDialog(O,DataReader,GameNameEdit.Text,LanguageSetup.DataReaderDownloadCaption,LanguageSetup.DataReaderDownloadInfo,LanguageSetup.DataReaderDownloadError) then begin
+        ListBoxClick(Sender);
+        exit;
+      end;
     finally
       Enabled:=True;
     end;
@@ -159,6 +167,11 @@ begin
     ListBoxClick(Sender);
     If ListBox.Items.Count>0 then ActiveControl:=ListBox;
   end;
+end;
+
+procedure TDataReaderForm.SearchTypeCheckBoxClick(Sender: TObject);
+begin
+  PrgSetup.DataReaderAllPlatforms:=not SearchTypeCheckBox.Checked;
 end;
 
 Function ProcessGenre(const S : String) : String;

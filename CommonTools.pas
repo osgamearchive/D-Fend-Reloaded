@@ -1179,6 +1179,8 @@ end;
 Function LoadImageFromFile(const FileName : String) : TPicture;
 Var Ext : String;
     GIFImage : TGIFImage;
+    FSt : TFileStream;
+    B : Array[0..1] of Byte;
 begin
   Ext:=Trim(ExtUpperCase(ExtractFileExt(FileName)));
 
@@ -1197,6 +1199,16 @@ begin
       exit;
     end;
     result:=TPicture.Create;
+    If Ext='.BMP' then begin
+      FSt:=TFileStream.Create(FileName,fmOpenRead);
+      try
+        If (FSt.Read(B,2)<>2) or (B[0]<>$42) or (B[1]<>$4D) then begin
+          FreeAndNil(result); exit;
+        end;
+      finally
+        FSt.Free;
+      end;
+    end;
     result.LoadFromFile(FileName);
   except
     If result<>nil then FreeAndNil(result);

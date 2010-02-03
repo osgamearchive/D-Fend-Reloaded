@@ -34,6 +34,18 @@ ProfileMode=DOSBox
 ExtraDirs=
 ExtraFiles=
 DataDir=
+SecureMode=1
+ScreenshotListScreenshot=
+ExtraExe0=
+ExtraExe1=
+ExtraExe2=
+ExtraExe3=
+ExtraExe4=
+ExtraExe5=
+ExtraExe6=
+ExtraExe7=
+ExtraExe8=
+ExtraExe9=
 
 [ExtraInfo]
 Favorite=0
@@ -59,6 +71,7 @@ windowresolution=original
 fullresolution=original
 priority=higher,normal
 mapperfile=mapper.txt
+DOSBoxlanguage=default
 
 [dos]
 Force2ButtonMouseMode=0
@@ -100,7 +113,6 @@ printoutput=ps
 
 [mixer]
 nosound=0
-rate=22050
 blocksize=2048
 prebuffer=10
 VolumeMasterLeft=100
@@ -115,6 +127,9 @@ VolumeSBLeft=100
 VolumeSBRight=100
 VolumeFMLeft=100
 VolumeFMRight=100
+rate=44100
+VolumeCDLeft=100
+VolumeCDRight=100
 
 [sblaster]
 mixer=1
@@ -122,9 +137,10 @@ sbbase=220
 irq=7
 dma=1
 hdma=5
-oplrate=22050
 sbtype=sb16
 oplmode=auto
+oplrate=44100
+oplemu=default
 
 [gus]
 gus=1
@@ -139,16 +155,16 @@ ultradir=C:\ULTRASND
 [speaker]
 pcspeaker=1
 disney=1
-pcrate=22050
-tandyrate=22050
 tandy=auto
+pcrate=44100
+tandyrate=44100
 
 [joystick]
 timed=1
 autofire=0
 swap34=0
-buttonwrap=1
 joysticktype=none
+buttonwrap=0
 
 [ScummVM]
 NativeMT32=0
@@ -168,6 +184,21 @@ GamePath=
 Filter=2x
 Language=en
 MusicDriver=auto
+ConfirmExit=0
+AltIntro=0
+MusicMute=0
+ObjectLabels=0
+ReverseStereo=0
+SFXMute=0
+CDROM=0
+JoystickNum=0
+GFXDetails=3
+Walkspeed=2
+GameZipFile=
+RenderMode=
+Savepath=
+ExtraPath=
+Platform=
 
 [dosbox]
 memsize=16
@@ -180,10 +211,12 @@ cyclesup=500
 cyclesdown=20
 core=normal
 cycles=750
+type=auto
 
 [vga]
 videoram=2048
 svgachipset=s3
+PixelShader=none
 
 [serial]
 serial1=Dummy
@@ -195,4 +228,23 @@ serial4=disabled
 mpu401=intelligent
 device=default
 config=
+
+[ExtraCommands]
+BeforeExecution.Wait=1
+BeforeExecution.Minimized=0
+AfterExecution.Minimized=0
+BeforeExecution=
+AfterExecution=
+
+[ExtraGameIdentify]
+File1.Filename=
+File1.Checksum=
+File2.Filename=
+File2.Checksum=
+File3.Filename=
+File3.Checksum=
+File4.Filename=
+File4.Checksum=
+File5.Filename=
+File5.Checksum=
 

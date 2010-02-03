@@ -3,11 +3,11 @@ object DataReaderForm: TDataReaderForm
   Top = 0
   BorderIcons = [biSystemMenu, biMaximize]
   Caption = 'DataReaderForm'
-  ClientHeight = 327
+  ClientHeight = 351
   ClientWidth = 592
   Color = clBtnFace
-  Constraints.MinHeight = 363
-  Constraints.MinWidth = 608
+  Constraints.MinHeight = 361
+  Constraints.MinWidth = 600
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
@@ -22,12 +22,12 @@ object DataReaderForm: TDataReaderForm
   OnShow = FormShow
   DesignSize = (
     592
-    327)
+    351)
   PixelsPerInch = 96
   TextHeight = 13
   object SearchResultsLabel: TLabel
     Left = 16
-    Top = 54
+    Top = 69
     Width = 68
     Height = 13
     Caption = 'Search results'
@@ -69,9 +69,9 @@ object DataReaderForm: TDataReaderForm
   end
   object ListBox: TListBox
     Left = 16
-    Top = 70
+    Top = 88
     Width = 201
-    Height = 219
+    Height = 225
     Anchors = [akLeft, akTop, akBottom]
     ItemHeight = 13
     TabOrder = 2
@@ -79,15 +79,15 @@ object DataReaderForm: TDataReaderForm
   end
   object GameDataBox: TGroupBox
     Left = 232
-    Top = 66
+    Top = 88
     Width = 352
-    Height = 224
+    Height = 226
     Anchors = [akLeft, akTop, akRight, akBottom]
     Caption = 'GameDataBox'
     TabOrder = 3
     DesignSize = (
       352
-      224)
+      226)
     object GenreLabel: TLabel
       Left = 32
       Top = 42
@@ -174,7 +174,7 @@ object DataReaderForm: TDataReaderForm
   end
   object InsertButton: TBitBtn
     Left = 16
-    Top = 296
+    Top = 320
     Width = 97
     Height = 25
     Anchors = [akLeft, akBottom]
@@ -204,11 +204,23 @@ object DataReaderForm: TDataReaderForm
   end
   object CancelButton: TBitBtn
     Left = 128
-    Top = 296
+    Top = 320
     Width = 97
     Height = 25
     Anchors = [akLeft, akBottom]
     TabOrder = 5
     Kind = bkCancel
+  end
+  object SearchTypeCheckBox: TCheckBox
+    Left = 16
+    Top = 46
+    Width = 473
+    Height = 17
+    Anchors = [akLeft, akTop, akRight]
+    Caption = 'Search for DOS games only'
+    Checked = True
+    State = cbChecked
+    TabOrder = 6
+    OnClick = SearchTypeCheckBoxClick
   end
 end

@@ -1,5 +1,58 @@
 D-Fend Reloaded Changelog
 
+Version 0.9.1 (02/05/2010)
+==========================
+- Brazilian Portuguese language file (thanks to Cpt.Guapo)
+- Turkish language file (thanks to Hakan ATEÞ)
+- Updated DOSZip from 1.37 to 1.41.
+- Updated the DOSBox language files for German and Italian and added a new
+  DOSBox language file for Polish.
+- About 150 new auto setup templates for automatical installation of even more
+  games. Althogether D-Fend Reloaded now has more than 1000 auto setup 
+  templates.
+- Updated the default value lists for the supported keyboard layouts and
+  codepages.
+- Added Wikipedia to the "Search for game" default links.
+- Faster filtering functions in the package manager.
+- [Fix] Drag&drop of zip files etc. to the program window sometimes did not
+  work.
+- [Fix] Access violation when uninstalling multiple games while one of the
+  profiles to be uninstalled is installed in the games list.
+- [Fix] Access violation when clicking the "Download game information" button
+  on the programm information page of the profile editor when no internet
+  connection is available.
+- [Fix] The game data reader update function did not work.
+- [Fix] When canceling a download from the package manager the program will
+  continue with the next file from the download list instead of canceling the
+  whole operation.
+- [Fix] The reset to default values function on the default values page of the
+  program settings dialog could raise an access violation when closing the
+  dialog.
+- [Fix] The select/unselect functions of dialogs like the prof file export etc.
+  did not work for profiles having multiple values in the choosen category
+  (multiple genres divided by ";" for example).
+- [Fix] When downloading multiple games via the package manager the close
+  button of the main window became enabled after the first download was
+  completed. Clicking the main window close button while the package manager
+  dialog was opened raised an access violation.
+- [Fix] The "Use as screenshot in profiles list" context menu item in the
+  "Data folder" tab was also visible if no file was selected.
+- [Fix] The "Rename all" and "Delete all" context menu entries in the
+  screenshots, sounds and video tabs were also enabled if there were no files.
+- [Fix] Some minor problems in the keyboard layout setup; in particular when
+  keyboard layout "none" is selected.
+- [Fix] Wrong filenames for downloaded language files if language file and
+  the package list directring to this language file were not in the same
+  directory on the server.
+- [Fix] Some corrections to the DOSBox keyboard layouts default values list.
+- [Fix] The update installer did not update all DOSBox language files.
+- [Fix] The uninstaller will not remove non D-Fend Reloaded files from the
+  D-Fend Reloaded installation directory without confirmation anymore.
+- [Fix] The language dropdown boxes in the setup dialog now have a tooltip hint
+  and the dropdown list is wider (so "Brazilian Portuguese" is not truncated
+  anymore).
+
+
 Version 0.9.0 (12/02/2009)
 ==========================
 - Example games packages, language files, icon sets etc. can be downloaded from

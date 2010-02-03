@@ -31,8 +31,10 @@ Procedure InitDownloadWaitForm(const AOwner : TComponent; const MaxPos : Integer
 Function StepDownloadWaitForm(const Pos : Integer) : Boolean;
 Procedure DoneDownloadWaitForm;
 
-Function DownloadFileWithDialog(const AOwner : TComponent; const Size : Integer; const AbsBase, URL, Referer, DestFile : String) : Boolean;
-Function MetaLinkDownload(const AOwner : TComponent; const ASize : Integer; const AbsBase, MetaLinkURL, Referer, DestFile : String) : Boolean;
+Type TDownloadResult=(drSuccess, drFail, drCancel);
+
+Function DownloadFileWithDialog(const AOwner : TComponent; const Size : Integer; const AbsBase, URL, Referer, DestFile : String) : TDownloadResult;
+Function MetaLinkDownload(const AOwner : TComponent; const ASize : Integer; const AbsBase, MetaLinkURL, Referer, DestFile : String) : TDownloadResult;
 
 implementation
 
@@ -142,7 +144,7 @@ end;
 Type THTTPThread=class(TThread)
   private
     FURL, FReferer, FDestFile : String;
-    FSuccess : Boolean;
+    FSuccess : TDownloadResult;
     FWorkEvent1Sender : TObject;
     FWorkEvent1WorkMode : TWorkMode;
     FWorkEvent1WorkCount, FWorkEvent1WorkSize : Integer;
@@ -157,7 +159,7 @@ Type THTTPThread=class(TThread)
   public
     Constructor Create(const AOwner : TComponent; const AURL, AReferer, ADestFile : String; const ASize : Integer);
     Destructor Destroy; override;
-    property Success : Boolean read FSuccess;
+    property Success : TDownloadResult read FSuccess;
 end;
 
 Constructor THTTPThread.Create(const AOwner : TComponent; const AURL, AReferer, ADestFile : String; const ASize : Integer);
@@ -166,7 +168,7 @@ begin
   FURL:=AURL;
   FReferer:=AReferer;
   FDestFile:=ADestFile;
-  FSuccess:=False;
+  FSuccess:=drFail;
   FTPDownloadHandled:=False;
   InitDownloadWaitForm(AOwner,ASize);
   HTTP:=nil; FTP:=nil;
@@ -187,7 +189,9 @@ begin
   If ExtUpperCase(Copy(FURL,1,6))='FTP:/'+'/' then begin
     I:=0; B:=True; V:='GET';
     RedirectEvent(self,FURL,I,B,V);
-    FSuccess:=FTPDownloadHandled;
+    If FTPDownloadHandled then FSuccess:=drSuccess else begin
+      If DownloadWaitForm.Canceled then FSuccess:=drCancel;
+    end;
     exit;
   end;
 
@@ -210,10 +214,10 @@ begin
       end;
       If not FTPDownloadHandled then begin
         If not SimpleFileCheck(MSt,FDestFile) then exit;
-        If DownloadWaitForm.Canceled then exit;
+        If DownloadWaitForm.Canceled then begin FSuccess:=drCancel; exit; end;
         MSt.SaveToFile(FDestFile);
       end;
-      FSuccess:=True;
+      FSuccess:=drSuccess;
     finally
       MSt.Free;
     end;
@@ -342,7 +346,7 @@ begin
       FTP.Free;
     end;
     If not SimpleFileCheck(MSt,FDestFile) then exit;
-    If DownloadWaitForm.Canceled then exit;
+    If DownloadWaitForm.Canceled then begin FSuccess:=drCancel; exit; end;
     MSt.SaveToFile(FDestFile);
     Handled:=False;
     FTPDownloadHandled:=True;
@@ -351,7 +355,7 @@ begin
   end;
 end;
 
-Function DownloadFileFromInternet(const AOwner : TComponent; const Size : Integer; const URL, Referer, DestFile : String) : Boolean;
+Function DownloadFileFromInternet(const AOwner : TComponent; const Size : Integer; const URL, Referer, DestFile : String) : TDownloadResult;
 {$IFDEF UseBackgroundThread}
 Var HTTPThread : THTTPThread;
 begin
@@ -401,14 +405,14 @@ begin
 end;
 {$ENDIF}
 
-Function CopyFileWithDialog(const AOwner : TComponent; const SourceFile, DestinationFile : String) : Boolean;
+Function CopyFileWithDialog(const AOwner : TComponent; const SourceFile, DestinationFile : String) : TDownloadResult;
 const BufSize=1024*1224;
 Var FSt1, FSt2 : TFileStream;
     Buffer : Pointer;
     C,D : Int64;
     I : Integer;
 begin
-  result:=False;
+  result:=drFail;
   GetMem(Buffer,BufSize);
   try
     try FSt1:=TFileStream.Create(SourceFile,fmOpenRead); except exit; end;
@@ -424,6 +428,7 @@ begin
             FSt2.WriteBuffer(Buffer^,I);
             dec(C,I); inc(D,I);
             StepDownloadWaitForm(D);
+            If DownloadWaitForm.Canceled then begin result:=drCancel; exit; end;
           end;
         except
           exit;
@@ -438,15 +443,15 @@ begin
   finally
     FreeMem(Buffer);
   end;
-  result:=True;
+  result:=drSuccess;
 end;
 
-Function GetLocalFile(const AOwner : TComponent; const Size : Integer; const URL, DestFile : String) : Boolean;
+Function GetLocalFile(const AOwner : TComponent; const Size : Integer; const URL, DestFile : String) : TDownloadResult;
 Var C : Char;
     I, SaveErrorMode : Integer;
     AlternateURL : String;
 begin
-  result:=False;
+  result:=drCancel;
   If (length(URL)<2) or (URL[2]<>':') then exit;
 
   AlternateURL:=Replace(URL,'%20',' ');
@@ -459,11 +464,11 @@ begin
       try
         If FileExists(C+Copy(URL,2,MaxInt)) then begin
           result:=CopyFileWithDialog(AOwner,C+Copy(URL,2,MaxInt),DestFile);
-          If result then exit;
+          If result=drSuccess then exit;
         end;
         If FileExists(C+Copy(AlternateURL,2,MaxInt)) then begin
           result:=CopyFileWithDialog(AOwner,C+Copy(AlternateURL,2,MaxInt),DestFile);
-          If result then exit;
+          If result=drSuccess then exit;
         end;
       finally
         SetErrorMode(SaveErrorMode);
@@ -480,7 +485,7 @@ begin
   result:=(Copy(S,1,7)='HTTP:/'+'/') or (Copy(S,1,8)='HTTPS:/'+'/') or (Copy(S,1,6)='FTP:/'+'/');
 end;
 
-Function DownloadFileWithDialog(const AOwner : TComponent; const Size : Integer; const AbsBase, URL, Referer, DestFile : String) : Boolean;
+Function DownloadFileWithDialog(const AOwner : TComponent; const Size : Integer; const AbsBase, URL, Referer, DestFile : String) : TDownloadResult;
 Var S : String;
 begin
   If IsInternetURL(URL) or IsInternetURL(AbsBase) then begin
@@ -527,17 +532,17 @@ begin
   end;
 end;
 
-Function MetaLinkProcessor(const AOwner : TComponent; const ASize : Integer; const XMLFileName, DestFile : String) : Boolean;
+Function MetaLinkProcessor(const AOwner : TComponent; const ASize : Integer; const XMLFileName, DestFile : String) : TDownloadResult;
 Var St : TStringList;
     I : Integer;
 begin
-  result:=False;
+  result:=drFail;
   St:=GetDownloadLinksFromMetaLink(XMLFileName);
   try
     While St.Count>0 do begin
       I:=Random(St.Count);
       result:=DownloadFileWithDialog(AOwner,ASize,'',St[I],'',DestFile);
-      If result then exit;
+      if result<>drFail then exit;
       St.Delete(I);
     end;
   finally
@@ -545,12 +550,12 @@ begin
   end;
 end;
 
-Function MetaLinkDownload(const AOwner : TComponent; const ASize : Integer; const AbsBase, MetaLinkURL, Referer, DestFile : String) : Boolean;
+Function MetaLinkDownload(const AOwner : TComponent; const ASize : Integer; const AbsBase, MetaLinkURL, Referer, DestFile : String) : TDownloadResult;
 Var TempXMLFile : String;
 begin
-  result:=False;
   TempXMLFile:=TempDir+PackageDBTempFile;
-  If not DownloadFileWithDialog(AOwner,0,AbsBase,MetaLinkURL,Referer,TempXMLFile) then exit;
+  result:=DownloadFileWithDialog(AOwner,0,AbsBase,MetaLinkURL,Referer,TempXMLFile);
+  If result<>drSuccess then exit;
   try
     result:=MetaLinkProcessor(AOwner,ASize,TempXMLFile,DestFile);
   finally

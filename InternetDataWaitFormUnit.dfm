@@ -33,7 +33,7 @@ object InternetDataWaitForm: TInternetDataWaitForm
     Height = 50
     Active = True
     CommonAVI = aviFindFolder
-    StopFrame = 27
+    StopFrame = 29
     Timers = True
   end
   object Timer: TTimer

@@ -33,6 +33,7 @@
 	Language CDATA #REQUIRED
 	PackageChecksum CDATA #REQUIRED
 	Size CDATA #REQUIRED
+	MaxVersion CDATA #IMPLIED
 >
 
 <!ELEMENT Language (#PCDATA)>

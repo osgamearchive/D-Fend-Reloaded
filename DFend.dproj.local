@@ -401,5 +401,8 @@
     <Transaction>2009.11.24 14:51:28.498.pas,C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\DropTargetUnit.pas=</Transaction>
     <Transaction>2009.11.24 18:35:36.795.pas,C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\Unit1.pas=C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\SetupFrameAutomaticConfigurationUnit.pas</Transaction>
     <Transaction>2009.11.24 18:35:36.795.dfm,C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\Unit1.dfm=C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\SetupFrameAutomaticConfigurationUnit.dfm</Transaction>
+    <Transaction>2010.01.27 08:09:26.171.pas,C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\Unit1.pas=C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\CheatDBSearchUnit.pas</Transaction>
+    <Transaction>2010.01.28 09:24:29.148.pas,C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\Unit1.pas=C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\CheatSearchFormUnit.pas</Transaction>
+    <Transaction>2010.01.28 09:24:29.167.dfm,C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\Unit1.dfm=C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\CheatSearchFormUnit.dfm</Transaction>
   </Transactions>
 </BorlandProject>

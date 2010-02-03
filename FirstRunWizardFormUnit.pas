@@ -211,6 +211,8 @@ begin
   If Update2RadioButton.Checked then PrgSetup.CheckForUpdates:=2;
   If Update3RadioButton.Checked then PrgSetup.CheckForUpdates:=3;
   PrgSetup.VersionSpecificUpdateCheck:=UpdateCheckBox.Checked;
+
+  PrgSetup.ValueForNotSet:=LanguageSetup.NotSetLanguageDefault;
 end;
 
 Function VersionStringToInt(S : String) : Integer;

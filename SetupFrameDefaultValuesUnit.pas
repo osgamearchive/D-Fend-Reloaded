@@ -276,6 +276,7 @@ begin
     If (I<>J) and (not All) then exit;
     TStringList(DefaultValueComboBox.Items.Objects[J]).Free;
     DefaultValueComboBox.Items.Objects[J]:=ValueToList(S,';,');
+    DefaultValueLists[J]:=TStringList(DefaultValueComboBox.Items.Objects[J]);
   finally
     inc(J);
   end;

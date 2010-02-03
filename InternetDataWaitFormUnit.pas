@@ -32,7 +32,8 @@ Function DomainOnly(const S : String) : String;
 
 implementation
 
-uses ShellAnimations, VistaToolsUnit, CommonTools, LanguageSetupUnit, PrgConsts;
+uses ShellAnimations, VistaToolsUnit, CommonTools, LanguageSetupUnit, PrgConsts,
+     PrgSetupUnit;
 
 {$R *.dfm}
 
@@ -66,7 +67,7 @@ Function ShowDataReaderInternetWaitDialog(const AOwner : TComponent; const AThre
 begin
   ShowInternetWaitDialog(AOwner,AThread,ACaption,AInfo);
   result:=AThread.Success;
-  If not result then begin MessageDlg(AError,mtError,[mbOK],0); FreeAndNil(result); end;
+  If not result then MessageDlg(AError,mtError,[mbOK],0);
 end;
 
 Function ShowDataReaderInternetConfigWaitDialog(const AOwner : TComponent; const ADataReader : TDataReader; const ACaption, AInfo, AError : String) : Boolean;
@@ -82,10 +83,12 @@ end;
 
 Function ShowDataReaderInternetListWaitDialog(const AOwner : TComponent; const ADataReader : TDataReader; const AName : String; const ACaption, AInfo, AError : String) : Boolean;
 Var DataReaderGameListThread : TDataReaderGameListThread;
+    URL : String;
 begin
   DataReaderGameListThread:=TDataReaderGameListThread.Create(ADataReader,AName);
   try
-    result:=ShowDataReaderInternetWaitDialog(AOwner,DataReaderGameListThread,ACaption,Format(AInfo,[DomainOnly(ADataReader.Config.GamesListURL)]),Format(AError,[DomainOnly(ADataReader.Config.GamesListURL)]));
+    If PrgSetup.DataReaderAllPlatforms then URL:=ADataReader.Config.GamesListAllPlatformsURL else URL:=ADataReader.Config.GamesListURL;
+    result:=ShowDataReaderInternetWaitDialog(AOwner,DataReaderGameListThread,ACaption,Format(AInfo,[DomainOnly(URL)]),Format(AError,[DomainOnly(URL)]));
   finally
     DataReaderGameListThread.Free;
   end;

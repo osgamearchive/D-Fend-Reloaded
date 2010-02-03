@@ -31,10 +31,11 @@ end;
 
      TDownloadAutoSetupData=class(TDownloadData)
   private
-    FGenre, FDeveloper, FPublisher, FYear, FLanguage, FGameExeChecksum : String;
+    FGenre, FDeveloper, FPublisher, FYear, FLanguage, FGameExeChecksum, FMaxVersion : String;
   public
     Constructor Create(const APackageList : TPackageList);
     Function LoadFromXMLNode(const N : IXMLNode) : Boolean; override;
+    property MaxVersion : String read FMaxVersion;
     property Genre : String read FGenre;
     property Developer : String read FDeveloper;
     property Publisher : String read FPublisher;
@@ -182,8 +183,8 @@ Type TPackageDB=class
     FDBDir : String;
     FOnDownload : TDownloadEvent;
     Function InitDBDir : Boolean;
-    Procedure InitPackageFiles(const MainFile, UserFile : TPackageListFile; const Update, UpdateAll: Boolean);
-    Function InitPackageFile(const URL : String; const Update, UpdateAll : Boolean) : TPackageList;
+    Procedure InitPackageFiles(const MainFile, UserFile : TPackageListFile; const Update, UpdateAll, UpdateRemoteOnly: Boolean);
+    Function InitPackageFile(const URL : String; const Update, UpdateAll, UpdateRemoteOnly : Boolean) : TPackageList;
     Function GetCount: Integer;
     Function GetPackageList(I: Integer): TPackageList;
     Function FileInUse(FileName : String) : Boolean;
@@ -192,6 +193,7 @@ Type TPackageDB=class
     Destructor Destroy; override;
     Procedure Clear;
     Procedure LoadDB(const Update, UpdateAll  : Boolean);
+    Procedure UpdateRemoteFiles;
     property Count : Integer read GetCount;
     property List[I : Integer] : TPackageList read GetPackageList; default;
     property DBDir : String read FDBDir;
@@ -255,6 +257,7 @@ begin
   FPublisher:='';
   FYear:='';
   FLanguage:='';
+  FMaxVersion:='';
 end;
 
 function TDownloadAutoSetupData.LoadFromXMLNode(const N: IXMLNode): Boolean;
@@ -268,6 +271,7 @@ begin
   FYear:=DecodeHTMLSymbols(N.Attributes['Year']);
   FLanguage:=DecodeHTMLSymbols(N.Attributes['Language']);
   If N.HasAttribute('GameExeChecksum') then FGameExeChecksum:=N.Attributes['GameExeChecksum'] else FGameExeChecksum:='';
+  If N.HasAttribute('MaxVersion') then FMaxVersion:=N.Attributes['MaxVersion'] else FMaxVersion:='';
   result:=True;
 end;
 
@@ -787,27 +791,28 @@ begin
   result:=True;
 end;
 
-function TPackageDB.InitPackageFile(const URL: String; const Update, UpdateAll: Boolean): TPackageList;
+function TPackageDB.InitPackageFile(const URL: String; const Update, UpdateAll, UpdateRemoteOnly: Boolean): TPackageList;
 Var TempList : TPackageList;
 begin
   result:=TPackageList.Create(URL);
-  result.LoadFromFile(DBDir+ExtractFileNameFromURL(URL,'.xml'));
+  result.LoadFromFile(DBDir+ExtractFileNameFromURL(URL,'.xml',False));
 
   If not Update then exit;
+  If UpdateRemoteOnly and (ExtUpperCase(Copy(URL,1,7))<>'HTTP:/'+'/') then exit;
 
   if not DownloadFile(URL,DBDir+PackageDBTempFile) then exit;
 
   TempList:=TPackageList.Create(URL);
   try
-    if not TempList.LoadFromFile(DBDir+PackageDBTempFile,DBDir+ExtractFileNameFromURL(URL,'.xml')) then exit;
+    if not TempList.LoadFromFile(DBDir+PackageDBTempFile,DBDir+ExtractFileNameFromURL(URL,'.xml',False)) then exit;
     If (TempList.UpdateDate<=result.UpdateDate) and (not UpdateAll) then exit;
 
     result.Free;
     FreeAndNil(TempList);
-    ExtDeleteFile(DBDir+ExtractFileNameFromURL(URL,'.xml'),ftTemp);
-    RenameFile(DBDir+PackageDBTempFile,DBDir+ExtractFileNameFromURL(URL,'.xml'));
+    ExtDeleteFile(DBDir+ExtractFileNameFromURL(URL,'.xml',False),ftTemp);
+    RenameFile(DBDir+PackageDBTempFile,DBDir+ExtractFileNameFromURL(URL,'.xml',False));
     result:=TPackageList.Create(URL);
-    result.LoadFromFile(DBDir+ExtractFileNameFromURL(URL,'.xml'));
+    result.LoadFromFile(DBDir+ExtractFileNameFromURL(URL,'.xml',False));
   finally
     TempList.Free;
     ExtDeleteFile(DBDir+PackageDBTempFile,ftTemp);
@@ -827,7 +832,7 @@ begin
   result:=False;
 end;
 
-procedure TPackageDB.InitPackageFiles(const MainFile, UserFile: TPackageListFile; const Update, UpdateAll: Boolean);
+procedure TPackageDB.InitPackageFiles(const MainFile, UserFile: TPackageListFile; const Update, UpdateAll, UpdateRemoteOnly: Boolean);
 Var I,C1,C2 : Integer;
     P : TPackageList;
     Rec : TSearchRec;
@@ -843,14 +848,14 @@ begin
 
     For I:=0 to MainFile.Count-1 do If MainFile.Active[I] then begin
       If Assigned(FOnDownload) then FOnDownload(self,I,C1+C2,dsProgress,ContinueDownload);
-      P:=InitPackageFile(MainFile[I],Update,UpdateAll);
+      P:=InitPackageFile(MainFile[I],Update,UpdateAll,UpdateRemoteOnly);
       If P<>nil then FPackageList.Add(P);
       If not ContinueDownload then break;
     end;
     If ContinueDownload then For I:=0 to UserFile.Count-1 do If UserFile.Active[I] then begin
       ContinueDownload:=True;
       If Assigned(FOnDownload) then FOnDownload(self,C1+I,C1+C2,dsProgress,ContinueDownload);
-      P:=InitPackageFile(UserFile[I],Update,UpdateAll);
+      P:=InitPackageFile(UserFile[I],Update,UpdateAll,UpdateRemoteOnly);
       If P<>nil then FPackageList.Add(P);
     end;
   finally
@@ -884,7 +889,29 @@ begin
     UserFile:=TPackageListFile.Create(False);
     try
       UserFile.LoadFromFile(DBDir+PackageDBUserFile);
-      InitPackageFiles(MainFile,UserFile,Update,UpdateAll);
+      InitPackageFiles(MainFile,UserFile,Update,UpdateAll,False);
+    finally
+      UserFile.Free;
+    end;
+  finally
+    MainFile.Free;
+  end;
+end;
+
+procedure TPackageDB.UpdateRemoteFiles;
+Var MainFile, UserFile : TPackageListFile;
+begin
+  Clear;
+  If not InitDBDir then exit;
+
+  MainFile:=TPackageListFile.Create(True);
+  try
+    MainFile.LoadFromFile(DBDir+PackageDBMainFile);
+    MainFile.UpdateFromServer(Format(PackageDBMainFileURL,[GetNormalFileVersionAsString]),DBDir+PackageDBTempFile,False);
+    UserFile:=TPackageListFile.Create(False);
+    try
+      UserFile.LoadFromFile(DBDir+PackageDBUserFile);
+      InitPackageFiles(MainFile,UserFile,True,False,True);
     finally
       UserFile.Free;
     end;

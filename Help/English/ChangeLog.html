@@ -16,6 +16,7 @@
 <h1>Version history</h1>
 
 <p class="small">
+  <a href="#ver091">Version 0.9.1 (02/05/2010)</a><br />
   <a href="#ver090">Version 0.9.0 (12/02/2009)</a><br />
   <a href="#ver082">Version 0.8.2 (08/31/2009)</a><br />
   <a href="#ver081">Version 0.8.1 (08/10/2009)</a><br />
@@ -34,6 +35,34 @@
   <a href="#ver011">Version 0.1.1 (12/18/2007)</a><br />
   <a href="#ver010">Version 0.1.0 (11/08/2007)</a>
 </p>
+
+<a onclick="Work('ver091')" name="ver091" href="#"><h2>&raquo; Version 0.9.1 (02/05/2010)</h2></a>
+<div id="ver091">
+<ul>
+  <li>Brazilian Portuguese language file (thanks to Cpt.Guapo)</li>
+  <li>Turkish language file (thanks to Hakan ATEÞ)</li>
+  <li>Updated DOSZip from 1.37 to 1.41.</li>
+  <li>Updated the DOSBox language files for German and Italian and added a new DOSBox language file for Polish.</li>
+  <li>About 150 new auto setup templates for automatical installation of even more games. Althogether D-Fend Reloaded now has more than 1000 auto setup templates.</li>
+  <li>Updated the default value lists for the supported keyboard layouts and codepages.</li>
+  <li>Added Wikipedia to the "Search for game" default links.</li>
+  <li>Faster filtering functions in the package manager.</li>
+  <li>[Fix] Drag&drop of zip files etc. to the program window sometimes did not work.</li>
+  <li>[Fix] Access violation when uninstalling multiple games while one of the profiles to be uninstalled is installed in the games list.</li>
+  <li>[Fix] Access violation when clicking the "Download game information" button on the programm information page of the profile editor when no internet connection is available.</li>
+  <li>[Fix] The game data reader update function did not work.</li>
+  <li>[Fix] When canceling a download from the package manager the program will continue with the next file from the download list instead of canceling the whole operation.</li>
+  <li>[Fix] The reset to default values function on the default values page of the program settings dialog could raise an access violation when closing the dialog.</li>
+  <li>[Fix] The select/unselect functions of dialogs like the prof file export etc. did not work for profiles having multiple values in the choosen category (multiple genres divided by ";" for example).</li>
+  <li>[Fix] When downloading multiple games via the package manager the close button of the main window became enabled after the first download was completed. Clicking the main window close button while the package manager dialog was opened raised an access violation.</li>
+  <li>[Fix] The "Use as screenshot in profiles list" context menu item in the "Data folder" tab was also visible if no file was selected.</li>
+  <li>[Fix] The "Rename all" and "Delete all" context menu entries in the screenshots, sounds and video tabs were also enabled if there were no files.</li>
+  <li>[Fix] Some minor problems in the keyboard layout setup; in particular when keyboard layout "none" is selected.</li>
+  <li>[Fix] Wrong filenames for downloaded language files if language file and the package list directring to this language file were not in the same directory on the server.</li>
+  <li>[Fix] Some corrections to the DOSBox keyboard layouts default values list.</li>
+  <li>[Fix] The language dropdown boxes in the setup dialog now have a tooltip hint and the dropdown list is wider (so "Brazilian Portuguese" is not truncated anymore).</li>
+</ul>
+</div>
 
 <a onclick="Work('ver090')" name="ver090" href="#"><h2>&raquo; Version 0.9.0 (12/02/2009)</h2></a>
 <div id="ver090">

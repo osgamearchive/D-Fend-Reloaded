@@ -4,12 +4,12 @@ interface
 uses Classes, Forms, XMLDoc, GameDBUnit;
 
 Function AddPackageDataZip(const Doc : TXMLDocument; const Game : TGame; const DataFileName : String) : Boolean;
-Function AddPackageDataAutoSetup(const Doc : TXMLDocument; const DataFileName : String) : Boolean;
+Function AddPackageDataAutoSetup(const Doc : TXMLDocument; const DataFileName, MaxVersion : String) : Boolean;
 Function AddPackageDataIcon(const Doc : TXMLDocument; const DataFileName : String) : Boolean;
 Function AddPackageDataIconSet(const Doc : TXMLDocument; const IconSetIniFile : String; const DataFileName : String) : Boolean;
 Function AddPackageDataLanguage(const Doc : TXMLDocument; const DataFileName : String) : Boolean;
 Function AddPackageDataExe(const Doc : TXMLDocument; const DataFileName : String) : Boolean;
-Function AddPackageDataPlainZip(const Doc : TXMLDocument; const DataFileName : String; const AutoSetupDB : TGameDB; const Owner : TComponent; const AddAutoSetups : Boolean) : Boolean;
+Function AddPackageDataPlainZip(const Doc : TXMLDocument; const DataFileName : String; const AutoSetupDB : TGameDB; const Owner : TComponent; const AddAutoSetups : Boolean; const AutoSetupsMaxVersion : String) : Boolean;
 
 Function AddPackageDataHeader(const ParentForm : TForm; const Description : String) : TXMLDocument;
 Function AddPackageDataFooter(const Doc : TXMLDocument) : TStringList;
@@ -77,7 +77,7 @@ begin
   N.NodeValue:=URLFileNameFromFileName(ExtractFileName(DataFileName));
 end;
 
-Function AddPackageDataAutoSetup(const Doc : TXMLDocument; const DataFileName : String) : Boolean;
+Function AddPackageDataAutoSetup(const Doc : TXMLDocument; const DataFileName, MaxVersion : String) : Boolean;
 Var Ini : TIniFile;
     N : IXMLNode;
 begin
@@ -95,6 +95,7 @@ begin
     N.Attributes['PackageChecksum']:=GetMD5Sum(DataFileName);
     N.Attributes['GameExeChecksum']:=Ini.ReadString('Extra','ExeMD5','');
     N.Attributes['Size']:=GetFileSize(DataFileName);
+    If Trim(MaxVersion)<>'' then N.Attributes['MaxVersion']:=MaxVersion;
     N.NodeValue:=URLFileNameFromFileName(ExtractFileName(DataFileName));
   finally
     Ini.Free;
@@ -213,7 +214,7 @@ begin
 end;
 
 
-Function AddPackageDataPlainZip(const Doc : TXMLDocument; const DataFileName : String; const AutoSetupDB : TGameDB; const Owner : TComponent; const AddAutoSetups : Boolean) : Boolean;
+Function AddPackageDataPlainZip(const Doc : TXMLDocument; const DataFileName : String; const AutoSetupDB : TGameDB; const Owner : TComponent; const AddAutoSetups : Boolean; const AutoSetupsMaxVersion : String) : Boolean;
 Var Temp : String;
     Template : TGame;
     St2 : TStringList;
@@ -231,7 +232,7 @@ begin
   try
     if not ExtractZipFile(Owner,DataFileName,Temp) then exit;
     Template:=GetAutoSetupTemplateForFolder(AutoSetupDB,Temp);
-    If AddAutoSetups then CopyFile(PChar(Template.SetupFile),PChar(IncludeTrailingPathDelimiter(ExtractFilePath(DataFileName))+ExtractFileName(Template.SetupFile)),False);
+    If AddAutoSetups and (Template<>nil) then CopyFile(PChar(Template.SetupFile),PChar(IncludeTrailingPathDelimiter(ExtractFilePath(DataFileName))+ExtractFileName(Template.SetupFile)),False);
     N:=Doc.DocumentElement.AddChild('Game');
     If Template=nil then begin
       N.Attributes['Name']:='Warning: No matching auto setup template for '+ExtractFileName(DataFileName);
@@ -254,8 +255,9 @@ begin
       N.Attributes['GameExeChecksum']:=Template.GameExeMD5;
       N.Attributes['Size']:=GetFileSize(DataFileName);
       If AddAutoSetups then begin
-        N.Attributes['AutoSetupURL']:=URLFileNameFromFileName(ExtractFileName(Template.SetupFile));
-        N.Attributes['AutoSetupURLMaxVersion']:=GetNormalLastFileVersionAsString;
+        If Template=nil then S:='not found!' else S:=URLFileNameFromFileName(ExtractFileName(Template.SetupFile));
+        N.Attributes['AutoSetupURL']:=S;
+        If Trim(AutoSetupsMaxVersion)<>'' then N.Attributes['AutoSetupURLMaxVersion']:=AutoSetupsMaxVersion;
       end;
       N.NodeValue:=URLFileNameFromFileName(ExtractFileName(DataFileName));
     end;

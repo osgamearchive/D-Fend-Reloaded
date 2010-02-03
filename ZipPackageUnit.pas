@@ -849,6 +849,7 @@ begin
 
   try
     if not ExtractZipFile(AOwner,AFileName,Temp) then exit;
+
     result:=CreateGameFromFolder(Temp,AGameDB,AFileName,NoDialogIfAutoSetupIsAvailable);
     If result<>nil then begin
       result.StoreAllValues;

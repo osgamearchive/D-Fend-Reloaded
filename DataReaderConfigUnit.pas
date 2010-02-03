@@ -87,7 +87,7 @@ Type TDataReaderConfig=class
     FConfigOK : Boolean;
     FConfigFile : String;
     FVersion : Integer;
-    FGamesListURL, FGameRecordBaseURL, FCoverRecordBaseURL : String;
+    FGamesListURL, FGamesListAllPlatformsURL, FGameRecordBaseURL, FCoverRecordBaseURL : String;
     FGamesList, FGameRecord, FCoverRecord : THTMLStructureElement;
   public
     Constructor Create(const AConfigFile : String);
@@ -96,6 +96,7 @@ Type TDataReaderConfig=class
     property ConfigFile : String read FConfigFile;
     property Version : Integer read FVersion;
     property GamesListURL : String read FGamesListURL;
+    property GamesListAllPlatformsURL : String read FGamesListAllPlatformsURL;
     property GamesList : THTMLStructureElement read FGamesList;
     property GameRecordBaseURL : String read FGameRecordBaseURL;
     property GameRecord : THTMLStructureElement read FGameRecord;
@@ -253,6 +254,7 @@ begin
   FConfigFile:=AConfigFile;
   FVersion:=0;
   FGamesListURL:='';
+  FGamesListAllPlatformsURL:='';
   FGamesList:=nil;
   FGameRecordBaseURL:='';
   FGameRecord:=nil;
@@ -271,6 +273,9 @@ begin
         If Assigned(FGamesList) then exit;
         If N.HasAttribute('URL') then FGamesListURL:=N.Attributes['URL'] else exit;
         FGamesList:=HTMLStructElementFromXMLNode(N,False); If FGamesList=nil then exit;
+        If N.HasAttribute('AllPlatformsURL')
+          then FGamesListAllPlatformsURL:=N.Attributes['AllPlatformsURL']
+          else FGamesListAllPlatformsURL:=FGamesListURL;
       end;
       If N.NodeName='GamePage' then begin
         If Assigned(FGameRecord) then exit;

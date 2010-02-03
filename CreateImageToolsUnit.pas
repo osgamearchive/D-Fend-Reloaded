@@ -290,6 +290,8 @@ begin
     S:=Copy(result,Pos('(',result)+1,MaxInt);
     If Pos(')',S)>0 then begin S:=Trim(Copy(S,1,Pos(')',S)-1)); If S<>'' then result:=S; end;
   end;
+
+  If ExtUpperCase(result)='NONE' then result:='us';
 end;
 
 Function GetFreeDOSDir : String;

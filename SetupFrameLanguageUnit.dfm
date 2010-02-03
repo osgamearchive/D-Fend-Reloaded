@@ -55,9 +55,10 @@ object SetupFrameLanguage: TSetupFrameLanguage
     Width = 169
     Height = 21
     Style = csDropDownList
-    ItemHeight = 0
+    ItemHeight = 13
     TabOrder = 0
     OnChange = LanguageComboBoxChange
+    OnDropDown = ComboBoxDropDown
   end
   object DosBoxLangEditComboBox: TComboBox
     Left = 16
@@ -65,11 +66,12 @@ object SetupFrameLanguage: TSetupFrameLanguage
     Width = 169
     Height = 21
     Style = csDropDownList
-    ItemHeight = 0
+    ItemHeight = 13
     ParentShowHint = False
     ShowHint = True
     TabOrder = 1
     OnChange = DosBoxLangEditComboBoxChange
+    OnDropDown = ComboBoxDropDown
   end
   object LanguageOpenEditor: TBitBtn
     Left = 16
@@ -96,9 +98,10 @@ object SetupFrameLanguage: TSetupFrameLanguage
     Width = 169
     Height = 21
     Style = csDropDownList
-    ItemHeight = 0
+    ItemHeight = 13
     TabOrder = 4
     OnChange = InstallerLangEditComboBoxChange
+    OnDropDown = ComboBoxDropDown
   end
   object Timer: TTimer
     Enabled = False

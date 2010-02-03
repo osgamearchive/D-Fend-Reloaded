@@ -301,6 +301,16 @@ begin
   end;
 end;
 
+Procedure RedrawFrameIfVisible(const F : TFrame);
+begin
+  If not F.Visible then exit;
+
+  F.Visible:=False;
+  F.Visible:=True;
+  F.Invalidate;
+  F.Repaint;
+end;
+
 procedure TWizardForm.StepButtonWork(Sender: TObject);
 begin
   Case (Sender as TComponent).Tag of
@@ -311,6 +321,14 @@ begin
     OKButtonClick(Sender);
     ModalResult:=mrOK;
   end;
+
+  RedrawFrameIfVisible(WizardBaseFrame);
+  RedrawFrameIfVisible(WizardPrgFileFrame);
+  RedrawFrameIfVisible(WizardTemplateFrame);
+  RedrawFrameIfVisible(WizardGameInfoFrame);
+  RedrawFrameIfVisible(WizardFinishFrame);
+  RedrawFrameIfVisible(WizardScummVMFrame);
+  RedrawFrameIfVisible(WizardScummVMSettingsFrame);
 end;
 
 procedure TWizardForm.OKButtonClick(Sender: TObject);

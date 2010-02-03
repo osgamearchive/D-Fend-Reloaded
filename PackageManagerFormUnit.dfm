@@ -174,6 +174,7 @@ object PackageManagerForm: TPackageManagerForm
         ShowHint = True
         TabOrder = 1
         ViewStyle = vsReport
+        OnClick = ListViewClick
         OnInfoTip = ListViewInfoTip
       end
     end
@@ -236,6 +237,7 @@ object PackageManagerForm: TPackageManagerForm
         ShowHint = True
         TabOrder = 1
         ViewStyle = vsReport
+        OnClick = ListViewClick
         OnInfoTip = ListViewInfoTip
       end
     end
@@ -288,6 +290,7 @@ object PackageManagerForm: TPackageManagerForm
         ShowHint = True
         TabOrder = 1
         ViewStyle = vsReport
+        OnClick = ListViewClick
       end
     end
     object TabSheet6: TTabSheet
@@ -339,6 +342,7 @@ object PackageManagerForm: TPackageManagerForm
         ShowHint = True
         TabOrder = 1
         ViewStyle = vsReport
+        OnClick = ListViewClick
       end
     end
     object TabSheet3: TTabSheet
@@ -390,6 +394,7 @@ object PackageManagerForm: TPackageManagerForm
         ShowHint = True
         TabOrder = 1
         ViewStyle = vsReport
+        OnClick = ListViewClick
         OnInfoTip = ListViewInfoTip
       end
     end

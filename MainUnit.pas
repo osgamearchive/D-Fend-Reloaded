@@ -9,18 +9,28 @@ uses
   LinkFileUnit, HelpTools;
 
 {
+0.9.2:
+- Codepages list with names
+- Internal update checker
+- Improve&Test: Search for values in saved games
+- Update function for the cheats data base
+- Hidden function: "Search for updates": Big dialog with options what to search for and what to install
+- Integrate DOSBox 0.74
+- Update default values (see comments in GameDBUnit and GameDBToolsUnit)
+
 1.0:
 - Language strings for TLanguageSetup.GetString2
-- Changelog: Game installation support, making booter profiles from normal profiles, setup automatic game configuration
+- New uninstaller language string (see Install\Languages\TODO_Languages.txt)
 - Hint on update lists button in package manager: shift+click forces updates.
-- Add new help pages for installation support, image from profile to index and setup automatic game configuration to index
+- Add new help pages for installation support, image from profile to index, setup automatic game configuration and cheat system (3 pages) to index
+- Activate help paragraphs for new functions in Setup|Service
 - Setup dialog: When to update package lists / data reader configuration
 - Game installation support: Connect to wizard and plain zip import
 - Making the games license field user translateable
-- Clean up extras|images menu
 - More filter functions for games list
-- Improve first run wizard
 - Better collision detection when importing zip packages
+- Clean up extras|images menu
+- Improve first run wizard
 }
 
 type
@@ -338,6 +348,12 @@ type
     N44: TMenuItem;
     MenuExtrasImageFromProfile: TMenuItem;
     MenuFileImportZIPFileWithInstallationSupport: TMenuItem;
+    MenuProfileCheating: TMenuItem;
+    PopupCheating: TMenuItem;
+    MenuExtrasCheating: TMenuItem;
+    MenuExtrasCheatingApply: TMenuItem;
+    MenuExtrasCheatingEdit: TMenuItem;
+    MenuExtrasCheatingSearch: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure TreeViewChange(Sender: TObject; Node: TTreeNode);
@@ -488,7 +504,8 @@ uses ShellAPI, ShlObj, ClipBrd, Math, PNGImage, CommonTools, LanguageSetupUnit,
      CreateShortcutsFormUnit, PackageManagerFormUnit, PackageBuilderUnit,
      RunPrgManagerUnit, PackageCreationFormUnit, TextEditPopupUnit,
      MultipleProfilesEditorFormUnit, InstallationSupportFormUnit,
-     RenameAllScreenshotsFormUnit, MakeBootImageFromProfileFormUnit;
+     RenameAllScreenshotsFormUnit, MakeBootImageFromProfileFormUnit,
+     CheatApplyFormUnit, CheatDBEditFormUnit, CheatSearchFormUnit;
 
 {$R *.dfm}
 
@@ -566,6 +583,7 @@ begin
 
   LastDragDropEffect:=DROPEFFECT_NONE;
   RegisterDragDrop(Handle,Self);
+  RegisterDragDrop(GameNotesEdit.Handle,Self);
 
   Icon.Assign(Application.Icon); {Window icon is only 16x16, application icon is larger; Win7 is using the window icon in the taskbar} 
 
@@ -607,7 +625,7 @@ begin
     PrgSetup.DFendVersion:=GetNormalFileVersionAsString;
   end else begin
     If PrgSetup.DFendVersion<>GetNormalFileVersionAsString then begin
-      UpdateUserDataFolderAndSettingsAfterUpgrade(GameDB);
+      UpdateUserDataFolderAndSettingsAfterUpgrade(GameDB,VersionToInt(PrgSetup.DFendVersion));
       PrgSetup.DFendVersion:=GetNormalFileVersionAsString;
       FastSearchAllTools;
       LoadGUISetup(False);
@@ -678,6 +696,7 @@ begin
   SearchLinkFile.Free;
 
   RevokeDragDrop(Handle);
+  RevokeDragDrop(GameNotesEdit.Handle);
 end;
 
 procedure TDFendReloadedMainForm.LoadMenuLanguage;
@@ -755,11 +774,18 @@ begin
   MenuProfileMarkAsFavorite.Caption:=LanguageSetup.MenuProfileMarkAsFavorite;
   MenuProfileCreateShortcut.Caption:=LanguageSetup.MenuProfileCreateShortcut;
   MenuProfileSearchGame.Caption:=LanguageSetup.MenuProfileSearchGame;
+  MenuProfileCheating.Caption:=LanguageSetup.MenuProfileCheating;
+  MenuProfileCheating.Visible:=PrgSetup.ActivateIncompleteFeatures and FileExists(PrgDir+BinFolder+'\'+CheatDBFile);
   MenuExtras.Caption:=LanguageSetup.MenuExtras;
   MenuExtrasIconManager.Caption:=LanguageSetup.MenuExtrasIconManager;
   MenuExtrasViewLogs.Caption:=LanguageSetup.MenuExtrasViewLogs;
   MenuExtrasOpenGamesFolder.Caption:=LanguageSetup.MenuExtrasViewLogsOpenGamesFolder;
   MenuExtrasTemplates.Caption:=LanguageSetup.MenuExtrasTemplates;
+  MenuExtrasCheating.Caption:=LanguageSetup.MenuExtrasCheating;
+  MenuExtrasCheating.Visible:=PrgSetup.ActivateIncompleteFeatures and FileExists(PrgDir+BinFolder+'\'+CheatDBFile);
+  MenuExtrasCheatingApply.Caption:=LanguageSetup.MenuExtrasCheatingApply;
+  MenuExtrasCheatingEdit.Caption:=LanguageSetup.MenuExtrasCheatingEdit;
+  MenuExtrasCheatingSearch.Caption:=LanguageSetup.MenuExtrasCheatingSearch;
   MenuExtrasDeinstallMultipleGames.Caption:=LanguageSetup.MenuExtrasDeinstallMultipleGames;
   MenuExtrasImageFiles.Caption:=LanguageSetup.MenuExtrasImageFiles;
   MenuExtrasCreateIMGImage.Caption:=LanguageSetup.MenuExtrasCreateIMGImageFile;
@@ -836,6 +862,8 @@ begin
   PopupMarkAsFavorite.Caption:=LanguageSetup.PopupMarkAsFavorite;
   PopupCreateShortcut.Caption:=LanguageSetup.PopupCreateShortcut;
   PopupSearchGame.Caption:=LanguageSetup.PopupSearchGame;
+  PopupCheating.Caption:=LanguageSetup.MenuProfileCheating;
+  PopupCheating.Visible:=PrgSetup.ActivateIncompleteFeatures and FileExists(PrgDir+BinFolder+'\'+CheatDBFile);
   PopupViews.Caption:=LanguageSetup.PopupView;
   PopupSimpleListNoIcons.Caption:=LanguageSetup.MenuViewListNoIcons;
   PopupSimpleList.Caption:=LanguageSetup.MenuViewList;
@@ -1660,6 +1688,8 @@ begin
     ScreenshotListView.Selected:=ScreenshotListView.Items[I];
     break;
   end;
+  ScreenshotPopupRenameAll.Enabled:=(ScreenshotListView.Items.Count>0);
+  ScreenshotPopupDeleteAll.Enabled:=(ScreenshotListView.Items.Count>0);
 
   ScreenshotsInfoPanel.Visible:=(ScreenshotListView.Items.Count=0) and (ListView.Selected<>nil);
   ScreenshotsInfoPanel.Height:=IfThen(ScreenshotsInfoPanel.Visible,17,0);
@@ -1691,6 +1721,9 @@ begin
     SoundListView.Selected:=SoundListView.Items[I];
     break;
   end;
+  SoundPopupRenameAll.Enabled:=(SoundListView.Items.Count>0);
+  SoundPopupDeleteAll.Enabled:=(SoundListView.Items.Count>0);
+
   SoundInfoPanel.Visible:=(SoundListView.Items.Count=0) and (ListView.Selected<>nil) and (not ScummVMMode(TGame(ListView.Selected.Data))) and (not WindowsExeMode(TGame(ListView.Selected.Data)));
   SoundInfoPanel.Height:=IfThen(SoundInfoPanel.Visible,17,0);
   SoundListViewSelectItem(self,SoundListView.Selected,True);
@@ -1712,6 +1745,9 @@ begin
     VideoListView.Selected:=VideoListView.Items[I];
     break;
   end;
+  VideoPopupRenameAll.Enabled:=(VideoListView.Items.Count>0);
+  VideoPopupDeleteAll.Enabled:=(VideoListView.Items.Count>0);
+
   VideoInfoPanel.Visible:=(VideoListView.Items.Count=0) and (ListView.Selected<>nil) and (not ScummVMMode(TGame(ListView.Selected.Data))) and (not WindowsExeMode(TGame(ListView.Selected.Data)));
   VideoInfoPanel.Height:=IfThen(VideoInfoPanel.Visible,17,0);
   VideoListViewSelectItem(self,VideoListView.Selected,True);
@@ -2334,6 +2370,7 @@ begin
                end;
              end;
       1011 : begin
+               Enabled:=False;
                AutoSetupDB:=TGameDB.Create(PrgDataDir+AutoSetupSubDir,False);
                try
                  S:=ShowPackageManagerDialog(self,GameDB,AutoSetupDB);
@@ -2345,6 +2382,7 @@ begin
                  TreeViewChange(Sender,TreeView.Selected);
                finally
                  AutoSetupDB.Free;
+                 Enabled:=True;
                end;
              end;
       1012 : ShowPackageCreationDialog(self,GameDB);
@@ -2602,12 +2640,15 @@ begin
                UpdateGameNotes; LastSelectedGame:=nil;
                G:=TGame(ListView.Selected.Data);
                ListView.OnAdvancedCustomDrawItem:=nil;
+               ViewFilesFrame.SetGame(nil);
                try
-                 if not UninstallGame(self,GameDB,G) then exit;
+                 if not UninstallGame(self,GameDB,G) then begin
+                   If ListView.Selected<>nil then ViewFilesFrame.SetGame(TGame(ListView.Selected.Data));
+                   exit;
+                 end;
                  LastSelectedGame:=nil;
                  ListView.Selected:=nil;
                  ListView.Items.Clear;
-                 ViewFilesFrame.SetGame(nil);
                finally
                  ListView.OnAdvancedCustomDrawItem:=ListViewAdvancedCustomDrawItem;
                end;
@@ -2698,6 +2739,18 @@ begin
                  Enabled:=True;
                end;
              end;
+      4021 : begin
+               If (ListView.Selected=nil) or (ListView.Selected.Data=nil) then begin
+                 MessageDlg(LanguageSetup.MessageNoGameSelected,mtError,[mbOK],0); exit;
+               end;
+               S:=Trim(TGame(ListView.Selected.Data).GameExe);
+               If S='' then S:=Trim(TGame(ListView.Selected.Data).SetupExe);
+               If S='' then S:=MakeAbsPath(PrgSetup.GameDir,PrgSetup.BaseDir) else S:=ExtractFilePath(MakeAbsPath(S,PrgSetup.BaseDir));
+               B:=False;
+               If ShowCheatApplyDialog(self,S,B) and B then begin
+                 ShowCheatDBEditDialog(self);
+               end;
+             end;
       4100..4199 : AddProfileForWindowsEmulator((Sender as TComponent).Tag-4100);
       {Extras}
       5001 : begin S:=''; ShowIconManager(self,S,PrgSetup.GameDir,True); end;
@@ -2725,11 +2778,14 @@ begin
                ListView.OnAdvancedCustomDrawItem:=nil;
                UpdateGameNotes;
                try
-                 If not UninstallMultipleGames(self,GameDB) then exit;
+                 ViewFilesFrame.SetGame(nil);
+                 If not UninstallMultipleGames(self,GameDB) then begin
+                   If ListView.Selected<>nil then ViewFilesFrame.SetGame(TGame(ListView.Selected.Data));
+                   exit;
+                 end;
                  LastSelectedGame:=nil;
                  ListView.Selected:=nil;
                  ListView.Items.Clear;
-                 ViewFilesFrame.SetGame(nil);
                finally
                  ListView.OnAdvancedCustomDrawItem:=ListViewAdvancedCustomDrawItem;
                end;
@@ -2806,6 +2862,13 @@ begin
                  SelectGame(G);
                end;
              end;
+      5022 : begin B:=False;
+               If ShowCheatApplyDialog(self,MakeAbsPath(PrgSetup.GameDir,PrgSetup.BaseDir),B) and B then begin
+                 ShowCheatDBEditDialog(self);
+               end;
+             end;
+      5023 : ShowCheatDBEditDialog(self);
+      5024 : ShowCheatSearchDialog(self);       
       {Help}
       6001 : ShellExecute(Handle,'open',PChar('http:/'+'/www.dosbox.com/wiki/'),nil,nil,SW_SHOW);
       6002 : ShellExecute(Handle,'open',PChar('http:/'+'/www.dosbox.com/wiki/Special_Keys'),nil,nil,SW_SHOW);
@@ -2821,7 +2884,7 @@ begin
              end;
       6004 : ShellExecute(Handle,'open',PChar('http:/'+'/www.dosbox.com/comp_list.php?letter=a'),nil,nil,SW_SHOW);
       6005 : ShellExecute(Handle,'open',PChar('http:/'+'/pain.scene.org/service_dosbox.php'),nil,nil,SW_SHOW);
-      6006 : ShellExecute(Handle,'open',PChar('http:/'+'/dosbox.sourceforge.net/oldwiki/index.php?page=CommandLine'),nil,nil,SW_SHOW);
+      6006 : ShellExecute(Handle,'open',PChar('http:/'+'/www.dosbox.com/wiki/Commands'),nil,nil,SW_SHOW);
       6007 : If FileExists(IncludeTrailingPathDelimiter(PrgSetup.DOSBoxSettings[0].DosBoxDir)+DosBoxFileName) then begin
                DefaultGame:=TGame.Create(PrgSetup);
                try
@@ -4084,8 +4147,15 @@ begin
 end;
 
 function TDFendReloadedMainForm.DragEnter(const dataObj: IDataObject; grfKeyState: Longint; pt: TPoint; var dwEffect: Longint): HResult; stdcall;
+Var B1,B2,B3,B4,B5 : Boolean;
 begin
-  If ((Screen.ActiveForm=DFendReloadedMainForm) or (Screen.ActiveForm=QuickStartForm)) and DragDropExHasFormat(dataObj,CF_TEXT) then begin
+  B1:=(Screen.ActiveForm=DFendReloadedMainForm);
+  B2:=(Screen.ActiveForm=QuickStartForm);
+  B3:=DragDropExHasFormat(dataObj,CF_TEXT);
+  B4:=DragDropExHasFormat(dataObj,CF_OEMTEXT);
+  B5:=DragDropExHasFormat(dataObj,CF_HDROP);
+
+  If (B1 or B2) and (B3 or B4 or B5) then begin
     dwEffect:=DROPEFFECT_LINK;
     Result:=S_OK;
     LastDragDropEffect:=DROPEFFECT_LINK;
@@ -4111,10 +4181,14 @@ function TDFendReloadedMainForm.Drop(const dataObj: IDataObject; grfKeyState: Lo
 Var S,T : String;
     G : TGame;
 begin
-  If DragDropExHasFormat(dataObj,CF_TEXT) then begin
+  If DragDropExHasFormat(dataObj,CF_TEXT) or DragDropExHasFormat(dataObj,CF_OEMTEXT) then begin
     dwEffect:=DROPEFFECT_COPY;
     Result:=S_OK;
-    S:=DragDropExGetTextFromObj(dataObj,CF_TEXT);
+    If DragDropExHasFormat(dataObj,CF_TEXT) then begin
+      S:=DragDropExGetTextFromObj(dataObj,CF_TEXT);
+    end else begin
+      S:=DragDropExGetTextFromObj(dataObj,CF_OEMTEXT);
+    end;
     T:=ExtUpperCase(S);
     If (Copy(T,1,7)='HTTP:/'+'/') or (Copy(T,1,8)='HTTPS:/'+'/') or (Copy(T,1,6)='FTP:/'+'/') then begin
       G:=DonwloadAndInstall(self,S,GameDB);
@@ -4125,7 +4199,11 @@ begin
       end;
     end;
   end else begin
-    Result:=S_FALSE;
+    If DragDropExHasFormat(dataObj,CF_HDROP) then begin
+      Result:=2; {if not a link use the normal handler to handle droped files etc.}
+    end else begin
+      Result:=S_FALSE;
+    end;
   end;
 end;
 

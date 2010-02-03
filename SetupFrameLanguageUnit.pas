@@ -24,6 +24,7 @@ type
     procedure TimerTimer(Sender: TObject);
     procedure InstallerLangEditComboBoxChange(Sender: TObject);
     procedure DosBoxLangEditComboBoxChange(Sender: TObject);
+    procedure ComboBoxDropDown(Sender: TObject);
   private
     { Private-Deklarationen }
     DosBoxLang : TStringList;
@@ -121,6 +122,15 @@ begin
   finally
     JustLoading:=False;
   end;
+
+  SetComboHint(LanguageComboBox);
+  SetComboHint(DosBoxLangEditComboBox);
+  SetComboHint(InstallerLangEditComboBox);
+end;
+
+procedure TSetupFrameLanguage.ComboBoxDropDown(Sender: TObject);
+begin
+  SetComboDropDownDropDownWidth(Sender as TComboBox);
 end;
 
 procedure TSetupFrameLanguage.InstallerLangEditComboBoxChange(Sender: TObject);
@@ -136,6 +146,7 @@ begin
   end else begin
     ShellExecute(Handle,'open',PChar(PrgDir+BinFolder+'\'+'SetInstallerLanguage.exe'),PChar(IntToStr(I)),nil,SW_SHOW);
   end;
+  SetComboHint(InstallerLangEditComboBox);
   LangTimerCounter:=10;
   Timer.Enabled:=True;
 end;
@@ -191,6 +202,7 @@ end;
 procedure TSetupFrameLanguage.DosBoxLangEditComboBoxChange(Sender: TObject);
 begin
   PDOSBoxLang^:=DosBoxLang[DosBoxLangEditComboBox.ItemIndex];
+  SetComboHint(DosBoxLangEditComboBox);
 end;
 
 procedure TSetupFrameLanguage.ShowFrame(const AdvencedMode: Boolean);
@@ -256,6 +268,8 @@ begin
       LanguageInfoLabel.Visible:=False;
     end;
   end;
+
+  SetComboHint(LanguageComboBox);
 end;
 
 procedure TSetupFrameLanguage.ButtonWork(Sender: TObject);

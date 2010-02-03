@@ -117,7 +117,7 @@ begin
 
   if UpdateCheck and DownloadConfigFile(TempDir+ExtractFileName(AConfigFile)) then begin
     try
-      TempConfig:=TDataReaderConfig.Create(AConfigFile);
+      TempConfig:=TDataReaderConfig.Create(TempDir+ExtractFileName(AConfigFile));
       try
         If TempConfig.ConfigOK then I:=TempConfig.Version else I:=-1;
       finally
@@ -141,21 +141,24 @@ begin
 end;
 
 Procedure TDataReader.OpenListPage(const ASearchString : String);
+Var URL : String;
 begin
-  ShellExecute(Application.Handle,'open',PChar(Format(FConfig.GamesListURL,[EncodeName(ASearchString)])),nil,nil,SW_SHOW);
+  If PrgSetup.DataReaderAllPlatforms then URL:=FConfig.GamesListURL else URL:=FConfig.GamesListAllPlatformsURL;
+  ShellExecute(Application.Handle,'open',PChar(Format(URL,[EncodeName(ASearchString)])),nil,nil,SW_SHOW);
 end;
 
 function TDataReader.ReadList(const ASearchString: String): Boolean;
-Var Lines : String;
+Var Lines,URL : String;
 begin
   FGameNames.Clear;
   FGameURLs.Clear;
   FLastListRequest:='';
   result:=False;
   If not Assigned(FConfig) then exit;
-  if not DownloadTextFile(Format(FConfig.GamesListURL,[EncodeName(ASearchString)]),Lines) then exit;
+  If PrgSetup.DataReaderAllPlatforms then URL:=FConfig.GamesListAllPlatformsURL else URL:=FConfig.GamesListURL;
+  if not DownloadTextFile(Format(URL,[EncodeName(ASearchString)]),Lines) then exit;
   result:=ReadListGlobalPart(Lines,FConfig.GamesList);
-  if result then FLastListRequest:=Format(FConfig.GamesListURL,[EncodeName(ASearchString)]);
+  if result then FLastListRequest:=Format(URL,[EncodeName(ASearchString)]);
 end;
 
 function TDataReader.ReadListGlobalPart(const Lines: String; const NextElement: THTMLStructureElement): Boolean;

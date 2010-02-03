@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
 <!DOCTYPE DataReader SYSTEM "http://dfendreloaded.sourceforge.net/DataReader/DataReader.dtd">
 
-<DataReader Version="1">
+<DataReader Version="2">
 
-  <GamesList URL="http://www.mobygames.com/search/quick/p,2/q,%s/showOnly,9/">
+  <GamesList URL="http://www.mobygames.com/search/quick/p,2/q,%s/showOnly,9/" AllPlatformsURL="http://www.mobygames.com/search/quick/p,-1/q,%s/showOnly,9/">
     <Element Type="div" Key="id" Value="searchResults">
       <PerGameBlock Type="div" Key="class" Value="searchResult">
         <Element Type="div" Key="class" Value="searchTitle">

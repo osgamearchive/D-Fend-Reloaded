@@ -6,7 +6,7 @@ LangString PrgName ${LANG_ENGLISH} "${PrgName}"
 LangString LANGNAME_NeedAdminRights ${LANG_ENGLISH} "Without admin rights the installer can't write to the programs folder. Only portalbe mode installation will work. Do you want to retry changing to admin state ?"
 LangString LANGNAME_NeedAdminRightsUpdate ${LANG_ENGLISH} "Without admin rights the installer can't write to the programs folder. Only USB stick installations can be updated then. Do you want to retry changing to admin state ?"
 
-LangString LANGNAME_WelcomeText ${LANG_ENGLISH} "This wizard will guide you through the installation of ${PrgName}.\r\n\r\nD-Fend Reloaded is open source software and licensed unter the GPL 3 license. (You can view the license by clicking Help|About in the program.)\r\n\r\nClick Next to continue."
+LangString LANGNAME_WelcomeText ${LANG_ENGLISH} "This wizard will guide you through the installation of ${PrgName}.\r\n\r\nD-Fend Reloaded is open source software and licensed unter the GPL 3 license. (You can view the license by clicking Help|About in the program.) D-Fend Reloaded comes without any guarantee and warranty.\r\n\r\nClick Next to continue."
 LangString LANGNAME_WelcomeTextUpdate ${LANG_ENGLISH} "This wizard will guide you through the update installation of ${PrgName}.\r\n\r\nThis installer requires an existing D-Fend Reloaded installation !\r\n\r\nClick Next to continue."
 LangString LANGNAME_Next ${LANG_ENGLISH} "Next"
 LicenseLangString LANGNAME_License ${LANG_ENGLISH} "..\Bin\License.txt"
@@ -25,6 +25,7 @@ LangString LANGNAME_GamesFolder ${LANG_ENGLISH} "Games folder"
 LangString LANGNAME_GameDataFolder ${LANG_ENGLISH} "Manuals folder"
 LangString LANGNAME_Deinstall ${LANG_ENGLISH} "deinstall"
 LangString LANGNAME_ConfirmDelUserData ${LANG_ENGLISH} "Do you want to delete the data folder $DataInstDir too ?"
+LangString LANGNAME_ConfirmDelPrgDir ${LANG_ENGLISH} "There are some files not created by the D-Fend Reloaded installer in the installation directory. Do you want to remove the folder $INSTDIR anyway?"
 
 LangString LANGNAME_NoInstallationFound ${LANG_ENGLISH} "There is no D-Fend Reloaded installation in the choosen folder which could be updated."
 

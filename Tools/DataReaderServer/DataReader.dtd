@@ -8,6 +8,7 @@
 <!ELEMENT GamesList (Element | PerGameBlock)+>
 <!ATTLIST GamesList
 	URL CDATA #REQUIRED
+	AllPlatformsURL CDATA #IMPLIED
 >
 
 <!ELEMENT GamePage (Element)>

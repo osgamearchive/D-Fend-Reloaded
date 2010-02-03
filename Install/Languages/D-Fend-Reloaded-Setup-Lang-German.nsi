@@ -6,7 +6,7 @@ LangString PrgName ${LANG_GERMAN} "${PrgName}"
 LangString LANGNAME_NeedAdminRights ${LANG_GERMAN} "Ohne Admin-Rechte kann das Installationsprogramm keine Dateien in den Programmeordner schreiben; nur die Installation im Portable-Modus wird in diesem Fall funktionieren. Wollen Sie erneut versuchen, in den Admin-Modus zu wechseln ?"
 LangString LANGNAME_NeedAdminRightsUpdate ${LANG_GERMAN} "Ohne Admin-Rechte kann das Installationsprogramm keine Dateien in den Programmeordner schreiben; nur USB-Stick-Installationen können in diesem Fall aktualisiert werden. Wollen Sie erneut versuchen, in den Admin-Modus zu wechseln ?"
 
-LangString LANGNAME_WelcomeText ${LANG_GERMAN} "Dieser Assistent wird Sie durch die Installation von ${PrgName} begleiten.\r\n\r\nD-Fend Reloaded ist Open Source und steht unter der GPL 3 Lizenz. (Sie können sich die Lizenz im Programm über den Menüpunkt Hilfe|Info anzeigen lassen.)\r\n\r\nKlicken Sie auf Weiter, um fortzufahren."
+LangString LANGNAME_WelcomeText ${LANG_GERMAN} "Dieser Assistent wird Sie durch die Installation von ${PrgName} begleiten.\r\n\r\nD-Fend Reloaded ist Open Source und steht unter der GPL 3 Lizenz. (Sie können sich die Lizenz im Programm über den Menüpunkt Hilfe|Info anzeigen lassen.) Es wird keine Garantie für eine korrekte Funktionsweise des Programms übernommen.\r\n\r\nKlicken Sie auf Weiter, um fortzufahren."
 LangString LANGNAME_WelcomeTextUpdate ${LANG_GERMAN} "Dieser Assistent wird Sie durch die Update-Installation von ${PrgName} begleiten.\r\n\r\nBitte beachten Sie, dass dieses Installationsprogramm eine bestehende D-Fend Reloaded Installation voraussetzt !\r\n\r\nKlicken Sie auf Weiter, um fortzufahren."
 LangString LANGNAME_Next ${LANG_GERMAN} "Weiter"
 LicenseLangString LANGNAME_License ${LANG_GERMAN} "..\Bin\License.txt"
@@ -25,6 +25,7 @@ LangString LANGNAME_GamesFolder ${LANG_GERMAN} "Spieleordner"
 LangString LANGNAME_GameDataFolder ${LANG_GERMAN} "Handbücherordner"
 LangString LANGNAME_Deinstall ${LANG_GERMAN} "deinstallieren"
 LangString LANGNAME_ConfirmDelUserData ${LANG_GERMAN} "Soll der Datenordner $DataInstDir ebenfalls gelöscht werden ?"
+LangString LANGNAME_ConfirmDelPrgDir ${LANG_GERMAN} "Im D-Fend Reloaded Installationsverzeichnis befinden sich Dateien, die nicht vom Installationsprogramm erstellt wurden. Wollen Sie den Ordner $INSTDIR dennoch vollständig löschen?"
 
 LangString LANGNAME_NoInstallationFound ${LANG_GERMAN} "An dem angegebenen Pfad konnte keine D-Fend Reloaded Installation gefunden werden, die aktualisiert werden könnte."
 

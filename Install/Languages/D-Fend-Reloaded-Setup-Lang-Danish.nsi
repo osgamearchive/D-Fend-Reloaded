@@ -25,6 +25,7 @@ LangString LANGNAME_GamesFolder ${LANG_DANISH} "Spil mappe"
 LangString LANGNAME_GameDataFolder ${LANG_DANISH} "Manualer mappe"
 LangString LANGNAME_Deinstall ${LANG_DANISH} "deinstall"
 LangString LANGNAME_ConfirmDelUserData ${LANG_DANISH} "Ønsker du at slette data mappen $DataInstDir?"
+LangString LANGNAME_ConfirmDelPrgDir ${LANG_DANISH} "There are some files not created by the D-Fend Reloaded installer in the installation directory. Do you want to remove the folder $INSTDIR anyway?" ; New !
 
 LangString LANGNAME_NoInstallationFound ${LANG_DANISH} "Der er ingen D-Febd Reloaded installation i den valgte mappe som kunne være opdateret."
 

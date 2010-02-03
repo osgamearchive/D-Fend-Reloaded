@@ -232,7 +232,8 @@ Type TPrgSetup=class(TBasePrgSetup)
     property BinaryCache : Boolean index 73 read GetBoolean write SetBoolean;
     property ImportZipWithoutDialogIfPossible : Boolean index 74 read GetBoolean write SetBoolean;
     property DOSBoxStartLogging : Boolean index 75 read GetBoolean write SetBoolean;
-    property ActivateIncompleteFeatures : Boolean index 76 read GetBoolean write SetBoolean;
+    property DataReaderAllPlatforms : Boolean index 75 read GetBoolean write SetBoolean;
+    property ActivateIncompleteFeatures : Boolean index 77 read GetBoolean write SetBoolean;
 
     property MainLeft : Integer index 0 read GetInteger write SetInteger;
     property MainTop : Integer index 1 read GetInteger write SetInteger;
@@ -712,9 +713,10 @@ begin
   AddBooleanRec(71,'ProgramSets','CreateConfFilesForProfiles',False);
   AddBooleanRec(72,'ProgramSets','AddMountingDataAutomatically',True);
   AddBooleanRec(73,'ProgramSets','BinaryCache',True);
-  AddBooleanRec(74,'ProgramSets','ImportZipWithoutDialogIfPossible',False); // will be true in 1.0, because 1.0 wll have a setup option for this
+  AddBooleanRec(74,'ProgramSets','ImportZipWithoutDialogIfPossible',False); //... will be true in 1.0, because 1.0 wll have a setup option for this
   AddBooleanRec(75,'ProgramSets','DOSBoxStartLogging',False);
-  AddBooleanRec(76,'ProgramSets','ActivateIncompleteFeatures',False);
+  AddBooleanRec(76,'ProgramSets','DataReaderAllPlatforms',False);
+  AddBooleanRec(77,'ProgramSets','ActivateIncompleteFeatures',False);
 
   AddIntegerRec(0,'ProgramSets','MainLeft',-1);
   AddIntegerRec(1,'ProgramSets','MainTop',-1);

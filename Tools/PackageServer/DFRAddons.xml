@@ -1,7 +1,26 @@
 <?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
 <!DOCTYPE DFRPackagesFile SYSTEM "http://dfendreloaded.sourceforge.net/Packages/DFRPackagesFile.dtd">
 
-<DFRPackagesFile Name="Official addons (languages, icon sets etc.) for D-Fend Reloaded" LastUpdateDate="11/19/2009">
+<DFRPackagesFile Name="Official addons (languages, icon sets etc.) for D-Fend Reloaded" LastUpdateDate="12/29/2009">
+
+  <Language
+    Name="Turkish"
+	Description="A Turkish language file for the 0.9.x series."
+    MinVersion="0.9.0"
+    MaxVersion="0.9.0"
+    Author="Hakan ATEÞ ( hakan.ates@msn.com )"
+    PackageChecksum="16E7257D6AAB7551D9DDB8A52E37078F"
+    Size="100083">Turkish.ini</Language>
+
+  <Language
+    Name="Portuguese-BR"
+	Description="A Brazilian Portuguese language file for the 0.9.x series."
+    MinVersion="0.9.0"
+    MaxVersion="0.9.0"
+    Author="Cpt.Guapo (cpt.guapo@gmail.com)"
+    PackageChecksum="5A919C0FBD834E735D3A671D386ACD80"
+    Size="100083">Portuguese-BR.ini</Language>
+	
   <Language
     Name="French"
 	Description="An improved version of the French language file for the 0.8.x series."

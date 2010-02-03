@@ -92,8 +92,8 @@ type
     Procedure LoadGamesList;
     Procedure LoadAutoSetupsList;
     Function CreatePackageFile(const OutputDir : String) : TStringList;
-    Function CreatePackageFileForPlainZips(const OutputDir : String; const AddAutoSetups : Boolean) : TStringList;
-    Function CreatePackageFileForAutoSetupTemplates(const OutputDir : String) : TStringList;
+    Function CreatePackageFileForPlainZips(const OutputDir : String; const AddAutoSetups : Boolean; const AutoSetupsMaxVersion : String) : TStringList;
+    Function CreatePackageFileForAutoSetupTemplates(const OutputDir, MaxVersion : String) : TStringList;
   public
     { Public-Deklarationen }
     GameDB, AutoSetupDB : TGameDB;
@@ -391,7 +391,7 @@ begin
       S:=TGame(AutoSetupListView.Items[I].Data).SetupFile;
       T:=OutputDir+ExtractFileName(S);
       If not CopyWithWithMsg(S,T) then begin FreeAndNil(result); exit; end;
-      if not AddPackageDataAutoSetup(Doc,T) then exit;
+      if not AddPackageDataAutoSetup(Doc,T,'') then exit;
     end;
 
     {Icons}
@@ -431,7 +431,7 @@ begin
   end;
 end;
 
-Function TPackageCreationForm.CreatePackageFileForPlainZips(const OutputDir : String; const AddAutoSetups : Boolean) : TStringList;
+Function TPackageCreationForm.CreatePackageFileForPlainZips(const OutputDir : String; const AddAutoSetups : Boolean; const AutoSetupsMaxVersion : String) : TStringList;
 Var Rec : TSearchRec;
     I : Integer;
     Doc : TXMLDocument;
@@ -444,7 +444,7 @@ begin
     try
       While I=0 do begin
         If (Rec.Attr and faDirectory)=0 then begin
-          If not AddPackageDataPlainZip(Doc,IncludeTrailingPathDelimiter(OutputDir)+Rec.Name,AutoSetupDB,self,AddAutoSetups) then begin FreeAndNil(result); exit; end;
+          If not AddPackageDataPlainZip(Doc,IncludeTrailingPathDelimiter(OutputDir)+Rec.Name,AutoSetupDB,self,AddAutoSetups,AutoSetupsMaxVersion) then begin FreeAndNil(result); exit; end;
         end;
         I:=FindNext(Rec);
       end;
@@ -458,7 +458,7 @@ begin
   end;
 end;
 
-Function TPackageCreationForm.CreatePackageFileForAutoSetupTemplates(const OutputDir : String) : TStringList;
+Function TPackageCreationForm.CreatePackageFileForAutoSetupTemplates(const OutputDir, MaxVersion : String) : TStringList;
 Var Rec : TSearchRec;
     I : Integer;
     Doc : TXMLDocument;
@@ -471,7 +471,7 @@ begin
     try
       While I=0 do begin
         If (Rec.Attr and faDirectory)=0 then begin
-          If not AddPackageDataAutoSetup(Doc,IncludeTrailingPathDelimiter(OutputDir)+Rec.Name) then begin FreeAndNil(result); exit; end;
+          If not AddPackageDataAutoSetup(Doc,IncludeTrailingPathDelimiter(OutputDir)+Rec.Name,MaxVersion) then begin FreeAndNil(result); exit; end;
         end;
         I:=FindNext(Rec);
       end;
@@ -527,7 +527,7 @@ end;
 procedure TPackageCreationForm.ToolsMenuWork(Sender: TObject);
 Var Dialog : TOpenDialog;
     St : TStringList;
-    OutputFile : String;
+    OutputFile,S : String;
 begin
   Case (Sender as TComponent).Tag of
     0 : begin
@@ -545,7 +545,15 @@ begin
           OutputFile:=OutputFileEdit.Text;
           If Trim(OutputFile)='' then begin MessageDlg(LanguageSetup.MessageNoFileName,mtError,[mbOK],0); exit; end;
           OutputFile:=MakeAbsPath(OutputFile,GetSpecialFolder(Handle,CSIDL_DESKTOPDIRECTORY));
-          St:=CreatePackageFileForPlainZips(IncludeTrailingPathDelimiter(ExtractFilePath(OutputFile)),(Sender as TComponent).Tag=2);
+
+          If (Sender as TComponent).Tag=2 then begin
+            S:=GetNormalFileVersionAsString;
+            If not InputQuery('Make package file from plain zip files and add auto setup templates','If you want to specify a maximum version for which the external templates are needed, enter it here. If the field is blank, the auto setup template will be assumed to be needed for all versions.',S) then exit;
+          end else begin
+            S:='';
+          end;
+
+          St:=CreatePackageFileForPlainZips(IncludeTrailingPathDelimiter(ExtractFilePath(OutputFile)),(Sender as TComponent).Tag=2,S);
           If St=nil then exit;
           try
             try St.SaveToFile(OutputFile); except MessageDlg(Format(LanguageSetup.MessageCouldNotSaveFile,[OutputFile]),mtError,[mbOK],0); exit; end;
@@ -558,7 +566,9 @@ begin
           OutputFile:=OutputFileEdit.Text;
           If Trim(OutputFile)='' then begin MessageDlg(LanguageSetup.MessageNoFileName,mtError,[mbOK],0); exit; end;
           OutputFile:=MakeAbsPath(OutputFile,GetSpecialFolder(Handle,CSIDL_DESKTOPDIRECTORY));
-          St:=CreatePackageFileForAutoSetupTemplates(IncludeTrailingPathDelimiter(ExtractFilePath(OutputFile)));
+          S:=GetNormalFileVersionAsString;
+          If not InputQuery('Make package file from auto setup templates','If you want to specify a maximum version for which this templates are needed, enter it here. If the field is blank, the auto setup template will be assumed to be needed for all versions.',S) then exit;
+          St:=CreatePackageFileForAutoSetupTemplates(IncludeTrailingPathDelimiter(ExtractFilePath(OutputFile)),Trim(S));
           If St=nil then exit;
           try
             try St.SaveToFile(OutputFile); except MessageDlg(Format(LanguageSetup.MessageCouldNotSaveFile,[OutputFile]),mtError,[mbOK],0); exit; end;

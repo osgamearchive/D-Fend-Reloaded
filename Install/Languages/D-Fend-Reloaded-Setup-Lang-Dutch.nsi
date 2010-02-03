@@ -25,6 +25,7 @@ LangString LANGNAME_GamesFolder ${LANG_DUTCH} "Games map"
 LangString LANGNAME_GameDataFolder ${LANG_DUTCH} "Handleidingen map"
 LangString LANGNAME_Deinstall ${LANG_DUTCH} "Deïnstalleren"
 LangString LANGNAME_ConfirmDelUserData ${LANG_DUTCH} "Wil je de data map $DataInstDir mee verwijderen ?"
+LangString LANGNAME_ConfirmDelPrgDir ${LANG_DUTCH} "There are some files not created by the D-Fend Reloaded installer in the installation directory. Do you want to remove the folder $INSTDIR anyway?" ; New !
 
 LangString LANGNAME_NoInstallationFound ${LANG_DUTCH} "Er is geen ${PrgName} installatie gevonden in de geselecteerde map die geüpdatet kan worden."
 

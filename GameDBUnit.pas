@@ -583,7 +583,8 @@ end;
 
 Var DefaultValueReaderGame : TGame = nil;
 
-Const DefaultValuesResolution='original,320x200,320x240,640x432,640x480,720x480,800x600,1024x768,1152x864,1280x720,1280x768,1280x960,1280x1024,1600x1200,1920x1080,1920x1200,0x0';
+Const //... DOSBox 0.74: DefaultValuesResolution='original,320x200,320x240,640x432,640x480,720x480,800x600,1024x768,1152x864,1280x720,1280x768,1280x960,1280x1024,1366x760,1366x768,1600x1200,1920x1080,1920x1200,0x0';
+      DefaultValuesResolution='original,320x200,320x240,640x432,640x480,720x480,800x600,1024x768,1152x864,1280x720,1280x768,1280x960,1280x1024,1600x1200,1920x1080,1920x1200,0x0';
       DefaultValuesJoysticks='none,auto,2axis,4axis,4axis_2,fcs,ch';
       DefaultValuesScale='No Scaling (none),Nearest neighbor upscaling with factor 2 (normal2x),Nearest neighbor upscaling with factor 3 (normal3x),'+
                          'Advanced upscaling with factor 2 (advmame2x),Advanced upscaling with factor 3 (advmame3x),'+
@@ -599,7 +600,38 @@ Const DefaultValuesResolution='original,320x200,320x240,640x432,640x480,720x480,
       DefaultValuesCore='auto,normal,dynamic,simple';
       DefaultValueSBlaster='none,sb1,sb2,sbpro1,sbpro2,sb16';
       DefaultValuesOPLModes='auto,cms,opl2,dualopl2,opl3,none';
-      DefaultValuesKeyboardLayout='default,Albania (SQ),Argentina (LA),Armenia (HY),Australia (US),Austria (GR),Azerbaijan (AZ),Belarus (BL),Belarus (BY),'+
+      DefaultValuesKeyboardLayout='default,none,Albania (SQ),Albania (SQ448),Argentina (LA),Armenia (HY),Australia (US),Austria (DE),Austria (DE453),Azerbaijan (AZ),'+
+                                  'Belarus (BY),Belgium (BE),Bosnia & Herzegovina (BA),Brazil (BR),Brazil (BR274),Bulgaria (BG),Bulgaria (BG241),'+
+                                  'Canada (CA),Canada (CA445),Canada (CF501),Chile (LA),Colombia (LA),Croatia (HR),Czech Republic (CZ),Czech Republic (CZ243),'+
+                                  'Denmark (DK),Ecuador (LA),Estonia (EE),Faeroe Islands (FO),Finland (FI),France (FR),France (FR120),Georgia (KA),Germany (DE),Germany (DE453),'+
+                                  'Greece (GK),Greece (GK220),Greece (GK459),Hungary (HU),Hungary (HU208),Iceland (IS),Iceland (IS161),Ireland (UK),Ireland (UK168),'+
+                                  'Italy (IT),Italy (IT142),Kazakhstan (KK),Kyrgyzstan (KY),Latin-American-Spanish (LA),Latvia (LV),Latvia (LV455),'+
+                                  'Lithuania (LT),Lithuania (LT210),Lithuania (LT211),Lithuania (LT221),Lithuania (LT456),Macedonia (MK),Malta (MT),Malta (MT47),Mexico (LA),'+
+                                  'Mongolia (MN),Netherlands (NL),New Zealand (US),Norway (NO),Philippines (PH),Poland (PL),Poland (PL214),Portugal (PO),Romania (RO),Romania (RO446),'+
+                                  'Russia (RU),Russia (RU443),Serbia & Montenegro (SR),Serbia & Montenegro (SR450),Slovakia (SK),Slovenia (SI),South Africa (US),Spain (ES),'+
+                                  'Sweden (SV),Switzerland - French (SF),Switzerland - German (SD),Turkmenistan (TM),Turkey (TR),Turkey (TR440),Ukraine (UA),Ukraine (UA465),'+
+                                  'United Kingdom (UK),United Kingdom (UK168),US (US),US International (UX),US Dvorak (DV),US Left-Hand Dvorak (LH),US Right-Hand Dvorak (RH),'+
+                                  'Uzbekistan (UZ),Venezuela (LA),Yugoslavia (YU)';
+      {DefaultValuesKeyboardLayout='default,none,Albania (SQ),Albania (SQ448),Argentina (LA),Australia (US),Austria (GR),Austria (GR453),Belarus (BL),'+
+                                  'Belgium (BE),Bosnia & Herzegovina (BA),Brazil (BR),Brazil (BR274),Bulgaria (BG),Bulgaria (BG241),Canada (CF),Canada (CF445),'+
+                                  'Canada (CF501),Chile (LA),Colombia (LA),Croatia (HR),Czech Republic (CZ),Czech Republic (CZ243),Denmark (DK),Ecuador (LA),'+
+                                  'Estonia (EE),Faeroe Islands (FO),Finland (FI),France (FR),France (FR120),Germany (GR),Germany (GR453),Greece (GK),Greece (GK220),'+
+                                  'Greece (GK459),Hungary (HU),Hungary (HU208),Iceland (IS),Iceland (IS161),Ireland (UK),Ireland (UK168),Italy (IT),Italy (IT142),'+
+                                  'Latin-American-Spanish (LA),Lithuania (LT),Lithuania (LT210),Lithuania (LT211),Lithuania (LT221),Lithuania (LT456),Macedonia (MK),'+
+                                  'Malta (MT),Malta (MT47),Mexico (LA),Netherlands (NL),New Zealand (US),Norway (NO),Philippines (PH),Poland (PL),Poland (PL214),'+
+                                  'Portugal (PO),Romania (RO),Romania (RO446),Russia (RU),Russia (RU443),Serbia & Montenegro (SR),Serbia & Montenegro (SR450),'+
+                                  'Slovakia (SK),Slovenia (SI),South Africa (US),Spain (SP),Sweden (SV),Switzerland - French (SF),Switzerland - German (SG),'+
+                                  'Turkmenistan (TM),Turkey (TR),Turkey (TR440),Ukraine (UA),Ukraine (UA465),United Kingdom (UK),United Kingdom (UK168),US (US),'+
+                                  'US International (UX),US Dvorak (DV),US Left-Hand Dvorak (LH),US Right-Hand Dvorak (RH),Venezuela (LA),Yugoslavia (YU)';}
+      {DefaultValuesKeyboardLayout='default,Albania (SQ),Argentina (LA),Australia (US),Austria (GR),Belgium (BE),Bosnia & Herzegovina (YU),Bosnia & Herzegovina (BA),'+
+                                  'Brazil (BR),Brazil (BR274),Bulgaria (BG),Canada (CF),Canada (CA),Chile (LA),Colombia (LA),Croatia (YU),Croatia (HR),Czech Republic (CZ243),'+
+                                  'Denmark (DK),Ecuador (LA),Estonia (ET),Estonia (EE),Faeroe Islands (FO),Finland (SU),Finland (FI),France (FR),Greece (GK),Greece (EL),'+
+                                  'Germany (GR),Croatia (HR),Hungary (HU),Iceland (IS),Ireland (UK),Italy (IT),Latin-American-Spanish (LA),Macedonia (MK),Malta (MT),Malta (ML),'+
+                                  'Mexico (LA),Netherlands (NL),New Zealand (US),Norway (NO),Philippines (PH),Poland (PL),Portugal (PO),Romania (RO),Russia (RU),'+
+                                  'Serbia & Montenegro (YC),Serbia & Montenegro (SR),Slovakia (SK),Slovenia (YU),Slovenia (SI),South Africa (US),Spain (SP),Spain (ES),'+
+                                  'Sweden (SV),Switzerland - French (SF),Switzerland - German (SG),Switzerland - German (SD),Turkmenistan (TM),Turkey (TR),United Kingdom (UK),'+
+                                  'US (US),US (UX),US Dvorak (DV),US Left-Hand Dvorak (LH),US Right-Hand Dvorak (RH),Venezuela (LA),Yugoslavia (YU)';}
+      {DefaultValuesKeyboardLayout='default,Albania (SQ),Argentina (LA),Armenia (HY),Australia (US),Austria (GR),Azerbaijan (AZ),Belarus (BL),Belarus (BY),'+
                                   'Belgium (BE),Bosnia & Herzegovina (YU),Bosnia & Herzegovina (BA),Brazil (BR),Brazil (br274),Bulgaria (BG),Canada (CF),'+
                                   'Canada (CA),Chile (LA),Colombia (LA),Croatia (YU),Croatia (HR),Czech Republic (CZ243),Denmark (DK),Ecuador (LA),'+
                                   'Estonia (ET),Estonia (EE),Faeroe Islands (FO),Finland (SU),Finland (FI),France (FR),Greece (GK),Greece (EL),Germany (GR),'+
@@ -609,7 +641,8 @@ Const DefaultValuesResolution='original,320x200,320x240,640x432,640x480,720x480,
                                   'Portugal (PO),Romania (RO),Russia (RU),Serbia & Montenegro (YC),Serbia & Montenegro (SR),Slovakia (SK),Slovenia (YU),'+
                                   'Slovenia (SI),South Africa (US),Spain (SP),Spain (ES),Sweden (SV),Switzerland - French (SF),Switzerland - German (SG),'+
                                   'Switzerland - German (SD),Tadjikistan (TJ),Turkmenistan (TM),Turkey (TR),United Kingdom (UK),Ukraine (UR),Ukraine (UA),'+
-                                  'US (US),US (UX),US Dvorak (DV),US Left-Hand Dvorak (LH),US Right-Hand Dvorak (RH),Uzbekistan (UZ),Venezuela (LA),Vietnam (VI)';
+                                  'US (US),US (UX),US Dvorak (DV),US Left-Hand Dvorak (LH),US Right-Hand Dvorak (RH),Uzbekistan (UZ),Venezuela (LA),Vietnam (VI),'+
+                                  'Yugoslavia (YU)';}
       {DefaultValuesKeyboardLayout='default,Albania (SQ),Argentina (LA),Armenia (HY),Australia (US),Austria (GR),Azerbaijan (AZ),'+
                                   'Belarus (BL),Belarus (BY),Belgium (BE),Bosnia & Herzegovina (YU),Bosnia & Herzegovina (BA),Brazil BR),Brazil (br274),'+
                                   'Bulgaria (BG),Canada (CF),Canada (CA),Chile (LA),Colombia (LA),Croatia (YU),Croatia (HR),Czech Republic (CZ243),Denmark (DK),'+
@@ -620,7 +653,19 @@ Const DefaultValuesResolution='original,320x200,320x240,640x432,640x480,720x480,
                                   'Serbia & Montenegro (YC),Serbia & Montenegro (SR),Slovakia (SK),Slovenia (YU),Slovenia (SI),South Africa (US),Spain (SP),'+
                                   'Spain (ES),Sweden (SV),Switzerland - French (SF),Switzerland - German (SG),Switzerland - German (SD),Tadjikistan (TJ),'+
                                   'Turkmenistan (TM),Turkey (TR),UK (UK),Ukraine (UR),Ukraine (UA),US (US),Uzbekistan (UZ),Venezuela (LA),Vietnam (VI)';}
-      DefaultValuesCodepage='default,437,850,852,860,863,865,866';
+      DefaultValuesCodepage='default,113,437,667,668,737,770,771,772,773,774,775,777,778,790,808,848,849,850,851,852,853,855,857,858,859,860,861,863,865,866,867,869,872,899,991,1116,1117,1125,1131,57781,58152,58210,59234,59829,60258,60853,61282,62306';
+//... 0.9.2:
+      {DefaultValuesCodepage='113 (Yugoslavian),437 (United States),667 (Polish),668 (Polish),737 (Greek-2),770 (Baltic),771 (Lithuanian and Russian KBL),'+
+                            '772 (Lithuanian and Russian),773 (Latin-7 Baltic - old standard),774 (Lithuanian),775 (Latin-7 Baltic),777 (Accented Lithuanian),'+
+                            '778 (Accented Lithuanian),790 (Polish Mazovia),808 (Cyrillic-2 with Euro),848 (Cyrillic Ukrainian with Euro),849 (Cyrillic Belarusian with Euro),'+
+                            '850 (Latin-1),851 (Greek),852 (Latin-2 Eastern European),853 (Latin-3 Southern European),855 (Cyrillic-1),857 (Latin-5 Turkish),'+
+                            '858 (Latin-1 with Euro),859 (Latin-9; 858 plus full french and estonian),860 (Portugal),861 (Icelandic),863 (Canadian French),'+
+                            '865 (Nordic),866 (Cyrillic-2 Russian),867 (Czech Kamenicky),869 (Greek),872 (Cyrillic-1 with Euro),899 (Armenian),991 (Polish Mazovia with Zloty sign),'+
+                            '1116 (Estonian),1117 (Latvian),1125 (Cyrillic Ukrainian),1131 (Cyrillic Belarusian),57781 (Hungarian),58152 (Cyrillic Kazakh with Euro),'+
+                            '58210 (Cyrillic Azeri Cyrillic),59234 (Cyrillic Tatar),59829 (Georgian),60258 (Cyrillic Azeri Latin),60853 (Georgian with capital letters),'+
+                            '61282 (Latvian and Russian "RusLat"),62306 (Cyrillic Uzbek)';}
+
+      {DefaultValuesCodepage='default,437,850,852,860,863,865,866';}
       DefaultValuesReportedDOSVersion='default,6.2,6.0,5.0,4.0,3.3';
       DefaultValuesMIDIDevice='default,alsa,oss,win32,coreaudio,none';
       DefaultValuesBlocksize='512,1024,2048,3072,4096,8192';
@@ -639,6 +684,7 @@ Const DefaultValuesResolution='original,320x200,320x240,640x432,640x480,720x480,
       DefaultValuesRate='8000,11025,22050,32000,44100,48000,49716';
       DefaultValuesSBBase='220,240,260,280,2a0,2c0,2e0,300';
       DefaultValuesMouseSensitivity='10,20,30,40,50,60,70,80,90,100,125,150,175,200,250,300,350,400,450,500,550,600,700,800,900,1000';
+      //... DOSBox 0.74: DefaultValuesTandyRate='8000,11025,16000,22050,32000,44100,48000,49716';
       DefaultValuesTandyRate='8000,11025,22050,32000,44100';
       DefaultValuesScummVMFilter='No filtering. no scaling. Fastest (1x),No filtering. factor 2x. default for non 640x480 games (2x),No filtering. factor 3x (3x),2xSAI filter. factor 2x (2xsai),Enhanced 2xSAI filtering. factor 2x (super2xsai),'+
                                  'Less blurry than 2xSAI but slower. Factor 2x (supereagle),Doesn''t rely on blurring like 2xSAI. fast. Factor 2x (advmame2x),Doesn''t rely on blurring like 2xSAI. fast. Factor 3x (advmame3x),Very nice high quality filter but slow. Factor 2x (hq2x),'+
@@ -858,7 +904,7 @@ begin
   AddBooleanRec(NR_SecureMode,'Extra','SecureMode',True);
 
   AddBooleanRec(NR_MixerNosound,'mixer','nosound',false);
-  AddIntegerRec(NR_MixerRate,'mixer','rate',22050);
+  AddIntegerRec(NR_MixerRate,'mixer','rate',44100);
   AddIntegerRec(NR_MixerBlocksize,'mixer','blocksize',2048);
   AddIntegerRec(NR_MixerPrebuffer,'mixer','prebuffer',10);
   AddIntegerRec(NR_MixerVolumeMasterLeft,'mixer','VolumeMasterLeft',100);
@@ -882,7 +928,7 @@ begin
   AddIntegerRec(NR_SBHDMA,'sblaster','hdma',5);
   AddBooleanRec(NR_SBMixer,'sblaster','mixer',true);
   AddStringRec(NR_SBOplMode,'sblaster','oplmode','auto');
-  AddIntegerRec(NR_SBOplRate,'sblaster','oplrate',22050);
+  AddIntegerRec(NR_SBOplRate,'sblaster','oplrate',44100);
   AddStringRec(NR_SBOplEmu,'sblaster','oplemu','default');
   AddBooleanRec(NR_GUS,'gus','gus',true);
   AddIntegerRec(NR_GUSRate,'gus','gusrate',22050);
@@ -894,15 +940,15 @@ begin
   AddStringRec(NR_MIDIDevice,'midi','device','default');
   AddStringRec(NR_MIDIConfig,'midi','config','');
   AddBooleanRec(NR_SpeakerPC,'speaker','pcspeaker',true);
-  AddIntegerRec(NR_SpeakerRate,'speaker','pcrate',22050);
+  AddIntegerRec(NR_SpeakerRate,'speaker','pcrate',44100);
   AddStringRec(NR_SpeakerTandy,'speaker','tandy','auto');
-  AddIntegerRec(NR_SpeakerTandyRate,'speaker','tandyrate',22050);
+  AddIntegerRec(NR_SpeakerTandyRate,'speaker','tandyrate',44100);
   AddBooleanRec(NR_SpeakerDisney,'speaker','disney',true);
   AddStringRec(NR_JoystickType,'joystick','joysticktype','none');
   AddBooleanRec(NR_JoystickTimed,'joystick','timed',True);
   AddBooleanRec(NR_JoystickAutoFire,'joystick','autofire',False);
   AddBooleanRec(NR_JoystickSwap34,'joystick','swap34',False);
-  AddBooleanRec(NR_JoystickButtonwrap,'joystick','buttonwrap',True);
+  AddBooleanRec(NR_JoystickButtonwrap,'joystick','buttonwrap',False);
   AddStringRec(NR_Autoexec,'Extra','autoexec','');
   AddBooleanRec(NR_AutoexecOverridegamestart,'Extra','Overridegamestart',False);
   AddBooleanRec(NR_AutoexecOverrideMount,'Extra','OverrideMount',False);

@@ -181,6 +181,7 @@ begin
 end;
 
 procedure TSetupFrameGamesListAppearance.RestoreDefaults;
+Var S : String;
 begin
   GamesListBackgroundColorBox.Selected:=clBlack;
   GamesListBackgroundEdit.Text:='';
@@ -190,7 +191,13 @@ begin
   GamesListFontColorBox.Selected:=clBlack;
 
   NotSetEdit.Text:='';
-  NotSetRadioButton1.Checked:=True;
+  S:=Trim(LanguageSetup.NotSetLanguageDefault);
+  If S='' then NotSetRadioButton1.Checked:=True else begin
+    If S='-' then NotSetRadioButton2.Checked:=True else begin
+      NotSetRadioButton3.Checked:=True;
+      NotSetEdit.Text:=S;
+    end;
+  end;
 
   CheckBoxBold.Checked:=True;
   CheckBoxItalic.Checked:=False;

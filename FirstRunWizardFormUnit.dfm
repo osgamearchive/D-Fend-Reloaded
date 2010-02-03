@@ -32,12 +32,10 @@ object FirstRunWizardForm: TFirstRunWizardForm
     Anchors = [akLeft, akTop, akRight, akBottom]
     PageIndex = 1
     TabOrder = 0
-    ExplicitHeight = 274
     object TPage
       Left = 0
       Top = 0
       Caption = 'Start'
-      ExplicitHeight = 283
       object StartLabel: TLabel
         Left = 8
         Top = 8
@@ -125,7 +123,6 @@ object FirstRunWizardForm: TFirstRunWizardForm
       Left = 0
       Top = 0
       Caption = 'ProgramLanguage'
-      ExplicitHeight = 283
       object LanguageLabel: TLabel
         Left = 8
         Top = 79
@@ -170,7 +167,6 @@ object FirstRunWizardForm: TFirstRunWizardForm
       Left = 0
       Top = 0
       Caption = 'DOSBox'
-      ExplicitHeight = 283
       DesignSize = (
         569
         258)
@@ -257,7 +253,6 @@ object FirstRunWizardForm: TFirstRunWizardForm
       Left = 0
       Top = 0
       Caption = 'DOSBoxLanguage'
-      ExplicitHeight = 283
       object DosBoxLangLabel: TLabel
         Left = 8
         Top = 79
@@ -303,7 +298,6 @@ object FirstRunWizardForm: TFirstRunWizardForm
       Left = 0
       Top = 0
       Caption = 'GameDir'
-      ExplicitHeight = 283
       object GameDirTopInfoLabel: TLabel
         Left = 8
         Top = 8
@@ -363,7 +357,6 @@ object FirstRunWizardForm: TFirstRunWizardForm
       Left = 0
       Top = 0
       Caption = 'Update'
-      ExplicitHeight = 283
       DesignSize = (
         569
         258)
@@ -468,7 +461,6 @@ object FirstRunWizardForm: TFirstRunWizardForm
       3333333333333333333333333333333333333333333333333333333333333333
       3333333333333333333333333333333333333333333333333333}
     NumGlyphs = 2
-    ExplicitTop = 289
   end
   object NextButton: TBitBtn
     Left = 60
@@ -494,7 +486,6 @@ object FirstRunWizardForm: TFirstRunWizardForm
       3333333333333333333333333333333333333333333333333333}
     Layout = blGlyphRight
     NumGlyphs = 2
-    ExplicitTop = 273
   end
   object OKButton: TBitBtn
     Left = 99
@@ -505,7 +496,6 @@ object FirstRunWizardForm: TFirstRunWizardForm
     TabOrder = 3
     Visible = False
     Kind = bkOK
-    ExplicitTop = 273
   end
   object AcceptAllSettingsButton: TBitBtn
     Left = 317
@@ -516,7 +506,6 @@ object FirstRunWizardForm: TFirstRunWizardForm
     Caption = '&Accept all settings'
     TabOrder = 4
     Kind = bkAll
-    ExplicitTop = 289
   end
   object HelpButton: TBitBtn
     Left = 521
@@ -527,7 +516,6 @@ object FirstRunWizardForm: TFirstRunWizardForm
     TabOrder = 6
     OnClick = HelpButtonClick
     Kind = bkHelp
-    ExplicitTop = 273
   end
   object EditSettingsButton: TBitBtn
     Left = 182
@@ -552,6 +540,5 @@ object FirstRunWizardForm: TFirstRunWizardForm
       0FF03333737F37737F373330B00FFFFF0F033337F77F33337F733309030FFFFF
       00333377737FFFFF773333303300000003333337337777777333}
     NumGlyphs = 2
-    ExplicitTop = 273
   end
 end

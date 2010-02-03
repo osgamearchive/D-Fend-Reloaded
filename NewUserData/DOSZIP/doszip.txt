@@ -2,9 +2,9 @@ DOSZIP.TXT--
 Copyright 2009 Hjort Nidudsson.
 
 DOSZIP COMMANDER
-Version 1.37
+Version 1.41
 
-Welcome to Doszip Commander Version 1.37!
+Welcome to Doszip Commander Version 1.41!
 =========================================
 
 	Topics covered in this file include:
@@ -31,7 +31,6 @@ Doszip Commander File List
 
 	DZ.EXE      		DZ Loader
 	DZ.ICO      		Icon File for DZ.EXE
-	TVIEW.EXE		Text Viewer
 	DZMAIN.EXE  		DZ Main Shell
 	DOSZIP.TXT     		*this file
 
@@ -344,7 +343,7 @@ Shortkey Table
 	Esc		Clear command line
 
 	Alt-[afesthb]	Activate Menus
-	Ctrl		Activate Ctrl-Statusline
+	Ctrl		Activate Ctrl-Status-line
 	Ctrl-Alt	Activate Quick Search
 	Alt-Up/Down	Resize Panels
 
@@ -367,28 +366,34 @@ Shortkey Table
 	Ctrl-F2		Toggle Panel-B
 	Ctrl-F3		View file --> DZ.INI
 	Ctrl-F4		Edit file --> DZ.INI
-	Ctrl-F5	(N)	Sort current panel by Name
-	Ctrl-F6 (E)	Sort current panel by Type
-	Ctrl-F7 (D)	Sort current panel by Date
-	Ctrl-F8 (Z)	Sort current panel by Size
-	Ctrl-U		Unsorted
+	Ctrl-F5         Sort current panel by Name
+	Ctrl-F6		Sort current panel by Type
+	Ctrl-F7		Sort current panel by Date
+	Ctrl-F8		Sort current panel by Size
 	Ctrl-F9		Configuration
 
-	Ctrl-A		Screen Options
 	Ctrl-F		Confirmation
-	Ctrl-P		Panel Options
-	Ctrl-S		File search
+	Ctrl-P          Panel Options
+	Ctrl-A		Screen Options
 	Ctrl-B		User Screen
+	Ctrl-C		Compare Directories
+	Ctrl-I		Directory information
+	Ctrl-J		Compress Options
+	Ctrl-N		Sort current panel by Name
+	Ctrl-E		Sort current panel by Type
+	Ctrl-D		Sort current panel by Date
+	Ctrl-Z		Sort current panel by Size
+	Ctrl-U		Unsorted
 	Ctrl-O		Toggle Panels on/off
 	Ctrl-L		Toggle Long filenames in current Panel
+	Ctrl-H		Toggle Show Hidden in current Panel
 	Ctrl-T		Toggle Show Detail in current Panel
-	Ctrl-V		Toggle Show Hidden in current Panel
+	Ctrl-V		Toggle Show Volume Information in current Panel
 	Ctrl-M		Toggle Ministatus in current Panel
 	Ctrl-K		Toggle Status Line
 	Ctrl-X		Toggle Menus Line
-
-	Ctrl-C		Compare Directories
 	Ctrl-R		Reread current Panel
+	Ctrl-S		File search
 	Ctrl-W		Swap Panels
 
 	Ctrl-Left	History: Prev Directory
@@ -428,14 +433,22 @@ Compiling
 
 	Source directory:
 	-----------------
-	src-->dz	Source files for DZ.EXE
-	      dzmain	Source files for DZMAIN.EXE
-	      tview	Source files for TVIEW.EXE
+		dz	Source files for DZ.EXE
+		dzmain	Source files for DZMAIN.EXE
+		tview	Source files for TVIEW.EXE
+		clib	Library source
+		make	Include files for MAKE and WMAKE
+		tools	Resource compiler and test
+			programs for library code
 
-	Makefiles: 	Borlandc.bat - Borland C/C++ 3.1
-			Masm611.bat  - Masm 6.11 (Masm 5.10)
-			Watcom18.bat - Open Watcom 1.8
-			JWasm200.bat - JWasm 2.00 (Masm 5.10)
+	Makefiles
+	---------
+		srcpath		Source directory
+		debug           EXE include file
+		release		EXE include file
+		rules		Library include file
+		borlandc	Borland C/C++ 3.1 - MAKE
+		opwatcom	Open Watcom 1.8   - WMAKE
 
 
 Additional Resources
@@ -443,4 +456,25 @@ Additional Resources
 
 	For more information about DOSZIP, visit the
 	Web site at: http://sourceforge.net/projects/doszip/
+
+	Open Watcom is a project of the open source community to maintain
+	and enhance the Watcom C, C++, and Fortran cross compilers and tools.
+	http://www.openwatcom.org/
+
+	JWasm is a Masm-compatible assembler.
+	http://sourceforge.net/projects/jwasm/
+
+	7ZA.EXE is a standalone command line version of 7-Zip.
+	Supported formats: 7z, xz, ZIP, GZIP, BZIP2 and TAR
+	http://sourceforge.net/projects/sevenzip/files/
+
+	Info-ZIP provide free, portable, high-quality versions of the
+	Zip and UnZip compressor-archiver utilities that are compatible
+	with the DOS-based PKZIP by PKWARE, Inc.
+	http://sourceforge.net/projects/infozip/
+	http://www.info-zip.org/pub/infozip/
+
+	NTOLDAPP is a TSR that provides Windows NT/2K/XP clipboard support
+	for DOS programs that would use WINOLDAP in Windows 3.x/95.
+	http://www.phatcode.net/downloads.php?id=188
 

@@ -94,6 +94,7 @@ ProfileAddWindows.html
 ProfileAddFromTemplate.html
 ProfileWithWizard.html
 ProfileAddFromMedia.html
+ProfileCheating.html
 ProfileEdit.html
 ProfileEditProfile.html
 ProfileEditAdditionalChecksums.html
@@ -149,6 +150,8 @@ ExtrasImagesCreateImageFromCD.html
 ExtrasImagesExtractToFolder.html
 ExtrasImagesCreateFromFolder.html
 ExtrasImagesCreateFromProfile.html
+ExtrasEditCheatDB.html
+ExtrasSearchAddress.html
 ExtrasScanGamesFolder.html
 ExtrasEditMultipleProfiles.html
 ExtrasUninstallMultipleGames.html
@@ -235,6 +238,7 @@ GPL3.html
 #define ProfileCreateShortCut 2014
 #define ProfileSearchGame 2015
 #define ProfileAddFromMedia 2016
+#define ProfileCheating 2017
 
 #define ProfileEdit 2100
 #define ProfileEditProfile 2101
@@ -282,6 +286,8 @@ GPL3.html
 #define ExtrasCreateShortcuts 3018
 #define ExtrasLanguageEditor 3019
 #define ExtrasImagesCreateFromProfile 3020
+#define ExtrasEditCheatDB 3021
+#define ExtrasSearchAddress 3022
 
 #define HelpForum 4001
 #define HelpOldGames 4006

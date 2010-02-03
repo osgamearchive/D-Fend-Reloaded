@@ -13,6 +13,7 @@
 ; ============================================================
 
 !insertmacro MUI_RESERVEFILE_INSTALLOPTIONS
+ReserveFile "Languages\ioFileBrazilian_Portuguese.ini"
 ReserveFile "Languages\ioFileDanish.ini"
 ReserveFile "Languages\ioFileDutch.ini"
 ReserveFile "Languages\ioFileEnglish.ini"
@@ -24,7 +25,9 @@ ReserveFile "Languages\ioFileRussian.ini"
 ReserveFile "Languages\ioFileSimplified_Chinese.ini"
 ReserveFile "Languages\ioFileSpanish.ini"
 ReserveFile "Languages\ioFileTraditional_Chinese.ini"
+ReserveFile "Languages\ioFileTurkish.ini"
 
+ReserveFile "Languages\ioFile2Brazilian_Portuguese.ini"
 ReserveFile "Languages\ioFile2Danish.ini"
 ReserveFile "Languages\ioFile2Dutch.ini"
 ReserveFile "Languages\ioFile2English.ini"
@@ -36,6 +39,7 @@ ReserveFile "Languages\ioFile2Russian.ini"
 ReserveFile "Languages\ioFile2Simplified_Chinese.ini"
 ReserveFile "Languages\ioFile2Spanish.ini"
 ReserveFile "Languages\ioFile2Traditional_Chinese.ini"
+ReserveFile "Languages\ioFile2Turkish.ini"
 
 
 
@@ -282,6 +286,8 @@ Section "$(LANGNAME_ProgramFiles)" ID_DosBoxProgramFiles
   File "..\DOSBox\SDL.dll"
   File "..\DOSBox\SDL_net.dll"
   
+  File "..\NewUserData\FREEDOS\CPI\*.*"
+  
   SetOutPath "$INSTDIR\DOSBox\zmbv"
   File "..\DOSBox\zmbv\zmbv.dll"
   File "..\DOSBox\zmbv\zmbv.inf"
@@ -397,6 +403,7 @@ SectionEnd
 ; ============================================================
 
 !macro ExtractInstallOptionFiles
+  !insertmacro MUI_INSTALLOPTIONS_EXTRACT_AS "Languages\ioFileBrazilian_Portuguese.ini" "ioFileBrazilian_Portuguese.ini"
   !insertmacro MUI_INSTALLOPTIONS_EXTRACT_AS "Languages\ioFileDanish.ini" "ioFileDanish.ini"
   !insertmacro MUI_INSTALLOPTIONS_EXTRACT_AS "Languages\ioFileDutch.ini" "ioFileDutch.ini"
   !insertmacro MUI_INSTALLOPTIONS_EXTRACT_AS "Languages\ioFileEnglish.ini" "ioFileEnglish.ini"
@@ -407,8 +414,10 @@ SectionEnd
   !insertmacro MUI_INSTALLOPTIONS_EXTRACT_AS "Languages\ioFileRussian.ini" "ioFileRussian.ini"
   !insertmacro MUI_INSTALLOPTIONS_EXTRACT_AS "Languages\ioFileSimplified_Chinese.ini" "ioFileSimplified_Chinese.ini"
   !insertmacro MUI_INSTALLOPTIONS_EXTRACT_AS "Languages\ioFileSpanish.ini" "ioFileSpanish.ini"
-  !insertmacro MUI_INSTALLOPTIONS_EXTRACT_AS "Languages\ioFileTraditional_Chinese.ini" "ioFileTraditional_Chinese.ini"
-  
+  !insertmacro MUI_INSTALLOPTIONS_EXTRACT_AS "Languages\ioFileTraditional_Chinese.ini" "ioFileTraditional_Chinese.ini"  
+  !insertmacro MUI_INSTALLOPTIONS_EXTRACT_AS "Languages\ioFileTurkish.ini" "ioFileTurkish.ini"
+ 
+  !insertmacro MUI_INSTALLOPTIONS_EXTRACT_AS "Languages\ioFile2Brazilian_Portuguese.ini" "ioFile2Brazilian_Portuguese.ini"
   !insertmacro MUI_INSTALLOPTIONS_EXTRACT_AS "Languages\ioFile2Danish.ini" "ioFile2Danish.ini"
   !insertmacro MUI_INSTALLOPTIONS_EXTRACT_AS "Languages\ioFile2Dutch.ini" "ioFile2Dutch.ini"
   !insertmacro MUI_INSTALLOPTIONS_EXTRACT_AS "Languages\ioFile2English.ini" "ioFile2English.ini"
@@ -420,6 +429,7 @@ SectionEnd
   !insertmacro MUI_INSTALLOPTIONS_EXTRACT_AS "Languages\ioFile2Simplified_Chinese.ini" "ioFile2Simplified_Chinese.ini"
   !insertmacro MUI_INSTALLOPTIONS_EXTRACT_AS "Languages\ioFile2Spanish.ini" "ioFile2Spanish.ini"
   !insertmacro MUI_INSTALLOPTIONS_EXTRACT_AS "Languages\ioFile2Traditional_Chinese.ini" "ioFile2Traditional_Chinese.ini"
+  !insertmacro MUI_INSTALLOPTIONS_EXTRACT_AS "Languages\ioFile2Turkish.ini" "ioFile2Turkish.ini"
 !macroend
 
 !insertmacro CommonUACCode
