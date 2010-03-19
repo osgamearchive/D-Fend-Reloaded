@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, 
-  Dialogs, StdCtrls, Buttons, SetupFormUnit, PackageDBUnit;
+  Dialogs, StdCtrls, Buttons, SetupFormUnit, PackageDBUnit, GameDBUnit;
 
 type
   TSetupFrameUpdate = class(TFrame, ISetupFrame)
@@ -19,12 +19,12 @@ type
     PackagesLabel: TLabel;
     PackagesComboBox: TComboBox;
     UpdateButton: TBitBtn;
-    DataReaderButton: TBitBtn;
-    PackagesButton: TBitBtn;
+    CheatsLabel: TLabel;
+    CheatsComboBox: TComboBox;
     procedure ButtonWork(Sender: TObject);
   private
     { Private-Deklarationen }
-    Procedure PackageDBDownload(Sender : TObject; const Progress, Size : Integer; const Status : TDownloadStatus; var ContinueDownload : Boolean);
+    GameDB : TGameDB;
   public
     { Public-Deklarationen }
     Function GetName : String;
@@ -42,7 +42,8 @@ implementation
 
 uses ShellAPI, Math, LanguageSetupUnit, VistaToolsUnit, PrgSetupUnit, PrgConsts,
      HelpConsts, IconLoaderUnit, InternetDataWaitFormUnit, DataReaderUnit,
-     CommonTools, MainUnit, DownloadWaitFormUnit;
+     CommonTools, MainUnit, DownloadWaitFormUnit, ProgramUpdateCheckUnit,
+     CheatDBToolsUnit, UpdateCheckFormUnit;
 
 {$R *.dfm}
 
@@ -65,11 +66,21 @@ begin
   UpdateCheckBox.Checked:=PrgSetup.VersionSpecificUpdateCheck;
 
   UserIconLoader.DialogImage(DI_Update,UpdateButton);
-  UserIconLoader.DialogImage(DI_Update,DataReaderButton);
-  UserIconLoader.DialogImage(DI_Update,PackagesButton);
+
+  DataReaderComboBox.Items.Clear;
+  While DataReaderComboBox.Items.Count<4 do DataReaderComboBox.Items.Add('');
+
+  PackagesComboBox.Items.Clear;
+  While PackagesComboBox.Items.Count<4 do PackagesComboBox.Items.Add('');
+
+  CheatsComboBox.Items.Clear;
+  While CheatsComboBox.Items.Count<3 do CheatsComboBox.Items.Add('');
 
   DataReaderComboBox.ItemIndex:=Max(0,Min(3,PrgSetup.DataReaderCheckForUpdates));
   PackagesComboBox.ItemIndex:=Max(0,Min(3,PrgSetup.PackageListsCheckForUpdates));
+  CheatsComboBox.ItemIndex:=Max(0,Min(2,PrgSetup.CheatsDBCheckForUpdates));
+
+  GameDB:=InitData.GameDB;
 end;
 
 procedure TSetupFrameUpdate.BeforeChangeLanguage;
@@ -97,7 +108,6 @@ begin
   finally
     DataReaderComboBox.ItemIndex:=I;
   end;
-  DataReaderButton.Caption:=LanguageSetup.SetupFormUpdatePackagesButton;
 
   PackagesLabel.Caption:=LanguageSetup.SetupFormUpdatePackages;
   I:=PackagesComboBox.ItemIndex;
@@ -109,7 +119,16 @@ begin
   finally
     PackagesComboBox.ItemIndex:=I;
   end;
-  PackagesButton.Caption:=LanguageSetup.SetupFormUpdatePackagesButton;
+
+  CheatsLabel.Caption:=LanguageSetup.SetupFormUpdateCheats;
+  I:=CheatsComboBox.ItemIndex;
+  try
+    CheatsComboBox.Items[0]:=LanguageSetup.SetupFormUpdateCheats0;
+    CheatsComboBox.Items[1]:=LanguageSetup.SetupFormUpdateCheats1;
+    CheatsComboBox.Items[2]:=LanguageSetup.SetupFormUpdateCheats2;
+  finally
+    CheatsComboBox.ItemIndex:=I;
+  end;
 
   HelpContext:=ID_FileOptionsSearchForUpdates;
 end;
@@ -123,10 +142,10 @@ begin
   UpdateButton.Visible:=PrgSetup.ActivateIncompleteFeatures;
   DataReaderInfoLabel.Visible:=PrgSetup.ActivateIncompleteFeatures;
   DataReaderComboBox.Visible:=PrgSetup.ActivateIncompleteFeatures;
-  DataReaderButton.Visible:=PrgSetup.ActivateIncompleteFeatures;
   PackagesLabel.Visible:=PrgSetup.ActivateIncompleteFeatures;
   PackagesComboBox.Visible:=PrgSetup.ActivateIncompleteFeatures;
-  PackagesButton.Visible:=PrgSetup.ActivateIncompleteFeatures;
+  CheatsLabel.Visible:=PrgSetup.ActivateIncompleteFeatures;
+  CheatsComboBox.Visible:=PrgSetup.ActivateIncompleteFeatures;
 end;
 
 procedure TSetupFrameUpdate.HideFrame;
@@ -140,6 +159,7 @@ begin
 
   DataReaderComboBox.ItemIndex:=2;
   PackagesComboBox.ItemIndex:=0;
+  CheatsComboBox.ItemIndex:=0;
 end;
 
 procedure TSetupFrameUpdate.SaveSetup;
@@ -152,54 +172,17 @@ begin
 
   PrgSetup.DataReaderCheckForUpdates:=DataReaderComboBox.ItemIndex;
   PrgSetup.PackageListsCheckForUpdates:=PackagesComboBox.ItemIndex;
+  PrgSetup.CheatsDBCheckForUpdates:=CheatsComboBox.ItemIndex;
 end;
 
 procedure TSetupFrameUpdate.ButtonWork(Sender: TObject);
-Var I : Integer;
-    DataReader : TDataReader;
-    PackageDB : TPackageDB;
 begin
-  Case (Sender as TComponent).Tag of
-    0 : If FileExists(PrgDir+'UpdateCheck.exe') or FileExists(PrgDir+BinFolder+'\'+'UpdateCheck.exe')
-          then DFendReloadedMainForm.RunUpdateCheck(False)
-          else ShellExecute(Handle,'open',PChar(LanguageSetup.MenuHelpUpdatesURL),nil,nil,SW_SHOW);
-    1 : begin
-          I:=PrgSetup.DataReaderCheckForUpdates;
-          try
-            PrgSetup.DataReaderCheckForUpdates:=3;
-            DataReader:=TDataReader.Create;
-            try
-              ShowDataReaderInternetConfigWaitDialog(Owner,DataReader,LanguageSetup.DataReaderDownloadCaption,LanguageSetup.DataReaderDownloadInfo,LanguageSetup.DataReaderDownloadError);
-            finally
-              DataReader.Free;
-            end;
-          finally
-            PrgSetup.DataReaderCheckForUpdates:=I;
-          end;
-        end;
-    2 : begin
-          PackageDB:=TPackageDB.Create;
-          try
-            PackageDB.LoadDB(False,False);
-            PackageDB.OnDownload:=PackageDBDownload;
-            PackageDB.LoadDB(True,((Word(GetKeyState(VK_LSHIFT)) div 256)<>0) or ((Word(GetKeyState(VK_RSHIFT)) div 256)<>0));
-          finally
-            PackageDB.Free;
-          end;
-        end;  
+  If PrgSetup.ActivateIncompleteFeatures then begin
+    ShowUpdateCheckDialog(self,GameDB);
+  end else begin
+    RunUpdateCheck(self,False);
   end;
 end;
 
-Procedure TSetupFrameUpdate.PackageDBDownload(Sender : TObject; const Progress, Size : Integer; const Status : TDownloadStatus; var ContinueDownload : Boolean);
-begin
-  Case Status of
-    dsStart : begin Enabled:=False; InitDownloadWaitForm(self,Size); end;
-    dsProgress : begin
-                   If DownloadWaitForm.ProgressBar.Max=1 then DownloadWaitForm.ProgressBar.Max:=Size;
-                   ContinueDownload:=StepDownloadWaitForm(Progress);
-                 end;
-    dsDone : begin Enabled:=True; DoneDownloadWaitForm; end;
-  End;
-end;
 
 end.

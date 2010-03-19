@@ -3,7 +3,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
   Top = 0
   ActiveControl = TreeView
   Caption = 'D-Fend Reloaded'
-  ClientHeight = 658
+  ClientHeight = 578
   ClientWidth = 774
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -4360,7 +4360,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
   object Splitter: TSplitter
     Left = 169
     Top = 24
-    Height = 512
+    Height = 432
     ResizeStyle = rsUpdate
     OnMoved = FormResize
     ExplicitLeft = 224
@@ -4371,7 +4371,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
     Left = 0
     Top = 24
     Width = 169
-    Height = 512
+    Height = 432
     Align = alLeft
     Constraints.MinWidth = 50
     HideSelection = False
@@ -4382,6 +4382,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
     TabOrder = 0
     OnChange = TreeViewChange
     OnDragDrop = MainDragDrop
+    ExplicitHeight = 412
   end
   object CoolBar: TCoolBar
     Left = 0
@@ -4518,13 +4519,14 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
     Left = 172
     Top = 24
     Width = 602
-    Height = 512
+    Height = 432
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 2
+    ExplicitHeight = 412
     object Splitter1: TSplitter
       Left = 0
-      Top = 309
+      Top = 229
       Width = 602
       Height = 3
       Cursor = crVSplit
@@ -4537,7 +4539,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
       Left = 0
       Top = 0
       Width = 602
-      Height = 309
+      Height = 229
       Align = alClient
       Columns = <>
       HideSelection = False
@@ -4556,11 +4558,11 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
       OnDragDrop = MainDragDrop
       OnInfoTip = ListViewInfoTip
       OnSelectItem = ListViewSelectItem
-      ExplicitHeight = 289
+      ExplicitHeight = 209
     end
     object CapturePageControl: TPageControl
       Left = 0
-      Top = 312
+      Top = 232
       Width = 602
       Height = 200
       ActivePage = CaptureScreenshotsTab
@@ -4687,6 +4689,10 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
       object GameNotesPanel: TTabSheet
         Caption = 'Notes'
         ImageIndex = 44
+        ExplicitLeft = 0
+        ExplicitTop = 0
+        ExplicitWidth = 0
+        ExplicitHeight = 0
         object GameNotesEdit: TRichEdit
           Left = 0
           Top = 22
@@ -4776,7 +4782,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
   end
   object ZipInfoPanel: TPanel
     Left = 0
-    Top = 536
+    Top = 456
     Width = 774
     Height = 40
     Align = alBottom
@@ -4803,7 +4809,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
   end
   object FirstRunInfoPanel: TPanel
     Left = 0
-    Top = 576
+    Top = 496
     Width = 774
     Height = 82
     Align = alBottom
@@ -6946,6 +6952,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
         object MenuExtrasCheatingSearch: TMenuItem
           Tag = 5024
           Caption = '&Search for address in saved game...'
+          ShortCut = 49235
           OnClick = MenuWork
         end
       end
@@ -9960,5 +9967,12 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
       C900000000003F19C900002300239F8BC300006300238FC3E30000C30023C7E7
       FF0101070007E00FFF0303FF003FF83F00000000000000000000000000000000
       000000000000}
+  end
+  object SearchEditTimer: TTimer
+    Enabled = False
+    Interval = 1500
+    OnTimer = SearchEditTimerTimer
+    Left = 456
+    Top = 32
   end
 end

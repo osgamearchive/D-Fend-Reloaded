@@ -37,6 +37,7 @@ type
     GameZipLabel: TLabel;
     InfoButton1: TSpeedButton;
     InfoButton2: TSpeedButton;
+    IgnoreWindowsWarningsCheckBox: TCheckBox;
     procedure IconButtonClick(Sender: TObject);
     procedure ExeSelectButtonClick(Sender: TObject);
     procedure ProfileNameEditChange(Sender: TObject);
@@ -74,7 +75,7 @@ implementation
 uses ShlObj, Math, LanguageSetupUnit, VistaToolsUnit, IconManagerFormUnit,
      PrgSetupUnit, PrgConsts, CommonTools, GameDBToolsUnit, ScummVMToolsUnit,
      ExtraExeEditFormUnit, HelpConsts, ZipInfoFormUnit, IconLoaderUnit,
-     ImageStretch;
+     ImageStretch, DOSBoxUnit;
 
 {$R *.dfm}
 
@@ -164,6 +165,9 @@ begin
   InfoButton1.Caption:=LanguageSetup.ProfileEditorRelPathInfo;
   InfoButton2.Caption:=LanguageSetup.ProfileEditorRelPathInfo;
 
+  IgnoreWindowsWarningsCheckBox.Caption:=LanguageSetup.ProfileEditorIgnoreWindowsWarnings;
+  IgnoreWindowsWarningsCheckBox.Hint:=LanguageSetup.ProfileEditorIgnoreWindowsWarningsHints;
+
   HelpContext:=ID_ProfileEditProfile;
 end;
 
@@ -252,6 +256,8 @@ begin
         SetupExeEdit.Text:=Game.SetupExe;
       end;
       SetupParameterEdit.Text:=Game.SetupParameters;
+
+      IgnoreWindowsWarningsCheckBox.Checked:=Game.IgnoreWindowsFileWarnings;
     end;
     { Windows and DOSBox mode }
     For I:=0 to 9 do If Trim(Game.ExtraPrgFile[I])<>'' then ExtraExeFiles.Add(Game.ExtraPrgFile[I]);
@@ -267,18 +273,22 @@ begin
     ExtraExeFilesButton.Visible:=False;
     GameGroup.Visible:=True;
     GameComboBoxChange(self);
+    IgnoreWindowsWarningsCheckBox.Visible:=False;
   end else begin
     GameGroup.Visible:=False;
     GameExeGroup.Top:=GameGroup.Top;
     SetupExeGroup.Top:=GameExeGroup.BoundsRect.Bottom+8;
     ExtraExeFilesButton.Top:=SetupExeGroup.BoundsRect.Bottom+8;
+    IgnoreWindowsWarningsCheckBox.Top:=ExtraExeFilesButton.Top+5;
     If WindowsMode then begin
       GameRelPathCheckBox.Visible:=False;
       SetupRelPathCheckBox.Visible:=False;
       InfoButton1.Visible:=False;
       InfoButton2.Visible:=False;
+      IgnoreWindowsWarningsCheckBox.Visible:=False;
     end else begin
       { DOSBox mode }
+      GameExeEditChange(Sender); {Make IgnoreWindowsWarningsCheckBox visible if needed}
     end;
   end;
 end;
@@ -340,6 +350,8 @@ begin
       If SetupRelPathCheckBox.Checked then S:='DOSBox:' else S:='';
       Game.SetupExe:=S+SetupExeEdit.Text;
       Game.SetupParameters:=SetupParameterEdit.Text;
+
+      Game.IgnoreWindowsFileWarnings:=IgnoreWindowsWarningsCheckBox.Checked;
     end;
 
     For I:=0 to 9 do Game.ExtraPrgFile[I]:='';
@@ -369,6 +381,10 @@ Var S : String;
 begin
   If GameRelPathCheckBox.Checked then S:='DOSBox:' else S:='';
   FOnProfileNameChange(Sender,ProfileName^,S+GameExeEdit.Text,ProfileSetup^,ProfileScummVMGameName^,ProfileScummVMPath^,ProfileDOSBoxInstallation^,ProfileCaptureDir^);
+
+  If PrgSetup.ActivateIncompleteFeatures then begin
+    IgnoreWindowsWarningsCheckBox.Visible:=(not GameRelPathCheckBox.Checked) and (IsWindowsExe(MakeAbsPath(GameExeEdit.Text,PrgSetup.BaseDir)) or IsWindowsExe(MakeAbsPath(SetupExeEdit.Text,PrgSetup.BaseDir)));
+  end;
 end;
 
 procedure TModernProfileEditorBaseFrame.GameRelPathButton(Sender: TObject);
@@ -381,6 +397,10 @@ Var S : String;
 begin
   If SetupRelPathCheckBox.Checked then S:='DOSBox:' else S:='';
   FOnProfileNameChange(Sender,ProfileName^,ProfileExe^,S+SetupExeEdit.Text,ProfileScummVMGameName^,ProfileScummVMPath^,ProfileDOSBoxInstallation^,ProfileCaptureDir^);
+
+  If PrgSetup.ActivateIncompleteFeatures then begin
+    IgnoreWindowsWarningsCheckBox.Visible:=(not GameRelPathCheckBox.Checked) and (IsWindowsExe(MakeAbsPath(GameExeEdit.Text,PrgSetup.BaseDir)) or IsWindowsExe(MakeAbsPath(SetupExeEdit.Text,PrgSetup.BaseDir)));
+  end;
 end;
 
 procedure TModernProfileEditorBaseFrame.RelPathCheckBoxClick(Sender: TObject);
@@ -450,11 +470,15 @@ begin
   Case (Sender as TSpeedButton).Tag of
     0 : begin
           S:=GameExeEdit.Text;
-          if SelectProgramFile(S,GameExeEdit.Text,SetupExeEdit.Text,WindowsMode,-1,self) then GameExeEdit.Text:=S;
+          if not SelectProgramFile(S,GameExeEdit.Text,SetupExeEdit.Text,WindowsMode,-1,self) then exit;
+          GameExeEdit.Text:=S;
+          GameExeEditChange(Sender);
         end;
     1 : begin
           S:=SetupExeEdit.Text;
-          if SelectProgramFile(S,SetupExeEdit.Text,GameExeEdit.Text,WindowsMode,-1,self) then SetupExeEdit.Text:=S;
+          if not SelectProgramFile(S,SetupExeEdit.Text,GameExeEdit.Text,WindowsMode,-1,self) then exit;
+          SetupExeEdit.Text:=S;
+          SetupExeEditChange(Sender);
         end;
     2 : begin
           If Trim(GameEdit.Text)='' then begin

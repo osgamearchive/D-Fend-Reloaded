@@ -43,12 +43,14 @@ var
   InstallationSupportForm: TInstallationSupportForm;
 
 Function ShowInstallationSupportDialog(const AOwner : TComponent; const AGameDB : TGameDB) : TGame;
-Function RunInstallationFromZipFile(const AOwner : TComponent; const AGameDB : TGameDB; const FileName : String) : TGame;
+Function RunInstallationFromZipFile(const AOwner : TComponent; const AGameDB : TGameDB; const FileName : String; const FilesAlreadyInTempDir : String = '') : TGame;
+Function TestInstallationSupportNeeded(const AFolder : String) : Boolean;
 
 implementation
 
 uses LanguageSetupUnit, CommonTools, VistaToolsUnit, IconLoaderUnit, HelpConsts,
-     ClassExtensions, ZipInfoFormUnit, InstallationRunFormUnit, ZipPackageUnit;
+     ClassExtensions, ZipInfoFormUnit, InstallationRunFormUnit, ZipPackageUnit,
+     PrgConsts;
 
 {$R *.dfm}
 
@@ -305,16 +307,48 @@ begin
   end;
 end;
 
-Function RunInstallationFromZipFile(const AOwner : TComponent; const AGameDB : TGameDB; const FileName : String) : TGame;
+Function RunInstallationFromZipFile(const AOwner : TComponent; const AGameDB : TGameDB; const FileName : String; const FilesAlreadyInTempDir : String) : TGame;
 begin
   result:=nil;
   InstallationRunForm:=TInstallationRunForm.Create(AOwner);
   try
     InstallationRunForm.InstallType:=itArchive;
     InstallationRunForm.Sources.Add(FileName);
+    InstallationRunForm.FilesAlreadyInTempDir:=FilesAlreadyInTempDir;
     If InstallationRunForm.ShowModal=mrOK then result:=CreateGameFromSimpleFolder(InstallationRunForm.NewGameDir,AGameDB,'',True,True);
   finally
     InstallationRunForm.Free;
+  end;
+end;
+
+Procedure FindProgramFiles(const Dir : String; const St : TStringList);
+Var Rec : TSearchRec;
+    I,J : Integer;
+begin
+  For J:=Low(ProgramExts) to high(ProgramExts) do begin
+     I:=FindFirst(Dir+'*.'+ProgramExts[J],faAnyFile,Rec);
+     try While I=0 do begin If ((Rec.Attr and faDirectory)=0) then St.Add(ExtUpperCase(ChangeFileExt(Rec.Name,''))); I:=FindNext(Rec); end;
+     finally FindClose(Rec); end;
+  end;
+end;
+
+Function TestInstallationSupportNeeded(const AFolder : String) : Boolean;
+Var St : TStringList;
+    I,J : Integer;
+    B : Boolean;
+begin
+  St:=TStringList.Create;
+  try
+    result:=False;
+    FindProgramFiles(IncludeTrailingPathDelimiter(AFolder),St);
+    I:=0; while I<St.Count do begin
+      B:=True; For J:=Low(IgnoreGameExeFilesIgnore) to High(IgnoreGameExeFilesIgnore) do If St[I]=IgnoreGameExeFilesIgnore[J] then begin B:=False; break; end;
+      If B then inc(I) else St.Delete(I);
+    end;
+    if St.Count<>1 then exit;
+    For I:=Low(InstallerNames) to High(InstallerNames) do If InstallerNames[I]=St[0] then begin result:=True; exit; end;
+  finally
+    St.Free;
   end;
 end;
 

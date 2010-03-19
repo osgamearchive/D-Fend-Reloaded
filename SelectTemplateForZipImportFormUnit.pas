@@ -23,6 +23,7 @@ type
     SetupFileComboBox: TComboBox;
     SetupFileLabel: TLabel;
     WarningLabel: TLabel;
+    InstallSupportButton: TBitBtn;
     procedure FormCreate(Sender: TObject);
     procedure TypeSelectClick(Sender: TObject);
     procedure OKButtonClick(Sender: TObject);
@@ -32,6 +33,7 @@ type
     procedure ComboBoxDropDown(Sender: TObject);
     procedure FolderEditChange(Sender: TObject);
     procedure ProfileNameEditChange(Sender: TObject);
+    procedure InstallSupportButtonClick(Sender: TObject);
   private
     { Private-Deklarationen }
     JustChanging : Boolean;
@@ -39,7 +41,7 @@ type
     Procedure SelectFilesFromAutoSetupTemplate;
   public
     { Public-Deklarationen }
-    ProfileNameChanged : Boolean;
+    ProfileNameChanged, UseInstallSupport : Boolean;
     ArchivFileName : String;
     AutoSetupDB, TemplateDB : TGameDB;
     PrgFiles, Templates : TStringList;
@@ -48,7 +50,7 @@ type
     Procedure Prepare(const DoNotCopyFolder : Boolean);
   end;
 
-Function ShowSelectTemplateForZipImportDialog(const AOwner : TComponent; const AAutoSetupDB, ATemplateDB : TGameDB; const APrgFiles, ATemplates : TStringList; const AArchivFileName : String; var AProfileName, AFileToStart, ASetupFileToStart, AFolder : String; var ATemplateNr : Integer; const NoDialogIfAutoSetupIsAvailable, DoNotCopyFolder : Boolean) : Boolean;
+Function ShowSelectTemplateForZipImportDialog(const AOwner : TComponent; const AAutoSetupDB, ATemplateDB : TGameDB; const APrgFiles, ATemplates : TStringList; const AArchivFileName : String; var AProfileName, AFileToStart, ASetupFileToStart, AFolder : String; var ATemplateNr : Integer; const NoDialogIfAutoSetupIsAvailable, DoNotCopyFolder : Boolean; var UseInstallSupport : Boolean) : Boolean;
 
 var
   SelectTemplateForZipImportForm: TSelectTemplateForZipImportForm;
@@ -56,7 +58,7 @@ var
 implementation
 
 uses Math, CommonTools, LanguageSetupUnit, VistaToolsUnit, IconLoaderUnit,
-     HelpConsts, PrgSetupUnit;
+     HelpConsts, PrgSetupUnit, PrgConsts;
 
 {$R *.dfm}
 
@@ -79,35 +81,53 @@ begin
   SetupFileLabel.Caption:=LanguageSetup.ProfileEditorSetupEXE;
   OKButton.Caption:=LanguageSetup.OK;
   CancelButton.Caption:=LanguageSetup.Cancel;
+  InstallSupportButton.Caption:=LanguageSetup.InstallationSupportZipImportUse;
+  InstallSupportButton.Hint:=LanguageSetup.InstallationSupportZipImportUseHint;
   HelpButton.Caption:=LanguageSetup.Help;
 
   UserIconLoader.DialogImage(DI_OK,OKButton);
   UserIconLoader.DialogImage(DI_Cancel,CancelButton);
+  UserIconLoader.DirectLoad('Main',0,InstallSupportButton);
   UserIconLoader.DialogImage(DI_Help,HelpButton);
 
   JustChanging:=False;
   ProfileNameChanged:=False;
+  UseInstallSupport:=False;
+
+  If not PrgSetup.ActivateIncompleteFeatures then begin
+    InstallSupportButton.Visible:=False;
+    HelpButton.Left:=InstallSupportButton.Left;
+  end;
 end;
 
 Function AvoidSomeNames(const St : TStringList; const SetupNumber : Integer) : String;
-const Avoid : Array[1..14] of String = ('README','DECIDE','CATALOG','LIST','LHARC','ARJ','UNARJ','UNZIP','HELPME','ORDER','DEALERS','ULTRAMID','PRINTME','UNIVBE');
 var I,J : Integer;
     OK : Boolean;
     S : String;
 begin
+  result:='';
+
   For I:=0 to St.Count-1 do if I<>SetupNumber then begin
     OK:=True; S:=ExtUpperCase(ChangeFileExt(St[I],''));
-    For J:=Low(Avoid) to High(Avoid) do if S=Avoid[J] then begin OK:=False; break; end;
-    If OK then begin result:=St[I]; exit; end;
+    For J:=Low(IgnoreGameExeFilesIgnore) to High(IgnoreGameExeFilesIgnore) do if S=IgnoreGameExeFilesIgnore[J] then begin OK:=False; break; end;
+    If OK then result:=St[I]; {File is ok in level 1}
+
+    If OK then for J:=Low(SetupExeFilesLevel1) to High(SetupExeFilesLevel1) do if S=SetupExeFilesLevel1[J] then begin OK:=False; break; end;
+    If OK then for J:=Low(SetupExeFilesLevel2) to High(SetupExeFilesLevel2) do if S=SetupExeFilesLevel2[J] then begin OK:=False; break; end;
+    If OK then for J:=Low(SetupExeFilesLevel3) to High(SetupExeFilesLevel3) do if S=SetupExeFilesLevel3[J] then begin OK:=False; break; end;
+    If OK then for J:=Low(SetupExeFilesLevel4) to High(SetupExeFilesLevel4) do if S=SetupExeFilesLevel4[J] then begin OK:=False; break; end;
+
+    If OK then exit; {File is ok in level 2}
   end;
+  If result<>'' then exit; {File was ok in level 1}
 
   For I:=0 to St.Count-1 do if I<>SetupNumber then begin result:=St[I]; exit; end;
 
-  If St.Count>0 then result:=St[0] else result:='';
+  If St.Count>0 then result:=St[0];
 end;
 
 Procedure TSelectTemplateForZipImportForm.Prepare(const DoNotCopyFolder : Boolean);
-Var I,Nr : Integer;
+Var I,J,Nr : Integer;
     S : String;
 begin
   JustChanging:=True;
@@ -146,21 +166,27 @@ begin
           Nr:=-1;
           For I:=0 to PrgFiles.Count-1 do begin
             S:=ExtUpperCase(ChangeFileExt(PrgFiles[I],''));
-            If (S='SETUP') or (S='CONFIG') or (S='SETSOUND') or (S='SETSND') or (S='SETBLAST') or (S='XINSTALL') then begin Nr:=I; break; end;
+            For J:=Low(SetupExeFilesLevel1) to High(SetupExeFilesLevel1) do if S=SetupExeFilesLevel1[J] then begin Nr:=I; break; end;
+            If Nr>=0 then break;
           end;
-          If Nr<0 then begin
-            For I:=0 to PrgFiles.Count-1 do begin
-              S:=ExtUpperCase(ChangeFileExt(PrgFiles[I],''));
-              If (S='INSTALL') then begin Nr:=I; break; end;
-            end;
+          If Nr<0 then For I:=0 to PrgFiles.Count-1 do begin
+            S:=ExtUpperCase(ChangeFileExt(PrgFiles[I],''));
+            For J:=Low(SetupExeFilesLevel2) to High(SetupExeFilesLevel2) do if S=SetupExeFilesLevel2[J] then begin Nr:=I; break; end;
+            If Nr>=0 then break;
           end;
-          If Nr<0 then begin
-            FileToStart:=AvoidSomeNames(PrgFiles,-1);
-            SetupFileToStart:='';
-          end else begin
-            FileToStart:=AvoidSomeNames(PrgFiles,Nr);
-            SetupFileToStart:=PrgFiles[Nr];
+          If Nr<0 then For I:=0 to PrgFiles.Count-1 do begin
+            S:=ExtUpperCase(ChangeFileExt(PrgFiles[I],''));
+            For J:=Low(SetupExeFilesLevel3) to High(SetupExeFilesLevel3) do if S=SetupExeFilesLevel3[J] then begin Nr:=I; break; end;
+            If Nr>=0 then break;
           end;
+          If Nr<0 then For I:=0 to PrgFiles.Count-1 do begin
+            S:=ExtUpperCase(ChangeFileExt(PrgFiles[I],''));
+            For J:=Low(SetupExeFilesLevel4) to High(SetupExeFilesLevel4) do if S=SetupExeFilesLevel4[J] then begin Nr:=I; break; end;
+            If Nr>=0 then break;
+          end;
+
+          FileToStart:=AvoidSomeNames(PrgFiles,-1);
+          If Nr<0 then SetupFileToStart:='' else SetupFileToStart:=PrgFiles[Nr];
 
           I:=ProgramFileComboBox.Items.IndexOf(FileToStart);
           If I>=0 then ProgramFileComboBox.ItemIndex:=I;
@@ -341,6 +367,12 @@ begin
   end;
 end;
 
+procedure TSelectTemplateForZipImportForm.InstallSupportButtonClick(Sender: TObject);
+begin
+  UseInstallSupport:=True;
+  ModalResult:=mrOK;
+end;
+
 procedure TSelectTemplateForZipImportForm.HelpButtonClick(Sender: TObject);
 begin
   Application.HelpCommand(HELP_CONTEXT,ID_FileImportZip);
@@ -353,8 +385,9 @@ end;
 
 { global }
 
-Function ShowSelectTemplateForZipImportDialog(const AOwner : TComponent; const AAutoSetupDB, ATemplateDB : TGameDB; const APrgFiles, ATemplates : TStringList; const AArchivFileName : String; var AProfileName, AFileToStart, ASetupFileToStart, AFolder : String; var ATemplateNr : Integer; const NoDialogIfAutoSetupIsAvailable, DoNotCopyFolder : Boolean) : Boolean;
+Function ShowSelectTemplateForZipImportDialog(const AOwner : TComponent; const AAutoSetupDB, ATemplateDB : TGameDB; const APrgFiles, ATemplates : TStringList; const AArchivFileName : String; var AProfileName, AFileToStart, ASetupFileToStart, AFolder : String; var ATemplateNr : Integer; const NoDialogIfAutoSetupIsAvailable, DoNotCopyFolder : Boolean; var UseInstallSupport : Boolean) : Boolean;
 begin
+  UseInstallSupport:=False;
   SelectTemplateForZipImportForm:=TSelectTemplateForZipImportForm.Create(AOwner);
   try
     SelectTemplateForZipImportForm.ArchivFileName:=AArchivFileName;
@@ -368,8 +401,9 @@ begin
       SelectTemplateForZipImportForm.OKButtonClick(SelectTemplateForZipImportForm);
     end else begin
       result:=(SelectTemplateForZipImportForm.ShowModal=mrOK);
+      UseInstallSupport:=SelectTemplateForZipImportForm.UseInstallSupport;
     end;
-    if result then begin
+    if result and not UseInstallSupport then begin
       AFileToStart:=SelectTemplateForZipImportForm.FileToStart;
       ASetupFileToStart:=SelectTemplateForZipImportForm.SetupFileToStart;
       ATemplateNr:=SelectTemplateForZipImportForm.TemplateNr;

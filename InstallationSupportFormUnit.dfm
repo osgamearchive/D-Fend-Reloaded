@@ -183,10 +183,9 @@ object InstallationSupportForm: TInstallationSupportForm
     Height = 21
     Style = csDropDownList
     Anchors = [akLeft, akTop, akRight]
-    ItemHeight = 13
+    ItemHeight = 0
     TabOrder = 0
     OnChange = InstallTypeComboBoxChange
-    ExplicitWidth = 303
   end
   object ListBox: TListBox
     Left = 8
@@ -199,7 +198,6 @@ object InstallationSupportForm: TInstallationSupportForm
     OnClick = ListBoxClick
     OnDragDrop = ListBoxDragDrop
     OnKeyDown = ListBoxKeyDown
-    ExplicitWidth = 273
   end
   object AlwaysMountISOCheckBox: TCheckBox
     Left = 8
@@ -209,7 +207,6 @@ object InstallationSupportForm: TInstallationSupportForm
     Anchors = [akLeft, akRight, akBottom]
     Caption = 'Make iso image available when running the game.'
     TabOrder = 2
-    ExplicitWidth = 303
   end
   object OpenDialog: TOpenDialog
     Left = 16

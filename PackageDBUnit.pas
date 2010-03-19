@@ -164,7 +164,7 @@ Type TPackageListFile=class
     Procedure Clear;
     Function LoadFromFile(const AFileName : String; const AOrigFileName : String ='') : Boolean;
     Procedure SaveToFile(const ParentForm : TForm);
-    Procedure UpdateFromServer(const URL, TempFile : String; const UpdateAnyway : Boolean);
+    Function UpdateFromServer(const URL, TempFile : String; const UpdateAnyway : Boolean) : Boolean;
     Procedure Add(const AURL : String; const AActive : Boolean);
     Procedure Delete(const Nr : Integer);
     property FileName : String read FFileName;
@@ -183,7 +183,7 @@ Type TPackageDB=class
     FDBDir : String;
     FOnDownload : TDownloadEvent;
     Function InitDBDir : Boolean;
-    Procedure InitPackageFiles(const MainFile, UserFile : TPackageListFile; const Update, UpdateAll, UpdateRemoteOnly: Boolean);
+    Function InitPackageFiles(const MainFile, UserFile : TPackageListFile; const Update, UpdateAll, UpdateRemoteOnly: Boolean) : Boolean;
     Function InitPackageFile(const URL : String; const Update, UpdateAll, UpdateRemoteOnly : Boolean) : TPackageList;
     Function GetCount: Integer;
     Function GetPackageList(I: Integer): TPackageList;
@@ -192,7 +192,7 @@ Type TPackageDB=class
     Constructor Create;
     Destructor Destroy; override;
     Procedure Clear;
-    Procedure LoadDB(const Update, UpdateAll  : Boolean);
+    Function LoadDB(const Update, UpdateAll  : Boolean) : Boolean;
     Procedure UpdateRemoteFiles;
     property Count : Integer read GetCount;
     property List[I : Integer] : TPackageList read GetPackageList; default;
@@ -669,7 +669,7 @@ begin
       N.Attributes['URL']:=FURL[I];
       If Integer(FActive[I])<>0 then N.Attributes['Active']:='Yes' else N.Attributes['Active']:='No';
     end;
-    SaveXMLDoc(Doc,['<!DOCTYPE DFRPackagesList SYSTEM "http:/'+'/dfendreloaded.sourceforge.net/Packages/DFRPackagesList.dtd">'],FFileName,False);
+    SaveXMLDoc(Doc,['<!DOCTYPE DFRPackagesList SYSTEM "'+DFRHomepage+'Packages/DFRPackagesList.dtd">'],FFileName,False);
   finally
     Doc.Free;
   end;
@@ -677,10 +677,11 @@ begin
   If FIsMasterList then SpecialSaveActiveState;
 end;
 
-Procedure TPackageListFile.UpdateFromServer(const URL, TempFile : String; const UpdateAnyway : Boolean);
+Function TPackageListFile.UpdateFromServer(const URL, TempFile : String; const UpdateAnyway : Boolean) : Boolean;
 Var TempMainFile : TPackageListFile;
 begin
-  if not DownloadFile(URL,TempFile) then exit;
+  result:=DownloadFile(URL,TempFile);
+  if not result then exit;
 
   TempMainFile:=TPackageListFile.Create(FIsMasterList);
   try
@@ -832,7 +833,7 @@ begin
   result:=False;
 end;
 
-procedure TPackageDB.InitPackageFiles(const MainFile, UserFile: TPackageListFile; const Update, UpdateAll, UpdateRemoteOnly: Boolean);
+Function TPackageDB.InitPackageFiles(const MainFile, UserFile: TPackageListFile; const Update, UpdateAll, UpdateRemoteOnly: Boolean) : Boolean;
 Var I,C1,C2 : Integer;
     P : TPackageList;
     Rec : TSearchRec;
@@ -857,10 +858,12 @@ begin
       If Assigned(FOnDownload) then FOnDownload(self,C1+I,C1+C2,dsProgress,ContinueDownload);
       P:=InitPackageFile(UserFile[I],Update,UpdateAll,UpdateRemoteOnly);
       If P<>nil then FPackageList.Add(P);
+      If not ContinueDownload then break;
     end;
   finally
     If Assigned(FOnDownload) then FOnDownload(self,MainFile.Count+UserFile.Count,MainFile.Count+UserFile.Count,dsDone,ContinueDownload);
   end;
+  result:=ContinueDownload;
 
   {Delete unused files}
   I:=FindFirst(DBDir+'*.xml',faAnyFile,Rec);
@@ -876,20 +879,23 @@ begin
   end;
 end;
 
-procedure TPackageDB.LoadDB(const Update, UpdateAll : Boolean);
+Function TPackageDB.LoadDB(const Update, UpdateAll : Boolean) : Boolean;
 Var MainFile, UserFile : TPackageListFile;
 begin
   Clear;
+  result:=True;
   If not InitDBDir then exit;
 
   MainFile:=TPackageListFile.Create(True);
   try
     MainFile.LoadFromFile(DBDir+PackageDBMainFile);
-    If Update then MainFile.UpdateFromServer(Format(PackageDBMainFileURL,[GetNormalFileVersionAsString]),DBDir+PackageDBTempFile,UpdateAll);
+    If Update
+      then result:=MainFile.UpdateFromServer(Format(PackageDBMainFileURL,[GetNormalFileVersionAsString]),DBDir+PackageDBTempFile,UpdateAll)
+      else result:=True;
     UserFile:=TPackageListFile.Create(False);
     try
       UserFile.LoadFromFile(DBDir+PackageDBUserFile);
-      InitPackageFiles(MainFile,UserFile,Update,UpdateAll,False);
+      result:=InitPackageFiles(MainFile,UserFile,result and Update,result and UpdateAll,False);
     finally
       UserFile.Free;
     end;

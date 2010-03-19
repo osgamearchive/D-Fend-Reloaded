@@ -133,7 +133,7 @@ begin
         end;
     3 : begin
           BuildDefaultProfile;
-          ReBuildTemplates;
+          ReBuildTemplates(False);
         end;
     4 : CreateCheckSumsForAllGames(GameDB);
     5 : ClearPackageCache;

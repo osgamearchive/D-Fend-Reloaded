@@ -264,7 +264,8 @@ begin
   end;
 end;
 
-const Priority : Array[0..3] of String = ('lower','normal','higher','highest');
+const PriorityForeground : Array[0..3] of String = ('lower','normal','higher','highest');
+      PriorityBackground : Array[0..4] of String = ('pause','lower','normal','higher','highest');
 
 { TEditMultipleProfilesForm }
 
@@ -636,7 +637,7 @@ begin
   AddCaption(LanguageSetup.ProfileEditorGeneralSheet+' - '+LanguageSetup.ProfileEditorKeyboardSheet);
   AddYesNoSetting(6001,LanguageSetup.GameUseScanCodes);
   AddSetting(6002,LanguageSetup.GameKeyboardLayout,ValueToList(GameDB.ConfOpt.KeyboardLayout,';,'),False,-1,True);
-  AddSetting(6003,LanguageSetup.GameKeyboardCodepage,ValueToList(GameDB.ConfOpt.Codepage,';,'),False,ValueWidth,True);
+  AddSetting(6003,LanguageSetup.GameKeyboardCodepage,ValueToList(GameDB.ConfOpt.Codepage,';,'),False,-1,True);
   St:=TStringList.Create;
   try
     St.Add(LanguageSetup.DoNotChange);
@@ -907,11 +908,13 @@ begin
       {DOSBox}
       If ValueActive(2001) then begin
         St:=ValueToList(G.Priority,',');
-        try While St.Count<2 do St.Add(''); St[0]:=Priority[Max(0,Min(3,GetComboIndex))]; G.Priority:=ListToValue(St,','); finally St.Free; end;
+        try While St.Count<2 do St.Add(''); St[0]:=PriorityForeground[Max(0,Min(3,GetComboIndex))]; G.Priority:=ListToValue(St,','); finally St.Free; end;
       end;
       If ValueActive(2002) then begin
         St:=ValueToList(G.Priority,',');
-        try While St.Count<2 do St.Add(''); St[1]:=Priority[Max(0,Min(3,GetComboIndex))]; G.Priority:=ListToValue(St,','); finally St.Free; end;
+        try While St.Count<2 do St.Add(''); St[1]:=PriorityBackground[Max(0,Min(4,GetComboIndex))];
+         G.Priority:=ListToValue(St,',');
+         finally St.Free; end;
       end;
       If ValueActive(2003) then G.CloseDosBoxAfterGameExit:=GetYesNo;
       If ValueActive(2004) then G.CustomDOSBoxDir:=GetComboText;

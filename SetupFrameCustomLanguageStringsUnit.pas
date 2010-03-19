@@ -23,7 +23,7 @@ type
   private
     { Private-Deklarationen }
     LastType : Integer;
-    GenreEnglish, GenreCustom, LanguageEnglish, LanguageCustom : TStringList;
+    GenreEnglish, GenreCustom, LanguageEnglish, LanguageCustom, LicenseEnglish, LicenseCustom : TStringList;
     GameDB : TGameDB;
   public
     { Public-Deklarationen }
@@ -54,6 +54,8 @@ begin
   GenreCustom.Free;
   LanguageEnglish.Free;
   LanguageCustom.Free;
+  LicenseEnglish.Free;
+  LicenseCustom.Free;
   inherited Destroy;
 end;
 
@@ -71,11 +73,14 @@ begin
   TypeComboBox.Items.Clear;
   TypeComboBox.Items.Add('');
   TypeComboBox.Items.Add('');
+  If PrgSetup.ActivateIncompleteFeatures then TypeComboBox.Items.Add('');
 
   GenreEnglish:=TStringList.Create;
   GenreCustom:=TStringList.Create;
   LanguageEnglish:=TStringList.Create;
   LanguageCustom:=TStringList.Create;
+  LicenseEnglish:=TStringList.Create;
+  LicenseCustom:=TStringList.Create;
 
   GameDB:=InitData.GameDB;
 
@@ -99,6 +104,10 @@ begin
   LanguageSetupEnglishLanguages.AddStrings(LanguageEnglish);
   LanguageSetupCustomLanguages.Clear;
   LanguageSetupCustomLanguages.AddStrings(LanguageCustom);
+  LanguageSetupEnglishLicenses.Clear;
+  LanguageSetupEnglishLicenses.AddStrings(LicenseEnglish);
+  LanguageSetupCustomLicenses.Clear;
+  LanguageSetupCustomLicenses.AddStrings(LicenseCustom);
 
   SaveGameListTranslations;
 end;
@@ -109,6 +118,7 @@ begin
   I:=TypeComboBox.ItemIndex;
   TypeComboBox.Items[0]:=LanguageSetup.GameGenre;
   TypeComboBox.Items[1]:=LanguageSetup.GameLanguage;
+  If PrgSetup.ActivateIncompleteFeatures then TypeComboBox.Items[2]:=LanguageSetup.GameLicense;
   TypeComboBox.ItemIndex:=I;
 
   AddButton.Hint:=LanguageSetup.AddNewEmptyLine;
@@ -125,6 +135,8 @@ begin
   GenreCustom.Clear;
   LanguageEnglish.Clear;
   LanguageCustom.Clear;
+  LicenseEnglish.Clear;
+  LicenseCustom.Clear;
 
   GenreEnglish.AddStrings(LanguageSetupEnglishGenres);
   GenreCustom.AddStrings(LanguageSetupCustomGenres);
@@ -134,6 +146,10 @@ begin
   LanguageCustom.AddStrings(LanguageSetupCustomLanguages);
   While LanguageEnglish.Count<LanguageCustom.Count do LanguageEnglish.Add('');
   While LanguageEnglish.Count>LanguageCustom.Count do LanguageCustom.Add('');
+  LicenseEnglish.AddStrings(LanguageSetupEnglishLicenses);
+  LicenseCustom.AddStrings(LanguageSetupCustomLicenses);
+  While LicenseEnglish.Count<LicenseCustom.Count do LicenseEnglish.Add('');
+  While LicenseEnglish.Count>LicenseCustom.Count do LicenseCustom.Add('');
 
   LastType:=-1;
   TypeComboBoxChange(self);
@@ -157,15 +173,17 @@ begin
 end;
 
 procedure TSetupFrameCustomLanguageStrings.RestoreDefaults;
-Var DefaultGenreEnglish, DefaultGenreCustom, DefaultLanguageEnglish, DefaultLanguageCustom : TStringList;
+Var DefaultGenreEnglish, DefaultGenreCustom, DefaultLanguageEnglish, DefaultLanguageCustom, DefaultLicenseEnglish, DefaultLicenseCustom : TStringList;
 begin
-  GetDefaultGameListTranslations(DefaultGenreEnglish,DefaultGenreCustom,DefaultLanguageEnglish,DefaultLanguageCustom);
+  GetDefaultGameListTranslations(DefaultGenreEnglish,DefaultGenreCustom,DefaultLanguageEnglish,DefaultLanguageCustom,DefaultLicenseEnglish,DefaultLicenseCustom);
 
   try
     GenreEnglish.Clear;
     GenreCustom.Clear;
     LanguageEnglish.Clear;
     LanguageCustom.Clear;
+    LicenseEnglish.Clear;
+    LicenseCustom.Clear;
 
     GenreEnglish.AddStrings(DefaultGenreEnglish);
     GenreCustom.AddStrings(DefaultGenreCustom);
@@ -175,6 +193,10 @@ begin
     LanguageCustom.AddStrings(DefaultLanguageCustom);
     While LanguageEnglish.Count<LanguageCustom.Count do LanguageEnglish.Add('');
     While LanguageEnglish.Count>LanguageCustom.Count do LanguageCustom.Add('');
+    LicenseEnglish.AddStrings(DefaultLicenseEnglish);
+    LicenseCustom.AddStrings(DefaultLicenseCustom);
+    While LicenseEnglish.Count<LicenseCustom.Count do LicenseEnglish.Add('');
+    While LicenseEnglish.Count>LicenseCustom.Count do LicenseCustom.Add('');
 
     LastType:=-1;
     TypeComboBoxChange(self);
@@ -207,7 +229,12 @@ begin
   Case (Sender as TComponent).Tag of
     0 : begin
           {Add button}
-          If TypeComboBox.ItemIndex=0 then St:=GameDB.GetGenreList else St:=GameDB.GetLanguageList;
+          Case TypeComboBox.ItemIndex of
+            0 : St:=GameDB.GetGenreList;
+            1 : St:=GameDB.GetLanguageList;
+            2 : St:=GameDB.GetLicenseList;
+            else St:=TStringList.Create;
+          End;
           try
             I:=0;
             While I<St.Count do begin
@@ -299,6 +326,11 @@ begin
           LanguageCustom.Clear;
           For I:=1 to Tab.RowCount-1 do begin LanguageEnglish.Add(Tab.Cells[0,I]); LanguageCustom.Add(Tab.Cells[1,I]); end;
         end;
+    2 : begin
+          LicenseEnglish.Clear;
+          LicenseCustom.Clear;
+          For I:=1 to Tab.RowCount-1 do begin LicenseEnglish.Add(Tab.Cells[0,I]); LicenseCustom.Add(Tab.Cells[1,I]); end;
+        end;
   end;
 
   LastType:=TypeComboBox.ItemIndex;
@@ -312,15 +344,24 @@ begin
   end;
 
   Tab.Options:=Tab.Options+[goEditing];
-  If LastType=0 then begin
-    If GenreEnglish.Count=0 then exit;
-    Tab.RowCount:=1+GenreEnglish.Count;
-    For I:=0 to GenreEnglish.Count-1 do begin Tab.Cells[0,1+I]:=GenreEnglish[I]; Tab.Cells[1,1+I]:=GenreCustom[I]; end;
-  end else begin
-    If LanguageEnglish.Count=0 then exit;
-    Tab.RowCount:=1+LanguageEnglish.Count;
-    For I:=0 to LanguageEnglish.Count-1 do begin Tab.Cells[0,1+I]:=LanguageEnglish[I]; Tab.Cells[1,1+I]:=LanguageCustom[I]; end;
+  Case LastType of
+    0 : begin
+          If GenreEnglish.Count=0 then exit;
+          Tab.RowCount:=1+GenreEnglish.Count;
+          For I:=0 to GenreEnglish.Count-1 do begin Tab.Cells[0,1+I]:=GenreEnglish[I]; Tab.Cells[1,1+I]:=GenreCustom[I]; end;
+        end;
+    1 : begin
+          If LanguageEnglish.Count=0 then exit;
+          Tab.RowCount:=1+LanguageEnglish.Count;
+          For I:=0 to LanguageEnglish.Count-1 do begin Tab.Cells[0,1+I]:=LanguageEnglish[I]; Tab.Cells[1,1+I]:=LanguageCustom[I]; end;
+        end;
+    2 : begin
+          If LicenseEnglish.Count=0 then exit;
+          Tab.RowCount:=1+LicenseEnglish.Count;
+          For I:=0 to LicenseEnglish.Count-1 do begin Tab.Cells[0,1+I]:=LicenseEnglish[I]; Tab.Cells[1,1+I]:=LicenseCustom[I]; end;
+        end;
   end;
+
   TabClick(Sender);
 end;
 

@@ -28,6 +28,7 @@ Type TAddressSearcher=class
     Procedure SearchAddressIndirect(const ASavedGameFile : String; const AValueChangeType : TValueChangeType);
     Function NoResults : Boolean;
     Function GetResult(var AAddress, ASize : Integer) : TResultStatus;
+    Function GetResultNr(const ANr : Integer; var AAddress, ASize : Integer) : Boolean;
     Function GetList : TStringList;
     property Name : String read FName write FName;
     property LastSavedGameFileName : String read FLastSavedGameFileName write FLastSavedGameFileName;
@@ -413,6 +414,15 @@ begin
   result:=rsFound;
   AAddress:=Integer(FAddressList[MaxNr]);
   ASize:=MaxBytes;
+end;
+
+Function TAddressSearcher.GetResultNr(const ANr : Integer; var AAddress, ASize : Integer) : Boolean;
+begin
+  result:=False;
+  if (not Assigned(FAddressList)) or (FAddressList.Count=0) or (ANr<0) or (ANr>=FAddressList.Count) then exit;
+  ASize:=Integer(FAddressSizeList[ANr]);
+  AAddress:=Integer(FAddressList[ANr]);
+  result:=True;
 end;
 
 function TAddressSearcher.GetList: TStringList;

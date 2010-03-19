@@ -1185,6 +1185,7 @@ begin
   Ext:=Trim(ExtUpperCase(ExtractFileExt(FileName)));
 
   result:=nil;
+  If not FileExists(FileName) then exit;
 
   try
     If Ext='.GIF' then begin

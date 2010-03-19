@@ -530,6 +530,7 @@ end;
 
 Function ShowCheatDBEditDialog(const AOwner : TComponent) : Boolean;
 begin
+  CheatsDBUpdateCheckIfSetup(Application.MainForm);
   CheatDBEditForm:=TCheatDBEditForm.Create(AOwner);
   try
     result:=(CheatDBEditForm.ShowModal=mrOK)

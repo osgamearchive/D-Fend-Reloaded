@@ -31,7 +31,7 @@ uses Windows, SysUtils, ShellAPI, Forms, Dialogs, ShlObj, Math,
      ZipManagerUnit, ScreensaverControlUnit, FullscreenInfoFormUnit,
      DOSBoxCountUnit, DOSBoxShortNameUnit, RunPrgManagerUnit,
      SelectCDDriveToMountFormUnit, SelectCDDriveToMountByDataFormUnit,
-     FileNameConvertor;
+     FileNameConvertor, DOSBoxTempUnit;
 
 var SpeedTestSt : TStringList = nil;
     LastSpeedTestStep : String = '';
@@ -584,8 +584,10 @@ begin
 
     SpeedTestInfo('Windows file check');
     If IsWindowsExe(MakeAbsPath(ProgramFile,PrgSetup.BaseDir)) and WarnIfNotReachable and WarnIfWindowsExe then begin
-      Application.Restore;
-      MessageDlg(Format(LanguageSetup.MessageWindowsExeExecuteWarning,[MakeAbsPath(ProgramFile,PrgSetup.BaseDir)]),mtError,[mbOK],0);
+      If not Game.IgnoreWindowsFileWarnings then begin
+        Application.Restore;
+        MessageDlg(Format(LanguageSetup.MessageWindowsExeExecuteWarning,[MakeAbsPath(ProgramFile,PrgSetup.BaseDir)]),mtError,[mbOK],0);
+      end;
     end;
 
     T:=MakePathShort(Trim(ExtractFilePath(MakeAbsPath(ProgramFile,PrgSetup.BaseDir))));
@@ -799,7 +801,7 @@ end;
 Function BuildAutoexec(const Game : TGame; const RunSetup : Boolean; const St : TStringList; const WarnIfNotReachable : Boolean; const RunExtraFile : Integer; const WarnIfWindowsExe, SelectCD : Boolean) : Boolean;
   Procedure SetVolume(const Channel : String; const Left,Right : Integer);
   begin If (Left<>100) or (Right<>100) then St.Add('mixer '+Channel+' '+IntToStr(Left)+':'+IntToStr(Right)+' /NOSHOW'); end;
-Var S,T,NumCommands,MouseCommands,UsePath,Mount,UnMount : String;
+Var S,T,U,NumCommands,MouseCommands,UsePath,Mount,UnMount : String;
     I : Integer;
     FreeDriveLetters : String;
     St2 : TStringList;
@@ -846,8 +848,22 @@ begin
     S:=Trim(ExtUpperCase(PrgSetup.DOSBoxSettings[DOSBoxNr].Codepage));
     If (S='') or (S='DEFAULT') then S:=LanguageSetup.GameKeyboardCodepageDefault;
   end;
+  If Pos('(',S)>0 then begin
+    S:=Copy(S,1,Pos('(',S)-1);
+  end;
 
   If ExtUpperCase(T)='NONE' then T:='none'; {DOSBox keyb accepts GR and gr but not NONE}
+
+  If ExtUpperCase(T)='AUTO' then begin
+    DOSBoxNr:=Max(0,GetDOSBoxNr(Game));
+    T:=Trim(ExtUpperCase(PrgSetup.DOSBoxSettings[DOSBoxNr].KeyboardLayout));
+    If (T='') or (T='DEFAULT') then T:=LanguageSetup.GameKeyboardLayoutDefault;
+    If Pos('(',T)>0 then begin
+      U:=Copy(T,Pos('(',T)+1,MaxInt);
+      If Pos(')',U)>0 then begin U:=Trim(Copy(U,1,Pos(')',U)-1)); If U<>'' then T:=U; end;
+    end;
+  end;
+
   St.Add('keyb '+T+' '+S{+' > nul'}); {no "> nul" to display possible error message if layout and codepage do not match}
 
   { Reported DOS version }
@@ -859,18 +875,6 @@ begin
     If Pos('.',S)<>0 then begin T:=Trim(Copy(S,Pos('.',S)+1,MaxInt)); S:=Trim(Copy(S,1,Pos('.',S)-1)); end else begin T:=''; end;
     St.Add('ver set '+S+' '+T);
   end;
-
-  { Mixer }
-
-  SpeedTestInfo('Adding mixer settings to [autoexec] section of DOSBox conf file');
-
-  SetVolume('MASTER',Game.MixerVolumeMasterLeft,Game.MixerVolumeMasterRight);
-  SetVolume('DISNEY',Game.MixerVolumeDisneyLeft,Game.MixerVolumeDisneyRight);
-  SetVolume('SPKR',Game.MixerVolumeSpeakerLeft,Game.MixerVolumeSpeakerRight);
-  SetVolume('GUS',Game.MixerVolumeGUSLeft,Game.MixerVolumeGUSRight);
-  SetVolume('SB',Game.MixerVolumeSBLeft,Game.MixerVolumeSBRight);
-  SetVolume('FM',Game.MixerVolumeFMLeft,Game.MixerVolumeFMRight);
-  SetVolume('CDAUDIO',Game.MixerVolumeCDLeft,Game.MixerVolumeCDRight);
 
   { Text mode lines }
 
@@ -906,6 +910,18 @@ begin
     end;
     If Game.AutoMountCDs then AutoMountCDs(St,Game,FreeDriveLetters,SpecialMountedCDDrives);
   end;
+
+  { Mixer }
+
+  SpeedTestInfo('Adding mixer settings to [autoexec] section of DOSBox conf file');
+
+  SetVolume('MASTER',Game.MixerVolumeMasterLeft,Game.MixerVolumeMasterRight);
+  SetVolume('DISNEY',Game.MixerVolumeDisneyLeft,Game.MixerVolumeDisneyRight);
+  SetVolume('SPKR',Game.MixerVolumeSpeakerLeft,Game.MixerVolumeSpeakerRight);
+  SetVolume('GUS',Game.MixerVolumeGUSLeft,Game.MixerVolumeGUSRight);
+  SetVolume('SB',Game.MixerVolumeSBLeft,Game.MixerVolumeSBRight);
+  SetVolume('FM',Game.MixerVolumeFMLeft,Game.MixerVolumeFMRight);
+  SetVolume('CDAUDIO',Game.MixerVolumeCDLeft,Game.MixerVolumeCDRight);
 
   { Setting num, caps and scroll lock and CuteMouse }
 
@@ -1436,9 +1452,11 @@ begin
         MessageDlg(Format(LanguageSetup.MessageCouldNotSaveFile,[TempDir+DosBoxConfFileName]),mtError,[mbOK],0);
         exit;
       end;
-      SpeedTestInfo('Adding historiy');
-      SpeedTestInfoOnly('Game name: '+Game.CacheName);
-      AddToHistory(Game.CacheName);
+      If Game.CacheName<>TempDOSBoxName then begin
+        SpeedTestInfo('Adding historiy');
+        SpeedTestInfoOnly('Game name: '+Game.CacheName);
+        AddToHistory(Game.CacheName);
+      end;
 
       If DOSBoxNr>=0 then T:=MakeAbsPath(PrgSetup.DOSBoxSettings[DOSBoxNr].DosBoxDir,PrgSetup.BaseDir) else T:=Trim(Game.CustomDOSBoxDir);
 

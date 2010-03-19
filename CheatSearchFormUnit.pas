@@ -37,6 +37,10 @@ type
     UseDialogCheckBox: TCheckBox;
     UseDialogEdit: TLabeledEdit;
     SearchNameDeleteButton: TBitBtn;
+    SelectActionRadioGroup: TRadioGroup;
+    SelectActionLabel: TLabel;
+    SelectActionListBox: TListBox;
+    LastSavedGameHintLabel: TLabel;
     procedure FormShow(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -48,13 +52,19 @@ type
     procedure FileNameButtonClick(Sender: TObject);
     procedure UseDialogEditChange(Sender: TObject);
     procedure SearchNameDeleteButtonClick(Sender: TObject);
+    procedure BytesComboBoxChange(Sender: TObject);
   private
     { Private-Deklarationen }
     SearchFiles, SearchNames : TStringList;
     AddressSearcher : TAddressSearcher;
     ResultAddress,ResultSize : Integer;
+    DeleteSearch : Boolean;
     CheatDB : TCheatDB;
     Procedure InitPage(const Nr : Integer);
+    Procedure InitGameListAndCheatDB;
+    Function ValueCheck : Boolean;
+    Procedure RunSearch;
+    Procedure StoreActionToDB(const DeleteSearch : Boolean);
   public
     { Public-Deklarationen }
   end;
@@ -112,6 +122,14 @@ begin
   FileMaskEdit.EditLabel.Caption:=LanguageSetup.SearchAddressResultFileMask;
   UseDialogCheckBox.Caption:=LanguageSetup.SearchAddressResultUseDialog;
   UseDialogEdit.EditLabel.Caption:=LanguageSetup.SearchAddressResultUseDialogPrompt;
+  SelectActionLabel.Caption:=LanguageSetup.SearchAddressResultMessageMultipleAddresses;
+  SelectActionRadioGroup.Caption:=LanguageSetup.SearchAddressResultMessageMultipleAddressesActions;
+  While SelectActionRadioGroup.Items.Count>3 do SelectActionRadioGroup.Items.Delete(0);
+  While SelectActionRadioGroup.Items.Count<3 do SelectActionRadioGroup.Items.Add('');
+  SelectActionRadioGroup.Items[0]:=LanguageSetup.SearchAddressResultMessageMultipleAddressesAction1;
+  SelectActionRadioGroup.Items[1]:=LanguageSetup.SearchAddressResultMessageMultipleAddressesAction2;
+  SelectActionRadioGroup.Items[2]:=LanguageSetup.SearchAddressResultMessageMultipleAddressesAction3;
+  SelectActionRadioGroup.ItemIndex:=0;
   NextButton.Caption:=LanguageSetup.Next;
   CancelButton.Caption:=LanguageSetup.Cancel;
   HelpButton.Caption:=LanguageSetup.Help;
@@ -132,11 +150,26 @@ begin
   If Assigned(CheatDB) then CheatDB.Free;
 end;
 
-procedure TCheatSearchForm.InitPage(const Nr: Integer);
+Procedure TCheatSearchForm.InitGameListAndCheatDB;
 Var I : Integer;
 begin
+  CheatDB:=SmartLoadCheatsDB;
+  GameNameComboBox.Items.BeginUpdate;
+  try
+    GameNameComboBox.Items.Clear;
+    For I:=0 to CheatDB.Count-1 do GameNameComboBox.Items.AddObject(CheatDB[I].Name,CheatDB[I]);
+  finally
+    GameNameComboBox.Items.EndUpdate;
+  end;
+  GameNameComboBox.Text:=AddressSearcher.Name;
+end;
+
+procedure TCheatSearchForm.InitPage(const Nr: Integer);
+Var St : TStringList;
+begin
+  Notebook.PageIndex:=Nr;
   Case Nr of
-    0 : begin
+    0 : begin {New search / continue search}
           SearchNameComboBox.Items.Clear;
           SearchNameComboBox.Items.AddStrings(SearchNames);
           If SearchNames.Count>0 then begin
@@ -149,7 +182,7 @@ begin
             SearchStartRadioButton1.Checked:=True;
           end;
         end;
-    1 : begin
+    1 : begin {Select file and value}
           If SearchStartRadioButton2.Checked then begin
             AddressSearcher:=TAddressSearcher.Create;
             AddressSearcher.LoadFromFile(SearchFiles[SearchNameComboBox.ItemIndex]);
@@ -161,32 +194,37 @@ begin
           end;
           ValueTypeRadioButton1.Checked:=True;
         end;
-    2 : begin
-          CheatDB:=SmartLoadCheatsDB;
-          GameNameComboBox.Items.BeginUpdate;
-          try
-            GameNameComboBox.Items.Clear;
-            For I:=0 to CheatDB.Count-1 do GameNameComboBox.Items.AddObject(CheatDB[I].Name,CheatDB[I]);
-          finally
-            GameNameComboBox.Items.EndUpdate;
+    2 : begin {Store result to DB}
+          InitGameListAndCheatDB;
+          with BytesComboBox.Items do begin
+            Clear; Add('1');
+            If ResultSize>=2 then Add('2');
+            If ResultSize=4 then Add('4');
           end;
-          If GameNameComboBox.Items.Count>0 then GameNameComboBox.ItemIndex:=0;
-
-          AddressSearcher.GetResult(ResultAddress,ResultSize);
-          BytesComboBox.Items.Clear;
-          BytesComboBox.Items.Add('1');
-          If ResultSize>=2 then BytesComboBox.Items.Add('2');
-          If ResultSize=4 then BytesComboBox.Items.Add('4');
           BytesComboBox.ItemIndex:=BytesComboBox.Items.Count-1;
-
-          AddressEdit.Text:=IntToStr(ResultAddress)+'d'+IntToHex(ResultAddress,1)+'h';
+          AddressEdit.Text:=IntToStr(ResultAddress)+'d='+IntToHex(ResultAddress,1)+'h';
           AddressEdit.Color:=Color;
-
           Case ResultSize of
             1 : NewValueEdit.Text:='$FF';
             2 : NewValueEdit.Text:='$FFFF';
-            4 : NewValueEdit.Text:='$FFFFFFFF';
+            4 : NewValueEdit.Text:='$7EFFFFFF';
           End;
+          LastSavedGameHintLabel.Caption:=Format(LanguageSetup.SearchAddressResultFileMaskHint,[ExtractFileName(FileNameEdit.Text)]);
+        end;
+    3 : begin {Multiple addresses found}
+          St:=AddressSearcher.GetList;
+          try
+            SelectActionListBox.Items.BeginUpdate;
+            try
+              SelectActionListBox.Items.Clear;
+              SelectActionListBox.Items.AddStrings(St);
+            finally
+              SelectActionListBox.Items.EndUpdate;
+            end;
+            SelectActionListBox.ItemIndex:=0;
+          finally
+            St.Free;
+          end;
         end;
   end;
 end;
@@ -219,6 +257,17 @@ begin
   UseDialogCheckBox.Checked:=True;
 end;
 
+procedure TCheatSearchForm.BytesComboBoxChange(Sender: TObject);
+Var I,J : Integer;
+begin
+  I:=StrToInt(BytesComboBox.Text);
+  If not TryStrToInt(NewValueEdit.Text,J) then exit;
+  Case I of
+    1 : If J>$FF then NewValueEdit.Text:='$FF';
+    2 : If J>$FFFF then NewValueEdit.Text:='$FFFF';
+  end;
+end;
+
 procedure TCheatSearchForm.FileNameButtonClick(Sender: TObject);
 Var S : String;
 begin
@@ -228,137 +277,135 @@ begin
   FileNameEdit.Text:=OpenDialog.FileName;
 end;
 
-procedure TCheatSearchForm.NextButtonClick(Sender: TObject);
-Var Value,I,J : Integer;
-    R : TResultStatus;
-    SavedGameFileName : String;
+Function TCheatSearchForm.ValueCheck : Boolean;
+Var I : Integer;
+    S : String;
+begin
+  result:=False;
+  Case Notebook.PageIndex of
+    0 : begin {New search / continue search}
+          If SearchStartRadioButton1.Checked and (Trim(SearchNameEdit.Text)='') then begin MessageDlg(LanguageSetup.SearchAddressStartNewNameMessage,mtError,[mbOK],0); exit; end;
+        end;
+    1 : begin {Select file and value}
+          If ValueTypeRadioButton1.Checked and not TryStrToInt(ValueEdit.Text,I) then begin MessageDlg(LanguageSetup.SearchAddressDataKnownValueMessage,mtError,[mbOK],0); exit; end;
+          If Trim(FileNameEdit.Text)='' then begin MessageDlg(LanguageSetup.SearchAddressDataFileNameMessage,mtError,[mbOK],0); exit; end;
+          S:=MakeAbsPath(FileNameEdit.Text,PrgSetup.BaseDir);
+          If not FileExists(S) then begin MessageDlg(Format(LanguageSetup.MessageFileNotFound,[S]),mtError,[mbOK],0); exit; end;
+        end;
+    2 : begin {Store result to DB}
+          If Trim(GameNameComboBox.Text)='' then begin MessageDlg(LanguageSetup.SearchAddressResultGameNameMessage,mtError,[mbOK],0); exit; end;
+          If Trim(DescriptionEdit.Text)='' then begin MessageDlg(LanguageSetup.SearchAddressResultDescriptionMessage,mtError,[mbOK],0); exit; end;
+          If Trim(NewValueEdit.Text)='' then begin MessageDlg(LanguageSetup.SearchAddressResultNewValueMessage,mtError,[mbOK],0); exit; end;
+          If not ExtTryStrToInt(NewValueEdit.Text,I) then begin MessageDlg(LanguageSetup.SearchAddressResultNewValueMessageInvalid,mtError,[mbOK],0); exit; end;
+          If Trim(FileMaskEdit.Text)='' then begin MessageDlg(LanguageSetup.SearchAddressResultFileMaskMessage,mtError,[mbOK],0); exit; end;
+          If Trim(FileMaskEdit.Text)='*.*' then begin If MessageDlg(LanguageSetup.SearchAddressResultFileMaskMessageAllFiles,mtConfirmation,[mbYes,mbNo],0)<>mrYes then exit; end;
+        end;
+    3 : begin {Multiple addresses found}
+        end;
+  end;
+  result:=True;
+end;
+
+procedure TCheatSearchForm.RunSearch;
+Var SavedGameFileName : String;
     ValueChangeType : TValueChangeType;
-    GameRecord : TCheatGameRecord;
+begin
+  SavedGameFileName:=MakeAbsPath(FileNameEdit.Text,PrgSetup.BaseDir);
+
+  If not Assigned(AddressSearcher) then begin
+    AddressSearcher:=TAddressSearcher.Create;
+    AddressSearcher.Name:=SearchNameEdit.Text;
+  end;
+  If ValueTypeRadioButton1.Checked then begin
+    AddressSearcher.SearchAddress(SavedGameFileName,StrToInt(ValueEdit.Text));
+  end else begin
+    If ValueComboBox.Enabled then begin
+      If ValueComboBox.ItemIndex=0 then ValueChangeType:=vctUp else ValueChangeType:=vctDown;
+      AddressSearcher.SearchAddressIndirect(SavedGameFileName,ValueChangeType);
+    end else begin
+      AddressSearcher.LoadSavedGameFile(SavedGameFileName)
+    end;
+  end;
+end;
+
+procedure TCheatSearchForm.StoreActionToDB(const DeleteSearch : Boolean);
+Var GameRecord : TCheatGameRecord;
     CheatAction : TCheatAction;
     CheatActionStep : TCheatActionStep;
-    St : TStringList;
 begin
+  If GameNameComboBox.ItemIndex<0 then begin
+    GameRecord:=TCheatGameRecord.Create(nil);
+    CheatDB.Add(GameRecord);
+    GameRecord.Name:=GameNameComboBox.Text;
+  end else begin
+    GameRecord:=TCheatGameRecord(GameNameComboBox.Items.Objects[GameNameComboBox.ItemIndex]);
+  end;
+
+  CheatAction:=TCheatAction.Create(nil);
+  GameRecord.Add(CheatAction);
+  CheatAction.Name:=DescriptionEdit.Text;
+  CheatAction.FileMask:=FileMaskEdit.Text;
+
+  If UseDialogCheckBox.Checked then begin
+    CheatActionStep:=TCheatActionStepChangeAddressWithDialog.Create(nil);
+    with TCheatActionStepChangeAddressWithDialog(CheatActionStep) do begin
+      Addresses:=IntToStr(ResultAddress);
+      Bytes:=StrToInt(BytesComboBox.Text);
+      DefaultValue:=Trim(NewValueEdit.Text);
+      DialogPrompt:=UseDialogEdit.Text;
+    end;
+  end else begin
+    CheatActionStep:=TCheatActionStepChangeAddress.Create(nil);
+    with TCheatActionStepChangeAddress(CheatActionStep) do begin
+      Addresses:=IntToStr(ResultAddress);
+      Bytes:=ResultSize;
+      NewValue:=Trim(NewValueEdit.Text);
+    end;
+  end;
+  CheatAction.Add(CheatActionStep);
+
+  SmartSaveCheatsDB(CheatDB,self);
+  If DeleteSearch then ExtDeleteFile(AddressSearcher.SearchDataFileName,ftTemp);
+
+  MessageDlg(LanguageSetup.SearchAddressResultSuccess,mtInformation,[mbOK],0);
+end;
+
+procedure TCheatSearchForm.NextButtonClick(Sender: TObject);
+Var R : TResultStatus;
+begin
+  if not ValueCheck then exit;
+
   Case Notebook.PageIndex of
-    0 : begin
-          If SearchStartRadioButton1.Checked and (Trim(SearchNameEdit.Text)='') then begin
-            MessageDlg(LanguageSetup.SearchAddressStartNewNameMessage,mtError,[mbOK],0);
-            exit;
-          end;
-          Notebook.PageIndex:=1;
+    0 : begin {New search / continue search}
           InitPage(1);
         end;
-    1 : begin
-          If ValueTypeRadioButton1.Checked and not TryStrToInt(ValueEdit.Text,Value) then begin
-            MessageDlg(LanguageSetup.SearchAddressDataKnownValueMessage,mtError,[mbOK],0);
-            exit;
-          end;
-          If Trim(FileNameEdit.Text)='' then begin
-            MessageDlg(LanguageSetup.SearchAddressDataFileNameMessage,mtError,[mbOK],0);
-            exit;
-          end;
-          SavedGameFileName:=MakeAbsPath(FileNameEdit.Text,PrgSetup.BaseDir);
-          If not FileExists(SavedGameFileName) then begin
-            MessageDlg(Format(LanguageSetup.MessageFileNotFound,[SavedGameFileName]),mtError,[mbOK],0);
-            exit;
-          end;
-
-          If not Assigned(AddressSearcher) then begin
-            AddressSearcher:=TAddressSearcher.Create;
-            AddressSearcher.Name:=SearchNameEdit.Text;
-          end;
-          If ValueTypeRadioButton1.Checked then begin
-            AddressSearcher.SearchAddress(SavedGameFileName,StrToInt(ValueEdit.Text));
-          end else begin
-            If ValueComboBox.Enabled then begin
-              If ValueComboBox.ItemIndex=0 then ValueChangeType:=vctUp else ValueChangeType:=vctDown;
-              AddressSearcher.SearchAddressIndirect(SavedGameFileName,ValueChangeType);
-            end else begin
-              AddressSearcher.LoadSavedGameFile(SavedGameFileName)
-            end;
-          end;
-
-          R:=AddressSearcher.GetResult(I,J);
+    1 : begin {Select file and value}
+          RunSearch;
+          R:=AddressSearcher.GetResult(ResultAddress,ResultSize);
           If (R=rsNoResultsYet) or (R=rsMultipleAddresses) then AddressSearcher.SaveToFile('');
-
-          If R=rsNoResultsYet then begin
-            MessageDlg(LanguageSetup.SearchAddressResultMessageStart,mtInformation,[mbOK],0);
-            Close; exit;
-          end;
-          If R=rsMultipleAddresses then begin
-            If MessageDlg(LanguageSetup.SearchAddressResultMessageMultipleAddresses,mtInformation,[mbYes,mbNo],0)=mrYes then begin
-              St:=AddressSearcher.GetList;
-              try
-                ShowInfoTextDialog(self,LanguageSetup.SearchAddressResultMessageMultipleAddressesSearchResults,St,False);
-              finally
-                St.Free;
-              end;
-            end;
-            Close; exit;
-          end;
-          If R=rsNoAddress then begin
-            MessageDlg(LanguageSetup.SearchAddressResultMessageNotFound,mtInformation,[mbOK],0);
-            ExtDeleteFile(AddressSearcher.SearchDataFileName,ftTemp);
-            Close; exit;
-          end;
-          InitPage(2);
+          Case R of
+            rsNoResultsYet      : MessageDlg(LanguageSetup.SearchAddressResultMessageStart,mtInformation,[mbOK],0);
+            rsMultipleAddresses : InitPage(3);
+            rsNoAddress         : begin
+                                    MessageDlg(LanguageSetup.SearchAddressResultMessageNotFound,mtInformation,[mbOK],0);
+                                    ExtDeleteFile(AddressSearcher.SearchDataFileName,ftTemp);
+                                  end;
+            rsFound             : begin DeleteSearch:=True; InitPage(2); end;
+          End;
+          if (R=rsNoResultsYet) or (R=rsNoAddress) then Close;
         end;
-    2 : begin
-          If Trim(GameNameComboBox.Text)='' then begin
-            MessageDlg(LanguageSetup.SearchAddressResultGameNameMessage,mtError,[mbOK],0);
-            exit;
-          end;
-          If Trim(DescriptionEdit.Text)='' then begin
-            MessageDlg(LanguageSetup.SearchAddressResultDescriptionMessage,mtError,[mbOK],0);
-            exit;
-          end;
-          If Trim(NewValueEdit.Text)='' then begin
-            MessageDlg(LanguageSetup.SearchAddressResultNewValueMessage,mtError,[mbOK],0);
-            exit;
-          end;
-          If not ExtTryStrToInt(NewValueEdit.Text,I) then begin
-            MessageDlg(LanguageSetup.SearchAddressResultNewValueMessageInvalid,mtError,[mbOK],0);
-            exit;
-          end;
-          If Trim(FileMaskEdit.Text)='' then begin
-            MessageDlg(LanguageSetup.SearchAddressResultFileMaskMessage,mtError,[mbOK],0);
-            exit;
-          end;
-          If Trim(FileMaskEdit.Text)='*.*' then begin
-            If MessageDlg(LanguageSetup.SearchAddressResultFileMaskMessageAllFiles,mtConfirmation,[mbYes,mbNo],0)<>mrYes then exit;
-          end;
-
-          If GameNameComboBox.ItemIndex<0 then begin
-            GameRecord:=TCheatGameRecord.Create(nil);
-            CheatDB.Add(GameRecord);
-            GameRecord.Name:=GameNameComboBox.Text;
-          end else begin
-            GameRecord:=TCheatGameRecord(GameNameComboBox.Items.Objects[GameNameComboBox.ItemIndex]);
-          end;
-
-          CheatAction:=TCheatAction.Create(nil);
-          GameRecord.Add(CheatAction);
-          CheatAction.Name:=DescriptionEdit.Text;
-          CheatAction.FileMask:=FileNameEdit.Text;
-
-          If UseDialogCheckBox.Checked then begin
-            CheatActionStep:=TCheatActionStepChangeAddressWithDialog.Create(nil);
-            TCheatActionStepChangeAddressWithDialog(CheatActionStep).Addresses:=IntToStr(ResultAddress);
-            TCheatActionStepChangeAddressWithDialog(CheatActionStep).Bytes:=ResultSize;
-            TCheatActionStepChangeAddressWithDialog(CheatActionStep).DefaultValue:=Trim(NewValueEdit.Text);
-            TCheatActionStepChangeAddressWithDialog(CheatActionStep).DialogPrompt:=UseDialogEdit.Text;
-          end else begin
-            CheatActionStep:=TCheatActionStepChangeAddress.Create(nil);
-            TCheatActionStepChangeAddress(CheatActionStep).Addresses:=IntToStr(ResultAddress);
-            TCheatActionStepChangeAddress(CheatActionStep).Bytes:=ResultSize;
-            TCheatActionStepChangeAddress(CheatActionStep).NewValue:=Trim(NewValueEdit.Text);
-          end;
-          CheatAction.Add(CheatActionStep);
-
-          SmartSaveCheatsDB(CheatDB,self);
-          ExtDeleteFile(AddressSearcher.SearchDataFileName,ftTemp);
-
-          MessageDlg(LanguageSetup.SearchAddressResultSuccess,mtInformation,[mbOK],0);
+    2 : begin {Store result to DB}
+          StoreActionToDB(DeleteSearch);
           Close;
+        end;
+    3 : begin {Multiple addresses found}
+          Case SelectActionRadioGroup.ItemIndex of
+            0 : begin Close; exit; {Search results already stored in NextButtonClick for page 1} end;
+            1 : DeleteSearch:=True;
+            2 : DeleteSearch:=False;
+          End;
+          AddressSearcher.GetResultNr(SelectActionListBox.ItemIndex,ResultAddress,ResultSize);
+          InitPage(2);
         end;
   end;
 end;
@@ -377,6 +424,7 @@ end;
 
 Procedure ShowCheatSearchDialog(const AOwner : TComponent);
 begin
+  CheatsDBUpdateCheckIfSetup(Application.MainForm);
   CheatSearchForm:=TCheatSearchForm.Create(AOwner);
   try
     CheatSearchForm.ShowModal;

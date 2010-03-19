@@ -1,7 +1,15 @@
 <?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
 <!DOCTYPE DFRPackagesFile SYSTEM "http://dfendreloaded.sourceforge.net/Packages/DFRPackagesFile.dtd">
 
-<DFRPackagesFile Name="Official addons (languages, icon sets etc.) for D-Fend Reloaded" LastUpdateDate="12/29/2009">
+<DFRPackagesFile Name="Official addons (languages, icon sets etc.) for D-Fend Reloaded" LastUpdateDate="03/18/2010">
+
+  <Language
+    Name="Italian"
+	MinVersion="0.9.0"
+	MaxVersion="0.9.1"
+	Author="Filippo Bartoli (fillo82@email.it) &amp; Massimo Pizzolante Leuzzi (maxim30@tiscali.it)"
+	PackageChecksum="D713F30DB5C12E63AD2E3B335186E803"
+	Size="106074">Italian.ini</Language>
 
   <Language
     Name="Turkish"

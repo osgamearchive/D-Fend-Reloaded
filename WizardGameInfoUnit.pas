@@ -28,6 +28,7 @@ type
     AddUserDataPopupMenu: TPopupMenu;
     ToolButton1: TToolButton;
     DownloadDataButton: TToolButton;
+    MultiValueInfoLabel: TLabel;
     procedure AddButtonClick(Sender: TObject);
     procedure DelButtonClick(Sender: TObject);
     procedure SearchClick(Sender: TObject);
@@ -88,10 +89,15 @@ begin
     ItemProps[Strings.Count-1].EditStyle:=esPickList;
     St:=ExtLanguageList(GetCustomLanguageName(AGameDB.GetLanguageList)); try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
     Strings.Add(LanguageSetup.GameWWW+'=');
+    Strings.Add(LanguageSetup.GameLicense+'=');
+    ItemProps[Strings.Count-1].EditStyle:=esPickList;
+    St:=ExtLicenseList(GetCustomLicenseName(AGameDB.GetLicenseList)); try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
   end;
   DownloadDataButton.Caption:=LanguageSetup.DataReaderButton;  
   FavouriteCheckBox.Caption:=LanguageSetup.GameFavorite;
   FavouriteCheckBox.Left:=GameInfoValueListEditor.Left+GameInfoValueListEditor.Width-Application.MainForm.Canvas.TextWidth(FavouriteCheckBox.Caption)-20;
+
+  MultiValueInfoLabel.Caption:=LanguageSetup.ProfileEditorMultipleValuesInfo;
 
   UserDefinedDataLabel.Caption:=LanguageSetup.ProfileEditorUserdefinedInfo+':';
 
@@ -169,6 +175,7 @@ begin
       If Trim(Template.Year)<>'' then ValueFromIndex[3]:=Template.Year;
       If Trim(Template.Language)<>'' then ValueFromIndex[4]:=GetCustomLanguageName(Template.Language);
       If Trim(Template.WWW)<>'' then ValueFromIndex[5]:=Template.WWW;
+      S:=Template.License; If S<>'' then ValueFromIndex[6]:=S else GameInfoValueListEditor.Strings[6]:=GameInfoValueListEditor.Strings.Names[6]+'=';
     end;
 
     St:=StringToStringList(Template.UserInfo);
@@ -179,6 +186,7 @@ begin
           S:=St[I];
           J:=Pos('=',S);
           If J=0 then T:='' else begin T:=Trim(Copy(S,J+1,MaxInt)); S:=Trim(Copy(S,1,J-1)); end;
+          If Trim(ExtUpperCase(S))='LICENSE' then continue;
           Tab.Cells[0,I+1]:=S;
           Tab.Cells[1,I+1]:=T;
         end;
@@ -199,7 +207,8 @@ end;
 procedure TWizardGameInfoFrame.AddButtonClick(Sender: TObject);
 Var M : TMenuItem;
     St : TStringList;
-    I : Integer;
+    S : String;
+    I,J : Integer;
     P : TPoint;
 begin
   If (Sender as TComponent).Tag>0 then begin
@@ -220,14 +229,30 @@ begin
 
   St:=GameDB.GetUserKeys;
   try
-    AddUserDataPopupMenu.Items.Clear;
-    M:=TMenuItem.Create(AddUserDataPopupMenu); M.Caption:=LanguageSetup.AddNewEmptyLine; M.Tag:=1; M.OnClick:=AddButtonClick;
-    AddUserDataPopupMenu.Items.Add(M);
-    M:=TMenuItem.Create(AddUserDataPopupMenu); M.Caption:='-';
-    AddUserDataPopupMenu.Items.Add(M);
-    For I:=0 to St.Count-1 do begin
-      M:=TMenuItem.Create(AddUserDataPopupMenu); M.Caption:=St[I]; M.Tag:=2; M.OnClick:=AddButtonClick;
+    I:=0;
+    While I<St.Count do begin
+      S:=Trim(ExtUpperCase(St[I]));
+      If S='LICENSE' then begin St.Delete(I); continue; end;
+      For J:=1 to Tab.RowCount-1 do If Trim(ExtUpperCase(Tab.Cells[0,J]))=S then begin St.Delete(I); dec(I); break; end;
+      inc(I);
+    end;
+    If St.Count=0 then begin
+      Tab.RowCount:=Tab.RowCount+1;
+      Tab.RowHeights[Tab.RowCount-1]:=GameInfoValueListEditor.RowHeights[0];
+      Tab.Row:=Tab.RowCount-1;
+      Tab.Col:=0;
+      Tab.SetFocus;
+      exit;
+    end else begin
+      AddUserDataPopupMenu.Items.Clear;
+      M:=TMenuItem.Create(AddUserDataPopupMenu); M.Caption:=LanguageSetup.AddNewEmptyLine; M.Tag:=1; M.OnClick:=AddButtonClick;
       AddUserDataPopupMenu.Items.Add(M);
+      M:=TMenuItem.Create(AddUserDataPopupMenu); M.Caption:='-';
+      AddUserDataPopupMenu.Items.Add(M);
+      For I:=0 to St.Count-1 do begin
+        M:=TMenuItem.Create(AddUserDataPopupMenu); M.Caption:=St[I]; M.Tag:=2; M.OnClick:=AddButtonClick;
+        AddUserDataPopupMenu.Items.Add(M);
+      end;
     end;
   finally
     St.Free;
@@ -261,7 +286,7 @@ end;
 procedure TWizardGameInfoFrame.WriteDataToGame(const Game: TGame);
 Var St : TStringList;
     I : Integer;
-    S,T : String;
+    S,T,License : String;
 begin
   Game.Name:=BaseName.Text;
 
@@ -272,11 +297,13 @@ begin
     Game.Year:=ValueFromIndex[3];
     Game.Language:=GetEnglishLanguageName(ValueFromIndex[4]);
     Game.WWW:=ValueFromIndex[5];
+    License:=Trim(ValueFromIndex[6]);
   end;
   Game.Favorite:=FavouriteCheckBox.Checked;
 
   St:=TStringList.Create;
   try
+    If License<>'' then St.Add('License='+License);
     For I:=1 to Tab.RowCount-1 do begin
       S:=Trim(Tab.Cells[0,I]); T:=Trim(Tab.Cells[1,I]);
       If (S<>'') or (T<>'') then St.Add(S+'='+T);

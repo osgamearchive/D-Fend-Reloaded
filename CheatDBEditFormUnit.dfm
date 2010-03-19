@@ -277,7 +277,7 @@ object CheatDBEditForm: TCheatDBEditForm
     Width = 225
     Height = 21
     Style = csDropDownList
-    ItemHeight = 0
+    ItemHeight = 13
     TabOrder = 0
     OnChange = GameComboBoxChange
   end
@@ -287,7 +287,7 @@ object CheatDBEditForm: TCheatDBEditForm
     Width = 272
     Height = 21
     Style = csDropDownList
-    ItemHeight = 0
+    ItemHeight = 13
     TabOrder = 1
     OnChange = ActionComboBoxChange
   end
@@ -307,7 +307,7 @@ object CheatDBEditForm: TCheatDBEditForm
     Width = 273
     Height = 21
     Style = csDropDownList
-    ItemHeight = 0
+    ItemHeight = 13
     TabOrder = 3
     OnChange = ActionStepComboBoxChange
   end
@@ -381,7 +381,7 @@ object CheatDBEditForm: TCheatDBEditForm
         Width = 84
         Height = 21
         Style = csDropDownList
-        ItemHeight = 13
+        ItemHeight = 0
         ItemIndex = 2
         TabOrder = 2
         Text = '4'
@@ -395,8 +395,6 @@ object CheatDBEditForm: TCheatDBEditForm
       Left = 0
       Top = 0
       Caption = 'ChangeAddressWithDialog'
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object ChangeAddressWithDialogBytesLabel: TLabel
         Left = 272
         Top = 160

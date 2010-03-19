@@ -1,14 +1,4 @@
 [Extra]
-NrOfMounts=1
-Tab2=0
-Exe=CHINESE.EXE
-ExeMD5=BE483C09B2DB19B8B652FE4C84F49467
-Setup=SETUP.EXE
-SetupMD5=74E8BC227E67E42E9B463D6C281FBCCD
-LastModification=40101-63583
-ScreenshotListScreenshot=
-0=.\VirtualHD\;Drive;C;false
-Environment=PATH[61]Z:\[13][10]
 Loadhigh=0
 CloseOnExit=1
 AutoMountCDs=0
@@ -16,11 +6,17 @@ SecureMode=1
 Overridegamestart=0
 OverrideMount=0
 LoadFixVal=64
-Tab=0
+NrOfMounts=1
+Tab=1
+Tab2=0
+Exe=KEN.EXE
+ExeMD5=4A757BB893918301F9E1AA85E7C9D1D3
+Setup=SETUP.EXE
+SetupMD5=E320EC0887F0719655A25A84C66BBF6D
 GameParameters=
 SetupParameters=
-ExtraDirs=
-ExtraFiles=
+LastModification=40240-32117
+ScreenshotListScreenshot=
 ExtraExe0=
 ExtraExe1=
 ExtraExe2=
@@ -31,7 +27,7 @@ ExtraExe6=
 ExtraExe7=
 ExtraExe8=
 ExtraExe9=
-DataDir=
+0=.\VirtualHD\;Drive;C;false;
 1=
 2=
 3=
@@ -45,36 +41,39 @@ autoexec=
 BootImage=
 Finalization=
 CustomSettings=
+Environment=PATH[61]Z:\[13][10]
 ProfileMode=DOSBox
+ExtraDirs=
+ExtraFiles=
+DataDir=
 
 [ExtraInfo]
-Icon=CHINESE.ICO
-Language=English
 Favorite=0
-Name=Chinese Checkers
-Genre=
-Developer=
-Publisher=
-Year=
+Name=Ken's Labyrinth
+Icon=
+Genre=First Person
+Developer=Advanced Systems
+Publisher=Epic MegaGames
+Year=1993
 Notes=
-WWW=
-UserInfo=
+WWW=http://www.classicdosgames.com/epic.html
+Language=English
+UserInfo=License=Shareware[13][10]Version=2.0[13][10]
 
 [sdl]
-output=ddraw
-priority=highest,lower
 fullscreen=1
-autolock=1
-fulldouble=0
+autolock=0
+fulldouble=1
 usecancodes=1
 sensitivity=100
+output=overlay
 windowresolution=original
 fullresolution=original
+priority=higher,normal
 mapperfile=default
 DOSBoxlanguage=default
 
 [dos]
-ReportedDOSVersion=6.2
 Force2ButtonMouseMode=0
 SwapMouseButtons=0
 xms=1
@@ -84,15 +83,16 @@ umb=1
 DOS32A=0
 keyboardlayout=default
 codepage=default
+ReportedDOSVersion=default
 NumLockStatus=
 CapsLockStatus=
 ScrollLockStatus=
 
 [render]
-aspect=1
+aspect=0
 TextModeLines=25
-scaler=auto
 frameskip=0
+scaler=normal2x
 
 [ipx]
 ipx=0
@@ -112,9 +112,9 @@ height=110
 printoutput=ps
 
 [mixer]
-rate=44100
-blocksize=8192
 nosound=0
+rate=44100
+blocksize=2048
 prebuffer=10
 VolumeMasterLeft=100
 VolumeMasterRight=100
@@ -133,36 +133,36 @@ VolumeCDRight=100
 
 [sblaster]
 mixer=1
-sbbase=220
 irq=7
 dma=1
 hdma=5
+oplrate=44100
 sbtype=sb16
+sbbase=220
 oplmode=auto
 oplemu=default
-oplrate=44100
 
 [gus]
 gus=1
 gusrate=22050
-gusbase=240
 irq1=5
 dma1=1
+gusbase=240
 ultradir=C:\ULTRASND
 
 [speaker]
-disney=0
+pcspeaker=1
+disney=1
 pcrate=44100
 tandyrate=44100
-tandy=off
-pcspeaker=1
+tandy=auto
 
 [joystick]
-timed=0
-buttonwrap=0
-joysticktype=auto
+timed=1
 autofire=0
 swap34=0
+buttonwrap=0
+joysticktype=none
 
 [ScummVM]
 NativeMT32=0
@@ -192,7 +192,7 @@ GamePath=
 GameZipFile=
 Filter=2x
 RenderMode=
-Language=
+Language=en
 MusicDriver=auto
 Savepath=
 ExtraPath=
@@ -206,22 +206,22 @@ BeforeExecution=
 AfterExecution=
 
 [dosbox]
-captures=.\Capture\
-DOSBoxDirectory=Default
-memsize=16
-machine=svga_s3
+memsize=32
+captures=
+DOSBoxDirectory=
+machine=vesa_oldvbe
 
 [cpu]
 cyclesup=500
 cyclesdown=20
 core=auto
-cycles=auto
+cycles=10000
 type=auto
 
 [vga]
 videoram=2048
-svgachipset=et4000
-PixelShader=
+svgachipset=3s
+PixelShader=none
 
 [serial]
 serial1=Dummy
@@ -235,14 +235,14 @@ device=default
 config=
 
 [ExtraGameIdentify]
-File1.Filename=CHINESE.ICO
-File1.Checksum=B3E469ED8F78D21A486091FDA83FB7D6
-File2.Filename=NOTEPAD.ICO
-File2.Checksum=DE5903BD33749ADCD1CB20DF2256976F
-File3.Filename=SAXCOMPR.DLL
-File3.Checksum=92E7AEBEFE48C78B890D4E97E171E1E8
-File4.Filename=
-File4.Checksum=
-File5.Filename=
-File5.Checksum=
+File1.Filename=CATALOG.EXE
+File1.Checksum=6A958500AB86080AD3108E488C8F20A6
+File2.Filename=HELPME.EXE
+File2.Checksum=209DD94F30338FB38162AF401E25C466
+File3.Filename=HISCORE.DAT
+File3.Checksum=D4BEC66B587BFD331109E6FB6277A318
+File4.Filename=INSTS.DAT
+File4.Checksum=DE5B16E8DF438A7406287D2E9D4125C0
+File5.Filename=TABLES.DAT
+File5.Checksum=AF08D8C5AE85676171C708C9D51E2559
 

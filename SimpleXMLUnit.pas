@@ -378,7 +378,7 @@ begin
   end;
 end;
 
-Procedure LoadFullConfiguration(const G : TGame; Profile : IXMLNode; const XMLType : TXMLType);
+Procedure LoadFullConfiguration(const AGameDB : TGameDB; const G : TGame; Profile : IXMLNode; const XMLType : TXMLType);
 Var N : IXMLNode;
 begin
   If XMLType=xtDBGL then begin
@@ -392,7 +392,7 @@ begin
   end;
 
   If N<>nil then begin
-    ImportConfData(G,N.Text);
+    ImportConfData(AGameDB,G,N.Text);
   end;  
 end;
 
@@ -541,7 +541,7 @@ begin
   If G=nil then exit;
 
   LoadMetaInfoFromXML(G,Profile,XMLType);
-  LoadFullConfiguration(G,Profile,XMLType);
+  LoadFullConfiguration(GameDB,G,Profile,XMLType);
 
   If XMLType=xtDBGL then LoadSpecialDBGLData(G,Profile);
   If XMLType=xtDOG then LoadSpecialDOGData(G,Profile);

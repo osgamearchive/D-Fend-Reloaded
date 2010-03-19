@@ -248,6 +248,7 @@ end;
 
 Function ShowCheatApplyDialog(const AOwner : TComponent; const GameDir : String; var EditButtonClicked : Boolean) : Boolean;
 begin
+  CheatsDBUpdateCheckIfSetup(Application.MainForm);
   CheatApplyForm:=TCheatApplyForm.Create(AOwner);
   try
     CheatApplyForm.GameDir:=IncludeTrailingPathDelimiter(GameDir);

@@ -1052,7 +1052,7 @@ object ProfileEditorForm: TProfileEditorForm
         Left = 16
         Top = 96
         Width = 505
-        Height = 169
+        Height = 163
         ActivePage = AutoexecSheet1
         Anchors = [akLeft, akTop, akRight, akBottom]
         TabOrder = 2

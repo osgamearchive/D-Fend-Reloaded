@@ -619,9 +619,9 @@ begin
       {User template}
       G.AssignFrom(TemplateDB[-NewGame.SelectedTemplate-2]);
     end;
-    G.Name:=NewGame.Name;
     G.GameExe:=MakeRelPath(NewGame.ExeFile,PrgSetup.BaseDir);
   end;
+  G.Name:=NewGame.Name;
 
   If Trim(NewGame.ExeFile)<>'' then S:=ExtractFilePath(NewGame.ExeFile) else S:='';
   If ExtUpperCase(Copy(Trim(S),1,7))='DOSBOX:' then S:='';
@@ -636,7 +636,13 @@ begin
 
   Folder:=IncludeTrailingPathDelimiter(ExtractFilePath(NewGame.ExeFile));
 
-  G.CaptureFolder:=MakeRelPath(IncludeTrailingPathDelimiter(PrgSetup.CaptureDir)+MakeFileSysOKFolderName(G.Name)+'\',PrgSetup.BaseDir);
+  S:=IncludeTrailingPathDelimiter(PrgSetup.CaptureDir)+MakeFileSysOKFolderName(G.Name)+'\';
+  I:=0;
+  While (not PrgSetup.IgnoreDirectoryCollisions) and DirectoryExists(MakeAbsPath(S,PrgSetup.BaseDir)) do begin
+    Inc(I);
+    S:=IncludeTrailingPathDelimiter(PrgSetup.CaptureDir)+MakeFileSysOKFolderName(G.Name)+IntToStr(I)+'\';
+  end;
+  G.CaptureFolder:=MakeRelPath(S,PrgSetup.BaseDir);
   ForceDirectories(MakeAbsPath(G.CaptureFolder,PrgSetup.BaseDir));
 
   {Look for Icons in game folder}

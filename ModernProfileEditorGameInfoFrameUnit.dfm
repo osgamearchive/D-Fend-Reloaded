@@ -2,29 +2,29 @@ object ModernProfileEditorGameInfoFrame: TModernProfileEditorGameInfoFrame
   Left = 0
   Top = 0
   Width = 630
-  Height = 546
+  Height = 551
   TabOrder = 0
   OnResize = FrameResize
   DesignSize = (
     630
-    546)
+    551)
   object NotesLabel: TLabel
     Left = 12
-    Top = 374
+    Top = 384
     Width = 69
     Height = 13
     Caption = 'Bemerkungen:'
   end
   object UserDefinedDataLabel: TLabel
     Left = 12
-    Top = 228
+    Top = 246
     Width = 107
     Height = 13
     Caption = 'UserDefinedDataLabel'
   end
   object DelButton: TSpeedButton
     Left = 593
-    Top = 224
+    Top = 238
     Width = 23
     Height = 22
     Anchors = [akTop, akRight]
@@ -48,7 +48,7 @@ object ModernProfileEditorGameInfoFrame: TModernProfileEditorGameInfoFrame
   end
   object AddButton: TSpeedButton
     Left = 564
-    Top = 224
+    Top = 238
     Width = 23
     Height = 22
     Anchors = [akTop, akRight]
@@ -81,7 +81,7 @@ object ModernProfileEditorGameInfoFrame: TModernProfileEditorGameInfoFrame
     Left = 12
     Top = 40
     Width = 605
-    Height = 145
+    Height = 164
     Anchors = [akLeft, akTop, akRight]
     Strings.Strings = (
       '=')
@@ -101,9 +101,9 @@ object ModernProfileEditorGameInfoFrame: TModernProfileEditorGameInfoFrame
   end
   object NotesMemo: TRichEdit
     Left = 12
-    Top = 390
+    Top = 400
     Width = 605
-    Height = 150
+    Height = 145
     Anchors = [akLeft, akTop, akRight, akBottom]
     PlainText = True
     ScrollBars = ssBoth
@@ -111,7 +111,7 @@ object ModernProfileEditorGameInfoFrame: TModernProfileEditorGameInfoFrame
   end
   object Tab: TStringGrid
     Left = 12
-    Top = 247
+    Top = 261
     Width = 605
     Height = 114
     Anchors = [akLeft, akTop, akRight]
@@ -123,7 +123,7 @@ object ModernProfileEditorGameInfoFrame: TModernProfileEditorGameInfoFrame
   end
   object ToolBarPanel: TPanel
     Left = 12
-    Top = 186
+    Top = 205
     Width = 604
     Height = 30
     Anchors = [akLeft, akTop, akRight]
@@ -323,6 +323,6 @@ object ModernProfileEditorGameInfoFrame: TModernProfileEditorGameInfoFrame
   end
   object AddUserDataPopupMenu: TPopupMenu
     Left = 528
-    Top = 216
+    Top = 230
   end
 end

@@ -47,12 +47,13 @@ Procedure DeleteOldFiles;
 Procedure ReplaceAbsoluteDirs(const GameDB : TGameDB);
 Function BuildDefaultDosProfile(const GameDB : TGameDB; const CopyFiles : Boolean = True) : TGame;
 Procedure BuildDefaultProfile;
-Procedure ReBuildTemplates;
+Procedure ReBuildTemplates(const InBackground : Boolean);
 Function CopyFiles(Source, Dest : String; const OverwriteExistingFiles, ProcessMessages : Boolean) : Boolean;
 Procedure UpdateUserDataFolderAndSettingsAfterUpgrade(const GameDB : TGameDB; const LastVersion : Integer);
 Procedure UpdateSettingsFilesLocation;
 
 Var FreeDOSInitThreadRunning : Boolean = False;
+    TemplatesInitThreadRunning : Boolean = False;
 
 { Extras }
 
@@ -73,9 +74,9 @@ Procedure ClearHistory;
 
 { Import }
 
-Procedure ImportConfData(const AGame : TGame; const Lines : String); overload;
-Procedure ImportConfData(const AGame : TGame; const St : TStringList); overload;
-Procedure ImportConfFileData(const AGame : TGame; const AFileName : String);
+Procedure ImportConfData(const AGameDB : TGameDB; const AGame : TGame; const Lines : String); overload;
+Procedure ImportConfData(const AGameDB : TGameDB; const AGame : TGame; const St : TStringList); overload;
+Procedure ImportConfFileData(const AGameDB : TGameDB; const AGame : TGame; const AFileName : String);
 Function ImportConfFile(const AGameDB : TGameDB; const AFileName : String) : TGame;
 
 { Checksums }
@@ -133,7 +134,7 @@ uses Windows, SysUtils, Forms, Dialogs, Graphics, ShellAPI, ShlObj, IniFiles,
      Math, PNGImage, JPEG, GIFImage, CommonTools, LanguageSetupUnit, PrgConsts,
      PrgSetupUnit, ProfileEditorFormUnit, ModernProfileEditorFormUnit, HashCalc,
      SmallWaitFormUnit, ChecksumFormUnit, WaitFormUnit, ImageCacheUnit,
-     DosBoxUnit, ScummVMUnit, ImageStretch, MainUnit;
+     DosBoxUnit, ScummVMUnit, ImageStretch, MainUnit, GameDBFilterUnit;
 
 Function GroupMatch(const GameGroupUpper, SelectedGroupUpper : String) : Boolean; forward;
 
@@ -890,6 +891,7 @@ begin
   end;
   If not B then begin
     If Trim(Game.Icon)<>'' then S:=MakeAbsIconName(Game.Icon) else S:='';
+    If (S<>'') and (not FileExists(S)) then S:='';
     If (S='') and WindowsExeMode(Game) and PrgSetup.UseWindowsExeIcons then
       S:=MakeAbsIconName(MakeAbsPath(Game.GameExe,PrgSetup.BaseDir));
     If S<>'' then Icon:=IconCache.GetIcon(S) else Icon:=nil;
@@ -1027,7 +1029,7 @@ end;
 
 Procedure AddGamesToList(const AListView : TListView; const AListViewImageList, AListViewIconImageList, AImageList : TImageList; const GameDB : TGameDB; const Game : TGame; const Group, SubGroup, SearchString : String; const ShowExtraInfo : Boolean; const SortBy : TSortListBy; const ReverseOrder, HideScummVMProfiles, HideWindowsProfiles, HideDefaultProfile,  ScreenshotViewMode : Boolean); overload;
 Var I,J,K,Nr,ItemsUsed : Integer;
-    GroupUpper, SubGroupUpper, SearchStringUpper : String;
+    GroupUpper, SubGroupUpper : String;
     B, FirstDefaultTemplate : Boolean;
     C : Array of Integer;
     List : TList;
@@ -1039,6 +1041,7 @@ Var I,J,K,Nr,ItemsUsed : Integer;
     VUserSt : TStringList;
     W : TWinControl;
     F : TForm;
+    Filter : TGamesListFilter;
     {$IFDEF SpeedTest}Ca : Cardinal;{$ENDIF}
 begin
   {$IFDEF SpeedTest}Ca:=GetTickCount;{$ENDIF}
@@ -1083,64 +1086,69 @@ begin
   List:=TList.Create;
   try
     {Select games to add}
-    SearchStringUpper:=ExtUpperCase(Trim(SearchString));
-    If SubGroup='' then begin
-      B:=(Group=LanguageSetup.GameFavorites);
-      for I:=0 to GameDB.Count-1 do begin
-        If B and (not GameDB[I].Favorite) then continue;
-        If HideDefaultProfile and (GameDB[I].Name=DosBoxDOSProfile) then continue;
-        If HideScummVMProfiles and (ScummVMMode(GameDB[I]) or WindowsExeMode(GameDB[I])) then continue;
-        If HideWindowsProfiles and WindowsExeMode(GameDB[I]) then continue;
-        If (SearchStringUpper<>'') and (Pos(SearchStringUpper,GameDB[I].CacheNameUpper)=0) then continue;
-        List.Add(GameDB[I]);
-      end;
-    end else begin
-      GroupUpper:=Trim(ExtUpperCase(Group));
-      If SubGroup=LanguageSetup.NotSet then SubGroupUpper:='' else SubGroupUpper:=ExtUpperCase(SubGroup);
-      Nr:=6;
-      If Group=LanguageSetup.GameGenre then Nr:=0;
-      If Group=LanguageSetup.GameDeveloper then Nr:=1;
-      If Group=LanguageSetup.GamePublisher then Nr:=2;
-      If Group=LanguageSetup.GameYear then Nr:=3;
-      If Group=LanguageSetup.GameLanguage then Nr:=4;
-      If Group=LanguageSetup.GameEmulationType then Nr:=5;
-
-      EmType1:=ExtUpperCase(LanguageSetup.GameEmulationTypeDOSBox);
-      EmType2:=ExtUpperCase(LanguageSetup.GameEmulationTypeScummVM);
-      EmType3:=ExtUpperCase(LanguageSetup.GameEmulationTypeWindows);
-
-      For I:=0 to GameDB.Count-1 do begin
-        If HideScummVMProfiles and (ScummVMMode(GameDB[I]) or WindowsExeMode(GameDB[I])) then continue;
-        If HideDefaultProfile and (GameDB[I].Name=DosBoxDOSProfile) then continue;
-        B:=False;
-        Case Nr of
-          0 : B:=GroupMatch(ExtUpperCase(GetCustomGenreName(GameDB[I].CacheGenre)),SubGroupUpper);
-          1 : B:=GroupMatch(GameDB[I].CacheDeveloperUpper,SubGroupUpper);
-          2 : B:=GroupMatch(GameDB[I].CachePublisherUpper,SubGroupUpper);
-          3 : B:=GroupMatch(GameDB[I].CacheYearUpper,SubGroupUpper);
-          4 : B:=GroupMatch(ExtUpperCase(GetCustomLanguageName(GameDB[I].CacheLanguage)),SubGroupUpper);
-          5 : begin
-                If (SubGroupUpper=EmType1) then B:=DOSBoxMode(GameDB[I]);
-                If (SubGroupUpper=EmType2) then B:=ScummVMMode(GameDB[I]);
-                If (SubGroupUpper=EmType3) then B:=WindowsExeMode(GameDB[I]);
-              end;
-          6 : begin
-                B:=(SubGroupUpper='');
-                St2:=StringToStringList(GameDB[I].CacheUserInfo);
-                try
-                  For J:=0 to St2.Count-1 do begin
-                    S:=St2[J]; K:=Pos('=',S); If K=0 then T:='' else begin T:=Trim(Copy(S,K+1,MaxInt)); S:=Trim(Copy(S,1,K-1)); end;
-                    If Trim(ExtUpperCase(S))=GroupUpper then begin B:=GroupMatch(Trim(ExtUpperCase(T)),SubGroupUpper); break; end;
-                  end;
-                finally
-                  St2.Free;
-                end;
-              end;
+    Filter:=TGamesListFilter.Create;
+    try
+      Filter.SetFilterString(SearchString);
+      If SubGroup='' then begin
+        B:=(Group=LanguageSetup.GameFavorites);
+        for I:=0 to GameDB.Count-1 do begin
+          If B and (not GameDB[I].Favorite) then continue;
+          If HideDefaultProfile and (GameDB[I].Name=DosBoxDOSProfile) then continue;
+          If HideScummVMProfiles and (ScummVMMode(GameDB[I]) or WindowsExeMode(GameDB[I])) then continue;
+          If HideWindowsProfiles and WindowsExeMode(GameDB[I]) then continue;
+          If (SearchString<>'') and (not Filter.FilterOk(GameDB[I])) then continue;
+          List.Add(GameDB[I]);
         end;
-        If not B then continue;
-        If (SearchStringUpper<>'') and (Pos(SearchStringUpper,ExtUpperCase(GameDB[I].CacheName))=0) then continue;
-        List.Add(GameDB[I]);
+      end else begin
+        GroupUpper:=Trim(ExtUpperCase(Group));
+        If SubGroup=LanguageSetup.NotSet then SubGroupUpper:='' else SubGroupUpper:=ExtUpperCase(SubGroup);
+        Nr:=6;
+        If Group=LanguageSetup.GameGenre then Nr:=0;
+        If Group=LanguageSetup.GameDeveloper then Nr:=1;
+        If Group=LanguageSetup.GamePublisher then Nr:=2;
+        If Group=LanguageSetup.GameYear then Nr:=3;
+        If Group=LanguageSetup.GameLanguage then Nr:=4;
+        If Group=LanguageSetup.GameEmulationType then Nr:=5;
+
+        EmType1:=ExtUpperCase(LanguageSetup.GameEmulationTypeDOSBox);
+        EmType2:=ExtUpperCase(LanguageSetup.GameEmulationTypeScummVM);
+        EmType3:=ExtUpperCase(LanguageSetup.GameEmulationTypeWindows);
+
+        For I:=0 to GameDB.Count-1 do begin
+          If HideScummVMProfiles and (ScummVMMode(GameDB[I]) or WindowsExeMode(GameDB[I])) then continue;
+          If HideDefaultProfile and (GameDB[I].Name=DosBoxDOSProfile) then continue;
+          B:=False;
+          Case Nr of
+            0 : B:=GroupMatch(ExtUpperCase(GetCustomGenreName(GameDB[I].CacheGenre)),SubGroupUpper);
+            1 : B:=GroupMatch(GameDB[I].CacheDeveloperUpper,SubGroupUpper);
+            2 : B:=GroupMatch(GameDB[I].CachePublisherUpper,SubGroupUpper);
+            3 : B:=GroupMatch(GameDB[I].CacheYearUpper,SubGroupUpper);
+            4 : B:=GroupMatch(ExtUpperCase(GetCustomLanguageName(GameDB[I].CacheLanguage)),SubGroupUpper);
+            5 : begin
+                  If (SubGroupUpper=EmType1) then B:=DOSBoxMode(GameDB[I]);
+                  If (SubGroupUpper=EmType2) then B:=ScummVMMode(GameDB[I]);
+                  If (SubGroupUpper=EmType3) then B:=WindowsExeMode(GameDB[I]);
+                end;
+            6 : begin
+                  B:=(SubGroupUpper='');
+                  St2:=StringToStringList(GameDB[I].CacheUserInfo);
+                  try
+                    For J:=0 to St2.Count-1 do begin
+                      S:=St2[J]; K:=Pos('=',S); If K=0 then T:='' else begin T:=Trim(Copy(S,K+1,MaxInt)); S:=Trim(Copy(S,1,K-1)); end;
+                      If Trim(ExtUpperCase(S))=GroupUpper then begin B:=GroupMatch(Trim(ExtUpperCase(T)),SubGroupUpper); break; end;
+                    end;
+                  finally
+                    St2.Free;
+                  end;
+                end;
+          end;
+          If not B then continue;
+          If (SearchString<>'') and (not Filter.FilterOk(GameDB[I])) then continue;
+          List.Add(GameDB[I]);
+        end;
       end;
+    finally
+      Filter.Free;  
     end;
 
     If Game<>nil then begin
@@ -1916,7 +1924,11 @@ begin
     end;
   end;
 
-  {Update settings in ConfOpt.dat (only if upgrade from below 0.9.1, 0.9.0, 0.8.1 or 0.8.0)}
+  {Update settings in ConfOpt.dat (only if upgrade from below 0.9.2, 0.9.1, 0.9.0, 0.8.1 or 0.8.0)}
+  If LastVersion<902 then begin
+    GameDB.ConfOpt.Codepage:=DefaultValuesCodepage;
+    GameDB.ConfOpt.TandyRate:=DefaultValuesTandyRate;
+  end;
   If LastVersion<901 then begin
     GameDB.ConfOpt.KeyboardLayout:=DefaultValuesKeyboardLayout;
     GameDB.ConfOpt.Codepage:=DefaultValuesCodepage;
@@ -2155,9 +2167,39 @@ begin
   end;
 end;
 
-Procedure ReBuildTemplates;
+Type TReBuildTemplatesThread=class(TThread)
+  protected
+    Procedure Execute; override;
+  public
+    Constructor Create;
+end;
+
+Constructor TReBuildTemplatesThread.Create;
+begin
+  inherited Create(True);
+  FreeOnTerminate:=True;
+  Resume;
+end;
+
+Procedure TReBuildTemplatesThread.Execute;
+begin
+  TemplatesInitThreadRunning:=True;
+  try
+    SetThreadPriority(GetCurrentThread,THREAD_PRIORITY_BELOW_NORMAL);
+    ReBuildTemplates(false);
+  finally
+    TemplatesInitThreadRunning:=False;
+  end;
+end;
+
+Procedure ReBuildTemplates(const InBackground : Boolean);
 begin
   If PrgDir=PrgDataDir then exit;
+
+  If InBackground then begin
+    TReBuildTemplatesThread.Create;
+    exit;
+  end;
 
   ForceDirectories(PrgDataDir+TemplateSubDir);
   If DirectoryExists(PrgDir+NewUserDataSubDir+'\'+TemplateSubDir) then
@@ -2810,7 +2852,6 @@ begin
     AddDrive(Game,U,T,S);
     Autoexec.Delete(I);
   end;
-
 end;
 
 Procedure LoadSpecialData(const Game : TGame; const FileName : String);
@@ -2858,32 +2899,36 @@ begin
   end;
 end;
 
-Procedure ImportConfData(const AGame : TGame; const Lines : String);
+Procedure ImportConfData(const AGameDB : TGameDB; const AGame : TGame; const Lines : String);
 Var St : TStringList;
 begin
   St:=TStringList.Create;
   try
     St.Text:=Lines;
-    ImportConfData(AGame,St);
+    ImportConfData(AGameDB,AGame,St);
   finally
     St.Free;
   end;
 end;
 
-Procedure ImportConfData(const AGame : TGame; const St : TStringList);
+Procedure ImportConfData(const AGameDB : TGameDB; const AGame : TGame; const St : TStringList);
 Var FileName : String;
 begin
   FileName:=TempDir+'DFRTempConfFile.conf';
   St.SaveToFile(FileName);
   try
-    ImportConfFileData(AGame,FileName);
+    ImportConfFileData(AGameDB,AGame,FileName);
   finally
     ExtDeleteFile(FileName,ftProfile);
   end;
 end;
 
-Procedure ImportConfFileData(const AGame : TGame; const AFileName : String);
+Procedure ImportConfFileData(const AGameDB : TGameDB; const AGame : TGame; const AFileName : String);
 Var INI : TINIFile;
+    B : Boolean;
+    I : Integer;
+    S : String;
+    St : TStringList;
 begin
   INI:=TIniFile.Create(AFileName);
   try
@@ -2909,6 +2954,19 @@ begin
 
     AGame.Core:=INI.ReadString('cpu','core','auto');
     AGame.Cycles:=INI.ReadString('cpu','cycles','auto');
+
+    B:=TryStrToInt(AGame.Cycles,I);
+    If not B then begin
+      S:=Trim(ExtUpperCase(AGame.Cycles));
+      St:=ValueToList(AGameDB.ConfOpt.Cycles,';,');
+      try
+        For I:=0 to St.Count-1 do If Trim(ExtUpperCase(St[I]))=S then begin B:=True; break; end;
+      finally
+        St.Free;
+      end;
+    end;
+    If not B then AGame.Cycles:='auto';
+
     AGame.CyclesUp:=INI.ReadInteger('cpu','cycleup',500);
     AGame.CyclesDown:=INI.ReadInteger('cpu','cycledown',20);
 
@@ -2916,6 +2974,7 @@ begin
     AGame.XMS:=StrToBool(INI.ReadString('dos','xms','true'));
     AGame.UMB:=StrToBool(INI.ReadString('dos','umb','true'));
     AGame.KeyboardLayout:=INI.ReadString('dos','keyboardlayout','none');
+    If ExtUpperCase(AGame.KeyboardLayout)='AUTO' then AGame.KeyboardLayout:='default';
 
     AGame.MixerNosound:=StrToBool(INI.ReadString('mixer','nosound','false'));
     AGame.MixerRate:=Ini.ReadInteger('mixer','rate',22050);
@@ -2969,7 +3028,7 @@ end;
 Function ImportConfFile(const AGameDB : TGameDB; const AFileName : String) : TGame;
 begin
   result:=AGameDB[AGameDB.Add(ChangeFileExt(ExtractFileName(AGameDB.ProfFileName(ExtractFileName(AFileName),True)),''))];
-  ImportConfFileData(result,AFileName);
+  ImportConfFileData(AGameDB,result,AFileName);
 end;
 
 Function GameCheckSumOK(const AGame : TGame) : Boolean;

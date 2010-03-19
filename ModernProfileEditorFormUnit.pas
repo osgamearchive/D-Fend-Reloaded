@@ -710,7 +710,7 @@ begin
       If (not EditingTemplate) and TModernProfileEditorStartFrame(StartFrame).AutoexecBootNormal.Checked then begin
         If (not TModernProfileEditorBaseFrame(BaseFrame).GameRelPathCheckBox.Checked) and (Trim(TModernProfileEditorBaseFrame(BaseFrame).GameExeEdit.Text)<>'') then begin
           S:=MakeAbsPath(TModernProfileEditorBaseFrame(BaseFrame).GameExeEdit.Text,PrgSetup.BaseDir);
-          If IsWindowsExe(S) then begin
+          If IsWindowsExe(S) and (not TModernProfileEditorBaseFrame(BaseFrame).IgnoreWindowsWarningsCheckBox.Checked) then begin
             If MessageDlg(Format(LanguageSetup.MessageWindowsExeEditWarning,[S]),mtConfirmation,[mbYes,mbNo],0)<>mrYes then begin
               Tree.Selected:=Tree.Items[0];
               ModalResult:=mrNone;

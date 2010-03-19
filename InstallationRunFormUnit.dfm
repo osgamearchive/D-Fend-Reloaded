@@ -34,9 +34,9 @@ object InstallationRunForm: TInstallationRunForm
   object SourceLabel: TLabel
     Left = 8
     Top = 55
-    Width = 106
+    Width = 100
     Height = 13
-    Caption = 'Select activee source:'
+    Caption = 'Select active source:'
   end
   object SourceListBox: TCheckListBox
     Left = 8

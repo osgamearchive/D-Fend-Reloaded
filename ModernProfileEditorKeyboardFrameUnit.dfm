@@ -34,7 +34,7 @@ object ModernProfileEditorKeyboardFrame: TModernProfileEditorKeyboardFrame
     WordWrap = True
   end
   object CodepageLabel: TLabel
-    Left = 240
+    Left = 288
     Top = 56
     Width = 74
     Height = 13
@@ -67,10 +67,10 @@ object ModernProfileEditorKeyboardFrame: TModernProfileEditorKeyboardFrame
   object KeyboardLayoutComboBox: TComboBox
     Left = 24
     Top = 75
-    Width = 161
+    Width = 233
     Height = 21
     Style = csDropDownList
-    ItemHeight = 0
+    ItemHeight = 13
     TabOrder = 1
   end
   object UseScancodesCheckBox: TCheckBox
@@ -122,12 +122,12 @@ object ModernProfileEditorKeyboardFrame: TModernProfileEditorKeyboardFrame
     TabOrder = 5
   end
   object CodepageComboBox: TComboBox
-    Left = 240
+    Left = 288
     Top = 75
-    Width = 161
+    Width = 233
     Height = 21
     Style = csDropDownList
-    ItemHeight = 0
+    ItemHeight = 13
     TabOrder = 2
   end
   object DefaultKeyMapperFileRadioButton: TRadioButton

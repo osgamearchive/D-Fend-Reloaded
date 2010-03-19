@@ -31,6 +31,10 @@ object TemplateForm: TTemplateForm
     OnChange = PageControlChange
     object TemplateTab: TTabSheet
       Caption = 'TemplateTab'
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object ListView: TListView
         Left = 0
         Top = 0
@@ -53,6 +57,10 @@ object TemplateForm: TTemplateForm
     object AutoSetupSheet: TTabSheet
       Caption = 'AutoSetupSheet'
       ImageIndex = 1
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object ListView2: TListView
         Left = 0
         Top = 0

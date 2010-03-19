@@ -99,7 +99,7 @@ begin
 end;
 
 procedure TModernProfileEditorKeyboardFrame.SetGame(const Game: TGame; const LoadFromTemplate: Boolean);
-Var S : String;
+Var S,T : String;
     I : Integer;
 begin
   If KeyboardLayoutComboBox.Items.Count>0 then begin
@@ -111,14 +111,24 @@ begin
 
   If Game.KeyboardLayout<>'' then S:=Game.KeyboardLayout else S:='default';
   S:=Trim(ExtUpperCase(S));
-  For I:=0 to KeyboardLayoutComboBox.Items.Count-1 do If Trim(ExtUpperCase(KeyboardLayoutComboBox.Items[I]))=S then begin
-    KeyboardLayoutComboBox.ItemIndex:=I; break;
+  For I:=0 to KeyboardLayoutComboBox.Items.Count-1 do begin
+    If Trim(ExtUpperCase(KeyboardLayoutComboBox.Items[I]))=S then begin KeyboardLayoutComboBox.ItemIndex:=I; break; end;
+    T:=KeyboardLayoutComboBox.Items[I];
+    If Pos('(',T)>0 then begin
+      T:=Copy(T,Pos('(',T)+1,MaxInt);
+      If Pos(')',T)<>0 then T:=Copy(T,1,Pos(')',T)-1);
+      If Trim(ExtUpperCase(T))=S then begin KeyboardLayoutComboBox.ItemIndex:=I; break; end;
+    end;
   end;
 
   If Game.Codepage<>'' then S:=Game.Codepage else S:='default';
   S:=Trim(ExtUpperCase(S));
-  For I:=0 to CodepageComboBox.Items.Count-1 do If Trim(ExtUpperCase(CodepageComboBox.Items[I]))=S then begin
-    CodepageComboBox.ItemIndex:=I; break;
+  For I:=0 to CodepageComboBox.Items.Count-1 do begin
+    If Trim(ExtUpperCase(CodepageComboBox.Items[I]))=S then begin CodepageComboBox.ItemIndex:=I; break; end;
+    T:=CodepageComboBox.Items[I];
+    If Pos('(',T)>0 then begin
+      If Trim(Copy(T,1,Pos('(',T)-1))=S then begin CodepageComboBox.ItemIndex:=I; break; end;
+    end;
   end;
 
   UseScancodesCheckBox.Checked:=Game.UseScanCodes;

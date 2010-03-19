@@ -51,31 +51,35 @@ const NR_Author=1;
       NR_GlobalClear=10039;
       NR_GlobalClearMediaViewer=10040;
       NR_GlobalSearch=10041;
-      NR_GlobalSelect=10042;
-      NR_GlobalUnselect=10043;
-      NR_GlobalSelectAll=10044;
-      NR_GlobalPrevious=10045;
-      NR_GlobalPreviousHintMediaViewer=10046;
-      NR_GlobalNext=10047;
-      NR_GlobalNextHintMediaViewer=10048;
-      NR_GlobalMore=10049;
-      NR_GlobalOn=10050;
-      NR_GlobalOff=10051;
-      NR_GlobalDoNotChange=10052;
-      NR_GlobalLeft=10053;
-      NR_GlobalRight=10054;
-      NR_GlobalMoveUp=10055;
-      NR_GlobalMoveDown=10056;
-      NR_GlobalHelp=10057;
-      NR_GlobalHelpHint=10058;
-      NR_GlobalDefault=10059;
-      NR_GlobalCustom=10060;
-      NR_GlobalBytes=10061;
-      NR_GlobalKBytes=10062;
-      NR_GlobalMBytes=10063;
+      NR_GlobalSearchAnd=10042;
+      NR_GlobalSearchOr=10043;
+      NR_GlobalSearchNot=10044;
+      NR_GlobalSelect=10045;
+      NR_GlobalUnselect=10046;
+      NR_GlobalSelectAll=10047;
+      NR_GlobalPrevious=10048;
+      NR_GlobalPreviousHintMediaViewer=10049;
+      NR_GlobalNext=10050;
+      NR_GlobalNextHintMediaViewer=10051;
+      NR_GlobalMore=10052;
+      NR_GlobalOn=10053;
+      NR_GlobalOff=10054;
+      NR_GlobalDoNotChange=10055;
+      NR_GlobalLeft=10056;
+      NR_GlobalRight=10057;
+      NR_GlobalMoveUp=10058;
+      NR_GlobalMoveDown=10059;
+      NR_GlobalHelp=10060;
+      NR_GlobalHelpHint=10061;
+      NR_GlobalDefault=10062;
+      NR_GlobalCustom=10063;
+      NR_GlobalBytes=10064;
+      NR_GlobalKBytes=10065;
+      NR_GlobalMBytes=10066;
 
       NR_LanguageNoVersion=10501;
       NR_LanguageOutdated=10502;
+      NR_LanguageOutdatedShort=10503;
 
       NR_CharsetLower=10601;
       NR_CharsetUpper=10602;
@@ -169,10 +173,11 @@ const NR_Author=1;
       NR_MessageConfirmationDeleteFile=20049;
       NR_MessageConfirmationDeleteFolder=20050;
       NR_MessageDOSBoxOutdated=20051;
-      NR_MessageDirectoryAlreadyExists=20052;
-      NR_MessageCouldNotCopyDirectoriesToCapture=20053;
-      NR_MessageNoFolderNameForMounting=20054;
-      NR_MessageCouldNotFindScummVM=20055;
+      NR_MessageDOSBoxOutdatedShort=20052;
+      NR_MessageDirectoryAlreadyExists=20053;
+      NR_MessageCouldNotCopyDirectoriesToCapture=20054;
+      NR_MessageNoFolderNameForMounting=20055;
+      NR_MessageCouldNotFindScummVM=20056;
       NR_MessageShortNameErrorParentNotFound=20101;
       NR_MessageShortNameErrorDelimiterInFileName=20102;
       NR_MessageShortNameErrorFileNotFound=20103;
@@ -450,15 +455,17 @@ const NR_Author=1;
       NR_ProfileEditorRelPath=40118;
       NR_ProfileEditorRelPathInfo=40119;
       NR_ProfileEditorRelPathHint=40120;
-      NR_ProfileEditorLoadFix=40121;
-      NR_ProfileEditorLoadFixMemory=40122;
-      NR_ProfileEditorCaptureFolder=40123;
-      NR_ProfileEditorExtraFiles=40124;
-      NR_ProfileEditorExtraFilesCaption=40125;
-      NR_ProfileEditorExtraFilesFilter=40126;
-      NR_ProfileEditorExtraDirs=40127;
-      NR_ProfileEditorExtraDirsEditInfo=40128;
-      NR_ProfileEditorGenerateScreenshotFolderName=40129;
+      NR_ProfileEditorIgnoreWindowsWarnings=40121;
+      NR_ProfileEditorIgnoreWindowsWarningsHints=40122;
+      NR_ProfileEditorLoadFix=40123;
+      NR_ProfileEditorLoadFixMemory=40124;
+      NR_ProfileEditorCaptureFolder=40125;
+      NR_ProfileEditorExtraFiles=40126;
+      NR_ProfileEditorExtraFilesCaption=40127;
+      NR_ProfileEditorExtraFilesFilter=40128;
+      NR_ProfileEditorExtraDirs=40129;
+      NR_ProfileEditorExtraDirsEditInfo=40130;
+      NR_ProfileEditorGenerateScreenshotFolderName=40131;
       NR_ProfileEditorGameInfoSheet=40201;
       NR_ProfileEditorGenerateGameDataFolder=40202;
       NR_ProfileEditorMultipleValuesInfo=40203;
@@ -891,22 +898,20 @@ const NR_Author=1;
       NR_SetupFormUpdateInfo=43806;
 
       NR_SetupFormUpdateButton=43807;
-
       NR_SetupFormUpdateDataReader=43808;
       NR_SetupFormUpdateDataReader0=43809;
       NR_SetupFormUpdateDataReader1=43810;
       NR_SetupFormUpdateDataReader2=43811;
       NR_SetupFormUpdateDataReader3=43812;
-
-      NR_SetupFormUpdateDataReaderButton=43813;
-
-      NR_SetupFormUpdatePackages=43814;
-      NR_SetupFormUpdatePackages0=43815;
-      NR_SetupFormUpdatePackages1=43816;
-      NR_SetupFormUpdatePackages2=43817;
-      NR_SetupFormUpdatePackages3=43818;
-
-      NR_SetupFormUpdatePackagesButton=43819;
+      NR_SetupFormUpdatePackages=43813;
+      NR_SetupFormUpdatePackages0=43814;
+      NR_SetupFormUpdatePackages1=43815;
+      NR_SetupFormUpdatePackages2=43816;
+      NR_SetupFormUpdatePackages3=43817;
+      NR_SetupFormUpdateCheats=43818;
+      NR_SetupFormUpdateCheats0=43819;
+      NR_SetupFormUpdateCheats1=43820;
+      NR_SetupFormUpdateCheats2=43821;
 
       NR_SetupFormListViewSheet1=43901;
       NR_SetupFormListViewSheet2=43902;
@@ -1174,6 +1179,8 @@ const NR_Author=1;
       NR_WizardFormWizardModeAutomaticallyIfAutoSetupTemplateExists=50316;
       NR_WizardFormWizardModeAlwaysAllPages=50317;
       NR_WizardFormDoubleProfile=50318;
+      NR_WizardFormInstallationSupportInfo1=50319;
+      NR_WizardFormInstallationSupportInfo2=50320;
 
       NR_CreateShortcutForm=51001;
       NR_CreateShortcutFormLinkName=51002;
@@ -1311,6 +1318,8 @@ const NR_Author=1;
       NR_GameGenreCustom=60019;
       NR_GameLanguageEnglish=60020;
       NR_GameLanguageCustom=60021;
+      NR_GameLicenseEnglish=60022;
+      NR_GameLicenseCustom=60023;
       NR_GameResolution=61001;
       NR_GameWindowResolution=61002;
       NR_GameFullscreenResolution=61003;
@@ -1422,6 +1431,27 @@ const NR_Author=1;
       NR_UpdateNewVersionPart2=70016;
       NR_UpdateSingleInstanceMessage=70017;
 
+      NR_UpdateCheckDialog=70101;
+      NR_UpdateCheckDialogProgram=70102;
+      NR_UpdateCheckDialogProgramInfo=70103;
+      NR_UpdateCheckDialogPackages=70104;
+      NR_UpdateCheckDialogPackagesInfo=70105;
+      NR_UpdateCheckDialogCheats=70106;
+      NR_UpdateCheckDialogCheatsInfo=70107;
+      NR_UpdateCheckDialogDataReader=70108;
+      NR_UpdateCheckDialogDataReaderInfo=70109;
+      NR_UpdateCheckDialogDownload=70110;
+      NR_UpdateCheckDialogUpdate=70111;
+      NR_UpdateCheckDialogAutoUpdate=70112;
+      NR_UpdateCheckDialogStatusNotYetChecked=70113;
+      NR_UpdateCheckDialogStatusSearching=70114;
+      NR_UpdateCheckDialogStatusNoUpdates=70115;
+      NR_UpdateCheckDialogStatusAborted=70116;
+      NR_UpdateCheckDialogStatusProgramNewVersionAvailable=70117;
+      NR_UpdateCheckDialogStatusPackagesDone=70118;
+      NR_UpdateCheckDialogStatusCheatsDone=70119;
+      NR_UpdateCheckDialogStatusDataReaderDone=70120;
+
       NR_CacheChooseCaption=71001;
       NR_CacheChooseInfo=71002;
 
@@ -1509,8 +1539,19 @@ const NR_Author=1;
       NR_FirstRunWizardAcceptAllSettings=79013;
       NR_FirstRunWizardEditSettings=79014;
       NR_FirstRunWizardUpdateNow=79015;
-      NR_FirstRunInfoBar=79016;
-      NR_FirstRunInfoBarCloseHint=79017;
+      NR_FirstRunWizardProgramLanguage=79016;
+      NR_FirstRunWizardDOSBoxDir=79017;
+      NR_FirstRunWizardDOSBoxDirDefault=79018;
+      NR_FirstRunWizardDOSBoxDirCustom=79019;
+      NR_FirstRunWizardDOSBoxDirNoDOSBox=79020;
+      NR_FirstRunWizardDOSBoxDirNoDOSBoxShort=79021;
+      NR_FirstRunWizardDOSBoxDirPortableOK=79022;
+      NR_FirstRunWizardDOSBoxDirPortableOKShort=79023;
+      NR_FirstRunWizardDOSBoxLanguage=79024;
+      NR_FirstRunWizardAutoUpdate=79025;
+      NR_FirstRunWizardAutoUpdateInfo=79026;
+      NR_FirstRunInfoBar=79027;
+      NR_FirstRunInfoBarCloseHint=79028;
 
       NR_ImageFromFolderCaption=80001;
       NR_ImageFromFolderSourceFolder=80002;
@@ -1840,17 +1881,22 @@ const NR_Author=1;
       NR_InstallationSupportDelArchive=96518;
       NR_InstallationSupportDelISO=96519;
       NR_InstallationSupportRun=96520;
-      NR_InstallationSupportRunInfoStarting=96521;
-      NR_InstallationSupportRunInfoRunning=96522;
-      NR_InstallationSupportRunInfoNewGameScan=96523;
-      NR_InstallationSupportRunInfoNewGameScanError=96524;
-      NR_InstallationSupportRunStartGameFile1=96525;
-      NR_InstallationSupportRunStartGameFile2=96526;
-      NR_InstallationSupportRunNoGameFile=96527;
-      NR_InstallationSupportRunInstallationStart1=96528;
-      NR_InstallationSupportRunInstallationStart2=96529;
-      NR_InstallationSupportRunInstallationStart3=96530;
-      NR_InstallationSupportRunUpdateDirectoryInformation=96531;
+      NR_InstallationSupportRunSource=96521;
+      NR_InstallationSupportRunInfoStarting=96522;
+      NR_InstallationSupportRunInfoRunning=96523;
+      NR_InstallationSupportRunInfoNewGameScan=96524;
+      NR_InstallationSupportRunInfoNewGameScanError=96525;
+      NR_InstallationSupportRunStartGameFile1=96526;
+      NR_InstallationSupportRunStartGameFile2=96527;
+      NR_InstallationSupportRunStartGameFile3=96528;
+      NR_InstallationSupportRunNoGameFile=96529;
+      NR_InstallationSupportRunInstallationStart1=96530;
+      NR_InstallationSupportRunInstallationStart2=96531;
+      NR_InstallationSupportRunInstallationStart3=96532;
+      NR_InstallationSupportRunUpdateDirectoryInformation=96533;
+      NR_InstallationSupportArchiveCheck=96534;
+      NR_InstallationSupportZipImportUse=96535;
+      NR_InstallationSupportZipImportUseHint=96536;
 
       NR_ImageFromProfile=96601;
       NR_ImageFromProfileInfoLabel=96602;
@@ -1947,25 +1993,36 @@ const NR_Author=1;
       NR_SearchAddressResult=96868;
       NR_SearchAddressResultMessageStart=96869;
       NR_SearchAddressResultMessageMultipleAddresses=96870;
-      NR_SearchAddressResultMessageMultipleAddressesSearchResults=96871;
-      NR_SearchAddressResultMessageMultipleAddressesCurrentValue=96872;
-      NR_SearchAddressResultMessageNotFound=96873;
-      NR_SearchAddressResultAddress=96874;
-      NR_SearchAddressResultNewValue=96875;
-      NR_SearchAddressResultNewValueHint=96876;
-      NR_SearchAddressResultNewValueMessage=96877;
-      NR_SearchAddressResultNewValueMessageInvalid=96878;
-      NR_SearchAddressResultBytes=96879;
-      NR_SearchAddressResultGameName=96880;
-      NR_SearchAddressResultGameNameMessage=96881;
-      NR_SearchAddressResultDescription=96882;
-      NR_SearchAddressResultDescriptionMessage=96883;
-      NR_SearchAddressResultFileMask=96884;
-      NR_SearchAddressResultFileMaskMessage=96885;
-      NR_SearchAddressResultFileMaskMessageAllFiles=96886;
-      NR_SearchAddressResultUseDialog=96887;
-      NR_SearchAddressResultUseDialogPrompt=96888;
-      NR_SearchAddressResultSuccess=96889;
+      NR_SearchAddressResultMessageMultipleAddressesCurrentValue=96871;
+      NR_SearchAddressResultMessageMultipleAddressesActions=96872;
+      NR_SearchAddressResultMessageMultipleAddressesAction1=96873;
+      NR_SearchAddressResultMessageMultipleAddressesAction2=96874;
+      NR_SearchAddressResultMessageMultipleAddressesAction3=96875;
+      NR_SearchAddressResultMessageNotFound=96876;
+      NR_SearchAddressResultAddress=96877;
+      NR_SearchAddressResultNewValue=96878;
+      NR_SearchAddressResultNewValueHint=96879;
+      NR_SearchAddressResultNewValueMessage=96880;
+      NR_SearchAddressResultNewValueMessageInvalid=96881;
+      NR_SearchAddressResultBytes=96882;
+      NR_SearchAddressResultGameName=96883;
+      NR_SearchAddressResultGameNameMessage=96884;
+      NR_SearchAddressResultDescription=96885;
+      NR_SearchAddressResultDescriptionMessage=96886;
+      NR_SearchAddressResultFileMask=96887;
+      NR_SearchAddressResultFileMaskHint=96888;
+      NR_SearchAddressResultFileMaskMessage=96889;
+      NR_SearchAddressResultFileMaskMessageAllFiles=96890;
+      NR_SearchAddressResultUseDialog=96891;
+      NR_SearchAddressResultUseDialogPrompt=96892;
+      NR_SearchAddressResultSuccess=96893;
+
+      NR_ImportDBGLPackage=96900;
+      NR_ImportDBGLPackageTitle=96901;
+      NR_ImportDBGLPackageAuthor=96902;
+      NR_ImportDBGLPackageNotes=96903;
+      NR_ImportDBGLPackageGames=96904;
+      NR_ImportDBGLPackageProgress=96905;
 
 
 Type TLanguageSetup=class(TBasePrgSetup)
@@ -2026,6 +2083,9 @@ Type TLanguageSetup=class(TBasePrgSetup)
     property Clear : String index NR_GlobalClear read GetString write SetString;
     property ClearMediaViewer : String index NR_GlobalClearMediaViewer read GetString write SetString;
     property Search : String index NR_GlobalSearch read GetString write SetString;
+    property SearchAnd : String index NR_GlobalSearchAnd read GetString2 write SetString2;
+    property SearchOr : String index NR_GlobalSearchOr read GetString2 write SetString2;
+    property SearchNot : String index NR_GlobalSearchNot read GetString2 write SetString2;
     property Select : String index NR_GlobalSelect read GetString write SetString;
     property Unselect : String index NR_GlobalUnselect read GetString write SetString;
     property SelectAll : String index NR_GlobalSelectAll read GetString write SetString;
@@ -2051,6 +2111,7 @@ Type TLanguageSetup=class(TBasePrgSetup)
 
     property LanguageNoVersion : String index NR_LanguageNoVersion read GetString write SetString;
     property LanguageOutdated : String index NR_LanguageOutdated read GetString write SetString;
+    property LanguageOutdatedShort : String index NR_LanguageOutdatedShort read GetString2 write SetString2;
 
     property CharsetLower : String index NR_CharsetLower read GetString write SetString;
     property CharsetUpper : String index NR_CharsetUpper read GetString write SetString;
@@ -2145,6 +2206,7 @@ Type TLanguageSetup=class(TBasePrgSetup)
     property MessageConfirmationDeleteFile : String index NR_MessageConfirmationDeleteFile read GetString write SetString;
     property MessageConfirmationDeleteFolder : String index NR_MessageConfirmationDeleteFolder read GetString write SetString;
     property MessageDOSBoxOutdated : String index NR_MessageDOSBoxOutdated read GetString write SetString;
+    property MessageDOSBoxOutdatedShort : String index NR_MessageDOSBoxOutdatedShort read GetString2 write SetString2;
     property MessageDirectoryAlreadyExists : String index NR_MessageDirectoryAlreadyExists read GetString write SetString;
     property MessageCouldNotCopyDirectoriesToCapture : String index NR_MessageCouldNotCopyDirectoriesToCapture read GetString write SetString;
     property MessageNoFolderNameForMounting : String index NR_MessageNoFolderNameForMounting read GetString write SetString;
@@ -2424,6 +2486,8 @@ Type TLanguageSetup=class(TBasePrgSetup)
     property ProfileEditorRelPath : String index NR_ProfileEditorRelPath read GetString write SetString;
     property ProfileEditorRelPathInfo : String index NR_ProfileEditorRelPathInfo read GetString write SetString;
     property ProfileEditorRelPathHint : String index NR_ProfileEditorRelPathHint read GetString write SetString;
+    property ProfileEditorIgnoreWindowsWarnings : String index NR_ProfileEditorIgnoreWindowsWarnings read GetString2 write SetString2;
+    property ProfileEditorIgnoreWindowsWarningsHints : String index NR_ProfileEditorIgnoreWindowsWarningsHints read GetString2 write SetString2;
 
     property ProfileEditorLoadFix : String index NR_ProfileEditorLoadFix read GetString write SetString;
     property ProfileEditorLoadFixMemory : String index NR_ProfileEditorLoadFixMemory read GetString write SetString;
@@ -2864,13 +2928,15 @@ Type TLanguageSetup=class(TBasePrgSetup)
     property SetupFormUpdateDataReader1 : String index NR_SetupFormUpdateDataReader1 read GetString2 write SetString2;
     property SetupFormUpdateDataReader2 : String index NR_SetupFormUpdateDataReader2 read GetString2 write SetString2;
     property SetupFormUpdateDataReader3 : String index NR_SetupFormUpdateDataReader3 read GetString2 write SetString2;
-    property SetupFormUpdateDataReaderButton : String index NR_SetupFormUpdateDataReaderButton read GetString2 write SetString2;
     property SetupFormUpdatePackages : String index NR_SetupFormUpdatePackages read GetString2 write SetString2;
     property SetupFormUpdatePackages0 : String index NR_SetupFormUpdatePackages0 read GetString2 write SetString2;
     property SetupFormUpdatePackages1 : String index NR_SetupFormUpdatePackages1 read GetString2 write SetString2;
     property SetupFormUpdatePackages2 : String index NR_SetupFormUpdatePackages2 read GetString2 write SetString2;
     property SetupFormUpdatePackages3 : String index NR_SetupFormUpdatePackages3 read GetString2 write SetString2;
-    property SetupFormUpdatePackagesButton : String index NR_SetupFormUpdatePackagesButton read GetString2 write SetString2;
+    property SetupFormUpdateCheats : String index NR_SetupFormUpdateCheats read GetString2 write SetString2;
+    property SetupFormUpdateCheats0 : String index NR_SetupFormUpdateCheats0 read GetString2 write SetString2;
+    property SetupFormUpdateCheats1 : String index NR_SetupFormUpdateCheats1 read GetString2 write SetString2;
+    property SetupFormUpdateCheats2 : String index NR_SetupFormUpdateCheats2 read GetString2 write SetString2;
 
     property SetupFormListViewSheet1 : String index NR_SetupFormListViewSheet1 read GetString write SetString;
     property SetupFormListViewSheet2 : String index NR_SetupFormListViewSheet2 read GetString write SetString;
@@ -3138,6 +3204,8 @@ Type TLanguageSetup=class(TBasePrgSetup)
     property WizardFormWizardModeAutomaticallyIfAutoSetupTemplateExists : String index NR_WizardFormWizardModeAutomaticallyIfAutoSetupTemplateExists read GetString write SetString;
     property WizardFormWizardModeAlwaysAllPages : String index NR_WizardFormWizardModeAlwaysAllPages read GetString write SetString;
     property WizardFormDoubleProfile : String index NR_WizardFormDoubleProfile read GetString write SetString;
+    property WizardFormInstallationSupportInfo1 : String index NR_WizardFormInstallationSupportInfo1 read GetString2 write SetString2;
+    property WizardFormInstallationSupportInfo2 : String index NR_WizardFormInstallationSupportInfo2 read GetString2 write SetString2;
 
     property CreateShortcutForm : String index NR_CreateShortcutForm read GetString write SetString;
     property CreateShortcutFormLinkName : String index NR_CreateShortcutFormLinkName read GetString write SetString;
@@ -3275,6 +3343,8 @@ Type TLanguageSetup=class(TBasePrgSetup)
     property GameGenreCustom : String index NR_GameGenreCustom read GetString write SetString;
     property GameLanguageEnglish : String index NR_GameLanguageEnglish read GetString write SetString;
     property GameLanguageCustom : String index NR_GameLanguageCustom read GetString write SetString;
+    property GameLicenseEnglish : String index NR_GameLicenseEnglish read GetString2 write SetString2;
+    property GameLicenseCustom : String index NR_GameLicenseCustom read GetString2 write SetString2;
     property GameResolution : String index NR_GameResolution read GetString write SetString;
     property GameWindowResolution : String index NR_GameWindowResolution read GetString write SetString;
     property GameFullscreenResolution : String index NR_GameFullscreenResolution read GetString write SetString;
@@ -3384,6 +3454,27 @@ Type TLanguageSetup=class(TBasePrgSetup)
     property UpdateNewVersionPart2 : String index NR_UpdateNewVersionPart2 read GetString write SetString;
     property UpdateSingleInstanceMessage : String index NR_UpdateSingleInstanceMessage read GetString write SetString;
 
+    property UpdateCheckDialog : String index NR_UpdateCheckDialog read GetString2 write SetString2;
+    property UpdateCheckDialogProgram : String index NR_UpdateCheckDialogProgram read GetString2 write SetString2;
+    property UpdateCheckDialogProgramInfo : String index NR_UpdateCheckDialogProgramInfo read GetString2 write SetString2;
+    property UpdateCheckDialogPackages : String index NR_UpdateCheckDialogPackages read GetString2 write SetString2;
+    property UpdateCheckDialogPackagesInfo : String index NR_UpdateCheckDialogPackagesInfo read GetString2 write SetString2;
+    property UpdateCheckDialogCheats : String index NR_UpdateCheckDialogCheats read GetString2 write SetString2;
+    property UpdateCheckDialogCheatsInfo : String index NR_UpdateCheckDialogCheatsInfo read GetString2 write SetString2;
+    property UpdateCheckDialogDataReader : String index NR_UpdateCheckDialogDataReader read GetString2 write SetString2;
+    property UpdateCheckDialogDataReaderInfo : String index NR_UpdateCheckDialogDataReaderInfo read GetString2 write SetString2;
+    property UpdateCheckDialogDownload : String index NR_UpdateCheckDialogDownload read GetString2 write SetString2;
+    property UpdateCheckDialogUpdate : String index NR_UpdateCheckDialogUpdate read GetString2 write SetString2;
+    property UpdateCheckDialogAutoUpdate : String index NR_UpdateCheckDialogAutoUpdate read GetString2 write SetString2;
+    property UpdateCheckDialogStatusNotYetChecked : String index NR_UpdateCheckDialogStatusNotYetChecked read GetString2 write SetString2;
+    property UpdateCheckDialogStatusSearching : String index NR_UpdateCheckDialogStatusSearching read GetString2 write SetString2;
+    property UpdateCheckDialogStatusNoUpdates : String index NR_UpdateCheckDialogStatusNoUpdates read GetString2 write SetString2;
+    property UpdateCheckDialogStatusAborted : String index NR_UpdateCheckDialogStatusAborted read GetString2 write SetString2;
+    property UpdateCheckDialogStatusProgramNewVersionAvailable : String index NR_UpdateCheckDialogStatusProgramNewVersionAvailable read GetString2 write SetString2;
+    property UpdateCheckDialogStatusPackagesDone : String index NR_UpdateCheckDialogStatusPackagesDone read GetString2 write SetString2;
+    property UpdateCheckDialogStatusCheatsDone : String index NR_UpdateCheckDialogStatusCheatsDone read GetString2 write SetString2;
+    property UpdateCheckDialogStatusDataReaderDone : String index NR_UpdateCheckDialogStatusDataReaderDone read GetString2 write SetString2;
+
     property CacheChooseCaption : String index NR_CacheChooseCaption read GetString write SetString;
     property CacheChooseInfo : String index NR_CacheChooseInfo read GetString write SetString;
 
@@ -3471,6 +3562,17 @@ Type TLanguageSetup=class(TBasePrgSetup)
     property FirstRunWizardAcceptAllSettings : String index NR_FirstRunWizardAcceptAllSettings read GetString write SetString;
     property FirstRunWizardEditSettings : String index NR_FirstRunWizardEditSettings read GetString write SetString;
     property FirstRunWizardUpdateNow : String index NR_FirstRunWizardUpdateNow read GetString write SetString;
+    property FirstRunWizardProgramLanguage : String index NR_FirstRunWizardProgramLanguage read GetString2 write SetString2;
+    property FirstRunWizardDOSBoxDir : String index NR_FirstRunWizardDOSBoxDir read GetString2 write SetString2;
+    property FirstRunWizardDOSBoxDirDefault : String index NR_FirstRunWizardDOSBoxDirDefault read GetString2 write SetString2;
+    property FirstRunWizardDOSBoxDirCustom : String index NR_FirstRunWizardDOSBoxDirCustom read GetString2 write SetString2;
+    property FirstRunWizardDOSBoxDirNoDOSBox : String index NR_FirstRunWizardDOSBoxDirNoDOSBox read GetString2 write SetString2;
+    property FirstRunWizardDOSBoxDirNoDOSBoxShort : String index NR_FirstRunWizardDOSBoxDirNoDOSBoxShort read GetString2 write SetString2;
+    property FirstRunWizardDOSBoxDirPortableOK : String index NR_FirstRunWizardDOSBoxDirPortableOK read GetString2 write SetString2;
+    property FirstRunWizardDOSBoxDirPortableOKShort : String index NR_FirstRunWizardDOSBoxDirPortableOKShort read GetString2 write SetString2;
+    property FirstRunWizardDOSBoxLanguage : String index NR_FirstRunWizardDOSBoxLanguage read GetString2 write SetString2;
+    property FirstRunWizardAutoUpdate : String index NR_FirstRunWizardAutoUpdate read GetString2 write SetString2;
+    property FirstRunWizardAutoUpdateInfo : String index NR_FirstRunWizardAutoUpdateInfo read GetString2 write SetString2;
     property FirstRunInfoBar : String index NR_FirstRunInfoBar read GetString write SetString;
     property FirstRunInfoBarCloseHint : String index NR_FirstRunInfoBarCloseHint read GetString write SetString;
 
@@ -3802,17 +3904,22 @@ Type TLanguageSetup=class(TBasePrgSetup)
     property InstallationSupportDelArchive : String index NR_InstallationSupportDelArchive read GetString2 write SetString2;
     property InstallationSupportDelISO : String index NR_InstallationSupportDelISO read GetString2 write SetString2;
     property InstallationSupportRun : String index NR_InstallationSupportRun read GetString2 write SetString2;
+    property InstallationSupportRunSource : String index NR_InstallationSupportRunSource read GetString2 write SetString2;
     property InstallationSupportRunInfoStarting : String index NR_InstallationSupportRunInfoStarting read GetString2 write SetString2;
     property InstallationSupportRunInfoRunning : String index NR_InstallationSupportRunInfoRunning read GetString2 write SetString2;
     property InstallationSupportRunInfoNewGameScan : String index NR_InstallationSupportRunInfoNewGameScan read GetString2 write SetString2;
     property InstallationSupportRunInfoNewGameScanError : String index NR_InstallationSupportRunInfoNewGameScanError read GetString2 write SetString2;
     property InstallationSupportRunStartGameFile1 : String index NR_InstallationSupportRunStartGameFile1 read GetString2 write SetString2;
     property InstallationSupportRunStartGameFile2 : String index NR_InstallationSupportRunStartGameFile2 read GetString2 write SetString2;
+    property InstallationSupportRunStartGameFile3 : String index NR_InstallationSupportRunStartGameFile3 read GetString2 write SetString2;
     property InstallationSupportRunNoGameFile : String index NR_InstallationSupportRunNoGameFile read GetString2 write SetString2;
     property InstallationSupportRunInstallationStart1 : String index NR_InstallationSupportRunInstallationStart1 read GetString2 write SetString2;
     property InstallationSupportRunInstallationStart2 : String index NR_InstallationSupportRunInstallationStart2 read GetString2 write SetString2;
     property InstallationSupportRunInstallationStart3 : String index NR_InstallationSupportRunInstallationStart3 read GetString2 write SetString2;
     property InstallationSupportRunUpdateDirectoryInformation : String index NR_InstallationSupportRunUpdateDirectoryInformation read GetString2 write SetString2;
+    property InstallationSupportArchiveCheck : String index NR_InstallationSupportArchiveCheck read GetString2 write SetString2;
+    property InstallationSupportZipImportUse : String index NR_InstallationSupportZipImportUse read GetString2 write SetString2;
+    property InstallationSupportZipImportUseHint : String index NR_InstallationSupportZipImportUseHint read GetString2 write SetString2;
 
     property ImageFromProfile : String index NR_ImageFromProfile read GetString2 write SetString2;
     property ImageFromProfileInfoLabel : String index NR_ImageFromProfileInfoLabel read GetString2 write SetString2;
@@ -3909,8 +4016,11 @@ Type TLanguageSetup=class(TBasePrgSetup)
     property SearchAddressResult : String index NR_SearchAddressResult read GetString2 write SetString2;
     property SearchAddressResultMessageStart : String index NR_SearchAddressResultMessageStart read GetString2 write SetString2;
     property SearchAddressResultMessageMultipleAddresses : String index NR_SearchAddressResultMessageMultipleAddresses read GetString2 write SetString2;
-    property SearchAddressResultMessageMultipleAddressesSearchResults : String index NR_SearchAddressResultMessageMultipleAddressesSearchResults read GetString2 write SetString2;
     property SearchAddressResultMessageMultipleAddressesCurrentValue : String index NR_SearchAddressResultMessageMultipleAddressesCurrentValue read GetString2 write SetString2;
+    property SearchAddressResultMessageMultipleAddressesActions : String index NR_SearchAddressResultMessageMultipleAddressesActions read GetString2 write SetString2;
+    property SearchAddressResultMessageMultipleAddressesAction1 : String index NR_SearchAddressResultMessageMultipleAddressesAction1 read GetString2 write SetString2;
+    property SearchAddressResultMessageMultipleAddressesAction2 : String index NR_SearchAddressResultMessageMultipleAddressesAction2 read GetString2 write SetString2;
+    property SearchAddressResultMessageMultipleAddressesAction3 : String index NR_SearchAddressResultMessageMultipleAddressesAction3 read GetString2 write SetString2;
     property SearchAddressResultMessageNotFound : String index NR_SearchAddressResultMessageNotFound read GetString2 write SetString2;
     property SearchAddressResultAddress : String index NR_SearchAddressResultAddress read GetString2 write SetString2;
     property SearchAddressResultNewValue : String index NR_SearchAddressResultNewValue read GetString2 write SetString2;
@@ -3923,28 +4033,40 @@ Type TLanguageSetup=class(TBasePrgSetup)
     property SearchAddressResultDescription : String index NR_SearchAddressResultDescription read GetString2 write SetString2;
     property SearchAddressResultDescriptionMessage : String index NR_SearchAddressResultDescriptionMessage read GetString2 write SetString2;
     property SearchAddressResultFileMask : String index NR_SearchAddressResultFileMask read GetString2 write SetString2;
+    property SearchAddressResultFileMaskHint : String index NR_SearchAddressResultFileMaskHint read GetString2 write SetString2;
     property SearchAddressResultFileMaskMessage : String index NR_SearchAddressResultFileMaskMessage read GetString2 write SetString2;
     property SearchAddressResultFileMaskMessageAllFiles : String index NR_SearchAddressResultFileMaskMessageAllFiles read GetString2 write SetString2;
     property SearchAddressResultUseDialog : String index NR_SearchAddressResultUseDialog read GetString2 write SetString2;
     property SearchAddressResultUseDialogPrompt : String index NR_SearchAddressResultUseDialogPrompt read GetString2 write SetString2;
     property SearchAddressResultSuccess : String index NR_SearchAddressResultSuccess read GetString2 write SetString2;
+
+    property ImportDBGLPackage : String index NR_ImportDBGLPackage read GetString2 write SetString2;
+    property ImportDBGLPackageTitle : String index NR_ImportDBGLPackageTitle read GetString2 write SetString2;
+    property ImportDBGLPackageAuthor : String index NR_ImportDBGLPackageAuthor read GetString2 write SetString2;
+    property ImportDBGLPackageNotes : String index NR_ImportDBGLPackageNotes read GetString2 write SetString2;
+    property ImportDBGLPackageGames : String index NR_ImportDBGLPackageGames read GetString2 write SetString2;
+    property ImportDBGLPackageProgress : String index NR_ImportDBGLPackageProgress read GetString2 write SetString2;
   end;
 
 Function RemoveUnderline(const S : String) : String;
 Procedure LoadLanguage(const LanguageFile : String);
 
 Procedure LoadGameListTranslations;
-Procedure GetDefaultGameListTranslations(var DefaultGenreEnglish, DefaultGenreCustom, DefaultLanguageEnglish, DefaultLanguageCustom : TStringList);
+Procedure GetDefaultGameListTranslations(var DefaultGenreEnglish, DefaultGenreCustom, DefaultLanguageEnglish, DefaultLanguageCustom, DefaultLicenseEnglish, DefaultLicenseCustom : TStringList);
 Procedure SaveGameListTranslations;
 
 Function GetCustomGenreName(const S : String) : String; overload;
 Function GetCustomGenreName(const St : TStringList) : TStringList; overload; {original list will be freed !}
 Function GetCustomLanguageName(const S : String) : String; overload;
 Function GetCustomLanguageName(const St : TStringList) : TStringList; overload; {original list will be freed !}
+Function GetCustomLicenseName(const S : String) : String; overload;
+Function GetCustomLicenseName(const St : TStringList) : TStringList; overload; {original list will be freed !}
 Function GetEnglishGenreName(const S : String) : String;
 Function GetEnglishLanguageName(const S : String) : String;
+Function GetEnglishLicenseName(const S : String) : String;
 Function ExtGenreList(const St : TStringList) : TStringList; {original list will be freed !}
 Function ExtLanguageList(const St : TStringList) : TStringList; {original list will be freed !}
+Function ExtLicenseList(const St : TStringList) : TStringList; {original list will be freed !}
 Function GetLanguageList : TStringList;
 Function LanguageFileNameFromName(const Name : String) : String;
 Function FindLanguageInList(const Lang : String; const List : TStrings) : Integer;
@@ -3958,7 +4080,9 @@ var LanguageSetup : TLanguageSetup;
     LanguageSetupEnglishGenres, LanguageSetupEnglishGenresUpper,
     LanguageSetupCustomGenres, LanguageSetupCustomGenresUpper,
     LanguageSetupEnglishLanguages, LanguageSetupEnglishLanguagesUpper,
-    LanguageSetupCustomLanguages, LanguageSetupCustomLanguagesUpper : TStringList;
+    LanguageSetupCustomLanguages, LanguageSetupCustomLanguagesUpper,
+    LanguageSetupEnglishLicenses, LanguageSetupEnglishLicensesUpper,
+    LanguageSetupCustomLicenses, LanguageSetupCustomLicensesUpper : TStringList;
 
 implementation
 
@@ -4051,6 +4175,9 @@ begin
   AddStringRec(NR_GlobalClear,'Global','Clear','Clear');
   AddStringRec(NR_GlobalClearMediaViewer,'Global','Clear.HintMediaViewer','Deletes the selected file.');
   AddStringRec(NR_GlobalSearch,'Global','Search','Search');
+  {AddStringRec(NR_GlobalSearchAnd,'Global','Search.And','and');
+  AddStringRec(NR_GlobalSearchOr,'Global','Search.Or','or');
+  AddStringRec(NR_GlobalSearchNot,'Global','Search.Not','not');}
   AddStringRec(NR_GlobalSelect,'Global','Select','Select');
   AddStringRec(NR_GlobalUnselect,'Global','Unselect','Unselect');
   AddStringRec(NR_GlobalSelectAll,'Global','SelectAll','Select all');
@@ -4076,6 +4203,7 @@ begin
 
   AddStringRec(NR_LanguageNoVersion,'LanguageInfo','NoVersionGiven','The chosen language file has no version information. Perhaps not all needed strings are available in this file.');
   AddStringRec(NR_LanguageOutdated,'LanguageInfo','Outdated','The chosen language file was made for D-Fend Reloaded %s. You are using version %s, this means there will be some untranslated strings in the program if you use this langauge file.');
+  {AddStringRec(NR_LanguageOutdatedShort,'LanguageInfo','Outdated.Short','Language file outdated');}
 
   AddStringRec(NR_CharsetLower,'CharsetSettings','SpecialLower','äöü');
   AddStringRec(NR_CharsetUpper,'CharsetSettings','SpecialUpper','ÄÖÜ');
@@ -4170,6 +4298,7 @@ begin
   AddStringRec(NR_MessageConfirmationDeleteFile,'Messages','ConfirmationDeleteFile','Do you really want to delete %s ?');
   AddStringRec(NR_MessageConfirmationDeleteFolder,'Messages','ConfirmationDeleteFolder','Do you really want to delete %s with all its files and subfolders ?');
   AddStringRec(NR_MessageDOSBoxOutdated,'Messages','DOSBoxOutdated','You are currently using DOSBox %s. D-Fend Reloaded requires DOSBox %s or higher. You should upgrade your DOSBox installation.');
+  {AddStringRec(NR_MessageDOSBoxOutdatedShort,'Messages','DOSBoxOutdated.Short','Version outdated');}
   AddStringRec(NR_MessageDirectoryAlreadyExists,'Messages','DirectoryAlreadyExists','The directory %s can not be created because it already exists.');
   AddStringRec(NR_MessageCouldNotCopyDirectoriesToCapture,'Messages','CouldNotCopyDirectoryToCapture','Cannot copy directories to capture folder. (Tried to copy %s to capture folder.)');
   AddStringRec(NR_MessageNoFolderNameForMounting,'Messages','NoFolderNameForMounting','No folder for extracting the archive file to was given.');
@@ -4330,10 +4459,10 @@ begin
   AddStringRec(NR_MenuHelpAbandonwareInfo,'Menu','Help.AbandonwareInfo','The website you want to open does not belong to the D-Fend Reloaded project. All linked abandonded ware sites say from themselves they offer only games for download when this is permitted. '+
                                                                     'But because sites can change, D-Fend Reloaded can not guarantee this for these links for the future.');
   AddStringRec(NR_MenuHelpHomepage,'Menu','Help.Homepage','D-Fend Reloaded homepage');
-  AddStringRec(NR_MenuHelpHomepageURL,'Menu','Help.HomepageURL','http:/'+'/dfendreloaded.sourceforge.net');
+  AddStringRec(NR_MenuHelpHomepageURL,'Menu','Help.HomepageURL',DFRHomepage);
   AddStringRec(NR_MenuHelpForum,'Menu','Help.Forum','Forum');
   AddStringRec(NR_MenuHelpUpdates,'Menu','Help.SearchForUpdates','Search for updates');
-  AddStringRec(NR_MenuHelpUpdatesURL,'Menu','Help.SearchForUpdatesURL','http:/'+'/dfendreloaded.sourceforge.net/Download.html');
+  AddStringRec(NR_MenuHelpUpdatesURL,'Menu','Help.SearchForUpdatesURL',DFRHomepage+'Download.html');
   AddStringRec(NR_MenuHelpFAQs,'Menu','Help.FAQs','FAQs');
   AddStringRec(NR_MenuHelpStatistics,'Menu','Help.Statistics','Statistics...');
   AddStringRec(NR_MenuHelpOperationMode,'Menu','Help.OperationMode','Operation mode...');
@@ -4452,6 +4581,9 @@ begin
   AddStringRec(NR_ProfileEditorRelPathInfo,'ProfileEditorForm','RelativePath.Info','Info');
   AddStringRec(NR_ProfileEditorRelPathHint,'ProfileEditorForm','RelativePath.Hint','This function has nothing to do with the portable operation mode of D-Fend Realoded! This function is meant to access files inside ISO images mounted in DOSBox which cannot be accessed by the Windows file structure. '+
                                                                                    'If you want to run D-Fend Reloaded from different place use a portable installation. This function will not help you running D-Fend Reloaded portabely.');
+  {AddStringRec(NR_ProfileEditorIgnoreWindowsWarnings,'ProfileEditorForm','IgnoreWindowsWarnings','No Windows file warnings for this profile');
+  AddStringRec(NR_ProfileEditorIgnoreWindowsWarningsHints,'ProfileEditorForm','IgnoreWindowsWarnings.Hints','If you select Windows executable files to be started with DOSBox D-Fend Reloaded will warn you. In some very rare cases an exe file contains DOS and Windows program code. In this case the warning can be disabled.');}
+
   AddStringRec(NR_ProfileEditorLoadFix,'ProfileEditorForm','LoadFix','Use Loadfix');
   AddStringRec(NR_ProfileEditorLoadFixMemory,'ProfileEditorForm','LoadFixMemory','Loadfix-memory (KB)');
   AddStringRec(NR_ProfileEditorCaptureFolder,'ProfileEditorForm','CaptureFolder','Screenshot folder');
@@ -4895,13 +5027,17 @@ begin
   AddStringRec(NR_SetupFormUpdateDataReader1,'SetupForm','Update.DataReader1','On the first use each week');
   AddStringRec(NR_SetupFormUpdateDataReader2,'SetupForm','Update.DataReader2','On the first use each day');
   AddStringRec(NR_SetupFormUpdateDataReader3,'SetupForm','Update.DataReader3','Every time I use the data reader');
-  AddStringRec(NR_SetupFormUpdateDataReaderButton,'SetupForm','Update.DataReaderButton','Update now');
   AddStringRec(NR_SetupFormUpdatePackages,'SetupForm','Update.Packages','Package lists update:');
   AddStringRec(NR_SetupFormUpdatePackages0,'SetupForm','Update.Packages0','Only manual ("Update lists" in packages manager)');
   AddStringRec(NR_SetupFormUpdatePackages1,'SetupForm','Update.Packages1','Weekly');
   AddStringRec(NR_SetupFormUpdatePackages2,'SetupForm','Update.Packages2','Daily');
   AddStringRec(NR_SetupFormUpdatePackages3,'SetupForm','Update.Packages3','Every time the package manager is opened');
-  AddStringRec(NR_SetupFormUpdatePackagesButton,'SetupForm','Update.PackagesButton','Update now');}
+  AddStringRec(NR_SetupFormUpdateCheats,'SetupForm','Update.Cheats','Cheats data base:');
+  AddStringRec(NR_SetupFormUpdateCheats0,'SetupForm','Update.Cheats0','Only manual ("Search for updates" in help menu)');
+  AddStringRec(NR_SetupFormUpdateCheats1,'SetupForm','Update.Cheats1,'Weekly');
+  AddStringRec(NR_SetupFormUpdateCheats2,'SetupForm','Update.Cheats2','Daily');
+
+  }
   AddStringRec(NR_SetupFormListViewSheet1,'SetupForm','GamesListGUI.Columns','Columns in the games list');
   AddStringRec(NR_SetupFormListViewSheet2,'SetupForm','GamesListGUI.ListAppearance','Games list');
   AddStringRec(NR_SetupFormListViewSheet2b,'SetupForm','GamesListGUI.ListAppearanceScreenshotMode','List in screenshot mode');
@@ -5184,6 +5320,8 @@ begin
   AddStringRec(NR_WizardFormWizardModeAutomaticallyIfAutoSetupTemplateExists,'WizardForm','WizardMode.AutomaticallyIfAutoSetupTemplateExists','Only setup game automatically if matching auto setup template exists');
   AddStringRec(NR_WizardFormWizardModeAlwaysAllPages,'WizardForm','WizardMode.AlwaysAllPages','Always show all setup pages of this wizard');
   AddStringRec(NR_WizardFormDoubleProfile,'WizardForm','DoubleProfile','There is already a profile named %s for this game file in the games list. Do you really want to create a second profile for the same game?');
+  {AddStringRec(NR_WizardFormInstallationSupportInfo1,'WizardForm','InstallationSupportInfo1','If the game you want to add needs to be installed first, you should use the');
+  AddStringRec(NR_WizardFormInstallationSupportInfo2,'WizardForm','InstallationSupportInfo2','Game installation wizard');}
 
   AddStringRec(NR_CreateShortcutForm,'CreateShortcutForm','Caption','Create shortcut');
   AddStringRec(NR_CreateShortcutFormLinkName,'CreateShortcutForm','LinkName','Link name');
@@ -5322,6 +5460,8 @@ begin
   AddStringRec(NR_GameGenreCustom,'GameSetup','Genre.CustomNames','');
   AddStringRec(NR_GameLanguageEnglish,'GameSetup','Language.EnglishNames','');
   AddStringRec(NR_GameLanguageCustom,'GameSetup','Language.CustomNames','');
+  {AddStringRec(NR_GameLicenseEnglish,'GameSetup','License.EnglishNames','');
+  AddStringRec(NR_GameLicenseCustom,'GameSetup','License.CustomNames','');}
   AddStringRec(NR_GameResolution,'GameSetup','Resolution','Resolution');
   AddStringRec(NR_GameWindowResolution,'GameSetup','Resolution.Window','Window resolution');
   AddStringRec(NR_GameFullscreenResolution,'GameSetup','Resolution.Fullscreen','Fullscreen resolution');
@@ -5431,6 +5571,27 @@ begin
   AddStringRec(NR_UpdateNewVersionPart2,'UpdateCheck','UpdateNewVersionPart2','on server. Do you want to update now ?');
   AddStringRec(NR_UpdateSingleInstanceMessage,'UpdateCheck','SingleInstanceMessage','The update checker is already running. Please wait for the update checker to finish before starting it again.');
 
+  {AddStringRec(NR_UpdateCheckDialog,'UpdateCheckDialog','Caption','Search for updates');
+  AddStringRec(NR_UpdateCheckDialogProgram,'UpdateCheckDialog','Program','Search for program updates');
+  AddStringRec(NR_UpdateCheckDialogProgramInfo,'UpdateCheckDialog','Program.Info','If activated the update checker will search for new versions of D-Fend Reloaded. If there is a new version, it will ask you, if you want to update your installation.');
+  AddStringRec(NR_UpdateCheckDialogPackages,'UpdateCheckDialog','Packages','Package lists for downloading add-ons and game packages');
+  AddStringRec(NR_UpdateCheckDialogPackagesInfo,'UpdateCheckDialog','Packages.Info','If activated the update checker will update the list of available packages if there are new lists on the server.');
+  AddStringRec(NR_UpdateCheckDialogCheats,'UpdateCheckDialog','Cheats','Cheats database');
+  AddStringRec(NR_UpdateCheckDialogCheatsInfo,'UpdateCheckDialog','Cheats.Info','If activated the update checker add new cheat records to the local data base if there are new records on the server.');
+  AddStringRec(NR_UpdateCheckDialogDataReader,'UpdateCheckDialog','DataReader','Data reader configuration');
+  AddStringRec(NR_UpdateCheckDialogDataReaderInfo,'UpdateCheckDialog','DataReader.Info','If activated the update checker will update the data reader configuration from the server to ensure D-Fend Reloaded is able to interpret the MobyGames search results homepage.');
+  AddStringRec(NR_UpdateCheckDialogDownload,'UpdateCheckDialog','Download','You can also open the D-Fend Reloaded homepage and search for updates manually:');
+  AddStringRec(NR_UpdateCheckDialogUpdate,'UpdateCheckDialog','Update','Update');
+  AddStringRec(NR_UpdateCheckDialogAutoUpdate,'UpdateCheckDialog','AutoUpdate','Automatisches Update konfigurieren');
+  AddStringRec(NR_UpdateCheckDialogStatusNotYetChecked,'UpdateCheckDialog','Status.NotYetChecked','Status: Not yet checked.');
+  AddStringRec(NR_UpdateCheckDialogStatusSearching,'UpdateCheckDialog','Status.Searching','Searching for updates...');
+  AddStringRec(NR_UpdateCheckDialogStatusNoUpdates,'UpdateCheckDialog','Status.NoUpdates','No updates available.');
+  AddStringRec(NR_UpdateCheckDialogStatusAborted,'UpdateCheckDialog','Status.Aborted','Update search has been aborted.');
+  AddStringRec(NR_UpdateCheckDialogStatusProgramNewVersionAvailable,'UpdateCheckDialog','Status.Program.NewVersionAvailable','A new version is available.');
+  AddStringRec(NR_UpdateCheckDialogStatusPackagesDone,'UpdateCheckDialog','Status.Packages.Done','List update check completed.');
+  AddStringRec(NR_UpdateCheckDialogStatusCheatsDone,'UpdateCheckDialog','Status.Cheats.Done','The data base has been updated from the server.');
+  AddStringRec(NR_UpdateCheckDialogStatusDataReaderDone,'UpdateCheckDialog','Status.DataReader.Done','The data reader configuration has been updated from the server.');}
+
   AddStringRec(NR_CacheChooseCaption,'CacheChoose','Caption','File conflict');
   AddStringRec(NR_CacheChooseInfo,'CacheChoose','Info','The listed profiles have changed on disk. This changes will be overwritten with the profiles in memory. If you want to keep the manual made changes to the files on the disk, you have to reload this files now. '+
                                                        'Please select which profiles should be reloaded from disk now.');
@@ -5523,6 +5684,17 @@ begin
   AddStringRec(NR_FirstRunWizardAcceptAllSettings,'FirstRunWizard','AcceptAllSettings','Accept all settings');
   AddStringRec(NR_FirstRunWizardEditSettings,'FirstRunWizard','EditSettings','Edit settings');
   AddStringRec(NR_FirstRunWizardUpdateNow,'FirstRunWizard','SearchForUpdatesNow','Search for updates now');
+  {AddStringRec(NR_FirstRunWizardProgramLanguage,'FirstRunWizard','ProgramLanguage','Program language:');
+  AddStringRec(NR_FirstRunWizardDOSBoxDir,'FirstRunWizard','DOSBoxFolder','DOSBox installation to be used by default:');
+  AddStringRec(NR_FirstRunWizardDOSBoxDirDefault,'FirstRunWizard','DOSBoxFolder.Default','Version installed with D-Fend Reloaded');
+  AddStringRec(NR_FirstRunWizardDOSBoxDirCustom,'FirstRunWizard','DOSBoxFolder.Custom','Custom DOSBox installation');
+  AddStringRec(NR_FirstRunWizardDOSBoxDirNoDOSBox,'FirstRunWizard','DOSBoxFolder.NoDOSBoxFiles','There are no DOSBox program files in the selected folder.');
+  AddStringRec(NR_FirstRunWizardDOSBoxDirNoDOSBoxShort,'FirstRunWizard','DOSBoxFolder.NoDOSBoxFiles.Short','No DOSBox files');
+  AddStringRec(NR_FirstRunWizardDOSBoxDirPortableOK,'FirstRunWizard','DOSBoxFolder.PortableOK','The selected DOSBox folder is a subdirectory of the D-Fend Reloaded program folder. Therefore it will be stored relatively to the D-Fend Reloaded program folder and so this installation can be used portable.');
+  AddStringRec(NR_FirstRunWizardDOSBoxDirPortableOKShort,'FirstRunWizard','DOSBoxFolder.PortableOK.Short','Ok for portable use');
+  AddStringRec(NR_FirstRunWizardDOSBoxLanguage,'FirstRunWizard','DOSBoxLanguage','DOSBox language:');
+  AddStringRec(NR_FirstRunWizardAutoUpdate,'FirstRunWizard','AutoUpdate','Automatically check for updates');
+  AddStringRec(NR_FirstRunWizardAutoUpdateInfo,'FirstRunWizard','AutoUpdate.Info','(You can configurate the details of the update checking process in the program options dialog.)');}
   AddStringRec(NR_FirstRunInfoBar,'FirstRunWizard','MainFormInfoBar','To add a new game to D-Fend Reloaded just drop the archive file containing the game to the program window or copy the game to a subfolder of the games folder (see Extras|Open games folder) and add it via the wizard (Profiles|Add with wizard) '+
                                                                      'or scan the games folder for new games (Extras|Scan games folder for new games). You can also download and install some shareware and freeware games directly from the internet (File|Import|Download packages). '+
                                                                      'Also see the online help on how to add a game (Help|Adding games).');
@@ -5861,17 +6033,22 @@ begin
   AddStringRec(NR_InstallationSupportDelArchive,'InstallationSupport','Del.Archive','Remove archive file from sources list');
   AddStringRec(NR_InstallationSupportDelISO,'InstallationSupport','Del.ISO','Remove iso image from sources list');
   AddStringRec(NR_InstallationSupportRun,'InstallationSupport','Run.Caption','Game installation');
+  AddStringRec(NR_InstallationSupportRunSource,'InstallationSupport','Run.Source','Select active source:');
   AddStringRec(NR_InstallationSupportRunInfoStarting,'InstallationSupport','Run.Info.Starting','Please wait, the starting of the installation programm is being prepared.');
   AddStringRec(NR_InstallationSupportRunInfoRunning,'InstallationSupport','Run.Info.Running','The installation process is being started. Please install the game to any directory on DOSBox drive C:.');
   AddStringRec(NR_InstallationSupportRunInfoNewGameScan,'InstallationSupport','Run.Info.NewGameScan','Scanning the games folder for the new game.');
   AddStringRec(NR_InstallationSupportRunInfoNewGameScanError,'InstallationSupport','Run.Info.NewGameScan.Error','There is no new folder in the games directory from which a new game could be added. Do you want to start the installation program again?');
   AddStringRec(NR_InstallationSupportRunStartGameFile1,'InstallationSupport','Run.StartGameFile1','Press return to start the installation of the game.');
-  AddStringRec(NR_InstallationSupportRunStartGameFile2,'InstallationSupport','Run.StartGameFile2','If D-Fend Reloaded has not selected the right file to start echo type "dir" and press return to see a list of all files then echo type in the name of the installation program and press return.');
+  AddStringRec(NR_InstallationSupportRunStartGameFile2,'InstallationSupport','Run.StartGameFile2','If D-Fend Reloaded has not selected the right file to start type "dir" and press return to see a list of all files then type in the name of the installation program and press return.');
+  AddStringRec(NR_InstallationSupportRunStartGameFile3,'InstallationSupport','Run.StartGameFile3','If the installation was successful, type "exit" and press return to close DOSBox.');
   AddStringRec(NR_InstallationSupportRunNoGameFile,'InstallationSupport','Run.NoGameFile','D-Fend Reloaded has not found out which file to start to install the game. Plase type "dir" and press return to see a list of all files then type in the name of the installation program and press return.');
   AddStringRec(NR_InstallationSupportRunInstallationStart1,'InstallationSupport','Run.InstallationStart1','Just install the game to any directory on drive C: you want.');
   AddStringRec(NR_InstallationSupportRunInstallationStart2,'InstallationSupport','Run.InstallationStart2','When the installation program terminates type "exit" and press return. D-Fend Reloaded will add the new game to the games list then.');
   AddStringRec(NR_InstallationSupportRunInstallationStart3,'InstallationSupport','Run.InstallationStart3','You can switch between the chosen ISO images by pressing Ctrl+F4.');
   AddStringRec(NR_InstallationSupportRunUpdateDirectoryInformation,'InstallationSupport','Run.UpdateDirectoryInformation','Please press Ctrl+F4 in DOSBox to update the folder information available to the installer before continuing the installation.');
+  AddStringRec(NR_InstallationSupportArchiveCheck,'InstallationSupport','ArchiveFileCheck','The game in this archive file looks like it needs to be installed before being able to be used. Do you want to add the game using the installation support wizard?');
+  AddStringRec(NR_InstallationSupportZipImportUse,'InstallationSupport','ZipImport.UseSupport','Use installation support');
+  AddStringRec(NR_InstallationSupportZipImportUseHint,'InstallationSupport','ZipImport.UseSupport.Hint','Do not add this game directly but try to run an install program from the archive file to install the game.');
 
   AddStringRec(NR_ImageFromProfile,'ImageFromProfile','Caption','Create image file based profile from normal profile');
   AddStringRec(NR_ImageFromProfileInfoLabel,'ImageFromProfile','InfoLabel','This function can create a bootable harddisk image from a profile. Running a game under FreeDOS from a harddisk image can solve some rare problems on games not running in DOSBox directly. '+
@@ -5969,9 +6146,12 @@ begin
   AddStringRec(NR_SearchAddressDataFileNameMessage,'SearchAddress','Data.Filename.Message','You have to select a saved game file in which D-Fend Reloaded should search the value.');
   AddStringRec(NR_SearchAddressResult,'SearchAddress','Result','An unique address for the value has been found. You can add this address to your cheats data base now.');
   AddStringRec(NR_SearchAddressResultMessageStart,'SearchAddress','Result.MessageStart','The saved game file has be copied to the D-Fend Reloaded settings folder and can be compared with later versions of the saved game file to find the address of a value be defining if the value has increased or decreased.');
-  AddStringRec(NR_SearchAddressResultMessageMultipleAddresses,'SearchAddress','Result.MessageMultipleAddresses','There are multiple matching addresses. Another search is needed to find the exact address of the value. Do you want to see the partial results of the search?');
-  AddStringRec(NR_SearchAddressResultMessageMultipleAddressesSearchResults,'SearchAddress','Result.MessageMultipleAddresses.SearchResults','Search results');
+  AddStringRec(NR_SearchAddressResultMessageMultipleAddresses,'SearchAddress','Result.MessageMultipleAddresses','Multiple matching addresses have been found. You can store the search results and continue later to find an unique address or you can create a cheat record from one of the addresses below.');
   AddStringRec(NR_SearchAddressResultMessageMultipleAddressesCurrentValue,'SearchAddress','Result.MessageMultipleAddresses.CurrentValue','current value');
+  AddStringRec(NR_SearchAddressResultMessageMultipleAddressesActions,'SearchAddress','Result.MessageMultipleAddresses.Actions','Actions');
+  AddStringRec(NR_SearchAddressResultMessageMultipleAddressesAction1,'SearchAddress','Result.MessageMultipleAddresses.Action1','Store search results and close dialog');
+  AddStringRec(NR_SearchAddressResultMessageMultipleAddressesAction2,'SearchAddress','Result.MessageMultipleAddresses.Action2','Create cheat record from selected address and delete search data');
+  AddStringRec(NR_SearchAddressResultMessageMultipleAddressesAction3,'SearchAddress','Result.MessageMultipleAddresses.Action3','Create cheat record from selected address but keep the search data');
   AddStringRec(NR_SearchAddressResultMessageNotFound,'SearchAddress','Result.MessageNotFound','There is no address matching the search criteria.');
   AddStringRec(NR_SearchAddressResultAddress,'SearchAddress','Result.Address','Address of the value');
   AddStringRec(NR_SearchAddressResultNewValue,'SearchAddress','Result.NewValue','New value');
@@ -5984,11 +6164,19 @@ begin
   AddStringRec(NR_SearchAddressResultDescription,'SearchAddress','Result.Description','Description ("Money" for example)');
   AddStringRec(NR_SearchAddressResultDescriptionMessage,'SearchAddress','Result.Description.Message','You have to enter a description for the address this cheat will change.');
   AddStringRec(NR_SearchAddressResultFileMask,'SearchAddress','Result.FileMask','Filemask ("*.sav" for example)');
+  AddStringRec(NR_SearchAddressResultFileMaskHint,'SearchAddress','Result.FileMask.Hint','(Last saved game: %s)');
   AddStringRec(NR_SearchAddressResultFileMaskMessage,'SearchAddress','Result.FileMask.Message','You have to enter a file mask for the saved games.');
   AddStringRec(NR_SearchAddressResultFileMaskMessageAllFiles,'SearchAddress','Result.FileMask.MessageAllFiles','Using *.* as file mask for the saved games is not a good idea because in case of *.* this action will be displayed always as a suggested action when using the cheat function for a game. Do you really want to use *.* as file mask?');
   AddStringRec(NR_SearchAddressResultUseDialog,'SearchAddress','Result.UseDialog','Let the user enter the new value');
   AddStringRec(NR_SearchAddressResultUseDialogPrompt,'SearchAddress','Result.UseDialog.Prompt','Dialog prompt');
-  AddStringRec(NR_SearchAddressResultSuccess,'SearchAddress','Result.Success','The new cheat has successfully been added to the cheats data base.');}
+  AddStringRec(NR_SearchAddressResultSuccess,'SearchAddress','Result.Success','The new cheat has successfully been added to the cheats data base.');
+
+  AddStringRec(NR_ImportDBGLPackage,'ImportDBGLPackage','Caption','DBGL archive file import');
+  AddStringRec(NR_ImportDBGLPackageTitle,'ImportDBGLPackage','Title','Package title');
+  AddStringRec(NR_ImportDBGLPackageAuthor,'ImportDBGLPackage','Author','Author');
+  AddStringRec(NR_ImportDBGLPackageNotes,'ImportDBGLPackage','Notes','Notes');
+  AddStringRec(NR_ImportDBGLPackageGames,'ImportDBGLPackage','Games','Games to import');
+  AddStringRec(NR_ImportDBGLPackageProgress,'ImportDBGLPackage','Progress','Importing profiles...');}
 end;
 
 destructor TLanguageSetup.Destroy;
@@ -6001,6 +6189,14 @@ Function TLanguageSetup.GetString2(Index : Integer) : String;
 begin
   result:='';
   Case Index of
+    NR_GlobalSearchAnd : result:='and';
+    NR_GlobalSearchOr : result:='or';
+    NR_GlobalSearchNot : result:='not';
+
+    NR_LanguageOutdatedShort : result:='Language file outdated';
+
+    NR_MessageDOSBoxOutdatedShort : result:='Version outdated';
+
     NR_MenuFileImportZIPWithInstallationSupport : result:='Import archive file with installation support...';
 
     NR_MenuProfileAddWithInstallationSupport : result:='&Install from source media...';
@@ -6010,6 +6206,9 @@ begin
     NR_MenuExtrasCheatingEdit : result:='Edit cheats data base...';
     NR_MenuExtrasCheatingSearch : result:='&Search for address in saved game...';
     NR_MenuExtrasImageFromProfile : result:='Create image file based profile from normal &profile...';
+
+    NR_ProfileEditorIgnoreWindowsWarnings : result:='No Windows file warnings for this profile';
+    NR_ProfileEditorIgnoreWindowsWarningsHints : result:='If you select Windows executable files to be started with DOSBox D-Fend Reloaded will warn you. In some very rare cases an exe file contains DOS and Windows program code. In this case the warning can be disabled.';
 
     NR_ProfileEditorSoundMIDIConfigButton : result:='Select MIDI device from device manager';
     NR_ProfileEditorSoundMIDIConfigButtonInfo : result:='If no device is selected, the Windows default MIDI device will be used.';
@@ -6024,17 +6223,58 @@ begin
     NR_SetupFormUpdateDataReader1 : result:='On the first use each week';
     NR_SetupFormUpdateDataReader2 : result:='On the first use each day';
     NR_SetupFormUpdateDataReader3 : result:='Every time I use the data reader';
-    NR_SetupFormUpdateDataReaderButton : result:='Update now';
     NR_SetupFormUpdatePackages : result:='Package lists update:';
     NR_SetupFormUpdatePackages0 : result:='Only manual ("Update lists" in packages manager)';
     NR_SetupFormUpdatePackages1 : result:='Weekly';
     NR_SetupFormUpdatePackages2 : result:='Daily';
     NR_SetupFormUpdatePackages3 : result:='Every time the package manager is opened';
-    NR_SetupFormUpdatePackagesButton : result:='Update now';
+    NR_SetupFormUpdateCheats : result:='Cheats data base:';
+    NR_SetupFormUpdateCheats0 : result:='Only manual ("Search for updates" in help menu)';
+    NR_SetupFormUpdateCheats1 : result:='Weekly';
+    NR_SetupFormUpdateCheats2 : result:='Daily';
 
     NR_SetupFormAutomaticConfiguration : result:='Automatic game configuration';
     NR_SetupFormAutomaticConfigurationArchiveImport : result:='Archive file import';
     NR_SetupFormAutomaticConfigurationArchiveImportNoDialog : result:='Do not show dialog if the game can be identifed by an auto setup template';
+
+    NR_WizardFormInstallationSupportInfo1 : result:='If the game you want to add needs to be installed first, you should use the';
+    NR_WizardFormInstallationSupportInfo2 : result:='Game installation wizard';
+
+    NR_GameLicenseEnglish : result:='';
+    NR_GameLicenseCustom : result:='';
+
+    NR_UpdateCheckDialog : result:='Search for updates';
+    NR_UpdateCheckDialogProgram : result:='Search for program updates';
+    NR_UpdateCheckDialogProgramInfo : result:='If activated the update checker will search for new versions of D-Fend Reloaded. If there is a new version, it will ask you, if you want to update your installation.';
+    NR_UpdateCheckDialogPackages : result:='Package lists for downloading add-ons and game packages';
+    NR_UpdateCheckDialogPackagesInfo : result:='If activated the update checker will update the list of available packages if there are new lists on the server.';
+    NR_UpdateCheckDialogCheats : result:='Cheats database';
+    NR_UpdateCheckDialogCheatsInfo : result:='If activated the update checker add new cheat records to the local data base if there are new records on the server.';
+    NR_UpdateCheckDialogDataReader : result:='Data reader configuration';
+    NR_UpdateCheckDialogDataReaderInfo : result:='If activated the update checker will update the data reader configuration from the server to ensure D-Fend Reloaded is able to interpret the MobyGames search results homepage.';
+    NR_UpdateCheckDialogDownload : result:='You can also open the D-Fend Reloaded homepage and search for updates manually:';
+    NR_UpdateCheckDialogUpdate : result:='Update';
+    NR_UpdateCheckDialogAutoUpdate : result:='Automatisches Update konfigurieren';
+    NR_UpdateCheckDialogStatusNotYetChecked : result:='Status: Not yet checked.';
+    NR_UpdateCheckDialogStatusSearching : result:='Searching for updates...';
+    NR_UpdateCheckDialogStatusNoUpdates : result:='No updates available.';
+    NR_UpdateCheckDialogStatusAborted : result:='Update search has been aborted.';
+    NR_UpdateCheckDialogStatusProgramNewVersionAvailable : result:='A new version is available.';
+    NR_UpdateCheckDialogStatusPackagesDone : result:='List update check completed.';
+    NR_UpdateCheckDialogStatusCheatsDone : result:='The data base has been updated from the server.';
+    NR_UpdateCheckDialogStatusDataReaderDone : result:='The data reader configuration has been updated from the server.';
+
+    NR_FirstRunWizardProgramLanguage : result:='Program language:';
+    NR_FirstRunWizardDOSBoxDir : result:='DOSBox installation to be used by default:';
+    NR_FirstRunWizardDOSBoxDirDefault : result:='Version installed with D-Fend Reloaded';
+    NR_FirstRunWizardDOSBoxDirCustom : result:='Custom DOSBox installation';
+    NR_FirstRunWizardDOSBoxDirNoDOSBox : result:='There are no DOSBox program files in the selected folder.';
+    NR_FirstRunWizardDOSBoxDirNoDOSBoxShort : result:='No DOSBox files';
+    NR_FirstRunWizardDOSBoxDirPortableOK : result:='The selected DOSBox folder is a subdirectory of the D-Fend Reloaded program folder. Therefore it will be stored relatively to the D-Fend Reloaded program folder and so this installation can be used portable.';
+    NR_FirstRunWizardDOSBoxDirPortableOKShort : result:='Ok for portable use';
+    NR_FirstRunWizardDOSBoxLanguage : result:='DOSBox language:';
+    NR_FirstRunWizardAutoUpdate : result:='Automatically check for updates';
+    NR_FirstRunWizardAutoUpdateInfo : result:='(You can configurate the details of the update checking process in the program options dialog.)';
 
     NR_DataReaderSearchForDOSGames : result:='Search for DOS games only';
 
@@ -6058,17 +6298,22 @@ begin
     NR_InstallationSupportDelArchive : result:='Remove archive file from sources list';
     NR_InstallationSupportDelISO : result:='Remove iso image from sources list';
     NR_InstallationSupportRun : result:='Game installation';
+    NR_InstallationSupportRunSource : result:='Select active source:';
     NR_InstallationSupportRunInfoStarting : result:='Please wait, the starting of the installation programm is being prepared.';
     NR_InstallationSupportRunInfoRunning : result:='The installation process is being started. Please install the game to any directory on DOSBox drive C:.';
     NR_InstallationSupportRunInfoNewGameScan : result:='Scanning the games folder for the new game.';
     NR_InstallationSupportRunInfoNewGameScanError : result:='There is no new folder in the games directory from which a new game could be added. Do you want to start the installation program again?';
     NR_InstallationSupportRunStartGameFile1 : result:='Press return to start the installation of the game.';
-    NR_InstallationSupportRunStartGameFile2 : result:='If D-Fend Reloaded has not selected the right file to start echo type "dir" and press return to see a list of all files then echo type in the name of the installation program and press return.';
+    NR_InstallationSupportRunStartGameFile2 : result:='If D-Fend Reloaded has not selected the right file to start type "dir" and press return to see a list of all files then type in the name of the installation program and press return.';
+    NR_InstallationSupportRunStartGameFile3 : result:='If the installation was successful, type "exit" and press return to close DOSBox.';
     NR_InstallationSupportRunNoGameFile : result:='D-Fend Reloaded has not found out which file to start to install the game. Plase type "dir" and press return to see a list of all files then type in the name of the installation program and press return.';
     NR_InstallationSupportRunInstallationStart1 : result:='Just install the game to any directory on drive C: you want.';
     NR_InstallationSupportRunInstallationStart2 : result:='When the installation program terminates type "exit" and press return. D-Fend Reloaded will add the new game to the games list then.';
     NR_InstallationSupportRunInstallationStart3 : result:='You can switch between the chosen ISO images by pressing Ctrl+F4.';
     NR_InstallationSupportRunUpdateDirectoryInformation : result:='Please press Ctrl+F4 in DOSBox to update the folder information available to the installer before continuing the installation.';
+    NR_InstallationSupportArchiveCheck : result:='The game in this archive file looks like it needs to be installed before being able to be used. Do you want to add the game using the installation support wizard?';
+    NR_InstallationSupportZipImportUse : result:='Use installation support';
+    NR_InstallationSupportZipImportUseHint : result:='Do not add this game directly but try to run an install program from the archive file to install the game.';
 
     NR_ImageFromProfile : result:='Create image file based profile from normal profile';
     NR_ImageFromProfileInfoLabel : result:='This function can create a bootable harddisk image from a profile. Running a game under FreeDOS from a harddisk image can solve some rare problems on games not running in DOSBox directly. '+
@@ -6166,9 +6411,12 @@ begin
     NR_SearchAddressDataFileNameMessage : result:='You have to select a saved game file in which D-Fend Reloaded should search the value.';
     NR_SearchAddressResult : result:='An unique address for the value has been found. You can add this address to your cheats data base now.';
     NR_SearchAddressResultMessageStart : result:='The saved game file has be copied to the D-Fend Reloaded settings folder and can be compared with later versions of the saved game file to find the address of a value be defining if the value has increased or decreased.';
-    NR_SearchAddressResultMessageMultipleAddresses : result:='There are multiple matching addresses. Another search is needed to find the exact address of the value. Do you want to see the partial results of the search?';
-    NR_SearchAddressResultMessageMultipleAddressesSearchResults : result:='Search results';
+    NR_SearchAddressResultMessageMultipleAddresses : result:='Multiple matching addresses have been found. You can store the search results and continue later to find an unique address or you can create a cheat record from one of the addresses below.';
     NR_SearchAddressResultMessageMultipleAddressesCurrentValue : result:='current value';
+    NR_SearchAddressResultMessageMultipleAddressesActions : result:='Actions';
+    NR_SearchAddressResultMessageMultipleAddressesAction1 : result:='Store search results and close dialog';
+    NR_SearchAddressResultMessageMultipleAddressesAction2 : result:='Create cheat record from selected address and delete search data';
+    NR_SearchAddressResultMessageMultipleAddressesAction3 : result:='Create cheat record from selected address but keep the search data';
     NR_SearchAddressResultMessageNotFound : result:='There is no address matching the search criteria.';
     NR_SearchAddressResultAddress : result:='Address of the value';
     NR_SearchAddressResultNewValue : result:='New value';
@@ -6181,11 +6429,19 @@ begin
     NR_SearchAddressResultDescription : result:='Description ("Money" for example)';
     NR_SearchAddressResultDescriptionMessage : result:='You have to enter a description for the address this cheat will change.';
     NR_SearchAddressResultFileMask : result:='Filemask ("*.sav" for example)';
+    NR_SearchAddressResultFileMaskHint : result:='(Last saved game: %s)';
     NR_SearchAddressResultFileMaskMessage : result:='You have to enter a file mask for the saved games.';
     NR_SearchAddressResultFileMaskMessageAllFiles : result:='Using *.* as file mask for the saved games is not a good idea because in case of *.* this action will be displayed always as a suggested action when using the cheat function for a game. Do you really want to use *.* as file mask?';
     NR_SearchAddressResultUseDialog : result:='Let the user enter the new value';
     NR_SearchAddressResultUseDialogPrompt : result:='Dialog prompt';
     NR_SearchAddressResultSuccess : result:='The new cheat has successfully been added to the cheats data base.';
+
+    NR_ImportDBGLPackage : result:='DBGL archive file import';
+    NR_ImportDBGLPackageTitle : result:='Package title';
+    NR_ImportDBGLPackageAuthor : result:='Author';
+    NR_ImportDBGLPackageNotes : result:='Notes';
+    NR_ImportDBGLPackageGames : result:='Games to import';
+    NR_ImportDBGLPackageProgress : result:='Importing profiles...';
   End;
 end;
 
@@ -6247,18 +6503,20 @@ begin
   LoadGameListTranslations;
 end;
 
-Procedure GetDefaultGameListTranslations(var DefaultGenreEnglish, DefaultGenreCustom, DefaultLanguageEnglish, DefaultLanguageCustom : TStringList);
+Procedure GetDefaultGameListTranslations(var DefaultGenreEnglish, DefaultGenreCustom, DefaultLanguageEnglish, DefaultLanguageCustom, DefaultLicenseEnglish, DefaultLicenseCustom : TStringList);
 begin
   DefaultGenreEnglish:=ValueToList(LanguageSetup.GameGenreEnglish);
   DefaultGenreCustom:=ValueToList(LanguageSetup.GameGenreCustom);
   DefaultLanguageEnglish:=ValueToList(LanguageSetup.GameLanguageEnglish);
   DefaultLanguageCustom:=ValueToList(LanguageSetup.GameLanguageCustom);
+  DefaultLicenseEnglish:=ValueToList(LanguageSetup.GameLicenseEnglish);
+  DefaultLicenseCustom:=ValueToList(LanguageSetup.GameLicenseCustom);
 end;
 
 Procedure LoadGameListTranslations;
 Var St : TStringList;
     I : Integer;
-    S, FileName, GenreEnglish, GenreCustom, LanguageEnglish, LanguageCustom : String;
+    S, FileName, GenreEnglish, GenreCustom, LanguageEnglish, LanguageCustom, LicenseEnglish, LicenseCustom : String;
     Mem : TMemIniFile;
 begin
   {Clear old data}
@@ -6270,12 +6528,16 @@ begin
   LanguageSetupEnglishLanguagesUpper.Clear;
   LanguageSetupCustomLanguages.Clear;
   LanguageSetupCustomLanguagesUpper.Clear;
+  LanguageSetupCustomLicenses.Clear;
+  LanguageSetupCustomLicensesUpper.Clear;
 
   {Load default values in temp data}
   GenreEnglish:=LanguageSetup.GameGenreEnglish;
   GenreCustom:=LanguageSetup.GameGenreCustom;
   LanguageEnglish:=LanguageSetup.GameLanguageEnglish;
   LanguageCustom:=LanguageSetup.GameLanguageCustom;
+  LicenseEnglish:=LanguageSetup.GameLicenseEnglish;
+  LicenseCustom:=LanguageSetup.GameLicenseCustom;
 
   FileName:=PrgDataDir+LanguageSubDir+'\'+ExtractFileName(ChangeFileExt(LanguageSetup.SetupFile,'.custom.ini'));
   If FileExists(FileName) then begin
@@ -6285,6 +6547,8 @@ begin
       S:=Mem.ReadString('GenreNames','Custom',''); If Trim(S)<>'' then GenreCustom:=S;
       S:=Mem.ReadString('LanguageNames','English',''); If Trim(S)<>'' then LanguageEnglish:=S;
       S:=Mem.ReadString('LanguageNames','Custom',''); If Trim(S)<>'' then LanguageCustom:=S;
+      S:=Mem.ReadString('LicenseNames','English',''); If Trim(S)<>'' then LicenseEnglish:=S;
+      S:=Mem.ReadString('LicenseNames','Custom',''); If Trim(S)<>'' then LicenseCustom:=S;
     finally
       Mem.Free;
     end;
@@ -6299,11 +6563,15 @@ begin
   For I:=0 to LanguageSetupEnglishLanguages.Count-1 do LanguageSetupEnglishLanguagesUpper.Add(ExtUpperCase(LanguageSetupEnglishLanguages[I]));
   St:=ValueToList(LanguageCustom); try LanguageSetupCustomLanguages.AddStrings(St); finally St.Free; end;
   For I:=0 to LanguageSetupCustomLanguages.Count-1 do LanguageSetupCustomLanguagesUpper.Add(ExtUpperCase(LanguageSetupCustomLanguages[I]));
+  St:=ValueToList(LicenseEnglish); try LanguageSetupEnglishLicenses.AddStrings(St); finally St.Free; end;
+  For I:=0 to LanguageSetupEnglishLicenses.Count-1 do LanguageSetupEnglishLicensesUpper.Add(ExtUpperCase(LanguageSetupEnglishLicenses[I]));
+  St:=ValueToList(LicenseCustom); try LanguageSetupCustomLicenses.AddStrings(St); finally St.Free; end;
+  For I:=0 to LanguageSetupCustomLicenses.Count-1 do LanguageSetupCustomLicensesUpper.Add(ExtUpperCase(LanguageSetupCustomLicenses[I]));
 end;
 
 Procedure SaveGameListTranslations;
 Var I : Integer;
-    FileName, GenreEnglish, GenreCustom, LanguageEnglish, LanguageCustom : String;
+    FileName, GenreEnglish, GenreCustom, LanguageEnglish, LanguageCustom, LicenseEnglish, LicenseCustom : String;
     Mem : TMemIniFile;
 begin
   {Make temp data from normal data}
@@ -6311,14 +6579,17 @@ begin
   If Trim(GenreEnglish)=Trim(LanguageSetup.GameGenreEnglish) then GenreEnglish:='';
   GenreCustom:=ListToValue(LanguageSetupCustomGenres);
   If Trim(GenreCustom)=Trim(LanguageSetup.GameGenreCustom) then GenreCustom:='';
-
   LanguageEnglish:=ListToValue(LanguageSetupEnglishLanguages);
   If Trim(LanguageEnglish)=Trim(LanguageSetup.GameLanguageEnglish) then LanguageEnglish:='';
   LanguageCustom:=ListToValue(LanguageSetupCustomLanguages);
   If Trim(LanguageCustom)=Trim(LanguageSetup.GameLanguageCustom) then LanguageCustom:='';
+  LicenseEnglish:=ListToValue(LanguageSetupEnglishLicenses);
+  If Trim(LicenseEnglish)=Trim(LanguageSetup.GameLicenseEnglish) then LicenseEnglish:='';
+  LicenseCustom:=ListToValue(LanguageSetupCustomLicenses);
+  If Trim(LicenseCustom)=Trim(LanguageSetup.GameLicenseCustom) then LicenseCustom:='';
 
   FileName:=PrgDataDir+LanguageSubDir+'\'+ExtractFileName(ChangeFileExt(LanguageSetup.SetupFile,'.custom.ini'));
-  If (GenreEnglish='') and (GenreCustom='') and (LanguageEnglish='') and (LanguageCustom='') then begin
+  If (GenreEnglish='') and (GenreCustom='') and (LanguageEnglish='') and (LanguageCustom='') and (LicenseEnglish='') and (LicenseCustom='') then begin
     {No custom file needed}
     If FileExists(FileName) then ExtDeleteFile(FileName,ftProfile)
   end else begin
@@ -6330,6 +6601,8 @@ begin
       If Trim(GenreCustom)='' then Mem.DeleteKey('GenreNames','Custom') else Mem.WriteString('GenreNames','Custom',GenreCustom);
       If Trim(LanguageEnglish)='' then Mem.DeleteKey('LanguageNames','English') else Mem.WriteString('LanguageNames','English',LanguageEnglish);
       If Trim(LanguageCustom)='' then Mem.DeleteKey('LanguageNames','Custom') else Mem.WriteString('LanguageNames','Custom',LanguageCustom);
+      If Trim(LicenseEnglish)='' then Mem.DeleteKey('LicenseNames','English') else Mem.WriteString('LicenseNames','English',LicenseEnglish);
+      If Trim(LicenseCustom)='' then Mem.DeleteKey('LicenseNames','Custom') else Mem.WriteString('LicenseNames','Custom',LicenseCustom);
       Mem.UpdateFile;
     finally
       Mem.Free;
@@ -6345,6 +6618,10 @@ begin
   For I:=0 to LanguageSetupCustomLanguages.Count-1 do LanguageSetupCustomLanguagesUpper.Add(ExtUpperCase(LanguageSetupCustomLanguages[I]));
   LanguageSetupEnglishLanguagesUpper.Clear;
   For I:=0 to LanguageSetupEnglishLanguages.Count-1 do LanguageSetupEnglishLanguagesUpper.Add(ExtUpperCase(LanguageSetupEnglishLanguages[I]));
+  LanguageSetupCustomLicensesUpper.Clear;
+  For I:=0 to LanguageSetupCustomLicenses.Count-1 do LanguageSetupCustomLicensesUpper.Add(ExtUpperCase(LanguageSetupCustomLicenses[I]));
+  LanguageSetupEnglishLicensesUpper.Clear;
+  For I:=0 to LanguageSetupEnglishLicenses.Count-1 do LanguageSetupEnglishLicensesUpper.Add(ExtUpperCase(LanguageSetupEnglishLicenses[I]));
 end;
 
 Function TranslateCustomString(const S : String; const SourceListUpper, DestList : TStringList) : String;
@@ -6410,6 +6687,24 @@ begin
   result.Sort;
 end;
 
+Function GetCustomLicenseName(const S : String) : String; overload;
+begin
+  result:=TranslateCustomString(S,LanguageSetupEnglishLicensesUpper,LanguageSetupCustomLicenses);
+end;
+
+Function GetCustomLicenseName(const St : TStringList) : TStringList; overload; {original list will be freed !}
+Var I : Integer;
+    S : String;
+begin
+  result:=TStringList.Create;
+  For I:=0 to St.Count-1 do begin
+    S:=GetCustomLicenseName(St[I]);
+    If result.IndexOf(S)<0 then result.Add(S);
+  end;
+  St.Free;
+  result.Sort;
+end;
+
 Function GetEnglishGenreName(const S : String) : String;
 begin
   result:=TranslateCustomString(S,LanguageSetupCustomGenresUpper,LanguageSetupEnglishGenres);
@@ -6418,6 +6713,12 @@ end;
 Function GetEnglishLanguageName(const S : String) : String;
 begin
   result:=TranslateCustomString(S,LanguageSetupCustomLanguagesUpper,LanguageSetupEnglishLanguages);
+end;
+
+Function GetEnglishLicenseName(const S : String) : String;
+begin
+  result:=TranslateCustomString(S,LanguageSetupCustomLicensesUpper,LanguageSetupEnglishLicenses);
+  result:=S;
 end;
 
 Function ExtGenreList(const St : TStringList) : TStringList;
@@ -6449,6 +6750,23 @@ begin
     B:=True;
     For J:=0 to result.Count-1 do If ExtUpperCase(result[J])=S then begin B:=False; break; end;
     If B then result.Add(LanguageSetupCustomLanguages[I]);
+  end;
+
+  result.Sort;
+end;
+
+Function ExtLicenseList(const St : TStringList) : TStringList;
+Var I,J : Integer;
+    S : String;
+    B : Boolean;
+begin
+  result:=TStringList.Create; result.AddStrings(St); St.Free;
+
+  For I:=0 to LanguageSetupCustomLicenses.Count-1 do begin
+    S:=ExtUpperCase(LanguageSetupCustomLicenses[I]);
+    B:=True;
+    For J:=0 to result.Count-1 do If ExtUpperCase(result[J])=S then begin B:=False; break; end;
+    If B then result.Add(LanguageSetupCustomLicenses[I]);
   end;
 
   result.Sort;
@@ -6579,6 +6897,10 @@ initialization
   LanguageSetupEnglishLanguagesUpper:=TStringList.Create;
   LanguageSetupCustomLanguages:=TStringList.Create;
   LanguageSetupCustomLanguagesUpper:=TStringList.Create;
+  LanguageSetupEnglishLicenses:=TStringList.Create;
+  LanguageSetupEnglishLicensesUpper:=TStringList.Create;
+  LanguageSetupCustomLicenses:=TStringList.Create;
+  LanguageSetupCustomLicensesUpper:=TStringList.Create;
   CheckDefaultLanguageFile;
   LoadLanguage(PrgSetup.Language);
 finalization
@@ -6591,4 +6913,8 @@ finalization
   LanguageSetupEnglishLanguagesUpper.Free;
   LanguageSetupCustomLanguages.Free;
   LanguageSetupCustomLanguagesUpper.Free;
+  LanguageSetupEnglishLicenses.Free;
+  LanguageSetupEnglishLicensesUpper.Free;
+  LanguageSetupCustomLicenses.Free;
+  LanguageSetupCustomLicensesUpper.Free;
 end.

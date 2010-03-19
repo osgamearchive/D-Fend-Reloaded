@@ -721,6 +721,7 @@ end;
 { global }
 
 Procedure RemoveNonAutoSetupValues(const G : TGame);
+Var S,T : String;
 begin
   If Trim(G.GameExe)<>'' then G.GameExe:=ExtractFileName(G.GameExe);
   If Trim(G.SetupExe)<>'' then G.SetupExe:=ExtractFileName(G.SetupExe);
@@ -729,6 +730,12 @@ begin
   G.ExtraDirs:='';
   G.ExtraFiles:='';
   G.CustomDOSBoxDir:='';
+
+  If Trim(G.Icon)<>'' then begin
+    S:=ExtUpperCase(MakeAbsPath(G.Icon,PrgSetup.BaseDir));
+    T:=ExtUpperCase(MakeAbsPath(PrgSetup.GameDir,PrgSetup.BaseDir));
+    If Copy(S,1,length(T))=T then G.Icon:='';
+  end;
 end;
 
 Function ShowTemplateDialog(const AOwner : TComponent; const AGameDB : TGameDB; const ASearchLinkFile : TLinkFile; const ADeleteOnExit : TStringList) : TGame;

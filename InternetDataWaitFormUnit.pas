@@ -23,7 +23,7 @@ type
 var
   InternetDataWaitForm: TInternetDataWaitForm;
 
-Function ShowDataReaderInternetConfigWaitDialog(const AOwner : TComponent; const ADataReader : TDataReader; const ACaption, AInfo, AError : String) : Boolean;
+Function ShowDataReaderInternetConfigWaitDialog(const AOwner : TComponent; const ADataReader : TDataReader; const AForceUpdate : Boolean; const ACaption, AInfo, AError : String) : Boolean;
 Function ShowDataReaderInternetListWaitDialog(const AOwner : TComponent; const ADataReader : TDataReader; const AName : String; const ACaption, AInfo, AError : String) : Boolean;
 Function ShowDataReaderInternetDataWaitDialog(const AOwner : TComponent; const ADataReader : TDataReader; const ANr : Integer; const ACaption, AInfo, AError : String) : TDataReaderGameDataThread;
 Procedure ShowDataReaderInternetCoverWaitDialog(const AOwner : TComponent; const ADataReader : TDataReader; const ADownloadURL, ADestFolder : String; const ACaption, AInfo, AError : String);
@@ -70,10 +70,10 @@ begin
   If not result then MessageDlg(AError,mtError,[mbOK],0);
 end;
 
-Function ShowDataReaderInternetConfigWaitDialog(const AOwner : TComponent; const ADataReader : TDataReader; const ACaption, AInfo, AError : String) : Boolean;
+Function ShowDataReaderInternetConfigWaitDialog(const AOwner : TComponent; const ADataReader : TDataReader; const AForceUpdate : Boolean; const ACaption, AInfo, AError : String) : Boolean;
 Var DataReaderLoadConfigThread : TDataReaderLoadConfigThread;
 begin
-  DataReaderLoadConfigThread:=TDataReaderLoadConfigThread.Create(ADataReader);
+  DataReaderLoadConfigThread:=TDataReaderLoadConfigThread.Create(ADataReader,AForceUpdate);
   try
     result:=ShowDataReaderInternetWaitDialog(AOwner,DataReaderLoadConfigThread,ACaption,Format(AInfo,[DomainOnly(DataReaderUpdateURL)]),Format(AError,[DomainOnly(DataReaderUpdateURL)]));
   finally

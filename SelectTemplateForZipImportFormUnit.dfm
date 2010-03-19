@@ -4,7 +4,7 @@ object SelectTemplateForZipImportForm: TSelectTemplateForZipImportForm
   BorderStyle = bsDialog
   Caption = 'SelectTemplateForZipImportForm'
   ClientHeight = 288
-  ClientWidth = 486
+  ClientWidth = 512
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -17,7 +17,7 @@ object SelectTemplateForZipImportForm: TSelectTemplateForZipImportForm
   OnCreate = FormCreate
   OnKeyDown = FormKeyDown
   DesignSize = (
-    486
+    512
     288)
   PixelsPerInch = 96
   TextHeight = 13
@@ -31,21 +31,23 @@ object SelectTemplateForZipImportForm: TSelectTemplateForZipImportForm
     ExplicitTop = 192
   end
   object ProgramFileLabel: TLabel
-    Left = 240
+    Left = 266
     Top = 189
     Width = 57
     Height = 13
     Anchors = [akRight, akBottom]
     Caption = 'Program file'
+    ExplicitLeft = 240
     ExplicitTop = 192
   end
   object SetupFileLabel: TLabel
-    Left = 368
+    Left = 394
     Top = 189
     Width = 45
     Height = 13
     Anchors = [akRight, akBottom]
     Caption = 'Setup file'
+    ExplicitLeft = 368
     ExplicitTop = 192
   end
   object WarningLabel: TLabel
@@ -65,33 +67,30 @@ object SelectTemplateForZipImportForm: TSelectTemplateForZipImportForm
     TabOrder = 8
     OnClick = OKButtonClick
     Kind = bkOK
-    ExplicitTop = 258
   end
   object CancelButton: TBitBtn
-    Left = 128
+    Left = 119
     Top = 255
     Width = 97
     Height = 25
     Anchors = [akLeft, akBottom]
     TabOrder = 9
     Kind = bkCancel
-    ExplicitTop = 258
   end
   object HelpButton: TBitBtn
-    Left = 242
+    Left = 407
     Top = 255
     Width = 97
     Height = 25
     Anchors = [akLeft, akBottom]
-    TabOrder = 10
+    TabOrder = 11
     OnClick = HelpButtonClick
     Kind = bkHelp
-    ExplicitTop = 258
   end
   object TemplateType1RadioButton: TRadioButton
     Left = 16
     Top = 109
-    Width = 460
+    Width = 486
     Height = 17
     Anchors = [akLeft, akRight, akBottom]
     Caption = 'Matching auto setup template'
@@ -99,34 +98,34 @@ object SelectTemplateForZipImportForm: TSelectTemplateForZipImportForm
     TabOrder = 2
     TabStop = True
     OnClick = TypeSelectClick
-    ExplicitTop = 112
+    ExplicitWidth = 460
   end
   object TemplateType2RadioButton: TRadioButton
     Left = 16
     Top = 132
-    Width = 460
+    Width = 486
     Height = 17
     Anchors = [akLeft, akRight, akBottom]
     Caption = 'Auto setup template'
     TabOrder = 3
     OnClick = TypeSelectClick
-    ExplicitTop = 135
+    ExplicitWidth = 460
   end
   object TemplateType3RadioButton: TRadioButton
     Left = 16
     Top = 155
-    Width = 460
+    Width = 486
     Height = 17
     Anchors = [akLeft, akRight, akBottom]
     Caption = 'User template'
     TabOrder = 4
     OnClick = TypeSelectClick
-    ExplicitTop = 158
+    ExplicitWidth = 460
   end
   object ProfileNameEdit: TLabeledEdit
     Left = 16
     Top = 24
-    Width = 460
+    Width = 486
     Height = 21
     Anchors = [akLeft, akTop, akRight]
     EditLabel.Width = 59
@@ -134,29 +133,32 @@ object SelectTemplateForZipImportForm: TSelectTemplateForZipImportForm
     EditLabel.Caption = 'Profile name'
     TabOrder = 0
     OnChange = ProfileNameEditChange
+    ExplicitWidth = 460
   end
   object TemplateComboBox: TComboBox
     Left = 16
     Top = 208
-    Width = 201
+    Width = 227
     Height = 21
     Style = csDropDownList
     Anchors = [akLeft, akRight, akBottom]
-    ItemHeight = 0
+    ItemHeight = 13
     TabOrder = 5
     OnChange = TemplateComboBoxChange
     OnDropDown = ComboBoxDropDown
+    ExplicitWidth = 201
   end
   object ProgramFileComboBox: TComboBox
-    Left = 240
+    Left = 266
     Top = 208
     Width = 108
     Height = 21
     Style = csDropDownList
     Anchors = [akRight, akBottom]
-    ItemHeight = 0
+    ItemHeight = 13
     TabOrder = 6
     OnDropDown = ComboBoxDropDown
+    ExplicitLeft = 240
   end
   object FolderEdit: TLabeledEdit
     Left = 16
@@ -170,14 +172,40 @@ object SelectTemplateForZipImportForm: TSelectTemplateForZipImportForm
     OnChange = FolderEditChange
   end
   object SetupFileComboBox: TComboBox
-    Left = 368
+    Left = 394
     Top = 208
     Width = 108
     Height = 21
     Style = csDropDownList
     Anchors = [akRight, akBottom]
-    ItemHeight = 0
+    ItemHeight = 13
     TabOrder = 7
     OnDropDown = ComboBoxDropDown
+    ExplicitLeft = 368
+  end
+  object InstallSupportButton: TBitBtn
+    Left = 222
+    Top = 255
+    Width = 179
+    Height = 25
+    Caption = 'Use installation support'
+    ParentShowHint = False
+    ShowHint = True
+    TabOrder = 10
+    OnClick = InstallSupportButtonClick
+    Glyph.Data = {
+      76010000424D7601000000000000760000002800000020000000100000000100
+      04000000000000010000120B0000120B00001000000000000000000000000000
+      800000800000008080008000000080008000808000007F7F7F00BFBFBF000000
+      FF0000FF000000FFFF00FF000000FF00FF00FFFF0000FFFFFF00333333333333
+      333333FFFFFFFFFFFFF33000077777770033377777777777773F000007888888
+      00037F3337F3FF37F37F00000780088800037F3337F77F37F37F000007800888
+      00037F3337F77FF7F37F00000788888800037F3337777777337F000000000000
+      00037F3FFFFFFFFFFF7F00000000000000037F77777777777F7F000FFFFFFFFF
+      00037F7F333333337F7F000FFFFFFFFF00037F7F333333337F7F000FFFFFFFFF
+      00037F7F333333337F7F000FFFFFFFFF00037F7F333333337F7F000FFFFFFFFF
+      00037F7F333333337F7F000FFFFFFFFF07037F7F33333333777F000FFFFFFFFF
+      0003737FFFFFFFFF7F7330099999999900333777777777777733}
+    NumGlyphs = 2
   end
 end

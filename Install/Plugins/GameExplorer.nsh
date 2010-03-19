@@ -85,8 +85,8 @@
   !endif
  
   ${If} $0 != 0 # S_OK
-
-    ;SetErrors
+ 
+    SetErrors
  
   ${Else}
  
@@ -96,14 +96,14 @@
  
       SetShellVarContext all
  
-    !else if if ${CONTEXT} == user
+    !else if ${CONTEXT} == user
  
-      SetShellVarContext user
+      SetShellVarContext current
  
     !endif
  
-    CreateDirectory LOCALAPPDATA\Microsoft\Windows\GameExplorer\$R2\PlayTasks\0
-    CreateShortcut $LOCALAPPDATA\Microsoft\Windows\GameExplorer\$R2\PlayTasks\0\Play.lnk $R3
+    CreateDirectory $APPDATA\Microsoft\Windows\GameExplorer\$R2\PlayTasks\0
+    CreateShortcut $APPDATA\Microsoft\Windows\GameExplorer\$R2\PlayTasks\0\Play.lnk $R3
  
   ${EndIf}
  
@@ -159,7 +159,7 @@
     Goto "done_${__GAME_EXPLORER_UNIQUE}"
  
   ${EndIf}
- 
+
   System::Call "$1->${Function}(i r2, i r3, i r4, i r5) i .r0"
  
   ${If} $0 != 0 # S_OK

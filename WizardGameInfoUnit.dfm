@@ -91,11 +91,18 @@ object WizardGameInfoFrame: TWizardGameInfoFrame
     ShowHint = True
     OnClick = DelButtonClick
   end
+  object MultiValueInfoLabel: TLabel
+    Left = 8
+    Top = 124
+    Width = 250
+    Height = 13
+    Caption = 'You can enter multiple values per key divided by ";".'
+  end
   object GameInfoValueListEditor: TValueListEditor
     Left = 8
-    Top = 144
+    Top = 140
     Width = 571
-    Height = 145
+    Height = 160
     Anchors = [akLeft, akTop, akRight]
     Strings.Strings = (
       '=')
@@ -106,7 +113,7 @@ object WizardGameInfoFrame: TWizardGameInfoFrame
   end
   object FavouriteCheckBox: TCheckBox
     Left = 440
-    Top = 123
+    Top = 118
     Width = 139
     Height = 21
     Anchors = [akTop, akRight]
@@ -137,7 +144,7 @@ object WizardGameInfoFrame: TWizardGameInfoFrame
   end
   object ToolBarPanel: TPanel
     Left = 8
-    Top = 290
+    Top = 300
     Width = 571
     Height = 30
     Anchors = [akLeft, akTop, akRight]
@@ -156,8 +163,6 @@ object WizardGameInfoFrame: TWizardGameInfoFrame
       ShowCaptions = True
       TabOrder = 0
       Wrapable = False
-      ExplicitTop = 22
-      ExplicitWidth = 409
       object SearchGameButton: TToolButton
         Tag = 2
         Left = 0

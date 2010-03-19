@@ -1,5 +1,41 @@
 D-Fend Reloaded Changelog
 
+Version 0.9.2 (03/19/2010)
+==========================
+- The Italian language file has been updated.
+- Updated DOSZip from 1.41 to 1.49.
+- The functions for filtering the games list by a search string can handle
+  complex search strings (including "and", "or", "not", quotes, brackets,
+  compare operators for numbers, selecting properties to check by writing
+  "genre=..." etc.) now.
+- D-Fend Reloaded will use an internal update checker for checking for
+  program updates now. This will also fix the Windows 7 issue the program
+  looses focus on start up.
+- When running an update via the update check function the update installer
+  will not ask for the installation directory anymore.
+- The codepage selection dropdown box in the profile editor will show some
+  descriptions for the codepages now.
+- Improved DOSBox directory search order (if not installed together with
+  DOSBox) on first run.
+- About 100 new auto setup templates for automatical installation of even more
+  games.
+- Some fine tuning to the way game and setup files are detected when importing
+  plain archive files.
+- D-Fend Reloaded will start a bit faster on first run now.
+- [Fix] The selected keyboard layout when defining a DOSBox installation
+  specific keyboard layout in the advanced DOSBox settings may not got saved.
+- [Fix] Setting the DOSBox background priority for multiple profiles at once
+  via the multi profile editor did not work correctly.
+- [Fix] Setting the CD volume did not work.
+- [Fix] In some conditions the Game Explorer integration during installation
+  could fail.
+- [Fix] When adding profiles via the scan games folder function the entered
+  name for the new profile was ignored when an auto setup template was
+  selected to be used for the new profile.
+- [Fix] When copying a profile or adding profiles via the scan games folder
+  function no collision check for existing capture folders was performed.
+
+
 Version 0.9.1 (02/05/2010)
 ==========================
 - Brazilian Portuguese language file (thanks to Cpt.Guapo)

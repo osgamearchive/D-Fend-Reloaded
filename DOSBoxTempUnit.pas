@@ -15,6 +15,8 @@ Type TTempGame=class
     property Game : TGame read FGame;
 end;
 
+const TempDOSBoxName='TempDOSBox';
+
 implementation
 
 uses PrgSetupUnit, CommonTools;
@@ -34,7 +36,7 @@ begin
   PrgSetup.MinimizeOnWindowsGameStart:=False;
 
   If InitTempGame then begin
-    FTempProf:=TempDir+'TempDOSBox.prof';
+    FTempProf:=TempDir+TempDOSBoxName+'.prof';
     FGame:=TGame.Create(FTempProf);
     DefaultGame:=TGame.Create(PrgSetup);
     try FGame.AssignFrom(DefaultGame); finally DefaultGame.Free; end;

@@ -51,12 +51,13 @@ type
     WindowsExe : Boolean;
     OpenEditorNow : Boolean;
     LinkFile : TLinkFile;
+    OpenInstallationSupportDialog : Boolean;
   end;
 
 var
   WizardForm: TWizardForm;
 
-Function ShowWizardDialog(const AOwner : TComponent; const AGameDB : TGameDB; const AExeFile : String; const AWindowsExe : Boolean; var AGame : TGame; var OpenEditorNow : Boolean; const ASearchLinkFile : TLinkFile) : Boolean;
+Function ShowWizardDialog(const AOwner : TComponent; const AGameDB : TGameDB; const AExeFile : String; const AWindowsExe : Boolean; var AGame : TGame; var OpenEditorNow, OpenInstallationSupport : Boolean; const ASearchLinkFile : TLinkFile) : Boolean;
 
 implementation
 
@@ -131,12 +132,13 @@ begin
   ActivePage:=0;
   InsecureTemplate:=False;
   OpenEditorNow:=False;
+  OpenInstallationSupportDialog:=False;
 end;
 
 procedure TWizardForm.FormShow(Sender: TObject);
 begin
   WizardBaseFrame:=TWizardBaseFrame.Create(self); WizardBaseFrame.Parent:=self;
-  with WizardBaseFrame do begin Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName); Align:=alClient; Visible:=False; Init(GameDB); end;
+  with WizardBaseFrame do begin Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName); Align:=alClient; Visible:=False; Init(GameDB,self); end;
 
   WizardPrgFileFrame:=TWizardPrgFileFrame.Create(self); WizardPrgFileFrame.Parent:=self;
   with WizardPrgFileFrame do begin Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName); Align:=alClient; Visible:=False; Init(GameDB); end;
@@ -403,8 +405,11 @@ end;
 
 { global }
 
-Function ShowWizardDialog(const AOwner : TComponent; const AGameDB : TGameDB; const AExeFile : String; const AWindowsExe : Boolean; var AGame : TGame; var OpenEditorNow : Boolean; const ASearchLinkFile : TLinkFile) : Boolean;
+Function ShowWizardDialog(const AOwner : TComponent; const AGameDB : TGameDB; const AExeFile : String; const AWindowsExe : Boolean; var AGame : TGame; var OpenEditorNow, OpenInstallationSupport : Boolean; const ASearchLinkFile : TLinkFile) : Boolean;
 begin
+  OpenEditorNow:=False;
+  OpenInstallationSupport:=False;
+
   WizardForm:=TWizardForm.Create(AOwner);
   try
     WizardForm.GameDB:=AGameDB;
@@ -412,6 +417,9 @@ begin
     WizardForm.ExeFile:=AExeFile;
     WizardForm.WindowsExe:=AWindowsExe;
     result:=(WizardForm.ShowModal=mrOK);
+    if (not result) and WizardForm.OpenInstallationSupportDialog then begin
+      OpenInstallationSupport:=True;
+    end;
     if result then begin
       AGame:=WizardForm.Game;
       OpenEditorNow:=WizardForm.OpenEditorNow;

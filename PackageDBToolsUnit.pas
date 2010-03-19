@@ -23,10 +23,12 @@ Function ReplaceBRs(const S : String) : String;
 
 Procedure ClearPackageCache;
 
+Function UpdatePackageDB(const Owner : TComponent; const UpdateAllListe : Boolean) : Boolean;
+
 implementation
 
 uses Windows, SysUtils, Forms, Dialogs, Controls, IdHTTP, LanguageSetupUnit,
-     CommonTools, PrgConsts, PrgSetupUnit;
+     CommonTools, PrgConsts, PrgSetupUnit, PackageDBUnit, DownloadWaitFormUnit;
 
 Function LoadXMLDoc(const FileName : String; var XMLDoc : TXMLDocument; const OrigFileName : String) : String;
 Var MSt : TMemoryStream;
@@ -289,6 +291,51 @@ begin
   end;
 
   ExtDeleteFolder(PrgDataDir+PackageDBCacheSubFolder,ftTemp);
+end;
+
+Type TPackageDownloadStatusClass=class
+  private
+    FOwner : TComponent;
+  public
+    Constructor Create(const AOwner : TComponent);
+    Procedure PackageDBDownload(Sender : TObject; const Progress, Size : Integer; const Status : TDownloadStatus; var ContinueDownload : Boolean);
+end;
+
+constructor TPackageDownloadStatusClass.Create(const AOwner: TComponent);
+begin
+  inherited Create;
+  FOwner:=AOwner;
+end;
+
+Procedure TPackageDownloadStatusClass.PackageDBDownload(Sender : TObject; const Progress, Size : Integer; const Status : TDownloadStatus; var ContinueDownload : Boolean);
+begin
+  Case Status of
+    dsStart : begin InitDownloadWaitForm(FOwner,Size); end;
+    dsProgress : begin
+                   If DownloadWaitForm.ProgressBar.Max=1 then DownloadWaitForm.ProgressBar.Max:=Size;
+                   ContinueDownload:=StepDownloadWaitForm(Progress);
+                 end;
+    dsDone : begin DoneDownloadWaitForm; end;
+  End;
+end;
+
+Function UpdatePackageDB(const Owner : TComponent; const UpdateAllListe : Boolean) : Boolean;
+Var PackageDB : TPackageDB;
+    PackageDownloadStatusClass : TPackageDownloadStatusClass;
+begin
+  PackageDownloadStatusClass:=TPackageDownloadStatusClass.Create(Owner);
+  try
+    PackageDB:=TPackageDB.Create;
+    try
+      PackageDB.LoadDB(False,False);
+      PackageDB.OnDownload:=PackageDownloadStatusClass.PackageDBDownload;
+      result:=PackageDB.LoadDB(True,((Word(GetKeyState(VK_LSHIFT)) div 256)<>0) or ((Word(GetKeyState(VK_RSHIFT)) div 256)<>0));
+    finally
+      PackageDB.Free;
+    end;
+  finally
+    PackageDownloadStatusClass.Free;
+  end;
 end;
 
 end.

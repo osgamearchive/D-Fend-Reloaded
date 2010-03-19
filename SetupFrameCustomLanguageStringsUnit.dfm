@@ -109,9 +109,9 @@ object SetupFrameCustomLanguageStrings: TSetupFrameCustomLanguageStrings
   end
   object InfoLabel: TLabel
     Left = 16
-    Top = 516
+    Top = 512
     Width = 689
-    Height = 29
+    Height = 34
     Anchors = [akLeft, akRight, akBottom]
     AutoSize = False
     Caption = 
@@ -125,7 +125,7 @@ object SetupFrameCustomLanguageStrings: TSetupFrameCustomLanguageStrings
     Width = 145
     Height = 21
     Style = csDropDownList
-    ItemHeight = 0
+    ItemHeight = 13
     TabOrder = 0
     OnChange = TypeComboBoxChange
   end
@@ -133,7 +133,7 @@ object SetupFrameCustomLanguageStrings: TSetupFrameCustomLanguageStrings
     Left = 16
     Top = 43
     Width = 689
-    Height = 471
+    Height = 468
     Anchors = [akLeft, akTop, akRight, akBottom]
     ColCount = 2
     FixedCols = 0

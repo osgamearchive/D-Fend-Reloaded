@@ -29,6 +29,7 @@ object CheatSearchForm: TCheatSearchForm
     Width = 550
     Height = 286
     Anchors = [akLeft, akTop, akRight, akBottom]
+    PageIndex = 2
     TabOrder = 0
     object TPage
       Left = 0
@@ -210,7 +211,7 @@ object CheatSearchForm: TCheatSearchForm
         Width = 249
         Height = 21
         Style = csDropDownList
-        ItemHeight = 13
+        ItemHeight = 0
         ItemIndex = 0
         TabOrder = 3
         Text = 'Value has increased since last search'
@@ -235,8 +236,6 @@ object CheatSearchForm: TCheatSearchForm
       Left = 0
       Top = 0
       Caption = 'Actions'
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         550
         286)
@@ -266,6 +265,13 @@ object CheatSearchForm: TCheatSearchForm
         Height = 13
         Caption = 'Game name'
       end
+      object LastSavedGameHintLabel: TLabel
+        Left = 192
+        Top = 183
+        Width = 121
+        Height = 13
+        Caption = 'LastSavedGameHintLabel'
+      end
       object AddressEdit: TLabeledEdit
         Left = 16
         Top = 71
@@ -283,15 +289,16 @@ object CheatSearchForm: TCheatSearchForm
         Width = 97
         Height = 21
         Style = csDropDownList
-        ItemHeight = 0
+        ItemHeight = 13
         TabOrder = 2
+        OnChange = BytesComboBoxChange
       end
       object GameNameComboBox: TComboBox
         Left = 16
         Top = 131
         Width = 249
         Height = 21
-        ItemHeight = 0
+        ItemHeight = 13
         TabOrder = 3
       end
       object DescriptionEdit: TLabeledEdit
@@ -342,6 +349,54 @@ object CheatSearchForm: TCheatSearchForm
         EditLabel.Caption = 'Dialog prompt'
         TabOrder = 7
         OnChange = UseDialogEditChange
+      end
+    end
+    object TPage
+      Left = 0
+      Top = 0
+      Caption = 'SelectAction'
+      ExplicitWidth = 0
+      ExplicitHeight = 0
+      DesignSize = (
+        550
+        286)
+      object SelectActionLabel: TLabel
+        Left = 16
+        Top = 16
+        Width = 521
+        Height = 33
+        Anchors = [akLeft, akTop, akRight]
+        AutoSize = False
+        Caption = 
+          'Multiple matching addresses have been found. You can store the s' +
+          'earch results and continue later to find an unique address or yo' +
+          'u can create a cheat record from one of the addresses below.'
+        WordWrap = True
+      end
+      object SelectActionRadioGroup: TRadioGroup
+        Left = 16
+        Top = 200
+        Width = 521
+        Height = 73
+        Anchors = [akLeft, akRight, akBottom]
+        Caption = 'Actions'
+        ItemIndex = 0
+        Items.Strings = (
+          'Store search results and close dialog'
+          'Create cheat record from selected address and delete search data'
+          
+            'Create cheat record from selected address but keep the search da' +
+            'ta')
+        TabOrder = 1
+      end
+      object SelectActionListBox: TListBox
+        Left = 16
+        Top = 55
+        Width = 521
+        Height = 139
+        Anchors = [akLeft, akTop, akRight, akBottom]
+        ItemHeight = 13
+        TabOrder = 0
       end
     end
   end

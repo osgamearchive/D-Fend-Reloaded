@@ -12,13 +12,38 @@
 ; Settings for the modern user interface (MUI)
 ; ============================================================
 
+!include FileFunc.nsh
+!insertmacro GetParameters
+!insertmacro GetOptions
+
+!define MUI_PAGE_CUSTOMFUNCTION_PRE SkipPageIfAutoUpdate
 !insertmacro MUI_PAGE_WELCOME
+!define MUI_PAGE_CUSTOMFUNCTION_PRE SkipPageIfAutoUpdate
 !insertmacro MUI_PAGE_DIRECTORY
 !insertmacro MUI_PAGE_INSTFILES
+!define MUI_PAGE_CUSTOMFUNCTION_PRE SkipPageAndCloseIfAutoUpdate
 !insertmacro MUI_PAGE_FINISH
 
 !insertmacro UninstallerPages
 !insertmacro LanguageSetup
+
+Function SkipPageIfAutoUpdate
+	${GetParameters} $R0
+    ClearErrors
+    ${GetOptions} $R0 /A $R0
+    IfErrors +2 0
+	Abort
+FunctionEnd
+
+Function SkipPageAndCloseIfAutoUpdate
+	${GetParameters} $R0
+    ClearErrors
+    ${GetOptions} $R0 /A $R0
+    IfErrors ShowFinishPage 0
+	Call ExecAppFile
+	Abort
+	ShowFinishPage:
+FunctionEnd
 
 
 
@@ -198,17 +223,7 @@ Section "$(LANGNAME_DFendReloaded)" ID_DFend
   SetShellVarContext all
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\D-Fend Reloaded" "DisplayVersion" "${VER_MAYOR}.${VER_MINOR1}.${VER_MINOR2}"
   
-  ; Add/Update to Vista games explorer
-  IfFileExists "$LOCALAPPDATA\Microsoft\Windows\GameExplorer\*.*" 0 NoUninstallerUpdate
-  ClearErrors
-  ReadRegStr $GEGUID HKLM "Software\D-Fend Reloaded" "GameExplorerGUID"  
-  IfErrors 0 NoNewGEGUIDNeeded
-  ${GameExplorer_GenerateGUID}
-  Pop $GEGUID
-  WriteRegStr HKLM "Software\D-Fend Reloaded" "GameExplorerGUID" "$GEGUID"
-  NoNewGEGUIDNeeded:
-  ClearErrors
-  ${GameExplorer_AddGame} all $INSTDIR\Bin\DFendGameExplorerData.dll $INSTDIR $INSTDIR\DFend.exe $GEGUID  
+  !insertmacro AddToGamesExplorer
   
   NoUninstallerUpdate:
   

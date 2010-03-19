@@ -17,15 +17,18 @@ type
     WizardModeComboBox: TComboBox;
     ListScummGamesLabel: TLabel;
     ShowInfoLabel: TLabel;
+    InfoLabelInstallationSupport: TLabel;
+    InfoLabelInstallationSupportLink: TLabel;
     procedure ButtonWork(Sender: TObject);
   private
     { Private-Deklarationen }
+    FDialog : TForm;
     Function GetEmulationType : Integer;
     Procedure SetEmulationType(I : Integer);
   public
     { Public-Deklarationen }
     Procedure BeforeClose;
-    Procedure Init(const GameDB : TGameDB);
+    Procedure Init(const GameDB : TGameDB; const ADialog : TForm);
     Procedure WriteDataToGame(const Game : TGame);
     property EmulationType : Integer read GetEmulationType write SetEmulationType;
   end;
@@ -33,7 +36,8 @@ type
 implementation
 
 uses Math, VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgConsts,
-     PrgSetupUnit, ListScummVMGamesFormUnit, TextViewerFormUnit, IconLoaderUnit;
+     PrgSetupUnit, ListScummVMGamesFormUnit, TextViewerFormUnit, IconLoaderUnit,
+     WizardFormUnit;
 
 {$R *.dfm}
 
@@ -44,10 +48,11 @@ begin
   PrgSetup.LastWizardMode:=WizardModeComboBox.ItemIndex;
 end;
 
-procedure TWizardBaseFrame.Init(const GameDB : TGameDB);
+procedure TWizardBaseFrame.Init(const GameDB : TGameDB; const ADialog : TForm);
 Var I : Integer;
 begin
   SetVistaFonts(self);
+  FDialog:=ADialog;
 
   InfoLabel.Font.Style:=[fsBold];
   InfoLabel.Caption:=LanguageSetup.WizardFormPage1Info;
@@ -60,6 +65,8 @@ begin
   EmulationTypeComboBox.Items.Objects[2]:=TObject(-3);
   ListScummGamesLabel.Caption:=LanguageSetup.WizardFormEmulationTypeListScummVMGames;
   ShowInfoLabel.Caption:=LanguageSetup.WizardFormMainInfo;
+  InfoLabelInstallationSupport.Caption:=LanguageSetup.WizardFormInstallationSupportInfo1;
+  InfoLabelInstallationSupportLink.Caption:=LanguageSetup.WizardFormInstallationSupportInfo2;
   WizardModeLabel.Caption:=LanguageSetup.WizardFormWizardMode;
   WizardModeComboBox.Items[0]:=LanguageSetup.WizardFormWizardModeAlwaysAutomatically;
   WizardModeComboBox.Items[1]:=LanguageSetup.WizardFormWizardModeAutomaticallyIfAutoSetupTemplateExists;
@@ -80,6 +87,11 @@ begin
   ListScummGamesLabel.Cursor:=crHandPoint;
   with ShowInfoLabel.Font do begin Color:=clBlue; Style:=[fsUnderline]; end;
   ShowInfoLabel.Cursor:=crHandPoint;
+  with InfoLabelInstallationSupportLink.Font do begin Color:=clBlue; Style:=[fsUnderline]; end;
+  InfoLabelInstallationSupportLink.Cursor:=crHandPoint;
+
+  InfoLabelInstallationSupport.Visible:=PrgSetup.ActivateIncompleteFeatures;
+  InfoLabelInstallationSupportLink.Visible:=PrgSetup.ActivateIncompleteFeatures;
 end;
 
 Function TWizardBaseFrame.GetEmulationType : Integer;
@@ -120,6 +132,10 @@ begin
           LanguageSetup.WizardFormMainInfo,
           LanguageSetup.WizardFormMainInfo1+#13+#13+LanguageSetup.WizardFormMainInfo2+#13+#13+LanguageSetup.WizardFormMainInfo3
         );
+    2 : begin
+          TWizardForm(FDialog).OpenInstallationSupportDialog:=True;
+          PostMessage(FDialog.Handle,WM_CLOSE,0,0);
+        end;
   end;
 end;
 

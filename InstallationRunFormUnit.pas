@@ -34,6 +34,7 @@ type
     { Public-Deklarationen }
     InstallType : TInstallType;
     Sources : TStringList;
+    FilesAlreadyInTempDir : String;
     AlwaysMountISO : Boolean;
     NewGameDir : String;
   end;
@@ -58,9 +59,11 @@ begin
   Sources:=TStringList.Create;
   AlwaysMountISO:=False;
   NewGameDir:='';
+  FilesAlreadyInTempDir:='';
 
   Caption:=LanguageSetup.InstallationSupportRun;
   InfoLabel.Caption:=LanguageSetup.InstallationSupportRunInfoStarting;
+  SourceLabel.Caption:=LanguageSetup.InstallationSupportRunSource;
 
   TempFolder:='';
 end;
@@ -163,8 +166,6 @@ begin
 end;
 
 function TInstallationRunForm.FindFileToStart(const Dir: String): String;
-const InstallerNames : Array[1..4] of String = ('Install','Setup','InstHD','Inst');
-      Exts : Array[1..3] of String = ('exe','com','bat');
 Var S : String;
     I,J : Integer;
     Rec : TSearchRec;
@@ -173,13 +174,13 @@ begin
   result:='';
   S:=IncludeTrailingPathDelimiter(Dir);
 
-  For I:=Low(InstallerNames) to High(InstallerNames) do For J:=Low(Exts) to High(Exts) do
-    If FileExists(S+InstallerNames[I]+'.'+Exts[J]) then begin result:=S+InstallerNames[I]+'.'+Exts[J]; exit; end;
+  For I:=Low(InstallerNames) to High(InstallerNames) do For J:=Low(ProgramExts) to High(ProgramExts) do
+    If FileExists(S+InstallerNames[I]+'.'+ProgramExts[J]) then begin result:=S+InstallerNames[I]+'.'+ProgramExts[J]; exit; end;
 
   St:=TStringList.Create;
   try
-    For I:=Low(Exts) to High(Exts) do begin
-      J:=FindFirst(S+'*.'+Exts[I],faAnyFile,Rec);
+    For I:=Low(ProgramExts) to High(ProgramExts) do begin
+      J:=FindFirst(S+'*.'+ProgramExts[I],faAnyFile,Rec);
       try
         While J=0 do begin
           St.Add(Rec.Name);
@@ -250,9 +251,9 @@ begin
                   end;
                end;
     itArchive : begin
-                  TempFolder:=TempDir+TempSubFolder;
+                  If FilesAlreadyInTempDir<>'' then TempFolder:=FilesAlreadyInTempDir else TempFolder:=TempDir+TempSubFolder;
                   Game.Mount1:=TempFolder+';Drive;A;false;';
-                  ExtractZipFile(self,Sources[0],TempFolder);
+                  If FilesAlreadyInTempDir='' then ExtractZipFile(self,Sources[0],TempFolder);
                   FileToStart:=FindFileToStart(TempFolder);
                   If FileToStart='' then StartUpCmds.Add('A:');
                   If Sources.Count=1 then begin
@@ -310,7 +311,7 @@ end;
 
 procedure TInstallationRunForm.RunInstaller;
 Var TempGame : TTempGame;
-    St,St2 : TStringList;
+    St,St2,St3 : TStringList;
     FileToStart : String;
     DOSBoxHandle : THandle;
     I : Integer;
@@ -335,6 +336,17 @@ begin
           St.Add('echo.');
           SplitText(St,LanguageSetup.InstallationSupportRunStartGameFile2);
           TempGame.Game.GameExe:=FileToStart;
+          St3:=TStringList.Create;
+          try
+            St3.Add('echo.');
+            SplitText(St3,LanguageSetup.InstallationSupportRunStartGameFile3);
+            St3.Add('echo.');
+            SplitText(St3,LanguageSetup.InstallationSupportRunStartGameFile2);
+            St3.Add('echo.');
+            TempGame.Game.AutoexecFinalization:=StringListToString(St3);
+          finally
+            St3.Free;
+          end;
         end;
         St.Add('echo.');
         SplitText(St,LanguageSetup.InstallationSupportRunInstallationStart1);
@@ -365,7 +377,7 @@ begin
     finally
       CloseHandle(DOSBoxHandle);
     end;
-    If TempFolder<>'' then ExtDeleteFolder(TempFolder,ftTemp);
+    If (TempFolder<>'') and (FilesAlreadyInTempDir='') then ExtDeleteFolder(TempFolder,ftTemp);
   finally
     TempGame.Free;
   end;

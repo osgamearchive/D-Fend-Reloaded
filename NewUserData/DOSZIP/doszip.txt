@@ -1,10 +1,10 @@
 DOSZIP.TXT--
-Copyright 2009 Hjort Nidudsson.
+Copyright 2010 Hjort Nidudsson.
 
 DOSZIP COMMANDER
-Version 1.41
+Version 1.49
 
-Welcome to Doszip Commander Version 1.41!
+Welcome to Doszip Commander Version 1.49!
 =========================================
 
 	Topics covered in this file include:
@@ -21,6 +21,8 @@ Welcome to Doszip Commander Version 1.41!
 	<> Windows 95/98/XP Compatibility
 	<> Installing Commander under Windows
 	<> Creating a user defined tools menu
+	<> The File Search utility
+	<> Operation Filter
 	<> Shortkey Table
 	<> Compiling
 	<> Additional Resources
@@ -325,6 +327,46 @@ Creating a tools menu
 	06 = &Previous Menu.., 		[Tools]
 
 
+The File Search utility
+=======================
+
+	The File Search utility use the short keys Ctrl-S or Shift-Tab, but
+	from the command line or configuration file you can use the macro
+	%find% <directory> <file_mask(s)> <text_to_find_in_files>
+
+	Example: %find% %doszip% *.h *.inc *.c *.asm ?
+
+	Short Keys
+	----------
+	F2		Save result to list file.
+	F3		View current file - same as Enter.
+	F4		Edit current file - exit and execute external editor.
+	F5		Launch the Operation Filter dialog.
+	F6		Toggle ascii/hex search string.
+	F7		Start a new search.
+	F8, Delete	Delete file from list.
+	F9		Load predefined file mask from .INI file.
+	Esc, Alt-X	Exit program.
+
+
+Operation Filter
+================
+
+	Choosing the Filters button (available on many of the file operation
+	panels - such as copy or move) displays the Operation Filters dialog
+	box.
+
+	The filters allow the users to specify file selection based on file
+	name, date, size and attributes. The definitions for the Operation
+	Filters used are stored in the DZ.CFG file.
+
+	You can modify the [Filter] section of DZ.INI file to add pre-defined
+	filters for use in commonly performed searches.
+
+	Use F3 to load pre-defined filters to [Include] and [Exlcude].	
+	Use F4 to load date from the calendar to [File date].
+
+	
 Shortkey Table
 ==============
 
@@ -433,22 +475,22 @@ Compiling
 
 	Source directory:
 	-----------------
-		dz	Source files for DZ.EXE
-		dzmain	Source files for DZMAIN.EXE
-		tview	Source files for TVIEW.EXE
-		clib	Library source
-		make	Include files for MAKE and WMAKE
-		tools	Resource compiler and test
+	dz		Source files for DZ.EXE
+	dzmain		Source files for DZMAIN.EXE
+	tview		Source files for TVIEW.EXE
+	clib		Library source
+	make		Include files for MAKE and WMAKE
+	tools		Resource compiler and test
 			programs for library code
 
 	Makefiles
 	---------
-		srcpath		Source directory
-		debug           EXE include file
-		release		EXE include file
-		rules		Library include file
-		borlandc	Borland C/C++ 3.1 - MAKE
-		opwatcom	Open Watcom 1.8   - WMAKE
+	srcpath		Source directory
+	debug           EXE include file
+	release		EXE include file
+	rules		Library include file
+	borlandc	Borland C/C++ 3.1 - MAKE
+	opwatcom	Open Watcom 1.8   - WMAKE
 
 
 Additional Resources

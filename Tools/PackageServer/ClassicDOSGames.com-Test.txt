@@ -1,6 +1,11 @@
+New auto setup templates since 0.9.1: 104
+
 Done:
+- 3D Shooter
 - Adventure
 - Ball and paddle
+- Educational
+- Fighting
 - Pinball
 - Platform
 - Puzzle
@@ -11,9 +16,6 @@ Done:
 - Sports
 - Strategy
 
-Todo:
-- 3D Shooter
-- Card and board games
-- Educational
-- Fighting
-- Game Creation
+In Progress:
+- Card and board games (games remaining: 23)
+  (Next: Hexxagon)

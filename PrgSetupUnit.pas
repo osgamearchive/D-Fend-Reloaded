@@ -269,6 +269,8 @@ Type TPrgSetup=class(TBasePrgSetup)
     property DataReaderCheckForUpdates : Integer index 31 read GetInteger write SetInteger;
     property PackageListsCheckForUpdates : Integer index 32 read GetInteger write SetInteger;
     property LastPackageListeUpdateCheck : Integer index 33 read GetInteger write SetInteger;
+    property CheatsDBCheckForUpdates : Integer index 34 read GetInteger write SetInteger;
+    property LastCheatsDBUpdateCheck : Integer index 35 read GetInteger write SetInteger;
 
     property DOSBoxSettingsCount : Integer index 0 read GetListCount;
     property DOSBoxSettings[I : Integer] : TDOSBoxSetting read GetDOSBoxSettings;
@@ -592,7 +594,7 @@ begin
   AddStringRec(5,'ProgramSets','ColVisible','1111110');
   AddStringRec(6,'ProgramSets','ILVS','List');
   AddStringRec(7,'ProgramSets','PathToFREEDOS','.\VirtualHD\FREEDOS\');
-  AddStringRec(8,'ProgramSets','UpdateCheckURL','http:/'+'/dfendreloaded.sourceforge.net/UpdateInfo.txt');
+  AddStringRec(8,'ProgramSets','UpdateCheckURL',DFRHomepage+'UpdateInfo.txt');
   AddStringRec(9,'ProgramSets','GamesListViewBackground','');
   AddStringRec(10,'ProgramSets','GamesListViewFontColor','clWindowText');
   AddStringRec(11,'ProgramSets','ScreenshotsListViewBackground','');
@@ -752,6 +754,8 @@ begin
   AddIntegerRec(31,'ProgramSets','DataReaderCheckForUpdates',1);
   AddIntegerRec(32,'ProgramSets','PackageListsCheckForUpdates',0);
   AddIntegerRec(33,'ProgramSets','LastPackageListeUpdateCheck',0);
+  AddIntegerRec(34,'ProgramSets','CheatsDBCheckForUpdates',0);
+  AddIntegerRec(35,'ProgramSets','LastCheatsDBUpdateCheck',0);
 end;
 
 Procedure TPrgSetup.InitDirs;

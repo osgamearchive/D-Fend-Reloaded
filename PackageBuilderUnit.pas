@@ -41,8 +41,6 @@ end;
 
 Function AddPackageDataZip(const Doc : TXMLDocument; const Game : TGame; const DataFileName : String) : Boolean;
 Var S : String;
-    I : Integer;
-    St2 : TStringList;
     N : IXMLNode;
 begin
   result:=FileOK(DataFileName); if not result then exit;
@@ -60,15 +58,7 @@ begin
   N.Attributes['Year']:=S;
   If Game=nil then S:='English' else S:=Game.CacheLanguage;
   N.Attributes['Language']:=S;
-   If Game=nil then S:='' else begin
-    S:='';
-    St2:=StringToStringList(Game.UserInfo);
-    try
-      For I:=0 to St2.Count-1 do If ExtUpperCase(Copy(Trim(St2[I]),1,8))='LICENSE=' then begin S:=Copy(Trim(St2[I]),9,MaxInt); break; end;
-    finally
-      St2.Free;
-    end;
-  end;
+  If Game=nil then S:='' else S:=Game.License;
   N.Attributes['License']:=S;
   N.Attributes['PackageChecksum']:=GetMD5Sum(DataFileName);
   CreateGameCheckSum(Game,False);
@@ -217,9 +207,7 @@ end;
 Function AddPackageDataPlainZip(const Doc : TXMLDocument; const DataFileName : String; const AutoSetupDB : TGameDB; const Owner : TComponent; const AddAutoSetups : Boolean; const AutoSetupsMaxVersion : String) : Boolean;
 Var Temp : String;
     Template : TGame;
-    St2 : TStringList;
     S : String;
-    I : Integer;
     N : IXMLNode;
 begin
   result:=FileOK(DataFileName); if not result then exit;
@@ -243,14 +231,7 @@ begin
       N.Attributes['Publisher']:=Template.CachePublisher;
       N.Attributes['Year']:=Template.CacheYear;
       N.Attributes['Language']:=Template.CacheLanguage;
-      S:='';
-      St2:=StringToStringList(Template.UserInfo);
-      try
-        For I:=0 to St2.Count-1 do If ExtUpperCase(Copy(Trim(St2[I]),1,8))='LICENSE=' then begin S:=Copy(Trim(St2[I]),9,MaxInt); break; end;
-      finally
-        St2.Free;
-      end;
-      N.Attributes['License']:=S;
+      N.Attributes['License']:=Template.License;
       N.Attributes['PackageChecksum']:=GetMD5Sum(DataFileName);
       N.Attributes['GameExeChecksum']:=Template.GameExeMD5;
       N.Attributes['Size']:=GetFileSize(DataFileName);
@@ -282,7 +263,7 @@ end;
 
 Function AddPackageDataFooter(const Doc : TXMLDocument) : TStringList;
 begin
-  result:=SaveXMLDoc(Doc,['<!DOCTYPE DFRPackagesFile SYSTEM "http:/'+'/dfendreloaded.sourceforge.net/Packages/DFRPackagesFile.dtd">'],False);
+  result:=SaveXMLDoc(Doc,['<!DOCTYPE DFRPackagesFile SYSTEM "'+DFRHomepage+'Packages/DFRPackagesFile.dtd">'],False);
 end;
 
 end.

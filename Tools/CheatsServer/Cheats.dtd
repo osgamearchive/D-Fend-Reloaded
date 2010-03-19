@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!ELEMENT CheatDB (GameRecord)+>
+<!ATTLIST CheatDB
+	Version CDATA #IMPLIED
+>
 
 <!ELEMENT GameRecord (Action)+>
 <!ATTLIST GameRecord

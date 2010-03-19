@@ -44,7 +44,7 @@ Type TFrameRecord=record
   CloseCheckEvent : TCloseCheckEvent;
 end;
 
-Type TOpenMode=(omNormal, omLanguage, omTreeList, omToolbar, omIconSet);
+Type TOpenMode=(omNormal, omLanguage, omTreeList, omToolbar, omIconSet, omUpdate);
 
 type
   TSetupForm = class(TForm)
@@ -75,7 +75,7 @@ type
     Frames : Array of TFrameRecord;
     VisibleFrame : Integer;
     SetAdvanced : Boolean;
-    LanguageFrame, TreeListFrame, ToolbarFrame, IconSetFrame : TFrame;
+    LanguageFrame, TreeListFrame, ToolbarFrame, IconSetFrame, UpdateFrame : TFrame;
     InternalDOSBoxDir, InternalDOSBoxLang, InternalBaseDir : String;
     Procedure InitFramesList;
     Procedure AddTreeNode(const ParentFrame, NewFrame : TFrame; NewFrameInterface : ISetupFrame; const AdvencedModeOnly : Boolean; const ImageIndex : Integer; const IsEmpty : Boolean = False);
@@ -101,6 +101,7 @@ Function ShowSetupDialog(const AOwner : TComponent; const AGameDB : TGameDB; con
 Function ShowTreeListSetupDialog(const AOwner : TComponent; const AGameDB : TGameDB) : Boolean;
 Function ShowToolbarSetupDialog(const AOwner : TComponent; const AGameDB : TGameDB) : Boolean;
 Function ShowIconSetSetupDialog(const AOwner : TComponent; const AGameDB : TGameDB) : Boolean;
+Function ShowUpdateSetupDialog(const AOwner : TComponent; const AGameDB : TGameDB) : Boolean;
 
 implementation
 
@@ -166,8 +167,9 @@ begin
   Case OpenMode of
     omLanguage : Tree.Selected:=FindNodeFromFrame(LanguageFrame);
     omTreeList : Tree.Selected:=FindNodeFromFrame(TreeListFrame);
-    omToolbar : Tree.Selected:=FindNodeFromFrame(ToolbarFrame);
-    omIconSet : Tree.Selected:=FindNodeFromFrame(IconSetFrame);
+    omToolbar  : Tree.Selected:=FindNodeFromFrame(ToolbarFrame);
+    omIconSet  : Tree.Selected:=FindNodeFromFrame(IconSetFrame);
+    omUpdate   : Tree.Selected:=FindNodeFromFrame(UpdateFrame);
     else         Tree.Selected:=Tree.Items[0];
   end;
   If Tree.Selected<>nil then Tree.Selected.MakeVisible;
@@ -266,7 +268,7 @@ begin
   F:=TSetupFrameWindowsGames.Create(self); AddTreeNode(Root,F,TSetupFrameWindowsGames(F),True,8,False);
 
   F:=TSetupFrameService.Create(self); AddTreeNode(nil,F,TSetupFrameService(F),False,7,True); Root:=F;
-  F:=TSetupFrameUpdate.Create(self); AddTreeNode(Root,F,TSetupFrameUpdate(F),False,14);
+  F:=TSetupFrameUpdate.Create(self); AddTreeNode(Root,F,TSetupFrameUpdate(F),False,14); UpdateFrame:=F;
 end;
 
 Procedure TSetupForm.BeforeChangeLanguage;
@@ -499,7 +501,7 @@ begin
   try
     SetupForm.GameDB:=AGameDB;
     If OpenMode<>omNormal then SetupForm.OpenMode:=OpenMode;
-    If (OpenMode<>omNormal) and (OpenMode<>omLanguage) and (OpenMode<>omIconSet) then SetupForm.SetAdvanced:=True;
+    If (OpenMode<>omNormal) and (OpenMode<>omLanguage) and (OpenMode<>omIconSet) and (OpenMode<>omUpdate) then SetupForm.SetAdvanced:=True;
     result:=(SetupForm.ShowModal=mrOK);
     if not result then LoadLanguage(PrgSetup.Language);
     If result and (SetupForm.LanguageEditorMode>0) then OpenLanguageEditor(AOwner,SetupForm.LanguageEditorMode);
@@ -528,6 +530,11 @@ end;
 Function ShowIconSetSetupDialog(const AOwner : TComponent; const AGameDB : TGameDB) : Boolean;
 begin
   result:=ShowSetupDialogSpecial(AOwner,AGameDB,omIconSet);
+end;
+
+Function ShowUpdateSetupDialog(const AOwner : TComponent; const AGameDB : TGameDB) : Boolean;
+begin
+  result:=ShowSetupDialogSpecial(AOwner,AGameDB,omUpdate);
 end;
 
 end.

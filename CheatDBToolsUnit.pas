@@ -1,7 +1,7 @@
 unit CheatDBToolsUnit;
 interface
 
-uses Classes, Forms, CheatDBUnit;
+uses Classes, Forms, CheatDBUnit, ProgramUpdateCheckUnit;
 
 Function SmartLoadCheatsDB : TCheatDB;
 Procedure SmartSaveCheatsDB(const ACheatDB : TCheatDB; const AForm : TForm);
@@ -19,9 +19,21 @@ Function FindMatchingGameRecords(const CheatDB : TCheatDB; const Folders : TStri
 
 Function FileMatchingMask(const FileName, FileMask : String) : Boolean;
 
+Procedure CheatsDBUpdateCheckIfSetup(const AForm : TForm);
+Function CheatsDBUpdateCheck(const AForm : TForm; const Quite : Boolean) : TUpdateResult;
+
 implementation
 
-uses Windows, SysUtils, Math, CommonTools, PrgConsts, PrgSetupUnit;
+uses Windows, SysUtils, Dialogs, Math, CommonTools, PrgConsts, PrgSetupUnit,
+     DownloadWaitFormUnit, LanguageSetupUnit;
+
+Function CheatsDBAvailable : Boolean;
+begin
+  result:=
+    FileExists(PrgDataDir+SettingsFolder+'\'+CheatDBFile) or
+    FileExists(PrgDir+BinFolder+'\'+CheatDBFile) or
+    FileExists(PrgDir+CheatDBFile);
+end;
 
 Function SmartLoadCheatsDB : TCheatDB;
 Var B : Boolean;
@@ -42,7 +54,13 @@ begin
     end;
   end;
 
-  If not B then B:=result.LoadFromXML(PrgDir+CheatDBFile);
+  If not B then begin
+    If FileExists(PrgDir+CheatDBFile) then begin
+      B:=result.LoadFromXML(PrgDir+CheatDBFile);
+    end else begin
+      B:=False;
+    end;
+  end;
 
   If not B then FreeAndNil(result);
 end;
@@ -236,5 +254,97 @@ begin
 
   result:=FileMatchingMaskPart(NameMask,Name) and FileMatchingMaskPart(ExtMask,Ext);
 end;
+
+Procedure CheatsDBUpdateCheckIfSetup(const AForm : TForm);
+Var DoUpdateCheck : Boolean;
+begin
+  If not CheatsDBAvailable then DoUpdateCheck:=True else begin
+    DoUpdateCheck:=False;
+    Case PrgSetup.CheatsDBCheckForUpdates of
+      0 : DoUpdateCheck:=False;
+      1 : DoUpdateCheck:=(Round(Int(Date))>=PrgSetup.LastCheatsDBUpdateCheck+7);
+      2 : DoUpdateCheck:=(Round(Int(Date))>=PrgSetup.LastCheatsDBUpdateCheck+1);
+      3 : DoUpdateCheck:=True;
+    End;
+  end;
+  If DoUpdateCheck then CheatsDBUpdateCheck(AForm,True);
+end;
+
+Procedure UpdateCheatsDB(const MainDB, TempDB : TCheatDB);
+Var I,J,Nr1,Nr2 : Integer;
+    G : TCheatGameRecord;
+    A : TCheatAction;
+begin
+  MainDB.Version:=TempDB.Version;
+  For I:=0 to TempDB.Count-1 do begin
+    Nr1:=MainDB.IndexOf(TempDB[I].Name);
+    If Nr1<0 then begin
+      {Copy TempDB[I] to MainDB}
+      G:=TCheatGameRecord.Create(nil);
+      G.CopyFrom(TempDB[I]);
+      MainDB.Add(G);
+    end else begin
+      For J:=0 to TempDB[I].Count-1 do begin
+        Nr2:=MainDB[Nr1].IndexOf(TempDB[I][J].Name);
+        If Nr2>=0 then continue;
+        {Copy TempDB[I][J] to MainDB[Nr1]}
+        A:=TCheatAction.Create(nil);
+        A.CopyFrom(TempDB[I][J]);
+        MainDB[Nr1].Add(A);
+      end;
+    end;
+  end;
+end;
+
+Function CheatsDBUpdateCheck(const AForm : TForm; const Quite : Boolean) : TUpdateResult;
+Var CheatDB, TempDB : TCheatDB;
+    DefaultDBFile, TempDBFile : String;
+    DR : TDownloadResult;
+begin
+  result:=urUpdateInstallCanceled;
+
+  DefaultDBFile:=PrgDataDir+SettingsFolder+'\'+CheatDBFile;
+  TempDBFile:=TempDir+CheatDBFile;
+
+  CheatDB:=SmartLoadCheatsDB;
+  try
+    If CheatDB=nil then TempDBFile:=DefaultDBFile;
+    If Quite then DR:=DownloadFileWithOutDialog(AForm,-1,'',CheatDBUpdateURL,'',TempDBFile)
+             else DR:=DownloadFileWithDialog(AForm,-1,'',CheatDBUpdateURL,'',TempDBFile);
+    If DR=drFail then begin
+      MessageDlg(Format(LanguageSetup.PackageManagerDownloadFailed,[CheatDBUpdateURL]),mtError,[mbOK],0);
+      exit;
+    end;
+    If CheatDB=nil then begin
+      if DR=drSuccess then result:=urUpdateInstalled else result:=urUpdateInstallCanceled;
+      exit;
+    end;
+
+    If DR<>drSuccess then begin
+      result:=urUpdateInstallCanceled;
+      exit;
+    end;
+
+    result:=urNoUpdatesAvailable;
+
+    PrgSetup.LastCheatsDBUpdateCheck:=Round(Int(Date));
+
+    TempDB:=TCheatDB.Create;
+    try
+      if not TempDB.LoadFromXML(TempDBFile) then exit;
+      if not TempDB.Version>CheatDB.Version then begin
+        UpdateCheatsDB(CheatDB,TempDB);
+        SmartSaveCheatsDB(CheatDB,AForm);
+        result:=urUpdateInstalled;
+      end;
+    finally
+      TempDB.Free;
+      ExtDeleteFile(TempDBFile,ftTemp);
+    end;
+  finally
+    If Assigned(CheatDB) then CheatDB.Free;
+  end;
+end;
+
 
 end.

@@ -193,7 +193,7 @@ Section "-Work"
   Call DownloadFile  
 
   ; Run update file
-  Exec '"$SetupTempFile" /D=$UpdateInstallDir'
+  Exec '"$SetupTempFile" /A /D=$UpdateInstallDir'
   
   ; Delete update file
   Delete /REBOOTOK "$SetupTempFile"

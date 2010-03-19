@@ -20,9 +20,12 @@ Function CreateGameFromSimpleFolder(Dir : String; const GameDB : TGameDB; const 
 implementation
 
 uses Windows, SysUtils, Forms, Controls, Dialogs, ShellAPI, ShlObj, Messages,
-     SevenZipVCL, CommonTools, LanguageSetupUnit, GameDBToolsUnit, PrgSetupUnit,
-     PrgConsts, UninstallFormUnit, ZipInfoFormUnit, DosBoxUnit, ScummVMUnit,
-     HashCalc, ImportSelectTemplateFormUnit, SelectTemplateForZipImportFormUnit;
+     XMLDoc, XMLIntf, Variants, SevenZipVCL, CommonTools, LanguageSetupUnit,
+     GameDBToolsUnit, PrgSetupUnit, PrgConsts, UninstallFormUnit,
+     ZipInfoFormUnit, DosBoxUnit, ScummVMUnit, HashCalc,
+     ImportSelectTemplateFormUnit, SelectTemplateForZipImportFormUnit,
+     InstallationSupportFormUnit, PackageDBToolsUnit, ZipPackageDBGLFormUnit,
+     SmallWaitFormUnit;
 
 Function CopyFileWithMsg(const Source, Dest : String; const ProcessMessages, MoveFileToDestDir : Boolean) : Boolean;
 begin
@@ -102,7 +105,7 @@ begin
         end else begin
           If IgnoreProfConfInRootDir then begin
             T:=Trim(ExtUpperCase(Rec.Name)); S:=ExtractFileExt(T);
-            B:=(S<>'.CONF') and (S<>'.PROF') and (T<>'INSTALLREADME.TXT');
+            B:=(S<>'.CONF') and (S<>'.PROF') and (T<>'INSTALLREADME.TXT') and (T<>ExtUpperCase(DBGLPackageInfoFile));
           end else B:=True;
           If B then StFiles.Add(Rec.Name);
         end;
@@ -142,7 +145,7 @@ begin
     St.Add('');
     St.Add('If you do not have a D-Fend Reloaded installation on your system, you can');
     St.Add('download it here for free:');
-    St.Add('http:/'+'/dfendreloaded.sourceforge.net/Download.html');
+    St.Add(DFRHomepage+'Download.html');
     St.Add('');
     If ScummVMMode(Game) then begin
       St.Add('You can also run the game from this package without having D-Fend Reloaded');
@@ -733,6 +736,7 @@ Var AutoSetupDB,TemplateDB : TGameDB;
     StartableFiles, AutoSetup : TStringList;
     Nr : Integer;
     ProfileName,FileToStart,SetupFileToStart,ProfileFolder : String;
+    UseInstallSupport : Boolean;
 begin
   result:=nil;
 
@@ -747,9 +751,12 @@ begin
     try
       TemplateDB:=TGameDB.Create(PrgDataDir+TemplateSubDir,False);
       try
-        If not ShowSelectTemplateForZipImportDialog(Application.MainForm,AutoSetupDB,TemplateDB,StartableFiles,AutoSetup,ArchiveFileName,ProfileName,FileToStart,SetupFileToStart,ProfileFolder,Nr,NoDialogIfAutoSetupIsAvailable,DoNotCopyFolder) then exit;
-        result:=AddGameFromSimpleFolder(Dir,GameDB,TemplateDB,AutoSetupDB,ProfileName,ProfileFolder,FileToStart,SetupFileToStart,Nr,DoNotCopyFolder);
-        if result=nil then exit;
+        If not ShowSelectTemplateForZipImportDialog(Application.MainForm,AutoSetupDB,TemplateDB,StartableFiles,AutoSetup,ArchiveFileName,ProfileName,FileToStart,SetupFileToStart,ProfileFolder,Nr,NoDialogIfAutoSetupIsAvailable,DoNotCopyFolder,UseInstallSupport) then exit;
+        If UseInstallSupport then begin
+          result:=RunInstallationFromZipFile(Application.MainForm,GameDB,ArchiveFileName,Dir);
+        end else begin
+          result:=AddGameFromSimpleFolder(Dir,GameDB,TemplateDB,AutoSetupDB,ProfileName,ProfileFolder,FileToStart,SetupFileToStart,Nr,DoNotCopyFolder);
+        end;
       finally
         TemplateDB.Free;
       end;
@@ -821,15 +828,295 @@ begin
   end;
 end;
 
+Function TextNodeNotEmpty(const Node : IXMLNode) : Boolean;
+begin
+  result:=(VarType(Node.NodeValue)<>varNull);
+end;
 
-Function CreateGameFromFolder(const Dir : String; const GameDB : TGameDB; const ArchivFileName : String; const NoDialogIfAutoSetupIsAvailable : Boolean) : TGame;
+Function RealPathFromDOSBoxPath(const Game : TGame; const LocalPath : String) : String;
+Var Drive : String;
+    St : TStringList;
+    I : Integer;
+begin
+  result:='';
+  If (length(LocalPath)<2) or (LocalPath[2]<>':') then exit;
+  Drive:=ExtUpperCase(LocalPath[1]);
+
+  For I:=0 to Game.NrOfMounts-1 do begin
+    St:=ValueToList(Game.Mount[I]);
+    try
+      If St.Count<3 then continue;
+      If ExtUpperCase(St[2])=Drive then begin
+        result:=IncludeTrailingPathDelimiter(St[0])+Copy(LocalPath,4,MaxInt);
+        exit;
+      end;
+    finally
+      St.Free;
+    end;
+  end;
+end;
+
+Function GetGameFileFromAutoexec(const Game : TGame; const Autoexec : TStringList) : String;
+Var I,J : Integer;
+    Lines : TList;
+    S,Path,GlobalPath : String;
+begin
+  result:='';
+
+  Lines:=TList.Create;
+  try
+    Path:='';
+    For I:=0 to Autoexec.Count-1 do begin
+      S:=Trim(Autoexec[I]);
+
+      {drive letters}
+      If (length(S)=2) and (S[2]=':') and (ExtUpperCase(S[1])>='A') and (ExtUpperCase(S[1])<='Z') then begin
+        Path:=S; Lines.Clear; Lines.Add(TObject(I)); continue;
+      end;
+
+      {cd commands}
+      If (length(S)>3) and (ExtUpperCase(Copy(S,1,2))='CD') and (S[3]=' ') and (Path<>'') then begin
+        S:=Trim(Copy(S,4,MaxInt));
+        If (S<>'') and (S[1]='\') then S:=Copy(S,2,MaxInt);
+        If (S<>'') and (S[length(S)]='\') then S:=Copy(S,1,length(S)-1);
+        Path:=Path+'\'+S;
+        Lines.Add(TObject(I)); continue;
+      end;
+
+      {test filename}
+      If I<Autoexec.Count-1 then begin Lines.Clear; continue; end;
+      If (length(S)>5) and (ExtUpperCase(Copy(S,1,4))='CALL') and (S[5]=' ') then S:=Trim(Copy(S,6,MaxInt));
+      GlobalPath:=RealPathFromDOSBoxPath(Game,Path);
+      If GlobalPath='' then begin Lines.Clear; continue; end;
+      GlobalPath:=IncludeTrailingPathDelimiter(MakeAbsPath(IncludeTrailingPathDelimiter(GlobalPath),PrgSetup.BaseDir));
+      If not FileExists(GlobalPath+S) then begin Lines.Clear; continue; end;
+      result:=MakeRelPath(GlobalPath+S,PrgSetup.BaseDir);
+      Lines.Add(TObject(I));
+      For J:=Lines.Count-1 downto 0 do Autoexec.Delete(Integer(Lines[J]));
+      exit;
+    end;
+  finally
+    Lines.Free;
+  end;
+end;
+
+Procedure GetRunCommandFromAutoexec(const Game : TGame);
+Var I : Integer;
+    Autoexec,St : TStringList;
+    S : String;
+begin
+  Autoexec:=StringToStringList(Game.Autoexec);
+  try
+    {Trim empty lines}
+    I:=0; while i<Autoexec.Count do If Trim(Autoexec[I])='' then Autoexec.Delete(I) else inc(I);
+
+    {Exit command}
+    If (Autoexec.Count>0) and (Trim(ExtUpperCase(Autoexec[Autoexec.Count-1]))='EXIT') then begin
+      Game.CloseDosBoxAfterGameExit:=True;
+      Autoexec.Delete(Autoexec.Count-1);
+    end;
+
+    {Get game filename from autoexec}
+    St:=TStringList.Create;
+    try
+      St.AddStrings(Autoexec);
+      S:=GetGameFileFromAutoexec(Game,St);
+      If S<>'' then begin Autoexec.Clear; Autoexec.AddStrings(St); Game.GameExe:=S; end;
+    finally
+      St.Free;
+    end;
+
+    Game.Autoexec:=StringListToString(Autoexec);
+  finally
+    Autoexec.Free;
+  end;
+end;
+
+Function CreateGameFromDBGLPackage(const Dir : String; const GameDB : TGameDB; const GameNode : IXMLNode; const CustomNames : TStringList) : TGame;
+Var I,J,K : Integer;
+    N,N2 : IXMLNode;
+    S,Capture,GameDir,ID,Config : String;
+    CustomValues,St : TStringList;
+begin
+  {Load title and create profile}
+  S:='Game';
+  For I:=0 to GameNode.ChildNodes.Count-1 do begin N:=GameNode.ChildNodes[I]; If (N.NodeName='title') and TextNodeNotEmpty(N) then S:=N.NodeValue; end;
+  I:=GameDB.Add(S); result:=GameDB[I];
+
+  CustomValues:=TStringList.Create;
+  try
+    For I:=1 to 10 do CustomValues.Add('');
+
+    {Load data from xml node}
+    Capture:=''; GameDir:=''; ID:=''; Config:='';
+    For I:=0 to GameNode.ChildNodes.Count-1 do begin
+      N:=GameNode.ChildNodes[I];
+      If N.NodeName='captures' then For J:=0 to N.ChildNodes.Count-1 do if (N.ChildNodes[J].NodeName='raw') and TextNodeNotEmpty(N.ChildNodes[J]) then Capture:=N.ChildNodes[J].NodeValue;
+      If N.NodeName='game-dir' then For J:=0 to N.ChildNodes.Count-1 do if (N.ChildNodes[J].NodeName='raw') and TextNodeNotEmpty(N.ChildNodes[J]) then GameDir:=N.ChildNodes[J].NodeValue;
+      If (N.NodeName='id') and TextNodeNotEmpty(N) then ID:=N.NodeValue;
+      If (N.NodeName='setup') and TextNodeNotEmpty(N) then result.SetupExe:=N.NodeValue;
+      If (N.NodeName='setup-parameters') and TextNodeNotEmpty(N) then result.SetupParameters:=N.NodeValue;
+      If N.NodeName='meta-info' then For J:=0 to N.ChildNodes.Count-1 do begin
+        N2:=N.ChildNodes[J];
+        If (N2.NodeName='developer') and TextNodeNotEmpty(N2) then result.Developer:=N2.NodeValue;
+        If (N2.NodeName='publisher') and TextNodeNotEmpty(N2) then result.Publisher:=N2.NodeValue;
+        If (N2.NodeName='year') and TextNodeNotEmpty(N2) then result.Year:=N2.NodeValue;
+        If (N2.NodeName='genre') and TextNodeNotEmpty(N2) then result.Genre:=N2.NodeValue;
+        If (N2.NodeName='favorite') and TextNodeNotEmpty(N2) then result.Favorite:=(ExtUpperCase(N2.NodeValue)<>'FALSE');
+        If (N2.NodeName='notes') and TextNodeNotEmpty(N2) then result.Notes:=N2.NodeValue;
+        For K:=1 to 10 do If (N2.NodeName='custom'+IntToStr(K)) and TextNodeNotEmpty(N2) then CustomValues[K-1]:=N2.NodeValue;
+        If N2.NodeName='link1' then For K:=0 to N2.ChildNodes.Count-1 do if (N2.ChildNodes[K].NodeName='raw') and TextNodeNotEmpty(N2.ChildNodes[K]) then result.WWW:=N2.ChildNodes[K].NodeValue;
+      end;
+      If (N.NodeName='full-configuration') and TextNodeNotEmpty(N) then Config:=N.NodeValue;
+    end;
+
+    {Process custom data}
+    St:=TStringList.Create;
+    try
+      For I:=0 to CustomValues.Count-1 do if (Trim(CustomValues[I])<>'') and (Trim(CustomValues[I])<>'0') then St.Add(CustomNames[I]+'='+CustomValues[I]);
+      result.UserInfo:=StringListToString(St);
+    finally
+      St.Free;
+    end;
+  finally
+    CustomValues.Free;
+  end;
+
+  {Compact genre data}
+  St:=ValueToList(result.Genre,',');
+  try
+    For I:=0 to St.Count-1 do St[I]:=Trim(St[I]);
+    result.Genre:=ListToValue(St,';');
+  finally
+    St.Free;
+  end;
+
+  {Copy game folders}
+  CopyFolderWithMsg(IncludeTrailingPathDelimiter(Dir)+'dosroot\'+ID+'\',MakeAbsPath(PrgSetup.GameDir,PrgSetup.BaseDir),True,True);
+
+  {Load profile settings}
+  St:=TStringList.Create;
+  try
+    St.Text:=Config;
+    St.SaveToFile(TempDir+DosBoxConfFileName);
+    try
+      ImportConfFileData(GameDB,result,TempDir+DosBoxConfFileName);
+    finally
+      ExtDeleteFile(TempDir+DosBoxConfFileName,ftTemp);
+    end;
+  finally
+    St.Free;
+  end;
+
+  {Setup capture folder and copy capture files}
+  S:=IncludeTrailingPathDelimiter(PrgSetup.CaptureDir)+MakeFileSysOKFolderName(result.Name)+'\';
+  I:=0;
+  While (not PrgSetup.IgnoreDirectoryCollisions) and DirectoryExists(MakeAbsPath(S,PrgSetup.BaseDir)) do begin
+    Inc(I);
+    S:=IncludeTrailingPathDelimiter(PrgSetup.CaptureDir)+MakeFileSysOKFolderName(result.Name)+IntToStr(I)+'\';
+  end;
+  result.CaptureFolder:=MakeRelPath(S,PrgSetup.BaseDir);
+  ForceDirectories(MakeAbsPath(result.CaptureFolder,PrgSetup.BaseDir));
+  If Trim(Capture)<>'' then
+    CopyFolderWithMsg(IncludeTrailingPathDelimiter(Dir)+IncludeTrailingPathDelimiter(Capture),MakeAbsPath(result.CaptureFolder,PrgSetup.BaseDir),True,True);
+
+  {Fix mount commands (DBGL is mounting ".")}
+  For I:=0 to result.NrOfMounts-1 do begin
+    St:=ValueToList(result.Mount[I]);
+    try
+      If (St.Count>0) and ((Trim(St[0])='.') or (Trim(St[0])='.\')) then begin
+        St[0]:=MakeRelPath(PrgSetup.GameDir,PrgSetup.BaseDir);
+        result.Mount[I]:=ListToValue(St);
+      end;
+    finally
+      St.Free;
+    end;
+  end;
+
+  {Build game run command}
+  GetRunCommandFromAutoexec(result);
+
+  {Build setup command}
+  S:=Trim(result.SetupExe);
+  If (S<>'') and (Copy(S,1,2)<>'.\') and ((length(S)<2) or (S[2]<>':')) then result.SetupExe:=MakeRelPath(PrgSetup.GameDir,PrgSetup.BaseDir)+S;
+
+  result.StoreAllValues;
+  result.LoadCache;
+end;
+
+Function CreateGamesFromDBGLPackageFolder(const Owner : TComponent; const Dir : String; const GameDB : TGameDB; const TempProfFile : String) : TGame;
+Var XMLDoc : TXMLDocument;
+    N,N2 : IXMLNode;
+    ProfileNames,CustomNames : TStringList;
+    ProfileNodes : Array of IXMLNode;
+    I,J,K : Integer;
+    Title, Author, Notes : String;
+    G : TGame;
+begin
+  result:=nil;
+  XMLDoc:=LoadXMLDoc(TempProfFile);
+  try
+    If (XMLDoc=nil) or (XMLDoc.DocumentElement.NodeName<>'document') then exit;
+
+    SetLength(ProfileNodes,0);
+    ProfileNames:=TStringList.Create;
+    CustomNames:=TStringList.Create;
+    try
+      For I:=1 to 10 do CustomNames.Add('');
+
+      {Read xml file, find profiles}
+      Title:=''; Author:=''; Notes:='';
+      For I:=0 to XMLDoc.DocumentElement.ChildNodes.Count-1 do begin
+        N:=XMLDoc.DocumentElement.ChildNodes[I];
+        If N.NodeName='export' then For J:=0 to N.ChildNodes.Count-1 do begin
+          N2:=N.ChildNodes[J];
+          If (N2.NodeName='title') and TextNodeNotEmpty(N2) then Title:=N2.NodeValue;
+          If (N2.NodeName='author') and TextNodeNotEmpty(N2) then Author:=N2.NodeValue;
+          If (N2.NodeName='notes') and TextNodeNotEmpty(N2) then Notes:=N2.NodeValue;
+          For K:=1 to 10 do If (N2.NodeName='custom'+IntToStr(K)) and TextNodeNotEmpty(N2) then CustomNames[K-1]:=N2.NodeValue;
+        end;
+        If N.NodeName='profile' then For J:=0 to N.ChildNodes.Count-1 do If (N.ChildNodes[J].NodeName='title') and TextNodeNotEmpty(N.ChildNodes[J]) then begin
+          K:=length(ProfileNodes); SetLength(ProfileNodes,K+1); ProfileNodes[K]:=N;
+          ProfileNames.AddObject(N.ChildNodes[J].NodeValue,TObject(K));
+          break;
+        end;
+      end;
+
+      {Select which profiles to install}
+      if not ShowZipPackageDBGLDialog(Owner,Title,Author,Notes,ProfileNames) then exit;
+
+      {Install profiles}
+      LoadAndShowSmallWaitForm(LanguageSetup.ImportDBGLPackageProgress);
+      try
+        For I:=0 to ProfileNames.Count-1 do begin
+          G:=CreateGameFromDBGLPackage(Dir,GameDB,ProfileNodes[Integer(ProfileNames.Objects[I])],CustomNames);
+          If G<>nil then result:=G;
+        end;
+      finally
+        FreeSmallWaitForm;
+      end;
+    finally
+      ProfileNames.Free;
+      CustomNames.Free;
+    end;
+  finally
+    XMLDoc.Free;
+  end;
+end;
+
+Function CreateGameFromFolder(const Owner : TComponent; const Dir : String; const GameDB : TGameDB; const ArchivFileName : String; const NoDialogIfAutoSetupIsAvailable : Boolean) : TGame;
 Var TempProfFile : String;
 begin
   TempProfFile:=GetProfFileName(Dir);
 
   If TempProfFile='' then begin
-    {Add simple zip archive}
-    result:=CreateGameFromSimpleFolder(Dir,GameDB,ArchivFileName,NoDialogIfAutoSetupIsAvailable,False);
+    If FileExists(Dir+DBGLPackageInfoFile) and PrgSetup.ActivateIncompleteFeatures then begin
+      {Import DBGL package file}
+      result:=CreateGamesFromDBGLPackageFolder(Owner,Dir,GameDB,Dir+DBGLPackageInfoFile);
+    end else begin
+      {Add simple zip archive}
+      result:=CreateGameFromSimpleFolder(Dir,GameDB,ArchivFileName,NoDialogIfAutoSetupIsAvailable,False);
+    end;
   end else begin
     {Add normal zip package (with prof file)}
     result:=CreateGameFromDFRPackageFolder(Dir,GameDB,TempProfFile);
@@ -838,8 +1125,10 @@ end;
 
 Function ImportZipPackage(const AOwner : TComponent; const AFileName : String; const AGameDB : TGameDB; const NoDialogIfAutoSetupIsAvailable : Boolean) : TGame;
 Var Temp : String;
+    InstSupport : Boolean;
 begin
   result:=nil;
+  InstSupport:=False;
 
   Temp:=IncludeTrailingPathDelimiter(TempDir+TempSubFolder);
   If not ForceDirectories(Temp) then begin
@@ -850,10 +1139,18 @@ begin
   try
     if not ExtractZipFile(AOwner,AFileName,Temp) then exit;
 
-    result:=CreateGameFromFolder(Temp,AGameDB,AFileName,NoDialogIfAutoSetupIsAvailable);
-    If result<>nil then begin
-      result.StoreAllValues;
-      result.LoadCache;
+    If PrgSetup.ActivateIncompleteFeatures and TestInstallationSupportNeeded(Temp) then begin
+      If MessageDlg(LanguageSetup.InstallationSupportArchiveCheck,mtConfirmation,[mbYes,mbNo],0)=mrYes then InstSupport:=True; 
+    end;
+
+    if InstSupport then begin
+      result:=RunInstallationFromZipFile(AOwner,AGameDB,AFileName,Temp);
+    end else begin
+      result:=CreateGameFromFolder(AOwner,Temp,AGameDB,AFileName,NoDialogIfAutoSetupIsAvailable);
+      If result<>nil then begin
+        result.StoreAllValues;
+        result.LoadCache;
+      end;
     end;
   finally
     ExtDeleteFolder(Temp,ftTemp);

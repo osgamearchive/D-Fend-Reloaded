@@ -51,6 +51,7 @@ type
     StartLabelUpdates: TLabel;
     StartLabelUpdatesValue: TLabel;
     EditSettingsButton: TBitBtn;
+    Image: TImage;
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure LanguageComboBoxChange(Sender: TObject);
@@ -84,13 +85,16 @@ Function ShowFirstRunWizardDialog(const AOwner : TComponent; var SearchForUpdate
 implementation
 
 uses Math, IniFiles, Registry, VistaToolsUnit, LanguageSetupUnit, PrgSetupUnit,
-     CommonTools, PrgConsts, HelpConsts, IconLoaderUnit, MainUnit;
+     CommonTools, PrgConsts, HelpConsts, IconLoaderUnit, MainUnit, LoggingUnit;
 
 {$R *.dfm}
 
 procedure TFirstRunWizardForm.FormCreate(Sender: TObject);
 begin
+  LogInfo('First run wizard: FormCreate');
+
   SetVistaFonts(self);
+  Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName);
 
   StartLabel.Font.Style:=[fsBold];
   LanguageTopInfoLabel.Font.Style:=[fsBold];
@@ -120,6 +124,8 @@ end;
 
 procedure TFirstRunWizardForm.InitGUI;
 begin
+  LogInfo('First run wizard: InitGUI (loading language)');
+
   Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName);
   StartLabel.Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName);
   LanguageTopInfoLabel.Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName);
@@ -183,6 +189,8 @@ end;
 
 procedure TFirstRunWizardForm.FormShow(Sender: TObject);
 begin
+  LogInfo('First run wizard: FormShow');
+
   LoadAndSetupLanguageList;
   DosBoxDirEdit.Text:=PrgSetup.DOSBoxSettings[0].DosBoxDir;
   DosBoxDirEditChange(Sender);
@@ -264,6 +272,8 @@ Var I,J : Integer;
     St : TStringList;
     Reg : TRegistry;
 begin
+  LogInfo('First run wizard: LoadAndSetupLanguageList');
+
   {Load language list}
   LanguageComboBox.OnChange:=nil;
   St:=GetLanguageList;
@@ -316,6 +326,8 @@ procedure TFirstRunWizardForm.LoadAndSetupDOSBoxLanguages;
 Var I : Integer;
     S,Save : String;
 begin
+  LogInfo('First run wizard: LoadAndSetupDOSBoxLanguages');
+
   Save:=DosBoxLangEditComboBox.Text;
 
   DosBoxLang.Clear;

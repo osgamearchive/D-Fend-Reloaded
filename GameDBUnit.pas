@@ -68,6 +68,7 @@ const NR_Name=1;
       NR_ExtraFiles=22;
       NR_LastModification=23;
       NR_ScreenshotListScreenshot=24;
+      NR_IgnoreWindowsFileWarnings=25;
 
       NR_ExtraPrgFile=30; {30-39}
 
@@ -288,6 +289,7 @@ Type TGameDB=class;
     function GetMount(I: Integer): String;
     procedure SetMount(I: Integer; const Value: String);
     Procedure CreateConfFile;
+    Function GetLicense : String;
   public
     CacheName, CacheNameUpper : String;
     CacheGenre, CacheGenreUpper : String;
@@ -326,6 +328,7 @@ Type TGameDB=class;
     property ExtraFiles : String index NR_ExtraFiles read GetString write SetString;
     property LastModification : String index NR_LastModification read GetString write SetString;
     property ScreenshotListScreenshot : String index NR_ScreenshotListScreenshot read GetString write SetString;
+    property IgnoreWindowsFileWarnings : Boolean index NR_IgnoreWindowsFileWarnings read GetBoolean write SetBoolean;
 
     property ExtraPrgFile[I : Integer] : String read GetExtraPrgFile write SetExtraPrgFile;
 
@@ -339,6 +342,7 @@ Type TGameDB=class;
     property WWW : String index NR_WWW read GetString write SetString;
     property Language : String index NR_Language read GetString write SetString;
     property UserInfo : String index NR_UserInfo read GetString write SetString;
+    property License : String read GetLicense;
 
     property CloseDosBoxAfterGameExit : Boolean index NR_CloseDosBoxAfterGameExit read GetBoolean write SetBoolean;
     property StartFullscreen : Boolean index NR_StartFullscreen read GetBoolean write SetBoolean;
@@ -567,6 +571,7 @@ end;
     Function GetPublisherList(WithDefaultProfile : Boolean =True; const HideWindowsProfiles : Boolean = False) : TStringList;
     Function GetYearList(WithDefaultProfile : Boolean =True; const HideWindowsProfiles : Boolean = False) : TStringList;
     Function GetLanguageList(WithDefaultProfile : Boolean =True; const HideWindowsProfiles : Boolean = False) : TStringList;
+    Function GetLicenseList(WithDefaultProfile : Boolean =True; const HideWindowsProfiles : Boolean = False) : TStringList;
     Function GetWWWList(WithDefaultProfile : Boolean =True; const HideWindowsProfiles : Boolean = False) : TStringList;
     Function GetKeyValueList(const Key : String; WithDefaultProfile : Boolean =True) : TStringList;
     Function GetUserKeys : TStringList;
@@ -653,9 +658,7 @@ Const //... DOSBox 0.74: DefaultValuesResolution='original,320x200,320x240,640x4
                                   'Serbia & Montenegro (YC),Serbia & Montenegro (SR),Slovakia (SK),Slovenia (YU),Slovenia (SI),South Africa (US),Spain (SP),'+
                                   'Spain (ES),Sweden (SV),Switzerland - French (SF),Switzerland - German (SG),Switzerland - German (SD),Tadjikistan (TJ),'+
                                   'Turkmenistan (TM),Turkey (TR),UK (UK),Ukraine (UR),Ukraine (UA),US (US),Uzbekistan (UZ),Venezuela (LA),Vietnam (VI)';}
-      DefaultValuesCodepage='default,113,437,667,668,737,770,771,772,773,774,775,777,778,790,808,848,849,850,851,852,853,855,857,858,859,860,861,863,865,866,867,869,872,899,991,1116,1117,1125,1131,57781,58152,58210,59234,59829,60258,60853,61282,62306';
-//... 0.9.2:
-      {DefaultValuesCodepage='113 (Yugoslavian),437 (United States),667 (Polish),668 (Polish),737 (Greek-2),770 (Baltic),771 (Lithuanian and Russian KBL),'+
+      DefaultValuesCodepage='default,113 (Yugoslavian),437 (United States),667 (Polish),668 (Polish),737 (Greek-2),770 (Baltic),771 (Lithuanian and Russian KBL),'+
                             '772 (Lithuanian and Russian),773 (Latin-7 Baltic - old standard),774 (Lithuanian),775 (Latin-7 Baltic),777 (Accented Lithuanian),'+
                             '778 (Accented Lithuanian),790 (Polish Mazovia),808 (Cyrillic-2 with Euro),848 (Cyrillic Ukrainian with Euro),849 (Cyrillic Belarusian with Euro),'+
                             '850 (Latin-1),851 (Greek),852 (Latin-2 Eastern European),853 (Latin-3 Southern European),855 (Cyrillic-1),857 (Latin-5 Turkish),'+
@@ -663,8 +666,8 @@ Const //... DOSBox 0.74: DefaultValuesResolution='original,320x200,320x240,640x4
                             '865 (Nordic),866 (Cyrillic-2 Russian),867 (Czech Kamenicky),869 (Greek),872 (Cyrillic-1 with Euro),899 (Armenian),991 (Polish Mazovia with Zloty sign),'+
                             '1116 (Estonian),1117 (Latvian),1125 (Cyrillic Ukrainian),1131 (Cyrillic Belarusian),57781 (Hungarian),58152 (Cyrillic Kazakh with Euro),'+
                             '58210 (Cyrillic Azeri Cyrillic),59234 (Cyrillic Tatar),59829 (Georgian),60258 (Cyrillic Azeri Latin),60853 (Georgian with capital letters),'+
-                            '61282 (Latvian and Russian "RusLat"),62306 (Cyrillic Uzbek)';}
-
+                            '61282 (Latvian and Russian "RusLat"),62306 (Cyrillic Uzbek)';
+      {DefaultValuesCodepage='default,113,437,667,668,737,770,771,772,773,774,775,777,778,790,808,848,849,850,851,852,853,855,857,858,859,860,861,863,865,866,867,869,872,899,991,1116,1117,1125,1131,57781,58152,58210,59234,59829,60258,60853,61282,62306';}
       {DefaultValuesCodepage='default,437,850,852,860,863,865,866';}
       DefaultValuesReportedDOSVersion='default,6.2,6.0,5.0,4.0,3.3';
       DefaultValuesMIDIDevice='default,alsa,oss,win32,coreaudio,none';
@@ -702,7 +705,8 @@ Const //... DOSBox 0.74: DefaultValuesResolution='original,320x200,320x240,640x4
 implementation
 
 uses Windows, SysUtils, Messages, Forms, Dialogs, Math, CommonTools, PrgConsts,
-     PrgSetupUnit, LanguageSetupUnit, GameDBToolsUnit, WaitFormUnit, DOSBoxUnit;
+     PrgSetupUnit, LanguageSetupUnit, GameDBToolsUnit, WaitFormUnit, DOSBoxUnit,
+     LoggingUnit;
 
 { TConfOpt }
 
@@ -814,6 +818,7 @@ begin
   AddStringRec(NR_ExtraDirs,'Extra','ExtraDirs','');
   AddStringRec(NR_ExtraFiles,'Extra','ExtraFiles','');
   AddStringRec(NR_LastModification,'Extra','LastModification','');
+  AddBooleanRec(NR_IgnoreWindowsFileWarnings,'Extras','IgnoreWindowsFileWarnings',False);
   AddStringRec(NR_ScreenshotListScreenshot,'Extra','ScreenshotListScreenshot','');
 
   For I:=0 to 9 do begin
@@ -1021,6 +1026,19 @@ begin
   result:=GetString(NR_ExtraPrgFile+I);
 end;
 
+function TGame.GetLicense: String;
+Var I : Integer;
+    St : TStringList;
+begin
+  result:='';
+  St:=StringToStringList(UserInfo);
+  try
+    For I:=0 to St.Count-1 do If ExtUpperCase(Copy(Trim(St[I]),1,8))='LICENSE=' then begin result:=Copy(Trim(St[I]),9,MaxInt); break; end;
+  finally
+    St.Free;
+  end;
+end;
+
 Procedure TGame.SetExtraPrgFile(I : Integer; S : String);
 begin
   If (I<0) or (I>9) then exit;
@@ -1130,8 +1148,13 @@ Var Msg : tagMSG;
     B : Boolean;
 begin
   inherited Create;
+
+  LogInfo('### Start of TGameDB.Create ('+ADir+') ###');
+
   FCreateConfFilesOnSave:=False;
   FGameList:=TList.Create;
+
+  LogInfo('Create conf opts object');
   FConfOpt:=TConfOpt.Create;
   If ATimeStampCheck then FConfOpt.CacheAllStrings;
   FDir:=IncludeTrailingPathDelimiter(ADir);
@@ -1142,6 +1165,7 @@ begin
    Application.MainForm.Enabled:=False;
   end;
   try
+    LogInfo('Start loading profiles');
     LoadList;
   finally
     If Application.MainForm<>nil then begin
@@ -1149,7 +1173,11 @@ begin
       Application.MainForm.Enabled:=B;
     end;
   end;
+
+  LogInfo('Deleting old files');
   DeleteOldFiles;
+
+  LogInfo('### End of TGameDB.Create ###');
 end;
 
 destructor TGameDB.Destroy;
@@ -1173,25 +1201,31 @@ end;
 Procedure TGameDB.LoadGameFromFile(const FileName: String; const DOSFileDate : Integer);
 Var Game : TGame;
 begin
+  LogInfo('Loading profile '+FileName);
   If PrgSetup.BinaryCache and GetLoadBinCacheOffset(FileName,DOSFileDate) then begin
+    LogInfo('Trying to load from cache');
     Game:=TGame.CreateDelayed(FileName,FTimeStampCheck);
     try
       Game.InitData;
       Game.LoadFromStream(BinLoadCache);
       Game.LoadCache;
     except
+      LogInfo('Cache failed, burning cache for all profiles and loading from prof file');
       Game.Free;
       Game:=TGame.Create(FileName);
       BurnLoadBinCache;
     end;
     If Game.GameExeMD5='' then begin
+      LogInfo('No game MD5, cached profile looks damaged, loading this profile from prof file');
       Game.Free;
       Game:=TGame.Create(FileName);
     end;
   end else begin
+    LogInfo('Loading profile from prof file');
     Game:=TGame.Create(FileName);
   end;
 
+  LogInfo('Adding profile to data base list');
   Game.OnChanged:=GameChanged;
   Game.GameDB:=self;
   FGameList.Add(Game);
@@ -1222,9 +1256,13 @@ begin
   Clear;
   ForceDirectories(FDir);
 
-  If PrgSetup.BinaryCache then InitLoadBinCache;
+  If PrgSetup.BinaryCache then begin
+    LogInfo('Init binary cache');
+    InitLoadBinCache;
+  end;
 
   {$IFDEF SpeedTest}C0:=GetTickCount; {$ENDIF}
+  LogInfo('Loading profiles file list from drive');
   List:=GetProfilesListFromDrive;
   WaitForm:=nil;
 
@@ -1254,7 +1292,10 @@ begin
     If Assigned(WaitForm) then FreeAndNil(WaitForm);
   end;
 
-  If PrgSetup.BinaryCache then DoneLoadBinCache;
+  If PrgSetup.BinaryCache then begin
+    LogInfo('Freeing binary cache');
+    DoneLoadBinCache;
+  end;
 
   If Application.MainForm<>nil then ForceForegroundWindow(Application.MainForm.Handle);
 end;
@@ -1498,6 +1539,22 @@ begin
     For I:=0 to FGameList.Count-1 do If WithDefaultProfile or (TGame(FGameList[I]).Name<>DosBoxDOSProfile) then begin
       If HideWindowsProfiles and WindowsExeMode(TGame(FGameList[I])) then continue;
       St.Add(TGame(FGameList[I]).CacheLanguage);
+    end;
+    result:=GetList(St);
+  finally
+    St.Free;
+  end;
+end;
+
+Function TGameDB.GetLicenseList(WithDefaultProfile : Boolean =True; const HideWindowsProfiles : Boolean = False) : TStringList;
+Var I : Integer;
+    St : TStringList;
+begin
+  St:=TStringList.Create;
+  try
+    For I:=0 to FGameList.Count-1 do If WithDefaultProfile or (TGame(FGameList[I]).Name<>DosBoxDOSProfile) then begin
+      If HideWindowsProfiles and WindowsExeMode(TGame(FGameList[I])) then continue;
+      St.Add(TGame(FGameList[I]).License);
     end;
     result:=GetList(St);
   finally

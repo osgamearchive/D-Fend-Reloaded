@@ -47,7 +47,7 @@ type
 
 implementation
 
-uses LanguageSetupUnit, VistaToolsUnit, CommonTools, HelpConsts,
+uses Math, LanguageSetupUnit, VistaToolsUnit, CommonTools, HelpConsts,
      ClassExtensions, IconLoaderUnit, TextEditPopupUnit, DataReaderFormUnit,
      PrgSetupUnit;
 
@@ -86,6 +86,9 @@ begin
     ItemProps[Strings.Count-1].EditStyle:=esPickList;
     St:=ExtLanguageList(GetCustomLanguageName(InitData.GameDB.GetLanguageList)); try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
     Strings.Add(LanguageSetup.GameWWW+'=');
+    Strings.Add(LanguageSetup.GameLicense+'=');
+    ItemProps[Strings.Count-1].EditStyle:=esPickList;
+    St:=ExtLicenseList(GetCustomLicenseName(InitData.GameDB.GetLicenseList)); try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
   end;
   DownloadDataButton.Caption:=LanguageSetup.DataReaderButton;
   FavouriteCheckBox.Caption:=LanguageSetup.GameFavorite;
@@ -155,7 +158,7 @@ end;
 
 procedure TModernProfileEditorGameInfoFrame.SetGame(const Game: TGame; const LoadFromTemplate: Boolean);
 Var St : TStringList;
-    I,J : Integer;
+    I,J,C : Integer;
     S,T : String;
 begin
   If Game=nil then begin
@@ -170,24 +173,24 @@ begin
     If Game.Year<>'' then ValueFromIndex[3]:=Game.Year else GameInfoValueListEditor.Strings[3]:=GameInfoValueListEditor.Strings.Names[3]+'=';
     If Game.Language<>'' then ValueFromIndex[4]:=GetCustomLanguageName(Game.Language) else GameInfoValueListEditor.Strings[4]:=GameInfoValueListEditor.Strings.Names[4]+'=';
     If Game.WWW<>'' then ValueFromIndex[5]:=Game.WWW else GameInfoValueListEditor.Strings[5]:=GameInfoValueListEditor.Strings.Names[5]+'=';
+    S:=Game.License; If S<>'' then ValueFromIndex[6]:=S else GameInfoValueListEditor.Strings[6]:=GameInfoValueListEditor.Strings.Names[6]+'=';
   end;
   FavouriteCheckBox.Checked:=Game.Favorite;
 
   St:=StringToStringList(Game.UserInfo);
   try
-    If St.Count>0 then begin
-      Tab.RowCount:=St.Count+1;
-      For I:=0 to St.Count-1 do begin
-        S:=St[I];
-        J:=Pos('=',S);
-        If J=0 then T:='' else begin T:=Trim(Copy(S,J+1,MaxInt)); S:=Trim(Copy(S,1,J-1)); end;
-        Tab.Cells[0,I+1]:=S;
-        Tab.Cells[1,I+1]:=T;
-      end;
-    end else begin
-      Tab.RowCount:=2;
-      Tab.Cells[0,1]:=''; Tab.Cells[1,1]:='';
+    Tab.RowCount:=Max(St.Count,1)+1;
+    Tab.Cells[0,1]:=''; Tab.Cells[1,1]:=''; C:=1;
+    For I:=0 to St.Count-1 do begin
+      S:=St[I];
+      J:=Pos('=',S);
+      If J=0 then T:='' else begin T:=Trim(Copy(S,J+1,MaxInt)); S:=Trim(Copy(S,1,J-1)); end;
+      If Trim(ExtUpperCase(S))='LICENSE' then continue;
+      Tab.Cells[0,C]:=S;
+      Tab.Cells[1,C]:=T;
+      inc(C);
     end;
+    Tab.RowCount:=Max(2,C);
   finally
     St.Free;
   end;
@@ -201,7 +204,7 @@ end;
 procedure TModernProfileEditorGameInfoFrame.GetGame(const Game: TGame);
 Var St : TStringList;
     I : Integer;
-    S,T : String;
+    S,T,License : String;
 begin
   with GameInfoValueListEditor.Strings do begin
     Game.Genre:=GetEnglishGenreName(ValueFromIndex[0]);
@@ -210,11 +213,13 @@ begin
     Game.Year:=ValueFromIndex[3];
     Game.Language:=GetEnglishLanguageName(ValueFromIndex[4]);
     Game.WWW:=ValueFromIndex[5];
+    License:=Trim(ValueFromIndex[6]);
   end;
   Game.Favorite:=FavouriteCheckBox.Checked;
 
   St:=TStringList.Create;
   try
+    If License<>'' then St.Add('License='+License);
     For I:=1 to Tab.RowCount-1 do begin
       S:=Trim(Tab.Cells[0,I]); T:=Trim(Tab.Cells[1,I]);
       If (S<>'') or (T<>'') then St.Add(S+'='+T);
@@ -261,6 +266,7 @@ begin
     I:=0;
     While I<St.Count do begin
       S:=Trim(ExtUpperCase(St[I]));
+      If S='LICENSE' then begin St.Delete(I); continue; end;
       For J:=1 to Tab.RowCount-1 do If Trim(ExtUpperCase(Tab.Cells[0,J]))=S then begin St.Delete(I); dec(I); break; end;
       inc(I);
     end;

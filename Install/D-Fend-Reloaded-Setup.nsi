@@ -126,10 +126,6 @@ Section "$(LANGNAME_DFendReloaded)" ID_DFend
   IntCmp $InstallDataType 2 +2
   File "..\Bin\DFendGameExplorerData.dll"
 
-  CreateDirectory "$DataInstDir\Confs"
-  
-  CreateDirectory "$DataInstDir\GameData"
-
   SetOutPath "$INSTDIR\Lang"
   File "..\Lang\*.ini"
   File "..\Lang\*.chm"
@@ -195,10 +191,6 @@ Section "$(LANGNAME_DFendReloaded)" ID_DFend
 
   TemplateWritingFinish:
   
-  ; Create "VirtualHD" folder in data dir
-  
-  CreateDirectory "$DataInstDir\VirtualHD"
-
   ; Write installation mode to DFend.dat
   
   ClearErrors
@@ -235,9 +227,10 @@ Section "$(LANGNAME_DFendReloaded)" ID_DFend
   CreateDirectory "$SMPROGRAMS\D-Fend Reloaded"
   CreateShortCut "$SMPROGRAMS\D-Fend Reloaded\$(LANGNAME_DFendReloaded).lnk" "$INSTDIR\DFend.exe"
   CreateShortCut "$SMPROGRAMS\D-Fend Reloaded\$(LANGNAME_Uninstall).lnk" "$INSTDIR\Uninstall.exe"
-  CreateShortCut "$SMPROGRAMS\D-Fend Reloaded\$(LANGNAME_GamesFolder).lnk" "$DataInstDir\VirtualHD"
-  CreateShortCut "$SMPROGRAMS\D-Fend Reloaded\$(LANGNAME_GameDataFolder).lnk" "$DataInstDir\GameData"
-  CreateDirectory $DataInstDir\GameData
+  CreateDirectory $DataInstDir\VirtualHD ; Has to be created before the start menu link is created otherwise the link will never work
+  CreateShortCut "$SMPROGRAMS\D-Fend Reloaded\$(LANGNAME_GamesFolder).lnk" "$DataInstDir\VirtualHD\"
+  CreateDirectory $DataInstDir\GameData ; Has to be created before the start menu link is created otherwise the link will never work
+  CreateShortCut "$SMPROGRAMS\D-Fend Reloaded\$(LANGNAME_GameDataFolder).lnk" "$DataInstDir\GameData\"
   
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\D-Fend Reloaded" "DisplayName" "${PrgName} ($(LANGNAME_Deinstall))"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\D-Fend Reloaded" "UninstallString" '"$INSTDIR\Uninstall.exe"'  
@@ -248,17 +241,7 @@ Section "$(LANGNAME_DFendReloaded)" ID_DFend
   WriteRegDWord HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\D-Fend Reloaded" "NoModify" 1
   WriteRegDWord HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\D-Fend Reloaded" "NoRepair" 1
   
-  ; Add/Update to Vista games explorer
-  IfFileExists "$LOCALAPPDATA\Microsoft\Windows\GameExplorer\*.*" 0 NoDFendStartMenuLinks
-  ClearErrors
-  ReadRegStr $GEGUID HKLM "Software\D-Fend Reloaded" "GameExplorerGUID"  
-  IfErrors 0 NoNewGEGUIDNeeded
-  ${GameExplorer_GenerateGUID}
-  Pop $GEGUID
-  WriteRegStr HKLM "Software\D-Fend Reloaded" "GameExplorerGUID" "$GEGUID"
-  NoNewGEGUIDNeeded:
-  ClearErrors
-  ${GameExplorer_AddGame} all $INSTDIR\Bin\DFendGameExplorerData.dll $INSTDIR $INSTDIR\DFend.exe $GEGUID
+  !insertmacro AddToGamesExplorer
 
   NoDFendStartMenuLinks:
 SectionEnd

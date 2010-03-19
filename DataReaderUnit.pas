@@ -35,10 +35,12 @@ Type TDataReaderThread=class(TThread)
 end;
 
 Type TDataReaderLoadConfigThread=class(TDataReaderThread)
+  private
+    FForceUpdate : Boolean;
   protected
     Procedure Execute; override;
   public
-    Constructor Create(const ADataReader : TDataReader);
+    Constructor Create(const ADataReader : TDataReader; const AForceUpdate : Boolean);
 end;
 
 Type TDataReaderGameListThread=class(TDataReaderThread)
@@ -105,6 +107,8 @@ begin
   result:=False;
 
   If (not FileExists(AConfigFile)) and (not DownloadConfigFile(AConfigFile)) then exit;
+
+  if Assigned(FConfig) then FreeAndNil(FConfig);
 
   repeat
     FConfig:=TDataReaderConfig.Create(AConfigFile);
@@ -461,9 +465,10 @@ end;
 
 { TDataReaderLoadConfigThread }
 
-constructor TDataReaderLoadConfigThread.Create(const ADataReader: TDataReader);
+constructor TDataReaderLoadConfigThread.Create(const ADataReader: TDataReader; const AForceUpdate : Boolean);
 begin
   inherited Create(ADataReader);
+  FForceUpdate:=AForceUpdate;
   Resume;
 end;
 
@@ -471,13 +476,17 @@ procedure TDataReaderLoadConfigThread.Execute;
 Var DoUpdateCheck : Boolean;
 begin
   CoInitialize(nil);
-  DoUpdateCheck:=False;
-  Case PrgSetup.DataReaderCheckForUpdates of
-    0 : DoUpdateCheck:=False;
-    1 : DoUpdateCheck:=(Round(Int(Date))>=PrgSetup.LastDataReaderUpdateCheck+7);
-    2 : DoUpdateCheck:=(Round(Int(Date))>=PrgSetup.LastDataReaderUpdateCheck+1);
-    3 : DoUpdateCheck:=True;
-  End;
+  If FForceUpdate then begin
+    DoUpdateCheck:=True;
+  end else begin
+    DoUpdateCheck:=False;
+    Case PrgSetup.DataReaderCheckForUpdates of
+      0 : DoUpdateCheck:=False;
+      1 : DoUpdateCheck:=(Round(Int(Date))>=PrgSetup.LastDataReaderUpdateCheck+7);
+      2 : DoUpdateCheck:=(Round(Int(Date))>=PrgSetup.LastDataReaderUpdateCheck+1);
+      3 : DoUpdateCheck:=True;
+    end;
+  end;
   FSuccess:=FDataReader.LoadConfig(PrgDataDir+SettingsFolder+'\'+DataReaderConfigFile,DoUpdateCheck);
   If DoUpdateCheck and FSuccess then PrgSetup.LastDataReaderUpdateCheck:=Round(Int(Date));
 end;

@@ -28,6 +28,8 @@ const DosBoxFileName='DOSBOX.EXE';
 
       NSIInstallerHelpFile='D-Fend Reloaded DataInstaller.nsi';
 
+      DFRHomepage='http:/'+'/dfendreloaded.sourceforge.net/';
+
       OggEncPrgFile='oggenc2.exe';
       LamePrgFile='lame.exe';
       ScummPrgFile='scummvm.exe';
@@ -38,13 +40,13 @@ const DosBoxFileName='DOSBOX.EXE';
 
       PackageDBSubFolder='Settings\Packages';
       PackageDBCacheSubFolder='Settings\Packages\Cache';
-      PackageDBMainFileURL='http:/'+'/dfendreloaded.sourceforge.net/Packages/DFR.xml?version=%s';
+      PackageDBMainFileURL=DFRHomepage+'Packages/DFR.xml?version=%s';
       PackageDBTempFile='DFRTemp.xml';
       PackageDBMainFile='DFR.xml';
       PackageDBUserFile='User.xml';
       PackageDBCacheFile='Cache.xml';
 
-      CacheVersionString='DFRCacheFile-FileVersion=001';
+      CacheVersionString='DFRCacheFile-FileVersion=002';
       CacheInfoString=#13+#13+'This is just a cache file for the profiles in the current directory. You can'+#13+
                       'ignore or delete this file. D-Fend Reloaded will only load data from this file'+#13+
                       'if the .prof file on disk has not changed. If you delete or change one of the'+#13+
@@ -56,15 +58,29 @@ const DosBoxFileName='DOSBOX.EXE';
                       '===Start of binary cache==='+#13;
       CacheFile='Cache.dfr';
 
-      DataReaderUpdateURL='http:/'+'/dfendreloaded.sourceforge.net/DataReader/DataReader.xml';
+      DataReaderUpdateURL=DFRHomepage+'DataReader/DataReader.xml';
       DataReaderConfigFile='DataReader.xml';
 
       CheatDBFile='Cheats.xml';
-      CheatDBSearchSubFolder='Settings\AddressSearch'; 
+      CheatDBSearchSubFolder='Settings\AddressSearch';
+      CheatDBUpdateURL=DFRHomepage+'Cheats/Cheats.xml';
+
+      DBGLPackageInfoFile='profiles.xml';
 
       MinSupportedDOSBoxVersion=0.73;
 
       DefaultFreeHDSize=250;
+
+
+const InstallerNames : Array[1..4] of String = ('INSTALL','SETUP','INSTHD','INST');
+      ProgramExts : Array[1..3] of String = ('EXE','COM','BAT');
+
+      IgnoreGameExeFilesIgnore : Array[1..31] of String = ('README','DECIDE','DEICE','CATALOG','LIST','LHARC','ARJ','UNARJ','UNZIP','HELPME','ORDER','DEALERS','ULTRAMID','PRINTME','UNIVBE','SWCBBS','INSTHELP','COMMIT','SETMAIN','BOOTMKR','IMUSE','KEYCONFI','32RTM','LOADPATS','MAKESWP','XPHELP','IBMSND','MIDPAK','SBLASTER','ALIVECAT','READDOC');
+
+      SetupExeFilesLevel1 : Array[1..2] of String = ('SETUP','CONFIG');
+      SetupExeFilesLevel2 : Array[1..4] of String = ('SETSOUND','SETSND','SETBLAST','SOUND');
+      SetupExeFilesLevel3 : Array[1..3] of String = ('XINSTALL','SETUPAQ','SETUPDP');
+      SetupExeFilesLevel4 : Array[1..1] of String = ('INSTALL');
 
 var MainSetupFile : String;
     OperationModeConfig : String;

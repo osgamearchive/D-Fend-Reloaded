@@ -142,16 +142,42 @@ end;
 
 Function SearchDosBox(const AOwner : TComponent; var ADOSBoxDir : String) : Boolean;
 Var S : String;
+    St : TStringList;
+    Rec : TSearchRec;
+    I : Integer;
 begin
   If FileExists(IncludeTrailingPathDelimiter(ADOSBoxDir)+DosBoxFileName) then begin
     result:=True;
     exit;
   end;
 
-  S:=IncludeTrailingPathDelimiter(GetSpecialFolder(Application.Handle,CSIDL_PROGRAM_FILES))+'DOSBox\';
+  S:=PrgDir+'DOSBox\';
   If FileExists(S+DosBoxFileName) then begin ADOSBoxDir:=S; result:=True; exit; end;
 
   S:=PrgDir+BinFolder+'\DOSBox\';
+  If FileExists(S+DosBoxFileName) then begin ADOSBoxDir:=S; result:=True; exit; end;
+
+  S:=PrgDataDir+'DOSBox\';
+  If FileExists(S+DosBoxFileName) then begin ADOSBoxDir:=S; result:=True; exit; end;
+
+  S:=IncludeTrailingPathDelimiter(GetSpecialFolder(Application.Handle,CSIDL_PROGRAM_FILES));
+  St:=TStringList.Create;
+  try
+    I:=FindFirst(S+'*.*',faDirectory,Rec);
+    try
+      While I=0 do begin
+        If (Rec.Name<>'.') and (Rec.Name<>'..') and (Copy(ExtUpperCase(Rec.Name),1,7)='DOSBOX-') then St.Add(S+Rec.Name+'\');
+        I:=FindNext(Rec);
+      end;
+    finally
+      FindClose(Rec);
+    end;
+    For I:=St.Count-1 downto 0 do if FileExists(St[I]+DosBoxFileName) then begin ADOSBoxDir:=St[I]; result:=True; exit; end;
+  finally
+    St.Free;
+  end;
+
+  S:=IncludeTrailingPathDelimiter(GetSpecialFolder(Application.Handle,CSIDL_PROGRAM_FILES))+'DOSBox\';
   If FileExists(S+DosBoxFileName) then begin ADOSBoxDir:=S; result:=True; exit; end;
 
   SetupDosBoxForm:=TSetupDosBoxForm.Create(AOwner);

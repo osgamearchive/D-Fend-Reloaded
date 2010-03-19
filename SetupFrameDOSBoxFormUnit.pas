@@ -122,15 +122,18 @@ begin
     If Trim(ExtUpperCase(T))=S then begin DOSBoxKeyboardLayoutComboBox.ItemIndex:=I; break; end;
     If Pos('(',T)<>0 then begin
       T:=Copy(T,Pos('(',T)+1,MaxInt);
-      If Pos(')',T)<>0 then T:=Copy(T,1,Pos(')',T)+1);
+      If Pos(')',T)<>0 then T:=Copy(T,1,Pos(')',T)-1);
       If Trim(ExtUpperCase(T))=S then begin DOSBoxKeyboardLayoutComboBox.ItemIndex:=I; break; end;
     end;
   end;
 
   S:=Trim(ExtUpperCase(DOSBoxData.Codepage));
-  For I:=0 to DOSBoxCodepageComboBox.Items.Count-1 do If S=Trim(ExtUpperCase(DOSBoxCodepageComboBox.Items[I])) then begin
-    DOSBoxCodepageComboBox.ItemIndex:=I;
-    break;
+  For I:=0 to DOSBoxCodepageComboBox.Items.Count-1 do begin
+    T:=DOSBoxCodepageComboBox.Items[I];
+    If Trim(ExtUpperCase(T))=S then begin DOSBoxCodepageComboBox.ItemIndex:=I; break; end;
+    If Pos('(',T)<>0 then begin
+      If Trim(Copy(T,1,Pos('(',T)-1))=S then begin DOSBoxCodepageComboBox.ItemIndex:=I; break; end;
+    end;
   end;
 
   DosBoxMapperEdit.Text:=DOSBoxData.DosBoxMapperFile;

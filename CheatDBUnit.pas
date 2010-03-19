@@ -23,6 +23,7 @@ Type TCheatActionStep=class(TCheatBaseClass)
     Constructor Create(const AOwner : TCheatBaseClass); virtual;
     Function LoadFromXML(const XML : IXMLNode) : Boolean; virtual; abstract;
     Procedure SaveToXML(const XML : IXMLNode); virtual; abstract;
+    Procedure CopyFrom(const ACheatActionStep : TCheatActionStep); virtual; abstract;
     Function Apply(const St : TFileStream) : Boolean; virtual; abstract;
     property XMLNodeName : String read GetXMLNodeName;
 end;
@@ -43,6 +44,7 @@ Type TCheatActionStepChangeAddress=class(TCheatActionStep)
     Constructor Create(const AOwner : TCheatBaseClass); override;
     Function LoadFromXML(const XML : IXMLNode) : Boolean; override;
     Procedure SaveToXML(const XML : IXMLNode); override;
+    Procedure CopyFrom(const ACheatActionStep : TCheatActionStep); override;
     Function Apply(const St : TFileStream) : Boolean; override;
     property Addresses : String index 0 read FAddresses write SetString;
     property Bytes : Integer read FBytes write SetBytes;
@@ -63,6 +65,7 @@ Type TCheatActionStepChangeAddressWithDialog=class(TCheatActionStep)
     Constructor Create(const AOwner : TCheatBaseClass); override;
     Function LoadFromXML(const XML : IXMLNode) : Boolean; override;
     Procedure SaveToXML(const XML : IXMLNode); override;
+    Procedure CopyFrom(const ACheatActionStep : TCheatActionStep); override;
     Function Apply(const St : TFileStream) : Boolean; override;
     property Addresses : String index 0 read FAddresses write SetString;
     property Bytes : Integer read FBytes write SetBytes;
@@ -84,6 +87,7 @@ Type TCheatActionStepInternal=class(TCheatActionStep)
     Constructor Create(const AOwner : TCheatBaseClass); override;
     Function LoadFromXML(const XML : IXMLNode) : Boolean; override;
     Procedure SaveToXML(const XML : IXMLNode); override;
+    Procedure CopyFrom(const ACheatActionStep : TCheatActionStep); override;
     Function Apply(const St : TFileStream) : Boolean; override;
     property Nr : Integer read FNr write SetNr;
 end;
@@ -101,6 +105,7 @@ Type TCheatAction=class(TCheatBaseClass)
     Destructor Destroy; override;
     Function LoadFromXML(const XML : IXMLNode) : Boolean;
     Procedure SaveToXML(const XML : IXMLNode);
+    Procedure CopyFrom(const ACheatAction : TCheatAction);
     Function Apply(const St : TFileStream) : Boolean; overload;
     Function Apply(const FileName : String; const BackupBefore : Boolean) : Boolean; overload;
     Function Add(const ACheatActionStep : TCheatActionStep) : Integer;
@@ -129,11 +134,13 @@ Type TCheatGameRecord=class(TCheatBaseClass)
     Destructor Destroy; override;
     Function LoadFromXML(const XML : IXMLNode) : Boolean;
     Procedure SaveToXML(const XML : IXMLNode);
+    Procedure CopyFrom(const ACheatGameRecord : TCheatGameRecord);
     Function Add(const ACheatAction : TCheatAction) : Integer;
     Procedure Delete(const Nr : Integer); overload;
     Procedure Delete(const ACheatAction : TCheatAction); overload;
     Procedure Clear;
-    Function IndexOf(const ACheatAction : TCheatAction) : Integer;
+    Function IndexOf(const ACheatAction : TCheatAction) : Integer; overload;
+    Function IndexOf(const ACheatActionName : String) : Integer; overload;
     Procedure CompressActionSteps;
     property Name : String read FName write SetName;
     property Count : Integer read GetCount;
@@ -158,7 +165,8 @@ Type TCheatDB=class(TCheatBaseClass)
     Procedure Delete(const Nr : Integer); overload;
     Procedure Delete(const AGameRecord : TCheatGameRecord); overload;
     Procedure Clear;
-    Function IndexOf(const AGameRecord : TCheatGameRecord) : Integer;
+    Function IndexOf(const AGameRecord : TCheatGameRecord) : Integer; overload;
+    Function IndexOf(const AGameName : String) : Integer; overload;
     Procedure SetChanged; override;
     Procedure CompressActionSteps;
     property Count : Integer read GetCount;
@@ -169,7 +177,7 @@ end;
 
 implementation
 
-uses SysUtils, XMLDoc, MSXMLDOM, Dialogs, Math, CheatDBToolsUnit,
+uses SysUtils, XMLDoc, MSXMLDOM, Dialogs, Math, CheatDBToolsUnit, PrgConsts,
      CheatDBInternalUnit, PackageDBToolsUnit, LanguageSetupUnit;
 
 { global }
@@ -270,6 +278,16 @@ begin
   N.Attributes['Addresses']:=FAddresses;
   N.Attributes['Bytes']:=IntToStr(FBytes);
   N.Attributes['NewValue']:=FNewValue;
+end;
+
+Procedure TCheatActionStepChangeAddress.CopyFrom(const ACheatActionStep : TCheatActionStep);
+begin
+  if not (ACheatActionStep is TCheatActionStepChangeAddress) then exit;
+  FAddresses:=TCheatActionStepChangeAddress(ACheatActionStep).Addresses;
+  FNewValue:=TCheatActionStepChangeAddress(ACheatActionStep).NewValue;
+  FAddressesInt:=TCheatActionStepChangeAddress(ACheatActionStep).FAddressesInt;
+  FBytes:=TCheatActionStepChangeAddress(ACheatActionStep).Bytes;
+  FNewValueInt:=TCheatActionStepChangeAddress(ACheatActionStep).FNewValueInt;
 end;
 
 Function TCheatActionStepChangeAddress.Apply(const St: TFileStream) : Boolean;
@@ -377,6 +395,23 @@ begin
   If Trim(FMaxValue)<>'' then N.Attributes['MaxValue']:=FMaxValue;
 end;
 
+Procedure TCheatActionStepChangeAddressWithDialog.CopyFrom(const ACheatActionStep : TCheatActionStep);
+begin
+  if not (ACheatActionStep is TCheatActionStepChangeAddressWithDialog) then exit;
+
+  FAddresses:=TCheatActionStepChangeAddressWithDialog(ACheatActionStep).Addresses;
+  FDefaultValue:=TCheatActionStepChangeAddressWithDialog(ACheatActionStep).DefaultValue;
+  FDefaultValueAddress:=TCheatActionStepChangeAddressWithDialog(ACheatActionStep).DefaultValueAddress;
+  FPrompt:=TCheatActionStepChangeAddressWithDialog(ACheatActionStep).DialogPrompt;
+  FMinValue:=TCheatActionStepChangeAddressWithDialog(ACheatActionStep).MinValue;
+  FMaxValue:=TCheatActionStepChangeAddressWithDialog(ACheatActionStep).MaxValue;
+  FAddressesInt:=TCheatActionStepChangeAddressWithDialog(ACheatActionStep).FAddressesInt;
+  FBytes:=TCheatActionStepChangeAddressWithDialog(ACheatActionStep).Bytes;
+  FDefaultValueAddressInt:=TCheatActionStepChangeAddressWithDialog(ACheatActionStep).FDefaultValueAddressInt;
+  FMinValueInt:=TCheatActionStepChangeAddressWithDialog(ACheatActionStep).FMinValueInt;
+  FMaxValueInt:=TCheatActionStepChangeAddressWithDialog(ACheatActionStep).FMaxValueInt;
+end;
+
 function TCheatActionStepChangeAddressWithDialog.Apply(const St: TFileStream): Boolean;
 Var Value : String;
     I,J : Integer;
@@ -443,6 +478,12 @@ begin
   N.Attributes['Nr']:=IntToStr(FNr);
 end;
 
+Procedure TCheatActionStepInternal.CopyFrom(const ACheatActionStep : TCheatActionStep);
+begin
+  if not (ACheatActionStep is TCheatActionStepInternal) then exit;
+  FNr:=TCheatActionStepInternal(ACheatActionStep).Nr;
+end;
+
 procedure TCheatActionStepInternal.SetNr(const Value: Integer);
 begin
   If FNr=Value then exit;
@@ -504,6 +545,22 @@ begin
   N.Attributes['FileMask']:=FFileMask;
 
   For I:=0 to FActionSteps.Count-1 do TCheatActionStep(FActionSteps[I]).SaveToXML(N);
+end;
+
+Procedure TCheatAction.CopyFrom(const ACheatAction : TCheatAction);
+Var I,J : Integer;
+    A : TCheatActionStep;
+begin
+  FName:=ACheatAction.Name;
+  FFileMask:=ACheatAction.FileMask;
+  For I:=0 to ACheatAction.Count-1 do begin
+    For J:=0 to length(CheatActionStepClasses)-1 do if ACheatAction[I] is CheatActionStepClasses[J] then begin
+      A:=CheatActionStepClasses[J].Create(nil);
+      (A as CheatActionStepClasses[J]).CopyFrom(ACheatAction[I]);
+      Add(A);
+      break;
+    end;
+  end;
 end;
 
 Function TCheatAction.Apply(const St : TFileStream) : Boolean;
@@ -659,6 +716,18 @@ begin
   For I:=0 to FActions.Count-1 do TCheatAction(FActions[I]).SaveToXML(N);
 end;
 
+Procedure TCheatGameRecord.CopyFrom(const ACheatGameRecord: TCheatGameRecord);
+Var I : Integer;
+    A : TCheatAction;
+begin
+  FName:=ACheatGameRecord.Name;
+  For I:=0 to ACheatGameRecord.Count-1 do begin
+    A:=TCheatAction.Create(nil);
+    A.CopyFrom(ACheatGameRecord[I]);
+    Add(A);
+  end;
+end;
+
 procedure TCheatGameRecord.SetName(const Value: String);
 begin
   If FName=Value then exit;
@@ -708,6 +777,15 @@ begin
   result:=FActions.IndexOf(ACheatAction);
 end;
 
+Function TCheatGameRecord.IndexOf(const ACheatActionName : String) : Integer;
+Var I : Integer;
+begin
+  result:=-1;
+  For I:=0 to FActions.Count-1 do If TCheatAction(FActions[I]).Name=ACheatActionName then begin
+    result:=I; exit;
+  end;
+end;
+
 procedure TCheatGameRecord.CompressActionSteps;
 Var I : Integer;
 begin
@@ -745,7 +823,7 @@ begin
   try
     If XMLDoc.DocumentElement.NodeName<>'CheatDB' then exit;
 
-    FVersion:=-1;
+    FVersion:=0;
     If XMLDoc.DocumentElement.HasAttribute('Version') then begin
       TryStrToInt(XMLDoc.DocumentElement.Attributes['Version'],FVersion);
     end;
@@ -779,7 +857,7 @@ begin
     XMLDoc.DocumentElement:=XMLDoc.CreateNode('CheatDB');
     If FVersion>=0 then XMLDoc.DocumentElement.Attributes['Version']:=IntToStr(FVersion);
     For I:=0 to FGameRecords.Count-1 do TCheatGameRecord(FGameRecords[I]).SaveToXML(XMLDoc.DocumentElement);
-    SaveXMLDoc(XMLDoc,['<!DOCTYPE CheatDB SYSTEM "http:/'+'/dfendreloaded.sourceforge.net/Packages/Cheats.dtd">'],FileName,False);
+    SaveXMLDoc(XMLDoc,['<!DOCTYPE CheatDB SYSTEM "'+DFRHomepage+'Packages/Cheats.dtd">'],FileName,False);
   finally
     XMLDoc.Free;
   end;
@@ -823,6 +901,15 @@ end;
 function TCheatDB.IndexOf(const AGameRecord: TCheatGameRecord): Integer;
 begin
   result:=FGameRecords.IndexOf(AGameRecord);
+end;
+
+function TCheatDB.IndexOf(const AGameName: String): Integer;
+Var I : Integer;
+begin
+  result:=-1;
+  For I:=0 to FGameRecords.Count-1 do if TCheatGameRecord(FGameRecords[I]).Name=AGameName then begin
+    result:=I; exit;
+  end;
 end;
 
 function TCheatDB.GetCount: Integer;

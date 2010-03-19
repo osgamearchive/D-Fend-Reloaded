@@ -213,7 +213,14 @@ uses
   CheatDBInternalUnit in 'CheatDBInternalUnit.pas',
   CheatDBToolsUnit in 'CheatDBToolsUnit.pas',
   CheatDBSearchUnit in 'CheatDBSearchUnit.pas',
-  CheatSearchFormUnit in 'CheatSearchFormUnit.pas' {CheatSearchForm};
+  CheatSearchFormUnit in 'CheatSearchFormUnit.pas' {CheatSearchForm},
+  ProgramUpdateCheckUnit in 'ProgramUpdateCheckUnit.pas',
+  UpdateCheckFormUnit in 'UpdateCheckFormUnit.pas' {UpdateCheckForm},
+  GameDBFilterUnit in 'GameDBFilterUnit.pas',
+  GameDBFilterToolsUnit in 'GameDBFilterToolsUnit.pas',
+  ZipPackageDBGLFormUnit in 'ZipPackageDBGLFormUnit.pas' {ZipPackageDBGLForm},
+  FirstRunWizardFormUnit2 in 'FirstRunWizardFormUnit2.pas' {FirstRunWizardForm2},
+  LoggingUnit in 'LoggingUnit.pas';
 
 {$R *.res}
 

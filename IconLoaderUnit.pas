@@ -70,6 +70,8 @@ const DI_OK=0;
       DI_Activate=62;
       DI_Expand=63;
       DI_Collapse=64;
+      DI_Warning=65;
+      DI_Information=66;
 
 Type TImageListRec=record
   ImageList, OriginalImageList : TImageList;

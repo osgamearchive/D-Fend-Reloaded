@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE CheatDB SYSTEM "http://dfendreloaded.sourceforge.net/Packages/Cheats.dtd">
-<CheatDB>
+<CheatDB Version="1">
   <GameRecord Name="Dark Side of Xeen">
     <Action Name="Money" FileMask="DARK??.SAV">
       <ChangeAddress Addresses="0;4" Bytes="4" NewValue="$FFFFFFFF"/>

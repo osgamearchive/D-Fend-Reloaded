@@ -1289,16 +1289,20 @@ begin
     If (ProfileSettingsValueListEditor.Strings.ValueFromIndex[3]=RemoveUnderline(LanguageSetup.No)) and (Trim(S1)<>'') then begin
       S:=MakeAbsPath(S1,PrgSetup.BaseDir);
       If IsWindowsExe(S) then begin
-        If MessageDlg(Format(LanguageSetup.MessageWindowsExeEditWarning,[S]),mtConfirmation,[mbYes,mbNo],0)<>mrYes then begin
-          PageControl.ActivePageIndex:=0; exit;
+        If (not Assigned(Game)) or (not Game.IgnoreWindowsFileWarnings) then begin
+          If MessageDlg(Format(LanguageSetup.MessageWindowsExeEditWarning,[S]),mtConfirmation,[mbYes,mbNo],0)<>mrYes then begin
+            PageControl.ActivePageIndex:=0; exit;
+          end;
         end;
       end;
     end;
     If (ProfileSettingsValueListEditor.Strings.ValueFromIndex[6]=RemoveUnderline(LanguageSetup.No)) and (Trim(S2)<>'') then begin
       S:=MakeAbsPath(S2,PrgSetup.BaseDir);
       If IsWindowsExe(S) then begin
-        If MessageDlg(Format(LanguageSetup.MessageWindowsExeEditWarning,[S]),mtConfirmation,[mbYes,mbNo],0)<>mrYes then begin
-          PageControl.ActivePageIndex:=0; exit;
+        If (not Assigned(Game)) or (not Game.IgnoreWindowsFileWarnings) then begin
+          If MessageDlg(Format(LanguageSetup.MessageWindowsExeEditWarning,[S]),mtConfirmation,[mbYes,mbNo],0)<>mrYes then begin
+            PageControl.ActivePageIndex:=0; exit;
+          end;
         end;
       end;
     end;

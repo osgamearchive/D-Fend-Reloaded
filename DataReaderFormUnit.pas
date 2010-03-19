@@ -67,7 +67,7 @@ begin
   CoverSt:=TStringList.Create;
   DataReader:=TDataReader.Create;
 
-  ConfigOK:=ShowDataReaderInternetConfigWaitDialog(Owner,DataReader,LanguageSetup.DataReaderDownloadCaption,LanguageSetup.DataReaderDownloadInfo,LanguageSetup.DataReaderDownloadError);
+  ConfigOK:=ShowDataReaderInternetConfigWaitDialog(Owner,DataReader,False,LanguageSetup.DataReaderDownloadCaption,LanguageSetup.DataReaderDownloadInfo,LanguageSetup.DataReaderDownloadError);
 end;
 
 procedure TDataReaderForm.FormShow(Sender: TObject);

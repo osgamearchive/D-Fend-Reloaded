@@ -65,7 +65,6 @@ InstallDir "$PROGRAMFILES\D-Fend Reloaded\"
 InstallDirRegKey HKLM "Software\D-Fend Reloaded" "ProgramFolder"
 
 !insertmacro MUI_RESERVEFILE_LANGDLL
-ReserveFile "..\Bin\License.txt"
 
 ShowInstDetails show
 ShowUninstDetails nevershow
@@ -173,6 +172,58 @@ FunctionEnd
 ; Definition of install sections
 ; ============================================================
 
+Function GameExplorerUninstall
+  ClearErrors
+  ReadRegStr $GEGUID HKLM "Software\D-Fend Reloaded" "GameExplorerGUID"	
+  IfErrors NoGameExplorerUninstall
+
+  ; Remove regular way
+  SetShellVarContext all
+  ${GameExplorer_RemoveGame} $GEGUID  
+  ClearErrors
+
+  ; Remove via deleting registry keys
+  StrCpy $0 0
+  CheckNextGameExplorerKey:
+  EnumRegKey $1 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\GameUX\Games\" $0
+  StrCmp $1 "" NoGameExplorerUninstall
+  ReadRegStr $2 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\GameUX\Games\$1" "Title"
+  StrCmp $2 "D-Fend Reloaded" 0 DoNotDeleteGameExplorerRegKey
+  DeleteRegKey HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\GameUX\Games\$1"
+  Goto CheckNextGameExplorerKey
+  DoNotDeleteGameExplorerRegKey:
+  IntOp $0 $0 + 1
+  Goto CheckNextGameExplorerKey
+	
+  NoGameExplorerUninstall:
+FunctionEnd
+
+Function un.GameExplorerUninstall
+  ClearErrors
+  ReadRegStr $GEGUID HKLM "Software\D-Fend Reloaded" "GameExplorerGUID"	
+  IfErrors unNoGameExplorerUninstall
+	
+  ; Remove regular way
+  SetShellVarContext all
+  ${GameExplorer_RemoveGame} $GEGUID  
+  ClearErrors
+
+  ; Remove via deleting registry keys
+  StrCpy $0 0
+  unCheckNextGameExplorerKey:
+  EnumRegKey $1 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\GameUX\Games\" $0
+  StrCmp $1 "" unNoGameExplorerUninstall
+  ReadRegStr $2 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\GameUX\Games\$1" "Title"
+  StrCmp $2 "D-Fend Reloaded" 0 unDoNotDeleteGameExplorerRegKey
+  DeleteRegKey HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\GameUX\Games\$1"
+  Goto unCheckNextGameExplorerKey
+  unDoNotDeleteGameExplorerRegKey:
+  IntOp $0 $0 + 1
+  Goto unCheckNextGameExplorerKey
+	
+  unNoGameExplorerUninstall:
+FunctionEnd
+
 !macro CommonSections
   !define TO_MS 2000
   
@@ -217,6 +268,8 @@ FunctionEnd
     AskForUserDataDel:
     ReadRegStr $DataInstDir HKLM "Software\D-Fend Reloaded" "DataFolder"
     StrCmp $DataInstDir "" UninstallUserDataEnd
+	
+	IfFileExists $DataInstDir 0 UninstallUserDataEnd
     MessageBox MB_YESNO "$(LANGNAME_ConfirmDelUserData)" IDYES DelUserData IDNO UninstallUserDataEnd
     DelUserData:  
     RmDir /r $DataInstDir  
@@ -251,13 +304,7 @@ FunctionEnd
   
     StrCmp $1 "PORTABLEMODE" NoUninstallFromStartMenu
 	
-    StrCmp $1 "PORTABLEMODE" NoGameExplorerUninstall  
-    ClearErrors
-    ReadRegStr $GEGUID HKLM "Software\D-Fend Reloaded" "GameExplorerGUID"  
-    IfErrors NoGameExplorerUninstall
-    ${GameExplorer_RemoveGame} $GEGUID  
-    ClearErrors
-    NoGameExplorerUninstall:
+    Call un.GameExplorerUninstall
 
 	SetShellVarContext all
     RmDir /r "$SMPROGRAMS\D-Fend Reloaded"
@@ -272,6 +319,18 @@ FunctionEnd
 	
   SectionEnd
   
+!macroend
+
+!macro AddToGamesExplorer
+  SetShellVarContext all
+  IfFileExists "$APPDATA\Microsoft\Windows\GameExplorer\*.*" 0 AddToGamesExplorerDone
+  ClearErrors
+  Call GameExplorerUninstall ; Remove old D-Fend Reloaded Game Explorer records
+  StrCpy $GEGUID "{C4CC218B-7E0A-4616-9ECB-500221826266}"  
+  WriteRegStr HKLM "Software\D-Fend Reloaded" "GameExplorerGUID" "$GEGUID"
+  ClearErrors
+  ${GameExplorer_AddGame} all $INSTDIR\Bin\DFendGameExplorerData.dll $INSTDIR $INSTDIR\DFend.exe $GEGUID
+  AddToGamesExplorerDone:
 !macroend
 
 
@@ -335,10 +394,9 @@ FunctionEnd
     StrCmp 1 $3 UAC_UnOK
     StrCmp 3 $1 0 UAC_UnErr
     UAC_UnOK:
-
-
     !insertmacro MUI_UNGETLANGUAGE
   FunctionEnd
+  
   Function .OnInstFailed
       UAC::Unload
   FunctionEnd

@@ -43,7 +43,7 @@ object WizardBaseFrame: TWizardBaseFrame
   end
   object ListScummGamesLabel: TLabel
     Left = 8
-    Top = 240
+    Top = 224
     Width = 151
     Height = 13
     Caption = 'List of supported Scumm games'
@@ -52,10 +52,28 @@ object WizardBaseFrame: TWizardBaseFrame
   object ShowInfoLabel: TLabel
     Tag = 1
     Left = 8
-    Top = 264
+    Top = 248
     Width = 256
     Height = 13
     Caption = 'Information about the D-Fend Reloaded file structure'
+    OnClick = ButtonWork
+  end
+  object InfoLabelInstallationSupport: TLabel
+    Left = 8
+    Top = 272
+    Width = 360
+    Height = 13
+    Caption = 
+      'If the game you want to add needs to be installed first, you sho' +
+      'uld use the'
+  end
+  object InfoLabelInstallationSupportLink: TLabel
+    Tag = 2
+    Left = 8
+    Top = 291
+    Width = 115
+    Height = 13
+    Caption = 'Game installation wizard'
     OnClick = ButtonWork
   end
   object EmulationTypeComboBox: TComboBox
