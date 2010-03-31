@@ -119,6 +119,10 @@ object PackageManagerForm: TPackageManagerForm
     object TabSheet1: TTabSheet
       Caption = 'Games'
       ImageIndex = 4
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object GamesPanel: TPanel
         Left = 0
         Top = 236
@@ -181,6 +185,10 @@ object PackageManagerForm: TPackageManagerForm
     object TabSheet2: TTabSheet
       Caption = 'Auto setup templates'
       ImageIndex = 5
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object AutoSetupPanel: TPanel
         Left = 0
         Top = 236
@@ -244,6 +252,10 @@ object PackageManagerForm: TPackageManagerForm
     object TabSheet5: TTabSheet
       Caption = 'Icons'
       ImageIndex = 6
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object IconsPanel: TPanel
         Left = 0
         Top = 236
@@ -296,6 +308,10 @@ object PackageManagerForm: TPackageManagerForm
     object TabSheet6: TTabSheet
       Caption = 'Icon sets'
       ImageIndex = 7
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object IconSetsPanel: TPanel
         Left = 0
         Top = 236
@@ -348,6 +364,10 @@ object PackageManagerForm: TPackageManagerForm
     object TabSheet3: TTabSheet
       Caption = 'Language files'
       ImageIndex = 8
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object LanguagePanel: TPanel
         Left = 0
         Top = 236
@@ -401,6 +421,10 @@ object PackageManagerForm: TPackageManagerForm
     object TabSheet4: TTabSheet
       Caption = 'Multiple games packages'
       ImageIndex = 9
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object Splitter1: TSplitter
         Left = 241
         Top = 0

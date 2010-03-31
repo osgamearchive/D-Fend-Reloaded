@@ -536,7 +536,7 @@ begin
       FileName:=ExtractFileNameFromURL(DownloadIconData[I].URL,'.ico',True);
       DR:=DownloadFileWithDialog(self,DownloadIconData[I].Size,DownloadIconData[I].PackageFileURL,DownloadIconData[I].URL,DownloadIconData[I].PackageList.Referer,PackageDB.DBDir+FileName);
       If DR=drCancel then exit;
-      If DR<>drSuccess then begin
+      If DR=drSuccess then begin
         ForceDirectories(PrgDataDir+IconsSubDir+'\');
         If FileExists(PrgDataDir+IconsSubDir+'\'+FileName) then ExtDeleteFile(PrgDataDir+IconsSubDir+'\'+FileName,ftTemp);
         MoveFile(PChar(PackageDB.DBDir+FileName),PChar(PrgDataDir+IconsSubDir+'\'+FileName));
@@ -573,7 +573,7 @@ begin
       FileName:=ExtractFileNameFromURL(DownloadIconSetData[I].URL,'.zip',True);
       DR:=DownloadFileWithDialog(self,DownloadIconSetData[I].Size,DownloadIconSetData[I].PackageFileURL,DownloadIconSetData[I].URL,DownloadIconSetData[I].PackageList.Referer,PackageDB.DBDir+FileName);
       If DR=drCancel then exit;
-      If DR<>drSuccess then begin
+      If DR=drSuccess then begin
         B:=True;
         ForceDirectories(PrgDataDir+IconSetsFolder+'\');
         DestDir:=PrgDataDir+IconSetsFolder+'\'+ChangeFileExt(FileName,'');
@@ -624,7 +624,7 @@ begin
       FileName:=ExtractFileNameFromURL(DownloadLanguageData[I].URL,'.ini',True);
       DR:=DownloadFileWithDialog(self,DownloadLanguageData[I].Size,DownloadLanguageData[I].PackageFileURL,DownloadLanguageData[I].URL,DownloadLanguageData[I].PackageList.Referer,PackageDB.DBDir+FileName);
       If DR=drCancel then exit;
-      If DR<>drSuccess then begin
+      If DR=drSuccess then begin
         inc(C);
         ForceDirectories(PrgDataDir+LanguageSubDir+'\');
         DestLangFile:=PrgDataDir+LanguageSubDir+'\'+FileName;

@@ -31,8 +31,8 @@ uses Windows, SysUtils, ShellAPI, Forms, Dialogs, ShlObj, Math,
      ZipManagerUnit, ScreensaverControlUnit, FullscreenInfoFormUnit,
      DOSBoxCountUnit, DOSBoxShortNameUnit, RunPrgManagerUnit,
      SelectCDDriveToMountFormUnit, SelectCDDriveToMountByDataFormUnit,
-     FileNameConvertor, DOSBoxTempUnit;
-
+     FileNameConvertor, DOSBoxTempUnit, WindowsFileWarningFormUnit;
+                                                                  
 var SpeedTestSt : TStringList = nil;
     LastSpeedTestStep : String = '';
     LastSpeedTestStep2 : String = '';
@@ -555,6 +555,7 @@ Var Prefix,S,T,UsePath,Mount,Unmount : String;
     St2 : TStringList;
     NoFreeDOS : Boolean;
     Path, Drive, RootPath : String;
+    B : Boolean;
 begin
   result:=True;
 
@@ -586,7 +587,13 @@ begin
     If IsWindowsExe(MakeAbsPath(ProgramFile,PrgSetup.BaseDir)) and WarnIfNotReachable and WarnIfWindowsExe then begin
       If not Game.IgnoreWindowsFileWarnings then begin
         Application.Restore;
-        MessageDlg(Format(LanguageSetup.MessageWindowsExeExecuteWarning,[MakeAbsPath(ProgramFile,PrgSetup.BaseDir)]),mtError,[mbOK],0);
+        If PrgSetup.ActivateIncompleteFeatures then begin
+          B:=False;
+          ShowWindowsFileWarningDialog(Application.MainForm,MakeAbsPath(ProgramFile,PrgSetup.BaseDir),B);
+          If B then begin Game.IgnoreWindowsFileWarnings:=True; Game.StoreAllValues; end;
+        end else begin
+          MessageDlg(Format(LanguageSetup.MessageWindowsExeExecuteWarning,[MakeAbsPath(ProgramFile,PrgSetup.BaseDir)]),mtError,[mbOK],0);
+        end;
       end;
     end;
 
@@ -1490,10 +1497,26 @@ end;
 
 Procedure RunGame(const Game : TGame; const RunSetup : Boolean; const DosBoxCommandLine : String; const Wait : Boolean);
 Var DOSBoxHandle : THandle;
+    B : Boolean;
 begin
   DOSBoxHandle:=RunGameInt(Game,RunSetup,DosBoxCommandLine);
   try
-    If Wait then WaitForSingleObject(DOSBoxHandle,INFINITE);
+    If Wait then begin
+      WaitForSingleObject(DOSBoxHandle,INFINITE);
+    end else begin
+      B:=(DosBoxCommandLine='');
+      If B and (not Game.IgnoreWindowsFileWarnings) then begin
+        If RunSetup then begin
+          If (Trim(Game.SetupExe)<>'') and (ExtUpperCase(Copy(Trim(Game.SetupExe),1,7))<>'DOSBOX:') then B:=not IsWindowsExe(MakeAbsPath(Game.SetupExe,PrgSetup.BaseDir));
+        end else begin
+          If (Trim(Game.GameExe)<>'') and (ExtUpperCase(Copy(Trim(Game.GameExe),1,7))<>'DOSBOX:') then B:=not IsWindowsExe(MakeAbsPath(Game.GameExe,PrgSetup.BaseDir));
+        end;
+      end;
+      if B then begin
+        LastDOSBoxStartTime:=GetTickCount;
+        LastDOSBoxProfile:=Game;
+      end;
+    end;
   finally
     CloseHandle(DOSBoxHandle);
   end;

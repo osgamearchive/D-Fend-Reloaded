@@ -1,14 +1,14 @@
 [Closed Files]
-File_0=TSourceModule,'C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\DosBoxUnit.pas',0,1,1,39,34,0,0,,
-File_1=TSourceModule,'C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\HistoryFormUnit.pas',0,1,40,8,67,0,0,,
-File_2=TSourceModule,'C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\GameDBToolsUnit.pas',0,1,48,24,70,0,0,,
-File_3=TSourceModule,'C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\DOSBoxTempUnit.pas',0,1,1,6,1,0,0,,
-File_4=TSourceModule,'C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\SelectTemplateForZipImportFormUnit.pas',0,1,58,80,85,0,0,,
-File_5=TSourceModule,'C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\LanguageSetupUnit.pas',0,1,6026,1,6051,0,0,,{0
-File_6=TSourceModule,'C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\ZipPackageUnit.pas',0,1,729,1,755,0,0,,{0
-File_7=TSourceModule,'C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\ImportSelectTemplateFormUnit.pas',0,1,1,1,1,0,0,,
-File_8=TSourceModule,'C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\LoggingUnit.pas',0,1,1,2,4,0,0,,
-File_9=TSourceModule,'C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\CommonTools.pas',0,1,4,1,1,0,0,,
+File_0=TSourceModule,'C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\DOSBoxFailedFormUnit.pas',0,1,1,1,1,0,0,,
+File_1=TSourceModule,'C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\DosBoxUnit.pas',0,1,1484,1,1512,0,0,,{0
+File_2=TSourceModule,'C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\DOSBoxCountUnit.pas',0,1,1,24,21,0,0,,
+File_3=TSourceModule,'C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\GameDBUnit.pas',0,1,322,39,331,0,0,,
+File_4=TSourceModule,'C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\PrgSetupUnit.pas',0,1,652,41,714,0,0,,
+File_5=TSourceModule,'C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\HistoryFormUnit.pas',0,1,40,8,67,0,0,,
+File_6=TSourceModule,'C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\GameDBToolsUnit.pas',0,1,48,24,70,0,0,,
+File_7=TSourceModule,'C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\DOSBoxTempUnit.pas',0,1,1,6,1,0,0,,
+File_8=TSourceModule,'C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\SelectTemplateForZipImportFormUnit.pas',0,1,58,80,85,0,0,,
+File_9=TSourceModule,'C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\LanguageSetupUnit.pas',0,1,6026,1,6051,0,0,,{0
 
 [Modules]
 Module0=C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\MainUnit.pas
@@ -57,12 +57,12 @@ BottomMiddelPanelData=0000080001000100000009000000446F636B5369746530301900000000
 [View0]
 CustomEditViewType=TEditView
 Module=C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\MainUnit.pas
-CursorX=49
-CursorY=14
+CursorX=38
+CursorY=6
 TopLine=1
 LeftCol=1
 Elisions=
-Bookmarks={0,3690,1}{9,796,56}
+Bookmarks={0,3685,1}{9,791,56}
 EditViewName=C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\MainUnit.pas
 
 [Watches]
@@ -124,11 +124,11 @@ State=0
 Left=0
 Top=0
 Width=1893
-Height=7735
+Height=7049
 MaxLeft=-1
 MaxTop=-1
 ClientWidth=1893
-ClientHeight=7735
+ClientHeight=7049
 TBDockHeight=5902
 LRDockWidth=2351
 Dockable=1
@@ -367,11 +367,11 @@ State=0
 Left=0
 Top=0
 Width=1893
-Height=6804
+Height=7735
 MaxLeft=-1
 MaxTop=-1
 ClientWidth=1893
-ClientHeight=6804
+ClientHeight=7735
 TBDockHeight=412
 LRDockWidth=1893
 Dockable=1
@@ -627,7 +627,7 @@ LRDockWidth=1893
 Dockable=1
 StayOnTop=0
 TabPosition=0
-ActiveTabID=ProjectManager
+ActiveTabID=PropertyInspector
 TabDockClients=PropertyInspector,ProjectManager,ModelViewTool,DataExplorer
 
 [DockSite3]

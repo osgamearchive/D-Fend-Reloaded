@@ -166,18 +166,19 @@ const NR_Author=1;
       NR_MessageQBasicNeededToExecuteFile=20042;
       NR_MessageCouldNotStartProgram=20043;
       NR_MessageWindowsExeExecuteWarning=20044;
-      NR_MessageWindowsExeEditWarning=20045;
-      NR_MessageDOSExeExecuteWarning=20046;
-      NR_MessageDOSExeEditWarning=20047;
-      NR_MessageZipImportError=20048;
-      NR_MessageConfirmationDeleteFile=20049;
-      NR_MessageConfirmationDeleteFolder=20050;
-      NR_MessageDOSBoxOutdated=20051;
-      NR_MessageDOSBoxOutdatedShort=20052;
-      NR_MessageDirectoryAlreadyExists=20053;
-      NR_MessageCouldNotCopyDirectoriesToCapture=20054;
-      NR_MessageNoFolderNameForMounting=20055;
-      NR_MessageCouldNotFindScummVM=20056;
+      NR_MessageWindowsExeExecuteWarningTurnOff=20045;
+      NR_MessageWindowsExeEditWarning=20046;
+      NR_MessageDOSExeExecuteWarning=20047;
+      NR_MessageDOSExeEditWarning=20048;
+      NR_MessageZipImportError=20049;
+      NR_MessageConfirmationDeleteFile=20050;
+      NR_MessageConfirmationDeleteFolder=20051;
+      NR_MessageDOSBoxOutdated=20052;
+      NR_MessageDOSBoxOutdatedShort=20053;
+      NR_MessageDirectoryAlreadyExists=20054;
+      NR_MessageCouldNotCopyDirectoriesToCapture=20055;
+      NR_MessageNoFolderNameForMounting=20056;
+      NR_MessageCouldNotFindScummVM=20057;
       NR_MessageShortNameErrorParentNotFound=20101;
       NR_MessageShortNameErrorDelimiterInFileName=20102;
       NR_MessageShortNameErrorFileNotFound=20103;
@@ -2024,6 +2025,10 @@ const NR_Author=1;
       NR_ImportDBGLPackageGames=96904;
       NR_ImportDBGLPackageProgress=96905;
 
+      NR_DOSBoxStartFailed=97001;
+      NR_DOSBoxStartFailedInfo=97002;
+      NR_DOSBoxStartFailedTurnOff=97003;
+
 
 Type TLanguageSetup=class(TBasePrgSetup)
   private
@@ -2199,6 +2204,7 @@ Type TLanguageSetup=class(TBasePrgSetup)
     property MessageQBasicNeededToExecuteFile : String index NR_MessageQBasicNeededToExecuteFile read GetString write SetString;
     property MessageCouldNotStartProgram : String index NR_MessageCouldNotStartProgram read GetString write SetString;
     property MessageWindowsExeExecuteWarning : String index NR_MessageWindowsExeExecuteWarning read GetString write SetString;
+    property MessageWindowsExeExecuteWarningTurnOff : String index NR_MessageWindowsExeExecuteWarningTurnOff read GetString2 write SetString2;
     property MessageWindowsExeEditWarning : String index NR_MessageWindowsExeEditWarning read GetString write SetString;
     property MessageDOSExeExecuteWarning : String index NR_MessageDOSExeExecuteWarning read GetString write SetString;
     property MessageDOSExeEditWarning : String index NR_MessageDOSExeEditWarning read GetString write SetString;
@@ -4046,6 +4052,10 @@ Type TLanguageSetup=class(TBasePrgSetup)
     property ImportDBGLPackageNotes : String index NR_ImportDBGLPackageNotes read GetString2 write SetString2;
     property ImportDBGLPackageGames : String index NR_ImportDBGLPackageGames read GetString2 write SetString2;
     property ImportDBGLPackageProgress : String index NR_ImportDBGLPackageProgress read GetString2 write SetString2;
+
+    property DOSBoxStartFailed : String index NR_DOSBoxStartFailed read GetString2 write SetString2;
+    property DOSBoxStartFailedInfo : String index NR_DOSBoxStartFailedInfo read GetString2 write SetString2;
+    property DOSBoxStartFailedTurnOff : String index NR_DOSBoxStartFailedTurnOff read GetString2 write SetString2;
   end;
 
 Function RemoveUnderline(const S : String) : String;
@@ -4291,6 +4301,7 @@ begin
   AddStringRec(NR_MessageQBasicNeededToExecuteFile,'Messages','QBasicNeededToExecuteFile','To execute %s the QBasic interpreter is needed. But there is no QBasic program file defined or the given program file does not exist.');
   AddStringRec(NR_MessageCouldNotStartProgram,'Messages','CouldNotStartProgram','Could not start %s.');
   AddStringRec(NR_MessageWindowsExeExecuteWarning,'Messages','WindowsExe.ExecuteWarning','The file "%s" is a Windows executable. DOSBox can not run this file.');
+  {AddStringRec(NR_MessageWindowsExeExecuteWarningTurnOff,'Messages','WindowsExe.ExecuteWarning.TurnOff','Turn off warnings for this profile.');}
   AddStringRec(NR_MessageWindowsExeEditWarning,'Messages','WindowsExe.EditWarning','The file "%s" is a Windows executable. DOSBox will not be able to run this file. Do you really want to continue ?');
   AddStringRec(NR_MessageDOSExeExecuteWarning,'Messages','DOSExe.ExecuteWarning','The file "%s" is a DOS executable. You should use DOSBox for running this file instead of starting it directly.');
   AddStringRec(NR_MessageDOSExeEditWarning,'Messages','DOSExe.EditWarning','The file "%s" is a DOS executable. You should use DOSBox for running this file instead of starting it directly. Do you really want to continue ?');
@@ -6176,7 +6187,12 @@ begin
   AddStringRec(NR_ImportDBGLPackageAuthor,'ImportDBGLPackage','Author','Author');
   AddStringRec(NR_ImportDBGLPackageNotes,'ImportDBGLPackage','Notes','Notes');
   AddStringRec(NR_ImportDBGLPackageGames,'ImportDBGLPackage','Games','Games to import');
-  AddStringRec(NR_ImportDBGLPackageProgress,'ImportDBGLPackage','Progress','Importing profiles...');}
+  AddStringRec(NR_ImportDBGLPackageProgress,'ImportDBGLPackage','Progress','Importing profiles...');
+
+  AddStringRec(NR_DOSBoxStartFailed,'DOSBoxStartFailed','Caption','Starting DOSBox failed');
+  AddStringRec(NR_DOSBoxStartFailedInfo,'DOSBoxStartFailed','Info','DOSBox has closed very soon. Eighter the program you wanted to start inside DOSBox has failed to start or DOSBox itself has caused a problem. To see what happens inside DOSBox, you can turn of the "Close DOSBox when program closes" option. '+
+                                                                   'If DOSBox itself fails to start, you can try some other render methods.');
+  AddStringRec(NR_DOSBoxStartFailedTurnOff,'DOSBoxStartFailed','TurnOff','Do not show this dialog for this profile again (not recommended)');}
 end;
 
 destructor TLanguageSetup.Destroy;
@@ -6194,6 +6210,8 @@ begin
     NR_GlobalSearchNot : result:='not';
 
     NR_LanguageOutdatedShort : result:='Language file outdated';
+
+    NR_MessageWindowsExeExecuteWarningTurnOff : result:='Turn off warnings for this profile.';
 
     NR_MessageDOSBoxOutdatedShort : result:='Version outdated';
 
@@ -6442,6 +6460,11 @@ begin
     NR_ImportDBGLPackageNotes : result:='Notes';
     NR_ImportDBGLPackageGames : result:='Games to import';
     NR_ImportDBGLPackageProgress : result:='Importing profiles...';
+
+    NR_DOSBoxStartFailed : result:='Starting DOSBox failed';
+    NR_DOSBoxStartFailedInfo : result:='DOSBox has closed very soon. Eighter the program you wanted to start inside DOSBox has failed to start or DOSBox itself has caused a problem. To see what happens inside DOSBox, you can turn of the "Close DOSBox when program closes" option. '+
+                                       'If DOSBox itself fails to start, you can try some other render methods.';
+    NR_DOSBoxStartFailedTurnOff : result:='Do not show this dialog for this profile again (not recommended) (will be available in 1.0)';
   End;
 end;
 

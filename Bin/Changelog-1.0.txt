@@ -16,6 +16,8 @@ Version 1.0.0 (0?/??/2010)
   list, data reader and cheats database updates.
 - The zip file import function also can import DBGL packages now.
 - New easier to use first run wizard.
+- If DOSBox start fails D-Fend Reloaded will show some information and will
+  offer some options to find and solve the problem.
 - New setup option when to configurate a new game completely automatically.
 - Like the genre and language names the license in game profiles can now be
   translated on the fly so profiles created via auto setup templates etc. will

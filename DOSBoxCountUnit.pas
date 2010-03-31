@@ -1,7 +1,7 @@
 unit DOSBoxCountUnit;
 interface
 
-uses Classes;
+uses Classes, GameDBUnit;
 
 Type TPrgCounter=class
   private
@@ -17,6 +17,9 @@ end;
 Var DOSBoxCounter : TPrgCounter;
     ScummVMCounter : TPrgCounter;
     WindowsGameCounter : TPrgCounter;
+
+var LastDOSBoxStartTime : Cardinal =0;
+    LastDOSBoxProfile : TGame =nil;
 
 implementation
 

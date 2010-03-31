@@ -14,6 +14,7 @@
 
 !insertmacro MUI_RESERVEFILE_INSTALLOPTIONS
 ReserveFile "Languages\ioFileBrazilian_Portuguese.ini"
+ReserveFile "Languages\ioFileCzech.ini"
 ReserveFile "Languages\ioFileDanish.ini"
 ReserveFile "Languages\ioFileDutch.ini"
 ReserveFile "Languages\ioFileEnglish.ini"
@@ -28,6 +29,7 @@ ReserveFile "Languages\ioFileTraditional_Chinese.ini"
 ReserveFile "Languages\ioFileTurkish.ini"
 
 ReserveFile "Languages\ioFile2Brazilian_Portuguese.ini"
+ReserveFile "Languages\ioFile2Czech.ini"
 ReserveFile "Languages\ioFile2Danish.ini"
 ReserveFile "Languages\ioFile2Dutch.ini"
 ReserveFile "Languages\ioFile2English.ini"
@@ -387,6 +389,7 @@ SectionEnd
 
 !macro ExtractInstallOptionFiles
   !insertmacro MUI_INSTALLOPTIONS_EXTRACT_AS "Languages\ioFileBrazilian_Portuguese.ini" "ioFileBrazilian_Portuguese.ini"
+  !insertmacro MUI_INSTALLOPTIONS_EXTRACT_AS "Languages\ioFileCzech.ini" "ioFileCzech.ini"
   !insertmacro MUI_INSTALLOPTIONS_EXTRACT_AS "Languages\ioFileDanish.ini" "ioFileDanish.ini"
   !insertmacro MUI_INSTALLOPTIONS_EXTRACT_AS "Languages\ioFileDutch.ini" "ioFileDutch.ini"
   !insertmacro MUI_INSTALLOPTIONS_EXTRACT_AS "Languages\ioFileEnglish.ini" "ioFileEnglish.ini"
@@ -401,6 +404,7 @@ SectionEnd
   !insertmacro MUI_INSTALLOPTIONS_EXTRACT_AS "Languages\ioFileTurkish.ini" "ioFileTurkish.ini"
  
   !insertmacro MUI_INSTALLOPTIONS_EXTRACT_AS "Languages\ioFile2Brazilian_Portuguese.ini" "ioFile2Brazilian_Portuguese.ini"
+  !insertmacro MUI_INSTALLOPTIONS_EXTRACT_AS "Languages\ioFile2Czech.ini" "ioFile2Czech.ini"
   !insertmacro MUI_INSTALLOPTIONS_EXTRACT_AS "Languages\ioFile2Danish.ini" "ioFile2Danish.ini"
   !insertmacro MUI_INSTALLOPTIONS_EXTRACT_AS "Languages\ioFile2Dutch.ini" "ioFile2Dutch.ini"
   !insertmacro MUI_INSTALLOPTIONS_EXTRACT_AS "Languages\ioFile2English.ini" "ioFile2English.ini"

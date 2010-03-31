@@ -1,5 +1,16 @@
 D-Fend Reloaded Changelog
 
+Version 0.9.3 (03/31/2010)
+==========================
+- Czech language file (thanks to marker)
+- About 50 new auto setup templates for automatical installation of even more
+  games.
+- Some more fine tuning to the way setup files are detected when importing
+  plain archive files.
+- [Fix] Downloading icons, language files and icon sets via the package manager
+  always failed.
+
+
 Version 0.9.2 (03/19/2010)
 ==========================
 - The Italian language file has been updated.

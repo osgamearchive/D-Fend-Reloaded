@@ -2055,10 +2055,6 @@ object InfoForm: TInfoForm
     object LanguageSheet: TTabSheet
       Caption = 'LanguageSheet'
       ImageIndex = 4
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object LanguageAuthorsTab: TStringGrid
         Left = 0
         Top = 0
@@ -2075,10 +2071,6 @@ object InfoForm: TInfoForm
     object LicenseSheet: TTabSheet
       Caption = 'LicenseSheet'
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object LicenseMemo: TRichEdit
         Left = 0
         Top = 30
@@ -2104,7 +2096,7 @@ object InfoForm: TInfoForm
           Width = 145
           Height = 21
           Style = csDropDownList
-          ItemHeight = 0
+          ItemHeight = 13
           TabOrder = 0
           OnChange = LicenseComboBoxChange
         end
@@ -2113,10 +2105,6 @@ object InfoForm: TInfoForm
     object CompLicenseSheet: TTabSheet
       Caption = 'CompLicenseSheet'
       ImageIndex = 2
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object CompLicenseMemo: TRichEdit
         Left = 0
         Top = 0
@@ -2132,10 +2120,6 @@ object InfoForm: TInfoForm
     object ChangeLogTabSheet: TTabSheet
       Caption = 'ChangeLogTabSheet'
       ImageIndex = 3
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object ChangeLogMemo: TRichEdit
         Left = 0
         Top = 30
@@ -2162,7 +2146,7 @@ object InfoForm: TInfoForm
           Width = 145
           Height = 21
           Style = csDropDownList
-          ItemHeight = 0
+          ItemHeight = 13
           TabOrder = 0
           OnChange = ChangeLogComboBoxChange
         end
@@ -2171,10 +2155,6 @@ object InfoForm: TInfoForm
     object DFendTabSheet: TTabSheet
       Caption = 'D-Fend'
       ImageIndex = 5
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object DFendInfoLabel: TLabel
         Left = 16
         Top = 16

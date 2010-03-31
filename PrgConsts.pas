@@ -75,11 +75,11 @@ const DosBoxFileName='DOSBOX.EXE';
 const InstallerNames : Array[1..4] of String = ('INSTALL','SETUP','INSTHD','INST');
       ProgramExts : Array[1..3] of String = ('EXE','COM','BAT');
 
-      IgnoreGameExeFilesIgnore : Array[1..31] of String = ('README','DECIDE','DEICE','CATALOG','LIST','LHARC','ARJ','UNARJ','UNZIP','HELPME','ORDER','DEALERS','ULTRAMID','PRINTME','UNIVBE','SWCBBS','INSTHELP','COMMIT','SETMAIN','BOOTMKR','IMUSE','KEYCONFI','32RTM','LOADPATS','MAKESWP','XPHELP','IBMSND','MIDPAK','SBLASTER','ALIVECAT','READDOC');
+      IgnoreGameExeFilesIgnore : Array[1..32] of String = ('README','DECIDE','DEICE','CATALOG','FACTORY','LIST','LHARC','ARJ','UNARJ','UNZIP','HELPME','ORDER','DEALERS','ULTRAMID','PRINTME','UNIVBE','SWCBBS','INSTHELP','COMMIT','SETMAIN','BOOTMKR','IMUSE','KEYCONFI','32RTM','LOADPATS','MAKESWP','XPHELP','IBMSND','MIDPAK','SBLASTER','ALIVECAT','READDOC');
 
       SetupExeFilesLevel1 : Array[1..2] of String = ('SETUP','CONFIG');
       SetupExeFilesLevel2 : Array[1..4] of String = ('SETSOUND','SETSND','SETBLAST','SOUND');
-      SetupExeFilesLevel3 : Array[1..3] of String = ('XINSTALL','SETUPAQ','SETUPDP');
+      SetupExeFilesLevel3 : Array[1..4] of String = ('XINSTALL','SETUPAQ','SETUPDP','SETUPVC');
       SetupExeFilesLevel4 : Array[1..1] of String = ('INSTALL');
 
 var MainSetupFile : String;

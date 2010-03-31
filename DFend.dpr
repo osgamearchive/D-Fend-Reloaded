@@ -220,7 +220,9 @@ uses
   GameDBFilterToolsUnit in 'GameDBFilterToolsUnit.pas',
   ZipPackageDBGLFormUnit in 'ZipPackageDBGLFormUnit.pas' {ZipPackageDBGLForm},
   FirstRunWizardFormUnit2 in 'FirstRunWizardFormUnit2.pas' {FirstRunWizardForm2},
-  LoggingUnit in 'LoggingUnit.pas';
+  LoggingUnit in 'LoggingUnit.pas',
+  WindowsFileWarningFormUnit in 'WindowsFileWarningFormUnit.pas' {WindowsFileWarningForm},
+  DOSBoxFailedFormUnit in 'DOSBoxFailedFormUnit.pas' {DOSBoxFailedForm};
 
 {$R *.res}
 

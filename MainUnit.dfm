@@ -4382,7 +4382,6 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
     TabOrder = 0
     OnChange = TreeViewChange
     OnDragDrop = MainDragDrop
-    ExplicitHeight = 412
   end
   object CoolBar: TCoolBar
     Left = 0
@@ -4523,7 +4522,6 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 2
-    ExplicitHeight = 412
     object Splitter1: TSplitter
       Left = 0
       Top = 229
@@ -4558,7 +4556,6 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
       OnDragDrop = MainDragDrop
       OnInfoTip = ListViewInfoTip
       OnSelectItem = ListViewSelectItem
-      ExplicitHeight = 209
     end
     object CapturePageControl: TPageControl
       Left = 0

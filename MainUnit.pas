@@ -18,12 +18,13 @@ uses
   - Activate help paragraphs for new functions in Setup|Service, Setup|Language|CustomStrings and Profile|Edit|Profile.
   - Change NR_SetupFormGamesListTranslations to "Non English translations for the games list" and update name in help index and setup help page
   - Update help page for first run wizard, remove unused language strings
-  - Add "Cardgame" and "Boardgame" to custom genre strings
 - Setup dialog: When to update package lists / data reader configuration
-- "Turn off Windows file warnings for this profile" checkbox in warning message
+- The run commands before/after DOSBox should be able to handle multiple commands.
+- Data field for turning off the DOSBox failed dialog
+- BinCache improvements: Counter field for data fields (do not use DB if not matching - in case I forget to change DB version string)
 - Clean up extras|images menu
-- More new auto setup templates (Rest of "Card and board games" Classic DOS game section)
 - Integrate DOSBox 0.74 and update default values
+- Option to also set profile name from the mobygames information.
 }
 
 {DEFINE UseNewFirstRunWizard}
@@ -502,7 +503,7 @@ uses ShellAPI, ShlObj, ClipBrd, Math, PNGImage, CommonTools, LanguageSetupUnit,
      RenameAllScreenshotsFormUnit, MakeBootImageFromProfileFormUnit,
      CheatApplyFormUnit, CheatDBEditFormUnit, CheatSearchFormUnit,
      UpdateCheckFormUnit, ProgramUpdateCheckUnit, GameDBFilterUnit,
-     FirstRunWizardFormUnit2, LoggingUnit;
+     FirstRunWizardFormUnit2, LoggingUnit, DOSBoxFailedFormUnit;
 
 {$R *.dfm}
 
@@ -3644,6 +3645,14 @@ begin
     LastTop:=Top;
     LastLeft:=Left;
     LastDOSBoxCount:=DOSBoxCounter.Count;
+  end;
+
+  If PrgSetup.ActivateIncompleteFeatures then begin
+    If (DOSBoxCounter.Count<LastDOSBoxCount) and (LastDOSBoxStartTime>0) and (LastDOSBoxStartTime+3000>GetTickCount) then begin
+      LastDOSBoxStartTime:=0;
+      ShowDOSBoxFailedDialog(self,GameDB,LastDOSBoxProfile);
+      LastDOSBoxProfile:=nil;
+    end;
   end;
 
   If PrgSetup.MinimizeOnDosBoxStart and PrgSetup.RestoreWhenDOSBoxCloses and (WindowState=wsMinimized) and MinimizedAtDOSBoxStart then begin

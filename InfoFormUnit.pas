@@ -84,6 +84,7 @@ begin
   CompLicenseSheet.Caption:=LanguageSetup.InfoFormCompLicense;
   ChangeLogTabSheet.Caption:=LanguageSetup.InfoFormChangeLog;
 
+  OKButton.Caption:=LanguageSetup.OK;
   UserIconLoader.DialogImage(DI_OK,OKButton);
 
   VersionLabel.Caption:=GetFileVersionAsString;

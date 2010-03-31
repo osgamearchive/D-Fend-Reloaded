@@ -414,5 +414,9 @@
     <Transaction>2010.02.24 12:22:59.539.pas,C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\Unit1.pas=C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\FirstRunWizardFormUnit2.pas</Transaction>
     <Transaction>2010.02.24 12:22:59.555.dfm,C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\Unit1.dfm=C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\FirstRunWizardFormUnit2.dfm</Transaction>
     <Transaction>2010.03.09 08:13:36.794.pas,C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\Unit1.pas=C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\LoggingUnit.pas</Transaction>
+    <Transaction>2010.03.28 16:16:50.887.pas,C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\Unit1.pas=C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\WindowsFileWarningFormUnit.pas</Transaction>
+    <Transaction>2010.03.28 16:16:50.887.dfm,C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\Unit1.dfm=C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\WindowsFileWarningFormUnit.dfm</Transaction>
+    <Transaction>2010.03.28 18:32:25.596.pas,C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\Unit1.pas=C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\DOSBoxFailedFormUnit.pas</Transaction>
+    <Transaction>2010.03.28 18:32:25.654.dfm,C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\Unit1.dfm=C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\DOSBoxFailedFormUnit.dfm</Transaction>
   </Transactions>
 </BorlandProject>

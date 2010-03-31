@@ -140,6 +140,7 @@ FunctionEnd
   !insertmacro MUI_LANGUAGE "English"
 
   !insertmacro MUI_LANGUAGE "PortugueseBR"
+  !insertmacro MUI_LANGUAGE "Czech"
   !insertmacro MUI_LANGUAGE "Danish"
   !insertmacro MUI_LANGUAGE "Dutch"
   !insertmacro MUI_LANGUAGE "French"
@@ -153,6 +154,7 @@ FunctionEnd
   !insertmacro MUI_LANGUAGE "Turkish"
 
   !include "Languages\D-Fend-Reloaded-Setup-Lang-BrazilianPortuguese.nsi"
+  !include "Languages\D-Fend-Reloaded-Setup-Lang-Czech.nsi"
   !include "Languages\D-Fend-Reloaded-Setup-Lang-Danish.nsi"
   !include "Languages\D-Fend-Reloaded-Setup-Lang-Dutch.nsi"
   !include "Languages\D-Fend-Reloaded-Setup-Lang-English.nsi"
