@@ -113,7 +113,7 @@ object ProfileMountEditorHDImageFrame: TProfileMountEditorHDImageFrame
     Width = 145
     Height = 21
     Style = csDropDownList
-    ItemHeight = 13
+    ItemHeight = 0
     TabOrder = 2
     OnChange = ImageDriveLetterComboBoxChange
   end

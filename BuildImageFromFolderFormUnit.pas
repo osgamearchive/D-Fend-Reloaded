@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, Buttons, ExtCtrls;
+  Dialogs, StdCtrls, Buttons, ExtCtrls, Spin;
 
 type
   TBuildImageFromFolderForm = class(TForm)
@@ -24,6 +24,9 @@ type
     AddEditCheckbox: TCheckBox;
     ImageTypeGroupBox: TRadioGroup;
     MemoryManagerCheckBox: TCheckBox;
+    FreeSpaceLabel: TLabel;
+    FreeSpaceEdit: TSpinEdit;
+    NeedFreeDOSLabel: TLabel;
     procedure FormCreate(Sender: TObject);
     procedure ButtonWork(Sender: TObject);
     procedure OKButtonClick(Sender: TObject);
@@ -53,7 +56,6 @@ Uses VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgSetupUnit,
 {$R *.dfm}
 
 procedure TBuildImageFromFolderForm.FormCreate(Sender: TObject);
-Var C : Char;
 begin
   SetVistaFonts(self);
   Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName);
@@ -66,7 +68,9 @@ begin
   ImageTypeGroupBox.Caption:=LanguageSetup.ImageFromFolderImageType;
   ImageTypeGroupBox.Items[0]:=LanguageSetup.ImageFromFolderImageTypeFloppy;
   ImageTypeGroupBox.Items[1]:=LanguageSetup.ImageFromFolderImageTypeHarddisk;
+  FreeSpaceLabel.Caption:=LanguageSetup.ImageFromFolderAdditionalFreeSpace;
   MakeBootableCheckBox.Caption:=LanguageSetup.CreateImageFormMakeFloppyBootable;
+  NeedFreeDOSLabel.Caption:=LanguageSetup.ProfileEditorNeedFreeDOS;
   AddKeyboardDriverCheckBox.Caption:=LanguageSetup.CreateImageFormMakeFloppyBootableWithKeyboardDriver;
   AddMouseDriverCheckBox.Caption:=LanguageSetup.CreateImageFormMakeFloppyBootableWithMouseDriver;
   MemoryManagerCheckBox.Caption:=LanguageSetup.CreateImageFormMakeFloppyBootableWithMemoryManager;
@@ -79,18 +83,24 @@ begin
   SaveDialog.Title:=LanguageSetup.ImageFromFolderSaveDialogTitle;
   SaveDialog.Filter:=LanguageSetup.ImageFromFolderSaveDialogFilter;
 
+  If DirectoryExists(IncludeTrailingPathDelimiter(MakeAbsPath(PrgSetup.PathToFREEDOS,PrgSetup.BaseDir))) then begin
+    NeedFreeDOSLabel.Font.Color:=clGrayText;
+  end else begin
+    NeedFreeDOSLabel.Font.Color:=clRed;
+  end;
+
   UserIconLoader.DialogImage(DI_OK,OKButton);
   UserIconLoader.DialogImage(DI_Cancel,CancelButton);
   UserIconLoader.DialogImage(DI_Help,HelpButton);
   UserIconLoader.DialogImage(DI_SelectFolder,FolderButton);
   UserIconLoader.DialogImage(DI_SelectFile,FileNameButton);
-
-  FloppyDriveAvailable:=False;
-  For C:='A' to 'Z' do If GetDriveType(PChar(C+':\'))=DRIVE_REMOVABLE then begin FloppyDriveAvailable:=True; break; end;
 end;
 
 procedure TBuildImageFromFolderForm.FormShow(Sender: TObject);
+Var C : Char;
 begin
+  FloppyDriveAvailable:=False;
+  For C:='A' to 'Z' do If GetDriveType(PChar(C+':\'))=DRIVE_REMOVABLE then begin FloppyDriveAvailable:=True; break; end;
   ImageTypeGroupBoxClick(Sender);
 end;
 
@@ -115,6 +125,8 @@ end;
 procedure TBuildImageFromFolderForm.ImageTypeGroupBoxClick(Sender: TObject);
 begin
   WriteToFloppyCheckBox.Enabled:=(ImageTypeGroupBox.ItemIndex=0) and FloppyDriveAvailable;
+  FreeSpaceLabel.Visible:=(ImageTypeGroupBox.ItemIndex=1);
+  FreeSpaceEdit.Visible:=(ImageTypeGroupBox.ItemIndex=1);
 end;
 
 procedure TBuildImageFromFolderForm.MakeBootableCheckBoxClick(Sender: TObject);
@@ -175,7 +187,7 @@ begin
       end;
       If not DiskImageCreator(FileName) then begin ModalResult:=mrNone; exit; end;
     end else begin
-      Size:=(Size div 1024 div 1024)+1+5;
+      Size:=(Size div 1024 div 1024)+1+FreeSpaceEdit.Value;
       If not DiskImageCreator(Size,FileName,False,True) then begin ModalResult:=mrNone; exit; end;
     end;
 

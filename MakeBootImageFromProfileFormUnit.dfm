@@ -4,7 +4,7 @@ object MakeBootImageFromProfileForm: TMakeBootImageFromProfileForm
   BorderStyle = bsDialog
   Caption = 'Create image file based profile from normal profile'
   ClientHeight = 265
-  ClientWidth = 396
+  ClientWidth = 443
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -18,14 +18,14 @@ object MakeBootImageFromProfileForm: TMakeBootImageFromProfileForm
   OnKeyDown = FormKeyDown
   OnShow = FormShow
   DesignSize = (
-    396
+    443
     265)
   PixelsPerInch = 96
   TextHeight = 13
   object InfoLabel: TLabel
     Left = 8
     Top = 8
-    Width = 377
+    Width = 424
     Height = 82
     Anchors = [akLeft, akTop, akRight]
     AutoSize = False
@@ -36,6 +36,7 @@ object MakeBootImageFromProfileForm: TMakeBootImageFromProfileForm
       ' original profile is not changed in any way. The new harddisk im' +
       'age based profile is created as a copy.)'
     WordWrap = True
+    ExplicitWidth = 377
   end
   object FreeSizeLabel: TLabel
     Left = 8
@@ -54,12 +55,13 @@ object MakeBootImageFromProfileForm: TMakeBootImageFromProfileForm
   object ProfileComboBox: TComboBox
     Left = 8
     Top = 96
-    Width = 377
+    Width = 424
     Height = 21
     Style = csDropDownList
     Anchors = [akLeft, akTop, akRight]
     ItemHeight = 13
     TabOrder = 0
+    ExplicitWidth = 377
   end
   object OKButton: TBitBtn
     Left = 8
@@ -103,23 +105,25 @@ object MakeBootImageFromProfileForm: TMakeBootImageFromProfileForm
   object CompressedCheckBox: TCheckBox
     Left = 8
     Top = 182
-    Width = 377
+    Width = 424
     Height = 17
     Anchors = [akLeft, akTop, akRight]
     Caption = 'Store Image with NTFS-compression'
     Checked = True
     State = cbChecked
     TabOrder = 2
+    ExplicitWidth = 377
   end
   object MemoryManagerCheckBox: TCheckBox
     Left = 8
     Top = 205
-    Width = 377
+    Width = 424
     Height = 17
     Anchors = [akLeft, akTop, akRight]
     Caption = 'Use memory manager on disk image'
     Checked = True
     State = cbChecked
     TabOrder = 3
+    ExplicitWidth = 377
   end
 end

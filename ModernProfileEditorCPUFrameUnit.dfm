@@ -32,16 +32,26 @@ object ModernProfileEditorCPUFrame: TModernProfileEditorCPUFrame
     WordWrap = True
   end
   object CPUTypeLabel: TLabel
-    Left = 256
+    Left = 312
     Top = 24
     Width = 69
     Height = 13
     Caption = 'CPUTypeLabel'
   end
+  object InfoLabel: TLabel
+    Left = 312
+    Top = 80
+    Width = 265
+    Height = 121
+    Anchors = [akLeft, akTop, akRight]
+    AutoSize = False
+    Caption = 'InfoLabel'
+    WordWrap = True
+  end
   object CPUCoreRadioGroup: TRadioGroup
     Left = 24
     Top = 24
-    Width = 209
+    Width = 273
     Height = 137
     Caption = 'CPUCoreRadioGroup'
     TabOrder = 0
@@ -49,10 +59,10 @@ object ModernProfileEditorCPUFrame: TModernProfileEditorCPUFrame
   object CPUCyclesGroupBox: TGroupBox
     Left = 24
     Top = 176
-    Width = 209
+    Width = 273
     Height = 113
     Caption = 'CPUCyclesGroupBox'
-    TabOrder = 1
+    TabOrder = 2
     object CyclesAutoRadioButton: TRadioButton
       Left = 16
       Top = 32
@@ -81,7 +91,7 @@ object ModernProfileEditorCPUFrame: TModernProfileEditorCPUFrame
       OnClick = CPUCyclesChange
     end
     object CyclesComboBox: TComboBox
-      Left = 96
+      Left = 112
       Top = 76
       Width = 104
       Height = 21
@@ -96,7 +106,7 @@ object ModernProfileEditorCPUFrame: TModernProfileEditorCPUFrame
     Height = 22
     MaxValue = 50000
     MinValue = 1
-    TabOrder = 2
+    TabOrder = 3
     Value = 500
   end
   object CyclesDownEdit: TSpinEdit
@@ -106,16 +116,36 @@ object ModernProfileEditorCPUFrame: TModernProfileEditorCPUFrame
     Height = 22
     MaxValue = 50000
     MinValue = 1
-    TabOrder = 3
+    TabOrder = 5
     Value = 20
   end
   object CPUTypeComboBox: TComboBox
-    Left = 256
+    Left = 312
     Top = 43
     Width = 145
     Height = 21
     Style = csDropDownList
     ItemHeight = 13
+    TabOrder = 1
+  end
+  object CyclesUpComboBox: TComboBox
+    Left = 107
+    Top = 328
+    Width = 145
+    Height = 21
+    Style = csDropDownList
+    ItemHeight = 13
     TabOrder = 4
+    OnChange = CyclesUpComboBoxChange
+  end
+  object CyclesDownComboBox: TComboBox
+    Left = 107
+    Top = 387
+    Width = 145
+    Height = 21
+    Style = csDropDownList
+    ItemHeight = 13
+    TabOrder = 6
+    OnChange = CyclesDownComboBoxChange
   end
 end

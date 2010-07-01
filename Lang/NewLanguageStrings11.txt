@@ -1,0 +1,5 @@
+[SetupForm]
+CHANGED: DOSBoxCVS.VideoModes=Add "demovga" graphic mode
+
+[SearchAddress]
+Start.DeleteButton=Delete selected search data

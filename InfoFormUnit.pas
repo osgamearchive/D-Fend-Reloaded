@@ -208,11 +208,16 @@ begin
   try LicenseMemo.Lines.Clear; except end;
   Case Integer(LicenseComboBox.Items.Objects[LicenseComboBox.ItemIndex]) of
     0 : If FileExists(PrgDir+BinFolder+'\'+'License.txt') then S:=PrgDir+BinFolder+'\'+'License.txt' else S:=PrgDir+'License.txt';
-    1 : S:=IncludeTrailingPathDelimiter(PrgSetup.DOSBoxSettings[0].DosBoxDir)+'COPYING.txt';
+    1 : begin
+          S:=IncludeTrailingPathDelimiter(PrgSetup.DOSBoxSettings[0].DosBoxDir)+'Documentation\COPYING.txt';
+          if not FileExists(S) then S:=IncludeTrailingPathDelimiter(PrgSetup.DOSBoxSettings[0].DosBoxDir)+'COPYING.txt';
+        end;
     2 : S:=IncludeTrailingPathDelimiter(PrgSetup.ScummVMPath)+'COPYING.txt';
   end;
   If S<>'' then begin
-     try LicenseMemo.Lines.LoadFromFile(S); except end;
+     try
+       if FileExists(S) then LicenseMemo.Lines.LoadFromFile(S);
+     except end;
   end;
 end;
 

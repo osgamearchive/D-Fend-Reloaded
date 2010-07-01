@@ -64,7 +64,7 @@ UserInfo=License=Shareware[13][10]
 fullscreen=1
 autolock=0
 fulldouble=0
-usecancodes=1
+usescancodes=1
 sensitivity=100
 output=ddraw
 windowresolution=original

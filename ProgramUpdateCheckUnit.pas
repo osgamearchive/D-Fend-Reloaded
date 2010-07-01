@@ -5,7 +5,7 @@ uses Classes;
 
 Type TUpdateResult=(urNoUpdatesAvailable, urUpdateAvailable, urUpdateInstalled, urUpdateInstallCanceled);
 
-Function RunUpdateCheck(const AOwner : TComponent; const Quite : Boolean) : TUpdateResult;
+Function RunUpdateCheck(const AOwner : TComponent; const Quite, QuiteOnError : Boolean) : TUpdateResult;
 Procedure RunUpdateCheckIfSetup(const AOwner : TComponent);
 Procedure RunUpdateCheckIdleCloseHandle;
 
@@ -87,9 +87,10 @@ begin
   PrgSetup.LastUpdateCheck:=Round(Int(Date));
 end;
 
-Function RunUpdateCheck(const AOwner : TComponent; const Quite : Boolean) : TUpdateResult;
+Function RunUpdateCheck(const AOwner : TComponent; const Quite, QuiteOnError : Boolean) : TUpdateResult;
 Var URL, FileName : String;
     St : TStringList;
+    B : Boolean;
 begin
   result:=urUpdateInstallCanceled;
 
@@ -97,9 +98,14 @@ begin
   URL:=PrgSetup.UpdateCheckURL; If PrgSetup.VersionSpecificUpdateCheck then URL:=URL+'?Version='+GetNormalFileVersionAsString;
 
   If Quite then begin
-    if DownloadFileWithOutDialog(AOwner,-1,'',URL,'',FileName)<>drSuccess then exit;
+    B:=(DownloadFileWithOutDialog(AOwner,-1,'',URL,'',FileName)=drSuccess);
   end else begin
-    if DownloadFileWithDialog(AOwner,-1,'',URL,'',FileName)<>drSuccess then exit;
+    B:=(DownloadFileWithDialog(AOwner,-1,'',URL,'',FileName)=drSuccess);
+  end;
+
+  If not B then begin
+    If not QuiteOnError then MessageDlg(Format(LanguageSetup.PackageManagerDownloadFailed,[URL]),mtError,[mbOK],0);
+    exit;
   end;
 
   St:=TStringList.Create;
@@ -130,9 +136,9 @@ Procedure RunUpdateCheckIfSetup(const AOwner : TComponent);
 begin
   Case PrgSetup.CheckForUpdates of
     0 : {Do not check automatically};
-    1 : If Round(Int(Date))>=PrgSetup.LastUpdateCheck+7 then RunUpdateCheck(AOwner,True);
-    2 : If Round(Int(Date))>=PrgSetup.LastUpdateCheck+1 then RunUpdateCheck(AOwner,True);
-    3 : RunUpdateCheck(AOwner,True);
+    1 : If Round(Int(Date))>=PrgSetup.LastUpdateCheck+7 then RunUpdateCheck(AOwner,True,True);
+    2 : If Round(Int(Date))>=PrgSetup.LastUpdateCheck+1 then RunUpdateCheck(AOwner,True,True);
+    3 : RunUpdateCheck(AOwner,True,True);
   end;
 end;
 

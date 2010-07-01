@@ -83,7 +83,7 @@ begin
   If (S='INTERNAL') or (S='') then ImagesRadioButton1.Checked:=True else begin
     If S='DEFAULT' then ImagesRadioButton2.Checked:=True else begin
       ImagesRadioButton3.Checked:=True;
-      ImagesEdit.Text:=PrgSetup.ImageViewer;
+      ImagesEdit.Text:=MakeRelPath(PrgSetup.ImageViewer,PrgSetup.BaseDir);
     end;
   end;
 
@@ -91,7 +91,7 @@ begin
   If (S='INTERNAL') or (S='') then SoundsRadioButton1.Checked:=True else begin
     If S='DEFAULT' then SoundsRadioButton2.Checked:=True else begin
       SoundsRadioButton3.Checked:=True;
-      SoundsEdit.Text:=PrgSetup.SoundPlayer;
+      SoundsEdit.Text:=MakeRelPath(PrgSetup.SoundPlayer,PrgSetup.BaseDir);
     end;
   end;
 
@@ -99,7 +99,7 @@ begin
   If (S='INTERNAL') or (S='') then VideosRadioButton1.Checked:=True else begin
     If S='DEFAULT' then VideosRadioButton2.Checked:=True else begin
       VideosRadioButton3.Checked:=True;
-      VideosEdit.Text:=PrgSetup.VideoPlayer;
+      VideosEdit.Text:=MakeRelPath(PrgSetup.VideoPlayer,PrgSetup.BaseDir);
     end;
   end;
 
@@ -163,15 +163,15 @@ procedure TSetupFrameViewer.SaveSetup;
 begin
   If ImagesRadioButton1.Checked then PrgSetup.ImageViewer:='Internal';
   If ImagesRadioButton2.Checked then PrgSetup.ImageViewer:='Default';
-  If ImagesRadioButton3.Checked then PrgSetup.ImageViewer:=ImagesEdit.Text;
+  If ImagesRadioButton3.Checked then PrgSetup.ImageViewer:=MakeRelPath(ImagesEdit.Text,PrgSetup.BaseDir);
 
   If SoundsRadioButton1.Checked then PrgSetup.SoundPlayer:='Internal';
   If SoundsRadioButton2.Checked then PrgSetup.SoundPlayer:='Default';
-  If SoundsRadioButton3.Checked then PrgSetup.SoundPlayer:=SoundsEdit.Text;
+  If SoundsRadioButton3.Checked then PrgSetup.SoundPlayer:=MakeRelPath(SoundsEdit.Text,PrgSetup.BaseDir);
 
   If VideosRadioButton1.Checked then PrgSetup.VideoPlayer:='Internal';
   If VideosRadioButton2.Checked then PrgSetup.VideoPlayer:='Default';
-  If VideosRadioButton3.Checked then PrgSetup.VideoPlayer:=VideosEdit.Text;
+  If VideosRadioButton3.Checked then PrgSetup.VideoPlayer:=MakeRelPath(VideosEdit.Text,PrgSetup.BaseDir);
 end;
 
 procedure TSetupFrameViewer.ImagesEditChange(Sender: TObject);

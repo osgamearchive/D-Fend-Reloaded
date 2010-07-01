@@ -42,6 +42,7 @@ type
   public
     { Public-Deklarationen }
     Function Init(const AInfoData : TInfoData) : Boolean;
+    Function CheckBeforeDone : Boolean;
     Function Done : String;
     Function GetName : String;
     Procedure ShowFrame;
@@ -141,6 +142,11 @@ end;
 
 procedure TProfileMountEditorZipFrame.ShowFrame;
 begin
+end;
+
+function TProfileMountEditorZipFrame.CheckBeforeDone: Boolean;
+begin
+  result:=True;
 end;
 
 function TProfileMountEditorZipFrame.Done: String;

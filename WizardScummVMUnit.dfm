@@ -9,7 +9,7 @@ object WizardScummVMFrame: TWizardScummVMFrame
     552)
   object Bevel: TBevel
     Left = 3
-    Top = 56
+    Top = 71
     Width = 589
     Height = 18
     Anchors = [akLeft, akTop, akRight]
@@ -19,7 +19,7 @@ object WizardScummVMFrame: TWizardScummVMFrame
     Left = 8
     Top = 16
     Width = 569
-    Height = 49
+    Height = 65
     Anchors = [akLeft, akTop, akRight]
     AutoSize = False
     Caption = 
@@ -32,7 +32,7 @@ object WizardScummVMFrame: TWizardScummVMFrame
   object ProgramButton: TSpeedButton
     Tag = 1
     Left = 561
-    Top = 104
+    Top = 115
     Width = 23
     Height = 22
     Anchors = [akTop, akRight]
@@ -56,7 +56,7 @@ object WizardScummVMFrame: TWizardScummVMFrame
   end
   object GamesFolderButton: TSpeedButton
     Left = 476
-    Top = 147
+    Top = 158
     Width = 79
     Height = 22
     Anchors = [akTop, akRight]
@@ -79,7 +79,7 @@ object WizardScummVMFrame: TWizardScummVMFrame
   end
   object FolderInfoButton: TSpeedButton
     Left = 561
-    Top = 147
+    Top = 158
     Width = 23
     Height = 22
     Anchors = [akTop, akRight]
@@ -101,7 +101,7 @@ object WizardScummVMFrame: TWizardScummVMFrame
   end
   object BaseInfoLabel3: TLabel
     Left = 8
-    Top = 232
+    Top = 243
     Width = 188
     Height = 13
     Anchors = [akLeft, akTop, akRight]
@@ -111,7 +111,7 @@ object WizardScummVMFrame: TWizardScummVMFrame
   object BaseDataFolderButton: TSpeedButton
     Tag = 2
     Left = 505
-    Top = 319
+    Top = 330
     Width = 79
     Height = 22
     Anchors = [akTop, akRight]
@@ -136,7 +136,7 @@ object WizardScummVMFrame: TWizardScummVMFrame
   object DataFolderButton: TSpeedButton
     Tag = 3
     Left = 561
-    Top = 272
+    Top = 283
     Width = 23
     Height = 22
     Anchors = [akTop, akRight]
@@ -161,14 +161,14 @@ object WizardScummVMFrame: TWizardScummVMFrame
   end
   object GameNameLabel: TLabel
     Left = 8
-    Top = 176
+    Top = 187
     Width = 77
     Height = 13
     Caption = 'Name des Spiels'
   end
   object ProgramEdit: TLabeledEdit
     Left = 8
-    Top = 104
+    Top = 115
     Width = 547
     Height = 21
     Anchors = [akLeft, akTop, akRight]
@@ -179,7 +179,7 @@ object WizardScummVMFrame: TWizardScummVMFrame
   end
   object GamesFolderEdit: TLabeledEdit
     Left = 8
-    Top = 147
+    Top = 158
     Width = 462
     Height = 21
     Anchors = [akLeft, akTop, akRight]
@@ -191,7 +191,7 @@ object WizardScummVMFrame: TWizardScummVMFrame
   end
   object DataFolderShowButton: TBitBtn
     Left = 8
-    Top = 241
+    Top = 252
     Width = 257
     Height = 25
     Caption = 'Zus'#228'tzliche Dateien konfigurieren'
@@ -214,7 +214,7 @@ object WizardScummVMFrame: TWizardScummVMFrame
   end
   object DataFolderEdit: TLabeledEdit
     Left = 8
-    Top = 272
+    Top = 283
     Width = 547
     Height = 21
     Anchors = [akLeft, akTop, akRight]
@@ -226,7 +226,7 @@ object WizardScummVMFrame: TWizardScummVMFrame
   end
   object BaseDataFolderEdit: TLabeledEdit
     Left = 8
-    Top = 320
+    Top = 331
     Width = 491
     Height = 21
     Anchors = [akLeft, akTop, akRight]
@@ -241,7 +241,7 @@ object WizardScummVMFrame: TWizardScummVMFrame
   end
   object GameNameComboBox: TComboBox
     Left = 8
-    Top = 193
+    Top = 204
     Width = 547
     Height = 21
     Style = csDropDownList
@@ -251,7 +251,7 @@ object WizardScummVMFrame: TWizardScummVMFrame
   end
   object DataFolderAutomaticCheckBox: TCheckBox
     Left = 8
-    Top = 220
+    Top = 231
     Width = 569
     Height = 17
     Anchors = [akLeft, akTop, akRight]

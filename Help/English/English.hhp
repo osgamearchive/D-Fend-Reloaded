@@ -27,6 +27,7 @@ FirstRunWizard.html
 FileImportConf.html
 FileImportProf.html
 FileImportZip.html
+FileImportFolder.html
 FileImportPackage.html
 FileExportList.html
 FileExportConf.html
@@ -57,6 +58,7 @@ FileOptionsProfileEditor.html
 FileOptionsDefaultValues.html
 FileOptionsAutomaticConfiguration.html
 FileOptionsDOSBox.html
+FileOptionsDOSBoxGeneral.html
 FileOptionsDOSBoxCVSFeatures.html
 FileOptionsFreeDOS.html
 FileOptionsScummVM.html
@@ -159,6 +161,7 @@ ExtrasTransferProfiles.html
 ExtrasCreateShortcuts.html
 ExtrasCheckProfiles.html
 ExtrasLanguageEditor.html
+ExtrasLanguageEditorDOSBox.html
 HelpForum.html
 HelpOldGames.html
 HelpStatistics.html
@@ -201,6 +204,7 @@ GPL3.html
 #define FileOptionsProfileEditor 1114
 #define FileOptionsDefaultValues 1115
 #define FileOptionsDOSBox 1116
+#define FileOptionsDOSBoxGeneral 1135
 #define FileOptionsDOSBoxCVSFeatures 1117
 #define FileOptionsFreeDOS 1118
 #define FileOptionsScummVM 1119
@@ -288,6 +292,7 @@ GPL3.html
 #define ExtrasImagesCreateFromProfile 3020
 #define ExtrasEditCheatDB 3021
 #define ExtrasSearchAddress 3022
+#define ExtrasLanguageEditorDOSBox 3023
 
 #define HelpForum 4001
 #define HelpStatistics 4003

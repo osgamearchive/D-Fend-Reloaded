@@ -9,8 +9,6 @@ uses
 
 type
   TModernProfileEditorDOSBoxFrame = class(TFrame, IModernProfileEditorFrame)
-    DOSBoxForegroundPriorityRadioGroup: TRadioGroup;
-    DOSBoxBackgroundPriorityRadioGroup: TRadioGroup;
     CloseDOSBoxOnExitCheckBox: TCheckBox;
     DefaultDOSBoxInstallationRadioButton: TRadioButton;
     CustomDOSBoxInstallationRadioButton: TRadioButton;
@@ -26,12 +24,19 @@ type
     DOSBoxInstallationComboBox: TComboBox;
     UserLanguageCheckBox: TCheckBox;
     UserLanguageComboBox: TComboBox;
+    DOSBoxForegroundPriorityComboBox: TComboBox;
+    DOSBoxBackgroundPriorityComboBox: TComboBox;
+    DOSBoxForegroundPriorityLabel: TLabel;
+    DOSBoxBackgroundPriorityLabel: TLabel;
+    UserConsoleCheckBox: TCheckBox;
+    UserConsoleComboBox: TComboBox;
     procedure CustomDOSBoxInstallationButtonClick(Sender: TObject);
     procedure CustomDOSBoxInstallationEditChange(Sender: TObject);
     procedure ButtonWork(Sender: TObject);
     procedure DOSBoxInstallationComboBoxChange(Sender: TObject);
     procedure DOSBoxInstallationTypeClick(Sender: TObject);
     procedure UserLanguageCheckBoxClick(Sender: TObject);
+    procedure UserConsoleCheckBoxClick(Sender: TObject);
   private
     { Private-Deklarationen }
     DosBoxLang : TStringList;
@@ -39,6 +44,7 @@ type
     FOnProfileNameChange : TTextEvent;
     Procedure UpdateLanguageList;
     Procedure SelectInLanguageList(const LangName : String);
+    Procedure SelectInConsoleList;
   public
     { Public-Deklarationen }
     Constructor Create(AOwner : TComponent); override;
@@ -76,8 +82,8 @@ procedure TModernProfileEditorDOSBoxFrame.InitGUI(var InitData : TModernProfileE
 Var I : Integer;
     S : String;
 begin
-  NoFlicker(DOSBoxForegroundPriorityRadioGroup);
-  NoFlicker(DOSBoxBackgroundPriorityRadioGroup);
+  NoFlicker(DOSBoxForegroundPriorityComboBox);
+  NoFlicker(DOSBoxBackgroundPriorityComboBox);
   NoFlicker(CloseDOSBoxOnExitCheckBox);
   NoFlicker(DefaultDOSBoxInstallationRadioButton);
   NoFlicker(DOSBoxInstallationComboBox);
@@ -85,6 +91,8 @@ begin
   NoFlicker(CustomDOSBoxInstallationEdit);
   NoFlicker(UserLanguageCheckBox);
   NoFlicker(UserLanguageComboBox);
+  NoFlicker(UserConsoleCheckBox);
+  NoFlicker(UserConsoleComboBox);
   {NoFlicker(CustomSetsMemo); - will hide text in Memo}
   NoFlicker(CustomSetsClearButton);
   NoFlicker(CustomSetsLoadButton);
@@ -92,15 +100,17 @@ begin
 
   SetRichEditPopup(CustomSetsMemo);
 
-  DOSBoxForegroundPriorityRadioGroup.Caption:=LanguageSetup.GamePriorityForeground;
-  with DOSBoxForegroundPriorityRadioGroup.Items do begin
+  DOSBoxForegroundPriorityLabel.Caption:=LanguageSetup.GamePriorityForeground;
+  with DOSBoxForegroundPriorityComboBox.Items do begin
+    Clear;
     Add(LanguageSetup.GamePriorityLower);
     Add(LanguageSetup.GamePriorityNormal);
     Add(LanguageSetup.GamePriorityHigher);
     Add(LanguageSetup.GamePriorityHighest);
   end;
-  DOSBoxBackgroundPriorityRadioGroup.Caption:=LanguageSetup.GamePriorityBackground;
-  with DOSBoxBackgroundPriorityRadioGroup.Items do begin
+  DOSBoxBackgroundPriorityLabel.Caption:=LanguageSetup.GamePriorityBackground;
+  with DOSBoxBackgroundPriorityComboBox.Items do begin
+    Clear;
     Add(LanguageSetup.GamePriorityPause);
     Add(LanguageSetup.GamePriorityLower);
     Add(LanguageSetup.GamePriorityNormal);
@@ -112,6 +122,12 @@ begin
   CustomDOSBoxInstallationRadioButton.Caption:=LanguageSetup.GameDOSBoxVersionCustom;
   CustomDOSBoxInstallationButton.Hint:=LanguageSetup.ChooseFolder;
   UserLanguageCheckBox.Caption:=LanguageSetup.GameDOSBoxLanguageCustom;
+  UserConsoleCheckBox.Caption:=LanguageSetup.GameDOSBoxConsole;
+  with UserConsoleComboBox.Items do begin
+    Clear;
+    Add(LanguageSetup.GameDOSBoxConsoleHide);
+    Add(LanguageSetup.GameDOSBoxConsoleShow);
+  end;
   CustomSetsLabel.Caption:=LanguageSetup.ProfileEditorCustomSetsSheet;
   CustomSetsMemo.Font.Name:='Courier New';
   CustomSetsClearButton.Caption:=LanguageSetup.Del;
@@ -152,15 +168,15 @@ begin
     St.Free;
   end;
   S:=Trim(ExtUpperCase(S));
-  DOSBoxForegroundPriorityRadioGroup.ItemIndex:=1;
-  For I:=0 to DOSBoxForegroundPriorityRadioGroup.Items.Count-1 do If ExtUpperCase(FPriority[I])=S then begin
-    DOSBoxForegroundPriorityRadioGroup.ItemIndex:=I;
+  DOSBoxForegroundPriorityComboBox.ItemIndex:=1;
+  For I:=0 to DOSBoxForegroundPriorityComboBox.Items.Count-1 do If ExtUpperCase(FPriority[I])=S then begin
+    DOSBoxForegroundPriorityComboBox.ItemIndex:=I;
     break;
   end;
   T:=Trim(ExtUpperCase(T));
-  DOSBoxBackgroundPriorityRadioGroup.ItemIndex:=2;
-  For I:=0 to DOSBoxBackgroundPriorityRadioGroup.Items.Count-1 do If ExtUpperCase(BPriority[I])=T then begin
-    DOSBoxBackgroundPriorityRadioGroup.ItemIndex:=I;
+  DOSBoxBackgroundPriorityComboBox.ItemIndex:=2;
+  For I:=0 to DOSBoxBackgroundPriorityComboBox.Items.Count-1 do If ExtUpperCase(BPriority[I])=T then begin
+    DOSBoxBackgroundPriorityComboBox.ItemIndex:=I;
     break;
   end;
 
@@ -181,7 +197,14 @@ begin
     CustomDOSBoxInstallationRadioButton.Checked:=True;
     CustomDOSBoxInstallationEdit.Text:=Game.CustomDOSBoxDir;
   end;
-  UserLanguageCheckBoxClick(self);
+
+  Case Game.ShowConsoleWindow of
+    0 : begin UserConsoleCheckBox.Checked:=True; UserConsoleComboBox.ItemIndex:=0; end;
+    2 : begin UserConsoleCheckBox.Checked:=True; UserConsoleComboBox.ItemIndex:=1; end;
+    else {1 :} UserConsoleCheckBox.Checked:=False;
+  End;
+  UserConsoleCheckBoxClick(self);
+  If not UserConsoleCheckBox.Checked then SelectInConsoleList;
 
   UpdateLanguageList;
   S:=Trim(ExtUpperCase(Game.CustomDOSBoxLanguage));
@@ -192,6 +215,7 @@ begin
     UserLanguageCheckBox.Checked:=True;
     SelectInLanguageList(ChangeFileExt(ExtractFileName(Game.CustomDOSBoxLanguage),''));
   end;
+  UserLanguageCheckBoxClick(self);
 
   St:=StringToStringList(Game.CustomSettings);
   try
@@ -252,16 +276,40 @@ begin
   UserLanguageComboBox.Enabled:=UserLanguageCheckBox.Checked;
 end;
 
-Procedure TModernProfileEditorDOSBoxFrame.SelectInLanguageList(const LangName : String);
+procedure TModernProfileEditorDOSBoxFrame.UserConsoleCheckBoxClick(Sender: TObject);
 begin
-  If Trim(LangName)=''
-    then UserLanguageComboBox.ItemIndex:=0
-    else UserLanguageComboBox.ItemIndex:=Max(0,UserLanguageComboBox.Items.IndexOf(LangName));
+  UserConsoleComboBox.Enabled:=UserConsoleCheckBox.Checked;
+end;
+
+Procedure TModernProfileEditorDOSBoxFrame.SelectInLanguageList(const LangName : String);
+Var I : Integer;
+    S : String;
+begin
+  If Trim(LangName)<>'' then begin
+    I:=UserLanguageComboBox.Items.IndexOf(LangName);
+    If I>=0 then begin UserLanguageComboBox.ItemIndex:=I; exit; end;
+  end;
+
+  UserLanguageComboBox.ItemIndex:=0;
+  If not DefaultDOSBoxInstallationRadioButton.Checked then exit;
+
+  S:=ChangeFileExt(ExtractFileName(PrgSetup.DOSBoxSettings[DOSBoxInstallationComboBox.ItemIndex].DosBoxLanguage),'');
+  UserLanguageComboBox.ItemIndex:=Max(0,UserLanguageComboBox.Items.IndexOf(S));
+end;
+
+procedure TModernProfileEditorDOSBoxFrame.SelectInConsoleList;
+begin
+  UserConsoleComboBox.ItemIndex:=0;
+  If not DefaultDOSBoxInstallationRadioButton.Checked then exit;
+
+  If PrgSetup.DOSBoxSettings[DOSBoxInstallationComboBox.ItemIndex].HideDosBoxConsole
+    then UserConsoleComboBox.ItemIndex:=0
+    else UserConsoleComboBox.ItemIndex:=1;
 end;
 
 procedure TModernProfileEditorDOSBoxFrame.GetGame(const Game: TGame);
 begin
-  Game.Priority:=FPriority[DOSBoxForegroundPriorityRadioGroup.ItemIndex]+','+BPriority[DOSBoxBackgroundPriorityRadioGroup.ItemIndex];
+  Game.Priority:=FPriority[DOSBoxForegroundPriorityComboBox.ItemIndex]+','+BPriority[DOSBoxBackgroundPriorityComboBox.ItemIndex];
   Game.CloseDosBoxAfterGameExit:=CloseDOSBoxOnExitCheckBox.Checked;
   If DefaultDOSBoxInstallationRadioButton.Checked then begin
     Game.CustomDOSBoxDir:=PrgSetup.DOSBoxSettings[DOSBoxInstallationComboBox.ItemIndex].Name;
@@ -270,6 +318,9 @@ begin
   end;
 
   If UserLanguageCheckBox.Checked then Game.CustomDOSBoxLanguage:=ExtractFileName(DosBoxLang[UserLanguageComboBox.ItemIndex]) else Game.CustomDOSBoxLanguage:='default';
+  If UserConsoleCheckBox.Checked then begin
+    If UserConsoleComboBox.ItemIndex=1 then Game.ShowConsoleWindow:=2 else Game.ShowConsoleWindow:=0;
+  end else Game.ShowConsoleWindow:=1;
 
   Game.CustomSettings:=StringListToString(CustomSetsMemo.Lines);
 end;
@@ -289,18 +340,23 @@ end;
 procedure TModernProfileEditorDOSBoxFrame.DOSBoxInstallationTypeClick(Sender: TObject);
 begin
   UpdateLanguageList;
+  If not UserLanguageCheckBox.Checked then SelectInLanguageList('');
+  If not UserConsoleCheckBox.Checked then SelectInConsoleList;
 end;
 
 procedure TModernProfileEditorDOSBoxFrame.DOSBoxInstallationComboBoxChange(Sender: TObject);
 begin
   DefaultDOSBoxInstallationRadioButton.Checked:=True;
   UpdateLanguageList;
+  If not UserLanguageCheckBox.Checked then SelectInLanguageList('');
+  If not UserConsoleCheckBox.Checked then SelectInConsoleList;
 end;
 
 procedure TModernProfileEditorDOSBoxFrame.CustomDOSBoxInstallationEditChange(Sender: TObject);
 begin
   CustomDOSBoxInstallationRadioButton.Checked:=True;
   UpdateLanguageList;
+  If not UserLanguageCheckBox.Checked then SelectInLanguageList('');
 end;
 
 procedure TModernProfileEditorDOSBoxFrame.ButtonWork(Sender: TObject);

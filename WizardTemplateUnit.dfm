@@ -2,32 +2,30 @@ object WizardTemplateFrame: TWizardTemplateFrame
   Left = 0
   Top = 0
   Width = 666
-  Height = 473
+  Height = 502
   TabOrder = 0
   DesignSize = (
     666
-    473)
+    502)
   object InfoLabel: TLabel
     Left = 8
     Top = 16
     Width = 617
-    Height = 49
+    Height = 65
     Anchors = [akLeft, akTop, akRight]
     AutoSize = False
     Caption = 
       'Bitte geben Sie an, auf welcher Vorlage das neue Profil angelegt' +
       ' werden soll.'
     WordWrap = True
-    ExplicitWidth = 543
   end
   object Bevel: TBevel
     Left = 3
-    Top = 56
+    Top = 71
     Width = 663
     Height = 18
     Anchors = [akLeft, akTop, akRight]
     Shape = bsBottomLine
-    ExplicitWidth = 589
   end
   object HelpButton: TSpeedButton
     Left = 631
@@ -55,7 +53,7 @@ object WizardTemplateFrame: TWizardTemplateFrame
   object SpeedButton1: TSpeedButton
     Tag = 1
     Left = 631
-    Top = 113
+    Top = 124
     Width = 23
     Height = 22
     Anchors = [akTop, akRight]
@@ -74,12 +72,11 @@ object WizardTemplateFrame: TWizardTemplateFrame
       3333333773FFFF77333333333FBFBF3333333333377777333333}
     NumGlyphs = 2
     OnClick = HelpButtonClick
-    ExplicitLeft = 557
   end
   object SpeedButton2: TSpeedButton
     Tag = 2
     Left = 631
-    Top = 167
+    Top = 178
     Width = 23
     Height = 22
     Anchors = [akTop, akRight]
@@ -98,12 +95,11 @@ object WizardTemplateFrame: TWizardTemplateFrame
       3333333773FFFF77333333333FBFBF3333333333377777333333}
     NumGlyphs = 2
     OnClick = HelpButtonClick
-    ExplicitLeft = 557
   end
   object SpeedButton3: TSpeedButton
     Tag = 3
     Left = 631
-    Top = 221
+    Top = 232
     Width = 23
     Height = 22
     Anchors = [akTop, akRight]
@@ -122,12 +118,11 @@ object WizardTemplateFrame: TWizardTemplateFrame
       3333333773FFFF77333333333FBFBF3333333333377777333333}
     NumGlyphs = 2
     OnClick = HelpButtonClick
-    ExplicitLeft = 557
   end
   object SpeedButton4: TSpeedButton
     Tag = 4
     Left = 631
-    Top = 275
+    Top = 286
     Width = 23
     Height = 22
     Anchors = [akTop, akRight]
@@ -146,11 +141,10 @@ object WizardTemplateFrame: TWizardTemplateFrame
       3333333773FFFF77333333333FBFBF3333333333377777333333}
     NumGlyphs = 2
     OnClick = HelpButtonClick
-    ExplicitLeft = 557
   end
   object TemplateType1: TRadioButton
     Left = 16
-    Top = 96
+    Top = 107
     Width = 635
     Height = 17
     Anchors = [akLeft, akTop, akRight]
@@ -159,7 +153,7 @@ object WizardTemplateFrame: TWizardTemplateFrame
   end
   object TemplateType2: TRadioButton
     Left = 16
-    Top = 150
+    Top = 161
     Width = 561
     Height = 17
     Caption = 
@@ -169,7 +163,7 @@ object WizardTemplateFrame: TWizardTemplateFrame
   end
   object TemplateType1List: TComboBox
     Left = 32
-    Top = 114
+    Top = 125
     Width = 593
     Height = 21
     Style = csDropDownList
@@ -181,7 +175,7 @@ object WizardTemplateFrame: TWizardTemplateFrame
   object TemplateType2List: TComboBox
     Tag = 1
     Left = 32
-    Top = 168
+    Top = 179
     Width = 593
     Height = 21
     Style = csDropDownList
@@ -192,7 +186,7 @@ object WizardTemplateFrame: TWizardTemplateFrame
   end
   object TemplateType4: TRadioButton
     Left = 16
-    Top = 258
+    Top = 269
     Width = 635
     Height = 17
     Anchors = [akLeft, akTop, akRight]
@@ -202,7 +196,7 @@ object WizardTemplateFrame: TWizardTemplateFrame
   object TemplateType4List: TComboBox
     Tag = 3
     Left = 32
-    Top = 276
+    Top = 287
     Width = 593
     Height = 21
     Style = csDropDownList
@@ -213,7 +207,7 @@ object WizardTemplateFrame: TWizardTemplateFrame
   end
   object TemplateType5: TRadioButton
     Left = 16
-    Top = 312
+    Top = 323
     Width = 561
     Height = 17
     Caption = 'Standard-Assistentenvorlage verwenden'
@@ -221,7 +215,7 @@ object WizardTemplateFrame: TWizardTemplateFrame
   end
   object TemplateType3: TRadioButton
     Left = 16
-    Top = 204
+    Top = 215
     Width = 561
     Height = 17
     Caption = 'Beliebige Autosetup Vorlage verwenden'
@@ -230,7 +224,7 @@ object WizardTemplateFrame: TWizardTemplateFrame
   object TemplateType3List: TComboBox
     Tag = 2
     Left = 32
-    Top = 222
+    Top = 233
     Width = 593
     Height = 21
     Style = csDropDownList
@@ -241,30 +235,31 @@ object WizardTemplateFrame: TWizardTemplateFrame
   end
   object InfoPanel: TPanel
     Left = 8
-    Top = 80
+    Top = 91
     Width = 467
-    Height = 60
+    Height = 89
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 9
     Visible = False
     DesignSize = (
       467
-      60)
+      89)
     object PanelInfoLabel: TLabel
       Left = 16
       Top = 16
       Width = 71
-      Height = 13
+      Height = 42
       Anchors = [akLeft, akTop, akRight, akBottom]
       Caption = 'PanelInfoLabel'
       Color = clBtnFace
       ParentColor = False
       Transparent = True
       WordWrap = True
+      ExplicitHeight = 13
     end
     object OKButton: TBitBtn
       Left = 16
-      Top = 27
+      Top = 56
       Width = 97
       Height = 25
       Anchors = [akLeft, akBottom]
@@ -290,21 +285,23 @@ object WizardTemplateFrame: TWizardTemplateFrame
         333A333333333333333338330000333333333333333333333333333333333333
         0000}
       NumGlyphs = 2
+      ExplicitTop = 27
     end
     object OperationModeInfoButton: TBitBtn
       Left = 128
-      Top = 27
+      Top = 56
       Width = 177
       Height = 25
       Anchors = [akLeft, akBottom]
       Caption = 'Operation mode info'
       TabOrder = 1
       OnClick = OperationModeInfoButtonClick
+      ExplicitTop = 27
     end
   end
   object TemplateType5GroupBox: TGroupBox
     Left = 32
-    Top = 335
+    Top = 346
     Width = 619
     Height = 130
     Anchors = [akLeft, akTop, akRight]

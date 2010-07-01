@@ -73,7 +73,6 @@ uses
   SimpleXMLUnit in 'SimpleXMLUnit.pas',
   CreateXMLFormUnit in 'CreateXMLFormUnit.pas' {CreateXMLForm},
   ExpandImageFormUnit in 'ExpandImageFormUnit.pas' {ExpandImageForm},
-  FirstRunWizardFormUnit in 'FirstRunWizardFormUnit.pas' {FirstRunWizardForm},
   WizardPrgFileUnit in 'WizardPrgFileUnit.pas' {WizardPrgFileFrame: TFrame},
   WizardBaseUnit in 'WizardBaseUnit.pas' {WizardBaseFrame: TFrame},
   WizardTemplateUnit in 'WizardTemplateUnit.pas' {WizardTemplateFrame: TFrame},
@@ -219,10 +218,15 @@ uses
   GameDBFilterUnit in 'GameDBFilterUnit.pas',
   GameDBFilterToolsUnit in 'GameDBFilterToolsUnit.pas',
   ZipPackageDBGLFormUnit in 'ZipPackageDBGLFormUnit.pas' {ZipPackageDBGLForm},
-  FirstRunWizardFormUnit2 in 'FirstRunWizardFormUnit2.pas' {FirstRunWizardForm2},
+  FirstRunWizardFormUnit in 'FirstRunWizardFormUnit.pas' {FirstRunWizardForm},
   LoggingUnit in 'LoggingUnit.pas',
   WindowsFileWarningFormUnit in 'WindowsFileWarningFormUnit.pas' {WindowsFileWarningForm},
-  DOSBoxFailedFormUnit in 'DOSBoxFailedFormUnit.pas' {DOSBoxFailedForm};
+  DOSBoxFailedFormUnit in 'DOSBoxFailedFormUnit.pas' {DOSBoxFailedForm},
+  SetupFrameDOSBoxGlobalUnit in 'SetupFrameDOSBoxGlobalUnit.pas' {SetupFrameDOSBoxGlobal: TFrame},
+  DOSBoxLangEditFormUnit in 'DOSBoxLangEditFormUnit.pas' {DOSBoxLangEditForm},
+  DOSBoxLangTools in 'DOSBoxLangTools.pas',
+  DOSBoxLangStartFormUnit in 'DOSBoxLangStartFormUnit.pas' {DOSBoxLangStartForm},
+  SetupFrameDataPrivacyUnit in 'SetupFrameDataPrivacyUnit.pas' {SetupFrameDataPrivacy: TFrame};
 
 {$R *.res}
 

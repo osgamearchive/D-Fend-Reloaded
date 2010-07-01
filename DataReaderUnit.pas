@@ -8,6 +8,7 @@ Type TDataReader=class
     FConfig : TDataReaderConfig;
     FGameNames, FGameURLs : TStringList;
     FLastListRequest : String;
+    FLastUpdateCheckOK : Boolean;
     Function DownloadConfigFile(const DestFile : String) : Boolean;
     Function ReadListGlobalPart(const Lines : String; const NextElement : THTMLStructureElement) : Boolean;
     Procedure ReadListPerGamePart(const Lines : String; const NextElement : THTMLStructureElement; var GameName, GameURL : String);
@@ -23,6 +24,7 @@ Type TDataReader=class
     Function GetGameCover(const CoverPageURL : String; var ImageURL : String) : Boolean;
     property Config : TDataReaderConfig read FConfig;
     property GameNames : TStringList read FGameNames;
+    property LastUpdateCheckOK : Boolean read FLastUpdateCheckOK;
 end; 
 
 Type TDataReaderThread=class(TThread)
@@ -90,6 +92,7 @@ begin
   FGameNames:=TStringList.Create;
   FGameURLs:=TStringList.Create;
   FLastListRequest:='';
+  FLastUpdateCheckOK:=True;
 end;
 
 destructor TDataReader.Destroy;
@@ -119,22 +122,25 @@ begin
     end;
   until result;
 
-  if UpdateCheck and DownloadConfigFile(TempDir+ExtractFileName(AConfigFile)) then begin
-    try
-      TempConfig:=TDataReaderConfig.Create(TempDir+ExtractFileName(AConfigFile));
+  if UpdateCheck then begin
+    FLastUpdateCheckOK:=DownloadConfigFile(TempDir+ExtractFileName(AConfigFile));
+    if FLastUpdateCheckOK then begin
       try
-        If TempConfig.ConfigOK then I:=TempConfig.Version else I:=-1;
+        TempConfig:=TDataReaderConfig.Create(TempDir+ExtractFileName(AConfigFile));
+        try
+          If TempConfig.ConfigOK then I:=TempConfig.Version else I:=-1;
+        finally
+          TempConfig.Free;
+        end;
+        If I>FConfig.Version then begin
+          FConfig.Free;
+          CopyFile(PChar(TempDir+ExtractFileName(AConfigFile)),PChar(AConfigFile),False);
+          FConfig:=TDataReaderConfig.Create(AConfigFile);
+          result:=FConfig.ConfigOK; if not result then exit;
+        end;
       finally
-        TempConfig.Free;
+        ExtDeleteFile(TempDir+ExtractFileName(AConfigFile),ftTemp);
       end;
-      If I>FConfig.Version then begin
-        FConfig.Free;
-        CopyFile(PChar(TempDir+ExtractFileName(AConfigFile)),PChar(AConfigFile),False);
-        FConfig:=TDataReaderConfig.Create(AConfigFile);
-        result:=FConfig.ConfigOK; if not result then exit;
-      end;
-    finally
-      ExtDeleteFile(TempDir+ExtractFileName(AConfigFile),ftTemp);
     end;
   end;
 end;
@@ -487,7 +493,7 @@ begin
       3 : DoUpdateCheck:=True;
     end;
   end;
-  FSuccess:=FDataReader.LoadConfig(PrgDataDir+SettingsFolder+'\'+DataReaderConfigFile,DoUpdateCheck);
+  If FDataReader.LoadConfig(PrgDataDir+SettingsFolder+'\'+DataReaderConfigFile,DoUpdateCheck) then FSuccess:=FDataReader.LastUpdateCheckOK else FSuccess:=False;
   If DoUpdateCheck and FSuccess then PrgSetup.LastDataReaderUpdateCheck:=Round(Int(Date));
 end;
 

@@ -4,7 +4,7 @@ object SelectTemplateForZipImportForm: TSelectTemplateForZipImportForm
   BorderStyle = bsDialog
   Caption = 'SelectTemplateForZipImportForm'
   ClientHeight = 288
-  ClientWidth = 512
+  ClientWidth = 556
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -16,8 +16,9 @@ object SelectTemplateForZipImportForm: TSelectTemplateForZipImportForm
   Position = poOwnerFormCenter
   OnCreate = FormCreate
   OnKeyDown = FormKeyDown
+  OnShow = FormShow
   DesignSize = (
-    512
+    556
     288)
   PixelsPerInch = 96
   TextHeight = 13
@@ -31,7 +32,7 @@ object SelectTemplateForZipImportForm: TSelectTemplateForZipImportForm
     ExplicitTop = 192
   end
   object ProgramFileLabel: TLabel
-    Left = 266
+    Left = 310
     Top = 189
     Width = 57
     Height = 13
@@ -41,7 +42,7 @@ object SelectTemplateForZipImportForm: TSelectTemplateForZipImportForm
     ExplicitTop = 192
   end
   object SetupFileLabel: TLabel
-    Left = 394
+    Left = 438
     Top = 189
     Width = 45
     Height = 13
@@ -78,9 +79,9 @@ object SelectTemplateForZipImportForm: TSelectTemplateForZipImportForm
     Kind = bkCancel
   end
   object HelpButton: TBitBtn
-    Left = 407
+    Left = 464
     Top = 255
-    Width = 97
+    Width = 84
     Height = 25
     Anchors = [akLeft, akBottom]
     TabOrder = 11
@@ -90,7 +91,7 @@ object SelectTemplateForZipImportForm: TSelectTemplateForZipImportForm
   object TemplateType1RadioButton: TRadioButton
     Left = 16
     Top = 109
-    Width = 486
+    Width = 530
     Height = 17
     Anchors = [akLeft, akRight, akBottom]
     Caption = 'Matching auto setup template'
@@ -98,34 +99,31 @@ object SelectTemplateForZipImportForm: TSelectTemplateForZipImportForm
     TabOrder = 2
     TabStop = True
     OnClick = TypeSelectClick
-    ExplicitWidth = 460
   end
   object TemplateType2RadioButton: TRadioButton
     Left = 16
     Top = 132
-    Width = 486
+    Width = 530
     Height = 17
     Anchors = [akLeft, akRight, akBottom]
     Caption = 'Auto setup template'
     TabOrder = 3
     OnClick = TypeSelectClick
-    ExplicitWidth = 460
   end
   object TemplateType3RadioButton: TRadioButton
     Left = 16
     Top = 155
-    Width = 486
+    Width = 530
     Height = 17
     Anchors = [akLeft, akRight, akBottom]
     Caption = 'User template'
     TabOrder = 4
     OnClick = TypeSelectClick
-    ExplicitWidth = 460
   end
   object ProfileNameEdit: TLabeledEdit
     Left = 16
     Top = 24
-    Width = 486
+    Width = 530
     Height = 21
     Anchors = [akLeft, akTop, akRight]
     EditLabel.Width = 59
@@ -133,32 +131,29 @@ object SelectTemplateForZipImportForm: TSelectTemplateForZipImportForm
     EditLabel.Caption = 'Profile name'
     TabOrder = 0
     OnChange = ProfileNameEditChange
-    ExplicitWidth = 460
   end
   object TemplateComboBox: TComboBox
     Left = 16
     Top = 208
-    Width = 227
+    Width = 271
     Height = 21
     Style = csDropDownList
     Anchors = [akLeft, akRight, akBottom]
-    ItemHeight = 13
+    ItemHeight = 0
     TabOrder = 5
     OnChange = TemplateComboBoxChange
     OnDropDown = ComboBoxDropDown
-    ExplicitWidth = 201
   end
   object ProgramFileComboBox: TComboBox
-    Left = 266
+    Left = 310
     Top = 208
     Width = 108
     Height = 21
     Style = csDropDownList
     Anchors = [akRight, akBottom]
-    ItemHeight = 13
+    ItemHeight = 0
     TabOrder = 6
     OnDropDown = ComboBoxDropDown
-    ExplicitLeft = 240
   end
   object FolderEdit: TLabeledEdit
     Left = 16
@@ -172,21 +167,20 @@ object SelectTemplateForZipImportForm: TSelectTemplateForZipImportForm
     OnChange = FolderEditChange
   end
   object SetupFileComboBox: TComboBox
-    Left = 394
+    Left = 438
     Top = 208
     Width = 108
     Height = 21
     Style = csDropDownList
     Anchors = [akRight, akBottom]
-    ItemHeight = 13
+    ItemHeight = 0
     TabOrder = 7
     OnDropDown = ComboBoxDropDown
-    ExplicitLeft = 368
   end
   object InstallSupportButton: TBitBtn
     Left = 222
     Top = 255
-    Width = 179
+    Width = 236
     Height = 25
     Caption = 'Use installation support'
     ParentShowHint = False

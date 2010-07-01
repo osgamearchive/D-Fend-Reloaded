@@ -19,6 +19,7 @@ type
     CDROMImageDriveLetterComboBox: TComboBox;
     CDImageDriveLetterWarningLabel: TLabel;
     OpenDialog: TOpenDialog;
+    ImageTypeInfoLabel: TLabel;
     procedure CDROMImageButtonClick(Sender: TObject);
     procedure ISOImageCreateButtonClick(Sender: TObject);
     procedure CDROMImageAddButtonClick(Sender: TObject);
@@ -31,6 +32,7 @@ type
   public
     { Public-Deklarationen }
     Function Init(const AInfoData : TInfoData) : Boolean;
+    Function CheckBeforeDone : Boolean;
     Function Done : String;
     Function GetName : String;
     Procedure ShowFrame;
@@ -39,7 +41,7 @@ type
 implementation
 
 uses LanguageSetupUnit, CommonTools, PrgSetupUnit, CreateISOImageFormUnit,
-     IconLoaderUnit;
+     IconLoaderUnit, ImageTools;
 
 {$R *.dfm}
 
@@ -75,6 +77,7 @@ begin
   finally
     CDROMImageDriveLetterComboBox.Items.EndUpdate;
   end;
+  ImageTypeInfoLabel.Caption:=LanguageSetup.ProfileMountingImageTypeInfo;
 
   UserIconLoader.DialogImage(DI_SelectFile,CDROMImageButton);
   UserIconLoader.DialogImage(DI_ImageCD,ISOImageCreateButton);
@@ -122,6 +125,19 @@ begin
   {ImageFile;CDROMIMAGE;Letter;;;}
   S:=MakeRelPath(CDROMImageTab.Cells[0,0],PrgSetup.BaseDir); For I:=1 to CDROMImageTab.RowCount-1 do S:=S+'$'+MakeRelPath(CDROMImageTab.Cells[0,I],PrgSetup.BaseDir);
   result:=S+';CDROMImage;'+CDROMImageDriveLetterComboBox.Text+';;;';
+end;
+
+function TProfileMountEditorCDImageFrame.CheckBeforeDone: Boolean;
+Var I : Integer;
+    S : String;
+begin
+  result:=True;
+  For I:=0 to CDROMImageTab.RowCount-1 do begin
+    S:=MakeAbsPath(CDROMImageTab.Cells[0,I],PrgSetup.BaseDir);
+    If not CheckCDImage(S) then begin
+      If MessageDlg(Format(LanguageSetup.ProfileMountingImageTypeWarning,[S]),mtWarning,[mbYes,mbNo],0)<>mrYes then begin result:=False; exit; end;
+    end;
+  end;
 end;
 
 function TProfileMountEditorCDImageFrame.GetName: String;

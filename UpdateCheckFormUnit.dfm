@@ -3,8 +3,8 @@ object UpdateCheckForm: TUpdateCheckForm
   Top = 0
   BorderStyle = bsDialog
   Caption = 'UpdateCheckForm'
-  ClientHeight = 425
-  ClientWidth = 564
+  ClientHeight = 502
+  ClientWidth = 571
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -15,59 +15,67 @@ object UpdateCheckForm: TUpdateCheckForm
   Position = poOwnerFormCenter
   OnCreate = FormCreate
   DesignSize = (
-    564
-    425)
+    571
+    502)
   PixelsPerInch = 96
   TextHeight = 13
   object InfoLabelProgram: TLabel
     Left = 32
     Top = 34
-    Width = 524
-    Height = 34
+    Width = 535
+    Height = 47
+    Anchors = [akLeft, akTop, akRight]
     AutoSize = False
     Caption = 
       'If activated the update checker will search for new versions of ' +
       'D-Fend Reloaded. If there is a new version, it will ask you, if ' +
       'you want to update your installation.'
     WordWrap = True
+    ExplicitWidth = 524
   end
   object InfoLabelPackages: TLabel
     Left = 32
-    Top = 114
-    Width = 524
-    Height = 34
+    Top = 135
+    Width = 535
+    Height = 47
+    Anchors = [akLeft, akTop, akRight]
     AutoSize = False
     Caption = 
       'If activated the update checker will update the list of availabl' +
       'e packages if there are new lists on the server.'
     WordWrap = True
+    ExplicitWidth = 524
   end
   object InfoLabelCheats: TLabel
     Left = 32
-    Top = 194
-    Width = 524
-    Height = 34
+    Top = 236
+    Width = 535
+    Height = 47
+    Anchors = [akLeft, akTop, akRight]
     AutoSize = False
     Caption = 
       'If activated the update checker add new cheat records to the loc' +
       'al data base if there are new records on the server.'
     WordWrap = True
+    ExplicitWidth = 524
   end
   object InfoLabelDatareader: TLabel
     Left = 32
-    Top = 274
-    Width = 524
-    Height = 34
+    Top = 332
+    Width = 535
+    Height = 47
+    Anchors = [akLeft, akTop, akRight]
     AutoSize = False
     Caption = 
       'If activated the update checker will update the data reader conf' +
       'iguration from the server to ensure D-Fend Reloaded is able to i' +
       'nterpret the MobyGames search results homepage.'
     WordWrap = True
+    ExplicitWidth = 524
   end
   object LabelDownload: TLabel
     Left = 16
-    Top = 344
+    Top = 418
     Width = 409
     Height = 13
     Caption = 
@@ -76,7 +84,7 @@ object UpdateCheckForm: TUpdateCheckForm
   end
   object DFRHomepageLabel: TLabel
     Left = 16
-    Top = 363
+    Top = 437
     Width = 96
     Height = 13
     Caption = 'DFRHomepageLabel'
@@ -84,28 +92,28 @@ object UpdateCheckForm: TUpdateCheckForm
   end
   object StatusLabelProgram: TLabel
     Left = 32
-    Top = 69
+    Top = 82
     Width = 120
     Height = 13
     Caption = 'Status: Not yet checked.'
   end
   object StatusLabelPackages: TLabel
     Left = 32
-    Top = 149
+    Top = 183
     Width = 120
     Height = 13
     Caption = 'Status: Not yet checked.'
   end
   object StatusLabelCheats: TLabel
     Left = 32
-    Top = 229
+    Top = 279
     Width = 120
     Height = 13
     Caption = 'Status: Not yet checked.'
   end
   object StatusLabelDatareader: TLabel
     Left = 32
-    Top = 309
+    Top = 380
     Width = 120
     Height = 13
     Caption = 'Status: Not yet checked.'
@@ -122,7 +130,7 @@ object UpdateCheckForm: TUpdateCheckForm
   end
   object CheckBoxPackages: TCheckBox
     Left = 16
-    Top = 96
+    Top = 117
     Width = 540
     Height = 17
     Caption = 'Package lists for downloading add-ons and game packages'
@@ -132,7 +140,7 @@ object UpdateCheckForm: TUpdateCheckForm
   end
   object CheckBoxCheats: TCheckBox
     Left = 16
-    Top = 176
+    Top = 218
     Width = 540
     Height = 17
     Caption = 'Cheats database'
@@ -142,7 +150,7 @@ object UpdateCheckForm: TUpdateCheckForm
   end
   object CheckBoxDatareader: TCheckBox
     Left = 16
-    Top = 256
+    Top = 314
     Width = 540
     Height = 17
     Caption = 'Data reader configuration'
@@ -153,7 +161,7 @@ object UpdateCheckForm: TUpdateCheckForm
   object UpdateButton: TBitBtn
     Tag = 3
     Left = 16
-    Top = 395
+    Top = 472
     Width = 113
     Height = 25
     Anchors = [akLeft, akBottom]
@@ -199,7 +207,7 @@ object UpdateCheckForm: TUpdateCheckForm
   object CloseButton: TBitBtn
     Tag = 3
     Left = 135
-    Top = 395
+    Top = 472
     Width = 113
     Height = 25
     Anchors = [akLeft, akBottom]
@@ -228,8 +236,8 @@ object UpdateCheckForm: TUpdateCheckForm
   object SetupButton: TBitBtn
     Tag = 3
     Left = 254
-    Top = 395
-    Width = 227
+    Top = 472
+    Width = 243
     Height = 25
     Anchors = [akLeft, akBottom]
     Caption = 'Automatisches Update konfigurieren'

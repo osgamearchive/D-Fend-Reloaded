@@ -29,22 +29,20 @@ object CheatSearchForm: TCheatSearchForm
     Width = 550
     Height = 286
     Anchors = [akLeft, akTop, akRight, akBottom]
-    PageIndex = 2
+    PageIndex = 3
     TabOrder = 0
     object TPage
       Left = 0
       Top = 0
       Caption = 'SelectSearch'
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         550
         286)
       object SearchStartLabel: TLabel
         Left = 16
-        Top = 16
+        Top = 8
         Width = 529
-        Height = 49
+        Height = 66
         Anchors = [akLeft, akTop, akRight]
         AutoSize = False
         Caption = 
@@ -55,7 +53,7 @@ object CheatSearchForm: TCheatSearchForm
       end
       object SearchStartRadioButton1: TRadioButton
         Left = 16
-        Top = 56
+        Top = 72
         Width = 521
         Height = 17
         Anchors = [akLeft, akTop, akRight]
@@ -66,7 +64,7 @@ object CheatSearchForm: TCheatSearchForm
       end
       object SearchNameEdit: TLabeledEdit
         Left = 32
-        Top = 96
+        Top = 112
         Width = 505
         Height = 21
         Anchors = [akLeft, akTop, akRight]
@@ -80,7 +78,7 @@ object CheatSearchForm: TCheatSearchForm
       end
       object SearchStartRadioButton2: TRadioButton
         Left = 16
-        Top = 131
+        Top = 147
         Width = 521
         Height = 17
         Anchors = [akLeft, akTop, akRight]
@@ -89,18 +87,18 @@ object CheatSearchForm: TCheatSearchForm
       end
       object SearchNameComboBox: TComboBox
         Left = 32
-        Top = 154
+        Top = 170
         Width = 505
         Height = 21
         Style = csDropDownList
         Anchors = [akLeft, akTop, akRight]
-        ItemHeight = 0
+        ItemHeight = 13
         TabOrder = 3
         OnChange = SearchNameChange
       end
       object SearchNameDeleteButton: TBitBtn
         Left = 32
-        Top = 181
+        Top = 197
         Width = 193
         Height = 25
         Caption = 'Delete selected search data'
@@ -126,16 +124,14 @@ object CheatSearchForm: TCheatSearchForm
       Left = 0
       Top = 0
       Caption = 'DoSearch'
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         550
         286)
       object DoSearchLabel: TLabel
         Left = 16
-        Top = 16
+        Top = 8
         Width = 521
-        Height = 66
+        Height = 82
         Anchors = [akLeft, akTop, akRight]
         AutoSize = False
         Caption = 
@@ -173,7 +169,7 @@ object CheatSearchForm: TCheatSearchForm
       end
       object ValueTypeRadioButton1: TRadioButton
         Left = 16
-        Top = 88
+        Top = 96
         Width = 521
         Height = 17
         Anchors = [akLeft, akTop, akRight]
@@ -184,7 +180,7 @@ object CheatSearchForm: TCheatSearchForm
       end
       object ValueEdit: TLabeledEdit
         Left = 32
-        Top = 128
+        Top = 136
         Width = 153
         Height = 21
         Hint = 
@@ -211,7 +207,7 @@ object CheatSearchForm: TCheatSearchForm
         Width = 249
         Height = 21
         Style = csDropDownList
-        ItemHeight = 0
+        ItemHeight = 13
         ItemIndex = 0
         TabOrder = 3
         Text = 'Value has increased since last search'
@@ -241,7 +237,7 @@ object CheatSearchForm: TCheatSearchForm
         286)
       object ActionLabel: TLabel
         Left = 16
-        Top = 16
+        Top = 8
         Width = 513
         Height = 33
         Anchors = [akLeft, akTop, akRight]
@@ -355,16 +351,14 @@ object CheatSearchForm: TCheatSearchForm
       Left = 0
       Top = 0
       Caption = 'SelectAction'
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         550
         286)
       object SelectActionLabel: TLabel
         Left = 16
-        Top = 16
+        Top = 8
         Width = 521
-        Height = 33
+        Height = 48
         Anchors = [akLeft, akTop, akRight]
         AutoSize = False
         Caption = 

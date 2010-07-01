@@ -104,6 +104,7 @@ begin
   DoSearchLabel.Caption:=LanguageSetup.SearchAddressData;
   ValueTypeRadioButton1.Caption:=LanguageSetup.SearchAddressDataKnown;
   ValueEdit.EditLabel.Caption:=LanguageSetup.SearchAddressDataKnownValue;
+  ValueEdit.Hint:=LanguageSetup.SearchAddressResultNewValueHint;
   ValueTypeRadioButton2.Caption:=LanguageSetup.SearchAddressDataUnknown;
   ValueComboBox.Items.Clear;
   ValueComboBox.Items.Add(LanguageSetup.SearchAddressDataUnknownIncreased);
@@ -130,6 +131,7 @@ begin
   SelectActionRadioGroup.Items[1]:=LanguageSetup.SearchAddressResultMessageMultipleAddressesAction2;
   SelectActionRadioGroup.Items[2]:=LanguageSetup.SearchAddressResultMessageMultipleAddressesAction3;
   SelectActionRadioGroup.ItemIndex:=0;
+  SearchNameDeleteButton.Caption:=LanguageSetup.SearchAddressStartDeleteButton;
   NextButton.Caption:=LanguageSetup.Next;
   CancelButton.Caption:=LanguageSetup.Cancel;
   HelpButton.Caption:=LanguageSetup.Help;
@@ -137,6 +139,7 @@ begin
   UserIconLoader.DialogImage(DI_Next,NextButton);
   UserIconLoader.DialogImage(DI_Cancel,CancelButton);
   UserIconLoader.DialogImage(DI_Help,HelpButton);
+  UserIconLoader.DialogImage(DI_Delete,SearchNameDeleteButton);
   UserIconLoader.DialogImage(DI_SelectFile,FileNameButton);
 
   InitPage(0);
@@ -404,7 +407,7 @@ begin
             1 : DeleteSearch:=True;
             2 : DeleteSearch:=False;
           End;
-          AddressSearcher.GetResultNr(SelectActionListBox.ItemIndex,ResultAddress,ResultSize);
+          AddressSearcher.GetResultNr(Integer(SelectActionListBox.Items.Objects[SelectActionListBox.ItemIndex]),ResultAddress,ResultSize);
           InitPage(2);
         end;
   end;

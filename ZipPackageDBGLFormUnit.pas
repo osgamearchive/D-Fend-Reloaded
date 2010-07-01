@@ -62,6 +62,10 @@ Var I : Integer;
 begin
   ZipPackageDBGLForm:=TZipPackageDBGLForm.Create(AOwner);
   try
+    {To fix problems with russian translation and VCL functions}
+    ZipPackageDBGLForm.TitleEdit.HandleNeeded;
+    ZipPackageDBGLForm.AuthorEdit.HandleNeeded;
+
     ZipPackageDBGLForm.TitleEdit.Text:=Title;
     ZipPackageDBGLForm.AuthorEdit.Text:=Author;
     ZipPackageDBGLForm.NotesMemo.Text:=Notes;

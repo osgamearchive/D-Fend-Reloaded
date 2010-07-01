@@ -418,5 +418,18 @@
     <Transaction>2010.03.28 16:16:50.887.dfm,C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\Unit1.dfm=C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\WindowsFileWarningFormUnit.dfm</Transaction>
     <Transaction>2010.03.28 18:32:25.596.pas,C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\Unit1.pas=C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\DOSBoxFailedFormUnit.pas</Transaction>
     <Transaction>2010.03.28 18:32:25.654.dfm,C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\Unit1.dfm=C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\DOSBoxFailedFormUnit.dfm</Transaction>
+    <Transaction>2010.04.10 18:49:54.913.pas,C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\FirstRunWizardFormUnit.pas=</Transaction>
+    <Transaction>2010.04.10 18:49:54.922.dfm,C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\FirstRunWizardFormUnit.dfm=</Transaction>
+    <Transaction>2010.04.10 18:51:34.533.pas,C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\FirstRunWizardFormUnit2.pas=C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\FirstRunWizardFormUnit.pas</Transaction>
+    <Transaction>2010.04.10 18:51:34.533.dfm,C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\FirstRunWizardFormUnit2.dfm=C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\FirstRunWizardFormUnit.dfm</Transaction>
+    <Transaction>2010.05.02 18:54:18.171.pas,C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\Unit1.pas=C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\SetupFrameDOSBoxGlobalUnit.pas</Transaction>
+    <Transaction>2010.05.02 18:54:18.171.dfm,C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\Unit1.dfm=C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\SetupFrameDOSBoxGlobalUnit.dfm</Transaction>
+    <Transaction>2010.05.10 10:36:59.491.pas,C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\Unit1.pas=C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\DOSBoxLangEditFormUnit.pas</Transaction>
+    <Transaction>2010.05.10 10:36:59.569.dfm,C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\Unit1.dfm=C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\DOSBoxLangEditFormUnit.dfm</Transaction>
+    <Transaction>2010.05.10 10:51:21.013.pas,C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\Unit1.pas=C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\DOSBoxLangTools.pas</Transaction>
+    <Transaction>2010.05.12 10:13:15.885.pas,C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\Unit1.pas=C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\DOSBoxLangStartFormUnit.pas</Transaction>
+    <Transaction>2010.05.12 10:13:15.901.dfm,C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\Unit1.dfm=C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\DOSBoxLangStartFormUnit.dfm</Transaction>
+    <Transaction>2010.05.31 08:39:39.606.pas,C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\Unit1.pas=C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\SetupFrameDataPrivacyUnit.pas</Transaction>
+    <Transaction>2010.05.31 08:39:39.606.dfm,C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\Unit1.dfm=C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\SetupFrameDataPrivacyUnit.dfm</Transaction>
   </Transactions>
 </BorlandProject>

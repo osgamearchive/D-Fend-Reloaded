@@ -599,8 +599,9 @@ begin
 
   {CPU}
   AddCaption(LanguageSetup.ProfileEditorGeneralSheet+' - '+LanguageSetup.ProfileEditorCPUSheet);
-  AddSetting(3001,LanguageSetup.GameCPUType,ValueToList(GameDB.ConfOpt.Core,';,'),False,ValueWidth,True);
-  AddSetting(3002,LanguageSetup.GameCycles,ValueToList(GameDB.ConfOpt.Cycles,';,'),False,ValueWidth,True);
+  AddSetting(3001,LanguageSetup.GameCore,ValueToList(GameDB.ConfOpt.Core,';,'),False,ValueWidth,True);
+  AddSetting(3002,LanguageSetup.GameCPUType,ValueToList(GameDB.ConfOpt.CPUType,';,'),False,ValueWidth,True);
+  AddSetting(3003,LanguageSetup.GameCycles,ValueToList(GameDB.ConfOpt.Cycles,';,'),False,ValueWidth,True);
 
   {Memory}
   AddCaption(LanguageSetup.ProfileEditorGeneralSheet+' - '+LanguageSetup.ProfileEditorMemorySheet);
@@ -613,13 +614,13 @@ begin
 
   {Graphics}
   AddCaption(LanguageSetup.ProfileEditorGeneralSheet+' - '+LanguageSetup.ProfileEditorGraphicsSheet);
-  AddSetting(5001,LanguageSetup.GameWindowResolution,ValueToList(GameDB.ConfOpt.Resolution,';,'),False,ValueWidth,True);
-  AddSetting(5002,LanguageSetup.GameFullscreenResolution,ValueToList(GameDB.ConfOpt.Resolution,';,'),False,ValueWidth,True);
+  AddSetting(5001,LanguageSetup.GameWindowResolution,ValueToList(GameDB.ConfOpt.ResolutionWindow,';,'),False,ValueWidth,True);
+  AddSetting(5002,LanguageSetup.GameFullscreenResolution,ValueToList(GameDB.ConfOpt.ResolutionFullscreen,';,'),False,ValueWidth,True);
   AddYesNoSetting(5003,LanguageSetup.GameStartFullscreen);
   AddYesNoSetting(5004,LanguageSetup.GameUseDoublebuffering);
   AddYesNoSetting(5005,LanguageSetup.GameAspectCorrection);
   AddSetting(5006,LanguageSetup.GameRender,ValueToList(GameDB.ConfOpt.Render,';,'),False,ValueWidth,True);
-  AddSetting(5007,LanguageSetup.GameVideoCard,ValueToList(GameDB.ConfOpt.Video,';,'),False,ValueWidth,True);
+  AddSetting(5007,LanguageSetup.GameVideoCard,ValueToList(GameDB.ConfOpt.Video,';,'),False,-1,True);
   AddSetting(5008,LanguageSetup.GameScale,ValueToList(GameDB.ConfOpt.Scale,';,'),False,-1,True);
   AddSpinSetting(5009,LanguageSetup.GameFrameskip,0,10,ValueWidth);
   If PrgSetup.AllowGlideSettings then begin
@@ -922,7 +923,8 @@ begin
 
       {CPU}
       If ValueActive(3001) then G.Core:=GetComboText;
-      If ValueActive(3002) then G.Cycles:=GetComboText;
+      If ValueActive(3002) then G.CPUType:=GetComboText;
+      If ValueActive(3003) then G.Cycles:=GetComboText;
 
       {Memory}
       If ValueActive(4001) then begin
@@ -942,7 +944,11 @@ begin
       If ValueActive(5005) then G.AspectCorrection:=GetYesNo;
 
       If ValueActive(5006) then G.Render:=GetComboText;
-      If ValueActive(5007) then G.VideoCard:=GetComboText;
+      If ValueActive(5007) then begin
+        S:=GetComboText;
+        If Pos('(',S)>0 then S:=Trim(Copy(S,1,Pos('(',S)-1));
+        G.VideoCard:=S;
+      end;
       If ValueActive(5008) then begin
         S:=GetComboText;
         If Pos('(',S)=0 then G.Scale:='' else begin

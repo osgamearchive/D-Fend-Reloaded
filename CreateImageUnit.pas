@@ -38,6 +38,7 @@ type
     AddEditCheckbox: TCheckBox;
     FormatImageCheckBox: TCheckBox;
     MemoryManagerCheckBox: TCheckBox;
+    WriteToFloppyCheckBox: TCheckBox;
     procedure FormCreate(Sender: TObject);
     procedure ImageFileButtonClick(Sender: TObject);
     procedure FloppyImageTypeComboBoxChange(Sender: TObject);
@@ -47,9 +48,12 @@ type
     procedure MakeBootableCheckBoxClick(Sender: TObject);
     procedure HelpButtonClick(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure PageControlChange(Sender: TObject);
+    procedure FormShow(Sender: TObject);
   private
     { Private-Deklarationen }
     JustChanging : Boolean;
+    FloppyDriveAvailable : Boolean;
     Procedure CalcFloppySize;
   public
     { Public-Deklarationen }
@@ -65,7 +69,8 @@ Function ShowCreateImageFileDialog(const AOwner : TComponent; const ShowFloppySh
 implementation
 
 uses ShellAPI, VistaToolsUnit, LanguageSetupUnit, PrgSetupUnit, CommonTools,
-     PrgConsts, ImageTools, HelpConsts, IconLoaderUnit, CreateImageToolsUnit;
+     PrgConsts, ImageTools, HelpConsts, IconLoaderUnit, CreateImageToolsUnit,
+     CreateISOImageFormUnit;
 
 {$R *.dfm}
 
@@ -126,6 +131,7 @@ begin
   HDSizeEdit.EditLabel.Caption:=LanguageSetup.CreateImageFormHDImageSize;
   HDGeometryEdit.EditLabel.Caption:=LanguageSetup.CreateImageFormHDImageGeometry;
   FormatImageCheckBox.Caption:=LanguageSetup.CreateImageFormFormat;
+  WriteToFloppyCheckBox.Caption:=LanguageSetup.ImageFromFolderWriteToFloppy;
 
   OKButton.Caption:=LanguageSetup.OK;
   CancelButton.Caption:=LanguageSetup.Cancel;
@@ -174,6 +180,14 @@ begin
 
   OpenDialog.Title:=LanguageSetup.ProfileMountingFile;
   OpenDialog.Filter:=LanguageSetup.ProfileMountingFileFilterImgOnly;
+end;
+
+procedure TCreateImageForm.FormShow(Sender: TObject);
+Var C : Char;
+begin
+  FloppyDriveAvailable:=False;
+  For C:='A' to 'Z' do If GetDriveType(PChar(C+':\'))=DRIVE_REMOVABLE then begin FloppyDriveAvailable:=True; break; end;
+  PageControlChange(Sender);
 end;
 
 procedure TCreateImageForm.FloppyImageTypeComboBoxChange(Sender: TObject);
@@ -328,6 +342,11 @@ begin
   end;
 end;
 
+procedure TCreateImageForm.PageControlChange(Sender: TObject);
+begin
+  WriteToFloppyCheckBox.Enabled:=(PageControl.ActivePageIndex=0) and FloppyDriveAvailable;
+end;
+
 procedure TCreateImageForm.HelpButtonClick(Sender: TObject);
 begin
   Application.HelpCommand(HELP_CONTEXT,ID_ExtrasImagesCreateImage);
@@ -347,6 +366,9 @@ begin
     CreateImageForm.FloppyImageSheet.TabVisible:=ShowFloppySheet;
     CreateImageForm.HDImageSheet.TabVisible:=ShowHDSheet;
     If CreateImageForm.ShowModal=mrOk then result:=CreateImageForm.ImageFileName else result:='';
+    if (result<>'') and CreateImageForm.WriteToFloppyCheckBox.Checked and CreateImageForm.WriteToFloppyCheckBox.Enabled then begin
+      ShowWriteIMGImageDialog(AOwner,CreateImageForm.ImageFileEdit.Text);
+    end;
   finally
     CreateImageForm.Free;
   end;

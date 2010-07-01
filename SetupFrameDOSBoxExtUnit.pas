@@ -89,11 +89,7 @@ begin
   If I=1 then RenderModesCheckBox.State:=cbGrayed else RenderModesCheckBox.Checked:=(I=2);
   ValueChanged[0]:=False;
 
-  I:=0;
-  If DefaultValueOnList(GameDB.ConfOpt.Video,'pcjr') then inc(I);
-  If DefaultValueOnList(GameDB.ConfOpt.Video,'ega') then inc(I);
-  If DefaultValueOnList(GameDB.ConfOpt.Video,'demovga') then inc(I);
-  If (I=1) or (I=2) then VideoModesCheckBox.State:=cbGrayed else VideoModesCheckBox.Checked:=(I=3);
+  VideoModesCheckBox.Checked:=DefaultValueOnList(GameDB.ConfOpt.Video,'demovga');
   ValueChanged[1]:=False;
 
   PixelShaderCheckBox.Checked:=PrgSetup.AllowPixelShader;
@@ -211,8 +207,6 @@ begin
   end;
 
   If ValueChanged[1] then begin
-    GameDB.ConfOpt.Video:=DefaultValueChange(GameDB.ConfOpt.Video,'pcjr',VideoModesCheckBox.Checked);
-    GameDB.ConfOpt.Video:=DefaultValueChange(GameDB.ConfOpt.Video,'ega',VideoModesCheckBox.Checked);
     GameDB.ConfOpt.Video:=DefaultValueChange(GameDB.ConfOpt.Video,'demovga',VideoModesCheckBox.Checked);
   end;
 

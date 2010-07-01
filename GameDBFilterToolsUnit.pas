@@ -220,7 +220,7 @@ begin
   result:=TStringList.Create;
 
   LastWasOp:=True;
-  I:=0; while (I<St.Count) and (St[I]<>'') do inc(I);
+  I:=0; while (I<St.Count) and (St[I]<>'') and (St[I]<>'!') do inc(I);
 
   For J:=I to St.Count-1 do begin
     If LastWasOp then begin

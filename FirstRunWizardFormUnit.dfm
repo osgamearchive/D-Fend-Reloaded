@@ -4,7 +4,7 @@ object FirstRunWizardForm: TFirstRunWizardForm
   BorderStyle = bsDialog
   Caption = 'FirstRunWizardForm'
   ClientHeight = 358
-  ClientWidth = 643
+  ClientWidth = 611
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -20,7 +20,7 @@ object FirstRunWizardForm: TFirstRunWizardForm
   OnKeyDown = FormKeyDown
   OnShow = FormShow
   DesignSize = (
-    643
+    611
     358)
   PixelsPerInch = 96
   TextHeight = 13
@@ -4862,540 +4862,152 @@ object FirstRunWizardForm: TFirstRunWizardForm
       EA96BEEA96BEEA96BEEA96BDEA96BEEA96BEEA94B9E594B8E192B6DE92B6DE92
       B7DE92B7DE92B8DE92B7DE92B8DEC9C5D4D3C7D0D2C7D1D2C7D1}
   end
-  object Notebook: TNotebook
-    Left = 164
-    Top = 0
-    Width = 480
-    Height = 314
-    Anchors = [akLeft, akTop, akRight, akBottom]
-    Color = clBtnFace
-    PageIndex = 2
-    ParentColor = False
-    TabOrder = 0
-    object TPage
-      Left = 0
-      Top = 0
-      Caption = 'Start'
-      ExplicitWidth = 0
-      ExplicitHeight = 0
-      DesignSize = (
-        480
-        314)
-      object StartLabel: TLabel
-        Left = 8
-        Top = 8
-        Width = 460
-        Height = 50
-        Anchors = [akLeft, akTop, akRight]
-        AutoSize = False
-        Caption = 
-          'In this wizard you can configurate the basic settings needed to ' +
-          'use D-Fend Reloaded. You can also change all settings offered in' +
-          ' this wizard from the program settings dialog.'
-        WordWrap = True
-        ExplicitWidth = 510
-      end
-      object StartLabelLanguage: TLabel
-        Left = 8
-        Top = 60
-        Width = 91
-        Height = 13
-        Caption = 'Program language:'
-      end
-      object StartLabelLanguageValue: TLabel
-        Left = 8
-        Top = 75
-        Width = 33
-        Height = 13
-        Caption = 'English'
-      end
-      object StartLabelDOSBox: TLabel
-        Left = 8
-        Top = 100
-        Width = 74
-        Height = 13
-        Caption = 'DOSBox folder:'
-      end
-      object StartLabelDOSBoxValue: TLabel
-        Left = 8
-        Top = 115
-        Width = 253
-        Height = 13
-        Caption = 'Default (C:\Program files\D-Fend Reloaded\DOSBox)'
-      end
-      object StartLabelDOSBoxLanguage: TLabel
-        Left = 8
-        Top = 140
-        Width = 90
-        Height = 13
-        Caption = 'DOSBox language:'
-      end
-      object StartLabelDOSBoxLanguageValue: TLabel
-        Left = 8
-        Top = 155
-        Width = 33
-        Height = 13
-        Caption = 'English'
-      end
-      object StartLabelGamesFolder: TLabel
-        Left = 8
-        Top = 180
-        Width = 67
-        Height = 13
-        Caption = 'Games folder:'
-      end
-      object StartLabelGamesFolderValue: TLabel
-        Left = 8
-        Top = 195
-        Width = 245
-        Height = 13
-        Caption = 'Default (C:\Users\you\D-Fend Reloaded\VirtualHD)'
-      end
-      object StartLabelUpdates: TLabel
-        Left = 8
-        Top = 220
-        Width = 83
-        Height = 13
-        Caption = 'Update checking:'
-      end
-      object StartLabelUpdatesValue: TLabel
-        Left = 8
-        Top = 235
-        Width = 101
-        Height = 13
-        Caption = 'Manual checking only'
-      end
-    end
-    object TPage
-      Left = 0
-      Top = 0
-      Caption = 'ProgramLanguage'
-      ExplicitWidth = 0
-      ExplicitHeight = 0
-      DesignSize = (
-        480
-        314)
-      object LanguageLabel: TLabel
-        Left = 8
-        Top = 79
-        Width = 90
-        Height = 13
-        Caption = 'Programmsprache:'
-      end
-      object LanguageInfoLabel: TLabel
-        Left = 8
-        Top = 125
-        Width = 455
-        Height = 76
-        Anchors = [akLeft, akTop, akRight]
-        AutoSize = False
-        Caption = 'LanguageInfoLabel'
-        Visible = False
-        WordWrap = True
-        ExplicitWidth = 505
-      end
-      object LanguageTopInfoLabel: TLabel
-        AlignWithMargins = True
-        Left = 8
-        Top = 8
-        Width = 458
-        Height = 26
-        Anchors = [akLeft, akTop, akRight]
-        Caption = 
-          'Please select the language you want to use in D-Fend Reloaded. I' +
-          'f there is already the correct language select, you can directly' +
-          ' click on "Next".'
-        WordWrap = True
-      end
-      object LanguageComboBox: TComboBox
-        Left = 8
-        Top = 98
-        Width = 290
-        Height = 21
-        Style = csDropDownList
-        ItemHeight = 0
-        TabOrder = 0
-        OnChange = LanguageComboBoxChange
-      end
-    end
-    object TPage
-      Left = 0
-      Top = 0
-      Caption = 'DOSBox'
-      DesignSize = (
-        480
-        314)
-      object DosBoxButton: TSpeedButton
-        Left = 418
-        Top = 97
-        Width = 23
-        Height = 22
-        Anchors = [akTop, akRight]
-        Glyph.Data = {
-          76010000424D7601000000000000760000002800000020000000100000000100
-          04000000000000010000120B0000120B00001000000000000000000000000000
-          800000800000008080008000000080008000808000007F7F7F00BFBFBF000000
-          FF0000FF000000FFFF00FF000000FF00FF00FFFF0000FFFFFF00555555555555
-          5555555555555555555555555555555555555555555555555555555555555555
-          555555555555555555555555555555555555555FFFFFFFFFF555550000000000
-          55555577777777775F55500B8B8B8B8B05555775F555555575F550F0B8B8B8B8
-          B05557F75F555555575F50BF0B8B8B8B8B0557F575FFFFFFFF7F50FBF0000000
-          000557F557777777777550BFBFBFBFB0555557F555555557F55550FBFBFBFBF0
-          555557F555555FF7555550BFBFBF00055555575F555577755555550BFBF05555
-          55555575FFF75555555555700007555555555557777555555555555555555555
-          5555555555555555555555555555555555555555555555555555}
-        NumGlyphs = 2
-        ParentShowHint = False
-        ShowHint = True
-        OnClick = DosBoxButtonClick
-        ExplicitLeft = 511
-      end
-      object DOSBoxTopInfoLabel: TLabel
-        Left = 8
-        Top = 8
-        Width = 460
-        Height = 57
-        Anchors = [akLeft, akTop, akRight]
-        AutoSize = False
-        Caption = 
-          'Please select the folder where DOSBox is located. If the edit fi' +
-          'eld is not empty, D-Fend Reloaded has already found the DOSBox d' +
-          'irectory and you can directly click on "Next".'
-        WordWrap = True
-        ExplicitWidth = 510
-      end
-      object DOSBoxInfoLabel: TLabel
-        Left = 8
-        Top = 128
-        Width = 460
-        Height = 105
-        Anchors = [akLeft, akTop, akRight]
-        AutoSize = False
-        Caption = 
-          'When adding games to D-Fend Reloaded, you can specify a custom D' +
-          'OSBox program folder for each game. The DOSBox folder from this ' +
-          'dialog will be used as the default DOSBox folder for games.'
-        WordWrap = True
-        ExplicitWidth = 510
-      end
-      object WarningButton: TSpeedButton
-        Left = 447
-        Top = 97
-        Width = 23
-        Height = 22
-        Anchors = [akTop, akRight]
-        Glyph.Data = {
-          F6000000424DF600000000000000760000002800000010000000100000000100
-          0400000000008000000000000000000000001000000000000000000000000000
-          8000008000000080800080000000800080008080000080808000C0C0C0000000
-          FF0000FF000000FFFF00FF000000FF00FF00FFFF0000FFFFFF00EEEEEEEEEEEE
-          EEEEEEEEEEEEEEEEEEEEEEEE99999999EEEEEEE9999009999EEEEE9999900999
-          99EEEE999999999999EEEE999999999999EEEE999990099999EEEE9999900999
-          99EEEE999990099999EEEE999990099999EEEE999990099999EEEEE999900999
-          9EEEEEEE99999999EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE}
-        ParentShowHint = False
-        ShowHint = True
-        Visible = False
-        OnClick = WarningButtonClick
-        ExplicitLeft = 540
-      end
-      object DosBoxDirEdit: TLabeledEdit
-        Left = 8
-        Top = 98
-        Width = 404
-        Height = 21
-        Anchors = [akLeft, akTop, akRight]
-        EditLabel.Width = 67
-        EditLabel.Height = 13
-        EditLabel.Caption = 'DosBoxDirEdit'
-        TabOrder = 0
-        OnChange = DosBoxDirEditChange
-      end
-    end
-    object TPage
-      Left = 0
-      Top = 0
-      Caption = 'DOSBoxLanguage'
-      ExplicitWidth = 0
-      ExplicitHeight = 0
-      DesignSize = (
-        480
-        314)
-      object DosBoxLangLabel: TLabel
-        Left = 8
-        Top = 79
-        Width = 84
-        Height = 13
-        Caption = 'DosBoxLangLabel'
-      end
-      object DOSBoxLanguageTopInfoLabel: TLabel
-        Left = 8
-        Top = 8
-        Width = 452
-        Height = 57
-        Anchors = [akLeft, akTop, akRight]
-        AutoSize = False
-        Caption = 
-          'Please select the language you want to use in DOSBox. If there i' +
-          's already the correct language select, you can directly click on' +
-          ' "Next".'
-        WordWrap = True
-        ExplicitWidth = 545
-      end
-      object DOSBoxLanguageInfoLabel2: TLabel
-        Left = 8
-        Top = 128
-        Width = 452
-        Height = 73
-        Anchors = [akLeft, akTop, akRight]
-        AutoSize = False
-        Caption = 
-          'There are more DOSBox languages than D-Fend Reloaded languages. ' +
-          'So you may want to set DOSBox to another language than D-Fend Re' +
-          'loaded.'
-        WordWrap = True
-        ExplicitWidth = 545
-      end
-      object DosBoxLangEditComboBox: TComboBox
-        Left = 8
-        Top = 98
-        Width = 290
-        Height = 21
-        Style = csDropDownList
-        ItemHeight = 0
-        TabOrder = 0
-      end
-    end
-    object TPage
-      Left = 0
-      Top = 0
-      Caption = 'GameDir'
-      ExplicitWidth = 0
-      ExplicitHeight = 0
-      DesignSize = (
-        480
-        314)
-      object GameDirTopInfoLabel: TLabel
-        Left = 8
-        Top = 8
-        Width = 461
-        Height = 57
-        Anchors = [akLeft, akTop, akRight]
-        AutoSize = False
-        Caption = 
-          'Please select the directory you want to store your games in. Thi' +
-          's directory will be shown at first when you open the "Select fil' +
-          'e" dialog.'
-        WordWrap = True
-        ExplicitWidth = 500
-      end
-      object GameDirButton: TSpeedButton
-        Left = 437
-        Top = 97
-        Width = 23
-        Height = 22
-        Anchors = [akTop, akRight]
-        Glyph.Data = {
-          76010000424D7601000000000000760000002800000020000000100000000100
-          04000000000000010000120B0000120B00001000000000000000000000000000
-          800000800000008080008000000080008000808000007F7F7F00BFBFBF000000
-          FF0000FF000000FFFF00FF000000FF00FF00FFFF0000FFFFFF00555555555555
-          5555555555555555555555555555555555555555555555555555555555555555
-          555555555555555555555555555555555555555FFFFFFFFFF555550000000000
-          55555577777777775F55500B8B8B8B8B05555775F555555575F550F0B8B8B8B8
-          B05557F75F555555575F50BF0B8B8B8B8B0557F575FFFFFFFF7F50FBF0000000
-          000557F557777777777550BFBFBFBFB0555557F555555557F55550FBFBFBFBF0
-          555557F555555FF7555550BFBFBF00055555575F555577755555550BFBF05555
-          55555575FFF75555555555700007555555555557777555555555555555555555
-          5555555555555555555555555555555555555555555555555555}
-        NumGlyphs = 2
-        ParentShowHint = False
-        ShowHint = True
-        OnClick = GameDirButtonClick
-        ExplicitLeft = 530
-      end
-      object GameDirInfoLabel: TLabel
-        Left = 8
-        Top = 125
-        Width = 461
-        Height = 84
-        Anchors = [akLeft, akTop, akRight]
-        AutoSize = False
-        Caption = 'GameDirInfoLabel'
-        WordWrap = True
-        ExplicitWidth = 500
-      end
-      object GameDirEdit: TLabeledEdit
-        Left = 8
-        Top = 98
-        Width = 423
-        Height = 21
-        Anchors = [akLeft, akTop, akRight]
-        EditLabel.Width = 58
-        EditLabel.Height = 13
-        EditLabel.Caption = 'GameDirEdit'
-        TabOrder = 0
-      end
-    end
-    object TPage
-      Left = 0
-      Top = 0
-      Caption = 'Update'
-      ExplicitWidth = 0
-      ExplicitHeight = 0
-      DesignSize = (
-        480
-        314)
-      object UpdateLabel: TLabel
-        Left = 8
-        Top = 156
-        Width = 464
-        Height = 45
-        Anchors = [akLeft, akTop, akRight]
-        AutoSize = False
-        Caption = 
-          'Bei der Update-Pr'#252'fung werden keine Daten ins Internet '#252'bertrage' +
-          'n. Es wird lediglich eine auf SourceForge.net gespeicherte Datei' +
-          ' ausgelesen und dann ggf. angeboten, die regul'#228're Update-Datei h' +
-          'erunterzuladen.'
-        WordWrap = True
-        ExplicitWidth = 534
-      end
-      object UpdateTopInfoLabel: TLabel
-        Left = 8
-        Top = 8
-        Width = 309
-        Height = 13
-        Caption = 'Please select when D-Fend Reloaded should search for updates:'
-      end
-      object Update0RadioButton: TRadioButton
-        Left = 8
-        Top = 35
-        Width = 470
-        Height = 17
-        Anchors = [akLeft, akTop, akRight]
-        Caption = 'Nur manuell auf Updates pr'#252'fen (Men'#252': Hilfe|Nach Updates suchen)'
-        Checked = True
-        TabOrder = 0
-        TabStop = True
-      end
-      object Update1RadioButton: TRadioButton
-        Left = 8
-        Top = 58
-        Width = 470
-        Height = 17
-        Anchors = [akLeft, akTop, akRight]
-        Caption = 'Einmal w'#246'chentlich pr'#252'fen'
-        TabOrder = 1
-      end
-      object Update2RadioButton: TRadioButton
-        Left = 8
-        Top = 81
-        Width = 470
-        Height = 17
-        Anchors = [akLeft, akTop, akRight]
-        Caption = 'Einmal t'#228'glich pr'#252'fen'
-        TabOrder = 2
-      end
-      object Update3RadioButton: TRadioButton
-        Left = 8
-        Top = 104
-        Width = 470
-        Height = 17
-        Anchors = [akLeft, akTop, akRight]
-        Caption = 'Bei jedem Start pr'#252'fen'
-        TabOrder = 3
-      end
-      object UpdateCheckBox: TCheckBox
-        Left = 8
-        Top = 135
-        Width = 550
-        Height = 17
-        Caption = 'Kennung der aktuellen Version in die Abfrage-URL integrieren'
-        TabOrder = 4
-      end
-      object UpdateNowCheckBox: TCheckBox
-        Left = 8
-        Top = 207
-        Width = 470
-        Height = 17
-        Anchors = [akLeft, akTop, akRight]
-        Caption = 'Jetzt nach Updates suchen'
-        TabOrder = 5
-      end
-    end
+  object StartLabel: TLabel
+    Left = 177
+    Top = 8
+    Width = 426
+    Height = 50
+    Anchors = [akLeft, akTop, akRight]
+    AutoSize = False
+    Caption = 
+      'In this wizard you can configurate the basic settings needed to ' +
+      'use D-Fend Reloaded. You can also change all settings offered in' +
+      ' this wizard from the program settings dialog.'
+    WordWrap = True
+    ExplicitWidth = 529
   end
-  object BackButton: TBitBtn
+  object ProgramLanguageLabel: TLabel
+    Left = 177
+    Top = 64
+    Width = 91
+    Height = 13
+    Caption = 'Program language:'
+  end
+  object DOSBoxLabel: TLabel
+    Left = 178
+    Top = 120
+    Width = 203
+    Height = 13
+    Caption = 'DOSBox installation to be used by default:'
+  end
+  object DOSBoxLanguageLabel: TLabel
+    Left = 178
+    Top = 200
+    Width = 90
+    Height = 13
+    Caption = 'DOSBox language:'
+  end
+  object UpdatesLabel: TLabel
+    Left = 192
+    Top = 275
+    Width = 411
+    Height = 35
+    Anchors = [akLeft, akTop, akRight]
+    AutoSize = False
+    Caption = 
+      '(You can configurate the details of the update checking process ' +
+      'in the program options dialog.)'
+    WordWrap = True
+  end
+  object DOSBoxButton: TSpeedButton
+    Left = 580
+    Top = 163
+    Width = 23
+    Height = 22
+    Anchors = [akTop, akRight]
+    Enabled = False
+    Glyph.Data = {
+      76010000424D7601000000000000760000002800000020000000100000000100
+      04000000000000010000120B0000120B00001000000000000000000000000000
+      800000800000008080008000000080008000808000007F7F7F00BFBFBF000000
+      FF0000FF000000FFFF00FF000000FF00FF00FFFF0000FFFFFF00555555555555
+      55555555FFFFFFFFFF55555000000000055555577777777775F55500B8B8B8B8
+      B05555775F555555575F550F0B8B8B8B8B05557F75F555555575550BF0B8B8B8
+      B8B0557F575FFFFFFFF7550FBF0000000000557F557777777777500BFBFBFBFB
+      0555577F555555557F550B0FBFBFBFBF05557F7F555555FF75550F0BFBFBF000
+      55557F75F555577755550BF0BFBF0B0555557F575FFF757F55550FB700007F05
+      55557F557777557F55550BFBFBFBFB0555557F555555557F55550FBFBFBFBF05
+      55557FFFFFFFFF7555550000000000555555777777777755555550FBFB055555
+      5555575FFF755555555557000075555555555577775555555555}
+    NumGlyphs = 2
+    ParentShowHint = False
+    ShowHint = True
+    OnClick = DOSBoxButtonClick
+  end
+  object ProgramLanguageWarningButton: TSpeedButton
+    Left = 432
+    Top = 80
+    Width = 168
+    Height = 22
+    Caption = 'Language file outdated'
+    Flat = True
+    Glyph.Data = {
+      F6000000424DF600000000000000760000002800000010000000100000000100
+      0400000000008000000000000000000000001000000000000000000000000000
+      8000008000000080800080000000800080008080000080808000C0C0C0000000
+      FF0000FF000000FFFF00FF000000FF00FF00FFFF0000FFFFFF00FFFFFFFFFFFF
+      FFFFF33333333333333F3BBBBBBBBBBBBBB33BBBBBB00BBBBBB33BBBBBB00BBB
+      BBB3F3BBBBBBBBBBBB3FF3BBBBBBBBBBBB3FF3BBBBB00BBBBB3FFF3BBBB00BBB
+      B3FFFF3BBB0000BBB3FFFFF3BB0000BB3FFFFFF3BBB00BBB3FFFFFFF3BB00BB3
+      FFFFFFFF3BBBBBB3FFFFFFFFF33BB33FFFFFFFFFFFF33FFFFFFF}
+    ParentShowHint = False
+    ShowHint = True
+    Visible = False
+    OnClick = ProgramLanguageButtonClick
+  end
+  object DOSBoxWarningButton: TSpeedButton
+    Left = 432
+    Top = 135
+    Width = 168
+    Height = 22
+    Caption = 'Version outdated'
+    Flat = True
+    Glyph.Data = {
+      F6000000424DF600000000000000760000002800000010000000100000000100
+      0400000000008000000000000000000000001000000000000000000000000000
+      8000008000000080800080000000800080008080000080808000C0C0C0000000
+      FF0000FF000000FFFF00FF000000FF00FF00FFFF0000FFFFFF00FFFFFFFFFFFF
+      FFFFF33333333333333F3BBBBBBBBBBBBBB33BBBBBB00BBBBBB33BBBBBB00BBB
+      BBB3F3BBBBBBBBBBBB3FF3BBBBBBBBBBBB3FF3BBBBB00BBBBB3FFF3BBBB00BBB
+      B3FFFF3BBB0000BBB3FFFFF3BB0000BB3FFFFFF3BBB00BBB3FFFFFFF3BB00BB3
+      FFFFFFFF3BBBBBB3FFFFFFFFF33BB33FFFFFFFFFFFF33FFFFFFF}
+    ParentShowHint = False
+    ShowHint = True
+    Visible = False
+    OnClick = ProgramLanguageButtonClick
+  end
+  object PortableOKButton: TSpeedButton
+    Left = 432
+    Top = 136
+    Width = 168
+    Height = 22
+    Caption = 'Ok for portable use'
+    Flat = True
+    Glyph.Data = {
+      F6000000424DF600000000000000760000002800000010000000100000000100
+      0400000000008000000000000000000000001000000000000000000000000000
+      8000008000000080800080000000800080008080000080808000C0C0C0000000
+      FF0000FF000000FFFF00FF000000FF00FF00FFFF0000FFFFFF00888888888888
+      8888888880000008888888880CCCCCC088888880CCCCCCCC0888880CCCCFFCCC
+      C08880CCCCCFFCCCC08880CCCCCFFCCCCC0880CCCCCFFCCCCC0880CCCCCFFCCC
+      CC0880CCCCCFFCCCCC0880CCCCCCCCCCC088880CCCCFFCCCC0888880CCCFFCCC
+      088888880CCCCCC0888888888000000888888888888888888888}
+    ParentShowHint = False
+    ShowHint = True
+    Visible = False
+    OnClick = ProgramLanguageButtonClick
+  end
+  object OKButton: TBitBtn
     Left = 8
     Top = 325
     Width = 97
     Height = 25
     Anchors = [akLeft, akBottom]
-    Caption = 'Back'
-    TabOrder = 1
-    OnClick = BackButtonClick
-    Glyph.Data = {
-      76010000424D7601000000000000760000002800000020000000100000000100
-      04000000000000010000120B0000120B00001000000000000000000000000000
-      800000800000008080008000000080008000808000007F7F7F00BFBFBF000000
-      FF0000FF000000FFFF00FF000000FF00FF00FFFF0000FFFFFF00333333333333
-      3333333333333333333333333333333333333333333333333333333333333333
-      3333333333333FF3333333333333003333333333333F77F33333333333009033
-      333333333F7737F333333333009990333333333F773337FFFFFF330099999000
-      00003F773333377777770099999999999990773FF33333FFFFF7330099999000
-      000033773FF33777777733330099903333333333773FF7F33333333333009033
-      33333333337737F3333333333333003333333333333377333333333333333333
-      3333333333333333333333333333333333333333333333333333333333333333
-      3333333333333333333333333333333333333333333333333333}
-    NumGlyphs = 2
-  end
-  object NextButton: TBitBtn
-    Left = 60
-    Top = 325
-    Width = 97
-    Height = 25
-    Anchors = [akLeft, akBottom]
-    Caption = 'Next'
-    TabOrder = 2
-    OnClick = NextButtonClick
-    Glyph.Data = {
-      76010000424D7601000000000000760000002800000020000000100000000100
-      04000000000000010000120B0000120B00001000000000000000000000000000
-      800000800000008080008000000080008000808000007F7F7F00BFBFBF000000
-      FF0000FF000000FFFF00FF000000FF00FF00FFFF0000FFFFFF00333333333333
-      3333333333333333333333333333333333333333333333333333333333333333
-      3333333333333333333333333333333333333333333FF3333333333333003333
-      3333333333773FF3333333333309003333333333337F773FF333333333099900
-      33333FFFFF7F33773FF30000000999990033777777733333773F099999999999
-      99007FFFFFFF33333F7700000009999900337777777F333F7733333333099900
-      33333333337F3F77333333333309003333333333337F77333333333333003333
-      3333333333773333333333333333333333333333333333333333333333333333
-      3333333333333333333333333333333333333333333333333333}
-    Layout = blGlyphRight
-    NumGlyphs = 2
-  end
-  object OKButton: TBitBtn
-    Left = 99
-    Top = 325
-    Width = 97
-    Height = 25
-    Anchors = [akLeft, akBottom]
-    TabOrder = 3
-    Visible = False
+    TabOrder = 5
     Kind = bkOK
   end
-  object AcceptAllSettingsButton: TBitBtn
-    Left = 317
-    Top = 325
-    Width = 198
-    Height = 25
-    Anchors = [akLeft, akBottom]
-    Caption = '&Accept all settings'
-    TabOrder = 4
-    Kind = bkAll
-  end
   object HelpButton: TBitBtn
-    Left = 745
+    Left = 111
     Top = 325
     Width = 97
     Height = 25
@@ -5404,28 +5016,52 @@ object FirstRunWizardForm: TFirstRunWizardForm
     OnClick = HelpButtonClick
     Kind = bkHelp
   end
-  object EditSettingsButton: TBitBtn
-    Left = 182
-    Top = 325
-    Width = 198
-    Height = 25
-    Anchors = [akLeft, akBottom]
-    Caption = '&Edit settings'
-    TabOrder = 5
-    OnClick = NextButtonClick
-    Glyph.Data = {
-      76010000424D7601000000000000760000002800000020000000100000000100
-      04000000000000010000120B0000120B00001000000000000000000000000000
-      800000800000008080008000000080008000808000007F7F7F00BFBFBF000000
-      FF0000FF000000FFFF00FF000000FF00FF00FFFF0000FFFFFF00333333000000
-      000033333377777777773333330FFFFFFFF03FF3FF7FF33F3FF700300000FF0F
-      00F077F777773F737737E00BFBFB0FFFFFF07773333F7F3333F7E0BFBF000FFF
-      F0F077F3337773F3F737E0FBFBFBF0F00FF077F3333FF7F77F37E0BFBF00000B
-      0FF077F3337777737337E0FBFBFBFBF0FFF077F33FFFFFF73337E0BF0000000F
-      FFF077FF777777733FF7000BFB00B0FF00F07773FF77373377373330000B0FFF
-      FFF03337777373333FF7333330B0FFFF00003333373733FF777733330B0FF00F
-      0FF03333737F37737F373330B00FFFFF0F033337F77F33337F733309030FFFFF
-      00333377737FFFFF773333303300000003333337337777777333}
-    NumGlyphs = 2
+  object ProgramLanguageComboBox: TComboBox
+    Left = 177
+    Top = 80
+    Width = 249
+    Height = 21
+    Style = csDropDownList
+    ItemHeight = 0
+    TabOrder = 0
+    OnChange = ProgramLanguageComboBoxChange
+  end
+  object DOSBoxLanguageComboBox: TComboBox
+    Left = 178
+    Top = 216
+    Width = 248
+    Height = 21
+    Style = csDropDownList
+    ItemHeight = 0
+    TabOrder = 3
+  end
+  object UpdatesCheckBox: TCheckBox
+    Left = 174
+    Top = 256
+    Width = 429
+    Height = 17
+    Anchors = [akLeft, akTop, akRight]
+    Caption = 'Automatically check for updates'
+    TabOrder = 4
+  end
+  object DOSBoxComboBox: TComboBox
+    Left = 178
+    Top = 136
+    Width = 248
+    Height = 21
+    Style = csDropDownList
+    ItemHeight = 0
+    TabOrder = 1
+    OnChange = DOSBoxComboBoxChange
+  end
+  object DOSBoxEdit: TEdit
+    Left = 178
+    Top = 163
+    Width = 396
+    Height = 21
+    Anchors = [akLeft, akTop, akRight]
+    Enabled = False
+    TabOrder = 2
+    OnChange = DOSBoxEditChange
   end
 end

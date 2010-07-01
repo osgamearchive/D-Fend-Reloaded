@@ -43,56 +43,11 @@ On this page you can configurate the DOSBox versions to use with D-Fend Reloaded
   </li>
 </ul>
 
-<p>
-The following settings will only be visible if the advanced setup mode is selected at the bottom of the program options dialog:
-</p>
-
-<ul class="big">
-  <li>
-    <b>More settings for this DOSBox installation</b><br />
-    Clicking on this button will open a dialog with some extra settings for the selected DOSBox installation.
-    (See section "More settings for this DOSBox installation" at the bottom of this page.)
-  </li>
-  <li>
-    <b>Minimize D-Fend Reloaded when DOSBox starts</b><br />
-    If this option is activated, the D-Fend Reloaded main window will minimize
-    as soon as you start a DOSBox based profile.
-    <br />(Default value for this option: off)
-  </li>  
-  <li>
-    <b>Restore program window when DOSBox is closed</b><br />
-    This option can only be activated if "Minimize D-Fend Reloaded when DOSBox starts" is active.
-    It will restore the D-Fend Reloaded main window as soon as the DOSBox instance you have
-    started by starting some profile closes.
-    <br />(Default value for this option: off)
-  </li>
-  <li>
-    <b>Use short path names for mount commands</b><br />
-    The DOSBox command line is limited to 134 characters, so long path names in
-    mount commands can cause problems. With this option activated D-Fend Reloaded
-    will create short path names in the DOSBox conf file
-    ("PROGRA~1" instead of "Program files" for example) to keep the commands
-    for mounting folders short.
-    <br />(Default value for this option: on)
-  </li>
-  <li>
-    <b>Show warning messages on DOSBox path name translation errors</b><br />
-    Because DOSBox uses a different algorithm to make short path names than Windows,
-	long path names need to be translated to the DOSBox version (for example for use in "cd" commands).
-	If this option is activated you will get a warning message if this translation process fails.
-    <br />(Default value for this option: on)
-  </li>
-  <li>
-    <b>Always create conf files for all profiles</b><br />
-	If this option is turned on, D-Fend Reloaded will create for each profile file (*.prof) a DOSBox
-	configuration file (*.conf) in the "Confs" folder and keep this configuration file up to date.
-	If this option is off, the DOSBox configuration files will only be generated on the fly when
-	starting DOSBox. (The function to always create all configuration files is not available in
-	portable operation mode.)
-	<br />(Default value for this option: off)
-</ul>
-
 <h2>"More settings for this DOSBox installation" dialog</h2>
+
+<p>
+This button will only be visible if the advanced setup mode is selected at the bottom of the program options dialog.
+</p>
 
 <ul class="big">
   <li>
@@ -174,7 +129,8 @@ The following settings will only be visible if the advanced setup mode is select
 
 <p class="smallH">See also:</p>
 <p class="smallT">
-  <a href="FileOptions.html">Program options dialog</a>
+  <a href="FileOptions.html">Program options dialog</a><br>
+  <a href="FileOptionsDOSBoxGeneral.html">Global DOSBox settings</a>
 </p>
 
 </body>

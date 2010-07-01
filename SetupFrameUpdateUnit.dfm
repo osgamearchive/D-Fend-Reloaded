@@ -2,114 +2,66 @@ object SetupFrameUpdate: TSetupFrameUpdate
   Left = 0
   Top = 0
   Width = 583
-  Height = 367
+  Height = 282
   TabOrder = 0
-  DesignSize = (
-    583
-    367)
-  object UpdateLabel: TLabel
-    Left = 16
-    Top = 132
-    Width = 552
-    Height = 45
-    Anchors = [akLeft, akTop, akRight]
-    AutoSize = False
-    Caption = 
-      'Bei der Update-Pr'#252'fung werden keine Daten ins Internet '#252'bertrage' +
-      'n. Es wird lediglich eine auf SourceForge.net gespeicherte Datei' +
-      ' ausgelesen und dann ggf. angeboten, die regul'#228're Update-Datei h' +
-      'erunterzuladen.'
-    WordWrap = True
-  end
   object DataReaderInfoLabel: TLabel
     Left = 16
-    Top = 216
+    Top = 170
     Width = 199
     Height = 13
     Caption = 'Mobygames reader configuration update:'
   end
   object PackagesLabel: TLabel
     Left = 16
-    Top = 256
+    Top = 80
     Width = 102
     Height = 13
     Caption = 'Package lists update:'
   end
   object CheatsLabel: TLabel
     Left = 16
-    Top = 294
+    Top = 126
     Width = 86
     Height = 13
     Caption = 'Cheats database:'
   end
-  object Update0RadioButton: TRadioButton
-    Left = 12
-    Top = 20
-    Width = 571
-    Height = 17
-    Anchors = [akLeft, akTop, akRight]
-    Caption = 'Nur manuell auf Updates pr'#252'fen (Men'#252': Hilfe|Nach Updates suchen)'
-    Checked = True
-    TabOrder = 0
-    TabStop = True
-  end
-  object Update1RadioButton: TRadioButton
-    Left = 12
-    Top = 40
-    Width = 571
-    Height = 17
-    Anchors = [akLeft, akTop, akRight]
-    Caption = 'Einmal w'#246'chentlich pr'#252'fen'
-    TabOrder = 1
-  end
-  object Update2RadioButton: TRadioButton
-    Left = 12
-    Top = 60
-    Width = 571
-    Height = 17
-    Anchors = [akLeft, akTop, akRight]
-    Caption = 'Einmal t'#228'glich pr'#252'fen'
-    TabOrder = 2
-  end
-  object Update3RadioButton: TRadioButton
-    Left = 12
-    Top = 80
-    Width = 571
-    Height = 17
-    Anchors = [akLeft, akTop, akRight]
-    Caption = 'Bei jedem Start pr'#252'fen'
-    TabOrder = 3
+  object ProgramUpdateInfoLabel: TLabel
+    Left = 16
+    Top = 8
+    Width = 81
+    Height = 13
+    Caption = 'Program update:'
   end
   object UpdateCheckBox: TCheckBox
     Left = 16
-    Top = 108
-    Width = 550
+    Top = 48
+    Width = 553
     Height = 17
     Caption = 'Kennung der aktuellen Version in die Abfrage-URL integrieren'
-    TabOrder = 4
+    TabOrder = 1
   end
   object DataReaderComboBox: TComboBox
     Left = 16
-    Top = 231
-    Width = 305
+    Top = 189
+    Width = 401
     Height = 21
     Style = csDropDownList
     ItemHeight = 13
-    TabOrder = 6
+    TabOrder = 4
   end
   object PackagesComboBox: TComboBox
     Left = 16
-    Top = 271
-    Width = 305
+    Top = 95
+    Width = 401
     Height = 21
     Style = csDropDownList
     ItemHeight = 13
-    TabOrder = 7
+    TabOrder = 2
   end
   object UpdateButton: TBitBtn
     Left = 16
-    Top = 180
-    Width = 161
+    Top = 236
+    Width = 169
     Height = 25
     Caption = 'Search for updates now'
     TabOrder = 5
@@ -152,11 +104,20 @@ object SetupFrameUpdate: TSetupFrameUpdate
   end
   object CheatsComboBox: TComboBox
     Left = 16
-    Top = 309
-    Width = 305
+    Top = 141
+    Width = 401
     Height = 21
     Style = csDropDownList
     ItemHeight = 13
-    TabOrder = 8
+    TabOrder = 3
+  end
+  object ProgramUpdateComboBox: TComboBox
+    Left = 16
+    Top = 23
+    Width = 401
+    Height = 21
+    Style = csDropDownList
+    ItemHeight = 13
+    TabOrder = 0
   end
 end

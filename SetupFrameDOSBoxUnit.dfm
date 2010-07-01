@@ -59,14 +59,14 @@ object SetupFrameDOSBox: TSetupFrameDOSBox
   end
   object DOSBoxDownloadURLInfo: TLabel
     Left = 16
-    Top = 295
+    Top = 183
     Width = 154
     Height = 13
     Caption = 'You can download DOSBox from'
   end
   object DOSBoxDownloadURL: TLabel
     Left = 16
-    Top = 314
+    Top = 202
     Width = 105
     Height = 13
     Caption = 'DOSBoxDownloadURL'
@@ -242,75 +242,15 @@ object SetupFrameDOSBox: TSetupFrameDOSBox
     Height = 21
     Style = csDropDownList
     Anchors = [akLeft, akTop, akRight]
-    ItemHeight = 0
+    ItemHeight = 13
     TabOrder = 0
     OnChange = DOSBoxInstallationComboBoxChange
-  end
-  object GlobalGroupBox: TGroupBox
-    Left = 16
-    Top = 151
-    Width = 628
-    Height = 130
-    Anchors = [akLeft, akTop, akRight]
-    Caption = 'Global settings (for all installations)'
-    TabOrder = 3
-    DesignSize = (
-      628
-      130)
-    object MinimizeDFendCheckBox: TCheckBox
-      Left = 16
-      Top = 20
-      Width = 601
-      Height = 17
-      Anchors = [akLeft, akTop, akRight]
-      Caption = 'D-Fend Reloaded minimieren, wenn DOSBox gestartet wird'
-      TabOrder = 0
-      OnClick = MinimizeDFendCheckBoxClick
-    end
-    object RestoreWindowCheckBox: TCheckBox
-      Left = 37
-      Top = 38
-      Width = 580
-      Height = 17
-      Anchors = [akLeft, akTop, akRight]
-      Caption = 'Restore program window when DOSBox is closed'
-      TabOrder = 1
-    end
-    object UseShortPathNamesCheckBox: TCheckBox
-      Left = 16
-      Top = 68
-      Width = 601
-      Height = 17
-      Anchors = [akLeft, akTop, akRight]
-      Caption = 'Use short path names for mount commands'
-      TabOrder = 2
-    end
-    object ShortNameWarningsCheckBox: TCheckBox
-      Left = 16
-      Top = 88
-      Width = 601
-      Height = 17
-      Anchors = [akLeft, akTop, akRight]
-      Caption = 'Show warning messages on DOSBox path name translation errors'
-      TabOrder = 3
-    end
-    object CreateConfFilesCheckBox: TCheckBox
-      Left = 16
-      Top = 108
-      Width = 601
-      Height = 17
-      Anchors = [akLeft, akTop, akRight]
-      Caption = 
-        'Always create conf files for all profiles (off: only when starti' +
-        'ng DOSBox)'
-      TabOrder = 4
-    end
   end
   object MoreSettingsButton: TBitBtn
     Tag = 7
     Left = 16
     Top = 107
-    Width = 281
+    Width = 297
     Height = 25
     Caption = 'More settings for this DOSBox installation'
     TabOrder = 2
@@ -331,12 +271,12 @@ object SetupFrameDOSBox: TSetupFrameDOSBox
     NumGlyphs = 2
   end
   object PortableModeInfoButton: TBitBtn
-    Left = 303
-    Top = 107
+    Left = 16
+    Top = 138
     Width = 170
     Height = 25
     Caption = 'Portable mode information'
-    TabOrder = 4
+    TabOrder = 3
     OnClick = PortableModeInfoButtonClick
   end
   object DosBoxTxtOpenDialog: TOpenDialog

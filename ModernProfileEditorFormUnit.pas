@@ -18,6 +18,7 @@ Type TModernProfileEditorInitData=record
   OnProfileNameChange : TTextEvent;
   OnResetToDefault : TResetEvent;
   OnCheckValue : TCheckValueEvent;
+  OnProfileNameChangedCallback : TNotifyEvent;
   OnShowFrame : TNotifyEvent;
   GameDB: TGameDB;
   EditingTemplate : Boolean;
@@ -42,6 +43,7 @@ Type TFrameRecord=record
   ResetToDefault : TResetEvent;
   CheckValue : TCheckValueEvent;
   ShowFrame : TNotifyEvent;
+  ProfileNameChangedCallback : TNotifyEvent;
   AllowDefaultValueReset : Boolean;
 end;
 
@@ -192,12 +194,14 @@ begin
   InitData.SearchLinkFile:=SearchLinkFile;
   InitData.EditingTemplate:=EditingTemplate;
   InitData.GetFrame:=GetFrame;
+  InitData.OnProfileNameChangedCallback:=nil;
 
   I.InitGUI(InitData);
   with FrameList[C] do begin
     ResetToDefault:=InitData.OnResetToDefault;
     CheckValue:=InitData.OnCheckValue;
     ShowFrame:=InitData.OnShowFrame;
+    ProfileNameChangedCallback:=InitData.OnProfileNameChangedCallback;
     AllowDefaultValueReset:=InitData.AllowDefaultValueReset;
   end;
 end;
@@ -611,8 +615,12 @@ end;
 
 procedure TModernProfileEditorForm.SetProfileNameEvent(Sender: TObject; const AProfileName, AProfileExe, AProfileSetup, AProfileScummVMGameName, AProfileScummVMPath, AProfileDOSBoxInstallation, AProfileCaptureDir : String);
 Var S : String;
+    B : Boolean;
+    I : Integer;
 begin
+  B:=(ProfileName<>AProfileName);
   ProfileName:=AProfileName;
+  If B then For I:=0 to length(FrameList)-1 do If Assigned(FrameList[I].ProfileNameChangedCallback) then FrameList[I].ProfileNameChangedCallback(self);
   ProfileExe:=AProfileExe;
   ProfileSetup:=AProfileSetup;
   ProfileScummVMGameName:=AProfileScummVMGameName;
@@ -720,7 +728,7 @@ begin
         end;
         If (not TModernProfileEditorBaseFrame(BaseFrame).SetupRelPathCheckBox.Checked) and (Trim(TModernProfileEditorBaseFrame(BaseFrame).SetupExeEdit.Text)<>'') then begin
           S:=MakeAbsPath(TModernProfileEditorBaseFrame(BaseFrame).SetupExeEdit.Text,PrgSetup.BaseDir);
-          If IsWindowsExe(S) then begin
+          If IsWindowsExe(S) and (not TModernProfileEditorBaseFrame(BaseFrame).IgnoreWindowsWarningsCheckBox.Checked) then begin
             If MessageDlg(Format(LanguageSetup.MessageWindowsExeEditWarning,[S]),mtConfirmation,[mbYes,mbNo],0)<>mrYes then begin
               Tree.Selected:=Tree.Items[0];
               ModalResult:=mrNone;

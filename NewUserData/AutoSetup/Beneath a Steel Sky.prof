@@ -64,7 +64,7 @@ UserInfo=License=Freeware[13]
 fullscreen=1
 autolock=0
 fulldouble=1
-usecancodes=1
+usescancodes=1
 sensitivity=100
 output=overlay
 windowresolution=original

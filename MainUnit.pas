@@ -8,27 +8,6 @@ uses
   Menus, AppEvnts, ActiveX, GameDBUnit, GameDBToolsUnit, ViewFilesFrameUnit,
   LinkFileUnit, HelpTools;
 
-{
-1.0:
-- New language strings and help pages
-  - Language strings for TLanguageSetup.GetString2
-  - New uninstaller language string (see Install\Languages\TODO_Languages.txt)
-  - Hint on update lists button in package manager: shift+click forces updates.
-  - Add new help pages for installation support, image from profile to index, setup automatic game configuration and cheat system (3 pages) to index
-  - Activate help paragraphs for new functions in Setup|Service, Setup|Language|CustomStrings and Profile|Edit|Profile.
-  - Change NR_SetupFormGamesListTranslations to "Non English translations for the games list" and update name in help index and setup help page
-  - Update help page for first run wizard, remove unused language strings
-- Setup dialog: When to update package lists / data reader configuration
-- The run commands before/after DOSBox should be able to handle multiple commands.
-- Data field for turning off the DOSBox failed dialog
-- BinCache improvements: Counter field for data fields (do not use DB if not matching - in case I forget to change DB version string)
-- Clean up extras|images menu
-- Integrate DOSBox 0.74 and update default values
-- Option to also set profile name from the mobygames information.
-}
-
-{DEFINE UseNewFirstRunWizard}
-
 type
   TDFendReloadedMainForm = class(TForm, IDropTarget)
     TreeView: TTreeView;
@@ -207,7 +186,6 @@ type
     MenuExtrasExtractImage: TMenuItem;
     IdleAddonTimer: TTimer;
     MenuExtrasImageFiles: TMenuItem;
-    N25: TMenuItem;
     N1: TMenuItem;
     MenuExtrasImageFromFolder: TMenuItem;
     ScreenshotsInfoPanel: TPanel;
@@ -351,6 +329,13 @@ type
     MenuExtrasCheatingEdit: TMenuItem;
     MenuExtrasCheatingSearch: TMenuItem;
     SearchEditTimer: TTimer;
+    MenuFileImportFolder: TMenuItem;
+    MenuFileImportFolderWithInstallationSupport: TMenuItem;
+    N25: TMenuItem;
+    AddButtonMenuAddManually: TMenuItem;
+    AddButtonMenuImportZip: TMenuItem;
+    MenuExtrasTranslationDOSBox: TMenuItem;
+    MenuExtrasTranslationDFendReloaded: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure TreeViewChange(Sender: TObject; Node: TTreeNode);
@@ -405,6 +390,8 @@ type
     procedure GameNotesEditEnter(Sender: TObject);
     procedure GameNotesEditExit(Sender: TObject);
     procedure SearchEditTimerTimer(Sender: TObject);
+    function ApplicationEventsHelp(Command: Word; Data: Integer;
+      var CallHelp: Boolean): Boolean;
   private
     { Private-Deklarationen }
     hScreenshotsChangeNotification, hConfsChangeNotification : THandle;
@@ -457,6 +444,7 @@ type
     Procedure QuickStarterCloseNotify(Sender : TObject);
     Procedure DisplayResolutionChange(var Msg : TMessage); message WM_DISPLAYCHANGE;
     Procedure UpdateGamesListByViewFilesFrame(Sender : TObject);
+    Procedure RunDOSBoxWithDefaultConfFile;
     Procedure OpenDOSBoxDefaultConfFile;
     function DragEnter(const dataObj: IDataObject; grfKeyState: Longint; pt: TPoint; var dwEffect: Longint): HResult; stdcall;
     function DragOver(grfKeyState: Longint; pt: TPoint; var dwEffect: Longint): HResult; reintroduce; stdcall;
@@ -503,7 +491,8 @@ uses ShellAPI, ShlObj, ClipBrd, Math, PNGImage, CommonTools, LanguageSetupUnit,
      RenameAllScreenshotsFormUnit, MakeBootImageFromProfileFormUnit,
      CheatApplyFormUnit, CheatDBEditFormUnit, CheatSearchFormUnit,
      UpdateCheckFormUnit, ProgramUpdateCheckUnit, GameDBFilterUnit,
-     FirstRunWizardFormUnit2, LoggingUnit, DOSBoxFailedFormUnit;
+     LoggingUnit, DOSBoxFailedFormUnit, DOSBoxLangEditFormUnit,
+     DOSBoxLangStartFormUnit;
 
 {$R *.dfm}
 
@@ -517,9 +506,8 @@ Var S : String;
 begin
   LogInfo('### Start of FormCreate ###');
 
-  {Caption:=Caption+' (RELEASE CANDIDATE 1 OF VERSION 0.9.2)';}
-  {Caption:=Caption+' (RELEASE CANDIDATE 1 OF VERSION 1.0)';}
-  {Caption:=Caption+' THIS IS A TEST VERSION ! NOT FOR REGULAR USE ! (Beta 1 of version 1.0)';}
+  {Caption:=Caption+' (RELEASE CANDIDATE 1 OF VERSION 1.1)';}
+  {Caption:=Caption+' THIS IS A TEST VERSION ! NOT FOR REGULAR USE ! (Beta 1 of version 1.1)';}
 
   Height:=790;
   Width:=Min(Width,790);
@@ -574,11 +562,7 @@ begin
     LogInfo('First run: Initializating templates');
     ReBuildTemplates(True);
     LogInfo('First run: Showing first run wizard');
-    {$IFDEF UseNewFirstRunWizard}
-    FirstRunWizardFormUnit2.ShowFirstRunWizardDialog(self,B);
-    {$ELSE}
-    FirstRunWizardFormUnit.ShowFirstRunWizardDialog(self,B);
-    {$ENDIF}
+    ShowFirstRunWizardDialog(self,B);
     If B then begin
       LogInfo('First run: Starting update check');
       RunProgramStartSilentUpdateCheck(self,true);
@@ -659,7 +643,12 @@ begin
   end else begin
     If PrgSetup.DFendVersion<>GetNormalFileVersionAsString then begin
       LogInfo('First run after update: Updating settings');
-      UpdateUserDataFolderAndSettingsAfterUpgrade(GameDB,VersionToInt(PrgSetup.DFendVersion));
+      Enabled:=False;
+      try
+        UpdateUserDataFolderAndSettingsAfterUpgrade(GameDB,VersionToInt(PrgSetup.DFendVersion));
+      finally
+        Enabled:=True;
+      end;
       PrgSetup.DFendVersion:=GetNormalFileVersionAsString;
       LogInfo('First run after update: Searching tools');
       FastSearchAllTools;
@@ -746,7 +735,8 @@ begin
   MenuFileImportProfFile.Caption:=LanguageSetup.MenuFileImportProf;
   MenuFileImportZIPFile.Caption:=LanguageSetup.MenuFileImportZIP;
   MenuFileImportZIPFileWithInstallationSupport.Caption:=LanguageSetup.MenuFileImportZIPWithInstallationSupport;
-  MenuFileImportZIPFileWithInstallationSupport.Visible:=PrgSetup.ActivateIncompleteFeatures;
+  MenuFileImportFolder.Caption:=LanguageSetup.MenuFileImportFolder;
+  MenuFileImportFolderWithInstallationSupport.Caption:=LanguageSetup.MenuFileImportFolderWithInstallationSupport;
   MenuFileImportDownload.Caption:=LanguageSetup.MenuFileImportDownload;
   MenuFileExport.Caption:=LanguageSetup.MenuFileExport;
   MenuFileExportGamesList.Caption:=LanguageSetup.MenuFileExportGamesList;
@@ -793,7 +783,6 @@ begin
   MenuProfileAddFromTemplate.Caption:=LanguageSetup.MenuProfileAddFromTemplate;
   MenuProfileAddWithWizard.Caption:=LanguageSetup.MenuProfileAddWithWizard;
   MenuProfileAddInstallationSupport.Caption:=LanguageSetup.MenuProfileAddWithInstallationSupport;
-  MenuProfileAddInstallationSupport.Visible:=PrgSetup.ActivateIncompleteFeatures;
   MenuProfileEdit.Caption:=LanguageSetup.MenuProfileEdit;
   MenuProfileCopy.Caption:=LanguageSetup.MenuProfileCopy;
   MenuProfileDelete.Caption:=LanguageSetup.MenuProfileDelete;
@@ -811,14 +800,12 @@ begin
   MenuProfileCreateShortcut.Caption:=LanguageSetup.MenuProfileCreateShortcut;
   MenuProfileSearchGame.Caption:=LanguageSetup.MenuProfileSearchGame;
   MenuProfileCheating.Caption:=LanguageSetup.MenuProfileCheating;
-  MenuProfileCheating.Visible:=PrgSetup.ActivateIncompleteFeatures;
   MenuExtras.Caption:=LanguageSetup.MenuExtras;
   MenuExtrasIconManager.Caption:=LanguageSetup.MenuExtrasIconManager;
   MenuExtrasViewLogs.Caption:=LanguageSetup.MenuExtrasViewLogs;
   MenuExtrasOpenGamesFolder.Caption:=LanguageSetup.MenuExtrasViewLogsOpenGamesFolder;
   MenuExtrasTemplates.Caption:=LanguageSetup.MenuExtrasTemplates;
   MenuExtrasCheating.Caption:=LanguageSetup.MenuExtrasCheating;
-  MenuExtrasCheating.Visible:=PrgSetup.ActivateIncompleteFeatures;
   MenuExtrasCheatingApply.Caption:=LanguageSetup.MenuExtrasCheatingApply;
   MenuExtrasCheatingEdit.Caption:=LanguageSetup.MenuExtrasCheatingEdit;
   MenuExtrasCheatingSearch.Caption:=LanguageSetup.MenuExtrasCheatingSearch;
@@ -831,13 +818,14 @@ begin
   MenuExtrasExtractImage.Caption:=LanguageSetup.MenuExtrasExtractImage;
   MenuExtrasImageFromFolder.Caption:=LanguageSetup.MenuExtrasImageFromFolder;
   MenuExtrasImageFromProfile.Caption:=LanguageSetup.MenuExtrasImageFromProfile;
-  MenuExtrasImageFromProfile.Visible:=PrgSetup.ActivateIncompleteFeatures;
   MenuExtrasScanGamesFolder.Caption:=LanguageSetup.MenuExtrasScanGamesFolder;
   MenuExtrasTransferProfiles.Caption:=LanguageSetup.MenuExtrasTransferProfiles;
   MenuExtrasChangeProfiles.Caption:=LanguageSetup.MenuExtrasChangeProfiles;
   MenuExtrasCreateShortcuts.Caption:=LanguageSetup.MenuExtrasCreateShortcuts;
   MenuExtrasCheckProfiles.Caption:=LanguageSetup.MenuExtrasCheckProfiles;
   MenuExtrasTranslation.Caption:=LanguageSetup.MenuExtrasTranslationEditor;
+  MenuExtrasTranslationDFendReloaded.Caption:=LanguageSetup.MenuExtrasTranslationEditorDFendReloaded;
+  MenuExtrasTranslationDOSBox.Caption:=LanguageSetup.MenuExtrasTranslationEditorDOSBox;
   MenuHelp.Caption:=LanguageSetup.MenuHelp;
   MenuHelpDosBox.Caption:=LanguageSetup.MenuHelpDosBox;
   MenuHelpDosBoxReadme.Caption:=LanguageSetup.MenuHelpDosBoxReadme;
@@ -868,14 +856,15 @@ begin
   MenuHelpAddingGames.Caption:=LanguageSetup.MenuHelpAddingGames;
   MenuHelpAbout.Caption:=LanguageSetup.MenuHelpAbout;
 
+  AddButtonMenuImportZip.Caption:=LanguageSetup.MenuFileImportZIP;
+  AddButtonMenuAddInstallationSupport.Caption:=LanguageSetup.MenuProfileAddWithInstallationSupport;
+  AddButtonMenuAddManually.Caption:=LanguageSetup.MenuProfileAddManually;
   AddButtonMenuAdd.Caption:=LanguageSetup.MenuProfileAdd;
   AddButtonMenuAddScummVM.Caption:=LanguageSetup.MenuProfileAddScummVM;
   AddButtonMenuAddWindows.Caption:=LanguageSetup.MenuProfileAddWindows;
   AddButtonMenuAddOther.Caption:=LanguageSetup.MenuProfileAddOther;
   AddButtonMenuAddFromTemplate.Caption:=LanguageSetup.MenuProfileAddFromTemplate;
   AddButtonMenuAddWithWizard.Caption:=LanguageSetup.MenuProfileAddWithWizard;
-  AddButtonMenuAddInstallationSupport.Caption:=LanguageSetup.MenuProfileAddWithInstallationSupport;
-  AddButtonMenuAddInstallationSupport.Visible:=PrgSetup.ActivateIncompleteFeatures;
 
   SetupToolbarHints;
 
@@ -899,7 +888,6 @@ begin
   PopupCreateShortcut.Caption:=LanguageSetup.PopupCreateShortcut;
   PopupSearchGame.Caption:=LanguageSetup.PopupSearchGame;
   PopupCheating.Caption:=LanguageSetup.MenuProfileCheating;
-  PopupCheating.Visible:=PrgSetup.ActivateIncompleteFeatures and FileExists(PrgDir+BinFolder+'\'+CheatDBFile);
   PopupViews.Caption:=LanguageSetup.PopupView;
   PopupSimpleListNoIcons.Caption:=LanguageSetup.MenuViewListNoIcons;
   PopupSimpleList.Caption:=LanguageSetup.MenuViewList;
@@ -1273,6 +1261,20 @@ Var I : Integer;
     M : TMenuItem;
     Rec : TSearchRec;
 begin
+  I:=FindFirst(PrgSetup.DOSBoxSettings[0].DosBoxDir+'DOSBox *.txt',faAnyFile,Rec);
+  try
+    while I=0 do begin
+      M:=TMenuItem.Create(self);
+      M.Caption:=Trim(Rec.Name);
+      M.Tag:=6101;
+      M.OnClick:=MenuWork;
+      M.ImageIndex:=24;
+      MenuHelpDosBoxReadme.Add(M);
+      I:=FindNext(Rec);
+    end;
+  finally
+    FindClose(Rec);
+  end;
   I:=FindFirst(PrgSetup.DOSBoxSettings[0].DosBoxDir+'Readme*.txt',faAnyFile,Rec);
   try
     while I=0 do begin
@@ -2430,10 +2432,9 @@ begin
                  OpenDialog.Title:=LanguageSetup.ProfileMountingZipFileGeneral;
                  OpenDialog.Filter:=ProcessFileNameFilter(LanguageSetup.ProfileMountingZipFileFilter2,LanguageSetup.ProfileMountingZipFileFilter2ArchiveFiles);
                  If not OpenDialog.Execute then exit;
-
                  G:=nil;
                  For I:=0 to OpenDialog.Files.Count-1 do begin
-                   G2:=ImportZipPackage(self,OpenDialog.Files[I],GameDB,False);
+                   G2:=ImportZipPackage(self,OpenDialog.Files[I],GameDB,PrgSetup.ImportZipWithoutDialogIfPossible);
                    If G2<>nil then G:=G2;
                  end;
                  If G=nil then exit;
@@ -2472,8 +2473,33 @@ begin
                OpenDialog.Title:=LanguageSetup.ProfileMountingZipFileGeneral;
                OpenDialog.Filter:=ProcessFileNameFilter(LanguageSetup.ProfileMountingZipFileFilter2,LanguageSetup.ProfileMountingZipFileFilter2ArchiveFiles);
                If not OpenDialog.Execute then exit;
-
                G:=RunInstallationFromZipFile(self,GameDB,OpenDialog.FileName);
+               If G=nil then exit;
+               LastSelectedGame:=nil;
+               ListView.Selected:=nil;
+               ListView.Items.Clear;
+               ViewFilesFrame.SetGame(nil);
+               InitTreeViewForGamesList(TreeView,GameDB);
+               TreeViewChange(Sender,TreeView.Selected);
+               SelectGame(G);
+             end;
+      1016 : begin
+               S:=GetSpecialFolder(Handle,CSIDL_DESKTOPDIRECTORY);
+               If not SelectDirectory(Handle,LanguageSetup.MenuFileImportFolderCaption,S) then exit;
+               G:=ImportFolder(self,S,GameDB,PrgSetup.ImportZipWithoutDialogIfPossible);
+               If G=nil then exit;
+               LastSelectedGame:=nil;
+               ListView.Selected:=nil;
+               ListView.Items.Clear;
+               ViewFilesFrame.SetGame(nil);
+               InitTreeViewForGamesList(TreeView,GameDB);
+               TreeViewChange(Sender,TreeView.Selected);
+               SelectGame(G);
+             end;
+      1017 : begin
+               S:=GetSpecialFolder(Handle,CSIDL_DESKTOPDIRECTORY);
+               If not SelectDirectory(Handle,LanguageSetup.MenuFileImportFolderCaption,S) then exit;
+               G:=RunInstallationFromFolder(self,GameDB,S);
                If G=nil then exit;
                LastSelectedGame:=nil;
                ListView.Selected:=nil;
@@ -2601,9 +2627,7 @@ begin
                G:=TGame(ListView.Selected.Data);
                If WindowsExeMode(G) then RunWindowsGame(G,True) else RunGame(G,True);
              end;
-      3003 : If FileExists(IncludeTrailingPathDelimiter(PrgSetup.DOSBoxSettings[0].DosBoxDir)+DosBoxFileName)
-               then ShellExecute(Handle,'open',PChar(IncludeTrailingPathDelimiter(PrgSetup.DOSBoxSettings[0].DosBoxDir)+DosBoxFileName),nil,PChar(IncludeTrailingPathDelimiter(PrgSetup.DOSBoxSettings[0].DosBoxDir)),SW_SHOW)
-               else MessageDlg(Format(LanguageSetup.MessageCouldNotFindFile,[IncludeTrailingPathDelimiter(PrgSetup.DOSBoxSettings[0].DosBoxDir)+DosBoxFileName]),mtError,[mbOK],0);
+      3003 : RunDOSBoxWithDefaultConfFile;
       3004 : begin
                If not FileExists(IncludeTrailingPathDelimiter(PrgSetup.DOSBoxSettings[0].DosBoxDir)+DosBoxFileName) then begin
                  MessageDlg(Format(LanguageSetup.MessageCouldNotFindFile,[IncludeTrailingPathDelimiter(PrgSetup.DOSBoxSettings[0].DosBoxDir)+DosBoxFileName]),mtError,[mbOK],0);
@@ -2835,7 +2859,8 @@ begin
                If S='' then S:=MakeAbsPath(PrgSetup.GameDir,PrgSetup.BaseDir) else S:=ExtractFilePath(MakeAbsPath(S,PrgSetup.BaseDir));
                B:=False;
                If ShowCheatApplyDialog(self,S,B) and B then begin
-                 ShowCheatDBEditDialog(self);
+                 ShowCheatDBEditDialog(self,B);
+                 If B then ShowUpdateCheckDialog(self,GameDB);
                end;
              end;
       4100..4199 : AddProfileForWindowsEmulator((Sender as TComponent).Tag-4100);
@@ -2951,11 +2976,23 @@ begin
              end;
       5022 : begin B:=False;
                If ShowCheatApplyDialog(self,MakeAbsPath(PrgSetup.GameDir,PrgSetup.BaseDir),B) and B then begin
-                 ShowCheatDBEditDialog(self);
+                 ShowCheatDBEditDialog(self,B);
+                 If B then ShowUpdateCheckDialog(self,GameDB);
                end;
              end;
-      5023 : ShowCheatDBEditDialog(self);
-      5024 : ShowCheatSearchDialog(self);       
+      5023 : begin
+               ShowCheatDBEditDialog(self,B);
+               If B then ShowUpdateCheckDialog(self,GameDB);
+             end;
+      5024 : ShowCheatSearchDialog(self);
+      5025 : begin
+               Enabled:=False;
+               try
+                 If ShowDOSBoxLangStartDialog(self,S,T) then ShowDOSBoxLangEditDialog(self,S,T);
+               finally
+                 Enabled:=True;
+               end;
+             end;
       {Help}
       6001 : ShellExecute(Handle,'open',PChar('http:/'+'/www.dosbox.com/wiki/'),nil,nil,SW_SHOW);
       6002 : ShellExecute(Handle,'open',PChar('http:/'+'/www.dosbox.com/wiki/Special_Keys'),nil,nil,SW_SHOW);
@@ -2985,11 +3022,7 @@ begin
       6008 : ShellExecute(Handle,'open',PChar(LanguageSetup.MenuHelpHomepageURL),nil,nil,SW_SHOW);
       6009 : {ShellExecute(Handle,'open',PChar('http:/'+'/vogons.zetafleet.com/viewtopic.php?t=17415'),nil,nil,SW_SHOW);}
              Application.HelpCommand(HELP_CONTEXT,ID_HelpForum);
-      6010 : If PrgSetup.ActivateIncompleteFeatures then begin
-               ShowUpdateCheckDialog(self,GameDB);
-             end else begin
-               RunUpdateCheck(self,False);
-             end;
+      6010 : ShowUpdateCheckDialog(self,GameDB);
       6011 : Application.HelpCommand(HELP_CONTEXT,ID_FAQs);
       6014 : ShowStatisticsDialog(self,GameDB);
       6015 : ShowInfoDialog(self);
@@ -3019,6 +3052,36 @@ begin
   finally
     StartCaptureChangeNotify;
   end;
+end;
+
+Procedure TDFendReloadedMainForm.RunDOSBoxWithDefaultConfFile;
+Var D : Double;
+    VerString,S,DOSBoxFile : String;
+    I : Integer;
+begin
+  DOSBoxFile:=IncludeTrailingPathDelimiter(PrgSetup.DOSBoxSettings[0].DosBoxDir)+DosBoxFileName;
+  If not FileExists(DOSBoxFile) then begin
+    MessageDlg(Format(LanguageSetup.MessageCouldNotFindFile,[DOSBoxFile]),mtError,[mbOK],0);
+    exit;
+  end;
+
+  VerString:=CheckDOSBoxVersion(0);
+  S:=VerString; For I:=1 to length(S) do if (S[I]=',') or (S[I]='.') then S[I]:=DecimalSeparator;
+  If not TryStrToFloat(S,D) then D:=0.72;
+
+  S:=IncludeTrailingPathDelimiter(GetSpecialFolder(Handle,CSIDL_LOCAL_APPDATA))+'DOSBox\dosbox-'+VerString+'.conf';
+
+  If (not FileExists(S)) or (D<=0.72) then begin
+    ShellExecute(Handle,'open',PChar(DOSBoxFile),nil,nil,SW_SHOW);
+    exit;
+  end;
+
+  If D<=0.73 then begin
+    ShellExecute(Handle,'open',PChar(DOSBoxFile),PChar('-c '+S),nil,SW_SHOW);
+    exit;
+  end;
+
+  ShellExecute(Handle,'open',PChar(DOSBoxFile),'-userconf',nil,SW_SHOW);
 end;
 
 Procedure TDFendReloadedMainForm.OpenDOSBoxDefaultConfFile;
@@ -3637,6 +3700,15 @@ begin
   ApplicationEventsIdle(Sender,Done);
 end;
 
+function TDFendReloadedMainForm.ApplicationEventsHelp(Command: Word; Data: Integer; var CallHelp: Boolean): Boolean;
+begin
+  If (Command=HELP_CONTEXT) and (Data=0) then begin
+    CallHelp:=False;
+    Application.HelpCommand(HELP_CONTEXT,ID_Index);
+  end;
+  result:=False;
+end;
+
 procedure TDFendReloadedMainForm.ApplicationEventsIdle(Sender: TObject; var Done: Boolean);
 begin
   RunUpdateCheckIdleCloseHandle;
@@ -3647,12 +3719,10 @@ begin
     LastDOSBoxCount:=DOSBoxCounter.Count;
   end;
 
-  If PrgSetup.ActivateIncompleteFeatures then begin
-    If (DOSBoxCounter.Count<LastDOSBoxCount) and (LastDOSBoxStartTime>0) and (LastDOSBoxStartTime+3000>GetTickCount) then begin
-      LastDOSBoxStartTime:=0;
-      ShowDOSBoxFailedDialog(self,GameDB,LastDOSBoxProfile);
-      LastDOSBoxProfile:=nil;
-    end;
+  If (DOSBoxCounter.Count<LastDOSBoxCount) and (LastDOSBoxStartTime>0) and (LastDOSBoxStartTime+Cardinal(Min(60,Max(1,PrgSetup.DOSBoxStartFailedTimeout)))*1000>GetTickCount) then begin
+    LastDOSBoxStartTime:=0;
+    ShowDOSBoxFailedDialog(self,GameDB,LastDOSBoxProfile);
+    LastDOSBoxProfile:=nil;
   end;
 
   If PrgSetup.MinimizeOnDosBoxStart and PrgSetup.RestoreWhenDOSBoxCloses and (WindowState=wsMinimized) and MinimizedAtDOSBoxStart then begin
@@ -3886,6 +3956,7 @@ Var FileExt : String;
     G : TGame;
     S : String;
     B : Boolean;
+    I : Integer;
 begin
   StopCaptureChangeNotify;
   try
@@ -3894,17 +3965,34 @@ begin
     FileExt:=Trim(ExtUpperCase(ExtractFileExt(FileName)));
     G:=nil; If ListView.Selected<>nil then G:=TGame(ListView.Selected.Data);
 
-    if DirectoryExists(FileName) and (G<>nil) then begin
-      If (Trim(G.DataDir)<>'') and DirectoryExists(MakeAbsPath(G.DataDir,PrgSetup.BaseDir)) then begin
-        S:=IncludeTrailingPathDelimiter(MakeAbsPath(G.DataDir,PrgSetup.BaseDir))+ExtractFileName(FileName);
-        If not ForceDirectories(S) then begin
-          ErrorCode:=Format(LanguageSetup.MessageCouldNotCreateDir,[S]);
-          exit;
-        end;
-        If not CopyFiles(FileName,S,True,True) then
-          ErrorCode:=Format(LanguageSetup.MessageCouldNotCopyFiles,[FileName,S]);
-        exit;
+    if DirectoryExists(FileName) then begin
+      B:=False;
+      If (G<>nil) and (Trim(G.DataDir)<>'') and DirectoryExists(MakeAbsPath(G.DataDir,PrgSetup.BaseDir)) then begin
+        B:=(MessageDlg(Format(LanguageSetup.DragDropImportFolderConfirmation,[FileName,G.Name]),mtConfirmation,[mbYes,mbNo],0)<>mrYes);
       end;
+      If B then begin
+        {Copy to DataDir}
+        S:=IncludeTrailingPathDelimiter(MakeAbsPath(G.DataDir,PrgSetup.BaseDir))+ExtractFileName(FileName);
+        If not ForceDirectories(S) then begin ErrorCode:=Format(LanguageSetup.MessageCouldNotCreateDir,[S]); exit; end;
+        If not CopyFiles(FileName,S,True,True) then ErrorCode:=Format(LanguageSetup.MessageCouldNotCopyFiles,[FileName,S]);
+      end else begin
+        {Import folder as game}
+        ListView.OnAdvancedCustomDrawItem:=nil;
+        try
+          G:=ImportFolder(self,FileName,GameDB,PrgSetup.ImportZipWithoutDialogIfPossible);
+          If G=nil then exit;
+          LastSelectedGame:=nil;
+          ListView.Selected:=nil;
+          ListView.Items.Clear;
+          ViewFilesFrame.SetGame(nil);
+        finally
+          ListView.OnAdvancedCustomDrawItem:=ListViewAdvancedCustomDrawItem;
+        end;
+        InitTreeViewForGamesList(TreeView,GameDB);
+        TreeViewChange(self,TreeView.Selected);
+        SelectGame(G);
+      end;
+      exit;
     end;
 
     If FileExt='.CONF' then begin
@@ -3982,17 +4070,18 @@ begin
       end;
     end;
 
-
     If (FileExt='.EXE') or (FileExt='.COM') or (FileExt='.BAT') or (FileExt='.BAS') then begin
       If FileExt='.EXE' then B:=IsWindowsExe(FileName) else B:=False;
       StartWizard(FileName,B);
       exit;
     end;
 
-    If (FileExt='.ZIP') or (FileExt='.7Z') then begin
+    B:=(FileExt='.ZIP') or (FileExt='.7Z');
+    If not B then For I:=0 to PrgSetup.PackerSettingsCount-1 do If ExtensionInList(FileExt,PrgSetup.PackerSettings[I].FileExtensions) then begin B:=True; break; end;
+    If B then begin
       ListView.OnAdvancedCustomDrawItem:=nil;
       try
-        G:=ImportZipPackage(self,FileName,GameDB,False);
+        G:=ImportZipPackage(self,FileName,GameDB,PrgSetup.ImportZipWithoutDialogIfPossible);
         If G=nil then exit;
         LastSelectedGame:=nil;
         ListView.Selected:=nil;
@@ -4007,6 +4096,43 @@ begin
       exit;
     end;
 
+    If (FileExt='.IMG') or (FileExt='.IMA') then begin
+      ListView.OnAdvancedCustomDrawItem:=nil;
+      try
+        G:=RunInstallationFromDiskImage(self,GameDB,FileName);
+        If G=nil then exit;
+        LastSelectedGame:=nil;
+        ListView.Selected:=nil;
+        ListView.Items.Clear;
+        ViewFilesFrame.SetGame(nil);
+      finally
+        ListView.OnAdvancedCustomDrawItem:=ListViewAdvancedCustomDrawItem;
+      end;
+      InitTreeViewForGamesList(TreeView,GameDB);
+      TreeViewChange(self,TreeView.Selected);
+      SelectGame(G);
+      exit;
+    end;
+
+    If (FileExt='.ISO') or (FileExt='.CUE') or (FileExt='.BIN') then begin
+      ListView.OnAdvancedCustomDrawItem:=nil;
+      try
+        G:=RunInstallationFromCDImage(self,GameDB,FileName);
+        If G=nil then exit;
+        LastSelectedGame:=nil;
+        ListView.Selected:=nil;
+        ListView.Items.Clear;
+        ViewFilesFrame.SetGame(nil);
+      finally
+        ListView.OnAdvancedCustomDrawItem:=ListViewAdvancedCustomDrawItem;
+      end;
+      InitTreeViewForGamesList(TreeView,GameDB);
+      TreeViewChange(self,TreeView.Selected);
+      SelectGame(G);
+      exit;
+    end;
+
+    {Otherwise try to copy the file to the game DataDir}
     If G<>nil then begin
       If (Trim(G.DataDir)<>'') and DirectoryExists(MakeAbsPath(G.DataDir,PrgSetup.BaseDir)) then begin
         S:=IncludeTrailingPathDelimiter(MakeAbsPath(G.DataDir,PrgSetup.BaseDir))+ExtractFileName(FileName);
@@ -4017,9 +4143,9 @@ begin
           ErrorCode:=Format(LanguageSetup.MessageCouldNotCopyFile,[FileName,S]);
         exit;
       end;
+    end else begin
+      ErrorCode:=Format(LanguageSetup.DragDropErrorUnknownExtension,[ExtractFileName(FileName)]);
     end;
-
-    ErrorCode:=Format(LanguageSetup.DragDropErrorUnknownExtension,[ExtractFileName(FileName)]);
   finally
     StartCaptureChangeNotify;
   end;

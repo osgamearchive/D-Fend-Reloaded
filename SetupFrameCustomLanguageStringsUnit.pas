@@ -73,7 +73,7 @@ begin
   TypeComboBox.Items.Clear;
   TypeComboBox.Items.Add('');
   TypeComboBox.Items.Add('');
-  If PrgSetup.ActivateIncompleteFeatures then TypeComboBox.Items.Add('');
+  TypeComboBox.Items.Add('');
 
   GenreEnglish:=TStringList.Create;
   GenreCustom:=TStringList.Create;
@@ -118,7 +118,7 @@ begin
   I:=TypeComboBox.ItemIndex;
   TypeComboBox.Items[0]:=LanguageSetup.GameGenre;
   TypeComboBox.Items[1]:=LanguageSetup.GameLanguage;
-  If PrgSetup.ActivateIncompleteFeatures then TypeComboBox.Items[2]:=LanguageSetup.GameLicense;
+  TypeComboBox.Items[2]:=LanguageSetup.GameLicense;
   TypeComboBox.ItemIndex:=I;
 
   AddButton.Hint:=LanguageSetup.AddNewEmptyLine;

@@ -6,7 +6,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, GameDBUnit, CheckLst;
 
-Type TInstallType=(itFloppy,itFolder,itArchive,itCD,itISO);
+Type TInstallType=(itFloppy,itFolder,itArchive,itFloppyImage,itCD,itCDImage);
 
 type
   TInstallationRunForm = class(TForm)
@@ -22,6 +22,7 @@ type
     GamesDir : TStringList;
     TempFolder : String;
     LastFolder : Integer;
+    AbortSetup, SecondTry : Boolean;
     Procedure PostShow(var Msg : TMessage); message WM_USER+1;
     Function InitialScanDir(const Dir : String) : TStringList;
     Function FindNewDir(const OldDir : TStringList; const NewDir : String) : String;
@@ -35,7 +36,6 @@ type
     InstallType : TInstallType;
     Sources : TStringList;
     FilesAlreadyInTempDir : String;
-    AlwaysMountISO : Boolean;
     NewGameDir : String;
   end;
 
@@ -57,9 +57,10 @@ begin
 
   InstallType:=itArchive;
   Sources:=TStringList.Create;
-  AlwaysMountISO:=False;
   NewGameDir:='';
   FilesAlreadyInTempDir:='';
+  AbortSetup:=False;
+  SecondTry:=False;
 
   Caption:=LanguageSetup.InstallationSupportRun;
   InfoLabel.Caption:=LanguageSetup.InstallationSupportRunInfoStarting;
@@ -83,16 +84,20 @@ begin
   GamesDir:=InitialScanDir(MakeAbsPath(PrgSetup.GameDir,PrgSetup.BaseDir));
   try
     repeat
+      SourceListBox.Items.Clear;
+      AbortSetup:=False;
       InfoLabel.Caption:=LanguageSetup.InstallationSupportRunInfoRunning;
       RunInstaller;
+      If AbortSetup then begin ModalResult:=mrCancel; exit; end;
       InfoLabel.Caption:=LanguageSetup.InstallationSupportRunInfoNewGameScan;
       NewGameDir:=FindNewDir(GamesDir,MakeAbsPath(PrgSetup.GameDir,PrgSetup.BaseDir));
       If NewGameDir<>'' then begin
         ModalResult:=mrOK;
       end else begin
-        If MessageDlg(LanguageSetup.InstallationSupportRunInfoNewGameScanError,mtError,[mbYes,mbNo],0)=mrYes then continue;
-        ModalResult:=mrCancel;
-        break;
+        If MessageDlg(LanguageSetup.InstallationSupportRunInfoNewGameScanError,mtError,[mbYes,mbNo],0)<>mrYes then begin
+          ModalResult:=mrCancel; break;
+        end;
+        SecondTry:=True;
       end;
     until ModalResult=mrOK;
   finally
@@ -169,13 +174,18 @@ function TInstallationRunForm.FindFileToStart(const Dir: String): String;
 Var S : String;
     I,J : Integer;
     Rec : TSearchRec;
-    St : TStringList;
+    St,Names : TStringList;
 begin
   result:='';
   S:=IncludeTrailingPathDelimiter(Dir);
 
-  For I:=Low(InstallerNames) to High(InstallerNames) do For J:=Low(ProgramExts) to High(ProgramExts) do
-    If FileExists(S+InstallerNames[I]+'.'+ProgramExts[J]) then begin result:=S+InstallerNames[I]+'.'+ProgramExts[J]; exit; end;
+  Names:=ValueToList(PrgSetup.InstallerNames);
+  try
+    For I:=0 to Names.Count-1 do For J:=Low(ProgramExts) to High(ProgramExts) do
+      If FileExists(S+Names[I]+'.'+ProgramExts[J]) then begin result:=S+Names[I]+'.'+ProgramExts[J]; exit; end;
+  finally
+    Names.Free;
+  end;
 
   St:=TStringList.Create;
   try
@@ -226,87 +236,117 @@ begin
   Game.Mount0:=MakeRelPath(PrgSetup.GameDir,PrgSetup.BaseDir,True)+';Drive;C;false;';
 
   Case InstallType of
-    itFloppy : begin
-                 Game.Mount1:=FloppyDriveLetter+';FLOPPY;A;False;;';
-                 FileToStart:=FindFileToStart(FloppyDriveLetter+':\');
-                 If FileToStart='' then StartUpCmds.Add('A:');
-                 HideSourceSection;
-               end;
-    itFolder : begin
-                  If Sources.Count=1 then begin
-                    Game.Mount1:=Sources[0]+';Drive;A;false;';
-                    FileToStart:=FindFileToStart(Sources[0]);
-                    If FileToStart='' then StartUpCmds.Add('A:');
-                    HideSourceSection;
-                  end else begin
-                    TempFolder:=TempDir+TempSubFolder;
-                    Game.Mount1:=TempFolder+';Drive;A;false;';
-                    SourceListBox.Items.AddStrings(Sources);
-                    SourceListBox.Checked[0]:=True;
-                    SourceListBox.ItemIndex:=0;
-                    LastFolder:=-1;
-                    SourceListBoxClick(self);
-                    FileToStart:=FindFileToStart(TempFolder);
-                    If FileToStart='' then StartUpCmds.Add('A:');
-                  end;
-               end;
-    itArchive : begin
-                  If FilesAlreadyInTempDir<>'' then TempFolder:=FilesAlreadyInTempDir else TempFolder:=TempDir+TempSubFolder;
-                  Game.Mount1:=TempFolder+';Drive;A;false;';
-                  If FilesAlreadyInTempDir='' then ExtractZipFile(self,Sources[0],TempFolder);
-                  FileToStart:=FindFileToStart(TempFolder);
-                  If FileToStart='' then StartUpCmds.Add('A:');
-                  If Sources.Count=1 then begin
-                    HideSourceSection;
-                  end else begin
-                    SourceListBox.Items.AddStrings(Sources);
-                    SourceListBox.Checked[0]:=True;
-                    LastFolder:=0;
-                  end;
-                end;
-    itCD : begin
-             S:=GetCDDriveWithMedia+':\';
-             Game.Mount1:=S+';CDROM;D;false;;';
-             FileToStart:=FindFileToStart(S);
-             If FileToStart='' then StartUpCmds.Add('D:');
-             HideSourceSection;
-           end;
-    itISO : begin
-              S:=Sources[0];
-              For I:=1 to Sources.Count-1 do S:=S+'$'+Sources[I];
-              Game.Mount1:=S+';CDROMIMAGE;D;;;';
-              StartUpCmds.Add('D:');
-              HideSourceSection;
-            end;
+         itFloppy : begin
+                      Game.Mount1:=FloppyDriveLetter+';FLOPPY;A;False;;';
+                      If SecondTry then FileToStart:='' else FileToStart:=FindFileToStart(FloppyDriveLetter+':\');
+                      If FileToStart='' then StartUpCmds.Add('A:');
+                      HideSourceSection;
+                    end;
+         itFolder : begin
+                       If Sources.Count=1 then begin
+                         Game.Mount1:=Sources[0]+';Drive;A;false;';
+                         FileToStart:=FindFileToStart(Sources[0]);
+                         If FileToStart='' then StartUpCmds.Add('A:');
+                         HideSourceSection;
+                       end else begin
+                         TempFolder:=TempDir+TempSubFolder;
+                         Game.Mount1:=TempFolder+';Drive;A;false;';
+                         SourceListBox.Items.AddStrings(Sources);
+                         SourceListBox.Checked[0]:=True;
+                         SourceListBox.ItemIndex:=0;
+                         LastFolder:=-1;
+                         SourceListBoxClick(self);
+                         If SecondTry then FileToStart:='' else FileToStart:=FindFileToStart(TempFolder);
+                         If FileToStart='' then StartUpCmds.Add('A:');
+                       end;
+                    end;
+        itArchive : begin
+                      If FilesAlreadyInTempDir<>'' then TempFolder:=FilesAlreadyInTempDir else TempFolder:=TempDir+TempSubFolder;
+                      Game.Mount1:=TempFolder+';Drive;A;false;';
+                      If FilesAlreadyInTempDir='' then begin
+                        If not ExtractZipFile(self,Sources[0],TempFolder) then AbortSetup:=True;
+                      end;
+                      If SecondTry then FileToStart:='' else FileToStart:=FindFileToStart(TempFolder);
+                      If FileToStart='' then StartUpCmds.Add('A:');
+                      If Sources.Count=1 then begin
+                        HideSourceSection;
+                      end else begin
+                        SourceListBox.Items.AddStrings(Sources);
+                        SourceListBox.Checked[0]:=True;
+                        LastFolder:=0;
+                      end;
+                    end;
+    itFloppyImage : begin
+                      StartUpCmds.Add('A:');
+                        If PrgSetup.AllowMultiFloppyImagesMount then begin
+                        S:=Sources[0];
+                        For I:=1 to Sources.Count-1 do S:=S+'$'+Sources[I];
+                        Game.Mount1:=S+';FLOPPYIMAGE;A;;;';
+                        HideSourceSection;
+                      end else begin
+                        If Sources.Count=1 then begin
+                           Game.Mount1:=Sources[0]+';FLOPPYIMAGE;A;;;';
+                           HideSourceSection;
+                        end else begin
+                          TempFolder:=TempDir+TempSubFolder;
+                          ForceDirectories(TempFolder);
+                          Game.Mount1:=TempFolder+'\Temp.img;FLOPPYIMAGE;A;false;';
+                          SourceListBox.Items.AddStrings(Sources);
+                          SourceListBox.Checked[0]:=True;
+                          SourceListBox.ItemIndex:=0;
+                          LastFolder:=-1;
+                          SourceListBoxClick(self);
+                        end;
+                      end;
+                    end;
+             itCD : begin
+                      S:=GetCDDriveWithMedia+':\';
+                      Game.Mount1:=S+';CDROM;D;false;;';
+                      If SecondTry then FileToStart:='' else FileToStart:=FindFileToStart(S);
+                      If FileToStart='' then StartUpCmds.Add('D:');
+                      HideSourceSection;
+                    end;
+        itCDImage : begin
+                      S:=Sources[0];
+                      For I:=1 to Sources.Count-1 do S:=S+'$'+Sources[I];
+                      Game.Mount1:=S+';CDROMIMAGE;D;;;';
+                      StartUpCmds.Add('D:');
+                      HideSourceSection;
+                    end;
   end;
 end;
 
-Procedure SplitText(const St : TStringList; Lines : String);
+Procedure SplitText(const St : TStringList; const Lines : String);
 Var I : Integer;
+    S : String;
 begin
-  While length(Lines)>75 do begin
+  SetLength(S,length(Lines)*2);
+  CharToOEM(PChar(Lines),PChar(S));
+  SetLength(S,StrLen(PChar(S)));
+
+  While length(S)>75 do begin
     I:=75;
-    While (I>1) and (Lines[I]<>' ') do dec(I);
-    If Lines[I]=' ' then begin
+    While (I>1) and (S[I]<>' ') do dec(I);
+    If S[I]=' ' then begin
       {space in first 75 chars}
-      St.Add('echo '+Trim(Copy(Lines,1,I-1)));
-      Lines:=Trim(Copy(Lines,I+1,MaxInt));
+      St.Add('echo '+Trim(Copy(S,1,I-1)));
+      S:=Trim(Copy(S,I+1,MaxInt));
     end else begin
       {no space in 1..75}
       I:=76;
-      While (I<length(Lines)) and (Lines[I]<>' ') do inc(I);
-      If I=length(Lines) then begin
+      While (I<length(S)) and (S[I]<>' ') do inc(I);
+      If I=length(S) then begin
         {no space at all}
-        St.Add('echo '+Trim(Lines));
+        St.Add('echo '+Trim(S));
         exit;
       end else begin
         {space after 75}
-        St.Add('echo '+Trim(Copy(Lines,1,I-1)));
-        Lines:=Trim(Copy(Lines,I+1,MaxInt));
+        St.Add('echo '+Trim(Copy(S,1,I-1)));
+        S:=Trim(Copy(S,I+1,MaxInt));
       end;
     end;
   end;
-  St.Add('echo '+Trim(Lines));
+  St.Add('echo '+Trim(S));
 end;
 
 procedure TInstallationRunForm.RunInstaller;
@@ -325,6 +365,7 @@ begin
     St2:=TStringList.Create;
     try
       BuildMountCommand(TempGame.Game,FileToStart,St2);
+      If AbortSetup then exit;
       St:=StringToStringList(TempGame.Game.Autoexec);
       try
         St.AddStrings(St2);
@@ -352,9 +393,13 @@ begin
         SplitText(St,LanguageSetup.InstallationSupportRunInstallationStart1);
         St.Add('echo.');
         SplitText(St,LanguageSetup.InstallationSupportRunInstallationStart2);
-        If (InstallType=itISO) and (Sources.Count>1) then begin
+        If (InstallType=itCDImage) and (Sources.Count>1) then begin
           St.Add('echo.');
           SplitText(St,LanguageSetup.InstallationSupportRunInstallationStart3);
+        end;
+        If (InstallType=itFloppyImage) and (Sources.Count>1) and PrgSetup.AllowMultiFloppyImagesMount then begin
+          St.Add('echo.');
+          SplitText(St,LanguageSetup.InstallationSupportRunInstallationStart4);
         end;
         If FileToStart<>'' then begin
           St.Add('echo.');
@@ -393,17 +438,22 @@ begin
   InitialChange:=(LastFolder=-1);
   LastFolder:=SourceListBox.ItemIndex;
 
-  If InstallType=itArchive then begin
-    ExtDeleteFolder(TempFolder,ftTemp);
-    ExtractZipFile(self,Sources[LastFolder],TempFolder);
-    If not InitialChange then MessageDlg(LanguageSetup.InstallationSupportRunUpdateDirectoryInformation,mtInformation,[mbOK],0);
-  end;
-
   If InstallType=itFolder then begin
     ExtDeleteFolder(TempFolder,ftTemp);
     CopyFiles(IncludeTrailingPathDelimiter(Sources[LastFolder]),TempFolder,False,False);
-    If not InitialChange then MessageDlg(LanguageSetup.InstallationSupportRunUpdateDirectoryInformation,mtInformation,[mbOK],0);
   end;
+
+  If InstallType=itArchive then begin
+    ExtDeleteFolder(TempFolder,ftTemp);
+    ExtractZipFile(self,Sources[LastFolder],TempFolder);
+  end;
+
+  If InstallType=itFloppyImage then begin
+    ExtDeleteFile(TempFolder+'\Temp.img',ftTemp);
+    CopyFile(PChar(Sources[LastFolder]),PChar(TempFolder+'\Temp.img'),False);
+  end;
+
+  If not InitialChange then MessageDlg(LanguageSetup.InstallationSupportRunUpdateDirectoryInformation,mtInformation,[mbOK],0);
 end;
 
 end.

@@ -372,10 +372,10 @@ begin
     St:=ValueToList(GameDB.ConfOpt.Render,';,'); try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
     Strings.Add(LanguageSetup.GameWindowResolution+'=');
     ItemProps[Strings.Count-1].EditStyle:=esPickList;
-    St:=ValueToList(GameDB.ConfOpt.Resolution,';,'); try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
+    St:=ValueToList(GameDB.ConfOpt.ResolutionWindow,';,'); try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
     Strings.Add(LanguageSetup.GameFullscreenResolution+'=');
     ItemProps[Strings.Count-1].EditStyle:=esPickList;
-    St:=ValueToList(GameDB.ConfOpt.Resolution,';,'); try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
+    St:=ValueToList(GameDB.ConfOpt.ResolutionFullscreen,';,'); try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
     Strings.Add(LanguageSetup.GameScale+'=');
     ItemProps[Strings.Count-1].ReadOnly:=True;
     ItemProps[Strings.Count-1].EditStyle:=esPickList;

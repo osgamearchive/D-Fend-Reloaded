@@ -89,21 +89,15 @@ begin
   result:=True;
 end;
 
-Function RemoveIllegalFileNameChars(const Name : String) : String;
-const AllowedCharsDefault='ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜabcdefghijklmnopqrstuvwxyzäöüß01234567890-_=.,;!()$#@{}&''`~'+chr(246)+chr(255)+chr($a0)+chr($e5);
-Var I : Integer;
-begin
-  result:='';
-  For I:=1 to length(Name) do If Pos(Name[I],AllowedCharsDefault)>0 then result:=result+ExtUpperCase(Name[I]);
-end;
-
 Procedure GetShortParts(const PathName : String; var Name, Ext : String);
 Var I : Integer;
 begin
   I:=Pos('.',PathName);
   If I>0 then begin Name:=Copy(PathName,1,I-1); Ext:=Copy(PathName,I+1,MaxInt); end else begin Name:=PathName; Ext:=''; end;
   Name:=RemoveIllegalFileNameChars(Name);
+  If Name<>'' then Name:=ExtUpperCase(Name);
   Ext:=RemoveIllegalFileNameChars(Ext);
+  If Ext<>'' then Ext:=ExtUpperCase(Ext);
   If length(Name)>8 then Name:=Copy(Name,1,8);
   If length(Ext)>3 then Ext:=Copy(Ext,1,3);
 end;

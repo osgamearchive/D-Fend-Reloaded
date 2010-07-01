@@ -7,7 +7,7 @@ Procedure RunScummVMGame(const Game : TGame);
 
 Function BuildScummVMIniFile(const Game : TGame) : TStringList;
 
-Function FindScummVMIni : String;
+Function FindScummVMIni(UseSecondOne : Boolean = False) : String;
 
 Var MinimizedAtScummVMStart : Boolean = False;
 
@@ -17,19 +17,21 @@ uses Windows, Forms, Dialogs, SysUtils, IniFiles, ShlObj, PrgSetupUnit,
      CommonTools, PrgConsts, GameDBToolsUnit, LanguageSetupUnit,
      ScummVMToolsUnit, ZipManagerUnit, DOSBoxCountUnit, RunPrgManagerUnit;
 
-Function FindScummVMIni : String;
+Function FindScummVMIni(UseSecondOne : Boolean) : String;
 Var S : String;
 begin
   result:='';
 
-  S:=ScummVMGamesList.ScummVMIniFile;
-  If FileExists(S) then begin result:=S; exit; end;
+  If not UseSecondOne then begin
+    S:=ScummVMGamesList.ScummVMIniFile;
+    If FileExists(S) then begin result:=S; exit; end;
 
-  S:=IncludeTrailingPathDelimiter(GetSpecialFolder(Application.Handle,CSIDL_APPDATA))+'ScummVM\';
-  If FileExists(S+ScummVMConfFileName) then begin result:=S+ScummVMConfFileName; exit; end;
+    S:=IncludeTrailingPathDelimiter(GetSpecialFolder(Application.Handle,CSIDL_APPDATA))+'ScummVM\';
+    If FileExists(S+ScummVMConfFileName) then begin result:=S+ScummVMConfFileName; exit; end;
 
-  SetLength(S,520); GetWindowsDirectory(PChar(S),512); SetLength(S,StrLen(PChar(S))); S:=IncludeTrailingPathDelimiter(S);
-  If FileExists(S+ScummVMConfFileName) then begin result:=S+ScummVMConfFileName; exit; end;
+    SetLength(S,520); GetWindowsDirectory(PChar(S),512); SetLength(S,StrLen(PChar(S))); S:=IncludeTrailingPathDelimiter(S);
+    If FileExists(S+ScummVMConfFileName) then begin result:=S+ScummVMConfFileName; exit; end;
+  end;
 
   S:=IncludeTrailingPathDelimiter(PrgSetup.ScummVMPath);
   If FileExists(S+ScummVMConfFileName) then begin result:=S+ScummVMConfFileName; exit; end;
@@ -69,10 +71,27 @@ begin
   end;
 end;
 
+Function FindTheme(const ScummVMPath : String) : String;
+Var Rec : TSearchRec;
+    I : Integer;
+begin
+  result:='';
+  I:=FindFirst(ScummVMPath+'*.zip',faAnyFile,Rec);
+  try
+    While I=0 do begin
+      If FileExists(ScummVMPath+ChangeFileExt(Rec.Name,'.ini')) then begin
+        result:=ChangeFileExt(Rec.Name,''); exit;
+      end;
+      I:=FindNext(Rec);
+    end;
+  finally
+    FindClose(Rec);
+  end;
+end;
 
 Function BuildScummVMIniFile(const Game : TGame) : TStringList;
 Var S : String;
-    Ini : TIniFile;
+    Ini,Ini2 : TIniFile;
     St1,St2,St3 : TStringList;
 begin
   result:=TStringList.Create;
@@ -141,16 +160,25 @@ begin
     If S<>'' then begin
       Ini:=TIniFile.Create(S);
       try
-        S:=Ini.ReadString('scummvm','themepath','');
-        If S='' then S:=IncludeTrailingPathDelimiter(PrgSetup.ScummVMPath);
-        St1.Add('themepath='+S);
+        S:=FindScummVMIni(True); If S<>'' then Ini2:=TIniFile.Create(S) else Ini2:=nil;
+        try
+          S:=Ini.ReadString('scummvm','themepath','');
+          If (S='') and Assigned(Ini2) then S:=Ini2.ReadString('scummvm','themepath','');
+          If S='' then S:=IncludeTrailingPathDelimiter(PrgSetup.ScummVMPath);
+          St1.Add('themepath='+S);
 
-        St1.Add('gui_theme='+Ini.ReadString('scummvm','gui_theme',''));
+          S:=Ini.ReadString('scummvm','gui_theme','');
+          If (S='') and Assigned(Ini2) then S:=Ini2.ReadString('scummvm','gui_theme','');
+          If S='' then S:=FindTheme(IncludeTrailingPathDelimiter(PrgSetup.ScummVMPath));
+          St1.Add('gui_theme='+S);
 
-        S:=Ini.ReadString('scummvm','extrapath','');
-        If S='' then S:=IncludeTrailingPathDelimiter(PrgSetup.ScummVMPath);
-        St1.Add('extrapath='+S);
-
+          S:=Ini.ReadString('scummvm','extrapath','');
+          If (S='') and Assigned(Ini2) then S:=Ini2.ReadString('scummvm','extrapath','');
+          If S='' then S:=IncludeTrailingPathDelimiter(PrgSetup.ScummVMPath);
+          St1.Add('extrapath='+S);
+        finally
+          If Assigned(Ini2) then Ini2.Free;
+        end;
         AddKeysFromDefaultScummVMIni(St1,St2,Ini,Game.ScummVMGame);
       finally
         Ini.Free;
@@ -261,7 +289,7 @@ begin
     {MinimizedAtScummVMStart:=True; -> RunScummVMGame}
   end;
 
-  If PrgSetup.HideScummVMConsole and (not FullScreen) then begin
+  If PrgSetup.HideScummVMConsole then begin
     If not Waited then Sleep(1000);
     HideWindowFromProcessIDAndTitle(ProcessInformation.dwProcessId,'\scummvm.exe');
   end;

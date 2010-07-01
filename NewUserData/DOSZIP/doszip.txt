@@ -2,9 +2,9 @@ DOSZIP.TXT--
 Copyright 2010 Hjort Nidudsson.
 
 DOSZIP COMMANDER
-Version 1.49
+Version 1.54
 
-Welcome to Doszip Commander Version 1.49!
+Welcome to Doszip Commander Version 1.54!
 =========================================
 
 	Topics covered in this file include:
@@ -399,6 +399,8 @@ Shortkey Table
 	Alt-F8		History: list of the last 16 DOS commands
 	Alt-F9		Toggle 50/25 lines
 	Alt-[0..9]	Run Tool nr. [0..9]
+	Alt-C		Toggle Command Line
+	Alt-L		Create List File
 	Alt-X		Quit
 
 	Ctrl-[0..9]	Load Directory defined in section [Directory]

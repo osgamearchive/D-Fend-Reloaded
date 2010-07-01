@@ -11,7 +11,7 @@ object WizardGameInfoFrame: TWizardGameInfoFrame
     Left = 8
     Top = 16
     Width = 571
-    Height = 49
+    Height = 65
     Anchors = [akLeft, akTop, akRight]
     AutoSize = False
     Caption = 
@@ -23,7 +23,7 @@ object WizardGameInfoFrame: TWizardGameInfoFrame
   end
   object Bevel: TBevel
     Left = 0
-    Top = 56
+    Top = 71
     Width = 597
     Height = 18
     Anchors = [akLeft, akTop, akRight]
@@ -31,21 +31,21 @@ object WizardGameInfoFrame: TWizardGameInfoFrame
   end
   object UserDefinedDataLabel: TLabel
     Left = 8
-    Top = 331
+    Top = 343
     Width = 107
     Height = 13
     Caption = 'UserDefinedDataLabel'
   end
   object NotesLabel: TLabel
     Left = 8
-    Top = 427
+    Top = 433
     Width = 69
     Height = 13
     Caption = 'Bemerkungen:'
   end
   object AddButton: TSpeedButton
     Left = 531
-    Top = 324
+    Top = 336
     Width = 23
     Height = 22
     Anchors = [akTop, akRight]
@@ -69,7 +69,7 @@ object WizardGameInfoFrame: TWizardGameInfoFrame
   end
   object DelButton: TSpeedButton
     Left = 556
-    Top = 324
+    Top = 336
     Width = 23
     Height = 22
     Anchors = [akTop, akRight]
@@ -93,14 +93,14 @@ object WizardGameInfoFrame: TWizardGameInfoFrame
   end
   object MultiValueInfoLabel: TLabel
     Left = 8
-    Top = 124
+    Top = 136
     Width = 250
     Height = 13
     Caption = 'You can enter multiple values per key divided by ";".'
   end
   object GameInfoValueListEditor: TValueListEditor
     Left = 8
-    Top = 140
+    Top = 152
     Width = 571
     Height = 160
     Anchors = [akLeft, akTop, akRight]
@@ -113,7 +113,7 @@ object WizardGameInfoFrame: TWizardGameInfoFrame
   end
   object FavouriteCheckBox: TCheckBox
     Left = 440
-    Top = 118
+    Top = 130
     Width = 139
     Height = 21
     Anchors = [akTop, akRight]
@@ -122,9 +122,9 @@ object WizardGameInfoFrame: TWizardGameInfoFrame
   end
   object Tab: TStringGrid
     Left = 8
-    Top = 347
+    Top = 359
     Width = 571
-    Height = 70
+    Height = 68
     Anchors = [akLeft, akTop, akRight]
     ColCount = 2
     FixedCols = 0
@@ -134,7 +134,7 @@ object WizardGameInfoFrame: TWizardGameInfoFrame
   end
   object NotesMemo: TRichEdit
     Left = 8
-    Top = 442
+    Top = 447
     Width = 571
     Height = 55
     Anchors = [akLeft, akTop, akRight, akBottom]
@@ -144,7 +144,7 @@ object WizardGameInfoFrame: TWizardGameInfoFrame
   end
   object ToolBarPanel: TPanel
     Left = 8
-    Top = 300
+    Top = 312
     Width = 571
     Height = 30
     Anchors = [akLeft, akTop, akRight]
@@ -193,7 +193,7 @@ object WizardGameInfoFrame: TWizardGameInfoFrame
   end
   object BaseName: TLabeledEdit
     Left = 8
-    Top = 96
+    Top = 109
     Width = 571
     Height = 21
     Anchors = [akLeft, akTop, akRight]
@@ -205,11 +205,11 @@ object WizardGameInfoFrame: TWizardGameInfoFrame
   object SearchPopupMenu: TPopupMenu
     Images = ImageList
     Left = 346
-    Top = 120
+    Top = 132
   end
   object ImageList: TImageList
     Left = 378
-    Top = 120
+    Top = 132
     Bitmap = {
       494C010102000400040010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000001000000001002000000000000010
@@ -352,6 +352,6 @@ object WizardGameInfoFrame: TWizardGameInfoFrame
   end
   object AddUserDataPopupMenu: TPopupMenu
     Left = 541
-    Top = 352
+    Top = 364
   end
 end

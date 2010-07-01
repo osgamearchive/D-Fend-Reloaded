@@ -233,6 +233,8 @@ Section "$(LANGNAME_DFendReloaded)" ID_DFend
   CreateShortCut "$SMPROGRAMS\D-Fend Reloaded\$(LANGNAME_GamesFolder).lnk" "$DataInstDir\VirtualHD\"
   CreateDirectory $DataInstDir\GameData ; Has to be created before the start menu link is created otherwise the link will never work
   CreateShortCut "$SMPROGRAMS\D-Fend Reloaded\$(LANGNAME_GameDataFolder).lnk" "$DataInstDir\GameData\"
+  CreateDirectory $DataInstDir\Capture ; Has to be created before the start menu link is created otherwise the link will never work
+  CreateShortCut "$SMPROGRAMS\D-Fend Reloaded\$(LANGNAME_CaptureFolder).lnk" "$DataInstDir\Capture\"  
   
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\D-Fend Reloaded" "DisplayName" "${PrgName} ($(LANGNAME_Deinstall))"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\D-Fend Reloaded" "UninstallString" '"$INSTDIR\Uninstall.exe"'  
@@ -260,45 +262,53 @@ Section "$(LANGNAME_ProgramFiles)" ID_DosBoxProgramFiles
   SetDetailsPrint none
 
   SetOutPath "$INSTDIR\DOSBox"
-  File "..\DOSBox\README.txt"
-  File "..\DOSBox\COPYING.txt"
-  File "..\DOSBox\THANKS.txt"
-  File "..\DOSBox\NEWS.txt"
-  File "..\DOSBox\AUTHORS.txt"
-  File "..\DOSBox\INSTALL.txt"
+  Delete "INSTDIR\DOSBox\README.txt"
+  Delete "INSTDIR\DOSBox\COPYING.txt"
+  Delete "INSTDIR\DOSBox\THANKS.txt"
+  Delete "INSTDIR\DOSBox\NEWS.txt"
+  Delete "INSTDIR\DOSBox\AUTHORS.txt"
+  Delete "INSTDIR\DOSBox\INSTALL.txt"
+  RmDir /r "$INSTDIR\DOSBox\zmbv"
+  
   File "..\DOSBox\DOSBox.exe"
   File "..\DOSBox\dosbox.conf"
   File "..\DOSBox\SDL.dll"
   File "..\DOSBox\SDL_net.dll"
+  File "..\DOSBox\DOSBox 0.74 Manual.txt"
+  File "..\DOSBox\DOSBox 0.74 Options.bat"
+  File "..\DOSBox\Reset KeyMapper.bat"
+  File "..\DOSBox\Reset Options.bat"
+  File "..\DOSBox\Screenshots & Recordings.bat"
   
   File "..\NewUserData\FREEDOS\CPI\*.*"
   
-  SetOutPath "$INSTDIR\DOSBox\zmbv"
-  File "..\DOSBox\zmbv\zmbv.dll"
-  File "..\DOSBox\zmbv\zmbv.inf"
-  File "..\DOSBox\zmbv\README.txt"
-
-  CreateDirectory "$INSTDIR\DOSBox\capture"
+  SetOutPath "$INSTDIR\DOSBox\Video Codec"
+  File "..\DOSBox\Video Codec\*.*"
+  
+  SetOutPath "$INSTDIR\DOSBox\Documentation"
+  File "..\DOSBox\Documentation\*.*"
   
   IntCmp $InstallDataType 2 NoDosBoxStartMenuLinks
   SetShellVarContext all
   CreateDirectory "$SMPROGRAMS\D-Fend Reloaded\DOSBox"
   CreateDirectory "$SMPROGRAMS\D-Fend Reloaded\DOSBox\Video"
+  CreateDirectory "$SMPROGRAMS\D-Fend Reloaded\DOSBox\Configuration"
   CreateShortCut "$SMPROGRAMS\D-Fend Reloaded\DOSBox\DOSBox.lnk" "$INSTDIR\DOSBox\DOSBox.exe" "-conf $\"$INSTDIR\DosBox\dosbox.conf$\"" "$INSTDIR\DosBox\DOSBox.exe" 0
   CreateShortCut "$SMPROGRAMS\D-Fend Reloaded\DOSBox\DOSBox (noconsole).lnk" "$INSTDIR\DOSBox\DOSBox.exe" "-noconsole -conf $\"$INSTDIR\DosBox\dosbox.conf$\"" "$INSTDIR\DosBox\DOSBox.exe" 0
-  CreateShortCut "$SMPROGRAMS\D-Fend Reloaded\DOSBox\README.lnk" "$INSTDIR\DOSBox\README.txt"
-  CreateShortCut "$SMPROGRAMS\D-Fend Reloaded\DOSBox\DOSBox.conf.lnk" "notepad.exe" "$INSTDIR\DOSBox\dosbox.conf"
-  CreateShortCut "$SMPROGRAMS\D-Fend Reloaded\DOSBox\Capture folder.lnk" "$INSTDIR\DOSBox\capture"
-  CreateShortCut "$SMPROGRAMS\D-Fend Reloaded\DOSBox\Video\Video instructions.lnk" "$INSTDIR\DOSBox\zmbv\README.txt"
+  CreateShortCut "$SMPROGRAMS\D-Fend Reloaded\DOSBox\DOSBox manual.lnk" "$INSTDIR\DOSBox\DOSBox 0.74 Manual.txt"
+  CreateShortCut "$SMPROGRAMS\D-Fend Reloaded\DOSBox\Capture folder.lnk" "$INSTDIR\DOSBox\DOSBox.exe" "-opencaptures explorer.exe"
+  CreateShortCut "$SMPROGRAMS\D-Fend Reloaded\DOSBox\Video\Video instructions.lnk" "$INSTDIR\DOSBox\Video Codec\Video Instructions.txt"
+  CreateShortCut "$SMPROGRAMS\D-Fend Reloaded\DOSBox\Configuration\Edit Configuration.lnk" "$INSTDIR\DOSBox\DOSBox.exe" "-editconf notepad.exe -editconf $\"%SystemRoot%\system32\notepad.exe$\" -editconf $\"%WINDIR%\notepad.exe$\""
+  CreateShortCut "$SMPROGRAMS\D-Fend Reloaded\DOSBox\Configuration\Reset Configuration.lnk" "$INSTDIR\DOSBox\DOSBox.exe" "-eraseconf"
   
   ClearErrors
   ReadRegStr $R0 HKLM "SOFTWARE\Microsoft\Windows NT\CurrentVersion" CurrentVersion
   IfErrors we_9x we_nt
   we_nt:  
-  CreateShortCut "$SMPROGRAMS\D-Fend Reloaded\DosBox\Video\Install movie codec.lnk" "rundll32" "setupapi,InstallHinfSection DefaultInstall 128 $INSTDIR\DOSBox\zmbv\zmbv.inf"
+  CreateShortCut "$SMPROGRAMS\D-Fend Reloaded\DosBox\Video\Install movie codec.lnk" "rundll32" "setupapi,InstallHinfSection DefaultInstall 128 $INSTDIR\DOSBox\Video Codec\zmbv.inf"
   goto end
   we_9x:
-  CreateShortCut "$SMPROGRAMS\D-Fend Reloaded\DosBox\Video\Install movie codec.lnk" "rundll" "setupx.dll,InstallHinfSection DefaultInstall 128 $INSTDIR\DOSBox\zmbv\zmbv.inf"
+  CreateShortCut "$SMPROGRAMS\D-Fend Reloaded\DosBox\Video\Install movie codec.lnk" "rundll" "setupx.dll,InstallHinfSection DefaultInstall 128 $INSTDIR\DOSBox\Video Codec\zmbv.inf"
   end:
   NoDosBoxStartMenuLinks:
 SectionEnd
@@ -323,10 +333,10 @@ Section "$(LANGNAME_VideoCodec)" ID_DosBoxVideoCodec
   ReadRegStr $R0 HKLM "SOFTWARE\Microsoft\Windows NT\CurrentVersion" CurrentVersion
   IfErrors we_9x2 we_nt2
   we_nt2:
-  Exec '"rundll32" setupapi,InstallHinfSection DefaultInstall 128 $INSTDIR\DOSBox\zmbv\zmbv.inf'
+  Exec '"rundll32" setupapi,InstallHinfSection DefaultInstall 128 $INSTDIR\DOSBox\Video Codec\zmbv.inf'
   goto end2
   we_9x2:
-  Exec '"rundll32" setupx.dll,InstallHinfSection DefaultInstall 128 $INSTDIR\DOSBox\zmbv\zmbv.inf'
+  Exec '"rundll32" setupx.dll,InstallHinfSection DefaultInstall 128 $INSTDIR\DOSBox\Video Codec\zmbv.inf'
   end2:
   
   SetDetailsPrint none

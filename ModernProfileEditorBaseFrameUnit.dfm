@@ -379,15 +379,27 @@ object ModernProfileEditorBaseFrame: TModernProfileEditorBaseFrame
     NumGlyphs = 2
   end
   object IgnoreWindowsWarningsCheckBox: TCheckBox
-    Left = 280
+    Left = 265
     Top = 660
-    Width = 302
+    Width = 330
     Height = 17
     Anchors = [akLeft, akTop, akRight]
     Caption = 'Ignore Windows file warnings for this profile'
     ParentShowHint = False
     ShowHint = True
     TabOrder = 9
+    Visible = False
+  end
+  object TurnOffDOSBoxFailedWarningCheckBox: TCheckBox
+    Left = 265
+    Top = 669
+    Width = 330
+    Height = 17
+    Anchors = [akLeft, akTop, akRight]
+    Caption = 'Turn off DOSBox failed warning for this profile'
+    ParentShowHint = False
+    ShowHint = True
+    TabOrder = 10
     Visible = False
   end
   object OpenDialog: TOpenDialog

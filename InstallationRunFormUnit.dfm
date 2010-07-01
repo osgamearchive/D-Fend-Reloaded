@@ -1,6 +1,7 @@
 object InstallationRunForm: TInstallationRunForm
   Left = 0
   Top = 0
+  BorderIcons = [biMinimize, biMaximize]
   BorderStyle = bsDialog
   Caption = 'Game installation'
   ClientHeight = 177

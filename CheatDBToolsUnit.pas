@@ -211,7 +211,7 @@ begin
   result.Sort;
 end;
 
-Function FileMatchingMaskPart(var Mask,Name: String): boolean;
+Function FileMatchingMaskPart(const Mask,Name: String): boolean;
 Var I,J,L,P : Integer;
 begin
   result:=false;
@@ -252,7 +252,7 @@ begin
     Ext:=Copy(FileName,I+1,MaxInt);
   end;
 
-  result:=FileMatchingMaskPart(NameMask,Name) and FileMatchingMaskPart(ExtMask,Ext);
+  result:=FileMatchingMaskPart(ExtUpperCase(NameMask),ExtUpperCase(Name)) and FileMatchingMaskPart(ExtUpperCase(ExtMask),ExtUpperCase(Ext));
 end;
 
 Procedure CheatsDBUpdateCheckIfSetup(const AForm : TForm);

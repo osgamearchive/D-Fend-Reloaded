@@ -270,17 +270,17 @@ begin
     AMSt.Position:=Integer(FAddressList[I]);
     If S=4 then begin
       AMSt.ReadBuffer(J,4);
-      If J=AValue then begin inc(I); FAddressLastValue[I]:=Pointer(AValue); end else begin FAddressList.Delete(I); FAddressSizeList.Delete(I); FAddressLastValue.Delete(I); end;
+      If J=AValue then begin FAddressLastValue[I]:=Pointer(AValue); inc(I); end else begin FAddressList.Delete(I); FAddressSizeList.Delete(I); FAddressLastValue.Delete(I); end;
       continue;
     end;
     If S=2 then begin
       AMSt.ReadBuffer(W,2);
-      If W=AValue then begin inc(I); FAddressLastValue[I]:=Pointer(AValue); end else begin FAddressList.Delete(I); FAddressSizeList.Delete(I); FAddressLastValue.Delete(I); end;
+      If W=AValue then begin FAddressLastValue[I]:=Pointer(AValue); inc(I); end else begin FAddressList.Delete(I); FAddressSizeList.Delete(I); FAddressLastValue.Delete(I); end;
       continue;
     end;
     If S=1 then begin
       AMSt.ReadBuffer(B,1);
-      If B=AValue then begin inc(I); FAddressLastValue[I]:=Pointer(AValue); end else begin FAddressList.Delete(I); FAddressSizeList.Delete(I); FAddressLastValue.Delete(I); end;
+      If B=AValue then begin FAddressLastValue[I]:=Pointer(AValue); inc(I); end else begin FAddressList.Delete(I); FAddressSizeList.Delete(I); FAddressLastValue.Delete(I); end;
       continue;
     end;
   end;
@@ -435,10 +435,10 @@ begin
     For I:=0 to FAddressList.Count-1 do begin
       If Addresses.IndexOf(FAddressList[I])>=0 then continue;
       Addresses.Add(FAddressList[I]);
-      result.Add(
+      result.AddObject(
         IntToHex(Integer(FAddressList[I]),1)+'h='+IntToStr(Integer(FAddressList[I]))+'d '+
         '('+IntToStr(Integer(FAddressSizeList[I]))+' '+LanguageSetup.Bytes+', '+
-        LanguageSetup.SearchAddressResultMessageMultipleAddressesCurrentValue+': '+IntToStr(Integer(FAddressLastValue[I]))+')');
+        LanguageSetup.SearchAddressResultMessageMultipleAddressesCurrentValue+': '+IntToStr(Integer(FAddressLastValue[I]))+')',TObject(I));
     end;
   finally
     Addresses.Free;

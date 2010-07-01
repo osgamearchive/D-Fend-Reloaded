@@ -3,7 +3,7 @@ object DOSBoxFailedForm: TDOSBoxFailedForm
   Top = 0
   BorderStyle = bsDialog
   Caption = 'DOSBoxFailedForm'
-  ClientHeight = 230
+  ClientHeight = 228
   ClientWidth = 645
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -17,7 +17,7 @@ object DOSBoxFailedForm: TDOSBoxFailedForm
   OnShow = FormShow
   DesignSize = (
     645
-    230)
+    228)
   PixelsPerInch = 96
   TextHeight = 13
   object InfoLabel: TLabel
@@ -32,18 +32,20 @@ object DOSBoxFailedForm: TDOSBoxFailedForm
   end
   object RenderLabel: TLabel
     Left = 8
-    Top = 110
+    Top = 139
     Width = 60
     Height = 13
     Caption = 'RenderLabel'
   end
   object OKButton: TBitBtn
     Left = 8
-    Top = 199
+    Top = 198
     Width = 97
     Height = 25
-    TabOrder = 0
+    Anchors = [akLeft, akBottom]
+    TabOrder = 3
     Kind = bkOK
+    ExplicitTop = 213
   end
   object CloseDOSBoxCheckBox: TCheckBox
     Left = 8
@@ -52,11 +54,11 @@ object DOSBoxFailedForm: TDOSBoxFailedForm
     Height = 17
     Anchors = [akLeft, akTop, akRight]
     Caption = 'CloseDOSBoxCheckBox'
-    TabOrder = 1
+    TabOrder = 0
   end
   object RenderComboBox: TComboBox
     Left = 8
-    Top = 129
+    Top = 158
     Width = 225
     Height = 21
     Style = csDropDownList
@@ -64,14 +66,22 @@ object DOSBoxFailedForm: TDOSBoxFailedForm
     TabOrder = 2
   end
   object DoNotShowAgainCheckBox: TCheckBox
+    Left = 128
+    Top = 202
+    Width = 508
+    Height = 17
+    Anchors = [akLeft, akRight, akBottom]
+    Caption = 'DoNotShowAgainCheckBox'
+    TabOrder = 4
+    ExplicitTop = 217
+  end
+  object ShowConsoleCheckBox: TCheckBox
     Left = 8
-    Top = 168
+    Top = 110
     Width = 629
     Height = 17
     Anchors = [akLeft, akTop, akRight]
-    Caption = 'DoNotShowAgainCheckBox (will be available in 1.0)'
-    Enabled = False
-    TabOrder = 3
-    Visible = False
+    Caption = 'ShowConsoleCheckBox'
+    TabOrder = 1
   end
 end

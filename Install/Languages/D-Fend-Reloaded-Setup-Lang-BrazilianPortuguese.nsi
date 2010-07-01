@@ -6,7 +6,7 @@ LangString PrgName ${LANG_PORTUGUESEBR} "${PrgName}"
 LangString LANGNAME_NeedAdminRights ${LANG_PORTUGUESEBR} "Sem privilégios de administrador o instalador não conseguirá escrever na pasta de programas. Apenas a instalação em modo portátil funcionará. Deseja tentar novamente mudando para modo de administrador?"
 LangString LANGNAME_NeedAdminRightsUpdate ${LANG_PORTUGUESEBR} "Sem privilégios de administrador o instalador não conseguirá escrever na pasta de programas. Dessa forma, apenas as instalações em pen drives USB poderão ser atualizadas. Deseja tentar novamente mudando para modo de administrador?"
 
-LangString LANGNAME_WelcomeText ${LANG_PORTUGUESEBR} "Este assistente o guiará através da instalação do ${PrgName}.\r\n\r\nO D-Fend Reloaded é um programa de código aberto e licenciado sob a licença GPL 3. (Pode-se visualizar a licença clicando-se em Ajuda|Sobre no programa.)\r\n\r\nClique em Próximo para continuar."
+LangString LANGNAME_WelcomeText ${LANG_PORTUGUESEBR} "Este assistente o guiará através da instalação do ${PrgName}.\r\n\r\nO D-Fend Reloaded é um programa de código aberto e licenciado sob a licença GPL 3. (Pode-se visualizar a licença clicando-se em Ajuda|Sobre no programa.) D-Fend Reloaded comes without any guarantee or warranty.\r\n\r\nClique em Próximo para continuar." ; EXTENDED
 LangString LANGNAME_WelcomeTextUpdate ${LANG_PORTUGUESEBR} "Este assistente o guiará através da instalação de atualização do ${PrgName}.\r\n\r\nEste instalador requer uma instalação existente do D-Fend Reloaded!\r\n\r\nClique em Próximo para continuar."
 LangString LANGNAME_Next ${LANG_PORTUGUESEBR} "Próximo"
 LicenseLangString LANGNAME_License ${LANG_PORTUGUESEBR} "..\Bin\License.txt"
@@ -14,6 +14,7 @@ LangString LANGNAME_LICENSE_TITLE ${LANG_PORTUGUESEBR} "Informações"
 LangString LANGNAME_LICENSE_SUBTITLE ${LANG_PORTUGUESEBR} "Informações adicionais para ${PrgName}"
 LangString LANGNAME_LICENSE_TOP ${LANG_PORTUGUESEBR} "Note a seguinte informação antes de continuar:"
 LangString LANGNAME_LICENSE_BOTTOM ${LANG_PORTUGUESEBR} "Use este programa sob seu próprio risco. Clique em Próximo para continuar."
+LangString LANGNAME_DIRECTORYPAGE_TEXT_TOP ${LANG_PORTUGUESEBR} "O Instalador instalará o ${PrgName} na seguinte pasta. Para instalar em uma pasta diferente, clique em Procurar e selecione outra pasta. It is strongly recommended to install ${PrgName} in a separate directory, not together with other programs in the same directory." ; NEW
 LangString PAGE_TITLE ${LANG_PORTUGUESEBR} "Tipo de instalação"
 LangString PAGE_SUBTITLE ${LANG_PORTUGUESEBR} "Selecione qual tipo de instalação você deseja."
 LangString PAGE2_TITLE ${LANG_PORTUGUESEBR} "Modo de instalação"
@@ -23,9 +24,10 @@ LangString LANGNAME_DFendReloaded ${LANG_PORTUGUESEBR} "D-Fend Reloaded"
 LangString LANGNAME_Uninstall ${LANG_PORTUGUESEBR} "Desinstalar"
 LangString LANGNAME_GamesFolder ${LANG_PORTUGUESEBR} "Pasta de jogos"
 LangString LANGNAME_GameDataFolder ${LANG_PORTUGUESEBR} "Pasta de manuais"
+LangString LANGNAME_CaptureFolder ${LANG_PORTUGUESEBR} "Screenshots folder" ; NEW
 LangString LANGNAME_Deinstall ${LANG_PORTUGUESEBR} "desinstalar"
 LangString LANGNAME_ConfirmDelUserData ${LANG_PORTUGUESEBR} "Deseja excluir a pasta de dados $DataInstDir também ?"
-LangString LANGNAME_ConfirmDelPrgDir ${LANG_PORTUGUESEBR} "There are some files not created by the D-Fend Reloaded installer in the installation directory. Do you want to remove the folder $INSTDIR anyway?" ; New !
+LangString LANGNAME_ConfirmDelPrgDir ${LANG_PORTUGUESEBR} "There are some files not created by the D-Fend Reloaded installer in the installation directory. Do you want to remove the folder $INSTDIR anyway?" ; NEW
 
 LangString LANGNAME_NoInstallationFound ${LANG_PORTUGUESEBR} "Não há instalação do D-Fend Reloaded na pasta escolhida que possa ser atualizada."
 

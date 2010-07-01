@@ -6,7 +6,7 @@ LangString PrgName ${LANG_POLISH} "${PrgName}"
 LangString LANGNAME_NeedAdminRights ${LANG_POLISH} "Bez praw administratora instalator nie mo¿e zapisywaæ w folderze programów. Mo¿liwy jest tylko tylko tryb instalacji przenoœnej. Czy chcesz ponownie spróbowaæ przejœæ w tryb administratora ?"
 LangString LANGNAME_NeedAdminRightsUpdate ${LANG_POLISH} "Bez praw administratora instalator nie mo¿e zapisywaæ w folderze programów. Mo¿liwa jest tylko aktualizacja instalacji na pendrive'ie USB. Czy chcesz ponownie spróbowaæ przejœæ w tryb administratora ?"
 
-LangString LANGNAME_WelcomeText ${LANG_POLISH} "Ten kreator poprowadzi ciê przez proces instalacji ${PrgName}.\r\n\r\nD-Fend Reloaded jest programem typu open source objêtym licencj¹ GPL 3. (Mo¿esz j¹ zobaczyæ klikaj¹c w programie Help|About.)\r\n\r\nKliknij Dalej, aby kontynuowaæ."
+LangString LANGNAME_WelcomeText ${LANG_POLISH} "Ten kreator poprowadzi ciê przez proces instalacji ${PrgName}.\r\n\r\nD-Fend Reloaded jest programem typu open source objêtym licencj¹ GPL 3. (Mo¿esz j¹ zobaczyæ klikaj¹c w programie Help|About.) D-Fend Reloaded comes without any guarantee or warranty.\r\n\r\nKliknij Dalej, aby kontynuowaæ." ; EXTENDED
 LangString LANGNAME_WelcomeTextUpdate ${LANG_POLISH} "Ten kreator poprowadzi ciê przez proces aktualizacji ${PrgName}.\r\n\r\nInstalator wymaga istniej¹cej instalacji D-Fend Reloaded !\r\n\r\nKliknij Dalej, aby kontynuowaæ."
 LangString LANGNAME_Next ${LANG_POLISH} "Dalej"
 LicenseLangString LANGNAME_License ${LANG_POLISH} "..\Bin\License.txt"
@@ -14,6 +14,7 @@ LangString LANGNAME_LICENSE_TITLE ${LANG_POLISH} "Informacje"
 LangString LANGNAME_LICENSE_SUBTITLE ${LANG_POLISH} "Informacje dodatkowe o ${PrgName}"
 LangString LANGNAME_LICENSE_TOP ${LANG_POLISH} "Przeczytaj poni¿sz¹ informacjê zanim kontynuujesz:"
 LangString LANGNAME_LICENSE_BOTTOM ${LANG_POLISH} "U¿ywasz tego programu na w³asne ryzyko. Kliknij Dalej, aby kontynuowaæ."
+LangString LANGNAME_DIRECTORYPAGE_TEXT_TOP ${LANG_POLISH} "Instalator zainstaluje program ${PrgName} w nastêpuj¹cym folderze. Aby zainstalowaæ w innym folderze, kliknij Przegl¹daj i wybierz folder. It is strongly recommended to install ${PrgName} in a separate directory, not together with other programs in the same directory." ; NEW
 LangString PAGE_TITLE ${LANG_POLISH} "Typ instalacji"
 LangString PAGE_SUBTITLE ${LANG_POLISH} "Wybierz ¿¹dany typ instalacji."
 LangString PAGE2_TITLE ${LANG_POLISH} "Tryb instalacji"
@@ -23,9 +24,10 @@ LangString LANGNAME_DFendReloaded ${LANG_POLISH} "D-Fend Reloaded"
 LangString LANGNAME_Uninstall ${LANG_POLISH} "Odinstaluj"
 LangString LANGNAME_GamesFolder ${LANG_POLISH} "Folder gier"
 LangString LANGNAME_GameDataFolder ${LANG_POLISH} "Folder instrukcji"
+LangString LANGNAME_CaptureFolder ${LANG_POLISH} "Screenshots folder" ; NEW
 LangString LANGNAME_Deinstall ${LANG_POLISH} "odinstaluj"
 LangString LANGNAME_ConfirmDelUserData ${LANG_POLISH} "Czy chcesz równie¿ usun¹æ folder danych $DataInstDir ?"
-LangString LANGNAME_ConfirmDelPrgDir ${LANG_POLISH} "There are some files not created by the D-Fend Reloaded installer in the installation directory. Do you want to remove the folder $INSTDIR anyway?" ; New !
+LangString LANGNAME_ConfirmDelPrgDir ${LANG_POLISH} "There are some files not created by the D-Fend Reloaded installer in the installation directory. Do you want to remove the folder $INSTDIR anyway?" ; NEW
 
 LangString LANGNAME_NoInstallationFound ${LANG_POLISH} "W podanym folderze nie ma instalacji D-Fend Reloaded, która mog³aby byæ uaktualniona."
 

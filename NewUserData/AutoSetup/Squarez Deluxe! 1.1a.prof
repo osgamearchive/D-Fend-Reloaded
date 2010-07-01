@@ -64,7 +64,7 @@ UserInfo=License=Shareware[13][10]Version=1.1a[13][10]
 fullscreen=1
 autolock=1
 fulldouble=0
-usecancodes=1
+usescancodes=1
 sensitivity=100
 output=surface
 windowresolution=original

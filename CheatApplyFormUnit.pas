@@ -82,6 +82,7 @@ begin
   UserIconLoader.DialogImage(DI_OK,OKButton);
   UserIconLoader.DialogImage(DI_Cancel,CancelButton);
   UserIconLoader.DialogImage(DI_Help,HelpButton);
+  UserIconLoader.DialogImage(DI_Edit,EditButton);
 end;
 
 procedure TCheatApplyForm.FormDestroy(Sender: TObject);
@@ -198,7 +199,7 @@ begin
   B:=False;
   For I:=0 to FilesListBox.Items.Count-1 do begin
     FilesListBox.Checked[I]:=(FilesListBox.ItemIndex=I);
-    If FilesListBox.Checked[I] then begin B:=True; break; end;
+    If FilesListBox.Checked[I] then B:=True;
   end;
   OKButton.Enabled:=B;
 end;

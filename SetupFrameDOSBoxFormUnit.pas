@@ -58,7 +58,7 @@ Function ShowSetupFrameDOSBoxDialog(const AOwner : TComponent; var DOSBoxData : 
 implementation
 
 uses ShlObj, Math, LanguageSetupUnit, VistaToolsUnit, CommonTools,
-     SetupDosBoxFormUnit, PrgConsts, IconLoaderUnit;
+     SetupDosBoxFormUnit, PrgConsts, IconLoaderUnit, DOSBoxLangTools;
 
 {$R *.dfm}
 
@@ -171,14 +171,11 @@ Var S : String;
     I : Integer;
 begin
   S:=DosBoxLangEditComboBox.Text;
+
   DosBoxLangEditComboBox.Items.Clear;
   DosBoxLang.Clear;
+  GetDOSBoxLangNamesAndFiles(DosBoxDirEdit.Text,DosBoxLangEditComboBox.Items,DosBoxLang,True);
 
-  DosBoxLangEditComboBox.Items.Add('English');
-  DosBoxLang.Add('');
-
-  FindAndAddLngFiles(IncludeTrailingPathDelimiter(DosBoxDirEdit.Text),DosBoxLangEditComboBox.Items,DosBoxLang);
-  FindAndAddLngFiles(PrgDir+LanguageSubDir+'\',DosBoxLangEditComboBox.Items,DosBoxLang);
   I:=DosBoxLangEditComboBox.Items.IndexOf(S);
   If I>=0 then DosBoxLangEditComboBox.ItemIndex:=I else DosBoxLangEditComboBox.ItemIndex:=0;
 

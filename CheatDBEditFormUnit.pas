@@ -52,6 +52,7 @@ type
     ChangeAddressInfoLabel: TLabel;
     ChangeAddressWithDialogInfoLabel2: TLabel;
     Bevel1: TBevel;
+    UpdateButton: TBitBtn;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure OKButtonClick(Sender: TObject);
@@ -63,6 +64,8 @@ type
     procedure ButtonWork(Sender: TObject);
     procedure ChangeAddressWithDialogDefaultEditChange(Sender: TObject);
     procedure FormShow(Sender: TObject);
+    procedure UpdateButtonClick(Sender: TObject);
+    procedure ActionStepComboBoxDropDown(Sender: TObject);
   private
     { Private-Deklarationen }
     LastGame, LastAction, LastActionStep : Integer;
@@ -73,12 +76,13 @@ type
     Procedure SelectAction(const A : TCheatAction);
   public
     { Public-Deklarationen }
+    SearchForUpdates : Boolean;
   end;
 
 var
   CheatDBEditForm: TCheatDBEditForm;
 
-Function ShowCheatDBEditDialog(const AOwner : TComponent) : Boolean;
+Function ShowCheatDBEditDialog(const AOwner : TComponent; var SearchForUpdates : Boolean) : Boolean;
 
 implementation
 
@@ -91,6 +95,8 @@ procedure TCheatDBEditForm.FormCreate(Sender: TObject);
 begin
   SetVistaFonts(self);
   Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName);
+
+  SearchForUpdates:=False;
 
   Caption:=LanguageSetup.EditCheats;
   GameLabel.Caption:=LanguageSetup.EditCheatsGameName;
@@ -129,10 +135,21 @@ begin
   OKButton.Caption:=LanguageSetup.OK;
   CancelButton.Caption:=LanguageSetup.Cancel;
   HelpButton.Caption:=LanguageSetup.Help;
+  UpdateButton.Caption:=LanguageSetup.EditCheatsSearchForUpdates;
 
   UserIconLoader.DialogImage(DI_OK,OKButton);
   UserIconLoader.DialogImage(DI_Cancel,CancelButton);
   UserIconLoader.DialogImage(DI_Help,HelpButton);
+  UserIconLoader.DialogImage(DI_Update,UpdateButton);
+
+  UserIconLoader.DialogImage(DI_Add,GameAddButton);
+  UserIconLoader.DialogImage(DI_Edit,GameEditButton);
+  UserIconLoader.DialogImage(DI_Delete,GameDeleteButton);
+  UserIconLoader.DialogImage(DI_Add,ActionAddButton);
+  UserIconLoader.DialogImage(DI_Edit,ActionEditButton);
+  UserIconLoader.DialogImage(DI_Delete,ActionDeleteButton);
+  UserIconLoader.DialogImage(DI_Add,ActionStepAddButton);
+  UserIconLoader.DialogImage(DI_Delete,ActionStepDeleteButton);
 
   CheatDB:=SmartLoadCheatsDB;
   If CheatDB=nil then exit;
@@ -277,9 +294,19 @@ begin
       If (LastGame>=0) and (LastAction>=0) then begin
         A:=CheatDB[LastGame][LastAction];
         For I:=0 to A.Count-1 do begin
-          S:=LanguageSetup.EditCheatsActionStepAddChangeAddress;
-          If A[I] is TCheatActionStepChangeAddressWithDialog then S:=LanguageSetup.EditCheatsActionStepAddChangeAddressWithDialog;
-          If A[I] is TCheatActionStepInternal then S:=LanguageSetup.EditCheatsActionStepInternal;
+          S:='';
+          If A[I] is TCheatActionStepChangeAddress then begin
+            S:=LanguageSetup.EditCheatsActionStepAddChangeAddress;
+            S:=S+' ('+TCheatActionStepChangeAddress(A[I]).Addresses+')';
+          end;
+          If A[I] is TCheatActionStepChangeAddressWithDialog then begin
+            S:=LanguageSetup.EditCheatsActionStepAddChangeAddressWithDialog;
+            S:=S+' ('+TCheatActionStepChangeAddressWithDialog(A[I]).Addresses+')';
+          end;
+          If A[I] is TCheatActionStepInternal then begin
+            S:=LanguageSetup.EditCheatsActionStepInternal;
+            S:=S+' ('+IntToStr(TCheatActionStepInternal(A[I]).Nr)+')';
+          end;
           St.AddObject(S,A[I]);
         end;
       end;
@@ -311,6 +338,8 @@ Var A : TCheatActionStep;
     I : Integer;
 begin
   If ActionStepsListUpdating then exit;
+
+  SetComboHint(ActionStepComboBox);
 
   If (LastGame>=0) and (LastAction>=0) and (LastActionStep>=0) then begin
     A:=CheatDB[LastGame][LastAction][LastActionStep];
@@ -420,6 +449,11 @@ begin
   end;
 end;
 
+procedure TCheatDBEditForm.ActionStepComboBoxDropDown(Sender: TObject);
+begin
+  SetComboDropDownDropDownWidth(ActionStepComboBox);
+end;
+
 procedure TCheatDBEditForm.ChangeAddressWithDialogDefaultEditChange(Sender: TObject);
 begin
   If Sender=ChangeAddressWithDialogDefaultAddressEdit then ChangeAddressWithDialogDefaultAddressRadioButton.Checked:=True;
@@ -448,8 +482,8 @@ begin
     2 : begin {Delete game}
           If GameComboBox.ItemIndex<0 then exit;
           G:=TCheatGameRecord(GameComboBox.Items.Objects[GameComboBox.ItemIndex]);
-          If MessageDlg(Format(LanguageSetup.EditCheatsGameDeletePrompt,[G.Name]),mtConfirmation,[mbOK],0)<>mrOK then exit;
-          CheatDB.Delete(G); LoadGamesList;
+          If MessageDlg(Format(LanguageSetup.EditCheatsGameDeletePrompt,[G.Name]),mtConfirmation,[mbYes,mbNo],0)<>mrYes then exit;
+          CheatDB.Delete(G); LastGame:=-1; LoadGamesList;
         end;
     3 : begin {Add action}
           If GameComboBox.ItemIndex<0 then exit;
@@ -471,8 +505,8 @@ begin
           G:=TCheatGameRecord(GameComboBox.Items.Objects[GameComboBox.ItemIndex]);
           If ActionComboBox.ItemIndex<0 then exit;
           A:=TCheatAction(ActionComboBox.Items.Objects[ActionComboBox.ItemIndex]);
-          If MessageDlg(Format(LanguageSetup.EditCheatsActionDeletePrompt,[A.Name,G.Name]),mtConfirmation,[mbOK],0)<>mrOK then exit;
-          G.Delete(A); LoadGamesList; SelectGame(G);
+          If MessageDlg(Format(LanguageSetup.EditCheatsActionDeletePrompt,[A.Name,G.Name]),mtConfirmation,[mbYes,mbNo],0)<>mrYes then exit;
+          G.Delete(A); LastAction:=-1; LoadGamesList; SelectGame(G);
         end;
     6 : begin {Add action step}
           If ActionComboBox.ItemIndex<0 then exit;
@@ -485,8 +519,8 @@ begin
           If ActionComboBox.ItemIndex<0 then exit;
           A:=TCheatAction(ActionComboBox.Items.Objects[ActionComboBox.ItemIndex]);
           If ActionStepComboBox.ItemIndex<0 then exit;
-          If MessageDlg(LanguageSetup.EditCheatsActionStepDeletePrompt,mtConfirmation,[mbOK],0)<>mrOK then exit;
-          A.Delete(ActionStepComboBox.ItemIndex); LoadGamesList; SelectGame(G); SelectAction(A);
+          If MessageDlg(LanguageSetup.EditCheatsActionStepDeletePrompt,mtConfirmation,[mbYes,mbNo],0)<>mrYes then exit;
+          A.Delete(ActionStepComboBox.ItemIndex); LastActionStep:=-1; LoadGamesList; SelectGame(G); SelectAction(A);
         end;
     8 : begin
           If GameComboBox.ItemIndex<0 then exit;
@@ -516,6 +550,13 @@ begin
   SmartSaveCheatsDB(CheatDB,self);
 end;
 
+procedure TCheatDBEditForm.UpdateButtonClick(Sender: TObject);
+begin
+  OKButtonClick(Sender);
+  SearchForUpdates:=True;
+  ModalResult:=mrOK;
+end;
+
 procedure TCheatDBEditForm.HelpButtonClick(Sender: TObject);
 begin
   Application.HelpCommand(HELP_CONTEXT,ID_ExtrasEditCheatDB);
@@ -528,12 +569,14 @@ end;
 
 { global }
 
-Function ShowCheatDBEditDialog(const AOwner : TComponent) : Boolean;
+Function ShowCheatDBEditDialog(const AOwner : TComponent; var SearchForUpdates : Boolean) : Boolean;
 begin
+  SearchForUpdates:=False;
   CheatsDBUpdateCheckIfSetup(Application.MainForm);
   CheatDBEditForm:=TCheatDBEditForm.Create(AOwner);
   try
-    result:=(CheatDBEditForm.ShowModal=mrOK)
+    result:=(CheatDBEditForm.ShowModal=mrOK);
+    SearchForUpdates:=CheatDBEditForm.SearchForUpdates;
   finally
     CheatDBEditForm.Free;
   end;

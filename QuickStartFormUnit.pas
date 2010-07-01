@@ -140,7 +140,7 @@ Type TFileTypeInfo=record
   Options : TFileTypeOptionsSet;
 end;
 
-const FileTypes : Array[0..52] of TFileTypeInfo=
+const FileTypes : Array[0..54] of TFileTypeInfo=
   ((Ext: '.EXE'; NameID: NR_QuickStarterColumnsTypeDOS; ImageIndex: 9; OpenType: otDOSBox; Options: [ftCanMakeProfileOf,ftDOSExe, ftRunWithParameters]),
    (Ext: '.EXE'; NameID: NR_QuickStarterColumnsTypeWindows; ImageIndex: 10; OpenType: otOpen; Options: [ftCanMakeProfileOf,ftWindowsExe, ftRunWithParameters]),
    (Ext: '.COM'; NameID: NR_QuickStarterColumnsTypeDOS; ImageIndex: 9; OpenType: otDOSBox; Options: [ftCanMakeProfileOf, ftRunWithParameters]),
@@ -201,7 +201,9 @@ const FileTypes : Array[0..52] of TFileTypeInfo=
    (Ext: '.IMG'; NameID: NR_QuickStarterColumnsTypeHDImage; ImageIndex: 7; OpenType: otOpen; Options: []),
    (Ext: '.IMA'; NameID: NR_QuickStarterColumnsTypeHDImage; ImageIndex: 7; OpenType: otOpen; Options: []),
 
-   (Ext: '.ISO'; NameID: NR_QuickStarterColumnsTypeISOImage; ImageIndex: 15; OpenType: otOpen; Options: []),
+   (Ext: '.ISO'; NameID: NR_QuickStarterColumnsTypeCDImage; ImageIndex: 15; OpenType: otOpen; Options: []),
+   (Ext: '.BIN'; NameID: NR_QuickStarterColumnsTypeCDImage; ImageIndex: 15; OpenType: otOpen; Options: []),
+   (Ext: '.CUE'; NameID: NR_QuickStarterColumnsTypeCDImage; ImageIndex: 15; OpenType: otOpen; Options: []),
 
    (Ext: '.DLL'; NameID: NR_QuickStarterColumnsTypeDLL; ImageIndex: 8; OpenType: otNone; Options: []),
 
@@ -248,10 +250,10 @@ begin
   If PrgSetup.QuickStarterMaximized then begin
     WindowState:=wsMaximized;
   end else begin
-    If (PrgSetup.QuickStarterLeft>=0) and (PrgSetup.QuickStarterLeft<9*Screen.Width div 10) then Left:=PrgSetup.QuickStarterLeft;
-    If (PrgSetup.QuickStarterTop>=0) and (PrgSetup.QuickStarterTop<9*Screen.Height div 10) then Top:=PrgSetup.QuickStarterTop;
-    If (PrgSetup.QuickStarterWidth>=0) and (Left+PrgSetup.QuickStarterWidth<=Screen.Width) then Width:=PrgSetup.QuickStarterWidth;
-    If (PrgSetup.QuickStarterHeight>=0) and (Top+PrgSetup.QuickStarterHeight<=Screen.Height) then Height:=PrgSetup.QuickStarterHeight;
+    If (PrgSetup.QuickStarterLeft>0) and (PrgSetup.QuickStarterLeft<9*Screen.Width div 10) then Left:=PrgSetup.QuickStarterLeft;
+    If (PrgSetup.QuickStarterTop>0) and (PrgSetup.QuickStarterTop<9*Screen.Height div 10) then Top:=PrgSetup.QuickStarterTop;
+    If (PrgSetup.QuickStarterWidth>0) and (Left+PrgSetup.QuickStarterWidth<=Screen.Width) then Width:=PrgSetup.QuickStarterWidth;
+    If (PrgSetup.QuickStarterHeight>0) and (Top+PrgSetup.QuickStarterHeight<=Screen.Height) then Height:=PrgSetup.QuickStarterHeight;
     Position:=poDesigned;
   end;
 

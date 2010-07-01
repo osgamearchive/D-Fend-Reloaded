@@ -43,6 +43,7 @@ type
   public
     { Public-Deklarationen }
     Function Init(const AInfoData : TInfoData) : Boolean;
+    Function CheckBeforeDone : Boolean;
     Function Done : String;
     Function GetName : String;
     Procedure ShowFrame;
@@ -137,6 +138,11 @@ begin
   ZipFolderDriveLetterComboBoxChange(self);
   ZipFolderFreeSpaceTrackBarChange(self);
   RepackCheckBoxClick(self);
+end;
+
+function TProfileMountEditorPhysFSFrame.CheckBeforeDone: Boolean;
+begin
+  result:=True;
 end;
 
 function TProfileMountEditorPhysFSFrame.Done: String;

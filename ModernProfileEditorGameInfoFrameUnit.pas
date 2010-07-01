@@ -35,6 +35,8 @@ type
     LinkFile : TLinkFile;
     PProfileName,PCaptureDir : PString;
     GameDB : TGameDB;
+    ProfileExe,ProfileSetup,ProfileScummVMGameName,ProfileScummVMPath,ProfileDOSBoxInstallation,ProfileCaptureDir : PString;
+    FOnProfileNameChange : TTextEvent;
     Procedure LoadLinks;
     Procedure TabListForCell(ACol, ARow: Integer; var UseDropdownListForCell : Boolean);
     Procedure TabGetListForCell(ACol, ARow: Integer; DropdownListForCell : TStrings);
@@ -123,6 +125,14 @@ begin
 
   LoadLinks;
 
+  ProfileExe:=InitData.CurrentProfileExe;
+  ProfileSetup:=InitData.CurrentProfileSetup;
+  ProfileScummVMGameName:=InitData.CurrentScummVMGameName;
+  ProfileScummVMPath:=InitData.CurrentScummVMPath;
+  ProfileDOSBoxInstallation:=InitData.CurrentDOSBoxInstallation;
+  ProfileCaptureDir:=InitData.CurrentCaptureDir;
+  FOnProfileNameChange:=InitData.OnProfileNameChange;
+
   HelpContext:=ID_ProfileEditProgramInformation;
 end;
 
@@ -134,7 +144,7 @@ begin
 end;
 
 procedure TModernProfileEditorGameInfoFrame.SearchClick(Sender: TObject);
-Var S,Genre,Developer,Publisher,Year,Internet : String;
+Var S,Name,Genre,Developer,Publisher,Year,Internet : String;
 begin
   Case (Sender as TComponent).Tag of
     0 : begin
@@ -145,7 +155,8 @@ begin
     2 : OpenLink(LinkFile.Link[0],'<GAMENAME>',PProfileName^);
     3 : begin
           If Trim(PCaptureDir^)='' then S:='' else S:=MakeAbsPath(PCaptureDir^,PrgSetup.BaseDir);
-          If ShowDataReaderDialog(self,PProfileName^,Genre,Developer,Publisher,Year,Internet,S) then with GameInfoValueListEditor.Strings do begin
+          If ShowDataReaderDialog(self,PProfileName^,Name,Genre,Developer,Publisher,Year,Internet,S) then with GameInfoValueListEditor.Strings do begin
+            If Name <>'' then FOnProfileNameChange(self,Name,ProfileExe^,ProfileSetup^,ProfileScummVMGameName^,ProfileScummVMPath^,ProfileDOSBoxInstallation^,ProfileCaptureDir^);
             If Genre<>'' then ValueFromIndex[0]:=Genre;
             If Developer<>'' then ValueFromIndex[1]:=Developer;
             If Publisher<>'' then ValueFromIndex[2]:=Publisher;

@@ -15,7 +15,7 @@
   <ExePackage
     Name="Action games package"
     Description="Freeware:\\Beast, Major Stryker, One Must Fall 2097, Overkill, Striker, Traffic Department 2192, Xenophage: Alien Bloodsport\\\\Shareware:\\Highway Hunter, Kiloblaster, Raptor, Seek and Destroy, Tyrian 2000, Zone 66, Terminal Velocity, Epic Pinball, Extreme Pinball, Death Rally, Slicks'n'Slide, Wacky Wheels"
-    PackageChecksum="4BFAB90351E15FA388D88F18B2123156"
+    PackageChecksum="8A971BE2CAA3FB8D780C7B4B785F4CAA"
     Size="75735193">http://downloads.sourceforge.net/dfendreloaded/D-Fend-Reloaded-DemoPackage3.exe</ExePackage>
   <ExePackage
     Name="Puzzle and board games package"
@@ -30,7 +30,7 @@
   <ExePackage
     Name="Platform games package"
     Description="Freeware:\\Alien Carnage, Bio Menace, Electro Man, Jazz Jackrabbit: Holiday Hare, Jazz Jackrabbit: Holiday Hare 1995\\\\Shareware:\\Commander Keen 1 (Marooned on Mars), Commander Keen 4 (Secret of the Oracle), Cosmo's Cosmic Adventure, Crystal Caves, Duke Nukem 1, Duke Nukem 2, Halloween Harry, Hocus Pocus, Jazz Jackrabbit, Jill of the Jungle, Math Rescue, Monster Bash, Realms of Chaos, Secret Agent, Space Chase, Word Rescue, Xargon"
-    PackageChecksum="C0B7A963A80AB0FB74EBD398CB1B74F1"
+    PackageChecksum="80659E1F8AE0F3E522459482F3AFEC2D"
     Size="15861158">http://downloads.sourceforge.net/dfendreloaded/D-Fend-Reloaded-DemoPackage6.exe</ExePackage>
   <ExePackage
     Name="Demos package"

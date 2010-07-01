@@ -34,6 +34,7 @@ type
     FullscreenInfoLabel: TLabel;
     PixelShaderComboBox: TComboBox;
     PixelShaderLabel: TLabel;
+    ResolutionInfoLabel: TLabel;
     procedure PixelShaderComboBoxChange(Sender: TObject);
   private
     { Private-Deklarationen }
@@ -80,13 +81,11 @@ begin
 
   WindowResolutionLabel.Caption:=LanguageSetup.GameWindowResolution;
   FullscreenResolutionLabel.Caption:=LanguageSetup.GameFullscreenResolution;
-  St:=ValueToList(InitData.GameDB.ConfOpt.Resolution,';,');
-  try
-    WindowResolutionComboBox.Items.AddStrings(St);
-    FullscreenResolutionComboBox.Items.AddStrings(St);
-  finally
-    St.Free;
-  end;
+  St:=ValueToList(InitData.GameDB.ConfOpt.ResolutionWindow,';,');
+  try WindowResolutionComboBox.Items.AddStrings(St); finally St.Free; end;
+  St:=ValueToList(InitData.GameDB.ConfOpt.ResolutionFullscreen,';,');
+  try FullscreenResolutionComboBox.Items.AddStrings(St); finally St.Free; end;
+  ResolutionInfoLabel.Caption:=LanguageSetup.GameResolutionInfo;
   StartFullscreenCheckBox.Caption:=LanguageSetup.GameStartFullscreen;
   FullscreenInfoLabel.Caption:='('+LanguageSetup.GameStartFullscreenInfo+')';
   DoublebufferingCheckBox.Caption:=LanguageSetup.GameUseDoublebuffering;
@@ -156,8 +155,10 @@ begin
 
   S:=Trim(ExtUpperCase(Game.VideoCard));
   VideoCardComboBox.ItemIndex:=VideoCardComboBox.Items.Count-1;
-  For I:=0 to VideoCardComboBox.Items.Count-1 do If Trim(ExtUpperCase(VideoCardComboBox.Items[I]))=S then begin
-    VideoCardComboBox.ItemIndex:=I; break;
+  For I:=0 to VideoCardComboBox.Items.Count-1 do begin
+    T:=Trim(ExtUpperCase(VideoCardComboBox.Items[I]));
+    If Pos('(',T)>0 then T:=Trim(Copy(T,1,Pos('(',T)-1));
+    If T=S then begin VideoCardComboBox.ItemIndex:=I; break; end;
   end;
 
   LastPixelShader:=Game.PixelShader;
@@ -264,7 +265,9 @@ begin
   If PrgSetup.AllowGlideSettings then Game.GlideEmulation:=GlideEmulationCheckBox.Checked;
 
   Game.Render:=RenderComboBox.Text;
-  Game.VideoCard:=VideoCardComboBox.Text;
+  S:=Trim(VideoCardComboBox.Text);
+  If Pos('(',S)<>0 then S:=Trim(Copy(S,1,Pos('(',S)-1));
+  Game.VideoCard:=S;
 
   If PixelShaderChanged then Game.PixelShader:=PixelShaderComboBox.Text;
 

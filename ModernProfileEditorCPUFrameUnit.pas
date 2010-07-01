@@ -21,7 +21,12 @@ type
     CyclesInfoLabel: TLabel;
     CPUTypeLabel: TLabel;
     CPUTypeComboBox: TComboBox;
+    InfoLabel: TLabel;
+    CyclesUpComboBox: TComboBox;
+    CyclesDownComboBox: TComboBox;
     procedure CPUCyclesChange(Sender: TObject);
+    procedure CyclesUpComboBoxChange(Sender: TObject);
+    procedure CyclesDownComboBoxChange(Sender: TObject);
   private
     { Private-Deklarationen }
     SaveCycles : String;
@@ -54,7 +59,9 @@ begin
   NoFlicker(CyclesMaxRadioButton);
   NoFlicker(CyclesValueRadioButton);
   NoFlicker(CyclesUpEdit);
+  NoFlicker(CyclesUpComboBox);
   NoFlicker(CyclesDownEdit);
+  NoFlicker(CyclesDownComboBox);
   NoFlicker(CPUTypeComboBox);
 
   CPUCoreRadioGroup.Caption:=LanguageSetup.GameCore;
@@ -79,10 +86,21 @@ begin
   end;
 
   CyclesUpLabel.Caption:=LanguageSetup.GameCyclesUp;
+  with CyclesUpComboBox.Items do begin
+    Clear;
+    Add(LanguageSetup.GameCyclesTypeValue);
+    Add(LanguageSetup.GameCyclesTypePercent);
+  end;
   CyclesDownLabel.Caption:=LanguageSetup.GameCyclesDown;
+  with CyclesDownComboBox.Items do begin
+    Clear;
+    Add(LanguageSetup.GameCyclesTypeValue);
+    Add(LanguageSetup.GameCyclesTypePercent);
+  end;
   CyclesInfoLabel.Caption:=LanguageSetup.GameCyclesInfo;
 
   CPUTypeLabel.Caption:=LanguageSetup.GameCPUType;
+  InfoLabel.Caption:=LanguageSetup.GameCPUInfo;
 
   St:=ValueToList(InitData.GameDB.ConfOpt.CPUType,';,');
   try
@@ -121,7 +139,11 @@ begin
   end;
   CPUCyclesChange(self);
 
+  If Game.CyclesUp<100 then CyclesUpComboBox.ItemIndex:=1 else CyclesUpComboBox.ItemIndex:=0;
+  CyclesUpComboBoxChange(self);
   CyclesUpEdit.Value:=Game.CyclesUp;
+  If Game.CyclesDown<100 then CyclesDownComboBox.ItemIndex:=1 else CyclesDownComboBox.ItemIndex:=0;
+  CyclesDownComboBoxChange(self);
   CyclesDownEdit.Value:=Game.CyclesDown;
 
   CPUTypeComboBox.ItemIndex:=0;
@@ -158,6 +180,24 @@ end;
 procedure TModernProfileEditorCPUFrame.CPUCyclesChange(Sender: TObject);
 begin
   CyclesComboBox.Enabled:=CyclesValueRadioButton.Checked;
+end;
+
+procedure TModernProfileEditorCPUFrame.CyclesUpComboBoxChange(Sender: TObject);
+begin
+  If CyclesUpComboBox.ItemIndex=0 then begin
+    CyclesUpEdit.MinValue:=100; CyclesUpEdit.MaxValue:=50000;
+  end else begin
+    CyclesUpEdit.MinValue:=1; CyclesUpEdit.MaxValue:=99;
+  end;
+end;
+
+procedure TModernProfileEditorCPUFrame.CyclesDownComboBoxChange(Sender: TObject);
+begin
+  If CyclesDownComboBox.ItemIndex=0 then begin
+    CyclesDownEdit.MinValue:=100; CyclesDownEdit.MaxValue:=50000;
+  end else begin
+    CyclesDownEdit.MinValue:=1; CyclesDownEdit.MaxValue:=99;
+  end;
 end;
 
 procedure TModernProfileEditorCPUFrame.GetGame(const Game: TGame);

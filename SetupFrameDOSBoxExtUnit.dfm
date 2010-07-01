@@ -15,7 +15,6 @@ object SetupFrameDOSBoxExt: TSetupFrameDOSBoxExt
     Align = alClient
     BorderStyle = bsNone
     TabOrder = 0
-    ExplicitHeight = 636
     DesignSize = (
       585
       511)

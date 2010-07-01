@@ -121,7 +121,8 @@ uses Math, VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgSetupUnit,
      SetupFrameZipPrgsUnit, SetupFrameCustomLanguageStringsUnit,
      SetupFrameGameListIconModeAppearanceUnit, SetupFrameUserInterpreterFrameUnit,
      SetupFrameImageScalingUnit, SetupFrameMoreEmulatorsUnit,
-     SetupFrameAutomaticConfigurationUnit;
+     SetupFrameAutomaticConfigurationUnit, SetupFrameDOSBoxGlobalUnit,
+     SetupFrameDataPrivacyUnit;
 
 {$R *.dfm}
 
@@ -231,6 +232,9 @@ begin
   F:=TSetupFrameBase.Create(self); AddTreeNode(nil,F,TSetupFrameBase(F),False,0); Root:=F;
   F:=TSetupFrameDirectories.Create(self); AddTreeNode(Root,F,TSetupFrameDirectories(F),False,1);
   F:=TSetupFrameSecurity.Create(self); AddTreeNode(Root,F,TSetupFrameSecurity(F),True,5);
+  If PrgSetup.ActivateIncompleteFeatures then begin
+    F:=TSetupFrameDataPrivacy.Create(self); AddTreeNode(Root,F,TSetupFrameDataPrivacy(F),True,5);
+  end;
   F:=TSetupFrameCompression.Create(self); AddTreeNode(Root,F,TSetupFrameCompression(F),True,16);
   F:=TSetupFrameWine.Create(self); AddTreeNode(Root,F,TSetupFrameWine(F),True,19);
 
@@ -249,12 +253,11 @@ begin
 
   F:=TSetupFrameProfileEditor.Create(self); AddTreeNode(nil,F,TSetupFrameProfileEditor(F),True,8); Root:=F;
   F:=TSetupFrameDefaultValues.Create(self); AddTreeNode(Root,F,TSetupFrameDefaultValues(F),True,6);
-  If PrgSetup.ActivateIncompleteFeatures then begin
-    F:=TSetupFrameAutomaticConfiguration.Create(self); AddTreeNode(Root,F,TSetupFrameAutomaticConfiguration(F),True,24);
-  end;
+  F:=TSetupFrameAutomaticConfiguration.Create(self); AddTreeNode(Root,F,TSetupFrameAutomaticConfiguration(F),True,24);
 
   F:=TSetupFramePrograms.Create(self); AddTreeNode(nil,F,TSetupFramePrograms(F),False,0,True); Root:=F;
   F:=TSetupFrameDOSBox.Create(self); AddTreeNode(Root,F,TSetupFrameDOSBox(F),False,4); Root2:=F;
+  F:=TSetupFrameDOSBoxGlobal.Create(self); AddTreeNode(Root2,F,TSetupFrameDOSBoxGlobal(F),True,4);
   F:=TSetupFrameDOSBoxExt.Create(self); AddTreeNode(Root2,F,TSetupFrameDOSBoxExt(F),True,4);
   F:=TSetupFrameFreeDOS.Create(self); AddTreeNode(Root,F,TSetupFrameFreeDOS(F),False,15,True);
   F:=TSetupFrameQBasic.Create(self); AddTreeNode(Root,F,TSetupFrameQBasic(F),False,11);

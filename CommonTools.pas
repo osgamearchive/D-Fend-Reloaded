@@ -25,6 +25,7 @@ Function MakeAbsPath(Path, Rel : String) : string;
 Function MakeExtRelPath(Path, Rel : String) : String;
 Function MakeExtAbsPath(Path, Rel : String) : string;
 Function MakeFileSysOKFolderName(const AName : String) : String;
+Function RemoveIllegalFileNameChars(const Name : String) : String;
 Function MakeAbsIconName(const Icon : String) : String;
 
 function SelectDirectory(const AOwner : THandle; const Caption: string; var Directory: String): Boolean;
@@ -400,8 +401,9 @@ begin
   result:=Rel+Path;
 end;
 
+const AllowedCharsDefault='ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜabcdefghijklmnopqrstuvwxyzäöüß01234567890-_=.,;!()$#@{}&''`~'+chr(246)+chr(255)+chr($a0)+chr($e5);
+
 Function MakeFileSysOKFolderName(const AName : String) : String;
-const AllowedCharsDefault='ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜabcdefghijklmnopqrstuvwxyzäöüß01234567890-_=.,;!()';
 Var I : Integer;
     AllowedChars : String;
 begin
@@ -411,6 +413,13 @@ begin
   AllowedChars:=AllowedChars+' ';
   For I:=1 to length(AName) do if Pos(AName[I],AllowedChars)>0 then result:=result+AName[I];
   if result='' then result:='Game';
+end;
+
+Function RemoveIllegalFileNameChars(const Name : String) : String;
+Var I : Integer;
+begin
+  result:='';
+  For I:=1 to length(Name) do If Pos(Name[I],AllowedCharsDefault)>0 then result:=result+Name[I];
 end;
 
 Function MakeAbsIconName(const Icon : String) : String;
@@ -918,28 +927,74 @@ begin
   end;
 end;
 
-Function CheckDOSBoxVersion(const Nr : Integer; const Path : String) : String;
-Var DOSBoxPath : String;
-    St : TStringList;
+Function FindManual(const Path : String) : TStringList;
+Var Rec : TSearchRec;
     I : Integer;
     S : String;
 begin
+  result:=TStringList.Create;
+
+  I:=FindFirst(Path+'*.txt',faAnyFile,Rec);
+  try
+    While I=0 do begin
+      S:=Trim(ExtUpperCase(Rec.Name));
+      If (S='README.TXT') or ((Pos('MANUAL',S)>0) and (Pos('DOSBOX',S)>0)) then
+        result.AddObject(Rec.Name,TObject(Rec.Time));
+      I:=FindNext(Rec);
+    end;
+  finally
+    FindClose(Rec);
+  end;
+end;
+
+Function GetVersionFromDOSBoxReadmeFile(const FileName : String) : String;
+Var S : String;
+    St : TStringList;
+    I : Integer;
+    B : Boolean;
+begin
   result:='';
-
-  If (Trim(Path)='') and (Nr>=0) then DOSBoxPath:=PrgSetup.DOSBoxSettings[Nr].DosBoxDir else DOSBoxPath:=Path;
-  DOSBoxPath:=IncludeTrailingPathDelimiter(MakeAbsPath(DOSBoxPath,PrgSetup.BaseDir));
-  If not FileExists(DOSBoxPath+'Readme.txt') then exit;
-
   S:='';
   St:=TStringList.Create;
   try
-    try St.LoadFromFile(DOSBoxPath+'Readme.txt'); except exit; end;
+    try St.LoadFromFile(FileName); except exit; end;
     For I:=0 to St.Count-1 do If Trim(St[I])<>'' then begin S:=St[I]; break; end;
   finally
     St.Free;
   end;
 
-  For I:=1 to length(S) do If ((S[I]>='0') and (S[I]<='9')) or (S[I]='.') then result:=result+S[I];
+  B:=True;
+  For I:=1 to length(S) do If ((S[I]>='0') and (S[I]<='9')) or (S[I]='.') then begin
+    If S[I]='.' then begin
+      If B then B:=False else continue;
+    end;
+    result:=result+S[I];
+  end;
+end;
+
+Function CheckDOSBoxVersion(const Nr : Integer; const Path : String) : String;
+Var DOSBoxPath : String;
+    I,J,Date : Integer;
+    FileNames : TStringList;
+begin
+  result:='';
+
+  If (Trim(Path)='') and (Nr>=0) then DOSBoxPath:=PrgSetup.DOSBoxSettings[Nr].DosBoxDir else DOSBoxPath:=Path;
+  DOSBoxPath:=IncludeTrailingPathDelimiter(MakeAbsPath(DOSBoxPath,PrgSetup.BaseDir));
+
+  FileNames:=FindManual(DOSBoxPath);
+  try
+    While FileNames.Count>0 do begin
+      Date:=Integer(FileNames.Objects[0]); J:=0;
+      For I:=1 to FileNames.Count-1 do if Integer(FileNames.Objects[I])>Date then begin
+        Date:=Integer(FileNames.Objects[I]); J:=I;
+      end;
+      result:=GetVersionFromDOSBoxReadmeFile(DOSBoxPath+FileNames[J]); If result<>'' then exit;
+      FileNames.Delete(J);
+    end;
+  finally
+    FileNames.Free;
+  end;
 end;
 
 Function OldDOSBoxVersion(const Version : String) : Boolean;
@@ -1640,7 +1695,7 @@ begin
     Editor:=GetDefaultEditor(ExtractFileExt(FileName),PrgSetup.FileTypeFallbackForEditor,False);
   end else begin
     If (S<>'NOTEPAD') and (S<>'NOTEPAD.EXE') then begin
-      If FileExists(PrgSetup.TextEditor) then Editor:=PrgSetup.TextEditor;
+      If FileExists(MakeAbsPath(PrgSetup.TextEditor,PrgSetup.BaseDir)) then Editor:=MakeAbsPath(PrgSetup.TextEditor,PrgSetup.BaseDir);
     end;
   end;
 
@@ -1668,8 +1723,8 @@ begin
     ShellExecute(Application.MainForm.Handle,'open',PChar(FileName),nil,PChar(ExtractFilePath(FileName)),SW_SHOW);
     exit;
   end;
-  If (S<>'') and (S<>'INTERNAL') and FileExists(SetupString) then begin
-    ShellExecute(Application.MainForm.Handle,'open',PChar(SetupString),PChar('"'+FileName+'"'),PChar(ExtractFilePath(FileName)),SW_SHOW);
+  If (S<>'') and (S<>'INTERNAL') and FileExists(MakeAbsPath(SetupString,PrgSetup.BaseDir)) then begin
+    ShellExecute(Application.MainForm.Handle,'open',PChar(MakeAbsPath(SetupString,PrgSetup.BaseDir)),PChar('"'+FileName+'"'),PChar(ExtractFilePath(FileName)),SW_SHOW);
     exit;
   end;
 

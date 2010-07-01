@@ -50,6 +50,8 @@ const ID_Index=1;
       ID_FileOptionsImageScaling=1132;
       ID_FileOptionsMoreEmulator=1133;
       ID_FileOptionsAutomaticConfiguration=1134;
+      ID_FileOptionsDOSBoxGlobal=1135;
+      ID_FileOptionsDataPrivacy=ID_FileOptions; //...
 
       ID_ViewQuickStarter=1501;
 
@@ -119,6 +121,7 @@ const ID_Index=1;
       ID_ExtrasImageFromProfile=3020;
       ID_ExtrasEditCheatDB=3021;
       ID_ExtrasSearchAddress=3022;
+      ID_ExtrasDOSBoxLanguageEditor=3023;
 
       ID_HelpForum=4001;
       ID_HelpStatistics=4003;

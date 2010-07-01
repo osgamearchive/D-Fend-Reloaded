@@ -6,14 +6,15 @@ LangString PrgName ${LANG_DANISH} "${PrgName}"
 LangString LANGNAME_NeedAdminRights ${LANG_DANISH} "Uden admin rettigheder installationsprogrammet kan ikke skrive til mappen Programmer. Kun bærbare mode installationen vil fungere. Vil du prøve at skifte til admin tilstand?"
 LangString LANGNAME_NeedAdminRightsUpdate ${LANG_DANISH} "Uden admin rettigheder installationsprogrammet kan ikke skrive til mappen Programmer. Kun USB stick anlæg kan opdateres derefter. Vil du prøve at skifte til admin tilstand?"
 
-LangString LANGNAME_WelcomeText ${LANG_DANISH} "Denne guide fører dig gennem installationen af $(PrgName).\r\n\r\nD-Fend Reloaded er open source-software og licens unter GPL 3 licens. (Du kan se licens ved at klikke Hjælp|Om i programmet.)\r\n\r\nKlik Næste for at fortsætte."
-LangString LANGNAME_WelcomeTextUpdate ${LANG_DANISH} "Denne guide fører dig gennem opdateringen installationen af $(PrgName). \R\n\r\nDette Installationsprogrammet kræver et eksisterende D-Fend Reloaded installation! \R\n\r\nKlik Næste for at fortsætte."
+LangString LANGNAME_WelcomeText ${LANG_DANISH} "Denne guide fører dig gennem installationen af ${PrgName}.\r\n\r\nD-Fend Reloaded er open source-software og licens unter GPL 3 licens. (Du kan se licens ved at klikke Hjælp|Om i programmet.) D-Fend Reloaded comes without any guarantee or warranty.\r\n\r\nKlik Næste for at fortsætte." ; EXTENDED
+LangString LANGNAME_WelcomeTextUpdate ${LANG_DANISH} "Denne guide fører dig gennem opdateringen installationen af ${PrgName}. \R\n\r\nDette Installationsprogrammet kræver et eksisterende D-Fend Reloaded installation! \R\n\r\nKlik Næste for at fortsætte."
 LangString LANGNAME_Next ${LANG_DANISH} "Næste"
 LicenseLangString LANGNAME_License ${LANG_DANISH} "..\Bin\License.txt"
 LangString LANGNAME_LICENSE_TITLE ${LANG_DANISH} "Information"
 LangString LANGNAME_LICENSE_SUBTITLE ${LANG_DANISH} "Yderligere oplysninger til $(PrgName)"
 LangString LANGNAME_LICENSE_TOP ${LANG_DANISH} "Vær opmærksom på følgende oplysninger, før du fortsætter:"
 LangString LANGNAME_LICENSE_BOTTOM ${LANG_DANISH} "Brug dette program på din egen risiko. Klik på Næste for at fortsætte."
+LangString LANGNAME_DIRECTORYPAGE_TEXT_TOP ${LANG_DANISH} "Installationsguiden vil installere ${PrgName} i følgende mappe. For at installere i en anden mappe, tryk Gennemse og vælg en anden mappe. It is strongly recommended to install ${PrgName} in a separate directory, not together with other programs in the same directory." ; NEW
 LangString PAGE_TITLE ${LANG_DANISH} "Installation type"
 LangString PAGE_SUBTITLE ${LANG_DANISH} "Vælg, hvilken type installation vil du have."
 LangString PAGE2_TITLE ${LANG_DANISH} "Installer mode"
@@ -23,9 +24,10 @@ LangString LANGNAME_DFendReloaded ${LANG_DANISH} "D-Fend Reloaded"
 LangString LANGNAME_Uninstall ${LANG_DANISH} "Afinstaller"
 LangString LANGNAME_GamesFolder ${LANG_DANISH} "Spil mappe"
 LangString LANGNAME_GameDataFolder ${LANG_DANISH} "Manualer mappe"
+LangString LANGNAME_CaptureFolder ${LANG_DANISH} "Screenshots folder" ; NEW
 LangString LANGNAME_Deinstall ${LANG_DANISH} "deinstall"
 LangString LANGNAME_ConfirmDelUserData ${LANG_DANISH} "Ønsker du at slette data mappen $DataInstDir?"
-LangString LANGNAME_ConfirmDelPrgDir ${LANG_DANISH} "There are some files not created by the D-Fend Reloaded installer in the installation directory. Do you want to remove the folder $INSTDIR anyway?" ; New !
+LangString LANGNAME_ConfirmDelPrgDir ${LANG_DANISH} "There are some files not created by the D-Fend Reloaded installer in the installation directory. Do you want to remove the folder $INSTDIR anyway?" ; NEW
 
 LangString LANGNAME_NoInstallationFound ${LANG_DANISH} "Der er ingen D-Febd Reloaded installation i den valgte mappe som kunne være opdateret."
 

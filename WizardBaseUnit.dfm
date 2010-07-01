@@ -11,7 +11,7 @@ object WizardBaseFrame: TWizardBaseFrame
     Left = 8
     Top = 16
     Width = 571
-    Height = 49
+    Height = 65
     Anchors = [akLeft, akTop, akRight]
     AutoSize = False
     Caption = 'Please choose the type of profile you want to create.'
@@ -19,7 +19,7 @@ object WizardBaseFrame: TWizardBaseFrame
   end
   object Bevel: TBevel
     Left = 3
-    Top = 56
+    Top = 71
     Width = 589
     Height = 18
     Anchors = [akLeft, akTop, akRight]
@@ -27,7 +27,7 @@ object WizardBaseFrame: TWizardBaseFrame
   end
   object EmulationTypeLabel: TLabel
     Left = 8
-    Top = 87
+    Top = 102
     Width = 95
     Height = 13
     Caption = 'EmulationTypeLabel'
@@ -35,7 +35,7 @@ object WizardBaseFrame: TWizardBaseFrame
   end
   object WizardModeLabel: TLabel
     Left = 8
-    Top = 148
+    Top = 163
     Width = 84
     Height = 13
     Caption = 'WizardModeLabel'
@@ -43,7 +43,7 @@ object WizardBaseFrame: TWizardBaseFrame
   end
   object ListScummGamesLabel: TLabel
     Left = 8
-    Top = 224
+    Top = 239
     Width = 151
     Height = 13
     Caption = 'List of supported Scumm games'
@@ -52,7 +52,7 @@ object WizardBaseFrame: TWizardBaseFrame
   object ShowInfoLabel: TLabel
     Tag = 1
     Left = 8
-    Top = 248
+    Top = 263
     Width = 256
     Height = 13
     Caption = 'Information about the D-Fend Reloaded file structure'
@@ -60,7 +60,7 @@ object WizardBaseFrame: TWizardBaseFrame
   end
   object InfoLabelInstallationSupport: TLabel
     Left = 8
-    Top = 272
+    Top = 287
     Width = 360
     Height = 13
     Caption = 
@@ -70,7 +70,7 @@ object WizardBaseFrame: TWizardBaseFrame
   object InfoLabelInstallationSupportLink: TLabel
     Tag = 2
     Left = 8
-    Top = 291
+    Top = 306
     Width = 115
     Height = 13
     Caption = 'Game installation wizard'
@@ -78,7 +78,7 @@ object WizardBaseFrame: TWizardBaseFrame
   end
   object EmulationTypeComboBox: TComboBox
     Left = 8
-    Top = 103
+    Top = 118
     Width = 571
     Height = 21
     Style = csDropDownList
@@ -94,7 +94,7 @@ object WizardBaseFrame: TWizardBaseFrame
   end
   object WizardModeComboBox: TComboBox
     Left = 8
-    Top = 164
+    Top = 179
     Width = 571
     Height = 21
     Style = csDropDownList

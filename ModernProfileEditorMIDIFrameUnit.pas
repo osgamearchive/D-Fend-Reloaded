@@ -17,6 +17,7 @@ type
     MIDISelectListBox: TListBox;
     MIDISelectLabel1: TLabel;
     MIDISelectLabel2: TLabel;
+    InfoLabel: TLabel;
     procedure MIDISelectButtonClick(Sender: TObject);
     procedure MIDISelectListBoxClick(Sender: TObject);
   private
@@ -45,6 +46,7 @@ begin
   NoFlicker(DeviceComboBox);
   NoFlicker(AdditionalSettingsEdit);
 
+  InfoLabel.Caption:=LanguageSetup.ProfileEditorSoundMIDIInfo;
   TypeLabel.Caption:=LanguageSetup.ProfileEditorSoundMIDIType;
   St:=ValueToList(InitData.GameDB.ConfOpt.MPU401,';,'); try TypeComboBox.Items.AddStrings(St); finally St.Free; end;
   DeviceLabel.Caption:=LanguageSetup.ProfileEditorSoundMIDIDevice;
@@ -63,8 +65,6 @@ end;
 
 procedure TModernProfileEditorMIDIFrame.ShowFrame(Sender: TObject);
 begin
-  MIDISelectButton.Visible:=PrgSetup.ActivateIncompleteFeatures;
-  MIDISelectLabel1.Visible:=PrgSetup.ActivateIncompleteFeatures;
 end;
 
 Procedure SetComboBox(const ComboBox : TComboBox; const Value : String; const Default : Integer); overload;

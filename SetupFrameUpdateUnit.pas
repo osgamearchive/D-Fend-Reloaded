@@ -8,12 +8,7 @@ uses
 
 type
   TSetupFrameUpdate = class(TFrame, ISetupFrame)
-    Update0RadioButton: TRadioButton;
-    Update1RadioButton: TRadioButton;
-    Update2RadioButton: TRadioButton;
-    Update3RadioButton: TRadioButton;
     UpdateCheckBox: TCheckBox;
-    UpdateLabel: TLabel;
     DataReaderInfoLabel: TLabel;
     DataReaderComboBox: TComboBox;
     PackagesLabel: TLabel;
@@ -21,6 +16,8 @@ type
     UpdateButton: TBitBtn;
     CheatsLabel: TLabel;
     CheatsComboBox: TComboBox;
+    ProgramUpdateInfoLabel: TLabel;
+    ProgramUpdateComboBox: TComboBox;
     procedure ButtonWork(Sender: TObject);
   private
     { Private-Deklarationen }
@@ -57,15 +54,12 @@ end;
 
 procedure TSetupFrameUpdate.InitGUIAndLoadSetup(var InitData: TInitData);
 begin
-  case PrgSetup.CheckForUpdates of
-    0 : Update0RadioButton.Checked:=True;
-    1 : Update1RadioButton.Checked:=True;
-    2 : Update2RadioButton.Checked:=True;
-    3 : Update3RadioButton.Checked:=True;
-  end;
   UpdateCheckBox.Checked:=PrgSetup.VersionSpecificUpdateCheck;
 
   UserIconLoader.DialogImage(DI_Update,UpdateButton);
+
+  ProgramUpdateComboBox.Items.Clear;
+  While ProgramUpdateComboBox.Items.Count<4 do ProgramUpdateComboBox.Items.Add('');
 
   DataReaderComboBox.Items.Clear;
   While DataReaderComboBox.Items.Count<4 do DataReaderComboBox.Items.Add('');
@@ -76,6 +70,7 @@ begin
   CheatsComboBox.Items.Clear;
   While CheatsComboBox.Items.Count<3 do CheatsComboBox.Items.Add('');
 
+  ProgramUpdateComboBox.ItemIndex:=Max(0,Min(3,PrgSetup.CheckForUpdates));
   DataReaderComboBox.ItemIndex:=Max(0,Min(3,PrgSetup.DataReaderCheckForUpdates));
   PackagesComboBox.ItemIndex:=Max(0,Min(3,PrgSetup.PackageListsCheckForUpdates));
   CheatsComboBox.ItemIndex:=Max(0,Min(2,PrgSetup.CheatsDBCheckForUpdates));
@@ -90,13 +85,22 @@ end;
 procedure TSetupFrameUpdate.LoadLanguage;
 Var I : Integer;
 begin
-  Update0RadioButton.Caption:=LanguageSetup.SetupFormUpdate0;
-  Update1RadioButton.Caption:=LanguageSetup.SetupFormUpdate1;
-  Update2RadioButton.Caption:=LanguageSetup.SetupFormUpdate2;
-  Update3RadioButton.Caption:=LanguageSetup.SetupFormUpdate3;
   UpdateCheckBox.Caption:=LanguageSetup.SetupFormUpdateVersionSpecific;
-  UpdateLabel.Caption:=LanguageSetup.SetupFormUpdateInfo;
   UpdateButton.Caption:=LanguageSetup.SetupFormUpdateButton;
+
+  TForm(Owner).Canvas.Font:=UpdateButton.Font;
+  UpdateButton.Width:=Max(169,40+TForm(Owner).Canvas.TextWidth(LanguageSetup.SetupFormUpdateButton));
+
+  ProgramUpdateInfoLabel.Caption:=LanguageSetup.SetupFormUpdateProgram;
+  I:=ProgramUpdateComboBox.ItemIndex;
+  try
+    ProgramUpdateComboBox.Items[0]:=LanguageSetup.SetupFormUpdate0;
+    ProgramUpdateComboBox.Items[1]:=LanguageSetup.SetupFormUpdate1;
+    ProgramUpdateComboBox.Items[2]:=LanguageSetup.SetupFormUpdate2;
+    ProgramUpdateComboBox.Items[3]:=LanguageSetup.SetupFormUpdate3;
+  finally
+    ProgramUpdateComboBox.ItemIndex:=I;
+  end;
 
   DataReaderInfoLabel.Caption:=LanguageSetup.SetupFormUpdateDataReader;
   I:=DataReaderComboBox.ItemIndex;
@@ -139,13 +143,6 @@ end;
 
 procedure TSetupFrameUpdate.ShowFrame(const AdvencedMode: Boolean);
 begin
-  UpdateButton.Visible:=PrgSetup.ActivateIncompleteFeatures;
-  DataReaderInfoLabel.Visible:=PrgSetup.ActivateIncompleteFeatures;
-  DataReaderComboBox.Visible:=PrgSetup.ActivateIncompleteFeatures;
-  PackagesLabel.Visible:=PrgSetup.ActivateIncompleteFeatures;
-  PackagesComboBox.Visible:=PrgSetup.ActivateIncompleteFeatures;
-  CheatsLabel.Visible:=PrgSetup.ActivateIncompleteFeatures;
-  CheatsComboBox.Visible:=PrgSetup.ActivateIncompleteFeatures;
 end;
 
 procedure TSetupFrameUpdate.HideFrame;
@@ -154,9 +151,9 @@ end;
 
 procedure TSetupFrameUpdate.RestoreDefaults;
 begin
-  Update0RadioButton.Checked:=True;
   UpdateCheckBox.Checked:=True;
 
+  ProgramUpdateComboBox.ItemIndex:=0;
   DataReaderComboBox.ItemIndex:=2;
   PackagesComboBox.ItemIndex:=0;
   CheatsComboBox.ItemIndex:=0;
@@ -164,12 +161,9 @@ end;
 
 procedure TSetupFrameUpdate.SaveSetup;
 begin
-  If Update0RadioButton.Checked then PrgSetup.CheckForUpdates:=0;
-  If Update1RadioButton.Checked then PrgSetup.CheckForUpdates:=1;
-  If Update2RadioButton.Checked then PrgSetup.CheckForUpdates:=2;
-  If Update3RadioButton.Checked then PrgSetup.CheckForUpdates:=3;
   PrgSetup.VersionSpecificUpdateCheck:=UpdateCheckBox.Checked;
 
+  PrgSetup.CheckForUpdates:=ProgramUpdateComboBox.ItemIndex;
   PrgSetup.DataReaderCheckForUpdates:=DataReaderComboBox.ItemIndex;
   PrgSetup.PackageListsCheckForUpdates:=PackagesComboBox.ItemIndex;
   PrgSetup.CheatsDBCheckForUpdates:=CheatsComboBox.ItemIndex;
@@ -177,12 +171,7 @@ end;
 
 procedure TSetupFrameUpdate.ButtonWork(Sender: TObject);
 begin
-  If PrgSetup.ActivateIncompleteFeatures then begin
-    ShowUpdateCheckDialog(self,GameDB);
-  end else begin
-    RunUpdateCheck(self,False);
-  end;
+  ShowUpdateCheckDialog(self,GameDB,True);
 end;
-
 
 end.

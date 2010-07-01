@@ -29,6 +29,7 @@ type
   public
     { Public-Deklarationen }
     Function Init(const AInfoData : TInfoData) : Boolean;
+    Function CheckBeforeDone : Boolean;
     Function Done : String;
     Function GetName : String;
     Procedure ShowFrame;
@@ -101,6 +102,11 @@ end;
 
 procedure TProfileMountEditorFloppyImage1Frame.ShowFrame;
 begin
+end;
+
+function TProfileMountEditorFloppyImage1Frame.CheckBeforeDone: Boolean;
+begin
+  result:=True;
 end;
 
 function TProfileMountEditorFloppyImage1Frame.Done: String;

@@ -9,7 +9,7 @@ object WizardScummVMSettingsFrame: TWizardScummVMSettingsFrame
     511)
   object LanguageLabel: TLabel
     Left = 20
-    Top = 85
+    Top = 100
     Width = 72
     Height = 13
     Caption = 'LanguageLabel'
@@ -18,7 +18,7 @@ object WizardScummVMSettingsFrame: TWizardScummVMSettingsFrame
     Left = 8
     Top = 16
     Width = 543
-    Height = 49
+    Height = 65
     Anchors = [akLeft, akTop, akRight]
     AutoSize = False
     Caption = 
@@ -28,7 +28,7 @@ object WizardScummVMSettingsFrame: TWizardScummVMSettingsFrame
   end
   object Bevel: TBevel
     Left = 3
-    Top = 56
+    Top = 71
     Width = 589
     Height = 18
     Anchors = [akLeft, akTop, akRight]
@@ -36,7 +36,7 @@ object WizardScummVMSettingsFrame: TWizardScummVMSettingsFrame
   end
   object LanguageInfoLabel: TLabel
     Left = 20
-    Top = 284
+    Top = 299
     Width = 552
     Height = 137
     Anchors = [akLeft, akTop, akRight]
@@ -46,7 +46,7 @@ object WizardScummVMSettingsFrame: TWizardScummVMSettingsFrame
   end
   object LanguageComboBox: TComboBox
     Left = 19
-    Top = 104
+    Top = 119
     Width = 105
     Height = 21
     Style = csDropDownList
@@ -56,7 +56,7 @@ object WizardScummVMSettingsFrame: TWizardScummVMSettingsFrame
   end
   object StartFullscreenCheckBox: TCheckBox
     Left = 20
-    Top = 144
+    Top = 159
     Width = 569
     Height = 17
     Anchors = [akLeft, akTop, akRight]
@@ -65,7 +65,7 @@ object WizardScummVMSettingsFrame: TWizardScummVMSettingsFrame
   end
   object SavePathGroupBox: TGroupBox
     Left = 19
-    Top = 184
+    Top = 199
     Width = 561
     Height = 86
     Anchors = [akLeft, akTop, akRight]
@@ -130,7 +130,7 @@ object WizardScummVMSettingsFrame: TWizardScummVMSettingsFrame
   end
   object CustomLanguageEdit: TEdit
     Left = 130
-    Top = 104
+    Top = 119
     Width = 50
     Height = 21
     TabOrder = 3

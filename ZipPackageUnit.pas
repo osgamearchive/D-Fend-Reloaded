@@ -5,6 +5,7 @@ uses Classes, Math, GameDBUnit;
 
 Procedure BuildZipPackage(const AOwner : TComponent; const AGame : TGame; const AFileName : String);
 Function ImportZipPackage(const AOwner : TComponent; const AFileName : String; const AGameDB : TGameDB; const NoDialogIfAutoSetupIsAvailable : Boolean) : TGame;
+Function ImportFolder(const AOwner : TComponent; const AFolderName : String; const AGameDB : TGameDB; const NoDialogIfAutoSetupIsAvailable : Boolean) : TGame;
 
 Function AdditionalDataMatching(const Folder : String; const Template : TGame) : Boolean;
 
@@ -523,7 +524,7 @@ begin
       For I:=0 to PrgFiles.Count-1 do If Integer(PrgFiles.Objects[I])=NewLevel then begin
         GameCheckSum:=GetMD5Sum(Folder+PrgFiles[I]);
         For J:=0 to AutoSetupDB.Count-1 do
-          If (AutoSetupDB[J].GameExeMD5<>'') and (AutoSetupDB[J].GameExeMD5=GameCheckSum) then begin
+          If (Trim(ExtUpperCase(AutoSetupDB[J].GameExe))=Trim(ExtUpperCase(PrgFiles[I]))) and (AutoSetupDB[J].GameExeMD5<>'') and (AutoSetupDB[J].GameExeMD5=GameCheckSum) then begin
           result.AddObject(PrgFiles[I],TObject(J));
         end;
       end;
@@ -640,7 +641,7 @@ begin
   end;
 end;
 
-Function AddGameFromSimpleFolder(Dir : String; const GameDB, TemplateDB, AutoSetupDB : TGameDB; const ProfileName, ProfileFolder, FileToStart, SetupFileToStart : String; const TemplateNr : Integer; const DoNotCopyFolder : Boolean) : TGame;
+Function AddGameFromSimpleFolder(Dir : String; const GameDB, TemplateDB, AutoSetupDB : TGameDB; const ProfileName, ProfileFolder, FileToStart, SetupFileToStart : String; const TemplateNr : Integer; const DoNotCopyFolder, MoveFiles : Boolean) : TGame;
 const FileExts : Array[0..5] of String = ('ico','png','jpeg','jpg','gif','bmp');
 Var GameDir,NewGameFolder,S : String;
     I,J : Integer;
@@ -673,7 +674,7 @@ begin
      Application.MainForm.Enabled:=False;
     end;
     try
-      if not CopyFolderWithMsg(Dir,GameDir+NewGameFolder,True,True) then exit;
+      if not CopyFolderWithMsg(Dir,GameDir+NewGameFolder,True,MoveFiles) then exit;
     finally
       If Application.MainForm<>nil then begin
         While PeekMessage(Msg,Application.MainForm.Handle,WM_INPUT,WM_INPUT,1) do ;
@@ -737,25 +738,39 @@ Var AutoSetupDB,TemplateDB : TGameDB;
     Nr : Integer;
     ProfileName,FileToStart,SetupFileToStart,ProfileFolder : String;
     UseInstallSupport : Boolean;
+    AlternateProfileNameSource, OrigDir : String;
 begin
   result:=nil;
 
   {If folder has only got some subfolder, use this}
+  OrigDir:=Dir;
   Dir:=OnlySubFolderCheck(Dir);
 
   AutoSetupDB:=TGameDB.Create(PrgDataDir+AutoSetupSubDir,False);
   StartableFiles:=TStringList.Create;
   try
     AutoSetup:=GetTemplateFromFolderExt(False,Dir,AutoSetupDB,StartableFiles);
-    If StartableFiles.Count=0 then begin MessageDlg(LanguageSetup.MessageZipImportError,mtError,[mbOK],0); exit; end;
+    If StartableFiles.Count=0 then begin
+      If ArchiveFileName=''
+        then MessageDlg(LanguageSetup.MessageFolderImportError,mtError,[mbOK],0)
+        else MessageDlg(LanguageSetup.MessageZipImportError,mtError,[mbOK],0);
+      exit;
+    end;
     try
       TemplateDB:=TGameDB.Create(PrgDataDir+TemplateSubDir,False);
       try
-        If not ShowSelectTemplateForZipImportDialog(Application.MainForm,AutoSetupDB,TemplateDB,StartableFiles,AutoSetup,ArchiveFileName,ProfileName,FileToStart,SetupFileToStart,ProfileFolder,Nr,NoDialogIfAutoSetupIsAvailable,DoNotCopyFolder,UseInstallSupport) then exit;
+        If ArchiveFileName<>'' then AlternateProfileNameSource:='' else begin
+          AlternateProfileNameSource:=OrigDir;
+          If (length(AlternateProfileNameSource)>0) and (AlternateProfileNameSource[length(AlternateProfileNameSource)]='\') then SetLength(AlternateProfileNameSource,length(AlternateProfileNameSource)-1);
+          While Pos('\',AlternateProfileNameSource)>0 do AlternateProfileNameSource:=Copy(AlternateProfileNameSource,Pos('\',AlternateProfileNameSource)+1,MaxInt);
+        end;
+        If not ShowSelectTemplateForZipImportDialog(Application.MainForm,AutoSetupDB,TemplateDB,StartableFiles,AutoSetup,ArchiveFileName,AlternateProfileNameSource,ProfileName,FileToStart,SetupFileToStart,ProfileFolder,Nr,NoDialogIfAutoSetupIsAvailable,DoNotCopyFolder,UseInstallSupport) then exit;
         If UseInstallSupport then begin
-          result:=RunInstallationFromZipFile(Application.MainForm,GameDB,ArchiveFileName,Dir);
+          If ArchiveFileName=''
+            then result:=RunInstallationFromFolder(Application.MainForm,GameDB,Dir)
+            else result:=RunInstallationFromZipFile(Application.MainForm,GameDB,ArchiveFileName,Dir);
         end else begin
-          result:=AddGameFromSimpleFolder(Dir,GameDB,TemplateDB,AutoSetupDB,ProfileName,ProfileFolder,FileToStart,SetupFileToStart,Nr,DoNotCopyFolder);
+          result:=AddGameFromSimpleFolder(Dir,GameDB,TemplateDB,AutoSetupDB,ProfileName,ProfileFolder,FileToStart,SetupFileToStart,Nr,DoNotCopyFolder,ArchiveFileName<>'');
         end;
       finally
         TemplateDB.Free;
@@ -790,7 +805,7 @@ begin
   end;
 end;
 
-Function CreateGameFromDFRPackageFolder(const Dir : String; const GameDB : TGameDB; const TempProfFile : String) : TGame;
+Function CreateGameFromDFRPackageFolder(const Dir : String; const GameDB : TGameDB; const TempProfFile : String; const MoveFiles : Boolean) : TGame;
 Var ProfFile : String;
     I : Integer;
     B : Boolean;
@@ -807,7 +822,7 @@ begin
     repeat inc(I); until not FileExists(ChangeFileExt(ProfFile,IntToStr(I)+'.prof'));
     ProfFile:=ChangeFileExt(ProfFile,IntToStr(I)+'.prof');
   end;
-  If not CopyFileWithMsg(TempProfFile,ProfFile,False,True) then exit;
+  If not CopyFileWithMsg(TempProfFile,ProfFile,False,MoveFiles) then exit;
 
   result:=TGame.Create(ProfFile);
   GameDB.Add(result);
@@ -932,7 +947,7 @@ begin
   end;
 end;
 
-Function CreateGameFromDBGLPackage(const Dir : String; const GameDB : TGameDB; const GameNode : IXMLNode; const CustomNames : TStringList) : TGame;
+Function CreateGameFromDBGLPackage(const Dir : String; const GameDB : TGameDB; const GameNode : IXMLNode; const CustomNames : TStringList; const MoveFiles : Boolean) : TGame;
 Var I,J,K : Integer;
     N,N2 : IXMLNode;
     S,Capture,GameDir,ID,Config : String;
@@ -992,7 +1007,7 @@ begin
   end;
 
   {Copy game folders}
-  CopyFolderWithMsg(IncludeTrailingPathDelimiter(Dir)+'dosroot\'+ID+'\',MakeAbsPath(PrgSetup.GameDir,PrgSetup.BaseDir),True,True);
+  CopyFolderWithMsg(IncludeTrailingPathDelimiter(Dir)+'dosroot\'+ID+'\',MakeAbsPath(PrgSetup.GameDir,PrgSetup.BaseDir),True,MoveFiles);
 
   {Load profile settings}
   St:=TStringList.Create;
@@ -1044,7 +1059,7 @@ begin
   result.LoadCache;
 end;
 
-Function CreateGamesFromDBGLPackageFolder(const Owner : TComponent; const Dir : String; const GameDB : TGameDB; const TempProfFile : String) : TGame;
+Function CreateGamesFromDBGLPackageFolder(const Owner : TComponent; const Dir : String; const GameDB : TGameDB; const TempProfFile : String; const MoveFiles : Boolean) : TGame;
 Var XMLDoc : TXMLDocument;
     N,N2 : IXMLNode;
     ProfileNames,CustomNames : TStringList;
@@ -1089,7 +1104,7 @@ begin
       LoadAndShowSmallWaitForm(LanguageSetup.ImportDBGLPackageProgress);
       try
         For I:=0 to ProfileNames.Count-1 do begin
-          G:=CreateGameFromDBGLPackage(Dir,GameDB,ProfileNodes[Integer(ProfileNames.Objects[I])],CustomNames);
+          G:=CreateGameFromDBGLPackage(Dir,GameDB,ProfileNodes[Integer(ProfileNames.Objects[I])],CustomNames,MoveFiles);
           If G<>nil then result:=G;
         end;
       finally
@@ -1110,16 +1125,16 @@ begin
   TempProfFile:=GetProfFileName(Dir);
 
   If TempProfFile='' then begin
-    If FileExists(Dir+DBGLPackageInfoFile) and PrgSetup.ActivateIncompleteFeatures then begin
+    If FileExists(Dir+DBGLPackageInfoFile) then begin
       {Import DBGL package file}
-      result:=CreateGamesFromDBGLPackageFolder(Owner,Dir,GameDB,Dir+DBGLPackageInfoFile);
+      result:=CreateGamesFromDBGLPackageFolder(Owner,Dir,GameDB,Dir+DBGLPackageInfoFile,ArchivFileName<>'');
     end else begin
       {Add simple zip archive}
       result:=CreateGameFromSimpleFolder(Dir,GameDB,ArchivFileName,NoDialogIfAutoSetupIsAvailable,False);
     end;
   end else begin
     {Add normal zip package (with prof file)}
-    result:=CreateGameFromDFRPackageFolder(Dir,GameDB,TempProfFile);
+    result:=CreateGameFromDFRPackageFolder(Dir,GameDB,TempProfFile,ArchivFileName<>'');
   end;
 end;
 
@@ -1139,8 +1154,8 @@ begin
   try
     if not ExtractZipFile(AOwner,AFileName,Temp) then exit;
 
-    If PrgSetup.ActivateIncompleteFeatures and TestInstallationSupportNeeded(Temp) then begin
-      If MessageDlg(LanguageSetup.InstallationSupportArchiveCheck,mtConfirmation,[mbYes,mbNo],0)=mrYes then InstSupport:=True; 
+    If TestInstallationSupportNeeded(Temp) then begin
+      If MessageDlg(LanguageSetup.InstallationSupportArchiveCheck,mtConfirmation,[mbYes,mbNo],0)=mrYes then InstSupport:=True;
     end;
 
     if InstSupport then begin
@@ -1154,6 +1169,26 @@ begin
     end;
   finally
     ExtDeleteFolder(Temp,ftTemp);
+  end;
+end;
+
+Function ImportFolder(const AOwner : TComponent; const AFolderName : String; const AGameDB : TGameDB; const NoDialogIfAutoSetupIsAvailable : Boolean) : TGame;
+Var InstSupport : Boolean;
+begin
+  InstSupport:=False;
+
+  If TestInstallationSupportNeeded(AFolderName) then begin
+    If MessageDlg(LanguageSetup.InstallationSupportFolderCheck,mtConfirmation,[mbYes,mbNo],0)=mrYes then InstSupport:=True;
+  end;
+
+  if InstSupport then begin
+    result:=RunInstallationFromFolder(AOwner,AGameDB,AFolderName);
+  end else begin
+    result:=CreateGameFromFolder(AOwner,AFolderName,AGameDB,'',NoDialogIfAutoSetupIsAvailable);
+    If result<>nil then begin
+      result.StoreAllValues;
+      result.LoadCache;
+    end;
   end;
 end;
 

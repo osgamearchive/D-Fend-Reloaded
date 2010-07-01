@@ -4,4 +4,4 @@ LangString runwarning ${LANG_CZECH} "Prosím ukonèete všechny instance ${CLOSENAM
 LangString invaliddirectory ${LANG_CZECH} "Zvolený cílový adresáø je neplatný.  Prosím zvolte správný adresáø."
 LangString notenoughspace ${LANG_CZECH} "Zvolené zaøízení nemá dostatek volného místa potøebného pro instalaci této aplikace."
 LangString checkforplatform ${LANG_CZECH} "Kontroluji portál PortableApps.com"
-LangString refreshmenu ${LANG_CZECH} "Aktualizuji nabídku PortableApps.com"
+LangString refreshmenu ${LANG_CZECH} "Aktualizuji Menu PortableApps.com"

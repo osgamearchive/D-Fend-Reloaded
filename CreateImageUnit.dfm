@@ -3,7 +3,7 @@ object CreateImageForm: TCreateImageForm
   Top = 0
   BorderStyle = bsDialog
   Caption = 'CreateImage'
-  ClientHeight = 476
+  ClientHeight = 495
   ClientWidth = 554
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -16,9 +16,10 @@ object CreateImageForm: TCreateImageForm
   Position = poOwnerFormCenter
   OnCreate = FormCreate
   OnKeyDown = FormKeyDown
+  OnShow = FormShow
   DesignSize = (
     554
-    476)
+    495)
   PixelsPerInch = 96
   TextHeight = 13
   object ImageFileButton: TSpeedButton
@@ -61,12 +62,9 @@ object CreateImageForm: TCreateImageForm
     ActivePage = FloppyImageSheet
     Images = ImageList
     TabOrder = 0
+    OnChange = PageControlChange
     object FloppyImageSheet: TTabSheet
       Caption = 'Floppy Image'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object FloppyImageTypeLabel: TLabel
         Left = 16
         Top = 16
@@ -101,7 +99,7 @@ object CreateImageForm: TCreateImageForm
         Width = 516
         Height = 21
         Style = csDropDownList
-        ItemHeight = 0
+        ItemHeight = 13
         TabOrder = 0
         OnChange = FloppyImageTypeComboBoxChange
       end
@@ -111,7 +109,7 @@ object CreateImageForm: TCreateImageForm
         Width = 96
         Height = 21
         Style = csDropDownList
-        ItemHeight = 0
+        ItemHeight = 13
         TabOrder = 1
         OnChange = FloppyDataChange
       end
@@ -121,7 +119,7 @@ object CreateImageForm: TCreateImageForm
         Width = 96
         Height = 21
         Style = csDropDownList
-        ItemHeight = 0
+        ItemHeight = 13
         TabOrder = 2
         OnChange = FloppyDataChange
       end
@@ -131,7 +129,7 @@ object CreateImageForm: TCreateImageForm
         Width = 96
         Height = 21
         Style = csDropDownList
-        ItemHeight = 0
+        ItemHeight = 13
         TabOrder = 3
         OnChange = FloppyDataChange
       end
@@ -150,10 +148,6 @@ object CreateImageForm: TCreateImageForm
     object HDImageSheet: TTabSheet
       Caption = 'HD Image'
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object HDSizeEdit: TLabeledEdit
         Left = 16
         Top = 32
@@ -181,32 +175,35 @@ object CreateImageForm: TCreateImageForm
   end
   object OKButton: TBitBtn
     Left = 8
-    Top = 443
-    Width = 97
-    Height = 25
-    Anchors = [akLeft, akBottom]
-    TabOrder = 10
-    OnClick = OKButtonClick
-    Kind = bkOK
-  end
-  object CancelButton: TBitBtn
-    Left = 120
-    Top = 443
+    Top = 462
     Width = 97
     Height = 25
     Anchors = [akLeft, akBottom]
     TabOrder = 11
-    Kind = bkCancel
+    OnClick = OKButtonClick
+    Kind = bkOK
+    ExplicitTop = 443
   end
-  object HelpButton: TBitBtn
-    Left = 232
-    Top = 443
+  object CancelButton: TBitBtn
+    Left = 120
+    Top = 462
     Width = 97
     Height = 25
     Anchors = [akLeft, akBottom]
     TabOrder = 12
+    Kind = bkCancel
+    ExplicitTop = 443
+  end
+  object HelpButton: TBitBtn
+    Left = 232
+    Top = 462
+    Width = 97
+    Height = 25
+    Anchors = [akLeft, akBottom]
+    TabOrder = 13
     OnClick = HelpButtonClick
     Kind = bkHelp
+    ExplicitTop = 443
   end
   object ImageFileEdit: TLabeledEdit
     Left = 8
@@ -299,6 +296,15 @@ object CreateImageForm: TCreateImageForm
     Checked = True
     State = cbChecked
     TabOrder = 7
+  end
+  object WriteToFloppyCheckBox: TCheckBox
+    Left = 8
+    Top = 432
+    Width = 518
+    Height = 17
+    Anchors = [akLeft, akTop, akRight]
+    Caption = 'Write image file to real floppy after creation'
+    TabOrder = 10
   end
   object ImageList: TImageList
     Left = 192

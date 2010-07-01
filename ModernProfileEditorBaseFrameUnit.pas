@@ -38,6 +38,7 @@ type
     InfoButton1: TSpeedButton;
     InfoButton2: TSpeedButton;
     IgnoreWindowsWarningsCheckBox: TCheckBox;
+    TurnOffDOSBoxFailedWarningCheckBox: TCheckBox;
     procedure IconButtonClick(Sender: TObject);
     procedure ExeSelectButtonClick(Sender: TObject);
     procedure ProfileNameEditChange(Sender: TObject);
@@ -60,6 +61,8 @@ type
     procedure LoadIcon;
     Procedure CheckValue(Sender : TObject; var OK : Boolean);
     Procedure ShowFrame(Sender : TObject);
+    Procedure ProfileNameChangedCallback(Sender : TObject);
+    Procedure CalcCheckBoxTop;
   public
     { Public-Deklarationen }
     ExtraExeFiles : TStringList;
@@ -98,6 +101,7 @@ begin
   InitData.OnCheckValue:=CheckValue;
   InitData.OnShowFrame:=ShowFrame;
   InitData.AllowDefaultValueReset:=False;
+  InitData.OnProfileNameChangedCallback:=ProfileNameChangedCallback;
 
   ScummVM:=False;
   WindowsMode:=False;
@@ -167,6 +171,9 @@ begin
 
   IgnoreWindowsWarningsCheckBox.Caption:=LanguageSetup.ProfileEditorIgnoreWindowsWarnings;
   IgnoreWindowsWarningsCheckBox.Hint:=LanguageSetup.ProfileEditorIgnoreWindowsWarningsHints;
+
+  TurnOffDOSBoxFailedWarningCheckBox.Caption:=LanguageSetup.TurnOffDOSBoxFailedWarning;
+  TurnOffDOSBoxFailedWarningCheckBox.Hint:=LanguageSetup.TurnOffDOSBoxFailedWarningHints;
 
   HelpContext:=ID_ProfileEditProfile;
 end;
@@ -258,6 +265,7 @@ begin
       SetupParameterEdit.Text:=Game.SetupParameters;
 
       IgnoreWindowsWarningsCheckBox.Checked:=Game.IgnoreWindowsFileWarnings;
+      TurnOffDOSBoxFailedWarningCheckBox.Checked:=Game.NoDOSBoxFailedDialog;
     end;
     { Windows and DOSBox mode }
     For I:=0 to 9 do If Trim(Game.ExtraPrgFile[I])<>'' then ExtraExeFiles.Add(Game.ExtraPrgFile[I]);
@@ -274,23 +282,33 @@ begin
     GameGroup.Visible:=True;
     GameComboBoxChange(self);
     IgnoreWindowsWarningsCheckBox.Visible:=False;
+    TurnOffDOSBoxFailedWarningCheckBox.Visible:=False;
   end else begin
     GameGroup.Visible:=False;
     GameExeGroup.Top:=GameGroup.Top;
     SetupExeGroup.Top:=GameExeGroup.BoundsRect.Bottom+8;
     ExtraExeFilesButton.Top:=SetupExeGroup.BoundsRect.Bottom+8;
     IgnoreWindowsWarningsCheckBox.Top:=ExtraExeFilesButton.Top+5;
+    TurnOffDOSBoxFailedWarningCheckBox.Top:=IgnoreWindowsWarningsCheckBox.Top+IgnoreWindowsWarningsCheckBox.Height;
     If WindowsMode then begin
       GameRelPathCheckBox.Visible:=False;
       SetupRelPathCheckBox.Visible:=False;
       InfoButton1.Visible:=False;
       InfoButton2.Visible:=False;
       IgnoreWindowsWarningsCheckBox.Visible:=False;
+      TurnOffDOSBoxFailedWarningCheckBox.Visible:=False;
     end else begin
       { DOSBox mode }
       GameExeEditChange(Sender); {Make IgnoreWindowsWarningsCheckBox visible if needed}
+      TurnOffDOSBoxFailedWarningCheckBox.Visible:=TurnOffDOSBoxFailedWarningCheckBox.Checked;
+      CalcCheckBoxTop;
     end;
   end;
+end;
+
+procedure TModernProfileEditorBaseFrame.ProfileNameChangedCallback(Sender: TObject);
+begin
+  ProfileNameEdit.Text:=ProfileName^;
 end;
 
 Procedure TModernProfileEditorBaseFrame.CheckValue(Sender : TObject; var OK : Boolean);
@@ -352,6 +370,7 @@ begin
       Game.SetupParameters:=SetupParameterEdit.Text;
 
       Game.IgnoreWindowsFileWarnings:=IgnoreWindowsWarningsCheckBox.Checked;
+      Game.NoDOSBoxFailedDialog:=TurnOffDOSBoxFailedWarningCheckBox.Checked;
     end;
 
     For I:=0 to 9 do Game.ExtraPrgFile[I]:='';
@@ -382,9 +401,8 @@ begin
   If GameRelPathCheckBox.Checked then S:='DOSBox:' else S:='';
   FOnProfileNameChange(Sender,ProfileName^,S+GameExeEdit.Text,ProfileSetup^,ProfileScummVMGameName^,ProfileScummVMPath^,ProfileDOSBoxInstallation^,ProfileCaptureDir^);
 
-  If PrgSetup.ActivateIncompleteFeatures then begin
-    IgnoreWindowsWarningsCheckBox.Visible:=(not GameRelPathCheckBox.Checked) and (IsWindowsExe(MakeAbsPath(GameExeEdit.Text,PrgSetup.BaseDir)) or IsWindowsExe(MakeAbsPath(SetupExeEdit.Text,PrgSetup.BaseDir)));
-  end;
+  IgnoreWindowsWarningsCheckBox.Visible:=(not GameRelPathCheckBox.Checked) and (IsWindowsExe(MakeAbsPath(GameExeEdit.Text,PrgSetup.BaseDir)) or IsWindowsExe(MakeAbsPath(SetupExeEdit.Text,PrgSetup.BaseDir)));
+  CalcCheckBoxTop;
 end;
 
 procedure TModernProfileEditorBaseFrame.GameRelPathButton(Sender: TObject);
@@ -398,8 +416,17 @@ begin
   If SetupRelPathCheckBox.Checked then S:='DOSBox:' else S:='';
   FOnProfileNameChange(Sender,ProfileName^,ProfileExe^,S+SetupExeEdit.Text,ProfileScummVMGameName^,ProfileScummVMPath^,ProfileDOSBoxInstallation^,ProfileCaptureDir^);
 
-  If PrgSetup.ActivateIncompleteFeatures then begin
-    IgnoreWindowsWarningsCheckBox.Visible:=(not GameRelPathCheckBox.Checked) and (IsWindowsExe(MakeAbsPath(GameExeEdit.Text,PrgSetup.BaseDir)) or IsWindowsExe(MakeAbsPath(SetupExeEdit.Text,PrgSetup.BaseDir)));
+  IgnoreWindowsWarningsCheckBox.Visible:=(not GameRelPathCheckBox.Checked) and (IsWindowsExe(MakeAbsPath(GameExeEdit.Text,PrgSetup.BaseDir)) or IsWindowsExe(MakeAbsPath(SetupExeEdit.Text,PrgSetup.BaseDir)));
+  CalcCheckBoxTop;
+end;
+
+Procedure TModernProfileEditorBaseFrame.CalcCheckBoxTop;
+begin
+  IgnoreWindowsWarningsCheckBox.Top:=ExtraExeFilesButton.Top+5;
+  If IgnoreWindowsWarningsCheckBox.Visible then begin
+    TurnOffDOSBoxFailedWarningCheckBox.Top:=IgnoreWindowsWarningsCheckBox.Top+IgnoreWindowsWarningsCheckBox.Height;
+  end else begin
+    TurnOffDOSBoxFailedWarningCheckBox.Top:=IgnoreWindowsWarningsCheckBox.Top;
   end;
 end;
 

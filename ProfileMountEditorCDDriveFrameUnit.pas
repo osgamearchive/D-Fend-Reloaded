@@ -30,6 +30,7 @@ type
   public
     { Public-Deklarationen }
     Function Init(const AInfoData : TInfoData) : Boolean;
+    Function CheckBeforeDone : Boolean;
     Function Done : String;
     Function GetName : String;
     Procedure ShowFrame;
@@ -171,6 +172,11 @@ end;
 procedure TProfileMountEditorCDDriveFrame.ShowFrame;
 begin
   CDMountTypeComboBoxChange(self);
+end;
+
+function TProfileMountEditorCDDriveFrame.CheckBeforeDone: Boolean;
+begin
+  result:=True;
 end;
 
 function TProfileMountEditorCDDriveFrame.Done: String;

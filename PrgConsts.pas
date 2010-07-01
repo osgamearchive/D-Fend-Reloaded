@@ -46,7 +46,7 @@ const DosBoxFileName='DOSBOX.EXE';
       PackageDBUserFile='User.xml';
       PackageDBCacheFile='Cache.xml';
 
-      CacheVersionString='DFRCacheFile-FileVersion=002';
+      CacheVersionString='DFRCacheFile-FileVersion=004';
       CacheInfoString=#13+#13+'This is just a cache file for the profiles in the current directory. You can'+#13+
                       'ignore or delete this file. D-Fend Reloaded will only load data from this file'+#13+
                       'if the .prof file on disk has not changed. If you delete or change one of the'+#13+
@@ -72,7 +72,7 @@ const DosBoxFileName='DOSBOX.EXE';
       DefaultFreeHDSize=250;
 
 
-const InstallerNames : Array[1..4] of String = ('INSTALL','SETUP','INSTHD','INST');
+const DefaultInstallerNames : String = 'INSTALL;SETUP;INSTHD;INST;INSTALAR;INSTALLE';
       ProgramExts : Array[1..3] of String = ('EXE','COM','BAT');
 
       IgnoreGameExeFilesIgnore : Array[1..32] of String = ('README','DECIDE','DEICE','CATALOG','FACTORY','LIST','LHARC','ARJ','UNARJ','UNZIP','HELPME','ORDER','DEALERS','ULTRAMID','PRINTME','UNIVBE','SWCBBS','INSTHELP','COMMIT','SETMAIN','BOOTMKR','IMUSE','KEYCONFI','32RTM','LOADPATS','MAKESWP','XPHELP','IBMSND','MIDPAK','SBLASTER','ALIVECAT','READDOC');
@@ -81,6 +81,8 @@ const InstallerNames : Array[1..4] of String = ('INSTALL','SETUP','INSTHD','INST
       SetupExeFilesLevel2 : Array[1..4] of String = ('SETSOUND','SETSND','SETBLAST','SOUND');
       SetupExeFilesLevel3 : Array[1..4] of String = ('XINSTALL','SETUPAQ','SETUPDP','SETUPVC');
       SetupExeFilesLevel4 : Array[1..1] of String = ('INSTALL');
+
+      ProgramExeFiles : Array[1..1] of String = ('GO');
 
 var MainSetupFile : String;
     OperationModeConfig : String;

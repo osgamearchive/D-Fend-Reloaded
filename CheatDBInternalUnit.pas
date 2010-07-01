@@ -49,6 +49,83 @@ begin
   result:=False;
   St.Position:=$3788; St.ReadBuffer(X,1); St.ReadBuffer(B,1); Str(X,S); Str(B,T);
   St.Position:=$378A; St.ReadBuffer(Y,1);
+  H:=False;
+  if (Y>112) or (Y>24) and (Y<89) then
+  begin
+    Str(Y,V);
+    U:='('+V+')';
+  end
+  else
+  begin
+  if Y>=88 Then begin
+    H:=True;
+    Y:=Y-88;
+  end;
+  Str(Y mod 4,V);
+  if V='0' then   begin V:='4';Y:=Y-1; end;
+  U:='?';
+  Case Y div 4 of
+    0 : U:='A';
+    1 : U:='B';
+    2 : U:='C';
+    3 : U:='D';
+    4 : U:='E';
+    5 : U:='F';
+  end;
+  U:=U+V;
+  end;
+
+  If not InputQuery(LanguageSetup.EditCheatsInternalDarkSideOfXeenPositionX,LanguageSetup.EditCheatsInternalDarkSideOfXeenPositionPrompt,S) then exit;
+  Val(S,X,I); IF I<>0 Then begin MessageDlg(LanguageSetup.EditCheatsInternalDarkSideOfXeenPositionInvalid,mtError,[mbOK],0); Exit; end;
+  If not InputQuery(LanguageSetup.EditCheatsInternalDarkSideOfXeenPositionY,LanguageSetup.EditCheatsInternalDarkSideOfXeenPositionPrompt,T) then exit;
+  Val(T,B,I); IF I<>0 Then begin MessageDlg(LanguageSetup.EditCheatsInternalDarkSideOfXeenPositionInvalid,mtError,[mbOK],0); Exit; end;
+  If not InputQuery(LanguageSetup.EditCheatsInternalDarkSideOfXeenPositionQuadrant,LanguageSetup.EditCheatsInternalDarkSideOfXeenPositionPrompt,U) Then Exit;
+
+  if (Length(U)>2) and (U[1]='(') and (U[Length(U)]=')') then
+  begin
+    Val(Copy(U,2,Length(U)-2),Y,I);
+    if (I<>0) or (Y>112) then begin MessageDlg(LanguageSetup.EditCheatsInternalDarkSideOfXeenPositionInvalid,mtError,[mbOK],0); Exit; end;
+  end
+  else
+  begin
+  Case UpCase(U[1]) of
+    'A' : Y:=0;
+    'B' : Y:=4;
+    'C' : Y:=8;
+    'D' : Y:=12;
+    'E' : Y:=16;
+    'F' : Y:=20;
+    else MessageDlg(LanguageSetup.EditCheatsInternalDarkSideOfXeenPositionInvalid,mtError,[mbOK],0); Exit;
+  end;
+  Case U[2] of
+    '1' : Inc(Y);
+    '2' : Inc(Y,2);
+    '3' : Inc(Y,3);
+    '4' : Inc(Y,4);
+    else MessageDlg(LanguageSetup.EditCheatsInternalDarkSideOfXeenPositionInvalid,mtError,[mbOK],0); Exit;
+  end;
+  IF H Then
+    H:=(MessageDlg(LanguageSetup.EditCheatsInternalDarkSideOfXeenPositionSkySet,mtConfirmation,[mbYes,mbNo],0)=mrYes)
+  else
+    H:=(MessageDlg(LanguageSetup.EditCheatsInternalDarkSideOfXeenPositionSkyNotSet,mtConfirmation,[mbYes,mbNo],0)=mrYes);
+  If H Then Inc(Y,88);
+  end;
+  result:=True;
+  St.Position:=$3788;
+  St.WriteBuffer(X,1); St.WriteBuffer(B,1);
+  St.Position:=$378A;
+  St.WriteBuffer(Y,1);
+end;
+
+{Function DarkSideOfXeenPosition(const St : TFileStream) : Boolean;
+Var X,B,Y : Byte;
+    S,T,U,V : String;
+    I : Integer;
+    H : Boolean;
+begin
+  result:=False;
+  St.Position:=$3788; St.ReadBuffer(X,1); St.ReadBuffer(B,1); Str(X,S); Str(B,T);
+  St.Position:=$378A; St.ReadBuffer(Y,1);
   IF Y>=88 Then begin
     H:=True; Str((Y-88) div 4,V);
     Case (Y-88) Mod 4 of
@@ -95,7 +172,9 @@ begin
   result:=True;
   St.Position:=$3788;
   St.WriteBuffer(X,1); St.WriteBuffer(B,1);
-end;
+  St.Position:=$378A;
+  St.WriteBuffer(Y,1);
+end;}
 
 Function PrivateerMoney(const St : TFileStream) : Boolean;
 Var X,B : Byte;

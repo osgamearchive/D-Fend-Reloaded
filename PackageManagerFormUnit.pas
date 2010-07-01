@@ -170,7 +170,7 @@ procedure TPackageManagerForm.FormShow(Sender: TObject);
 Var DoUpdateCheck : Boolean;
 begin
   PackageDB:=TPackageDB.Create;
-  PackageDB.LoadDB(False,False);
+  PackageDB.LoadDB(False,False,True);
   PackageDB.OnDownload:=PackageDBDownload;
   PackageDBCache:=TPackageDBCache.Create;
 
@@ -191,7 +191,7 @@ begin
     3 : DoUpdateCheck:=True;
   End;
   If DoUpdateCheck then begin
-    PackageDB.UpdateRemoteFiles;
+    PackageDB.UpdateRemoteFiles(True);
     PrgSetup.LastPackageListeUpdateCheck:=Round(Int(Date));
   end;
 
@@ -325,12 +325,12 @@ begin
   Case (Sender as TComponent).Tag of
     0 : Close;
     1 : begin
-          PackageDB.LoadDB(True,((Word(GetKeyState(VK_LSHIFT)) div 256)<>0) or ((Word(GetKeyState(VK_RSHIFT)) div 256)<>0));
+          PackageDB.LoadDB(True,((Word(GetKeyState(VK_LSHIFT)) div 256)<>0) or ((Word(GetKeyState(VK_RSHIFT)) div 256)<>0),False);
           PrgSetup.LastPackageListeUpdateCheck:=Round(Int(Date));
           LoadLists;
         end;
     2 : If ShowPackageManagerRepositoriesEditDialog(self) then begin
-          PackageDB.LoadDB(True,False);
+          PackageDB.LoadDB(True,False,True);
           LoadLists;
         end;
     3 : Application.HelpCommand(HELP_CONTEXT,ID_FileImportDownload);
@@ -707,7 +707,7 @@ begin
   If DownloadExeData.PackageChecksum<>OldChecksum then begin
     Enabled:=False;
     try
-      OK:=(DownloadFileWithDialog(self,DownloadExeData.Size,DownloadExeData.PackageFileURL,DownloadExeData.URL,DownloadExeData.PackageList.Referer,PackageDB.DBDir+FileName)<>drSuccess);
+      OK:=(DownloadFileWithDialog(self,DownloadExeData.Size,DownloadExeData.PackageFileURL,DownloadExeData.URL,DownloadExeData.PackageList.Referer,PackageDB.DBDir+FileName)=drSuccess);
     finally
       Enabled:=True;
     end;

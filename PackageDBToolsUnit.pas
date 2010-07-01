@@ -12,8 +12,8 @@ Procedure SaveXMLDoc(const Doc : IXMLDocument; const Lines : Array of String; co
 Function DecodeUpdateDate(S : String) : TDateTime;
 Function EncodeUpdateDate(const Date : TDateTime) : String;
 
-function DownloadFile(const URL: String): TMemoryStream; overload;
-function DownloadFile(const URL, FileName: String): Boolean; overload;
+function DownloadFile(const URL: String; const Quite : Boolean): TMemoryStream; overload;
+function DownloadFile(const URL, FileName: String; const Quite : Boolean): Boolean; overload;
 
 Function GetNiceFileSize(const Size : Integer) : String;
 
@@ -23,7 +23,7 @@ Function ReplaceBRs(const S : String) : String;
 
 Procedure ClearPackageCache;
 
-Function UpdatePackageDB(const Owner : TComponent; const UpdateAllListe : Boolean) : Boolean;
+Function UpdatePackageDB(const Owner : TComponent; const UpdateAllListe, Quite : Boolean) : Boolean;
 
 implementation
 
@@ -141,7 +141,7 @@ begin
   result:=S1+'/'+S2+'/'+S3;
 end;
 
-function DownloadFileFromInternet(const URL: String): TMemoryStream;
+function DownloadFileFromInternet(const URL: String; const Quite : Boolean): TMemoryStream;
 Var HTTP: TIdHTTP;
 begin
   result:=nil;
@@ -152,6 +152,7 @@ begin
     try
       HTTP.Get(URL,result);
     except
+      If not Quite then MessageDlg(Format(LanguageSetup.PackageManagerDownloadFailed,[URL]),mtError,[mbOK],0);
       FreeAndNil(result);
     end;
   finally
@@ -196,20 +197,20 @@ begin
   until False;
 end;
 
-function DownloadFile(const URL: String): TMemoryStream;
+function DownloadFile(const URL: String; const Quite : Boolean): TMemoryStream;
 begin
   If ExtUpperCase(Copy(URL,1,7))='HTTP:/'+'/' then begin
-    result:=DownloadFileFromInternet(URL);
+    result:=DownloadFileFromInternet(URL,Quite);
   end else begin
     result:=GetFileFromLocalPath(URL);
   end;
 end;
 
-function DownloadFile(const URL, FileName: String): Boolean;
+function DownloadFile(const URL, FileName: String; const Quite : Boolean): Boolean;
 Var MSt : TMemoryStream;
 begin
   result:=False;
-  MSt:=DownloadFile(URL);
+  MSt:=DownloadFile(URL,Quite);
   If MSt=nil then exit;
   try
     try
@@ -319,7 +320,7 @@ begin
   End;
 end;
 
-Function UpdatePackageDB(const Owner : TComponent; const UpdateAllListe : Boolean) : Boolean;
+Function UpdatePackageDB(const Owner : TComponent; const UpdateAllListe, Quite : Boolean) : Boolean;
 Var PackageDB : TPackageDB;
     PackageDownloadStatusClass : TPackageDownloadStatusClass;
 begin
@@ -327,9 +328,9 @@ begin
   try
     PackageDB:=TPackageDB.Create;
     try
-      PackageDB.LoadDB(False,False);
+      PackageDB.LoadDB(False,False,Quite);
       PackageDB.OnDownload:=PackageDownloadStatusClass.PackageDBDownload;
-      result:=PackageDB.LoadDB(True,((Word(GetKeyState(VK_LSHIFT)) div 256)<>0) or ((Word(GetKeyState(VK_RSHIFT)) div 256)<>0));
+      result:=PackageDB.LoadDB(True,((Word(GetKeyState(VK_LSHIFT)) div 256)<>0) or ((Word(GetKeyState(VK_RSHIFT)) div 256)<>0),Quite);
     finally
       PackageDB.Free;
     end;

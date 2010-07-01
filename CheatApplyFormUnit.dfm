@@ -130,7 +130,7 @@ object CheatApplyForm: TCheatApplyForm
   object SelectButton: TButton
     Left = 213
     Top = 311
-    Width = 177
+    Width = 204
     Height = 25
     Caption = 'Select the last changed file'
     TabOrder = 3
@@ -139,7 +139,7 @@ object CheatApplyForm: TCheatApplyForm
   object EditButton: TBitBtn
     Left = 315
     Top = 406
-    Width = 142
+    Width = 190
     Height = 25
     Anchors = [akLeft, akBottom]
     Caption = 'Edit cheats data base'

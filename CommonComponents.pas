@@ -71,6 +71,7 @@ Type TBasePrgSetup=class
     function GetString(const Index: Integer): String; inline;
     Procedure LoadFromStream(const St : TStream); virtual;
     Procedure SaveToStream(const St : TStream); virtual;
+    Function GetBinaryVersionID : Integer;
     Procedure CacheAllStrings;
     property SetupFile : String read FSetupFile;
     property FirstRun : Boolean read FFirstRun;
@@ -525,6 +526,11 @@ begin
   StoreBinConfig(St,@IntegerList,ctInteger);
   StoreBinConfig(St,@StringList,ctString);
   St.WriteBuffer(FLastTimeStamp,SizeOf(FLastTimeStamp));
+end;
+
+Function TBasePrgSetup.GetBinaryVersionID : Integer;
+begin
+  result:=1000*1000*length(BooleanList)+1000*length(IntegerList)+length(StringList);
 end;
 
 end.

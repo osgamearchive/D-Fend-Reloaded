@@ -62,7 +62,7 @@ begin
   If S='' then RadioButtonDefault.Checked:=True else begin
     If (S='NOTEPAD') or (S='NOTEPAD.EXE') then RadioButtonNotepad.Checked:=True else begin
       RadioButtonCustom.Checked:=True;
-      CustomEdit.Text:=PrgSetup.TextEditor;
+      CustomEdit.Text:=MakeRelPath(PrgSetup.TextEditor,PrgSetup.BaseDir);
     end;
   end;
   FallbackCheckBox.Checked:=PrgSetup.FileTypeFallbackForEditor;
@@ -116,7 +116,7 @@ procedure TSetupFrameEditor.SaveSetup;
 begin
   If RadioButtonDefault.Checked then PrgSetup.TextEditor:='';
   If RadioButtonNotepad.Checked then PrgSetup.TextEditor:='Notepad.exe';
-  If RadioButtonCustom.Checked then PrgSetup.TextEditor:=CustomEdit.Text;
+  If RadioButtonCustom.Checked then PrgSetup.TextEditor:=MakeRelPath(CustomEdit.Text,PrgSetup.BaseDir);
   PrgSetup.FileTypeFallbackForEditor:=FallbackCheckBox.Checked;
   PrgSetup.AutoFixLineWrap:=FixLineWrapCheckBox.Checked;
 end;

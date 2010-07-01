@@ -1,7 +1,8 @@
 unit GameDBToolsUnit;
 interface
 
-uses Classes, ComCtrls, Controls, Menus, CheckLst, GameDBUnit, LinkFileUnit;
+uses Windows, Classes, ComCtrls, Controls, Graphics, Menus, CheckLst,
+     GameDBUnit, LinkFileUnit;
 
 {DEFINE SpeedTest}
 
@@ -12,8 +13,8 @@ Type TSortListBy=(slbName=1, slbSetup=2, slbGenre=3, slbDeveloper=4, slbPublishe
 Procedure InitTreeViewForGamesList(const ATreeView : TTreeView; const GameDB : TGameDB);
 Procedure InitListViewForGamesList(const AListView : TListView; const ShowExtraInfo : Boolean);
 
-Procedure AddGameToList(const AListView : TListView; var ItemsUsed : Integer; const AListViewImageList, AListViewIconImageList, AImageList : TImageList; const Game : TGame; const ShowExtraInfo : Boolean; const O,V : String; const VUserSt : TStringList; const T : String; const ScreenshotViewMode, ScummVMTemplate : Boolean); overload;
-Procedure AddGameToList(const AListView : TListView; var ItemsUsed : Integer; const AListViewImageList, AListViewIconImageList, AImageList : TImageList; const Game : TGame; const ShowExtraInfo, ScreenshotViewMode, ScummVMTemplate : Boolean); overload;
+Procedure AddGameToList(const AListView : TListView; var ItemsUsed : Integer; const AListViewImageList, AListViewIconImageList, AImageList : TImageList; const Game : TGame; const ShowExtraInfo : Boolean; const O,V : String; const VUserSt : TStringList; const T : String; const ScreenshotViewMode, ScummVMTemplate : Boolean; const UseBackgroundColor : Boolean; const BackgroundColor : TColor); overload;
+Procedure AddGameToList(const AListView : TListView; var ItemsUsed : Integer; const AListViewImageList, AListViewIconImageList, AImageList : TImageList; const Game : TGame; const ShowExtraInfo, ScreenshotViewMode, ScummVMTemplate : Boolean; const UseBackgroundColor : Boolean; const BackgroundColor : TColor); overload;
 Procedure AddGamesToList(const AListView : TListView; const AListViewImageList, AListViewIconImageList, AImageList : TImageList; const GameDB : TGameDB; const Group, SubGroup, SearchString : String; const ShowExtraInfo : Boolean; const SortBy : TSortListBy; const ReverseOrder, HideScummVMProfiles, HideWindowsProfiles, HideDefaultProfile, ScreenshotViewMode : Boolean); overload;
 Procedure AddGamesToList(const AListView : TListView; const AListViewImageList, AListViewIconImageList, AImageList : TImageList; const GameDB : TGameDB; const Game : TGame; const Group, SubGroup, SearchString : String; const ShowExtraInfo : Boolean; const SortBy : TSortListBy; const ReverseOrder, HideScummVMProfiles, HideWindowsProfiles, HideDefaultProfile, ScreenshotViewMode : Boolean); overload;
 Procedure GamesListSaveColWidths(const AListView : TListView);
@@ -130,9 +131,9 @@ Procedure BuildGameDirMountData(const Mounting : TStringList; const ProgrammFile
 
 implementation
 
-uses Windows, SysUtils, Forms, Dialogs, Graphics, ShellAPI, ShlObj, IniFiles,
-     Math, PNGImage, JPEG, GIFImage, CommonTools, LanguageSetupUnit, PrgConsts,
-     PrgSetupUnit, ProfileEditorFormUnit, ModernProfileEditorFormUnit, HashCalc,
+uses SysUtils, Forms, Dialogs, ShellAPI, ShlObj, IniFiles, Math,  PNGImage,
+     JPEG, GIFImage, CommonTools, LanguageSetupUnit, PrgConsts, PrgSetupUnit,
+     ProfileEditorFormUnit, ModernProfileEditorFormUnit, HashCalc,
      SmallWaitFormUnit, ChecksumFormUnit, WaitFormUnit, ImageCacheUnit,
      DosBoxUnit, ScummVMUnit, ImageStretch, MainUnit, GameDBFilterUnit;
 
@@ -764,7 +765,7 @@ begin
   end;
 end;
 
-Procedure ScaleGraphicToImageList(const Graphic : TGraphic; const ImageList : TImageList; const UseFiltering : Boolean);
+Procedure ScaleGraphicToImageList(const Graphic : TGraphic; const ImageList : TImageList; const UseFiltering : Boolean; const UseBackgroundColor : Boolean; const BackgroundColor : TColor);
 Var B,B2 : TBitmap;
     D1,D2 : Double;
     W,H : Integer;
@@ -774,6 +775,11 @@ begin
     SetStretchBltMode(B.Canvas.Handle,STRETCH_HALFTONE);
     SetBrushOrgEx(B.Canvas.Handle,0,0,nil);
     B.Transparent:=True;
+
+    If UseBackgroundColor then begin
+      B.Canvas.Brush.Color:=BackgroundColor;
+      B.Canvas.Rectangle(-1,-1,B.Width+1,B.Height+1);
+    end;
 
     B2:=nil;
     try
@@ -795,7 +801,7 @@ begin
   end;
 end;
 
-Function LoadScreenshotToImageLists(const Game : TGame; ImageList2 : TImageList) : Boolean;
+Function LoadScreenshotToImageLists(const Game : TGame; ImageList2 : TImageList; const UseBackgroundColor : Boolean; const BackgroundColor : TColor) : Boolean;
 Var S,T,U : String;
     Rec : TSearchRec;
     I : Integer;
@@ -847,7 +853,8 @@ begin
 
   P:=PictureCache.GetPicture(T);
   result:=(P<>nil);
-  If result then ScaleGraphicToImageList(P.Graphic,ImageList2,True);
+
+  If result then ScaleGraphicToImageList(P.Graphic,ImageList2,True,UseBackgroundColor,BackgroundColor);
 end;
 
 Function UserInfoGetValue(const UserInfo, Key : String) : String;
@@ -874,7 +881,7 @@ begin
   end;
 end;
 
-Procedure AddGameToList(const AListView : TListView; var ItemsUsed : Integer; const AListViewImageList, AListViewIconImageList, AImageList : TImageList; const Game : TGame; const ShowExtraInfo : Boolean; const O,V : String; const VUserSt : TStringList; const T : String; const ScreenshotViewMode, ScummVMTemplate : Boolean);
+Procedure AddGameToList(const AListView : TListView; var ItemsUsed : Integer; const AListViewImageList, AListViewIconImageList, AImageList : TImageList; const Game : TGame; const ShowExtraInfo : Boolean; const O,V : String; const VUserSt : TStringList; const T : String; const ScreenshotViewMode, ScummVMTemplate : Boolean; const UseBackgroundColor : Boolean; const BackgroundColor : TColor);
 Var IconNr,I,J,Nr : Integer;
     B : Boolean;
     S : String;
@@ -886,7 +893,7 @@ begin
   {Set IconNr to the corrosponding icon in imagelist}
   B:=False; IconNr:=0;
   If ScreenshotViewMode then begin
-    B:=LoadScreenshotToImageLists(Game,AListViewIconImageList);
+    B:=LoadScreenshotToImageLists(Game,AListViewIconImageList,UseBackgroundColor,BackgroundColor);
     If B then IconNr:=AListViewIconImageList.Count-1;
   end;
   If not B then begin
@@ -899,14 +906,14 @@ begin
     If B then begin
       AListViewImageList.AddIcon(Icon);
       If ScreenshotViewMode then begin
-        ScaleGraphicToImageList(Icon,AListViewIconImageList,True);
+        ScaleGraphicToImageList(Icon,AListViewIconImageList,True,UseBackgroundColor,BackgroundColor);
       end else begin
         If Icon.Width>=AListViewIconImageList.Width then begin
           I:=AListViewIconImageList.Count;
           AListViewIconImageList.AddIcon(Icon);
-          If AListViewIconImageList.Count=I then ScaleGraphicToImageList(Icon,AListViewIconImageList,False);
+          If AListViewIconImageList.Count=I then ScaleGraphicToImageList(Icon,AListViewIconImageList,False,UseBackgroundColor,BackgroundColor);
         end else begin
-          ScaleGraphicToImageList(Icon,AListViewIconImageList,False);
+          ScaleGraphicToImageList(Icon,AListViewIconImageList,False,UseBackgroundColor,BackgroundColor);
         end;
       end;
     end;
@@ -985,7 +992,7 @@ begin
   end;
 end;
 
-Procedure AddGameToList(const AListView : TListView; var ItemsUsed : Integer; const AListViewImageList, AListViewIconImageList, AImageList : TImageList; const Game : TGame; const ShowExtraInfo, ScreenshotViewMode, ScummVMTemplate : Boolean);
+Procedure AddGameToList(const AListView : TListView; var ItemsUsed : Integer; const AListViewImageList, AListViewIconImageList, AImageList : TImageList; const Game : TGame; const ShowExtraInfo, ScreenshotViewMode, ScummVMTemplate : Boolean; const UseBackgroundColor : Boolean; const BackgroundColor : TColor);
 Var O,V,VUser,T : String;
     VUserSt : TStringList;
 begin
@@ -993,7 +1000,7 @@ begin
   VUserSt:=ValueToList(VUser);
   try
     If Trim(PrgSetup.ValueForNotSet)='' then T:=LanguageSetup.NotSet else T:=Trim(PrgSetup.ValueForNotSet);
-    AddGameToList(AListView,ItemsUsed,AListViewImageList,AListViewIconImageList,AImageList,Game,ShowExtraInfo,O,V,VUserSt,T,ScreenshotViewMode,ScummVMTemplate);
+    AddGameToList(AListView,ItemsUsed,AListViewImageList,AListViewIconImageList,AImageList,Game,ShowExtraInfo,O,V,VUserSt,T,ScreenshotViewMode,ScummVMTemplate,UseBackgroundColor,BackgroundColor);
   finally
     VUserSt.Free;
   end;
@@ -1042,9 +1049,15 @@ Var I,J,K,Nr,ItemsUsed : Integer;
     W : TWinControl;
     F : TForm;
     Filter : TGamesListFilter;
+    UseBackgroundColor : Boolean;
+    BackgroundColor : TColor;
     {$IFDEF SpeedTest}Ca : Cardinal;{$ENDIF}
 begin
   {$IFDEF SpeedTest}Ca:=GetTickCount;{$ENDIF}
+
+  S:=Trim(PrgSetup.GamesListViewBackground);
+  UseBackgroundColor:=(S<>''); BackgroundColor:=clWhite;
+  If UseBackgroundColor then try BackgroundColor:=StringToColor(S); except UseBackgroundColor:=False; end;
 
   {Prepare ListView}
   AListViewImageList.Clear;
@@ -1052,7 +1065,7 @@ begin
   Bitmap:=TBitmap.Create;
   try
     AImageList.GetBitmap(0,Bitmap);
-    ScaleGraphicToImageList(Bitmap,AListViewImageList,False);
+    ScaleGraphicToImageList(Bitmap,AListViewImageList,False,UseBackgroundColor,BackgroundColor);
   finally
     Bitmap.Free;
   end;
@@ -1062,7 +1075,7 @@ begin
     Bitmap:=TBitmap.Create;
     try
       AImageList.GetBitmap(0,Bitmap);
-      ScaleGraphicToImageList(Bitmap,AListViewIconImageList,False);
+      ScaleGraphicToImageList(Bitmap,AListViewIconImageList,False,UseBackgroundColor,BackgroundColor);
     finally
       Bitmap.Free;
     end;
@@ -1070,7 +1083,7 @@ begin
     Bitmap:=TBitmap.Create;
     try
       AImageList.GetBitmap(0,Bitmap);
-      ScaleGraphicToImageList(Bitmap,AListViewIconImageList,False);
+      ScaleGraphicToImageList(Bitmap,AListViewIconImageList,False,UseBackgroundColor,BackgroundColor);
     finally
       Bitmap.Free;
     end;
@@ -1200,13 +1213,13 @@ begin
             If ReverseOrder then begin
               For I:=St.Count-1 downto 0 do begin
                 If (I mod 25=0) and Assigned(F) then Application.ProcessMessages;
-                AddGameToList(AListView,ItemsUsed,AListViewImageList,AListViewIconImageList,AImageList,TGame(St.Objects[I]),ShowExtraInfo,O,V,VUserSt,T,ScreenshotViewMode,FirstDefaultTemplate);
+                AddGameToList(AListView,ItemsUsed,AListViewImageList,AListViewIconImageList,AImageList,TGame(St.Objects[I]),ShowExtraInfo,O,V,VUserSt,T,ScreenshotViewMode,FirstDefaultTemplate,UseBackgroundColor,BackgroundColor);
                 If (TGame(St.Objects[I]).CacheName='') and (not TGame(St.Objects[I]).OwnINI) then FirstDefaultTemplate:=False;
               end;
             end else begin
               For I:=0 to St.Count-1 do begin
                 If (I mod 25=0) and Assigned(F) then Application.ProcessMessages;
-                AddGameToList(AListView,ItemsUsed,AListViewImageList,AListViewIconImageList,AImageList,TGame(St.Objects[I]),ShowExtraInfo,O,V,VUserSt,T,ScreenshotViewMode, not FirstDefaultTemplate);
+                AddGameToList(AListView,ItemsUsed,AListViewImageList,AListViewIconImageList,AImageList,TGame(St.Objects[I]),ShowExtraInfo,O,V,VUserSt,T,ScreenshotViewMode, not FirstDefaultTemplate,UseBackgroundColor,BackgroundColor);
                 If (TGame(St.Objects[I]).CacheName='') and (not TGame(St.Objects[I]).OwnINI) then FirstDefaultTemplate:=False;
               end;
             end;
@@ -1839,6 +1852,11 @@ begin
     If G.SpeakerTandyRate=22050 then begin G.SpeakerTandyRate:=44100; B:=True; end;
     If G.JoystickButtonwrap then begin G.JoystickButtonwrap:=False; B:=True; end;
   end;
+
+  If LastVersion<10000 then begin
+    If not G.UseScanCodesOld then begin G.UseScanCodes:=False; B:=True; end;
+  end;
+
   If B then G.StoreAllValues;
 end;
 
@@ -1875,11 +1893,15 @@ begin
     {Add new auto setup templates (always)}
     CopyFiles(PrgDir+NewUserDataSubDir+'\'+AutoSetupSubDir,PrgDataDir+AutoSetupSubDir,False,True); {False = do not overwrite existing file}
 
-    {Update DozZip (only if upgrade from below 9.1)}
-    If LastVersion<901 then begin
+    {Update DozZip (only if upgrade from below 1.0)}
+    If LastVersion<10000 then begin
       Source:=PrgDir+NewUserDataSubDir+'\DOSZIP\';
       If DirectoryExists(Source) then CopyFiles(Source,IncludeTrailingPathDelimiter(PrgSetup.GameDir)+'DOSZIP\',True,True);
     end;
+
+    {Update DOSBox screenshot}
+    ForceDirectories(PrgDataDir+CaptureSubDir+'\'+DosBoxDOSProfile+'\');
+    CopyFiles(PrgDir+NewUserDataSubDir+'\'+CaptureSubDir+'\'+DosBoxDOSProfile+'\',PrgDataDir+CaptureSubDir+'\'+DosBoxDOSProfile+'\',True,False);
   end;
 
   {Update game DB: Max->max, Auto->auto (only if upgrade from below 9.0)}
@@ -1889,19 +1911,50 @@ begin
       If GameDB[I].Cycles='Max' then begin GameDB[I].Cycles:='max'; B:=True; end;
       If GameDB[I].Cycles='Auto' then begin GameDB[I].Cycles:='auto'; B:=True; end;
       If B then begin GameDB[I].StoreAllValues; GameDB[I].LoadCache; end;
+      Application.ProcessMessages;
     end;
+  end;
+
+  {Update default template}
+  G:=TGame.Create(PrgSetup);
+  try
+    If LastVersion<10000 then begin
+      G.GUS:=False;
+      G.CyclesUp:=10;
+      G.MixerRate:=44100;
+      G.MixerBlocksize:=1024;
+      G.MixerPrebuffer:=20;
+      G.SBOplRate:=44100;
+      G.GUSRate:=44100;
+      G.SpeakerRate:=44100;
+      G.SpeakerTandyRate:=44100;
+      G.JoystickButtonwrap:=False;
+    end;
+    If LastVersion<900 then begin
+      If G.Cycles='Max' then G.Cycles:='max';
+      If G.Cycles='Auto' then G.Cycles:='auto';
+    end;
+    G.StoreAllValues;
+  finally
+    G.Free;
   end;
 
   {Update templates and auto setup template (see UpdateTemplate)}
   DB:=TGameDB.Create(PrgDataDir+TemplateSubDir,False);
   try
-    For I:=0 to DB.Count-1 do UpdateTemplate(DB[I],LastVersion);
+    For I:=0 to DB.Count-1 do begin
+      UpdateTemplate(DB[I],LastVersion);
+      Application.ProcessMessages;
+    end;
   finally
     DB.Free;
   end;
   DB:=TGameDB.Create(PrgDataDir+AutoSetupSubDir,False);
   try
-    For I:=0 to DB.Count-1 do UpdateTemplate(DB[I],LastVersion);
+    For I:=0 to DB.Count-1 do begin
+      UpdateTemplate(DB[I],LastVersion);
+      Application.ProcessMessages;
+    end;
   finally
     DB.Free;
   end;
@@ -1912,11 +1965,10 @@ begin
     G.Free;
   end;
 
-  {Change year from 2007 to 2009 and "multilingual" to "Multilingual" in "DOSBox DOS" profile (always / only if upgrade from below 9.0)}
-  {//... Change year from 2007 or 2009 to 2010 and "multilingual" to "Multilingual" in "DOSBox DOS" profile (always / only if upgrade from below 9.0)}
+  {Change year from 2007 or 2009 to 2010 and "multilingual" to "Multilingual" in "DOSBox DOS" profile (always / only if upgrade from below 9.0)}
   I:=GameDB.IndexOf(DosBoxDOSProfile);
-  If (I>0) and ((GameDB[I].CacheYear='2007') {or (GameDB[I].CacheYear='2009')}) then begin
-    GameDB[I].Year:='2009'; {'2010';} GameDB[I].StoreAllValues; GameDB[I].LoadCache;
+  If (I>0) and ((GameDB[I].CacheYear='2007') or (GameDB[I].CacheYear='2009')) then begin
+    GameDB[I].Year:='2010'; GameDB[I].StoreAllValues; GameDB[I].LoadCache;
   end;
   If LastVersion<900 then begin
     If (I>0) and (GameDB[I].CacheLanguage='multilingual') then begin
@@ -1924,7 +1976,15 @@ begin
     end;
   end;
 
-  {Update settings in ConfOpt.dat (only if upgrade from below 0.9.2, 0.9.1, 0.9.0, 0.8.1 or 0.8.0)}
+  {Update settings in ConfOpt.dat}
+  If LastVersion<10000 then begin
+    GameDB.ConfOpt.Video:=DefaultValuesVideo;
+    GameDB.ConfOpt.ResolutionFullscreen:=DefaultValuesResolutionFullscreen;
+    GameDB.ConfOpt.ResolutionWindow:=DefaultValuesResolutionWindow;
+    GameDB.ConfOpt.TandyRate:=DefaultValuesTandyRate;
+    GameDB.ConfOpt.Sblaster:=DefaultValuesSBlaster;
+    GameDB.ConfOpt.ReportedDOSVersion:=DefaultValuesReportedDOSVersion;
+  end;
   If LastVersion<902 then begin
     GameDB.ConfOpt.Codepage:=DefaultValuesCodepage;
     GameDB.ConfOpt.TandyRate:=DefaultValuesTandyRate;
@@ -1951,7 +2011,8 @@ begin
     GameDB.ConfOpt.Memory:=DefaultValuesMemory;
   end;
   If LastVersion<800 then begin
-    GameDB.ConfOpt.Resolution:=DefaultValuesResolution;
+    GameDB.ConfOpt.ResolutionFullscreen:=DefaultValuesResolutionFullscreen;
+    GameDB.ConfOpt.ResolutionWindow:=DefaultValuesResolutionWindow;
     GameDB.ConfOpt.Scale:=DefaultValuesScale;
     GameDB.ConfOpt.Video:=DefaultValuesVideo;
   end;
@@ -2098,7 +2159,7 @@ begin
   result.Favorite:=True;
   result.Developer:='DOSBox Team';
   result.Publisher:='DOSBox Team';
-  result.Year:='2009';
+  result.Year:='2010';
   result.Language:='Multilingual';
   result.UserInfo:='License=GPL[13]';
   result.Icon:='DOSBox.ico';
@@ -2617,7 +2678,7 @@ end;
 Procedure AddToHistory(const GameName : String);
 Var F : TextFile;
 begin
-  If Trim(GameName)='' then exit;
+  If (Trim(GameName)='') or (not PrgSetup.StoreHistory) then exit;
 
   try
     AssignFile(F,PrgDataDir+SettingsFolder+'\'+HistoryFileName);

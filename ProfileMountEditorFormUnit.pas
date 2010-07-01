@@ -18,6 +18,7 @@ end;
 
 Type TProfileMountEditorFrame=interface
   Function Init(const AInfoData : TInfoData) : Boolean;
+  Function CheckBeforeDone : Boolean; 
   Function Done : String;
   Function GetName : String;
   Procedure ShowFrame;
@@ -175,7 +176,7 @@ procedure TProfileMountEditorForm.OKButtonClick(Sender: TObject);
 Var S : String;
 begin
   If LastVisible<0 then begin ModalResult:=mrNone; exit; end;
-
+  If not FrameInfoRec[LastVisible].FrameI.CheckBeforeDone then begin ModalResult:=mrNone; exit; end;
   S:=FrameInfoRec[LastVisible].FrameI.Done;
   If S='' then begin ModalResult:=mrNone; exit; end;
   Data:=S;

@@ -18,101 +18,40 @@
 
 <p>
 Der Erststart-Assistent hilft Ihnen bei Vornehmen der wichtigten Einstellungen
-unmittelbar nach der Installation von D-Fend Reloaded. Der Assistent besteht aus
-einer Übersichtsseite und 5 Konfigurationsseiten zwischen denen &uuml;ber die
-"Zur&uuml;ck"- und "Weiter"-Schaltfl&auml;che am unteren Rand des Dialoges gewechselt
-werden kann. Durch das Anklicken der "Alle Einstellungen akzeptieren"-Schaltfl&auml;che
-k&ouml;nnen Sie den Dialog jeder Zeit sofort schlie&szlig;en und alle Vorgabewerte
-f&uuml;r alle hier angebotenen Einstellungen ungepr&uuml;ft &uuml;bernehmen.
+unmittelbar nach der Installation von D-Fend Reloaded.
+</p>
+
+<h2>Programmsprache und DOSBox-Sprache</h2>
+<p>
+Die Programm- und DOSBox-Sprache wird vom Installationsprogramm übernommen, so dass diese
+in den meisten Fällen bereits korrekt eingestellt sein sollte.
+</p>
+
+<h2>Standard DOSBox-Installation</h2>
+<p>
+In diesem Feld können Sie angeben, welche DOSBox-Installation standardmäßig zum
+Aufruf der DOS-Spiele verwendet werden soll. Sofern Sie bei der Installation von
+D-Fend Reloaded die Option, DOSBox mit zu installieren, nicht explizit abgewählt haben,
+können Sie die Einstellung "Mit D-Fend Reloaded installierte Version" beibehalten.
+Unabhängig von der hier gewählten Standard-Installation können Sie später jedem
+Profil auch eine individuelle DOSBox-Version zuweisen.
+</p>
+
+<h2>Automatisch nach Updates suchen</h2>
+<p>
+Über dieses Feld können Sie festlegen, ob D-Fend Reloaded automatisch in regelmäßigen
+Abständen nach Programmupdates suchen soll. (Es wird dabei nur nach Updates gesucht;
+wenn ein Update gefunden wurde, werden Sie gefragt, ob Sie dieses installieren wollen.
+Eine automatische Installtion von Updates ohne Rückfrage erfolgt keinesfalls.)
+Wenn Sie die Vorgabeeinstellungen beibehalten, wird D-Fend Reloaded niemals automatisch
+Verbindungen mit dem Internet aufnehmen. Sie k&ouml;nnen auch jederzeit manuell
+&uuml;ber den Men&uuml;punkt <a href="HelpSearchForUpdates.html">Nach Updates suchen</a>
+im "Hilfe"-Men&uuml; einen Update-Suchvorgang starten.
 </p>
 
 <p>
 Alle hier angebotenen Einstellungen k&ouml;nnen Sie auch sp&auml;ter jederzeit
 in dem <a href="FileOptions.html">Programmeinstellungen</a>-Dialog anpassen.
-</p>
-
-<h2>Konfigurationsseite 1: Programmsprache</h2>
-
-<p>
-Auf dieser Seite k&ouml;nnen Sie die Sprache ausw&auml;hlen, die f&uuml;r die
-Benutzeroberfl&auml;che von D-Fend Reloaded verwendet werden soll. Anfangs
-wird hier die Sprache ausgew&auml;hlt angezeigt, die Sie bei der Installation
-gew&auml;hlt haben. Eine &Auml;nderung der Programmsprache wirkt sich
-unmittelbar auf das Programm aus (d.h. insbesondere ist kein Schlie&szlig;en und
-wieder Neustarten des Programmes erforderlich, um die zu verwendende Sprache
-zu &auml;ndern).
-</p>
-
-<h2>Konfigurationsseite 2: DOSBox-Ordner</h2>
-
-<p>
-Um die Spiele, die in D-Fend Reloaded eingetragen werden k&ouml;nnen,
-auszuf&uuml;hren, wird DOSBox ben&ouml;tigt. Wenn Sie bei der Installation
-von D-Fend Reloaded die Option DOSBox mitzuinstallieren nicht explizit
-abgew&auml;hlt haben, sollte hier bereits der richtige Pfad eingetragen
-sein. Sollten Sie DOSBox nicht zusammen mit D-Fend Reloaded installiert
-haben, so versucht D-Fend Reloaded eine bereits bestehende DOSBox-Installation
-zu finden und zeigt den Pfad zu dieser dann auf dieser Seite an.
-</p>
-
-<p>
-Wenn Sie D-Fend Reloaded in der portablen Betriebsart betreiben,
-muss der DOSBox-Pfad relativ zum Programmverzeichnis gespeichert werden.
-Auch wenn der Pfad in auf dieser Dialogseite stets als absoluter Pfad
-angezeigt wird, so wird er dennoch in der portablen Betriebsart als
-relativer Pfad gepseichert.
-</p>
-
-<h2>Konfigurationsseite 3: DOSBox-Sprache</h2>
-
-<p>
-Auf dieser Dialogseite k&ouml;nnen Sie die Sprache, in der DOSBox
-Meldungen anzeigen soll, ausw&auml;hlen. D-Fend Reloaded bietet
-Ihnen dabei alle Sprachdateien, die in dem auf der vorherigen
-Seite eingestellten DOSBox-Ordner vorhanden sind, an.
-</p>
-
-<h2>Konfigurationsseite 4: Spieleordner</h2>
-
-<p>
-Sie k&ouml;nnen die Spiele, die Sie in D-Fend Reloaded erfassen wollen,
-in jedem beliebigen Ordner ablegen. Allerdings stehen einige Programmfunktionen
-<a href="ExtrasTransferProfiles.html">&Uuml;bertragen von Programmen</a> und
-das <a href="FileExportBuildInstallers.html">Erstellen von Installer-Paketen</a>
-nur zur Verf&uuml;gung, wenn Sie die Spiele in einem Unterordner des
-Basisverzeichnisses (&uuml;blicherweise ein Verzeichnis der Art
-<tt>C:\Users\<i>IhrName</i>\D-Fend Reloaded</tt>) ablegen, da D-Fend Reloaded
-nur in diesem Fall mit relativen Pfaden zu den Spielen selbst operieren kann.
-</p>
-
-<p>
-In den meisten F&auml;llen sollte es am besten sein, den vorgeschlagenen
-Spieleordner beizubehalten (und dann im Betrieb die Spiele auch in diesem
-Ordner abzulegen).
-</p>
-
-<h2>Konfigurationsseite 5: Updates</h2>
-
-<p>
-Auf dieser Seite k&ouml;nnen Sie schlie&szlig;lich noch einstellen, ob und wann
-D-Fend Reloaded automatisch nach Updates suchen soll. Wenn Sie die Vorgabeeinstellungen
-beibehalten, wird D-Fend Reloaded niemals automatisch Verbindungen mit dem Internet
-aufnehmen. Sie k&ouml;nnen auch jederzeit manuell &uuml;ber den Men&uuml;punkt
-<a href="HelpSearchForUpdates.html">Nach Updates suchen</a> im "Hilfe"-Men&uuml;
-einen Update-Suchvorgang starten.
-</p>
-
-<p>
-Die automatische Suche nach Updates &uuml;bertr&auml;gt keine privaten Daten
-an irgendwelche Internetseiten. Sie l&auml;d lediglich eine spezielle
-Informationsdatei herunter und &uuml;berpr&uuml;ft, ob die in ihr verzeichnete
-Versionsnummer h&ouml;her als die Versionsnummer der momentan verwendeten
-D-Fend Reloaded Installation ist. In diesem Fall bietet sie an, den in der
-zweiten Zeile dieser Informationsdatei angegebenen Update-Installer
-herunterzuladen und zu starten.
-(Mehr Informationen zur Update-Pr&uuml;fung erhalten Sie auf der Hilfeseite
-der <a href="FileOptionsSearchForUpdates.html">Nach Updates suchen</a>-Seite
-des <a href="FileOptions.html">Programmeinstellungen</a>-Dialogs.)
 </p>
  
 <p>&nbsp;</p>

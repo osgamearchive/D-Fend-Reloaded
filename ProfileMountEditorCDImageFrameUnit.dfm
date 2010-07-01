@@ -142,6 +142,16 @@ object ProfileMountEditorCDImageFrame: TProfileMountEditorCDImageFrame
     Visible = False
     WordWrap = True
   end
+  object ImageTypeInfoLabel: TLabel
+    Left = 16
+    Top = 200
+    Width = 670
+    Height = 49
+    Anchors = [akLeft, akTop, akRight]
+    AutoSize = False
+    Caption = 'ImageTypeInfoLabel'
+    WordWrap = True
+  end
   object CDROMImageTab: TStringGrid
     Left = 16
     Top = 29
@@ -161,7 +171,7 @@ object ProfileMountEditorCDImageFrame: TProfileMountEditorCDImageFrame
     Width = 145
     Height = 21
     Style = csDropDownList
-    ItemHeight = 13
+    ItemHeight = 0
     TabOrder = 1
     OnChange = CDROMImageDriveLetterComboBoxChange
   end

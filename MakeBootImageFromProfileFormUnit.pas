@@ -193,7 +193,7 @@ begin
       For I:=0 to ExtraDirs.Count-1 do begin
         S:=MakeAbsPath(ExtraDirs[I],PrgSetup.BaseDir);
         If not IsDirectSubDir(ShortGamesDir,S) then begin
-          If MessageDlg(Format(LanguageSetup.ImageFromProfileConfirmationExtraDirectoryNotInGamesDirectory,[GameDir,MakeAbsPath(PrgSetup.GameDir,PrgSetup.BaseDir)]),mtWarning,[mbYes,mbNo],0)<>mrYes then exit;
+          If MessageDlg(Format(LanguageSetup.ImageFromProfileConfirmationExtraDirectoryNotInGamesDirectory,[ExtraDirs[I],MakeAbsPath(PrgSetup.GameDir,PrgSetup.BaseDir)]),mtWarning,[mbYes,mbNo],0)<>mrYes then exit;
         end else begin
           SourceDirs.Add(S);
         end;

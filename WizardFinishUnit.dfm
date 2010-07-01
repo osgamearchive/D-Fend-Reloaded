@@ -11,7 +11,7 @@ object WizardFinishFrame: TWizardFinishFrame
     Left = 8
     Top = 16
     Width = 569
-    Height = 49
+    Height = 65
     Anchors = [akLeft, akTop, akRight]
     AutoSize = False
     Caption = 
@@ -22,7 +22,7 @@ object WizardFinishFrame: TWizardFinishFrame
   end
   object Bevel: TBevel
     Left = 3
-    Top = 56
+    Top = 71
     Width = 589
     Height = 18
     Anchors = [akLeft, akTop, akRight]
@@ -30,7 +30,7 @@ object WizardFinishFrame: TWizardFinishFrame
   end
   object DriveSetupLabel: TLabel
     Left = 8
-    Top = 93
+    Top = 109
     Width = 153
     Height = 13
     Caption = 'Aktuell konfigurierte Laufwerke:'
@@ -54,9 +54,9 @@ object WizardFinishFrame: TWizardFinishFrame
   end
   object MountingListView: TListView
     Left = 8
-    Top = 112
+    Top = 128
     Width = 569
-    Height = 246
+    Height = 230
     Anchors = [akLeft, akTop, akRight, akBottom]
     Columns = <>
     ReadOnly = True
@@ -173,8 +173,8 @@ object WizardFinishFrame: TWizardFinishFrame
   end
   object PopupMenu: TPopupMenu
     Images = ImageList
-    Left = 24
-    Top = 120
+    Left = 16
+    Top = 136
     object PopupAdd: TMenuItem
       Caption = 'Add'
       ImageIndex = 0
@@ -196,8 +196,8 @@ object WizardFinishFrame: TWizardFinishFrame
     end
   end
   object ImageList: TImageList
-    Left = 56
-    Top = 120
+    Left = 48
+    Top = 136
     Bitmap = {
       494C010103000400040010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000001000000001002000000000000010

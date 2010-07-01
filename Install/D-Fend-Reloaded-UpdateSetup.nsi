@@ -213,6 +213,7 @@ Section "$(LANGNAME_DFendReloaded)" ID_DFend
   IntCmp $InstallDataType 2 NoUninstallerUpdate
   
   ; Update uninstaller
+  
   SetDetailsPrint both
   DetailPrint "$(LANGNAME_UpdateUninstaller)"
   SetDetailsPrint listonly
@@ -236,46 +237,36 @@ Section "$(LANGNAME_DFendReloaded)" ID_DFend
   SetDetailsPrint listonly
   SetOutPath "$INSTDIR\DOSBox"
   SetDetailsPrint none
-
-  File "..\DOSBox\README.txt"
-  ; not changed File "..\DOSBox\COPYING.txt"
-  File "..\DOSBox\THANKS.txt"
-  File "..\DOSBox\NEWS.txt"
-  ; not changed File "..\DOSBox\AUTHORS.txt"
-  File "..\DOSBox\INSTALL.txt"
+  
+  SetOutPath "$INSTDIR\DOSBox"
+  Delete "INSTDIR\DOSBox\README.txt"
+  Delete "INSTDIR\DOSBox\COPYING.txt"
+  Delete "INSTDIR\DOSBox\THANKS.txt"
+  Delete "INSTDIR\DOSBox\NEWS.txt"
+  Delete "INSTDIR\DOSBox\AUTHORS.txt"
+  Delete "INSTDIR\DOSBox\INSTALL.txt"
+  RmDir /r "$INSTDIR\DOSBox\zmbv"
+  
   File "..\DOSBox\DOSBox.exe"
   File "..\DOSBox\dosbox.conf"
   File "..\DOSBox\SDL.dll"
   File "..\DOSBox\SDL_net.dll"
+  File "..\DOSBox\DOSBox 0.74 Manual.txt"
+  File "..\DOSBox\DOSBox 0.74 Options.bat"
+  File "..\DOSBox\Reset KeyMapper.bat"
+  File "..\DOSBox\Reset Options.bat"
+  File "..\DOSBox\Screenshots & Recordings.bat"
   
-  SetOutPath "$INSTDIR\DOSBox\zmbv"
-  ; not changed File "..\DOSBox\zmbv\zmbv.dll"
-  File "..\DOSBox\zmbv\zmbv.inf"
-  ; not changed File "..\DOSBox\zmbv\README.txt"
+  File "..\NewUserData\FREEDOS\CPI\*.*"
+  
+  SetOutPath "$INSTDIR\DOSBox\Video Codec"
+  File "..\DOSBox\Video Codec\*.*"
+  
+  SetOutPath "$INSTDIR\DOSBox\Documentation"
+  File "..\DOSBox\Documentation\*.*"  
 
   SetOutPath "$INSTDIR\DOSBox"
-  File "..\DosBoxLang\Readme-0.73-German.txt"
-  File "..\DosBoxLang\German.dosbox.conf"
-  File "..\DosBoxLang\German.lng"
-  File "..\DosBoxLang\Polish.dosbox.conf"
-  File "..\DosBoxLang\Polish.lng"
-  File "..\DosBoxLang\Readme-0.73-Italian.txt"
-  File "..\DosBoxLang\Italian.dosbox.conf"
-  File "..\DosBoxLang\Italian.lng"
-  File "..\DosBoxLang\Russian.lng"
-  File "..\DosBoxLang\Readme-0.73-Russian.txt"
-  File "..\DosBoxLang\Russian.dosbox.conf"
-  File "..\DosBoxLang\Danish.dosbox.conf"
-  File "..\DosBoxLang\Danish.lng"
-  File "..\DosBoxLang\Readme-0.73-Danish.txt"
-  File "..\DosBoxLang\Readme-0.73-French.txt"
-  File "..\DosBoxLang\French.dosbox.conf"
-  File "..\DosBoxLang\French.lng"
-  File "..\DosBoxLang\Readme-0.73-Portuguese.txt"
-  File "..\DosBoxLang\Portuguese.lng"
-  File "..\DosBoxLang\Portuguese.dosbox.conf"
-  File "..\DosBoxLang\Turkish.lng"
-  File "..\DosBoxLang\Readme-0.72-Persian.rtf"
+  File "..\DosBoxLang\*.*"
   
   File "..\NewUserData\FREEDOS\CPI\*.*"
   

@@ -46,6 +46,18 @@ object ModernProfileEditorMIDIFrame: TModernProfileEditorMIDIFrame
     Visible = False
     WordWrap = True
   end
+  object InfoLabel: TLabel
+    Left = 200
+    Top = 24
+    Width = 528
+    Height = 69
+    Anchors = [akLeft, akTop, akRight]
+    AutoSize = False
+    Caption = 
+      'The MIDI device will be available on address 330 and interrupt 2' +
+      ' in DOSBox.'
+    WordWrap = True
+  end
   object TypeComboBox: TComboBox
     Left = 24
     Top = 43

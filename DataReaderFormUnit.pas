@@ -25,6 +25,7 @@ type
     PublisherLabel: TLabel;
     YearLabel: TLabel;
     SearchTypeCheckBox: TCheckBox;
+    NameCheckBox: TCheckBox;
     procedure FormShow(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -42,13 +43,13 @@ type
     { Public-Deklarationen }
     ConfigOK : Boolean;
     CaptureDir : String;
-    Genre, Developer, Publisher, Year, Internet : String;
+    Name, Genre, Developer, Publisher, Year, Internet : String;
   end;
 
 var
   DataReaderForm: TDataReaderForm;
 
-Function ShowDataReaderDialog(const AOwner : TComponent; const AGameName : String; var Genre, Developer, Publisher, Year, Internet : String; const CaptureDir : String) : Boolean;
+Function ShowDataReaderDialog(const AOwner : TComponent; const AGameName : String; var Name, Genre, Developer, Publisher, Year, Internet : String; const CaptureDir : String) : Boolean;
 
 implementation
 
@@ -71,6 +72,7 @@ begin
 end;
 
 procedure TDataReaderForm.FormShow(Sender: TObject);
+Var S : String;
 begin
   SetVistaFonts(self);
   Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName);
@@ -88,9 +90,9 @@ begin
   GameNameEdit.EditLabel.Caption:=LanguageSetup.GameName;
   SearchButton.Caption:=LanguageSetup.Search;
   SearchTypeCheckBox.Caption:=LanguageSetup.DataReaderSearchForDOSGames;
-  SearchTypeCheckBox.Visible:=PrgSetup.ActivateIncompleteFeatures;
   SearchResultsLabel.Caption:=LanguageSetup.DataReaderSearchResults;
   GameDataBox.Caption:=LanguageSetup.DataReaderNoSearchResults;
+  NameCheckBox.Caption:=LanguageSetup.GameName;
   GenreCheckBox.Caption:=LanguageSetup.GameGenre;
   DeveloperCheckBox.Caption:=LanguageSetup.GameDeveloper;
   PublisherCheckBox.Caption:=LanguageSetup.GamePublisher;
@@ -108,10 +110,30 @@ begin
 
   If Trim(GameNameEdit.Text)<>'' then SearchButtonClick(Sender) else ListBoxClick(Sender);
   ShowCompleted:=True;
+
+  S:=Trim(PrgSetup.DataReaderActiveSettings);
+  While length(S)<6 do S:=S+'X';
+  If length(S)>6 then S:=Copy(S,1,6);
+  NameCheckBox.Checked:=(S[1]<>'-');
+  GenreCheckBox.Checked:=(S[2]<>'-');
+  DeveloperCheckBox.Checked:=(S[3]<>'-');
+  PublisherCheckBox.Checked:=(S[4]<>'-');
+  YearCheckBox.Checked:=(S[5]<>'-');
+  DownloadCoverCheckBox.Checked:=(S[6]<>'-');
 end;
 
 procedure TDataReaderForm.FormDestroy(Sender: TObject);
+Var S : String;
 begin
+  S:='';
+  If NameCheckBox.Checked then S:=S+'X' else S:=S+'-';
+  If GenreCheckBox.Checked then S:=S+'X' else S:=S+'-';
+  If DeveloperCheckBox.Checked then S:=S+'X' else S:=S+'-';
+  If PublisherCheckBox.Checked then S:=S+'X' else S:=S+'-';
+  If YearCheckBox.Checked then S:=S+'X' else S:=S+'-';
+  If DownloadCoverCheckBox.Checked then S:=S+'X' else S:=S+'-';
+  PrgSetup.DataReaderActiveSettings:=S;
+
   GenreSt.Free;
   DeveloperSt.Free;
   PublisherSt.Free;
@@ -190,6 +212,7 @@ begin
   If Nr<0 then begin
     GameDataBox.Caption:=LanguageSetup.DataReaderNoSearchResults;
     InsertButton.Enabled:=False;
+    NameCheckBox.Enabled:=False;
     GenreCheckBox.Enabled:=False;
     GenreLabel.Caption:='';
     DeveloperCheckBox.Enabled:=False;
@@ -222,6 +245,7 @@ begin
   end;
 
   GameDataBox.Caption:=ListBox.Items[Nr];
+  NameCheckBox.Enabled:=True;
   GenreCheckBox.Enabled:=(Trim(GenreSt[Nr])<>'');
   GenreLabel.Caption:=GenreSt[Nr];
   DeveloperCheckBox.Enabled:=(Trim(DeveloperSt[Nr])<>'');
@@ -236,11 +260,13 @@ end;
 
 procedure TDataReaderForm.InsertButtonClick(Sender: TObject);
 begin
+  Name:='';
   Genre:='';
   Developer:='';
   Publisher:='';
   Year:='';
 
+  If NameCheckBox.Enabled and NameCheckBox.Checked then Name:=ListBox.Items[ListBox.ItemIndex];
   If GenreCheckBox.Enabled and GenreCheckBox.Checked then Genre:=GenreLabel.Caption;
   If DeveloperCheckBox.Enabled and DeveloperCheckBox.Checked then Developer:=DeveloperLabel.Caption;
   If PublisherCheckBox.Enabled and PublisherCheckBox.Checked then Publisher:=PublisherLabel.Caption;
@@ -252,7 +278,7 @@ end;
 
 { global }
 
-Function ShowDataReaderDialog(const AOwner : TComponent; const AGameName : String; var Genre, Developer, Publisher, Year, Internet : String; const CaptureDir : String) : Boolean;
+Function ShowDataReaderDialog(const AOwner : TComponent; const AGameName : String; var Name, Genre, Developer, Publisher, Year, Internet : String; const CaptureDir : String) : Boolean;
 begin
   DataReaderForm:=TDataReaderForm.Create(AOwner);
   try
@@ -261,6 +287,7 @@ begin
     DataReaderForm.CaptureDir:=CaptureDir;
     result:=(DataReaderForm.ShowModal=mrOK);
     if result then begin
+      Name:=DataReaderForm.Name;
       Genre:=DataReaderForm.Genre;
       Developer:=DataReaderForm.Developer;
       Publisher:=DataReaderForm.Publisher;

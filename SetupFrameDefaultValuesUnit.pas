@@ -115,7 +115,8 @@ begin
   AddString(P1+LanguageSetup.GameVideo,GameDB.ConfOpt.Video);
   AddString(P1+LanguageSetup.GameMemory,GameDB.ConfOpt.Memory);
   AddString(P1+LanguageSetup.GameFrameskip,GameDB.ConfOpt.Frameskip);
-  AddString(P1+LanguageSetup.GameResolution,GameDB.ConfOpt.Resolution);
+  AddString(P1+LanguageSetup.GameWindowResolution,GameDB.ConfOpt.ResolutionWindow);
+  AddString(P1+LanguageSetup.GameFullscreenResolution,GameDB.ConfOpt.ResolutionFullscreen);
   AddString(P1+LanguageSetup.GameScale,GameDB.ConfOpt.Scale);
   AddString(P1+LanguageSetup.GameRender,GameDB.ConfOpt.Render);
   AddString(P1+LanguageSetup.GameVGAChipset,GameDB.ConfOpt.VGAChipsets);
@@ -198,7 +199,8 @@ begin
   GameDB.ConfOpt.Video:=GetString;
   GameDB.ConfOpt.Memory:=GetString;
   GameDB.ConfOpt.Frameskip:=GetString;
-  GameDB.ConfOpt.Resolution:=GetString;
+  GameDB.ConfOpt.ResolutionWindow:=GetString;
+  GameDB.ConfOpt.ResolutionFullscreen:=GetString;
   GameDB.ConfOpt.Scale:=GetString;
   GameDB.ConfOpt.Render:=GetString;
   GameDB.ConfOpt.VGAChipsets:=GetString;
@@ -297,7 +299,8 @@ begin
   Work(DefaultValuesVideo);
   Work(DefaultValuesMemory);
   Work(DefaultValuesFrameSkip);
-  Work(DefaultValuesResolution);
+  Work(DefaultValuesResolutionWindow);
+  Work(DefaultValuesResolutionFullscreen);
   Work(DefaultValuesScale);
   Work(DefaultValueRender);
   Work(DefaultValuesVGAChipsets);
@@ -311,7 +314,7 @@ begin
   Work(DefaultValuesRate);
   Work(DefaultValuesBlocksize);
 
-  Work(DefaultValueSBlaster);
+  Work(DefaultValuesSBlaster);
   Work(DefaultValuesSBBase);
   Work(DefaultValuesIRQ);
   Work(DefaultValuesDMA);

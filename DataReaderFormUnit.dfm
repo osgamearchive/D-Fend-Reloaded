@@ -3,7 +3,7 @@ object DataReaderForm: TDataReaderForm
   Top = 0
   BorderIcons = [biSystemMenu, biMaximize]
   Caption = 'DataReaderForm'
-  ClientHeight = 351
+  ClientHeight = 389
   ClientWidth = 592
   Color = clBtnFace
   Constraints.MinHeight = 361
@@ -22,7 +22,7 @@ object DataReaderForm: TDataReaderForm
   OnShow = FormShow
   DesignSize = (
     592
-    351)
+    389)
   PixelsPerInch = 96
   TextHeight = 13
   object SearchResultsLabel: TLabel
@@ -71,7 +71,7 @@ object DataReaderForm: TDataReaderForm
     Left = 16
     Top = 88
     Width = 201
-    Height = 225
+    Height = 263
     Anchors = [akLeft, akTop, akBottom]
     ItemHeight = 13
     TabOrder = 2
@@ -81,100 +81,111 @@ object DataReaderForm: TDataReaderForm
     Left = 232
     Top = 88
     Width = 352
-    Height = 226
+    Height = 264
     Anchors = [akLeft, akTop, akRight, akBottom]
     Caption = 'GameDataBox'
     TabOrder = 3
     DesignSize = (
       352
-      226)
+      264)
     object GenreLabel: TLabel
       Left = 32
-      Top = 42
+      Top = 74
       Width = 54
       Height = 13
       Caption = 'GenreLabel'
     end
     object DeveloperLabel: TLabel
       Left = 32
-      Top = 86
+      Top = 118
       Width = 74
       Height = 13
       Caption = 'DeveloperLabel'
     end
     object PublisherLabel: TLabel
       Left = 32
-      Top = 130
+      Top = 162
       Width = 68
       Height = 13
       Caption = 'PublisherLabel'
     end
     object YearLabel: TLabel
       Left = 32
-      Top = 174
+      Top = 206
       Width = 47
       Height = 13
       Caption = 'YearLabel'
     end
     object GenreCheckBox: TCheckBox
       Left = 16
-      Top = 24
+      Top = 56
       Width = 324
       Height = 17
       Anchors = [akLeft, akTop, akRight]
       Caption = 'Genre'
       Checked = True
       State = cbChecked
-      TabOrder = 0
+      TabOrder = 1
     end
     object DeveloperCheckBox: TCheckBox
       Left = 16
-      Top = 68
+      Top = 100
       Width = 324
       Height = 17
       Anchors = [akLeft, akTop, akRight]
       Caption = 'Developer'
       Checked = True
       State = cbChecked
-      TabOrder = 1
+      TabOrder = 2
     end
     object PublisherCheckBox: TCheckBox
       Left = 16
-      Top = 112
+      Top = 144
       Width = 324
       Height = 17
       Anchors = [akLeft, akTop, akRight]
       Caption = 'Publisher'
       Checked = True
       State = cbChecked
-      TabOrder = 2
+      TabOrder = 3
     end
     object YearCheckBox: TCheckBox
       Left = 16
-      Top = 156
+      Top = 188
       Width = 324
       Height = 17
       Anchors = [akLeft, akTop, akRight]
       Caption = 'Year'
       Checked = True
       State = cbChecked
-      TabOrder = 3
+      TabOrder = 4
     end
     object DownloadCoverCheckBox: TCheckBox
       Left = 16
-      Top = 200
+      Top = 232
       Width = 324
       Height = 17
       Anchors = [akLeft, akTop, akRight]
       Caption = 'Download cover and store it in the capture folder'
       Checked = True
       State = cbChecked
-      TabOrder = 4
+      TabOrder = 5
+    end
+    object NameCheckBox: TCheckBox
+      Left = 16
+      Top = 24
+      Width = 321
+      Height = 17
+      Anchors = [akLeft, akTop, akRight]
+      Caption = 'Game name'
+      Checked = True
+      State = cbChecked
+      TabOrder = 0
     end
   end
   object InsertButton: TBitBtn
     Left = 16
-    Top = 320
+    Top = 358
     Width = 97
     Height = 25
     Anchors = [akLeft, akBottom]
@@ -204,7 +215,7 @@ object DataReaderForm: TDataReaderForm
   end
   object CancelButton: TBitBtn
     Left = 128
-    Top = 320
+    Top = 358
     Width = 97
     Height = 25
     Anchors = [akLeft, akBottom]

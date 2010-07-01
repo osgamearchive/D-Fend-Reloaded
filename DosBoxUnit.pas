@@ -227,8 +227,8 @@ begin
     If SelectCD and (S='LABEL') or (S='FILE') or (S='FOLDER') then begin
       MessageDlg(Format(LanguageSetup.MessageNoCDDriveMount,[DriveLetter]),mtError,[mbOK],0);
       result:=False;
+      Folder:=''; exit;
     end;
-    Folder:=''; exit;
   end;
 
   If S='NUMBER' then begin
@@ -256,7 +256,7 @@ begin
   end;
 end;
 
-Function BuildMountData(const ProfString : String; var FreeDriveLetters : String; const ProfileName : String; const SelectCD : Boolean; var OK : Boolean; var SpecialMountedCDDrives : String) : String;
+Function BuildMountData(const ProfString : String; const DOSBoxVersion : Double; var FreeDriveLetters : String; const ProfileName : String; const SelectCD : Boolean; var OK : Boolean; var SpecialMountedCDDrives : String) : String;
 Procedure MarkDriveUsed(S : String);
 begin
   S:=Trim(ExtUpperCase(S)); If length(S)<>1 then exit;
@@ -334,10 +334,18 @@ begin
       {ImageFile;CDROMIMAGE;Letter;;;}
       MarkDriveUsed(St[2]);
       If AllSameDir(St2) then begin
-        result:=SpecialMultiImgMount(St[2],St2,FreeDriveLetters,'-t iso -fs iso');
+        If DOSBoxVersion>0.73 then begin
+          result:=SpecialMultiImgMount(St[2],St2,FreeDriveLetters,'-t cdrom');
+        end else begin
+          result:=SpecialMultiImgMount(St[2],St2,FreeDriveLetters,'-t iso -fs iso');
+        end;
       end else begin
         S:='"'+ShortName(St2[0])+'"'; For I:=1 to St2.Count-1 do S:=S+' "'+ShortName(St2[I])+'"';
-        result:='imgmount '+St[2]+' '+S+' -t iso -fs iso';
+        If DOSBoxVersion>0.73 then begin
+          result:='imgmount '+St[2]+' '+S+' -t cdrom';
+        end else begin
+          result:='imgmount '+St[2]+' '+S+' -t iso -fs iso';
+        end;
       end;
     end;
 
@@ -587,13 +595,9 @@ begin
     If IsWindowsExe(MakeAbsPath(ProgramFile,PrgSetup.BaseDir)) and WarnIfNotReachable and WarnIfWindowsExe then begin
       If not Game.IgnoreWindowsFileWarnings then begin
         Application.Restore;
-        If PrgSetup.ActivateIncompleteFeatures then begin
-          B:=False;
-          ShowWindowsFileWarningDialog(Application.MainForm,MakeAbsPath(ProgramFile,PrgSetup.BaseDir),B);
-          If B then begin Game.IgnoreWindowsFileWarnings:=True; Game.StoreAllValues; end;
-        end else begin
-          MessageDlg(Format(LanguageSetup.MessageWindowsExeExecuteWarning,[MakeAbsPath(ProgramFile,PrgSetup.BaseDir)]),mtError,[mbOK],0);
-        end;
+        B:=False;
+        ShowWindowsFileWarningDialog(Application.MainForm,MakeAbsPath(ProgramFile,PrgSetup.BaseDir),B);
+        If B then begin Game.IgnoreWindowsFileWarnings:=True; Game.StoreAllValues; end;
       end;
     end;
 
@@ -759,7 +763,7 @@ begin
   end;
 end;
 
-Procedure AutoMountCDs(const St : TStringList; const Game : TGame; var FreeDriveLetters, SpecialMountedCDDrives : String);
+Procedure AutoMountCDs(const St : TStringList; const Game : TGame; const DOSBoxVersion : Double; var FreeDriveLetters, SpecialMountedCDDrives : String);
 Var AlreadyMounted,S,T : String;
     I : Integer;
     C,D : Char;
@@ -801,7 +805,7 @@ begin
       If S='' then For D:='A' to Chr(ord(C)-1) do If Pos(D,FreeDriveLetters)>0 then begin S:=D; break; end;
     end;
     S:=C+':\;CDROM;'+S+';TRUE;;';
-    St.Add(BuildMountData(S,FreeDriveLetters,'',True,OK,T)); {"''", "OK" and "T" can be ignored; only for user interactive mounting}
+    St.Add(BuildMountData(S,DOSBoxVersion,FreeDriveLetters,'',True,OK,T)); {"''", "OK" and "T" can be ignored; only for user interactive mounting}
   end;
 end;
 
@@ -815,8 +819,15 @@ Var S,T,U,NumCommands,MouseCommands,UsePath,Mount,UnMount : String;
     DOSBoxNr : Integer;
     OK : Boolean;
     SpecialMountedCDDrives : String;
+    DOSBoxVersion : Double;
 begin
   result:=True;
+
+  DOSBoxNr:=Max(0,GetDOSBoxNr(Game));
+  If DOSBoxNr>=0 then S:=CheckDOSBoxVersion(DOSBoxNr) else S:=CheckDOSBoxVersion(-1,Game.CustomDOSBoxDir);
+  If S=''
+    then DOSBoxVersion:=MinSupportedDOSBoxVersion
+    else try DOSBoxVersion:=StrToFloatEx(S); except DOSBoxVersion:=MinSupportedDOSBoxVersion; end;
 
   St.Add('');
   St.Add('[autoexec]');
@@ -909,13 +920,13 @@ begin
   if not Game.AutoexecOverrideMount then begin
     For I:=0 to 9 do begin
       If Game.NrOfMounts>=I+1 then begin
-        MultiLineAdd(St,BuildMountData(Game.Mount[I],FreeDriveLetters,Game.CacheName,SelectCD,OK,SpecialMountedCDDrives));
+        MultiLineAdd(St,BuildMountData(Game.Mount[I],DOSBoxVersion,FreeDriveLetters,Game.CacheName,SelectCD,OK,SpecialMountedCDDrives));
         If not OK then begin result:=False; exit; end;
       end else begin
         break;
       end;
     end;
-    If Game.AutoMountCDs then AutoMountCDs(St,Game,FreeDriveLetters,SpecialMountedCDDrives);
+    If Game.AutoMountCDs then AutoMountCDs(St,Game,DOSBoxVersion,FreeDriveLetters,SpecialMountedCDDrives);
   end;
 
   { Mixer }
@@ -1079,7 +1090,7 @@ begin
   result.Add('autolock='+BoolToStr(Game.AutoLockMouse));
   result.Add('sensitivity='+IntToStr(Game.MouseSensitivity));
   result.Add('waitonerror='+BoolToStr(PrgSetup.DOSBoxSettings[DOSBoxNr].WaitOnError));
-  result.Add('usecancodes='+BoolToStr(Game.UseScanCodes));
+  result.Add('usescancodes='+BoolToStr(Game.UseScanCodes));
   result.Add('priority='+Game.Priority);
   S:=Trim(Game.CustomKeyMappingFile);
   If (S='') or (ExtUpperCase(S)='DEFAULT') then S:=PrgSetup.DOSBoxSettings[DOSBoxNr].DosBoxMapperFile;
@@ -1104,6 +1115,9 @@ begin
       end;
     end;
     If S='' then S:=PrgSetup.DOSBoxSettings[DOSBoxNr].DosBoxLanguage;
+
+    T:=ExtractFileName(S);
+    If FileExists(PrgDataDir+LanguageSubDir+'\'+T) then S:=PrgDataDir+LanguageSubDir+'\'+T;
     If FileExists(S) then result.Add('language='+UnmapDrive(S,ptDOSBox));
   end;
   S:=Game.VideoCard; T:=Trim(ExtUpperCase((S)));
@@ -1303,7 +1317,7 @@ end;
 Type TCharArray=Array[0..MaxInt-1] of Char;
      PCharArray=^TCharArray;
 
-Function RunDosBox(const DOSBoxPath : String; const DOSBoxNr : Integer; const ConfFile : String; const FullScreen : Boolean; const DosBoxCommandLine : String ='') : THandle;
+Function RunDosBox(const DOSBoxPath : String; const DOSBoxNr : Integer; const ConfFile : String; const FullScreen : Boolean; const ShowConsole : Integer; const DosBoxCommandLine : String ='') : THandle;
 Var Add : String;
     PrgFile, Params, Env, S : String;
     StartupInfo : TStartupInfo;
@@ -1315,7 +1329,11 @@ Var Add : String;
 begin
   SpeedTestInfo('Building DOSBox command line');
   Add:='';
-  if PrgSetup.DOSBoxSettings[DOSBoxNr].HideDosBoxConsole then Add:=' -NOCONSOLE';
+  Case ShowConsole of
+    0 : Add:=' -NOCONSOLE';
+    2 : ; {always show console}
+    else {1 :} if PrgSetup.DOSBoxSettings[DOSBoxNr].HideDosBoxConsole then Add:=' -NOCONSOLE';
+  End;
   If Trim(PrgSetup.DOSBoxSettings[DOSBoxNr].CommandLineParameters)<>'' then Add:=Add+' '+Trim(PrgSetup.DOSBoxSettings[DOSBoxNr].CommandLineParameters);
   If DosBoxCommandLine<>'' then Add:=Add+' '+DosBoxCommandLine;
 
@@ -1480,7 +1498,7 @@ begin
         Application.Minimize;
       end;
 
-      result:=RunDosBox(T,Max(0,DOSBoxNr),TempDir+DosBoxConfFileName,Game.StartFullscreen,DosBoxCommandLine);
+      result:=RunDosBox(T,Max(0,DOSBoxNr),TempDir+DosBoxConfFileName,Game.StartFullscreen,Game.ShowConsoleWindow,DosBoxCommandLine);
 
       SpeedTestDone;
 

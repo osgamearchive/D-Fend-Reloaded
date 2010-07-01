@@ -1,0 +1,6 @@
+D-Fend Reloaded Changelog
+
+Version 1.1.0 (??/??/2010)
+==========================
+- Setup option to configure if history information of started games shall be
+  collected or not.

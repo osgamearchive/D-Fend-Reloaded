@@ -47,6 +47,10 @@
 					<param name="Local" value="FileImportZip.html">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="Import folder">
+					<param name="Local" value="FileImportFolder.html">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="Datenpakete herunterladen">
 					<param name="Local" value="FileImportPackage.html">
 					</OBJECT>
@@ -130,7 +134,7 @@
 						</OBJECT>
 					<UL>
 						<LI> <OBJECT type="text/sitemap">
-							<param name="Name" value="Übersetzungen für Genres und Namen von Sprachen">
+							<param name="Name" value="Übersetzungen in der Spieleliste">
 							<param name="Local" value="FileOptionsGamesListTranslations.html">
 							</OBJECT>
 					</UL>
@@ -182,6 +186,10 @@
 						<param name="Name" value="Vorgabewerte">
 						<param name="Local" value="FileOptionsDefaultValues.html">
 						</OBJECT>
+					<LI> <OBJECT type="text/sitemap">
+						<param name="Name" value="Automatische Spielekonfiguration">
+						<param name="Local" value="FileOptionsAutomaticConfiguration.html">
+						</OBJECT>
 				</UL>
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="Externe Programme">
@@ -192,6 +200,10 @@
 						<param name="Local" value="FileOptionsDOSBox.html">
 						</OBJECT>
 					<UL>
+						<LI> <OBJECT type="text/sitemap">
+							<param name="Name" value="Globale DOSBox-Einstellungen">
+							<param name="Local" value="FileOptionsDOSBoxGeneral.html">
+							</OBJECT>
 						<LI> <OBJECT type="text/sitemap">
 							<param name="Name" value="DOSBox CVS-Features">
 							<param name="Local" value="FileOptionsDOSBoxCVSFeatures.html">
@@ -353,6 +365,10 @@
 				<param name="Local" value="ProfileWithWizard.html">
 				</OBJECT>
 			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="Von Quellmedium installieren">
+				<param name="Local" value="ProfileAddFromMedia.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
 				<param name="Name" value="Bearbeiten">
 				<param name="Local" value="ProfileEdit.html">
 				</OBJECT>
@@ -497,6 +513,10 @@
 				<param name="Local" value="ProfileMakeZipPackage.html">
 				</OBJECT>
 			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="Gespeicherten Spielstand ändern">
+				<param name="Local" value="ProfileCheating.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
 				<param name="Name" value="DOSBox conf-Datei anzeigen">
 				<param name="Local" value="ProfileViewDOSBoxConfFile.html">
 				</OBJECT>
@@ -536,6 +556,10 @@
 				<param name="Name" value="Spiel suchen">
 				<param name="Local" value="ProfileSearchGame.html">
 				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="Gespeicherten Spielstand ändern">
+				<param name="Local" value="ProfileCheating.html">
+				</OBJECT>
 		</UL>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="Extras">
@@ -558,9 +582,30 @@
 				<param name="Local" value="ExtrasTemplates.html">
 				</OBJECT>
 			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="Cheaten">
+				</OBJECT>
+			<UL>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="Gespeicherten Spielstand ändern">
+					<param name="Local" value="ProfileCheating.html">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="Cheats-Datenbank bearbeiten">
+					<param name="Local" value="ExtrasEditCheatDB.html">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="In Spielstand nach Adresse suchen">
+					<param name="Local" value="ExtrasSearchAddress.html">
+					</OBJECT>
+			</UL>
+			<LI> <OBJECT type="text/sitemap">
 				<param name="Name" value="Imagedateien">
 				</OBJECT>
       <UL>
+  			<LI> <OBJECT type="text/sitemap">
+	  			<param name="Name" value="Imagedatei erstellen">
+		  		<param name="Local" value="ExtrasImagesCreateImage.html">
+			  	</OBJECT>
   			<LI> <OBJECT type="text/sitemap">
 	  			<param name="Name" value="IMG-Image von Diskette erstellen">
 		  		<param name="Local" value="ExtrasImagesCreateImageFromFloppy.html">
@@ -570,20 +615,20 @@
 		  		<param name="Local" value="ExtrasImagesWriteImageToFloppy.html">
 			  	</OBJECT>
   			<LI> <OBJECT type="text/sitemap">
-	  			<param name="Name" value="Imagedatei erstellen">
-		  		<param name="Local" value="ExtrasImagesCreateImage.html">
-			  	</OBJECT>
-  			<LI> <OBJECT type="text/sitemap">
-	  			<param name="Name" value="ISO-Image von CD erstellen">
-		  		<param name="Local" value="ExtrasImagesCreateImageFromCD.html">
+	  			<param name="Name" value="Imagedatei von Ordnerinhalt erstellen">
+		  		<param name="Local" value="ExtrasImagesCreateFromFolder.html">
 			  	</OBJECT>
   			<LI> <OBJECT type="text/sitemap">
 	  			<param name="Name" value="Imagedatei in Ordner entpacken">
 		  		<param name="Local" value="ExtrasImagesExtractToFolder.html">
 			  	</OBJECT>
   			<LI> <OBJECT type="text/sitemap">
-	  			<param name="Name" value="Imagedatei von Ordnerinhalt erstellen">
-		  		<param name="Local" value="ExtrasImagesCreateFromFolder.html">
+	  			<param name="Name" value="ISO-Image von CD erstellen">
+		  		<param name="Local" value="ExtrasImagesCreateImageFromCD.html">
+			  	</OBJECT>
+  			<LI> <OBJECT type="text/sitemap">
+	  			<param name="Name" value="Imagedatei-basierendes Profil von normalem Profil erstellen">
+		  		<param name="Local" value="ExtrasImagesCreateFromProfile.html">
 			  	</OBJECT>
       </UL>      
 			<LI> <OBJECT type="text/sitemap">
@@ -612,8 +657,17 @@
 				</OBJECT>
 			<LI> <OBJECT type="text/sitemap">
 				<param name="Name" value="Übersetzungseditor">
+				</OBJECT>
+      <UL>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="D-Fend Reloaded Übersetzungseditor">
 				<param name="Local" value="ExtrasLanguageEditor.html">
 				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="DOSBox Übersetzungseditor">
+				<param name="Local" value="ExtrasLanguageEditorDOSBox.html">
+				</OBJECT>
+      </UL>
 		</UL>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="Hilfe">
@@ -659,7 +713,7 @@
 			<param name="Local" value="FileExportBuildInstallers.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="Zip-Palete für mehrere Spiele erstellen">
+			<param name="Name" value="Archivdatei-Pakete für mehrere Spiele erstellen">
 			<param name="Local" value="FileExportBuildZipPackages.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
@@ -700,7 +754,7 @@
 					</OBJECT>
 				<UL>
 					<LI> <OBJECT type="text/sitemap">
-						<param name="Name" value="Übersetzungen für Genres und Namen von Sprachen">
+						<param name="Name" value="Übersetzungen in der Spieleliste">
 						<param name="Local" value="FileOptionsGamesListTranslations.html">
 						</OBJECT>
 				</UL>
@@ -762,6 +816,10 @@
 					<param name="Local" value="FileOptionsDOSBox.html">
 					</OBJECT>
 				<UL>
+					<LI> <OBJECT type="text/sitemap">
+						<param name="Name" value="Globale DOSBox-Einstellungen">
+						<param name="Local" value="FileOptionsDOSBoxGeneral.html">
+						</OBJECT>
 					<LI> <OBJECT type="text/sitemap">
 						<param name="Name" value="DOSBox CVS-Features">
 						<param name="Local" value="FileOptionsDOSBoxCVSFeatures.html">
@@ -960,6 +1018,10 @@
 			<param name="Local" value="ProfileWithWizard.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Von Quellmedium installieren">
+			<param name="Local" value="ProfileAddFromMedia.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="Spiel-Deinstallieren Dialog">
 			<param name="Local" value="ProfileUninstall.html">
 			</OBJECT>
@@ -1005,6 +1067,10 @@
   		<param name="Local" value="ExtrasImagesCreateFromFolder.html">
   	</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
+ 			<param name="Name" value="Imagedatei-basierendes Profil von normalem Profil erstellen">
+  		<param name="Local" value="ExtrasImagesCreateFromProfile.html">
+  	</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="Spieleverzeichnis nach neuen Spielen durchsuchen">
 			<param name="Local" value="ExtrasScanGamesFolder.html">
 			</OBJECT>
@@ -1021,8 +1087,20 @@
 			<param name="Local" value="ExtrasTransferProfiles.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="Übersetzungseditor">
+			<param name="Name" value="D-Fend Reloaded Übersetzungseditor">
 			<param name="Local" value="ExtrasLanguageEditor.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="DOSBox Übersetzungseditor">
+			<param name="Local" value="ExtrasLanguageEditorDOSBox.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Cheats-Datenbank bearbeiten">
+			<param name="Local" value="ExtrasEditCheatDB.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="In Spielstand nach Adresse suchen">
+			<param name="Local" value="ExtrasSearchAddress.html">
 			</OBJECT>
 	</UL>
 	<LI> <OBJECT type="text/sitemap">

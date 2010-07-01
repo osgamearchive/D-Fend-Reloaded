@@ -89,9 +89,6 @@ begin
   ShowInfoLabel.Cursor:=crHandPoint;
   with InfoLabelInstallationSupportLink.Font do begin Color:=clBlue; Style:=[fsUnderline]; end;
   InfoLabelInstallationSupportLink.Cursor:=crHandPoint;
-
-  InfoLabelInstallationSupport.Visible:=PrgSetup.ActivateIncompleteFeatures;
-  InfoLabelInstallationSupportLink.Visible:=PrgSetup.ActivateIncompleteFeatures;
 end;
 
 Function TWizardBaseFrame.GetEmulationType : Integer;

@@ -44,12 +44,12 @@ type
 var
   UpdateCheckForm: TUpdateCheckForm;
 
-Procedure ShowUpdateCheckDialog(const AOwner : TComponent; const AGameDB : TGameDB);
+Procedure ShowUpdateCheckDialog(const AOwner : TComponent; const AGameDB : TGameDB; const ANoConfigButton : Boolean = False);
 Procedure RunProgramStartSilentUpdateCheck(const AForm : TForm; const ForceCheck : Boolean);
 
 implementation
 
-uses ShellAPI, CommonTools, LanguageSetupUnit, VistaToolsUnit, PrgSetupUnit,
+uses ShellAPI, Math, CommonTools, LanguageSetupUnit, VistaToolsUnit, PrgSetupUnit,
      IconLoaderUnit, ProgramUpdateCheckUnit, CheatDBToolsUnit, SetupFormUnit,
      DataReaderUnit, InternetDataWaitFormUnit, PackageDBToolsUnit, PrgConsts;
 
@@ -93,6 +93,8 @@ begin
   DFRHomepageLabel.Caption:=LanguageSetup.MenuHelpUpdatesURL;
   with DFRHomepageLabel.Font do begin Color:=clBlue; Style:=[fsUnderline]; end;
   DFRHomepageLabel.Cursor:=crHandPoint;
+
+  ClientWidth:=Max(ClientWidth,2*LabelDownload.Left+LabelDownload.Width);
 end;
 
 procedure TUpdateCheckForm.SetStatus(const ALabel: TLabel; const AText: String; const AColor: TColor);
@@ -136,7 +138,7 @@ end;
 procedure TUpdateCheckForm.UpdateProgram;
 begin
   SetStatus(StatusLabelProgram,LanguageSetup.UpdateCheckDialogStatusSearching,clDarkYellow);
-  Case RunUpdateCheck(self,True) of
+  Case RunUpdateCheck(self,True,False) of
     urNoUpdatesAvailable : SetStatus(StatusLabelProgram,LanguageSetup.UpdateCheckDialogStatusNoUpdates,clGreen);
     urUpdateAvailable : SetStatus(StatusLabelProgram,LanguageSetup.UpdateCheckDialogStatusProgramNewVersionAvailable,clDarkYellow);
     urUpdateInstallCanceled : SetStatus(StatusLabelProgram,LanguageSetup.UpdateCheckDialogStatusAborted,clRed);
@@ -147,7 +149,7 @@ end;
 procedure TUpdateCheckForm.UpdatePackagesDB;
 begin
   SetStatus(StatusLabelPackages,LanguageSetup.UpdateCheckDialogStatusSearching,clDarkYellow);
-  If UpdatePackageDB(self,((Word(GetKeyState(VK_LSHIFT)) div 256)<>0) or ((Word(GetKeyState(VK_RSHIFT)) div 256)<>0)) then begin
+  If UpdatePackageDB(self,((Word(GetKeyState(VK_LSHIFT)) div 256)<>0) or ((Word(GetKeyState(VK_RSHIFT)) div 256)<>0),False) then begin
     SetStatus(StatusLabelPackages,LanguageSetup.UpdateCheckDialogStatusPackagesDone,clGreen);
   end else begin
     SetStatus(StatusLabelPackages,LanguageSetup.UpdateCheckDialogStatusAborted,clRed);
@@ -174,7 +176,10 @@ begin
   SetStatus(StatusLabelDatareader,LanguageSetup.UpdateCheckDialogStatusSearching,clDarkYellow);
   DataReader:=TDataReader.Create;
   try
-    DataReader.LoadConfig(PrgDataDir+SettingsFolder+'\'+DataReaderConfigFile,False);
+    If not DataReader.LoadConfig(PrgDataDir+SettingsFolder+'\'+DataReaderConfigFile,False) then begin
+      SetStatus(StatusLabelDatareader,Format(LanguageSetup.DataReaderDownloadError,[DataReaderUpdateURL]),clRed);
+      exit;
+    end;
     I:=DataReader.Config.Version;
     If ShowDataReaderInternetConfigWaitDialog(Owner,DataReader,True,LanguageSetup.DataReaderDownloadCaption,LanguageSetup.DataReaderDownloadInfo,LanguageSetup.DataReaderDownloadError) then begin
       If DataReader.Config.Version>I then begin
@@ -191,12 +196,13 @@ begin
   BringWindowToTop(Handle);
 end;
 
-Procedure ShowUpdateCheckDialog(const AOwner : TComponent; const AGameDB : TGameDB);
+Procedure ShowUpdateCheckDialog(const AOwner : TComponent; const AGameDB : TGameDB; const ANoConfigButton : Boolean);
 Var OpenSetup : Boolean;
 begin
   UpdateCheckForm:=TUpdateCheckForm.Create(AOwner);
   try
     UpdateCheckForm.GameDB:=AGameDB;
+    If ANoConfigButton then UpdateCheckForm.SetupButton.Visible:=False;
     OpenSetup:=(UpdateCheckForm.ShowModal=mrOK);
   finally
     UpdateCheckForm.Free;
@@ -208,7 +214,7 @@ end;
 Procedure RunProgramStartSilentUpdateCheck(const AForm : TForm; const ForceCheck : Boolean);
 begin
   If ForceCheck then begin
-    RunUpdateCheck(AForm,True);
+    RunUpdateCheck(AForm,True,True);
   end else begin
     RunUpdateCheckIfSetup(AForm);
   end;

@@ -22,12 +22,16 @@ type
     Timer: TTimer;
     DOS32AInfoButton: TSpeedButton;
     ImageList: TImageList;
+    FreeMemLabel: TLabel;
     procedure TimerTimer(Sender: TObject);
     procedure DOS32AInfoButtonClick(Sender: TObject);
+    procedure LoadFixCheckBoxClick(Sender: TObject);
+    procedure LoadFixEditChange(Sender: TObject);
   private
     { Private-Deklarationen }
     LastProfileExe : String;
     ProfileExe : PString;
+    Procedure SetFreeMemInfo;
   public
     { Public-Deklarationen }
     Procedure InitGUI(var InitData : TModernProfileEditorInitData);
@@ -76,6 +80,14 @@ begin
   LoadFixEdit.Value:=Game.LoadFixMemory;
   DOS32ACheckBox.Checked:=Game.UseDOS32A;
   Timer.Enabled:=True;
+  SetFreeMemInfo;
+end;
+
+procedure TModernProfileEditorMemoryFrame.SetFreeMemInfo;
+Var I : Integer;
+begin
+  If LoadFixCheckBox.Checked then I:=632-1-LoadFixEdit.Value else I:=632;
+  FreeMemLabel.Caption:=Format(LanguageSetup.GameMemoryFree,[I]);
 end;
 
 procedure TModernProfileEditorMemoryFrame.GetGame(const Game: TGame);
@@ -109,6 +121,16 @@ begin
     ImageList.GetBitmap(1,DOS32AInfoButton.Glyph);
     DOS32AInfoButton.Hint:=LanguageSetup.GameDOS32ANotUseable;;
   end;
+end;
+
+procedure TModernProfileEditorMemoryFrame.LoadFixCheckBoxClick(Sender: TObject);
+begin
+  SetFreeMemInfo;
+end;
+
+procedure TModernProfileEditorMemoryFrame.LoadFixEditChange(Sender: TObject);
+begin
+  SetFreeMemInfo;
 end;
 
 procedure TModernProfileEditorMemoryFrame.DOS32AInfoButtonClick(Sender: TObject);

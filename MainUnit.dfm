@@ -3,7 +3,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
   Top = 0
   ActiveControl = TreeView
   Caption = 'D-Fend Reloaded'
-  ClientHeight = 578
+  ClientHeight = 698
   ClientWidth = 774
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -4360,7 +4360,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
   object Splitter: TSplitter
     Left = 169
     Top = 24
-    Height = 432
+    Height = 552
     ResizeStyle = rsUpdate
     OnMoved = FormResize
     ExplicitLeft = 224
@@ -4371,7 +4371,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
     Left = 0
     Top = 24
     Width = 169
-    Height = 432
+    Height = 552
     Align = alLeft
     Constraints.MinWidth = 50
     HideSelection = False
@@ -4518,13 +4518,13 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
     Left = 172
     Top = 24
     Width = 602
-    Height = 432
+    Height = 552
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 2
     object Splitter1: TSplitter
       Left = 0
-      Top = 229
+      Top = 349
       Width = 602
       Height = 3
       Cursor = crVSplit
@@ -4537,7 +4537,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
       Left = 0
       Top = 0
       Width = 602
-      Height = 229
+      Height = 349
       Align = alClient
       Columns = <>
       HideSelection = False
@@ -4559,7 +4559,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
     end
     object CapturePageControl: TPageControl
       Left = 0
-      Top = 232
+      Top = 352
       Width = 602
       Height = 200
       ActivePage = CaptureScreenshotsTab
@@ -4686,10 +4686,6 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
       object GameNotesPanel: TTabSheet
         Caption = 'Notes'
         ImageIndex = 44
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object GameNotesEdit: TRichEdit
           Left = 0
           Top = 22
@@ -4779,7 +4775,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
   end
   object ZipInfoPanel: TPanel
     Left = 0
-    Top = 456
+    Top = 576
     Width = 774
     Height = 40
     Align = alBottom
@@ -4806,7 +4802,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
   end
   object FirstRunInfoPanel: TPanel
     Left = 0
-    Top = 496
+    Top = 616
     Width = 774
     Height = 82
     Align = alBottom
@@ -6495,6 +6491,17 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
           Caption = 'Import archive file with installation support...'
           OnClick = MenuWork
         end
+        object MenuFileImportFolder: TMenuItem
+          Tag = 1016
+          Caption = 'Import folder...'
+          ImageIndex = 11
+          OnClick = MenuWork
+        end
+        object MenuFileImportFolderWithInstallationSupport: TMenuItem
+          Tag = 1017
+          Caption = 'Import folder with installation support...'
+          OnClick = MenuWork
+        end
         object N39: TMenuItem
           Caption = '-'
         end
@@ -6958,6 +6965,15 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
       end
       object MenuExtrasImageFiles: TMenuItem
         Caption = 'Image files'
+        object MenuExtrasCreateImage: TMenuItem
+          Tag = 5007
+          Caption = '&Create image file...'
+          ImageIndex = 14
+          OnClick = MenuWork
+        end
+        object N25: TMenuItem
+          Caption = '-'
+        end
         object MenuExtrasCreateIMGImage: TMenuItem
           Tag = 5012
           Caption = 'Create I&MG image from floppy...'
@@ -6969,29 +6985,21 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
           Caption = '&Write IMG to floppy...'
           OnClick = MenuWork
         end
-        object MenuExtrasCreateImage: TMenuItem
-          Tag = 5007
-          Caption = '&Create image file...'
-          ImageIndex = 14
+        object MenuExtrasImageFromFolder: TMenuItem
+          Tag = 5015
+          Caption = 'Create image file from folder content...'
+          ImageIndex = 11
           OnClick = MenuWork
-        end
-        object MenuExtrasCreateISOImage: TMenuItem
-          Tag = 5011
-          Caption = 'Create &ISO image from CD...'
-          ImageIndex = 36
-          OnClick = MenuWork
-        end
-        object N25: TMenuItem
-          Caption = '-'
         end
         object MenuExtrasExtractImage: TMenuItem
           Tag = 5014
           Caption = 'Extract image file to folder...'
           OnClick = MenuWork
         end
-        object MenuExtrasImageFromFolder: TMenuItem
-          Tag = 5015
-          Caption = 'Create image file from folder content...'
+        object MenuExtrasCreateISOImage: TMenuItem
+          Tag = 5011
+          Caption = 'Create &ISO image from CD...'
+          ImageIndex = 36
           OnClick = MenuWork
         end
         object N44: TMenuItem
@@ -7046,10 +7054,19 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
         Caption = '-'
       end
       object MenuExtrasTranslation: TMenuItem
-        Tag = 5020
-        Caption = '&Translation editor...'
+        Caption = '&Translation editor'
         ImageIndex = 43
         OnClick = MenuWork
+        object MenuExtrasTranslationDFendReloaded: TMenuItem
+          Tag = 5020
+          Caption = 'D-Fend Reloaded translation editor...'
+          OnClick = MenuWork
+        end
+        object MenuExtrasTranslationDOSBox: TMenuItem
+          Tag = 5025
+          Caption = 'DOSBox translation editor...'
+          OnClick = MenuWork
+        end
       end
     end
     object MenuHelp: TMenuItem
@@ -9250,6 +9267,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
   end
   object ApplicationEvents: TApplicationEvents
     OnIdle = ApplicationEventsIdle
+    OnHelp = ApplicationEventsHelp
     OnMinimize = ApplicationEventsMinimize
     OnRestore = ApplicationEventsRestore
     Left = 216
@@ -9377,29 +9395,44 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
     Images = ImageList
     Left = 104
     Top = 32
-    object AddButtonMenuAdd: TMenuItem
-      Tag = 4001
-      Caption = '&Add...'
-      ImageIndex = 16
-      ShortCut = 45
+    object AddButtonMenuImportZip: TMenuItem
+      Tag = 1010
+      Caption = 'Import archive file...'
+      ImageIndex = 39
       OnClick = MenuWork
     end
-    object AddButtonMenuAddScummVM: TMenuItem
-      Tag = 4014
-      Caption = 'Add &ScummVM profile...'
-      ImageIndex = 37
+    object AddButtonMenuAddInstallationSupport: TMenuItem
+      Tag = 4020
+      Caption = 'Install from source media with wizard...'
+      ImageIndex = 0
       OnClick = MenuWork
-    end
-    object AddButtonMenuAddWindows: TMenuItem
-      Tag = 4018
-      Caption = 'Add &Windows game profile...'
-      OnClick = MenuWork
-    end
-    object AddButtonMenuAddOther: TMenuItem
-      Caption = 'Add game for other platform'
     end
     object N43: TMenuItem
       Caption = '-'
+    end
+    object AddButtonMenuAddManually: TMenuItem
+      Caption = 'Add manually'
+      object AddButtonMenuAdd: TMenuItem
+        Tag = 4001
+        Caption = '&Add...'
+        ImageIndex = 16
+        ShortCut = 45
+        OnClick = MenuWork
+      end
+      object AddButtonMenuAddScummVM: TMenuItem
+        Tag = 4014
+        Caption = 'Add &ScummVM profile...'
+        ImageIndex = 37
+        OnClick = MenuWork
+      end
+      object AddButtonMenuAddWindows: TMenuItem
+        Tag = 4018
+        Caption = 'Add &Windows game profile...'
+        OnClick = MenuWork
+      end
+      object AddButtonMenuAddOther: TMenuItem
+        Caption = 'Add game for other platform'
+      end
     end
     object AddButtonMenuAddFromTemplate: TMenuItem
       Caption = 'Add from &template'
@@ -9410,12 +9443,6 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
       Caption = '&Add with wizard...'
       ImageIndex = 41
       ShortCut = 114
-      OnClick = MenuWork
-    end
-    object AddButtonMenuAddInstallationSupport: TMenuItem
-      Tag = 4020
-      Caption = 'Install from source media with wizard...'
-      ImageIndex = 0
       OnClick = MenuWork
     end
   end

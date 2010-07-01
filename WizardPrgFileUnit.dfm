@@ -11,7 +11,7 @@ object WizardPrgFileFrame: TWizardPrgFileFrame
     Left = 8
     Top = 16
     Width = 569
-    Height = 49
+    Height = 65
     Anchors = [akLeft, akTop, akRight]
     AutoSize = False
     Caption = 
@@ -24,7 +24,7 @@ object WizardPrgFileFrame: TWizardPrgFileFrame
   object SetupButton: TSpeedButton
     Tag = 2
     Left = 561
-    Top = 151
+    Top = 163
     Width = 23
     Height = 22
     Anchors = [akTop, akRight]
@@ -49,7 +49,7 @@ object WizardPrgFileFrame: TWizardPrgFileFrame
   object ProgramButton: TSpeedButton
     Tag = 1
     Left = 561
-    Top = 104
+    Top = 116
     Width = 23
     Height = 22
     Anchors = [akTop, akRight]
@@ -73,7 +73,7 @@ object WizardPrgFileFrame: TWizardPrgFileFrame
   end
   object GamesFolderButton: TSpeedButton
     Left = 476
-    Top = 203
+    Top = 215
     Width = 79
     Height = 22
     Anchors = [akTop, akRight]
@@ -96,7 +96,7 @@ object WizardPrgFileFrame: TWizardPrgFileFrame
   end
   object BaseInfoLabel3: TLabel
     Left = 8
-    Top = 248
+    Top = 260
     Width = 188
     Height = 13
     Anchors = [akLeft, akTop, akRight]
@@ -106,7 +106,7 @@ object WizardPrgFileFrame: TWizardPrgFileFrame
   object BaseDataFolderButton: TSpeedButton
     Tag = 3
     Left = 476
-    Top = 335
+    Top = 347
     Width = 79
     Height = 22
     Anchors = [akTop, akRight]
@@ -131,7 +131,7 @@ object WizardPrgFileFrame: TWizardPrgFileFrame
   object DataFolderButton: TSpeedButton
     Tag = 4
     Left = 561
-    Top = 288
+    Top = 300
     Width = 23
     Height = 22
     Anchors = [akTop, akRight]
@@ -156,7 +156,7 @@ object WizardPrgFileFrame: TWizardPrgFileFrame
   end
   object Bevel: TBevel
     Left = 3
-    Top = 56
+    Top = 71
     Width = 589
     Height = 18
     Anchors = [akLeft, akTop, akRight]
@@ -164,7 +164,7 @@ object WizardPrgFileFrame: TWizardPrgFileFrame
   end
   object FolderInfoButton: TSpeedButton
     Left = 561
-    Top = 203
+    Top = 215
     Width = 23
     Height = 22
     Anchors = [akTop, akRight]
@@ -187,7 +187,7 @@ object WizardPrgFileFrame: TWizardPrgFileFrame
   object FolderInfoButton2: TSpeedButton
     Tag = 1
     Left = 561
-    Top = 335
+    Top = 347
     Width = 23
     Height = 22
     Anchors = [akTop, akRight]
@@ -210,7 +210,7 @@ object WizardPrgFileFrame: TWizardPrgFileFrame
   end
   object GamesFolderEdit: TLabeledEdit
     Left = 8
-    Top = 203
+    Top = 215
     Width = 462
     Height = 21
     Anchors = [akLeft, akTop, akRight]
@@ -222,7 +222,7 @@ object WizardPrgFileFrame: TWizardPrgFileFrame
   end
   object ProgramEdit: TLabeledEdit
     Left = 8
-    Top = 104
+    Top = 116
     Width = 547
     Height = 21
     Anchors = [akLeft, akTop, akRight]
@@ -233,7 +233,7 @@ object WizardPrgFileFrame: TWizardPrgFileFrame
   end
   object SetupEdit: TLabeledEdit
     Left = 8
-    Top = 152
+    Top = 164
     Width = 547
     Height = 21
     Anchors = [akLeft, akTop, akRight]
@@ -244,7 +244,7 @@ object WizardPrgFileFrame: TWizardPrgFileFrame
   end
   object DataFolderEdit: TLabeledEdit
     Left = 8
-    Top = 288
+    Top = 300
     Width = 547
     Height = 21
     Anchors = [akLeft, akTop, akRight]
@@ -256,7 +256,7 @@ object WizardPrgFileFrame: TWizardPrgFileFrame
   end
   object BaseDataFolderEdit: TLabeledEdit
     Left = 8
-    Top = 336
+    Top = 348
     Width = 462
     Height = 21
     Anchors = [akLeft, akTop, akRight]
@@ -271,7 +271,7 @@ object WizardPrgFileFrame: TWizardPrgFileFrame
   end
   object DataFolderShowButton: TBitBtn
     Left = 8
-    Top = 284
+    Top = 296
     Width = 289
     Height = 25
     Caption = 'Zus'#228'tzliche Dateien manuell konfigurieren'
@@ -294,7 +294,7 @@ object WizardPrgFileFrame: TWizardPrgFileFrame
   end
   object DataFolderAutomaticCheckBox: TCheckBox
     Left = 8
-    Top = 255
+    Top = 267
     Width = 569
     Height = 17
     Anchors = [akLeft, akTop, akRight]
@@ -303,8 +303,8 @@ object WizardPrgFileFrame: TWizardPrgFileFrame
   end
   object DataFolderAutomaticButton: TBitBtn
     Left = 8
-    Top = 370
-    Width = 393
+    Top = 382
+    Width = 409
     Height = 25
     Caption = 'Choose data folder name from profile name automatically'
     TabOrder = 7

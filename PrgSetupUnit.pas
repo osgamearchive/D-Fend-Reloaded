@@ -144,6 +144,8 @@ Type TPrgSetup=class(TBasePrgSetup)
     property CaptureDir : String index 38 read GetString write SetString;
     property IconSet : String index 39 read GetString write SetString;
     property RenameAllExpression : String index 40 read GetString write SetString;
+    property DataReaderActiveSettings : String index 41 read GetString write SetString;
+    property InstallerNames : String index 42 read GetString write SetString;
 
     property LinuxRemap[DriveLetter : Char] : String read GetDriveLetter write SetDriveLetter;
 
@@ -232,8 +234,9 @@ Type TPrgSetup=class(TBasePrgSetup)
     property BinaryCache : Boolean index 73 read GetBoolean write SetBoolean;
     property ImportZipWithoutDialogIfPossible : Boolean index 74 read GetBoolean write SetBoolean;
     property DOSBoxStartLogging : Boolean index 75 read GetBoolean write SetBoolean;
-    property DataReaderAllPlatforms : Boolean index 75 read GetBoolean write SetBoolean;
-    property ActivateIncompleteFeatures : Boolean index 77 read GetBoolean write SetBoolean;
+    property DataReaderAllPlatforms : Boolean index 76 read GetBoolean write SetBoolean;
+    property StoreHistory : Boolean index 77 read GetBoolean write SetBoolean;
+    property ActivateIncompleteFeatures : Boolean index 78 read GetBoolean write SetBoolean;
 
     property MainLeft : Integer index 0 read GetInteger write SetInteger;
     property MainTop : Integer index 1 read GetInteger write SetInteger;
@@ -271,6 +274,7 @@ Type TPrgSetup=class(TBasePrgSetup)
     property LastPackageListeUpdateCheck : Integer index 33 read GetInteger write SetInteger;
     property CheatsDBCheckForUpdates : Integer index 34 read GetInteger write SetInteger;
     property LastCheatsDBUpdateCheck : Integer index 35 read GetInteger write SetInteger;
+    property DOSBoxStartFailedTimeout : Integer index 36 read GetInteger write SetInteger;
 
     property DOSBoxSettingsCount : Integer index 0 read GetListCount;
     property DOSBoxSettings[I : Integer] : TDOSBoxSetting read GetDOSBoxSettings;
@@ -319,7 +323,7 @@ begin
   If FNr=0 then FName:='Default' else FName:=FPrgSetup.MemIni.ReadString(Section,'Name','');
 
   FDosBoxDir:=FPrgSetup.MemIni.ReadString(Section,'Location','');
-  FDosBoxMapperFile:=FPrgSetup.MemIni.ReadString(Section,'LocationMap','.\mapper.txt');
+  FDosBoxMapperFile:=FPrgSetup.MemIni.ReadString(Section,'LocationMap','.\mapper.map');
   FDosBoxLanguage:=FPrgSetup.MemIni.ReadString(Section,'DosBoxLanguageFile','');
   FSDLVideodriver:=FPrgSetup.MemIni.ReadString(Section,'SDLVideodriver','DirectX');
   FCommandLineParameters:=FPrgSetup.MemIni.ReadString(Section,'CommandLineParameters','');
@@ -627,6 +631,8 @@ begin
   AddStringRec(38,'ProgramSets','CaptureDefaultPath','.\'+CaptureSubDir+'\');
   AddStringRec(39,'ProgramSets','IconSet','Modern');
   AddStringRec(40,'ProgramSets','RenameAllExpression','%P_%N.%E');
+  AddStringRec(41,'ProgramSets','ActiveDataReaderFields','-XXXXX');
+  AddStringRec(42,'ProgramSets','InstallerNames',DefaultInstallerNames);
 
   For I:=0 to 25 do AddStringRec(450+I,'WineSupport',chr(ord('A')+I),'');
 
@@ -696,7 +702,7 @@ begin
   AddBooleanRec(52,'ProgramSets','FileTypeFallbackForEditor',True);
   AddBooleanRec(53,'ProgramSets','AutoFixLineWrap',False);
   AddBooleanRec(54,'ProgramSets','CenterScummVMWindow',False);
-  AddBooleanRec(55,'ProgramSets','HideScummVMConsole',False);
+  AddBooleanRec(55,'ProgramSets','HideScummVMConsole',True);
   AddBooleanRec(56,'ProgramSets','ShowShortNameWarnings',True);
   AddBooleanRec(57,'ProgramSets','RestoreWhenScummVMCloses',False);
   AddBooleanRec(58,'ProgramSets','UseWindowsExeIcons',True);
@@ -715,10 +721,11 @@ begin
   AddBooleanRec(71,'ProgramSets','CreateConfFilesForProfiles',False);
   AddBooleanRec(72,'ProgramSets','AddMountingDataAutomatically',True);
   AddBooleanRec(73,'ProgramSets','BinaryCache',True);
-  AddBooleanRec(74,'ProgramSets','ImportZipWithoutDialogIfPossible',False); //... will be true in 1.0, because 1.0 wll have a setup option for this
+  AddBooleanRec(74,'ProgramSets','ImportZipWithoutDialogIfPossible',True);
   AddBooleanRec(75,'ProgramSets','DOSBoxStartLogging',False);
   AddBooleanRec(76,'ProgramSets','DataReaderAllPlatforms',False);
-  AddBooleanRec(77,'ProgramSets','ActivateIncompleteFeatures',False);
+  AddBooleanRec(77,'ProgramSets','StoreHistory',True);
+  AddBooleanRec(78,'ProgramSets','ActivateIncompleteFeatures',False);
 
   AddIntegerRec(0,'ProgramSets','MainLeft',-1);
   AddIntegerRec(1,'ProgramSets','MainTop',-1);
@@ -756,6 +763,8 @@ begin
   AddIntegerRec(33,'ProgramSets','LastPackageListeUpdateCheck',0);
   AddIntegerRec(34,'ProgramSets','CheatsDBCheckForUpdates',0);
   AddIntegerRec(35,'ProgramSets','LastCheatsDBUpdateCheck',0);
+  AddIntegerRec(36,'ProgramSets','DOSBoxStartFailedTimeout',3);
+
 end;
 
 Procedure TPrgSetup.InitDirs;

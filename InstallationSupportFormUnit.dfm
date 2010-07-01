@@ -3,11 +3,11 @@ object InstallationSupportForm: TInstallationSupportForm
   Top = 0
   BorderIcons = [biSystemMenu, biMaximize]
   Caption = 'Install game from source media'
-  ClientHeight = 249
-  ClientWidth = 425
+  ClientHeight = 327
+  ClientWidth = 528
   Color = clBtnFace
-  Constraints.MinHeight = 285
-  Constraints.MinWidth = 335
+  Constraints.MinHeight = 325
+  Constraints.MinWidth = 510
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
@@ -20,12 +20,12 @@ object InstallationSupportForm: TInstallationSupportForm
   OnKeyDown = FormKeyDown
   OnShow = FormShow
   DesignSize = (
-    425
-    249)
+    528
+    327)
   PixelsPerInch = 96
   TextHeight = 13
   object AddButton: TSpeedButton
-    Left = 393
+    Left = 496
     Top = 43
     Width = 23
     Height = 22
@@ -51,7 +51,7 @@ object InstallationSupportForm: TInstallationSupportForm
   end
   object DelButton: TSpeedButton
     Tag = 1
-    Left = 393
+    Left = 496
     Top = 71
     Width = 23
     Height = 22
@@ -77,19 +77,18 @@ object InstallationSupportForm: TInstallationSupportForm
   end
   object DropInfoLabel: TLabel
     Left = 8
-    Top = 154
-    Width = 408
-    Height = 31
+    Top = 226
+    Width = 511
+    Height = 19
     Anchors = [akLeft, akRight, akBottom]
     AutoSize = False
-    Caption = 'You can also drag&drop ... here.'
+    Caption = 'You can also drag&&drop ... here.'
     WordWrap = True
-    ExplicitTop = 146
-    ExplicitWidth = 302
+    ExplicitWidth = 477
   end
   object UpButton: TSpeedButton
     Tag = 2
-    Left = 394
+    Left = 497
     Top = 99
     Width = 23
     Height = 22
@@ -115,7 +114,7 @@ object InstallationSupportForm: TInstallationSupportForm
   end
   object DownButton: TSpeedButton
     Tag = 3
-    Left = 394
+    Left = 497
     Top = 127
     Width = 23
     Height = 22
@@ -142,24 +141,39 @@ object InstallationSupportForm: TInstallationSupportForm
   object InsertMediaLabel: TLabel
     Left = 8
     Top = 43
-    Width = 303
+    Width = 482
     Height = 58
+    Anchors = [akLeft, akTop, akRight]
     AutoSize = False
     Caption = 'InsertMediaLabel'
     WordWrap = True
+    ExplicitWidth = 461
+  end
+  object CDImageTypeLabel: TLabel
+    Left = 8
+    Top = 143
+    Width = 483
+    Height = 77
+    Anchors = [akLeft, akRight, akBottom]
+    AutoSize = False
+    Caption = 'Only ISO and CUE/BIN images supported.'
+    Visible = False
+    WordWrap = True
+    ExplicitWidth = 449
   end
   object OKButton: TBitBtn
     Left = 8
-    Top = 216
+    Top = 298
     Width = 97
     Height = 25
     Anchors = [akLeft, akBottom]
     TabOrder = 3
+    OnClick = OKButtonClick
     Kind = bkOK
   end
   object CancelButton: TBitBtn
     Left = 111
-    Top = 216
+    Top = 298
     Width = 97
     Height = 25
     Anchors = [akLeft, akBottom]
@@ -168,7 +182,7 @@ object InstallationSupportForm: TInstallationSupportForm
   end
   object HelpButton: TBitBtn
     Left = 214
-    Top = 216
+    Top = 298
     Width = 97
     Height = 25
     Anchors = [akLeft, akBottom]
@@ -179,19 +193,19 @@ object InstallationSupportForm: TInstallationSupportForm
   object InstallTypeComboBox: TComboBox
     Left = 8
     Top = 8
-    Width = 409
+    Width = 512
     Height = 21
     Style = csDropDownList
     Anchors = [akLeft, akTop, akRight]
-    ItemHeight = 0
+    ItemHeight = 13
     TabOrder = 0
     OnChange = InstallTypeComboBoxChange
   end
   object ListBox: TListBox
     Left = 8
-    Top = 43
-    Width = 379
-    Height = 105
+    Top = 35
+    Width = 482
+    Height = 142
     Anchors = [akLeft, akTop, akRight, akBottom]
     ItemHeight = 13
     TabOrder = 1
@@ -199,14 +213,26 @@ object InstallationSupportForm: TInstallationSupportForm
     OnDragDrop = ListBoxDragDrop
     OnKeyDown = ListBoxKeyDown
   end
-  object AlwaysMountISOCheckBox: TCheckBox
+  object AlwaysMountSourceCheckBox: TCheckBox
     Left = 8
-    Top = 191
-    Width = 409
+    Top = 247
+    Width = 512
     Height = 17
     Anchors = [akLeft, akRight, akBottom]
-    Caption = 'Make iso image available when running the game.'
+    Caption = 'Make CD image available when running the game.'
+    Checked = True
+    State = cbChecked
     TabOrder = 2
+  end
+  object AlwaysMountSourceComboBox: TComboBox
+    Left = 23
+    Top = 264
+    Width = 497
+    Height = 21
+    Style = csDropDownList
+    Anchors = [akLeft, akRight, akBottom]
+    ItemHeight = 13
+    TabOrder = 6
   end
   object OpenDialog: TOpenDialog
     Left = 16

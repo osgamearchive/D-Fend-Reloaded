@@ -103,7 +103,7 @@ begin
 
   MainPackageList:=TPackageListFile.Create(True);
   MainPackageList.LoadFromFile(DBDir+PackageDBMainFile);
-  If MainPackageList.Count=0 then MainPackageList.UpdateFromServer(Format(PackageDBMainFileURL,[GetNormalFileVersionAsString]),DBDir+PackageDBTempFile,False);
+  If MainPackageList.Count=0 then MainPackageList.UpdateFromServer(Format(PackageDBMainFileURL,[GetNormalFileVersionAsString]),DBDir+PackageDBTempFile,False,False);
 
   UserPackageList:=TPackageListFile.Create(False);
   UserPackageList.LoadFromFile(DBDir+PackageDBUserFile);

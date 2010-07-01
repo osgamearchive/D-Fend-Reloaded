@@ -136,6 +136,11 @@ begin
       exit;
     end;
 
+    If not ForceDirectories(DestPrgDir+LanguageSubDir+'\') then begin
+      MessageDlg(Format(LanguageSetup.MessageCouldNotCreateDir,[DestPrgDir+BinFolder+'\']),mtError,[mbOK],0);
+      exit;
+    end;
+
     If not ForceDirectories(DestPrgDir+SettingsFolder+'\') then begin
       MessageDlg(Format(LanguageSetup.MessageCouldNotCreateDir,[DestPrgDir+SettingsFolder+'\']),mtError,[mbOK],0);
       exit;

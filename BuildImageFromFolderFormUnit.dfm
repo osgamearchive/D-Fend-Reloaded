@@ -3,8 +3,8 @@ object BuildImageFromFolderForm: TBuildImageFromFolderForm
   Top = 0
   BorderStyle = bsDialog
   Caption = 'Imagedatei von Ordnerinhalt erstellen'
-  ClientHeight = 377
-  ClientWidth = 493
+  ClientHeight = 427
+  ClientWidth = 533
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -18,16 +18,17 @@ object BuildImageFromFolderForm: TBuildImageFromFolderForm
   OnKeyDown = FormKeyDown
   OnShow = FormShow
   DesignSize = (
-    493
-    377)
+    533
+    427)
   PixelsPerInch = 96
   TextHeight = 13
   object FileNameButton: TSpeedButton
     Tag = 1
-    Left = 463
+    Left = 503
     Top = 72
     Width = 23
     Height = 22
+    Anchors = [akTop, akRight]
     Glyph.Data = {
       76010000424D7601000000000000760000002800000020000000100000000100
       04000000000000010000120B0000120B00001000000000000000000000000000
@@ -45,12 +46,14 @@ object BuildImageFromFolderForm: TBuildImageFromFolderForm
     ParentShowHint = False
     ShowHint = True
     OnClick = ButtonWork
+    ExplicitLeft = 463
   end
   object FolderButton: TSpeedButton
-    Left = 463
+    Left = 503
     Top = 28
     Width = 23
     Height = 22
+    Anchors = [akTop, akRight]
     Glyph.Data = {
       76010000424D7601000000000000760000002800000020000000100000000100
       04000000000000010000120B0000120B00001000000000000000000000000000
@@ -68,31 +71,51 @@ object BuildImageFromFolderForm: TBuildImageFromFolderForm
     ParentShowHint = False
     ShowHint = True
     OnClick = ButtonWork
+    ExplicitLeft = 463
+  end
+  object FreeSpaceLabel: TLabel
+    Left = 224
+    Top = 112
+    Width = 76
+    Height = 13
+    Caption = 'FreeSpaceLabel'
+  end
+  object NeedFreeDOSLabel: TLabel
+    Left = 25
+    Top = 199
+    Width = 500
+    Height = 40
+    Anchors = [akLeft, akTop, akRight]
+    AutoSize = False
+    Caption = 'NeedFreeDOSLabel'
+    WordWrap = True
+    ExplicitWidth = 460
   end
   object OKButton: TBitBtn
     Left = 8
-    Top = 346
+    Top = 396
     Width = 97
     Height = 25
     Anchors = [akLeft, akBottom]
-    TabOrder = 10
+    TabOrder = 11
     OnClick = OKButtonClick
     Kind = bkOK
   end
   object CancelButton: TBitBtn
     Left = 120
-    Top = 346
+    Top = 396
     Width = 97
     Height = 25
     Anchors = [akLeft, akBottom]
-    TabOrder = 11
+    TabOrder = 12
     Kind = bkCancel
   end
   object FolderEdit: TLabeledEdit
     Left = 8
     Top = 29
-    Width = 449
+    Width = 489
     Height = 21
+    Anchors = [akLeft, akTop, akRight]
     EditLabel.Width = 77
     EditLabel.Height = 13
     EditLabel.Caption = 'Quellverzeichnis'
@@ -101,8 +124,9 @@ object BuildImageFromFolderForm: TBuildImageFromFolderForm
   object FileNameEdit: TLabeledEdit
     Left = 8
     Top = 72
-    Width = 449
+    Width = 489
     Height = 21
+    Anchors = [akLeft, akTop, akRight]
     EditLabel.Width = 73
     EditLabel.Height = 13
     EditLabel.Caption = 'Diskettenimage'
@@ -111,68 +135,82 @@ object BuildImageFromFolderForm: TBuildImageFromFolderForm
   object MakeBootableCheckBox: TCheckBox
     Left = 8
     Top = 176
-    Width = 478
+    Width = 518
     Height = 17
+    Anchors = [akLeft, akTop, akRight]
     Caption = 'Make floppy image bootable'
-    TabOrder = 3
+    TabOrder = 4
     OnClick = MakeBootableCheckBoxClick
   end
   object AddKeyboardDriverCheckBox: TCheckBox
     Left = 8
-    Top = 199
-    Width = 478
+    Top = 247
+    Width = 518
     Height = 17
+    Anchors = [akLeft, akTop, akRight]
     Caption = 'Use DOSBox default keyboard layout on bootdisk'
+    Checked = True
     Enabled = False
-    TabOrder = 4
+    State = cbChecked
+    TabOrder = 5
   end
   object WriteToFloppyCheckBox: TCheckBox
     Left = 8
-    Top = 314
-    Width = 478
+    Top = 362
+    Width = 518
     Height = 17
-    Caption = 'Fertiges Image auf reale Diskette schreiben'
-    TabOrder = 9
+    Anchors = [akLeft, akTop, akRight]
+    Caption = 'Write image file to real floppy after creation'
+    TabOrder = 10
   end
   object AddMouseDriverCheckBox: TCheckBox
     Left = 8
-    Top = 222
-    Width = 477
+    Top = 270
+    Width = 517
     Height = 17
+    Anchors = [akLeft, akTop, akRight]
     Caption = 'Include mouse driver on bootdisk'
+    Checked = True
     Enabled = False
-    TabOrder = 5
+    State = cbChecked
+    TabOrder = 6
   end
   object HelpButton: TBitBtn
     Left = 232
-    Top = 346
+    Top = 396
     Width = 97
     Height = 25
     Anchors = [akLeft, akBottom]
-    TabOrder = 12
+    TabOrder = 13
     OnClick = HelpButtonClick
     Kind = bkHelp
   end
   object AddFormatCheckBox: TCheckBox
     Left = 8
-    Top = 268
-    Width = 516
+    Top = 316
+    Width = 556
     Height = 17
+    Anchors = [akLeft, akTop, akRight]
     Caption = 'Add disk management utilities'
-    TabOrder = 7
+    Checked = True
+    State = cbChecked
+    TabOrder = 8
   end
   object AddEditCheckbox: TCheckBox
     Left = 8
-    Top = 291
-    Width = 477
+    Top = 339
+    Width = 517
     Height = 17
+    Anchors = [akLeft, akTop, akRight]
     Caption = 'Add text editor'
-    TabOrder = 8
+    Checked = True
+    State = cbChecked
+    TabOrder = 9
   end
   object ImageTypeGroupBox: TRadioGroup
     Left = 8
     Top = 99
-    Width = 449
+    Width = 185
     Height = 62
     Caption = 'Image type'
     ItemIndex = 0
@@ -184,11 +222,25 @@ object BuildImageFromFolderForm: TBuildImageFromFolderForm
   end
   object MemoryManagerCheckBox: TCheckBox
     Left = 8
-    Top = 245
-    Width = 477
+    Top = 293
+    Width = 517
     Height = 17
+    Anchors = [akLeft, akTop, akRight]
     Caption = 'Use memory manager on disk image'
-    TabOrder = 6
+    Checked = True
+    Enabled = False
+    State = cbChecked
+    TabOrder = 7
+  end
+  object FreeSpaceEdit: TSpinEdit
+    Left = 224
+    Top = 131
+    Width = 73
+    Height = 22
+    MaxValue = 500
+    MinValue = 0
+    TabOrder = 3
+    Value = 5
   end
   object SaveDialog: TSaveDialog
     DefaultExt = 'img'

@@ -34,6 +34,7 @@ type
     procedure FolderEditChange(Sender: TObject);
     procedure ProfileNameEditChange(Sender: TObject);
     procedure InstallSupportButtonClick(Sender: TObject);
+    procedure FormShow(Sender: TObject);
   private
     { Private-Deklarationen }
     JustChanging : Boolean;
@@ -42,7 +43,7 @@ type
   public
     { Public-Deklarationen }
     ProfileNameChanged, UseInstallSupport : Boolean;
-    ArchivFileName : String;
+    ArchivFileName, AlternateProfileNameSource : String;
     AutoSetupDB, TemplateDB : TGameDB;
     PrgFiles, Templates : TStringList;
     FileToStart, SetupFileToStart, ProfileName, ProfileFolder : String;
@@ -50,7 +51,7 @@ type
     Procedure Prepare(const DoNotCopyFolder : Boolean);
   end;
 
-Function ShowSelectTemplateForZipImportDialog(const AOwner : TComponent; const AAutoSetupDB, ATemplateDB : TGameDB; const APrgFiles, ATemplates : TStringList; const AArchivFileName : String; var AProfileName, AFileToStart, ASetupFileToStart, AFolder : String; var ATemplateNr : Integer; const NoDialogIfAutoSetupIsAvailable, DoNotCopyFolder : Boolean; var UseInstallSupport : Boolean) : Boolean;
+Function ShowSelectTemplateForZipImportDialog(const AOwner : TComponent; const AAutoSetupDB, ATemplateDB : TGameDB; const APrgFiles, ATemplates : TStringList; const AArchivFileName, AAlternateProfileNameSource : String; var AProfileName, AFileToStart, ASetupFileToStart, AFolder : String; var ATemplateNr : Integer; const NoDialogIfAutoSetupIsAvailable, DoNotCopyFolder : Boolean; var UseInstallSupport : Boolean) : Boolean;
 
 var
   SelectTemplateForZipImportForm: TSelectTemplateForZipImportForm;
@@ -63,13 +64,11 @@ uses Math, CommonTools, LanguageSetupUnit, VistaToolsUnit, IconLoaderUnit,
 {$R *.dfm}
 
 procedure TSelectTemplateForZipImportForm.FormCreate(Sender: TObject);
-Var S : String;
 begin
   SetVistaFonts(self);
   Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName);
   WarningLabel.Font.Color:=clRed;
 
-  S:=LanguageSetup.MenuFileImportZIPCaption; While (S<>'') and (S[length(S)]='.') do SetLength(S,length(S)-1); Caption:=S;
   ProfileNameEdit.EditLabel.Caption:=LanguageSetup.AutoDetectProfileEditProfileName;
   FolderEdit.EditLabel.Caption:=LanguageSetup.MenuFileImportZIPDestinationFolder;
   WarningLabel.Caption:=LanguageSetup.MenuFileImportZIPDestinationFolderWarning;
@@ -93,11 +92,13 @@ begin
   JustChanging:=False;
   ProfileNameChanged:=False;
   UseInstallSupport:=False;
+end;
 
-  If not PrgSetup.ActivateIncompleteFeatures then begin
-    InstallSupportButton.Visible:=False;
-    HelpButton.Left:=InstallSupportButton.Left;
-  end;
+procedure TSelectTemplateForZipImportForm.FormShow(Sender: TObject);
+Var S : String;
+begin
+  If Trim(ArchivFileName)='' then S:=LanguageSetup.MenuFileImportFolder else S:=LanguageSetup.MenuFileImportZIPCaption;
+  While (S<>'') and (S[length(S)]='.') do SetLength(S,length(S)-1); Caption:=S;
 end;
 
 Function AvoidSomeNames(const St : TStringList; const SetupNumber : Integer) : String;
@@ -106,6 +107,16 @@ var I,J : Integer;
     S : String;
 begin
   result:='';
+
+  For I:=0 to St.Count-1 do if I<>SetupNumber then begin
+    OK:=True; S:=ExtUpperCase(ChangeFileExt(St[I],''));
+    For J:=Low(IgnoreGameExeFilesIgnore) to High(IgnoreGameExeFilesIgnore) do if S=IgnoreGameExeFilesIgnore[J] then begin OK:=False; break; end;
+    if not OK then continue;
+
+    for J:=Low(ProgramExeFiles) to High(ProgramExeFiles) do if S=ProgramExeFiles[J] then begin
+      result:=St[I]; exit;
+    end;
+  end;
 
   For I:=0 to St.Count-1 do if I<>SetupNumber then begin
     OK:=True; S:=ExtUpperCase(ChangeFileExt(St[I],''));
@@ -156,7 +167,9 @@ begin
     end else begin
       TemplateType1RadioButton.Enabled:=False;
       TemplateType3RadioButton.Checked:=True;
-      If Trim(ArchivFileName)<>'' then ProfileNameEdit.Text:=ChangeFileExt(ExtractFileName(ArchivFileName),'');
+      If Trim(ArchivFileName)<>''
+        then ProfileNameEdit.Text:=ChangeFileExt(ExtractFileName(ArchivFileName),'')
+        else ProfileNameEdit.Text:=AlternateProfileNameSource;
 
       If PrgFiles.Count>0 then begin
         If PrgFiles.Count=1 then begin
@@ -385,12 +398,13 @@ end;
 
 { global }
 
-Function ShowSelectTemplateForZipImportDialog(const AOwner : TComponent; const AAutoSetupDB, ATemplateDB : TGameDB; const APrgFiles, ATemplates : TStringList; const AArchivFileName : String; var AProfileName, AFileToStart, ASetupFileToStart, AFolder : String; var ATemplateNr : Integer; const NoDialogIfAutoSetupIsAvailable, DoNotCopyFolder : Boolean; var UseInstallSupport : Boolean) : Boolean;
+Function ShowSelectTemplateForZipImportDialog(const AOwner : TComponent; const AAutoSetupDB, ATemplateDB : TGameDB; const APrgFiles, ATemplates : TStringList; const AArchivFileName, AAlternateProfileNameSource : String; var AProfileName, AFileToStart, ASetupFileToStart, AFolder : String; var ATemplateNr : Integer; const NoDialogIfAutoSetupIsAvailable, DoNotCopyFolder : Boolean; var UseInstallSupport : Boolean) : Boolean;
 begin
   UseInstallSupport:=False;
   SelectTemplateForZipImportForm:=TSelectTemplateForZipImportForm.Create(AOwner);
   try
     SelectTemplateForZipImportForm.ArchivFileName:=AArchivFileName;
+    SelectTemplateForZipImportForm.AlternateProfileNameSource:=AAlternateProfileNameSource;
     SelectTemplateForZipImportForm.AutoSetupDB:=AAutoSetupDB;
     SelectTemplateForZipImportForm.TemplateDB:=ATemplateDB;
     SelectTemplateForZipImportForm.PrgFiles:=APrgFiles;

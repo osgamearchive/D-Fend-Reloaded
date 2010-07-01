@@ -83,7 +83,8 @@ begin
           OpenDialog.InitialDir:=S;
           If OpenDialog.Execute then begin
             FileNameEdit.Text:=OpenDialog.FileName;
-            If Trim(ExtUpperCase(ExtractFileExt(FileNameEdit.Text)))='.ISO' then ImageTypeRadioGroup.ItemIndex:=2 else ImageTypeRadioGroup.ItemIndex:=0;
+            S:=Trim(ExtUpperCase(ExtractFileExt(FileNameEdit.Text)));
+            If (S='.ISO') or (S='.CUE') or (S='.BIN') then ImageTypeRadioGroup.ItemIndex:=2 else ImageTypeRadioGroup.ItemIndex:=0;
           end;
         end;
     1 : begin
@@ -106,6 +107,11 @@ begin
   If not FileExists(FileName) then begin
     MessageDlg(Format(LanguageSetup.MessageFileNotFound,[FileName]),mtError,[mbOk],0);
     ModalResult:=mrNone; exit;
+  end;
+  If not CheckCDImage(FileName) then begin
+    If MessageDlg(Format(LanguageSetup.ProfileMountingImageTypeWarning,[FileName]),mtWarning,[mbYes,mbNo],0)<>mrYes then begin
+      ModalResult:=mrNone; exit;
+    end;
   end;
 
   Dir:=Trim(FolderEdit.Text);

@@ -18,10 +18,33 @@
 
 <p>
 The first run wizard will help you to initially setup D-Fend Reloaded.
-It consists of a overview page and 5 setting pages; you can change between
-the pages by pressing the "Previous" and "Next" buttons. By pressing the
-"Accept all settings" button you can immediately close the dialog and accept
-all settings without checking them.
+</p>
+
+<h2>Program language and DOSBox language</h2>
+<p>
+The program and the DOSBox language will initially be chosen from the setup program
+so in most cases this two fields will already show the right language.
+</p>
+
+<h2>DOSBox installation to be used by default</h2>
+<p>
+In diesem Feld können Sie angeben, welche DOSBox-Installation standardmäßig zum
+Aufruf der DOS-Spiele verwendet werden soll. Sofern Sie bei der Installation von
+D-Fend Reloaded die Option, DOSBox mit zu installieren, nicht explizit abgewählt haben,
+können Sie die Einstellung "Mit D-Fend Reloaded installierte Version" beibehalten.
+Unabhängig von der hier gewählten Standard-Installation können Sie später jedem
+Profil auch eine individuelle DOSBox-Version zuweisen.
+</p>
+
+<h2>Automatically check for updates</h2>
+<p>
+Via this checkbox you can choose whether D-Fend Reloaded should look for updates
+automatically. (The update checker will only search for updates and inform you
+about new versions, it will never automatically install any update without
+asking you.) If you keep to default setting D-Fend Reloaded will never
+connect to the internet automatically. You can look for updates manually
+at any time via the <a href="HelpSearchForUpdates.html">Search for updates</a>
+function from the help menu.
 </p>
 
 <p>
@@ -29,76 +52,6 @@ You can change all settings later at any time via the
 <a href="FileOptions.html">program options</a> dialog.
 </p>
 
-<h2>Settings page 1: Program language</h2>
-
-<p>
-On this page you can select the language you want to use in the program.
-Initally the language you have chosen in the installer will be selected on this page.
-Changing the program language will take effect immediately.
-</p>
-
-<h2>Settings page 2: DOSBox folder</h2>
-
-<p>
-DOSBox is needed to run the games configurated in D-Fend Reloaded.
-If DOSBox has been installed together with D-Fend Reloaded the right path
-should already be shown on this page. Additionally D-Fend Reloaded will
-try to find any existing DOSBox installation if it was not installed
-together with DOSBox.
-</p>
-
-<p>
-If you have installed D-Fend Reloaded in portable mode the DOSBox path
-needs to be stored relatively to the program path. The path shown in this
-dialog will be an absolute path but nevertheless it will be stored
-to as a relative path. So there is no cause to worry about this.
-</p>
-
-<h2>Settings page 3: DOSBox language</h2>
-
-<p>
-On this page you can choose the language DOSBox should use when
-showing messages. D-Fend Reloaded will offer you all language files
-available in the DOSBox folder defined on the last page.
-</p>
-
-<h2>Settings page 4: Games folder</h2>
-
-<p>
-You can place the games you want to use with D-Fend Reloaded in any folder
-you want to but if you choose a subfolder of the base folder (something
-like <tt>C:\Users\<i>YourAccount</i>\D-Fend Reloaded</tt>), you will
-be able to <a href="ExtrasTransferProfiles.html">transfer profiles</a>
-from one installation to another and to
-<a href="FileExportBuildInstallers.html">build installer packages</a> from
-the installed games.
-</p>
-
-<p>
-In most cases you should just keep the offered default games folder
-(and also using it when storing some games).
-</p>
-
-<h2>Settings page 5: Updates</h2>
-
-<p>
-On this last page you can choose if D-Fend Reloaded should look for updates
-automatically. If you keep to default setting on this page it will never
-connect to the internet automatically. You can look for update manually
-at any time via the <a href="HelpSearchForUpdates.html">Search for updates</a>
-function from the help menu.
-</p>
-
-<p>
-The automatic update search will not transfer any of your private data
-to the internet. It will just check if a special update info file will
-contain a bigger version number than the number of the current installed
-version and will offer in case to download the update installer for the
-new version. (For more information about the update checker see
-the <a href="FileOptionsSearchForUpdates.html">search for updates</a> page of
-the <a href="FileOptions.html">program options dialog</a>.)
-</p>
- 
 <p>&nbsp;</p>
 
 <p class="smallH">See also:</p>

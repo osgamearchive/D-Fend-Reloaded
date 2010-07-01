@@ -280,7 +280,7 @@ object SetupFrameDOSBoxForm: TSetupFrameDOSBoxForm
     Width = 169
     Height = 21
     Style = csDropDownList
-    ItemHeight = 0
+    ItemHeight = 13
     TabOrder = 1
   end
   object WaitOnErrorCheckBox: TCheckBox
@@ -298,7 +298,7 @@ object SetupFrameDOSBoxForm: TSetupFrameDOSBoxForm
     Width = 169
     Height = 21
     Style = csDropDownList
-    ItemHeight = 0
+    ItemHeight = 13
     TabOrder = 2
   end
   object DOSBoxCodepageComboBox: TComboBox
@@ -307,7 +307,7 @@ object SetupFrameDOSBoxForm: TSetupFrameDOSBoxForm
     Width = 169
     Height = 21
     Style = csDropDownList
-    ItemHeight = 0
+    ItemHeight = 13
     TabOrder = 3
   end
   object DosBoxTxtOpenDialog: TOpenDialog

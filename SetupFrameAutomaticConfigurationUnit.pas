@@ -11,6 +11,8 @@ type
     ZipImportGroupBox: TGroupBox;
     WizardRadioGroup: TRadioGroup;
     ZipImportCheckBox: TCheckBox;
+    InstallerNamesLabel: TLabel;
+    InstallerNamesMemo: TMemo;
   private
     { Private-Deklarationen }
   public
@@ -28,7 +30,8 @@ type
 
 implementation
 
-uses Math, PrgSetupUnit, LanguageSetupUnit, VistaToolsUnit, HelpConsts;
+uses Math, PrgSetupUnit, LanguageSetupUnit, VistaToolsUnit, HelpConsts,
+     CommonTools, PrgConsts;
 
 {$R *.dfm}
 
@@ -41,6 +44,7 @@ end;
 
 procedure TSetupFrameAutomaticConfiguration.InitGUIAndLoadSetup(var InitData: TInitData);
 Var I : Integer;
+    St : TStringList;
 begin
   WizardRadioGroup.Items.Clear;
   For I:=0 to 2 do WizardRadioGroup.Items.Add('');
@@ -48,9 +52,18 @@ begin
   NoFlicker(ZipImportGroupBox);
   NoFlicker(ZipImportCheckBox);
   NoFlicker(WizardRadioGroup);
+  NoFlicker(InstallerNamesMemo);
 
   ZipImportCheckBox.Checked:=PrgSetup.ImportZipWithoutDialogIfPossible;
   WizardRadioGroup.ItemIndex:=Max(0,Min(2,PrgSetup.LastWizardMode));
+
+  St:=ValueToList(PrgSetup.InstallerNames);
+  try
+    InstallerNamesMemo.Lines.Clear;
+    InstallerNamesMemo.Lines.AddStrings(St);
+  finally
+    St.Free;
+  end;
 end;
 
 procedure TSetupFrameAutomaticConfiguration.BeforeChangeLanguage;
@@ -68,6 +81,7 @@ begin
   WizardRadioGroup.Items[1]:=LanguageSetup.WizardFormWizardModeAutomaticallyIfAutoSetupTemplateExists;
   WizardRadioGroup.Items[2]:=LanguageSetup.WizardFormWizardModeAlwaysAllPages;
   WizardRadioGroup.ItemIndex:=I;
+  InstallerNamesLabel.Caption:=LanguageSetup.SetupFormAutomaticConfigurationInstallerNames;
 
   HelpContext:=ID_FileOptionsAutomaticConfiguration;
 end;
@@ -85,15 +99,36 @@ begin
 end;
 
 procedure TSetupFrameAutomaticConfiguration.RestoreDefaults;
+Var St : TStringList;
 begin
   PrgSetup.ImportZipWithoutDialogIfPossible:=True;
   PrgSetup.LastWizardMode:=1;
+  St:=ValueToList(DefaultInstallerNames);
+  try
+    InstallerNamesMemo.Lines.Clear;
+    InstallerNamesMemo.Lines.AddStrings(St);
+  finally
+    St.Free;
+  end;
 end;
 
 procedure TSetupFrameAutomaticConfiguration.SaveSetup;
+Var St : TStringList;
+    S : String;
+    I : Integer;
 begin
   PrgSetup.ImportZipWithoutDialogIfPossible:=ZipImportCheckBox.Checked;
   PrgSetup.LastWizardMode:=WizardRadioGroup.ItemIndex;
+  St:=TStringList.Create;
+  try
+    For I:=0 to InstallerNamesMemo.Lines.Count-1 do begin
+      S:=Trim(InstallerNamesMemo.Lines[I]);
+      If S<>'' then St.Add(S);
+    end;
+    PrgSetup.InstallerNames:=ListToValue(St);
+  finally
+    St.Free;
+  end;
 end;
 
 end.

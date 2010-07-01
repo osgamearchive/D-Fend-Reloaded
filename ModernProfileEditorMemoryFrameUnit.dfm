@@ -2,11 +2,11 @@ object ModernProfileEditorMemoryFrame: TModernProfileEditorMemoryFrame
   Left = 0
   Top = 0
   Width = 447
-  Height = 427
+  Height = 463
   TabOrder = 0
   DesignSize = (
     447
-    427)
+    463)
   object MemoryLabel: TLabel
     Left = 24
     Top = 16
@@ -25,7 +25,7 @@ object ModernProfileEditorMemoryFrame: TModernProfileEditorMemoryFrame
     Left = 38
     Top = 311
     Width = 387
-    Height = 98
+    Height = 58
     AutoSize = False
     Caption = 'DOS32AInfoLabel'
     WordWrap = True
@@ -40,6 +40,16 @@ object ModernProfileEditorMemoryFrame: TModernProfileEditorMemoryFrame
     ParentShowHint = False
     ShowHint = True
     OnClick = DOS32AInfoButtonClick
+  end
+  object FreeMemLabel: TLabel
+    Left = 24
+    Top = 381
+    Width = 401
+    Height = 69
+    Anchors = [akLeft, akTop, akRight]
+    AutoSize = False
+    Caption = 'FreeMemLabel'
+    WordWrap = True
   end
   object MemoryEdit: TSpinEdit
     Left = 24
@@ -86,6 +96,7 @@ object ModernProfileEditorMemoryFrame: TModernProfileEditorMemoryFrame
     Anchors = [akLeft, akTop, akRight]
     Caption = 'LoadFixCheckBox'
     TabOrder = 4
+    OnClick = LoadFixCheckBoxClick
   end
   object LoadFixEdit: TSpinEdit
     Left = 42
@@ -96,6 +107,7 @@ object ModernProfileEditorMemoryFrame: TModernProfileEditorMemoryFrame
     MinValue = 1
     TabOrder = 5
     Value = 64
+    OnChange = LoadFixEditChange
   end
   object DOS32ACheckBox: TCheckBox
     Left = 24
@@ -114,8 +126,8 @@ object ModernProfileEditorMemoryFrame: TModernProfileEditorMemoryFrame
     Top = 16
   end
   object ImageList: TImageList
-    Left = 352
-    Top = 248
+    Left = 368
+    Top = 16
     Bitmap = {
       494C010102000400040010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000001000000001002000000000000010
