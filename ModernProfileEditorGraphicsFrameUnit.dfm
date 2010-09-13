@@ -43,10 +43,11 @@ object ModernProfileEditorGraphicsFrame: TModernProfileEditorGraphicsFrame
     Caption = 'ScaleLabel'
   end
   object FrameSkipLabel: TLabel
-    Left = 408
+    Left = 424
     Top = 328
     Width = 74
     Height = 13
+    Anchors = [akTop, akRight]
     Caption = 'FrameSkipLabel'
   end
   object FullscreenInfoLabel: TLabel
@@ -64,6 +65,7 @@ object ModernProfileEditorGraphicsFrame: TModernProfileEditorGraphicsFrame
     Top = 328
     Width = 81
     Height = 13
+    Anchors = [akTop, akRight]
     Caption = 'PixelShaderLabel'
     Visible = False
   end
@@ -143,17 +145,19 @@ object ModernProfileEditorGraphicsFrame: TModernProfileEditorGraphicsFrame
   object ScaleComboBox: TComboBox
     Left = 24
     Top = 347
-    Width = 369
+    Width = 377
     Height = 21
     Style = csDropDownList
+    Anchors = [akLeft, akTop, akRight]
     ItemHeight = 13
     TabOrder = 8
   end
   object FrameSkipEdit: TSpinEdit
-    Left = 408
+    Left = 422
     Top = 347
     Width = 60
     Height = 22
+    Anchors = [akTop, akRight]
     MaxValue = 10
     MinValue = 0
     TabOrder = 9
@@ -244,6 +248,7 @@ object ModernProfileEditorGraphicsFrame: TModernProfileEditorGraphicsFrame
     Width = 120
     Height = 21
     Style = csDropDownList
+    Anchors = [akTop, akRight]
     ItemHeight = 13
     TabOrder = 10
     Visible = False

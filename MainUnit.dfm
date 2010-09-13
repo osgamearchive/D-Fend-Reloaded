@@ -4686,6 +4686,10 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
       object GameNotesPanel: TTabSheet
         Caption = 'Notes'
         ImageIndex = 44
+        ExplicitLeft = 0
+        ExplicitTop = 0
+        ExplicitWidth = 0
+        ExplicitHeight = 0
         object GameNotesEdit: TRichEdit
           Left = 0
           Top = 22

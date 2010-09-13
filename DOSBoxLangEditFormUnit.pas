@@ -135,13 +135,26 @@ end;
 
 Function ShowDOSBoxLangEditDialog(const AOwner : TComponent; const ALoadDOSBoxLangFile, ASaveDOSBoxLangFile : String) : Boolean;
 Var DOSBoxLangEditForm : TDOSBoxLangEditForm;
+    LangFile : String;
+    IsTemp : Boolean;
 begin
   result:=False;
   DOSBoxLangEditForm:=TDOSBoxLangEditForm.Create(AOwner);
   try
-    If not LoadDOSBoxLangFile(ALoadDOSBoxLangFile,DOSBoxLangEditForm.LangIDStrings,DOSBoxLangEditForm.LangValueStrings) then begin
-      MessageDlg(Format(LanguageSetup.MessageCouldNotFindFile,[ALoadDOSBoxLangFile]),mtError,[mbOK],0);
-      exit;
+    If ALoadDOSBoxLangFile='' then begin
+      IsTemp:=True;
+      LangFile:=GetTempDOSBoxEnglishLangFile;
+    end else begin
+      IsTemp:=False;
+      LangFile:=ALoadDOSBoxLangFile;
+    end;
+    try
+      If not LoadDOSBoxLangFile(LangFile,DOSBoxLangEditForm.LangIDStrings,DOSBoxLangEditForm.LangValueStrings) then begin
+        MessageDlg(Format(LanguageSetup.MessageCouldNotFindFile,[LangFile]),mtError,[mbOK],0);
+        exit;
+      end;
+    finally
+      If IsTemp then ExtDeleteFile(LangFile,ftTemp);
     end;
     result:=(DOSBoxLangEditForm.ShowModal=mrOK);
     If result then begin

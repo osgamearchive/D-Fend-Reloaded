@@ -9,9 +9,12 @@ Function SaveDOSBoxLangFile(const FileName : String; const LangIDStrings, LangVa
 Procedure GetDOSBoxLangNamesAndFiles(const DOSBoxPath : String; const Names, Files : TStrings; const WithDefaultEnglish : Boolean);
 Function GetDOSBoxLangNames(const DOSBoxPath : String; const WithDefaultEnglish : Boolean) : TStringList;
 
+Function GetTempDOSBoxEnglishLangFile : String;
+
 implementation
 
-uses Windows, SysUtils, Math, CommonTools, PrgConsts, PrgSetupUnit;
+uses Windows, SysUtils, Math, CommonTools, PrgConsts, PrgSetupUnit,
+     DOSBoxTempUnit, DOSBoxUnit;
 
 const SpecialChars : Array[0..6] of Char = (#27, 'É','Í','º','»','È','¼');
       SpecialSymbols : Array[0..6] of String = ('<ESC>','<UL>','<->','<|>','<UR>','<LL>','<LR>');
@@ -218,6 +221,22 @@ begin
     GetDOSBoxLangNamesAndFiles(DOSBoxPath,result,Files,WithDefaultEnglish);
   finally
     Files.Free;
+  end;
+end;
+
+Function GetTempDOSBoxEnglishLangFile : String;
+Var TempGame : TTempGame;
+begin
+  ForceDirectories(TempDir+TempSubFolder+'\');
+  result:=TempDir+TempSubFolder+'\DOSBox-English.lng';
+  TempGame:=TTempGame.Create;
+  try
+    TempGame.SetSimpleDefaults;
+    TempGame.Game.CloseDosBoxAfterGameExit:=True;
+    TempGame.Game.StoreAllValues;
+    RunCommandAndWait(TempGame.Game,'CONFIG -writelang "'+result+'"'+#13+'exit',true);
+  finally
+    TempGame.Free;
   end;
 end;
 

@@ -117,7 +117,8 @@ Section "$(LANGNAME_DFendReloaded)" ID_DFend
   SetDetailsPrint listonly
   SetOutPath "$INSTDIR\IconSets"
   SetDetailsPrint none  
-  File /r "..\IconSets\*.*"
+  File /r /x Thumbs.db "..\IconSets\*.*"
+  Delete "$INSTDIR\IconSets\Modern\Thumbs.db"
   
   ; Remove files in $INSTDIR for which the new position is $INSTDIR\Bin
   
@@ -239,12 +240,12 @@ Section "$(LANGNAME_DFendReloaded)" ID_DFend
   SetDetailsPrint none
   
   SetOutPath "$INSTDIR\DOSBox"
-  Delete "INSTDIR\DOSBox\README.txt"
-  Delete "INSTDIR\DOSBox\COPYING.txt"
-  Delete "INSTDIR\DOSBox\THANKS.txt"
-  Delete "INSTDIR\DOSBox\NEWS.txt"
-  Delete "INSTDIR\DOSBox\AUTHORS.txt"
-  Delete "INSTDIR\DOSBox\INSTALL.txt"
+  Delete "$INSTDIR\DOSBox\README.txt"
+  Delete "$INSTDIR\DOSBox\COPYING.txt"
+  Delete "$INSTDIR\DOSBox\THANKS.txt"
+  Delete "$INSTDIR\DOSBox\NEWS.txt"
+  Delete "$INSTDIR\DOSBox\AUTHORS.txt"
+  Delete "$INSTDIR\DOSBox\INSTALL.txt"
   RmDir /r "$INSTDIR\DOSBox\zmbv"
   
   File "..\DOSBox\DOSBox.exe"

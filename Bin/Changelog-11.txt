@@ -4,3 +4,4 @@ Version 1.1.0 (??/??/2010)
 ==========================
 - Setup option to configure if history information of started games shall be
   collected or not.
+- Setup option to rename all media files in all profiles.

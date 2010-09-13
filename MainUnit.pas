@@ -8,6 +8,14 @@ uses
   Menus, AppEvnts, ActiveX, GameDBUnit, GameDBToolsUnit, ViewFilesFrameUnit,
   LinkFileUnit, HelpTools;
 
+{
+- Update changelog in help files
+
+1.1:
+- Storing the name of the selected MIDI device and not only the number
+- Moby games cover download: Preview & select which cover to download
+}
+
 type
   TDFendReloadedMainForm = class(TForm, IDropTarget)
     TreeView: TTreeView;
@@ -466,7 +474,7 @@ var MainWindowShowComplete : Boolean = False;
 
 implementation
 
-uses ShellAPI, ShlObj, ClipBrd, Math, PNGImage, CommonTools, LanguageSetupUnit,
+uses ShellAPI, ShlObj, ClipBrd, Math, CommonTools, LanguageSetupUnit,
      PrgConsts, VistaToolsUnit, PrgSetupUnit, SetupDosBoxFormUnit,
      ProfileEditorFormUnit, SetupFormUnit, IconManagerFormUnit, DosBoxUnit,
      HistoryFormUnit, TemplateFormUnit, UninstallFormUnit, ViewImageFormUnit,
@@ -506,7 +514,7 @@ Var S : String;
 begin
   LogInfo('### Start of FormCreate ###');
 
-  {Caption:=Caption+' (RELEASE CANDIDATE 1 OF VERSION 1.1)';}
+  {Caption:=Caption+' (RELEASE CANDIDATE 4 OF VERSION 1.0.1)';}
   {Caption:=Caption+' THIS IS A TEST VERSION ! NOT FOR REGULAR USE ! (Beta 1 of version 1.1)';}
 
   Height:=790;
@@ -2921,13 +2929,20 @@ begin
       5016 : begin
                {$IFDEF CheckDoubleChecksums}
                AutoSetupDB:=TGameDB.Create(PrgDataDir+AutoSetupSubDir,False);
+               Enabled:=False;
                try
                  St:=CheckDoubleChecksums(AutoSetupDB);
                finally
+                 Enabled:=True;
                  AutoSetupDB.Free;
                end;
                {$ELSE}
-               St:=CheckGameDB(GameDB);
+               Enabled:=False;
+               try
+                 St:=CheckGameDB(GameDB);
+               finally
+                 Enabled:=True;
+               end;
                {$ENDIF}
                try
                  If St.Count=0 then begin
@@ -3278,7 +3293,7 @@ begin
           If S='' then exit;
           P:=LoadImageFromFile(IncludeTrailingPathDelimiter(S)+ScreenshotListView.Selected.Caption);
           try
-            Clipboard.Assign(P);
+            if P<>nil then Clipboard.Assign(P);
           finally
             P.Free;
           end;
@@ -3719,10 +3734,14 @@ begin
     LastDOSBoxCount:=DOSBoxCounter.Count;
   end;
 
-  If (DOSBoxCounter.Count<LastDOSBoxCount) and (LastDOSBoxStartTime>0) and (LastDOSBoxStartTime+Cardinal(Min(60,Max(1,PrgSetup.DOSBoxStartFailedTimeout)))*1000>GetTickCount) then begin
-    LastDOSBoxStartTime:=0;
-    ShowDOSBoxFailedDialog(self,GameDB,LastDOSBoxProfile);
-    LastDOSBoxProfile:=nil;
+  If DOSBoxCounter.Count<LastDOSBoxCount then begin
+    if (LastDOSBoxStartTime>0) and (LastDOSBoxStartTime+Cardinal(Min(60,Max(1,PrgSetup.DOSBoxStartFailedTimeout)))*1000>GetTickCount) then begin
+      LastDOSBoxStartTime:=0;
+      ShowDOSBoxFailedDialog(self,GameDB,LastDOSBoxProfile);
+      LastDOSBoxProfile:=nil;
+    end else begin
+      LastDOSBoxCount:=DOSBoxCounter.Count;
+    end;
   end;
 
   If PrgSetup.MinimizeOnDosBoxStart and PrgSetup.RestoreWhenDOSBoxCloses and (WindowState=wsMinimized) and MinimizedAtDOSBoxStart then begin

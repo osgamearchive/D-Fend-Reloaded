@@ -144,6 +144,11 @@ begin
   NextButton.Enabled:=(NextImages.Count>0);
 
   IntPicture:=LoadImageFromFile(ImageFile);
+  if IntPicture=nil then begin
+    IntPicture:=TPicture.Create;
+    IntPicture.Bitmap.Width:=10;
+    IntPicture.Bitmap.Height:=10;
+  end;
   Image.Picture.Assign(IntPicture);
   Caption:=LanguageSetup.ViewImageForm+' ['+MakeRelPath(ImageFile,PrgSetup.BaseDir)+']';
 

@@ -1,24 +1,20 @@
 unit LoggingUnit;
 interface
 
-{DEFINE TurnStartupLoggingOn}
-
 Procedure LogInfo(const Info : String; const ContinueLogging : Boolean = True);
 
 implementation
 
-uses SysUtils, Forms;
+uses SysUtils, Forms, ShlObj, CommonTools;
 
-{$IFDEF TurnStartupLoggingOn}
 var StartupLogFile : String ='';
-{$ENDIF}
 
 Procedure LogInfo(const Info : String; const ContinueLogging : Boolean);
-{$IFDEF TurnStartupLoggingOn} Var F : TextFile; {$ENDIF}
+Var F : TextFile;
 begin
-  {$IFDEF TurnStartupLoggingOn}
   If StartupLogFile='' then exit;
   If not FileExists(StartupLogFile) then begin StartupLogFile:=''; exit; end;
+
   AssignFile(F,StartupLogFile);
   Append(F);
   try
@@ -27,11 +23,9 @@ begin
     CloseFile(F);
   end;
   If not ContinueLogging then StartupLogFile:='';
-  {$ENDIF}
 end;
 
 initialization
-  {$IFDEF TurnStartupLoggingOn}
-  StartupLogFile:=IncludeTrailingPathDelimiter(ExtractFilePath(Application.ExeName))+'DFR-Log.txt';
-  {$ENDIF}
+  StartupLogFile:=IncludeTrailingPathDelimiter(GetSpecialFolder(0,CSIDL_DESKTOPDIRECTORY))+'D-Fend-Reloaded-Log.txt';
+  if not FileExists(StartupLogFile) then StartupLogFile:='';
 end.

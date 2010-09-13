@@ -1,7 +1,7 @@
 Name                : DOSZIP
-Version             : 1.54
-Filename            : DZBIN154.ZIP
-FileDate            : 20MAY10
+Version             : 2.01
+Filename            : DZBIN201.ZIP
+FileDate            : 15AUG10
 Status              : BETA
 E-Mail              : nidud@users.sourceforge.net
 Homepage            : http://sourceforge.net/projects/doszip/

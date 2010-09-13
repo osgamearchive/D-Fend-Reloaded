@@ -25,7 +25,6 @@ type
 var
   RenameAllScreenshotsForm: TRenameAllScreenshotsForm;
 
-Function ShowRenameAllScreenshotsDialog(const AOwner : TComponent; const Caption : String; var FileMask : String; var AllProfiles : Boolean) : Boolean;
 Function RenameMediaFiles(const AOwner : TComponent; const Game : TGame; const GameDB : TGameDB; const RenameFiles : TRenameFiles) : Boolean;
 
 implementation
@@ -57,11 +56,18 @@ end;
 
 { global }
 
-Function ShowRenameAllScreenshotsDialog(const AOwner : TComponent; const Caption : String; var FileMask : String; var AllProfiles : Boolean) : Boolean;
+Function ShowRenameAllScreenshotsDialog(const AOwner : TComponent; const Caption : String; var FileMask : String; var AllProfiles : Boolean; const OnlyAllProfiles : Boolean) : Boolean;
 begin
   RenameAllScreenshotsForm:=TRenameAllScreenshotsForm.Create(AOwner);
   try
     RenameAllScreenshotsForm.Caption:=Caption;
+
+    If OnlyAllProfiles then begin
+      RenameAllScreenshotsForm.AllProfilesRadioButton.Checked:=True;
+      RenameAllScreenshotsForm.ThisProfileRadioButton.Enabled:=False;
+      RenameAllScreenshotsForm.AllProfilesRadioButton.Enabled:=False;
+    end;
+
     result:=(RenameAllScreenshotsForm.ShowModal=mrOK);
     if result then begin
       Filemask:=RenameAllScreenshotsForm.Edit.Text;
@@ -85,7 +91,8 @@ begin
     rfVideos : Caption:=LanguageSetup.RenameAllVideos;
     else Caption:=LanguageSetup.RenameAllScreenshots;
   end;
-  if not ShowRenameAllScreenshotsDialog(AOwner,Caption,FileMask,AllProfiles) then exit;
+
+  if not ShowRenameAllScreenshotsDialog(AOwner,Caption,FileMask,AllProfiles,Game=nil) then exit;
 
   If AllProfiles then begin
     result:=(GameDB.Count>0);

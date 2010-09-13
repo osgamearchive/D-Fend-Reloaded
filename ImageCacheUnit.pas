@@ -77,6 +77,7 @@ begin
   result:=False;
   If not FileExists(AFileName) then exit;
   try FPicture:=LoadImageFromFile(AFileName); except FreeAndNil(FPicture); exit; end;
+  if FPicture=nil then exit;
   FPath:=IncludeTrailingPathDelimiter(ExtUpperCase(ExtractFilePath(AFileName)));
   result:=True;
 end;

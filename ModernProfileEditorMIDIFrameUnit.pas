@@ -169,7 +169,7 @@ end;
 procedure TModernProfileEditorMIDIFrame.MIDISelectListBoxClick(Sender: TObject);
 begin
   If MIDISelectListBox.ItemIndex<0 then exit;
-  AdditionalSettingsEdit.Text:='midiconfig='+IntToStr(Integer(MIDISelectListBox.Items.Objects[MIDISelectListBox.ItemIndex]));
+  AdditionalSettingsEdit.Text:=IntToStr(Integer(MIDISelectListBox.Items.Objects[MIDISelectListBox.ItemIndex]));
 end;
 
 end.

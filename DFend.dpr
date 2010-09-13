@@ -163,7 +163,6 @@ uses
   SelectCDDriveToMountFormUnit in 'SelectCDDriveToMountFormUnit.pas' {SelectCDDriveToMountForm},
   SelectCDDriveToMountByDataFormUnit in 'SelectCDDriveToMountByDataFormUnit.pas' {SelectCDDriveToMountByDataForm},
   ModernProfileEditorScummVMHardwareFrameUnit in 'ModernProfileEditorScummVMHardwareFrameUnit.pas' {ModernProfileEditorScummVMHardwareFrame: TFrame},
-  pngimage in 'Components\pngimage\pngimage.pas',
   CreateShortcutsFormUnit in 'CreateShortcutsFormUnit.pas' {CreateShortcutsForm},
   SetupFrameGameListIconModeAppearanceUnit in 'SetupFrameGameListIconModeAppearanceUnit.pas' {SetupFrameGameListIconModeAppearance: TFrame},
   ImportSelectTemplateFormUnit in 'ImportSelectTemplateFormUnit.pas' {ImportSelectTemplateForm},

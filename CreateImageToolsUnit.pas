@@ -617,7 +617,7 @@ begin
     end;
     St2:=TStringList.Create;
     try
-      If dicuCopyFolder in Upgrades then begin
+      If (dicuCopyFolder in Upgrades) and (CopyFolders<>nil) and (CopyFoldersDest<>nil) then begin
         For I:=0 to Min(7,CopyFolders.Count-1) do begin
           C:=Chr(Ord('E')+I);
           St2.Add(CopyFolders[I]);
@@ -633,22 +633,24 @@ begin
         St.Add('exit');
         DiskImageCreatorRunDOSBoxCommandsOnHDImage(ImageFileName,St,St2);
       end;
-      J:=8;
-      While CopyFolders.Count>J do begin
-        St.Clear; St2.Clear;
-        For I:=J to Min(7+J,CopyFolders.Count-1) do begin
-          C:=Chr(Ord('E')+I-J);
-          St2.Add(CopyFolders[I]);
-          If (CopyFoldersDest<>nil) and (CopyFoldersDest.Count>I) then begin
-            St.Add('mkdir D:\'+CopyFoldersDest[I]);
-            St.Add('C:\4DOS.COM /C COPY '+C+':\*.* D:\'+CopyFoldersDest[I]+'\ /S');
-          end else begin
-            St.Add('C:\4DOS.COM /C COPY '+C+':\*.* D:\ /S');
+      if (CopyFolders<>nil) and (CopyFoldersDest<>nil) then begin
+        J:=8;
+        While CopyFolders.Count>J do begin
+          St.Clear; St2.Clear;
+          For I:=J to Min(7+J,CopyFolders.Count-1) do begin
+            C:=Chr(Ord('E')+I-J);
+            St2.Add(CopyFolders[I]);
+            If (CopyFoldersDest<>nil) and (CopyFoldersDest.Count>I) then begin
+              St.Add('mkdir D:\'+CopyFoldersDest[I]);
+              St.Add('C:\4DOS.COM /C COPY '+C+':\*.* D:\'+CopyFoldersDest[I]+'\ /S');
+            end else begin
+              St.Add('C:\4DOS.COM /C COPY '+C+':\*.* D:\ /S');
+            end;
           end;
+          St.Add('exit');
+          DiskImageCreatorRunDOSBoxCommandsOnHDImage(ImageFileName,St,St2);
+          inc(J,8);
         end;
-        St.Add('exit');
-        DiskImageCreatorRunDOSBoxCommandsOnHDImage(ImageFileName,St,St2);
-        inc(J,8);
       end;
     finally
       St2.Free;

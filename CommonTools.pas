@@ -1192,6 +1192,10 @@ begin
   end;
 
   P:=LoadImageFromFile(OldFileName);
+  if P=nil then begin
+    MessageDlg(Format(LanguageSetup.MessageCouldNotOpenFile,[OldFileName]),mtError,[mbOK],0);
+    exit;
+  end;
   try
     try
       SaveImageToFile(P,NewFileName);
@@ -1319,6 +1323,10 @@ begin
 
   If ExtUpperCase(ExtractFileExt(S))='.PNG' then begin
     P:=LoadImageFromFile(FileName);
+    If P=nil then begin
+      MessageDlg(Format(LanguageSetup.MessageCouldNotOpenFile,[FileName]),mtError,[mbOK],0);
+      exit;
+    end;
     try
       S:=TempDir+ChangeFileExt(ExtractFileName(S),'.bmp');
       SaveImageToFile(P,S);

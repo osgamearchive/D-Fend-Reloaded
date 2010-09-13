@@ -1,5 +1,32 @@
 D-Fend Reloaded Changelog
 
+Version 1.0.1 (09/13/2010)
+==========================
+- Updated DOSZip from 1.54 to 2.01.
+- A new start-up logging function can help you to find the problem if 
+  D-Fend Reloaded is not running.
+- Now the DOSBox language file editor can use the DOSBox built-in Englisch
+  language file as template.
+- Updated the png file reader library.
+- [Fix] In some cases the "DOSBox start failed" dialog could appear even if
+  DOSBox is working correctly.
+- [Fix] Access violation when unsing the "Create image" dialog.
+- [Fix] Download of multiple games packages from Sourceforge always failed.
+- [Fix] The pixel shader option on the graphics card page of the profile editor
+  was partially out of the dialog.
+- [Fix] When selecting a MIDI device to be used in a DOSBox profile the text
+  "midiconfig=id" is added to the additional MIDI settings field instead of
+  just the MIDI device id.
+- [Fix] When running D-Fend Reloaded in portable operation mode and the base
+  directory for relative path names was not set to the program directory the
+  capture folder was not stored correctly.
+- [Fix] If updated from a previous D-Fend Reloaded version the changelog tab
+  in the program information dialog may displayed an outdated, incomplete
+  DOSBox changelog.
+- [Fix] The main window was not disabled while the check for missing files
+  progress dialog was shown.
+
+
 Version 1.0.0 (07/02/2010)
 ==========================
 - DOSBox 0.74 is supported and bundled with D-Fend Reloaded.

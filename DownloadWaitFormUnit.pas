@@ -39,8 +39,9 @@ Function MetaLinkDownload(const AOwner : TComponent; const ASize : Integer; cons
 
 implementation
 
-uses XMLDoc, XMLIntf, Math, CommonTools, VistaToolsUnit, LanguageSetupUnit,
-     PackageDBToolsUnit, PrgConsts, GameDBToolsUnit;
+uses XMLDoc, XMLIntf, IdCookie, IdCookieManager, Math,
+     CommonTools, VistaToolsUnit, LanguageSetupUnit, PackageDBToolsUnit,
+     PrgConsts, GameDBToolsUnit;
 
 {$R *.dfm}
 
@@ -152,9 +153,11 @@ Type THTTPThread=class(TThread)
     FTPDownloadHandled : Boolean;
     HTTP : TIdHTTP;
     FTP : TIdFTP;
+    FSize : Integer;
     Procedure WorkEvent1(ASender: TObject; AWorkMode: TWorkMode; AWorkCount: Integer);
     Procedure WorkEvent2;
     Procedure RedirectEvent(Sender: TObject; var dest: string; var NumRedirect: Integer; var Handled: boolean; var VMethod: TIdHTTPMethod);
+    Procedure FixSourceForgeDownload(const MSt : TMemoryStream);
   protected
     Procedure Execute; override;
   public
@@ -171,6 +174,7 @@ begin
   FDestFile:=ADestFile;
   FSuccess:=drFail;
   FTPDownloadHandled:=False;
+  FSize:=ASize;
   If ShowWaitDialog then InitDownloadWaitForm(AOwner,ASize);
   HTTP:=nil; FTP:=nil;
   Resume;
@@ -210,6 +214,7 @@ begin
       HTTP.ConnectTimeout:=10*1000;
       try
         HTTP.Get(FURL,MSt);
+        If (MSt.Size<30000) and ((FSize<=0) or (FSize<>MSt.Size)) then FixSourceForgeDownload(MSt);
       except
         If not FTPDownloadHandled then exit;
       end;
@@ -226,6 +231,44 @@ begin
     If Assigned(DownloadWaitForm) then DownloadWaitForm.HTTP:=nil;
     HTTP.Free;
   end;
+end;
+
+Procedure THTTPThread.FixSourceForgeDownload(const MSt : TMemoryStream);
+const SFURL='http://downloads.sourceforge.net/';
+Var St : TStringList;
+    S : String;
+    I,J,K : Integer;
+begin
+  If ExtLowerCase(Copy(FURL,1,length(SFURL)))<>SFURL then exit;
+
+  St:=TStringList.Create;
+  try
+    MSt.Position:=0;
+    St.LoadFromStream(MSt); S:=St.Text;
+    I:=Pos('class="direct-download"',S);
+    If I=0 then exit;
+    J:=0; K:=0;
+    while I>0 do begin
+      If S[I]='"' then begin
+        If J=0 then J:=I-1 else begin K:=I+1; break; end;
+      end;
+      dec(I);
+    end;
+    If K=0 then exit;
+    S:=Copy(S,K,J-K+1);
+
+    I:=Pos('&amp;',S);
+    While I>0 do begin
+      S:=Copy(S,1,I-1)+'&'+Copy(S,I+5,MaxInt);
+      I:=Pos('&amp;',S);
+    end;
+
+    MSt.Clear;
+    HTTP.Get(S,MSt);
+  finally
+    St.Free;
+  end;
+
 end;
 
 Procedure THTTPThread.WorkEvent1(ASender: TObject; AWorkMode: TWorkMode; AWorkCount: Integer);

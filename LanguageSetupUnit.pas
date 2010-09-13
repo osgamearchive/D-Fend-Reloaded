@@ -905,6 +905,7 @@ const NR_Author=1;
       NR_SetupFormService6=43708;
       NR_SetupFormService7=43709;
       NR_SetupFormService8=43710;
+      NR_SetupFormService9=43711;
       NR_SetupFormUpdate0=43801;
       NR_SetupFormUpdate1=43802;
       NR_SetupFormUpdate2=43803;
@@ -2978,6 +2979,7 @@ Type TLanguageSetup=class(TBasePrgSetup)
     property SetupFormService6 : String index NR_SetupFormService6 read GetString write SetString;
     property SetupFormService7 : String index NR_SetupFormService7 read GetString write SetString;
     property SetupFormService8 : String index NR_SetupFormService8 read GetString write SetString;
+    property SetupFormService9 : String index NR_SetupFormService9 read GetString2 write SetString2;
     property SetupFormUpdate0 : String index NR_SetupFormUpdate0 read GetString write SetString;
     property SetupFormUpdate1 : String index NR_SetupFormUpdate1 read GetString write SetString;
     property SetupFormUpdate2 : String index NR_SetupFormUpdate2 read GetString write SetString;
@@ -6148,7 +6150,7 @@ begin
   AddStringRec(NR_InstallationSupportDelCDImage,'InstallationSupport','Del.CDImage','Remove CD image from sources list');
   AddStringRec(NR_InstallationSupportRun,'InstallationSupport','Run.Caption','Game installation');
   AddStringRec(NR_InstallationSupportRunSource,'InstallationSupport','Run.Source','Select active source:');
-  AddStringRec(NR_InstallationSupportRunInfoStarting,'InstallationSupport','Run.Info.Starting','Please wait, the starting of the installation programm is being prepared.');
+  AddStringRec(NR_InstallationSupportRunInfoStarting,'InstallationSupport','Run.Info.Starting','Please wait, the starting of the installation program is being prepared.');
   AddStringRec(NR_InstallationSupportRunInfoRunning,'InstallationSupport','Run.Info.Running','The installation process is being started. Please install the game to any directory on DOSBox drive C:.');
   AddStringRec(NR_InstallationSupportRunInfoNewGameScan,'InstallationSupport','Run.Info.NewGameScan','Scanning the games folder for the new game.');
   AddStringRec(NR_InstallationSupportRunInfoNewGameScanError,'InstallationSupport','Run.Info.NewGameScan.Error','There is no new folder in the games directory from which a new game could be added. Do you want to start the installation program again?');
@@ -6324,9 +6326,10 @@ end;
 
 Function TLanguageSetup.GetString2(Index : Integer) : String;
 begin
-  //... Move to language files after 1.0final
+  //... Move to language files after 1.0.1final
   result:='';
   Case Index of
+    NR_SetupFormService9 : result:='Rename all media files for all profiles';
     NR_SetupFormDataPrivacy : result:='Data privacy';
     NR_SetupFormDataPrivacyStoreHistory : result:='Store history of started games';
     NR_SetupFormDataPrivacyShowHistory : result:='Show recorded history';

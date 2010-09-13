@@ -1193,7 +1193,7 @@ begin
       BurnLoadBinCache;
     end;
     If Game.GameExeMD5='' then begin
-      LogInfo('No game MD5, cached profile looks damaged, loading this profile from prof file');
+      LogInfo('No game exe MD5 sum. May be there is just no MD5 sum stored but may be also this cached profile is damaged. Loading this profile from prof file for safety reasons.');
       Game.Free;
       Game:=TGame.Create(FileName);
     end;

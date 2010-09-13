@@ -2,9 +2,9 @@ DOSZIP.TXT--
 Copyright 2010 Hjort Nidudsson.
 
 DOSZIP COMMANDER
-Version 1.54
+Version 2.01
 
-Welcome to Doszip Commander Version 1.54!
+Welcome to Doszip Commander Version 2.01!
 =========================================
 
 	Topics covered in this file include:
@@ -85,8 +85,6 @@ Command Line
 			is 5000.
 
 	/XP (WinXP)	Trigger a mode change on startup.
-
-	/V (verbose) 	Print DOS return code (errorlevel).
 
 	/C#		Set Configuration PATH to #
 			This is the path on your hard disk where the
@@ -386,7 +384,7 @@ Shortkey Table
 
 	Alt-[afesthb]	Activate Menus
 	Ctrl		Activate Ctrl-Status-line
-	Ctrl-Alt	Activate Quick Search
+	Ctrl-Alt	Activate Quick Search (hold down Ctrl while typing)
 	Alt-Up/Down	Resize Panels
 
 	Alt-F1		Select Disk Panel-A
@@ -455,6 +453,8 @@ Shortkey Table
 	Shift-F2	Copy file (- to a new name in current directory)
 	Shift-F3	View file --> DZ.INI
 	Shift-F4	Edit file --> DZ.INI
+	Shift-F7	Create .ZIP archive
+	Shift-F9	Save configuration
 	Shift-F10       Activate the last menu you used with the last
 			item you selected highlighted
 
@@ -479,11 +479,10 @@ Compiling
 	-----------------
 	dz		Source files for DZ.EXE
 	dzmain		Source files for DZMAIN.EXE
-	tview		Source files for TVIEW.EXE
 	clib		Library source
 	make		Include files for MAKE and WMAKE
-	tools		Resource compiler and test
-			programs for library code
+	tools		Resource compiler and Text viewer
+	debug		Test programs for library code
 
 	Makefiles
 	---------

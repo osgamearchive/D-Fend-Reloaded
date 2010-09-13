@@ -783,6 +783,8 @@ begin
     QBasic:=MakeExtAbsPath(QBasic,PrgDir);
     WaveEncOgg:=MakeExtAbsPath(WaveEncOgg,PrgDir);
     WaveEncMp3:=MakeExtAbsPath(WaveEncMp3,PrgDir);
+
+    CaptureDir:=MakeRelPath(CaptureDir,BaseDir);
   end;
 
   If not FileExists(WaveEncOgg) then begin
@@ -795,6 +797,8 @@ end;
 procedure TPrgSetup.DoneDirs;
 begin
   If OperationMode=omPortable then begin
+    CaptureDir:=MakeAbsPath(CaptureDir,BaseDir);
+
     BaseDir:=MakeExtRelPath(BaseDir,PrgDir);
     GameDir:=MakeExtRelPath(GameDir,PrgDir);
     DataDir:=MakeExtRelPath(DataDir,PrgDir);

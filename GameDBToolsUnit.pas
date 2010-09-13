@@ -1412,7 +1412,8 @@ begin
       P:=TPNGObject.Create;
       try
         OK:=True; try P.LoadFromFile(Dir+Rec.Name); except OK:=False; end;
-        IF OK then begin
+        if P=nil then OK:=False;
+        If OK then begin
           B:=TBitmap.Create;
           try
             try

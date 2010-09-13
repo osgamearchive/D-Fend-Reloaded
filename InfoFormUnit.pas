@@ -226,8 +226,12 @@ Var S : String;
 begin
   try ChangeLogMemo.Lines.Clear; except end;
   Case Integer(ChangeLogComboBox.Items.Objects[ChangeLogComboBox.ItemIndex]) of
-    0 : If FileExists(PrgDir+BinFolder+'\'+'ChangeLog.txt') then S:=PrgDir+BinFolder+'\'+'ChangeLog.txt' else S:=PrgDir+'ChangeLog.txt';
-    1 : S:=IncludeTrailingPathDelimiter(PrgSetup.DOSBoxSettings[0].DosBoxDir)+'NEWS.txt';
+    0 : If FileExists(PrgDir+BinFolder+'\'+'ChangeLog.txt')
+          then S:=PrgDir+BinFolder+'\'+'ChangeLog.txt'
+          else S:=PrgDir+'ChangeLog.txt';
+    1 : if FileExists(IncludeTrailingPathDelimiter(PrgSetup.DOSBoxSettings[0].DosBoxDir)+'Documentation\NEWS.txt')
+          then S:=IncludeTrailingPathDelimiter(PrgSetup.DOSBoxSettings[0].DosBoxDir)+'Documentation\NEWS.txt'
+          else S:=IncludeTrailingPathDelimiter(PrgSetup.DOSBoxSettings[0].DosBoxDir)+'NEWS.txt';
     2 : S:=IncludeTrailingPathDelimiter(PrgSetup.ScummVMPath)+'NEWS.txt';
   End;
   If S<>'' then begin

@@ -12,6 +12,7 @@ Procedure RunCommand(const Game : TGame; const Command : String; const DisableFu
 Procedure RunCommandAndWait(const Game : TGame; const Command : String; const DisableFullscreen : Boolean = False);
 Function RunCommandAndGetHandle(const Game : TGame; const Command : String; const DisableFullscreen : Boolean = False) : THandle;
 Procedure RunWithCommandline(const Game : TGame; const CommandLine : String; const DisableFullscreen : Boolean = False);
+Procedure RunWithCommandlineAndWait(const Game : TGame; const CommandLine : String; const DisableFullscreen : Boolean = False);
 
 Function BuildConfFile(const Game : TGame; const RunSetup : Boolean; const WarnIfNotReachable : Boolean; const RunExtraFile : Integer) : TStringList;
 Function BuildAutoexec(const Game : TGame; const RunSetup : Boolean; const St : TStringList; const WarnIfNotReachable : Boolean; const RunExtraFile : Integer; const WarnIfWindowsExe, SelectCD : Boolean) : Boolean;
@@ -1607,6 +1608,18 @@ begin
   try
     if DisableFullscreen then Game.StartFullscreen:=False;
     RunGame(Game,False,CommandLine);
+  finally
+    Game.StartFullscreen:=FullscreenSave;
+  end;
+end;
+
+Procedure RunWithCommandlineAndWait(const Game : TGame; const CommandLine : String; const DisableFullscreen : Boolean = False);
+Var FullscreenSave : Boolean;
+begin
+  FullscreenSave:=Game.StartFullscreen;
+  try
+    if DisableFullscreen then Game.StartFullscreen:=False;
+    RunGame(Game,False,CommandLine,True);
   finally
     Game.StartFullscreen:=FullscreenSave;
   end;

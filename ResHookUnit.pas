@@ -32,7 +32,7 @@ Var
 
 implementation
 
-uses SysUtils, Classes, Windows, Menus;
+uses SysUtils, Classes, Windows, Menus, IdGlobal, IdGlobalProtocols, IdException;
 
 { RTL patching system }
 
@@ -169,8 +169,217 @@ begin
   SetString(Result, Buffer, LoadString(FindResourceHInstance(ResStringRec.Module^), ResStringRec.Identifier, Buffer, SizeOf(Buffer)));
 end;
 
+{New versions of functions from IdGlobalProtocols}
+
+function StrToMonth(const AMonth: string): Byte;
+begin
+  Result := Succ(PosInStrArray(Uppercase(AMonth),
+    ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC']));   {do not localize}
+end;
+
+function StrToDay(const ADay: string): Byte;
+begin
+  Result := Succ(PosInStrArray(Uppercase(ADay),
+    ['SUN','MON','TUE','WED','THU','FRI','SAT']));   {do not localize}
+end;
+
+function NewRawStrInternetToDateTime(var Value: string): TDateTime;
+var
+  i: Integer;
+  Dt, Mo, Yr, Ho, Min, Sec: Word;
+  sTime: String;
+  ADelim: string;
+  SaveValue : String;
+
+  Procedure ParseDayOfMonth;
+  begin
+    Dt :=  StrToIntDef( Fetch(Value, ADelim), 1);
+    Value := TrimLeft(Value);
+  end;
+
+  Procedure ParseMonth;
+  begin
+    Mo := StrToMonth( Fetch ( Value, ADelim )  );
+    Value := TrimLeft(Value);
+  end;
+begin
+
+  If Pos('/',Value)>0 Then
+  Begin
+    { Turn Invalid 'Value' Into Valid. (Added by B Capel Feb 2005)
+     Example: 26/02/2005 19:23:30>>Becomes>>Sat, 26 Feb 2005 13:36:42}
+    Value := FormatDateTime('ddd, dd mmm yyyy hh:nn:ss',StrToDateTime(Value));
+  End;
+
+  Result := 0.0;
+  Value := Trim(Value);
+  if Length(Value) = 0 then begin
+    Exit;
+  end;
+
+  try
+    {Day of Week}
+    if StrToDay(Copy(Value, 1, 3)) > 0 then begin
+      {workaround in case a space is missing after the initial column}
+      if (Copy(Value,4,1)=',') and (Copy(Value,5,1)<>' ') then
+      begin
+        System.Insert(' ',Value,5);
+      end;
+      Fetch(Value);
+      Value := TrimLeft(Value);
+    end;
+
+    { Workaround for some buggy web servers which use '-' to separate the date parts.    {Do not Localize}
+    if (IndyPos('-', Value) > 1) and (IndyPos('-', Value) < IndyPos(' ', Value)) then begin    {Do not Localize}
+      ADelim := '-';    {Do not Localize}
+    end
+    else begin
+      ADelim := ' ';    {Do not Localize}
+    end;
+    {workaround for improper dates such as 'Fri, Sep 7 2001'    {Do not Localize}
+    {RFC 2822 states that they should be like 'Fri, 7 Sep 2001'    {Do not Localize}
+    if (StrToMonth(Fetch(Value, ADelim,False)) > 0) then
+    begin
+      {Month}
+      ParseMonth;
+      {Day of Month}
+      ParseDayOfMonth;
+    end
+    else
+    begin
+      {Day of Month}
+      ParseDayOfMonth;
+      {Month}
+      SaveValue:=Value;
+      ParseMonth;
+      If Mo=0 then begin
+        Value:=SaveValue;
+        ADelim := '-';
+        ParseDayOfMonth;
+        ParseMonth;
+      end;
+    end;
+    {Year}
+    { There is sometrage date/time formats like
+     DayOfWeek Month DayOfMonth Time Year}
+
+    sTime := Fetch(Value);
+    Yr := StrToIntDef(sTime, 1900);
+    { Is sTime valid Integer}
+    if Yr = 1900 then begin
+      Yr := StrToIntDef(Value, 1900);
+      Value := sTime;
+    end;
+    if Yr < 80 then begin
+      Inc(Yr, 2000);
+    end else if Yr < 100 then begin
+      Inc(Yr, 1900);
+    end;
+
+    Result := EncodeDate(Yr, Mo, Dt);
+    { SG 26/9/00: Changed so that ANY time format is accepted}
+    i := IndyPos(':', Value); {do not localize}
+    if i > 0 then begin
+      {Copy time string up until next space (before GMT offset)
+      sTime := fetch(Value, ' ');  {do not localize}
+      {Hour}
+      Ho  := StrToIntDef( Fetch ( Value,':'), 0);  {do not localize}
+      {Minute}
+      Min := StrToIntDef( Fetch ( Value,':'), 0);  {do not localize}
+      {Second}
+      Sec := StrToIntDef( Fetch ( Value ), 0);
+      {The date and time stamp returned}
+      Result := Result + EncodeTime(Ho, Min, Sec, 0);
+    end;
+    Value := TrimLeft(Value);
+  except
+    Result := 0.0;
+  end;
+end;
+
+function NewStrInternetToDateTime(Value: string): TDateTime;
+begin
+  Result := NewRawStrInternetToDateTime(Value);
+end;
+
+function GmtOffsetStrToDateTime(S: string): TDateTime;
+begin
+  Result := 0.0;
+  S := Copy(Trim(s), 1, 5);
+  if Length(S) > 0 then
+  begin
+    if s[1] in ['-', '+'] then   {do not localize}
+    begin
+      try
+        Result := EncodeTime(StrToInt(Copy(s, 2, 2)), StrToInt(Copy(s, 4, 2)), 0, 0);
+        if s[1] = '-' then  {do not localize}
+        begin
+          Result := -Result;
+        end;
+      except
+        Result := 0.0;
+      end;
+    end;
+  end;
+end;
+
+function OffsetFromUTC: TDateTime;
+var
+  iBias: Integer;
+  tmez: TTimeZoneInformation;
+begin
+  Case GetTimeZoneInformation(tmez) of
+    TIME_ZONE_ID_INVALID:
+      raise EIdFailedToRetreiveTimeZoneInfo.Create('RSFailedTimeZoneInfo');
+    TIME_ZONE_ID_UNKNOWN  :
+       iBias := tmez.Bias;
+    TIME_ZONE_ID_DAYLIGHT :
+      iBias := tmez.Bias + tmez.DaylightBias;
+    TIME_ZONE_ID_STANDARD :
+      iBias := tmez.Bias + tmez.StandardBias;
+    else
+      raise EIdFailedToRetreiveTimeZoneInfo.Create('RSFailedTimeZoneInfo');
+  end;
+  {We use ABS because EncodeTime will only accept positve values}
+  Result := EncodeTime(Abs(iBias) div 60, Abs(iBias) mod 60, 0, 0);
+  {The GetTimeZone function returns values oriented towards convertin
+   a GMT time into a local time.  We wish to do the do the opposit by returning
+   the difference between the local time and GMT.  So I just make a positive
+   value negative and leave a negative value as positive}
+  if iBias > 0 then begin
+    Result := 0 - Result;
+  end;
+end;
+
+function NewGMTToLocalDateTime(S: string): TDateTime;
+var  {-Always returns date/time relative to GMT!!  -Replaces StrInternetToDateTime}
+  DateTimeOffset: TDateTime;
+begin
+  try
+    If length(S)<10 then result:=Now else Result:=NewRawStrInternetToDateTime(S);
+  except
+    result:=Now;
+  end;
+  if Length(S) < 5 then begin
+    DateTimeOffset := 0.0
+  end else begin
+    DateTimeOffset := GmtOffsetStrToDateTime(S);
+  end;
+  {-Apply GMT offset here}
+  if DateTimeOffset < 0.0 then begin
+    Result := Result + Abs(DateTimeOffset);
+  end else begin
+    Result := Result - DateTimeOffset;
+  end;
+  { Apply local offset}
+  Result := Result + OffSetFromUTC;
+end;
+
+
 Var S : String;
 initialization
+  AddressPatch(@IdGlobalProtocols.GMTToLocalDateTime,@NewGMTToLocalDateTime);
+
   AddressPatch(@Menus.ShortCutToText,@NewShortCutToText);
 
   LoadResStringMode:=lrsmLearning;

@@ -27,7 +27,7 @@ type
     procedure EditFileComboBoxChange(Sender: TObject);
   private
     { Private-Deklarationen }
-    Names, Files : TStringList;
+    Names, NamesWithEnglish, Files : TStringList;
   public
     { Public-Deklarationen }
     LoadFileName, SaveFileName : String;
@@ -54,6 +54,7 @@ end;
 procedure TDOSBoxLangStartForm.FormShow(Sender: TObject);
 Var S : String;
     I,J : Integer;
+    B : Boolean;
 begin
   SetVistaFonts(self);
   Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName);
@@ -71,28 +72,46 @@ begin
   UserIconLoader.DialogImage(DI_Cancel,CancelButton);
 
   Names:=TStringList.Create;
+  NamesWithEnglish:=TStringList.Create;
   Files:=TStringList.Create;
   GetDOSBoxLangNamesAndFiles(PrgSetup.DOSBoxSettings[0].DOSBoxDir,Names,Files,False);
 
-  NewFileComboBox.Items.AddStrings(Names);
+  For I:=0 to Names.count-1 do Names.Objects[I]:=TObject(I);
+  NamesWithEnglish.AddStrings(Names);
+  B:=False;
+  For I:=0 to NamesWithEnglish.Count-1 do if ExtUpperCase(NamesWithEnglish[I])='ENGLISH' then begin B:=True; break; end;
+  if not B then NamesWithEnglish.AddObject('English',TObject(-1));
+
+  Names.Sort;
+  NamesWithEnglish.Sort;
+
+  NewFileComboBox.Items.AddStrings(NamesWithEnglish);
   EditFileComboBox.Items.AddStrings(Names);
 
   If NewFileComboBox.Items.Count=0 then begin
     MessageDlg(LanguageSetup.DOSBoxLangEditorStartNoFiles,mtError,[mbOK],0);
     PostMessage(Handle,WM_CLOSE,0,0);
+    exit;
+  end;
+
+  S:=ExtUpperCase(ExtractFileName(PrgSetup.DOSBoxSettings[0].DosBoxLanguage));
+  J:=-1; for I:=0 to Names.Count-1 do if ExtUpperCase(ExtractFileName(Files[I]))=S then begin J:=I; break; end;
+  If J>=0 then begin
+    For I:=0 to Names.Count-1 do if Names.Objects[I]=TObject(J) then begin EditFileComboBox.ItemIndex:=I; break; end;
+    For I:=0 to NamesWithEnglish.Count-1 do if NamesWithEnglish.Objects[I]=TObject(J) then begin NewFileComboBox.ItemIndex:=I; break; end;
   end else begin
-    S:=ExtUpperCase(ExtractFileName(PrgSetup.DOSBoxSettings[0].DosBoxLanguage));
-    J:=0; for I:=0 to Names.Count-1 do if ExtUpperCase(ExtractFileName(Files[I]))=S then begin J:=I; break; end;
-    NewFileComboBox.ItemIndex:=J;
-    EditFileComboBox.ItemIndex:=J;
+    For I:=0 to NamesWithEnglish.Count-1 do if NamesWithEnglish.Objects[I]=TObject(-1) then begin NewFileComboBox.ItemIndex:=I; break; end;
+    EditFileComboBox.ItemIndex:=0;
   end;
 end;
 
 procedure TDOSBoxLangStartForm.OKButtonClick(Sender: TObject);
 Var S : String;
+    I : Integer;
 begin
   If NewFileRadioButton.Checked then begin
-    LoadFileName:=Files[NewFileComboBox.ItemIndex];
+    I:=Integer(NamesWithEnglish.Objects[NewFileComboBox.ItemIndex]);
+    If I>=0 then LoadFileName:=Files[I] else LoadFileName:='';
     S:=RemoveIllegalFileNameChars(Trim(NewFileEdit.Text));
     If S='' then begin
       MessageDlg(LanguageSetup.DOSBoxLangEditorStartNoName,mtError,[mbOK],0);
@@ -101,7 +120,8 @@ begin
     end;
     SaveFileName:=PrgDataDir+LanguageSubDir+'\'+S+'.lng';
   end else begin
-    LoadFileName:=Files[EditFileComboBox.ItemIndex];
+    I:=Integer(NamesWithEnglish.Objects[NewFileComboBox.ItemIndex]);
+    LoadFileName:=Files[I];
     If (OperationMode=omUserDir) and (Copy(ExtUpperCase(LoadFileName),1,length(PrgDataDir))<>ExtUpperCase(PrgDataDir)) then begin
       SaveFileName:=PrgDataDir+LanguageSubDir+'\'+ExtractFileName(LoadFileName);
     end else begin
@@ -113,6 +133,7 @@ end;
 procedure TDOSBoxLangStartForm.FormDestroy(Sender: TObject);
 begin
   Names.Free;
+  NamesWithEnglish.Free;
   Files.Free;
 end;
 

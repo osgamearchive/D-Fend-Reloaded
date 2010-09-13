@@ -431,5 +431,10 @@
     <Transaction>2010.05.12 10:13:15.901.dfm,C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\Unit1.dfm=C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\DOSBoxLangStartFormUnit.dfm</Transaction>
     <Transaction>2010.05.31 08:39:39.606.pas,C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\Unit1.pas=C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\SetupFrameDataPrivacyUnit.pas</Transaction>
     <Transaction>2010.05.31 08:39:39.606.dfm,C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\Unit1.dfm=C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\SetupFrameDataPrivacyUnit.dfm</Transaction>
+    <Transaction>2010.07.31 21:54:30.750.pas,C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\Components\pngimage\pngimage.pas=</Transaction>
+    <Transaction>2010.08.29 00:00:06.473.pas,C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\Unit1.pas=C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\IdGlobal.pas</Transaction>
+    <Transaction>2010.08.29 00:08:25.482.pas,C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\Unit1.pas=C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\IdStack.pas</Transaction>
+    <Transaction>2010.08.29 00:10:36.616.pas,C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\IdStack.pas=</Transaction>
+    <Transaction>2010.08.29 00:14:52.919.pas,C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\IdGlobal.pas=</Transaction>
   </Transactions>
 </BorlandProject>
