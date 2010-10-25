@@ -2,9 +2,9 @@ DOSZIP.TXT--
 Copyright 2010 Hjort Nidudsson.
 
 DOSZIP COMMANDER
-Version 2.01
+Version 2.05
 
-Welcome to Doszip Commander Version 2.01!
+Welcome to Doszip Commander Version 2.05!
 =========================================
 
 	Topics covered in this file include:

@@ -3,7 +3,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
   Top = 0
   ActiveControl = TreeView
   Caption = 'D-Fend Reloaded'
-  ClientHeight = 698
+  ClientHeight = 718
   ClientWidth = 774
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -4360,7 +4360,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
   object Splitter: TSplitter
     Left = 169
     Top = 24
-    Height = 552
+    Height = 572
     ResizeStyle = rsUpdate
     OnMoved = FormResize
     ExplicitLeft = 224
@@ -4371,7 +4371,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
     Left = 0
     Top = 24
     Width = 169
-    Height = 552
+    Height = 572
     Align = alLeft
     Constraints.MinWidth = 50
     HideSelection = False
@@ -4518,13 +4518,14 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
     Left = 172
     Top = 24
     Width = 602
-    Height = 552
+    Height = 572
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 2
+    ExplicitHeight = 552
     object Splitter1: TSplitter
       Left = 0
-      Top = 349
+      Top = 369
       Width = 602
       Height = 3
       Cursor = crVSplit
@@ -4537,7 +4538,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
       Left = 0
       Top = 0
       Width = 602
-      Height = 349
+      Height = 369
       Align = alClient
       Columns = <>
       HideSelection = False
@@ -4556,10 +4557,11 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
       OnDragDrop = MainDragDrop
       OnInfoTip = ListViewInfoTip
       OnSelectItem = ListViewSelectItem
+      ExplicitHeight = 349
     end
     object CapturePageControl: TPageControl
       Left = 0
-      Top = 352
+      Top = 372
       Width = 602
       Height = 200
       ActivePage = CaptureScreenshotsTab
@@ -4779,7 +4781,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
   end
   object ZipInfoPanel: TPanel
     Left = 0
-    Top = 576
+    Top = 596
     Width = 774
     Height = 40
     Align = alBottom
@@ -4789,6 +4791,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
     TabOrder = 3
     Visible = False
     OnDblClick = ZipInfoPanelDblClick
+    ExplicitTop = 576
     DesignSize = (
       774
       40)
@@ -4806,7 +4809,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
   end
   object FirstRunInfoPanel: TPanel
     Left = 0
-    Top = 616
+    Top = 636
     Width = 774
     Height = 82
     Align = alBottom
@@ -4816,6 +4819,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
     TabOrder = 4
     Visible = False
     OnDblClick = ZipInfoPanelDblClick
+    ExplicitTop = 616
     DesignSize = (
       774
       82)

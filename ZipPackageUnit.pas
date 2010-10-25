@@ -706,8 +706,11 @@ begin
     result.SetupExeMD5:='';
   end;
 
-  {Look for Icons in game folder}
-  For I:=Low(FileExts) to High(FileExts) do begin
+  {Remove icon record if icon file does not exist}
+  If not FileExists(MakeAbsIconName(result.Icon)) then result.Icon:='';
+
+  {Look for icons in game folder}
+  If result.Icon='' then For I:=Low(FileExts) to High(FileExts) do begin
     J:=FindFirst(GameDir+NewGameFolder+'\*.'+FileExts[I],faAnyFile,Rec);
     try
       If J=0 then begin

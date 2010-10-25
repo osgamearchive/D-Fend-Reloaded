@@ -4,7 +4,7 @@ object TransferForm: TTransferForm
   BorderStyle = bsDialog
   Caption = 'Programme '#252'bertragen'
   ClientHeight = 462
-  ClientWidth = 391
+  ClientWidth = 463
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -27,8 +27,8 @@ object TransferForm: TTransferForm
     Caption = 'Bitte w'#228'hlen Sie die zu '#252'bertragenden Programme aus:'
   end
   object DestPrgDirButton: TSpeedButton
-    Left = 362
-    Top = 360
+    Left = 432
+    Top = 359
     Width = 23
     Height = 22
     Glyph.Data = {
@@ -50,7 +50,7 @@ object TransferForm: TTransferForm
   object ListBox: TCheckListBox
     Left = 8
     Top = 27
-    Width = 377
+    Width = 447
     Height = 270
     ItemHeight = 13
     TabOrder = 0
@@ -94,7 +94,7 @@ object TransferForm: TTransferForm
   object DestPrgDirEdit: TLabeledEdit
     Left = 8
     Top = 360
-    Width = 348
+    Width = 418
     Height = 21
     EditLabel.Width = 190
     EditLabel.Height = 13
@@ -114,7 +114,7 @@ object TransferForm: TTransferForm
   object CopyDFRCheckBox: TCheckBox
     Left = 8
     Top = 387
-    Width = 375
+    Width = 455
     Height = 17
     Caption = 
       'Create portable D-Fend Reloaded installation in destination fold' +

@@ -54,9 +54,9 @@ object SetupForm: TSetupForm
       Kind = bkOK
     end
     object ModeComboBox: TComboBox
-      Left = 580
+      Left = 590
       Top = 6
-      Width = 105
+      Width = 110
       Height = 21
       Style = csDropDownList
       ItemHeight = 13

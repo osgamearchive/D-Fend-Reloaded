@@ -107,6 +107,7 @@ Function RenameAllFiles(const Folder, Expression, GameName : String; const Renam
 Function ForceForegroundWindow(Wnd:HWND):Boolean;
 
 Function CPUCount : Integer;
+function IsRemoteSession: Boolean;
 
 Var TempPrgDir : String = ''; {Temporary overwrite normal PrgDir}
 
@@ -2307,6 +2308,11 @@ Var SystemInfo : TSystemInfo;
 begin
   GetSystemInfo(SystemInfo);
   result:=SystemInfo.dwNumberOfProcessors;
+end;
+
+function IsRemoteSession: Boolean;
+begin
+  result:=(GetSystemMetrics(SM_REMOTESESSION)<>0);
 end;
 
 end.

@@ -1,5 +1,19 @@
 D-Fend Reloaded Changelog
 
+Version 1.0.2 (10/25/2010)
+==========================
+- Updated DOSZip from 2.01 to 2.05.
+- About 50 new auto setup templates.
+- The French and the French (Canada) languages file have been updated.
+- [Fix] When starting a new language based on "English" in the DOSBox language
+  editor the chosen default DOSBox language was used, not always English.
+- [Fix] When importing a game from a plain archive file by using an auto setup
+  template which has an icon file defined now D-Fend Reloaded will check if the
+  icon file exists and remove the icon record if not.
+- [Fix] Some temporary files were not deleted when closing D-Fend Reloaded.
+- [Fix] "Transfer profiles" dialog not large enough for Italian translation.
+
+
 Version 1.0.1 (09/13/2010)
 ==========================
 - Updated DOSZip from 1.54 to 2.01.

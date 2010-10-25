@@ -1,8 +1,7 @@
 Name                : DOSZIP
-Version             : 2.01
-Filename            : DZBIN201.ZIP
-FileDate            : 15AUG10
-Status              : BETA
+Version             : 2.05
+Filename            : DZBIN205.ZIP
+FileDate            : 17OCT10
 E-Mail              : nidud@users.sourceforge.net
 Homepage            : http://sourceforge.net/projects/doszip/
 File Location       : http://sourceforge.net/projects/doszip/

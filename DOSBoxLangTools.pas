@@ -233,6 +233,7 @@ begin
   try
     TempGame.SetSimpleDefaults;
     TempGame.Game.CloseDosBoxAfterGameExit:=True;
+    TempGame.Game.CustomDOSBoxLanguage:='ENGLISH';
     TempGame.Game.StoreAllValues;
     RunCommandAndWait(TempGame.Game,'CONFIG -writelang "'+result+'"'+#13+'exit',true);
   finally

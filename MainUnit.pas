@@ -9,11 +9,12 @@ uses
   LinkFileUnit, HelpTools;
 
 {
-- Update changelog in help files
-
 1.1:
 - Storing the name of the selected MIDI device and not only the number
 - Moby games cover download: Preview & select which cover to download
+- When importing plain archive files: file_id.diz sniffing for titles.
+- Add SDL video driver setting when DOSBox closes fast.
+- If CommonTools.IsRemoteSession and SDL video driver=DirectX, suggest using WinDIB
 }
 
 type
@@ -514,7 +515,7 @@ Var S : String;
 begin
   LogInfo('### Start of FormCreate ###');
 
-  {Caption:=Caption+' (RELEASE CANDIDATE 4 OF VERSION 1.0.1)';}
+  {Caption:=Caption+' (RELEASE CANDIDATE 1 OF VERSION 1.0.2)';}
   {Caption:=Caption+' THIS IS A TEST VERSION ! NOT FOR REGULAR USE ! (Beta 1 of version 1.1)';}
 
   Height:=790;
@@ -698,6 +699,8 @@ begin
     finally
       DeleteOnExit.Free;
     end;
+    ExtDeleteFile(TempDir+TempSubFolder,ftTemp);
+    ExtDeleteFile(TempDir+DosBoxConfFileName,ftTemp);
   except end;
 
   GamesListSaveColWidths(ListView);
