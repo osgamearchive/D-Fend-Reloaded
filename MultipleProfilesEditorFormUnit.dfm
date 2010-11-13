@@ -2,9 +2,11 @@ object MultipleProfilesEditorForm: TMultipleProfilesEditorForm
   Left = 0
   Top = 0
   Caption = 'Multiple profiles editor'
-  ClientHeight = 429
-  ClientWidth = 645
+  ClientHeight = 514
+  ClientWidth = 644
   Color = clBtnFace
+  Constraints.MinHeight = 400
+  Constraints.MinWidth = 600
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
@@ -19,15 +21,15 @@ object MultipleProfilesEditorForm: TMultipleProfilesEditorForm
   OnMouseWheelUp = FormMouseWheelUp
   OnShow = FormShow
   DesignSize = (
-    645
-    429)
+    644
+    514)
   PixelsPerInch = 96
   TextHeight = 13
   object PageControl: TPageControl
     Left = 0
     Top = 0
-    Width = 645
-    Height = 390
+    Width = 644
+    Height = 475
     ActivePage = TabSheet1
     Align = alTop
     Anchors = [akLeft, akTop, akRight, akBottom]
@@ -35,8 +37,8 @@ object MultipleProfilesEditorForm: TMultipleProfilesEditorForm
     object TabSheet1: TTabSheet
       Caption = 'TabSheet1'
       DesignSize = (
-        637
-        362)
+        636
+        447)
       object InfoLabel: TLabel
         Left = 8
         Top = 8
@@ -47,15 +49,15 @@ object MultipleProfilesEditorForm: TMultipleProfilesEditorForm
       object ListBox: TCheckListBox
         Left = 8
         Top = 24
-        Width = 619
-        Height = 304
+        Width = 618
+        Height = 389
         Anchors = [akLeft, akTop, akRight, akBottom]
         ItemHeight = 13
         TabOrder = 0
       end
       object SelectAllButton: TBitBtn
         Left = 8
-        Top = 334
+        Top = 419
         Width = 107
         Height = 25
         Anchors = [akLeft, akBottom]
@@ -66,7 +68,7 @@ object MultipleProfilesEditorForm: TMultipleProfilesEditorForm
       object SelectNoneButton: TBitBtn
         Tag = 1
         Left = 121
-        Top = 334
+        Top = 419
         Width = 107
         Height = 25
         Anchors = [akLeft, akBottom]
@@ -77,7 +79,7 @@ object MultipleProfilesEditorForm: TMultipleProfilesEditorForm
       object SelectGenreButton: TBitBtn
         Tag = 2
         Left = 234
-        Top = 334
+        Top = 419
         Width = 107
         Height = 25
         Anchors = [akLeft, akBottom]
@@ -111,7 +113,7 @@ object MultipleProfilesEditorForm: TMultipleProfilesEditorForm
   end
   object OKButton: TBitBtn
     Left = 8
-    Top = 396
+    Top = 481
     Width = 97
     Height = 25
     Anchors = [akLeft, akBottom]
@@ -121,7 +123,7 @@ object MultipleProfilesEditorForm: TMultipleProfilesEditorForm
   end
   object CancelButton: TBitBtn
     Left = 120
-    Top = 396
+    Top = 481
     Width = 97
     Height = 25
     Anchors = [akLeft, akBottom]
@@ -130,7 +132,7 @@ object MultipleProfilesEditorForm: TMultipleProfilesEditorForm
   end
   object HelpButton: TBitBtn
     Left = 232
-    Top = 396
+    Top = 481
     Width = 97
     Height = 25
     Anchors = [akLeft, akBottom]

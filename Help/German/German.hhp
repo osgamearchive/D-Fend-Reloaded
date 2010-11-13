@@ -27,7 +27,7 @@ FirstRunWizard.html
 FileImportConf.html
 FileImportProf.html
 FileImportZip.html
-FileImportProf.html
+FileImportFolder.html
 FileImportPackage.html
 FileExportList.html
 FileExportConf.html
@@ -41,6 +41,7 @@ FileOptions.html
 FileOptionsGeneral.html
 FileOptionsDirectories.html
 FileOptionsSecurity.html
+FileOptionsDataPrivacy.html
 FileOptionsCompressionSettings.html
 FileOptionsWineSupport.html
 FileOptionsUserInterface.html
@@ -223,6 +224,7 @@ GPL3.html
 #define FileOptionsImageScaling 1132
 #define FileOptionsOtherEmulators 1133
 #define FileOptionsAutomaticConfiguration 1134
+#define FileOptionsDataPrivacy 1136
 
 #define ViewQuickStarter 1501
 

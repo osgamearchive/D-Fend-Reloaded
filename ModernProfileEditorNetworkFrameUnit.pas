@@ -46,6 +46,24 @@ begin
   ServerAddressEdit.EditLabel.Caption:=LanguageSetup.GameIPXAddress;
   PortLabel.Caption:=LanguageSetup.GameIPXPort;
 
+  //... 1.1: NE2000 settings
+  {
+[ne2000]
+ne2000=true (Enable Ethernet passthrough. Requires [Win]Pcap.)
+nicbase=300 (The base address of the NE2000 board.)
+nicirq=3 (The interrupt it uses. Note serial2 uses IRQ3 as default.)
+macaddr=AC:DE:48:88:99:AA (The physical address the emulator will use on your network.
+#          If you have multiple DOSBoxes running on your network,
+#          this has to be changed for each. AC:DE:48 is an address range reserved for
+#          private use, so modify the last three number blocks.
+#          I.e. AC:DE:48:88:99:AB.)
+realnic=list (Specifies which of your network interfaces is used.
+#          Write 'list' here to see the list of devices in the
+#          Status Window. Then make your choice and put either the
+#          interface number (2 or something) or a part of your adapters
+#          name, e.g. VIA here.)
+  }
+
   HelpContext:=ID_ProfileEditNetwork;
 end;
 

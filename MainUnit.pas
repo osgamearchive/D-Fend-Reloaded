@@ -9,12 +9,12 @@ uses
   LinkFileUnit, HelpTools;
 
 {
-1.1:
-- Storing the name of the selected MIDI device and not only the number
-- Moby games cover download: Preview & select which cover to download
-- When importing plain archive files: file_id.diz sniffing for titles.
-- Add SDL video driver setting when DOSBox closes fast.
-- If CommonTools.IsRemoteSession and SDL video driver=DirectX, suggest using WinDIB
+1.1b1:
+- Remove PrgSetup.ActivateIncompleteFeatures
+- Add new language strings
+- Activate new paragraphs in FileOptionsService.html, FileOptionsDOSBoxCVSFeatures.html and ExtrasViewHistroy.html
+- Activate data privacy help page in FileOptions.html and add it to Index.hhk
+- Extend/add profile editor pages for glide emulation, ne2000, innova (also multi profile editor!)
 }
 
 type
@@ -515,7 +515,7 @@ Var S : String;
 begin
   LogInfo('### Start of FormCreate ###');
 
-  {Caption:=Caption+' (RELEASE CANDIDATE 1 OF VERSION 1.0.2)';}
+  {Caption:=Caption+' (RELEASE CANDIDATE 2 OF VERSION 1.0.3)';}
   {Caption:=Caption+' THIS IS A TEST VERSION ! NOT FOR REGULAR USE ! (Beta 1 of version 1.1)';}
 
   Height:=790;
@@ -700,7 +700,7 @@ begin
       DeleteOnExit.Free;
     end;
     ExtDeleteFile(TempDir+TempSubFolder,ftTemp);
-    ExtDeleteFile(TempDir+DosBoxConfFileName,ftTemp);
+    If ParamCount=0 then ExtDeleteFile(TempDir+DosBoxConfFileName,ftTemp);
   except end;
 
   GamesListSaveColWidths(ListView);
@@ -2703,7 +2703,10 @@ begin
                    If PrgSetup.DFendStyleProfileEditor then begin
                      if not EditGameProfil(self,GameDB,G,nil,SearchLinkFile,DeleteOnExit,'','',L) then exit;
                    end else begin
-                     if not ModernEditGameProfil(self,GameDB,G,nil,SearchLinkFile,DeleteOnExit,'','',L) then exit;
+                     if not ModernEditGameProfil(self,GameDB,G,nil,SearchLinkFile,DeleteOnExit,'','',L) then begin
+                       SelectGame(G); {Always update screenshots list (a new image could have been downloaded)}
+                       exit;
+                     end;
                    end;
                  finally
                    Enabled:=True;

@@ -9,6 +9,7 @@ Function ScaleImage(const SourcePic : TPicture; const Factor : Double) : TBitmap
 Procedure ScaleImage(const Source, Dest : TBitmap; const DestW, DestH : Integer; const UseFiltering : Boolean = True); overload;
 Procedure ScaleImage(const Source, Dest : TBitmap; const UseFiltering : Boolean = True); overload;
 Procedure ScaleImage(const Source : TPicture; const Dest : TBitmap; const UseFiltering : Boolean = True); overload;
+Procedure ScaleImage(const Source : TIcon; const Dest : TBitmap; const UseFiltering : Boolean = True); overload;
 
 implementation
 
@@ -117,6 +118,19 @@ begin
   try
     Temp.SetSize(Source.Width,Source.Height);
     Temp.Canvas.Draw(0,0,Source.Graphic);
+    ScaleImage(Temp,Dest,UseFiltering);
+  finally
+    Temp.Free;
+  end;
+end;
+
+Procedure ScaleImage(const Source : TIcon; const Dest : TBitmap; const UseFiltering : Boolean);
+Var Temp : TBitmap;
+begin
+  Temp:=TBitmap.Create;
+  try
+    Temp.SetSize(Source.Width,Source.Height);
+    Temp.Canvas.Draw(0,0,Source);
     ScaleImage(Temp,Dest,UseFiltering);
   finally
     Temp.Free;

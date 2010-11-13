@@ -436,5 +436,8 @@
     <Transaction>2010.08.29 00:08:25.482.pas,C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\Unit1.pas=C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\IdStack.pas</Transaction>
     <Transaction>2010.08.29 00:10:36.616.pas,C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\IdStack.pas=</Transaction>
     <Transaction>2010.08.29 00:14:52.919.pas,C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\IdGlobal.pas=</Transaction>
+    <Transaction>2010.11.07 18:27:29.836.pas,C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\Unit1.pas=C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\MIDITools.pas</Transaction>
+    <Transaction>2010.11.07 19:57:11.276.pas,C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\Unit1.pas=C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\DOSBoxFailedForm2Unit.pas</Transaction>
+    <Transaction>2010.11.07 19:57:11.276.dfm,C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\Unit1.dfm=C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\DOSBoxFailedForm2Unit.dfm</Transaction>
   </Transactions>
 </BorlandProject>

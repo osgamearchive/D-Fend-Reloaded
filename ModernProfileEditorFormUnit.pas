@@ -491,6 +491,16 @@ begin
         F:=TModernProfileEditorSoundBlasterFrame.Create(self); AddTreeNode(N2,F,TModernProfileEditorSoundBlasterFrame(F),LanguageSetup.ProfileEditorSoundSoundBlaster,5,19);
         F:=TModernProfileEditorGUSFrame.Create(self); AddTreeNode(N2,F,TModernProfileEditorGUSFrame(F),LanguageSetup.ProfileEditorSoundGUS,5,20);
         F:=TModernProfileEditorMIDIFrame.Create(self); AddTreeNode(N2,F,TModernProfileEditorMIDIFrame(F),LanguageSetup.ProfileEditorSoundMIDI,5,21);
+        If PrgSetup.AllowInnova then begin
+          //... 1.1: Add Innova profile editor page
+          {
+          [innova]
+          innova=false (Enable the Innovation SSI-2001 emulation.)
+          samplerate=22050 (Sample rate of Innovation SSI-2001 emulation. Possible values: 44100, 48000, 32000, 22050, 16000, 11025, 8000, 49716.)
+          sidbase=280 (SID base port (typically 280h). Possible values: 240, 220, 260, 280, 2a0, 2c0, 2e0, 300.)
+          quality=0 (Set SID emulation quality level (0 to 3). Possible values: 0, 1, 2, 3.)
+          }
+        end;
         F:=TModernProfileEditorJoystickFrame.Create(self); AddTreeNode(N,F,TModernProfileEditorJoystickFrame(F),LanguageSetup.ProfileEditorSoundJoystick,5,16);
         F:=TModernProfileEditorDrivesFrame.Create(self); AddTreeNode(N,F,TModernProfileEditorDrivesFrame(F),LanguageSetup.ProfileEditorMountingSheet,4,4);
         F:=TModernProfileEditorSerialPortsFrame.Create(self); N2:=AddTreeNode(N,F,TModernProfileEditorSerialPortsFrame(F),LanguageSetup.ProfileEditorSerialPortsSheet,3,13);

@@ -79,13 +79,20 @@ object ModernProfileEditorGraphicsFrame: TModernProfileEditorGraphicsFrame
     Caption = 'ResolutionInfoLabel'
     WordWrap = True
   end
+  object GlideEmulationLabel: TLabel
+    Left = 24
+    Top = 240
+    Width = 94
+    Height = 13
+    Caption = 'GlideEmulationLabel'
+  end
   object WindowResolutionComboBox: TComboBox
     Left = 24
     Top = 32
     Width = 145
     Height = 21
     Style = csDropDownList
-    ItemHeight = 13
+    ItemHeight = 0
     TabOrder = 0
   end
   object FullscreenResolutionComboBox: TComboBox
@@ -94,7 +101,7 @@ object ModernProfileEditorGraphicsFrame: TModernProfileEditorGraphicsFrame
     Width = 145
     Height = 21
     Style = csDropDownList
-    ItemHeight = 13
+    ItemHeight = 0
     TabOrder = 1
   end
   object StartFullscreenCheckBox: TCheckBox
@@ -130,7 +137,7 @@ object ModernProfileEditorGraphicsFrame: TModernProfileEditorGraphicsFrame
     Width = 145
     Height = 21
     Style = csDropDownList
-    ItemHeight = 13
+    ItemHeight = 0
     TabOrder = 6
   end
   object VideoCardComboBox: TComboBox
@@ -139,7 +146,7 @@ object ModernProfileEditorGraphicsFrame: TModernProfileEditorGraphicsFrame
     Width = 284
     Height = 21
     Style = csDropDownList
-    ItemHeight = 13
+    ItemHeight = 0
     TabOrder = 7
   end
   object ScaleComboBox: TComboBox
@@ -149,7 +156,7 @@ object ModernProfileEditorGraphicsFrame: TModernProfileEditorGraphicsFrame
     Height = 21
     Style = csDropDownList
     Anchors = [akLeft, akTop, akRight]
-    ItemHeight = 13
+    ItemHeight = 0
     TabOrder = 8
   end
   object FrameSkipEdit: TSpinEdit
@@ -175,16 +182,6 @@ object ModernProfileEditorGraphicsFrame: TModernProfileEditorGraphicsFrame
       '28'
       '50')
     TabOrder = 11
-    Visible = False
-  end
-  object GlideEmulationCheckBox: TCheckBox
-    Left = 24
-    Top = 240
-    Width = 600
-    Height = 17
-    Anchors = [akLeft, akTop, akRight]
-    Caption = 'GlideEmulationCheckBox'
-    TabOrder = 5
     Visible = False
   end
   object VGASettingsGroupBox: TGroupBox
@@ -229,7 +226,7 @@ object ModernProfileEditorGraphicsFrame: TModernProfileEditorGraphicsFrame
       Width = 145
       Height = 21
       Style = csDropDownList
-      ItemHeight = 13
+      ItemHeight = 0
       TabOrder = 0
     end
     object VideoRamComboBox: TComboBox
@@ -238,7 +235,7 @@ object ModernProfileEditorGraphicsFrame: TModernProfileEditorGraphicsFrame
       Width = 145
       Height = 21
       Style = csDropDownList
-      ItemHeight = 13
+      ItemHeight = 0
       TabOrder = 1
     end
   end
@@ -249,9 +246,18 @@ object ModernProfileEditorGraphicsFrame: TModernProfileEditorGraphicsFrame
     Height = 21
     Style = csDropDownList
     Anchors = [akTop, akRight]
-    ItemHeight = 13
+    ItemHeight = 0
     TabOrder = 10
     Visible = False
     OnChange = PixelShaderComboBoxChange
+  end
+  object GlideEmulationComboBox: TComboBox
+    Left = 184
+    Top = 236
+    Width = 105
+    Height = 21
+    Style = csDropDownList
+    ItemHeight = 0
+    TabOrder = 5
   end
 end

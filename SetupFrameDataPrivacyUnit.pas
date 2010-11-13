@@ -11,8 +11,11 @@ type
     StoreHistoryCheckBox: TCheckBox;
     ShowHistoryButton: TBitBtn;
     DeleteHistoryButton: TBitBtn;
+    OpenFileLabel: TLabel;
+    InfoLabel: TLabel;
     procedure ShowHistoryButtonClick(Sender: TObject);
     procedure DeleteHistoryButtonClick(Sender: TObject);
+    procedure OpenFileLabelClick(Sender: TObject);
   private
     { Private-Deklarationen }
   public
@@ -31,7 +34,7 @@ type
 implementation
 
 uses LanguageSetupUnit, VistaToolsUnit, PrgSetupUnit, HelpConsts,
-     IconLoaderUnit, HistoryFormUnit, GameDBToolsUnit;
+     IconLoaderUnit, HistoryFormUnit, GameDBToolsUnit, CommonTools, PrgConsts;
 
 {$R *.dfm}
 
@@ -47,6 +50,9 @@ begin
   UserIconLoader.DirectLoad('Main',26,ShowHistoryButton);
   UserIconLoader.DialogImage(DI_Delete,DeleteHistoryButton);
 
+  with OpenFileLabel.Font do begin Color:=clBlue; Style:=[fsUnderline]; end;
+  OpenFileLabel.Cursor:=crHandPoint;
+
   StoreHistoryCheckBox.Checked:=PrgSetup.StoreHistory;
 end;
 
@@ -61,13 +67,10 @@ begin
   StoreHistoryCheckBox.Caption:=LanguageSetup.SetupFormDataPrivacyStoreHistory;
   ShowHistoryButton.Caption:=LanguageSetup.SetupFormDataPrivacyShowHistory;
   DeleteHistoryButton.Caption:=LanguageSetup.SetupFormDataPrivacyDeleteHistory;
+  OpenFileLabel.Caption:=LanguageSetup.SetupFormDataPrivacyOpenHistroyFile;
+  InfoLabel.Caption:=LanguageSetup.SetupFormDataPrivacyInfo;
 
   HelpContext:=ID_FileOptionsDataPrivacy;
-end;
-
-procedure TSetupFrameDataPrivacy.DeleteHistoryButtonClick(Sender: TObject);
-begin
-  ClearHistory;
 end;
 
 procedure TSetupFrameDataPrivacy.DOSBoxDirChanged;
@@ -76,11 +79,6 @@ end;
 
 procedure TSetupFrameDataPrivacy.ShowFrame(const AdvencedMode: Boolean);
 begin
-end;
-
-procedure TSetupFrameDataPrivacy.ShowHistoryButtonClick(Sender: TObject);
-begin
-  ShowHistoryDialog(self);
 end;
 
 procedure TSetupFrameDataPrivacy.HideFrame;
@@ -95,6 +93,21 @@ end;
 procedure TSetupFrameDataPrivacy.SaveSetup;
 begin
   PrgSetup.StoreHistory:=StoreHistoryCheckBox.Checked;
+end;
+
+procedure TSetupFrameDataPrivacy.ShowHistoryButtonClick(Sender: TObject);
+begin
+  ShowHistoryDialog(self);
+end;
+
+procedure TSetupFrameDataPrivacy.DeleteHistoryButtonClick(Sender: TObject);
+begin
+  If ClearHistory then MessageDlg(LanguageSetup.SetupFormDataPrivacyDeleteHistoryDone,mtInformation,[mbOK],0);
+end;
+
+procedure TSetupFrameDataPrivacy.OpenFileLabelClick(Sender: TObject);
+begin
+  OpenFileInEditor(PrgDataDir+SettingsFolder+'\'+HistoryFileName);
 end;
 
 end.

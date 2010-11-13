@@ -200,7 +200,7 @@ begin
     5 : T:='FOLDER:'+CDLabelEdit.Text;
     else T:=CDROMEdit.Text;
   End;
-  result:=T+';CDROM;'+CDROMDriveLetterComboBox.Text+';'+S+';'+CDROMLabelEdit.Text+';';
+  result:=StringReplace(T,';','<semicolon>',[rfReplaceAll])+';CDROM;'+CDROMDriveLetterComboBox.Text+';'+S+';'+CDROMLabelEdit.Text+';';
 end;
 
 function TProfileMountEditorCDDriveFrame.GetName: String;

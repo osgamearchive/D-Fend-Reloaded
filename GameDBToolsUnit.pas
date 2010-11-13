@@ -71,7 +71,7 @@ Function DecodeHTMLSymbols(const S : String) : String;
 Procedure AddToHistory(const GameName : String);
 Procedure LoadHistory(const AListView : TListView);
 Procedure LoadHistoryStatistics(const AListView : TListView);
-Procedure ClearHistory;
+Function ClearHistory : Boolean;
 
 { Import }
 
@@ -2853,11 +2853,12 @@ begin
   end;
 end;
 
-Procedure ClearHistory;
+Function ClearHistory : Boolean;
 begin
+  result:=True;
   if not FileExists(PrgDataDir+SettingsFolder+'\'+HistoryFileName) then exit;
-  if not ExtDeleteFile(PrgDataDir+SettingsFolder+'\'+HistoryFileName,ftProfile) then
-    MessageDlg(Format(LanguageSetup.MessageCouldNotDeleteFile,[PrgDataDir+SettingsFolder+'\'+HistoryFileName]),mtError,[mbOK],0);
+  result:=ExtDeleteFile(PrgDataDir+SettingsFolder+'\'+HistoryFileName,ftProfile);
+  if not result then MessageDlg(Format(LanguageSetup.MessageCouldNotDeleteFile,[PrgDataDir+SettingsFolder+'\'+HistoryFileName]),mtError,[mbOK],0);
 end;
 
 Function StrToBool(S : String) : Boolean;

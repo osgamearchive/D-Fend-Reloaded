@@ -2,13 +2,13 @@ object SetupFrameDOSBoxExt: TSetupFrameDOSBoxExt
   Left = 0
   Top = 0
   Width = 585
-  Height = 511
+  Height = 648
   TabOrder = 0
   object ScrollBox: TScrollBox
     Left = 0
     Top = 0
     Width = 585
-    Height = 511
+    Height = 648
     HorzScrollBar.Visible = False
     VertScrollBar.Smooth = True
     VertScrollBar.Tracking = True
@@ -17,7 +17,7 @@ object SetupFrameDOSBoxExt: TSetupFrameDOSBoxExt
     TabOrder = 0
     DesignSize = (
       585
-      511)
+      648)
     object WarningLabel: TLabel
       Left = 16
       Top = 16
@@ -27,6 +27,21 @@ object SetupFrameDOSBoxExt: TSetupFrameDOSBoxExt
       AutoSize = False
       Caption = 'WarningLabel'
       WordWrap = True
+    end
+    object InfoLabel: TLabel
+      Left = 24
+      Top = 584
+      Width = 281
+      Height = 13
+      Caption = 'You can download DOSBoxs supporting this features here:'
+    end
+    object InfoURLLabel: TLabel
+      Left = 24
+      Top = 603
+      Width = 64
+      Height = 13
+      Caption = 'InfoURLLabel'
+      OnClick = InfoURLLabelClick
     end
     object MountDialogGroupBox: TGroupBox
       Left = 16
@@ -151,6 +166,15 @@ object SetupFrameDOSBoxExt: TSetupFrameDOSBoxExt
         TabOrder = 0
         OnClick = DefaultValueChanged
       end
+      object InnovaCheckBox: TCheckBox
+        Left = 16
+        Top = 40
+        Width = 513
+        Height = 17
+        Anchors = [akLeft, akTop, akRight]
+        Caption = 'Activate Innova emulation settings'
+        TabOrder = 1
+      end
     end
     object PrinterGroupBox: TGroupBox
       Left = 16
@@ -170,6 +194,26 @@ object SetupFrameDOSBoxExt: TSetupFrameDOSBoxExt
         Height = 17
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Activate printer settings'
+        TabOrder = 0
+      end
+    end
+    object NetworkGroupBox: TGroupBox
+      Left = 16
+      Top = 512
+      Width = 545
+      Height = 58
+      Caption = 'NetworkGroupBox'
+      TabOrder = 4
+      DesignSize = (
+        545
+        58)
+      object NE2000CheckBox: TCheckBox
+        Left = 16
+        Top = 24
+        Width = 513
+        Height = 17
+        Anchors = [akLeft, akTop, akRight]
+        Caption = 'Activate NE2000 emulation settings'
         TabOrder = 0
       end
     end

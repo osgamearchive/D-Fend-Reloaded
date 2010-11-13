@@ -32,8 +32,7 @@ type
 
 implementation
 
-uses VistaToolsUnit, LanguageSetupUnit, CommonTools, HelpConsts, DOSBoxTempUnit,
-     DOSBoxUnit, PrgSetupUnit;
+uses VistaToolsUnit, LanguageSetupUnit, CommonTools, HelpConsts, PrgSetupUnit, MIDITools;
 
 {$R *.dfm}
 
@@ -98,55 +97,6 @@ begin
   Game.MIDIConfig:=AdditionalSettingsEdit.Text;
 end;
 
-Procedure ProcessMIDIInfoLine(const Line : String; const List : TStringList);
-Var I : Integer;
-    S,T : String;
-begin
-  I:=Pos(' ',Line); If I=0 then exit;
-  S:=Trim(Copy(Line,1,I-1)); T:=Trim(Copy(Line,I+1,MaxInt));
-  If not TryStrToInt(S,I) then exit;
-  If (T<>'') and (T[1]='"') and (T[length(T)]='"') then T:=Trim(Copy(T,2,length(T)-2));
-  List.AddObject(T+' ('+LanguageSetup.ProfileEditorSoundMIDIConfigID+'='+IntToStr(I)+')',TObject(I));
-end;
-
-Function GetMIDIDevices : TStringList;
-const MIDIListFile='DFR-MIDI.TMP';
-Var TempGame : TTempGame;
-    St : TStringList;
-    S : String;
-    I : Integer;
-begin
-  result:=TStringList.Create;
-  TempGame:=TTempGame.Create;
-  try
-    TempGame.Game.Mount0:=TempDir+';DRIVE;C;False;;';
-    St:=TStringList.Create;
-    try
-      St.Add('mixer /LISTMIDI > C:\'+MIDIListFile);
-      St.Add('exit');
-      TempGame.Game.Autoexec:=StringListToString(St);
-    finally
-      St.Free;
-    end;
-    TempGame.Game.StoreAllValues;
-    RunCommandAndWait(TempGame.Game,'',True);
-    St:=TStringList.Create;
-    try
-      try St.LoadFromFile(TempDir+MIDIListFile); except end;
-      For I:=0 to St.Count-1 do begin
-        S:=Trim(St[I]);
-        If S='' then continue;
-        ProcessMIDIInfoLine(S,result);
-      end;
-    finally
-      St.Free;
-    end;
-    ExtDeleteFile(TempDir+MIDIListFile,ftTemp);
-  finally
-    TempGame.Free;
-  end;
-end;
-
 procedure TModernProfileEditorMIDIFrame.MIDISelectButtonClick(Sender: TObject);
 Var St : TStringList;
 begin
@@ -167,9 +117,13 @@ begin
 end;
 
 procedure TModernProfileEditorMIDIFrame.MIDISelectListBoxClick(Sender: TObject);
+Var S : String;
 begin
   If MIDISelectListBox.ItemIndex<0 then exit;
-  AdditionalSettingsEdit.Text:=IntToStr(Integer(MIDISelectListBox.Items.Objects[MIDISelectListBox.ItemIndex]));
+  S:=MIDISelectListBox.Items[MIDISelectListBox.ItemIndex];
+  While (S<>'') and (S[length(S)]<>'(') do SetLength(S,length(S)-1);
+  SetLength(S,length(S)-1);
+  AdditionalSettingsEdit.Text:=Trim(S);
 end;
 
 end.

@@ -14,6 +14,7 @@ Type TDataReader=class
     Procedure ReadListPerGamePart(const Lines : String; const NextElement : THTMLStructureElement; var GameName, GameURL : String);
     Procedure GetGameDataFromLines(const Lines : String; const NextElement : THTMLStructureElement; var Genre, Developer, Publisher, Year, ImagePageURL : String);
     Procedure GetGameCoverFromLines(const Lines : String; const NextElement : THTMLStructureElement; var ImageURL : String);
+    Function GetImageURLAndNextURLsFromURL(const CoverPageURL : String; var ImageURL : String; var PossibleNextURLs : TStringList) : Boolean;
   public
     Constructor Create;
     Destructor Destroy; override;
@@ -66,7 +67,7 @@ Type TDataReaderGameDataThread=class(TDataReaderThread)
     property Developer : String read FDeveloper;
     property Publisher : String read FPublisher;
     property Year : String read FYear;
-    property ImageURL : String read FImageURL;
+    property ImageURL : String read FImageURL; {Multiple images can be separated by "$"}
 end;
 
 Type TDataReaderGameCoverThread=class(TDataReaderThread)
@@ -389,22 +390,16 @@ begin
   end;
 end;
 
-function TDataReader.GetGameCover(const CoverPageURL : String; var ImageURL: String): Boolean;
-Var S,T,Lines : String;
+Function TDataReader.GetImageURLAndNextURLsFromURL(const CoverPageURL : String; var ImageURL : String; var PossibleNextURLs : TStringList) : Boolean;
+Var Lines,S,T,LinesUpper,preURL : String;
+    I,J,CharsBefore : Integer;
 begin
   result:=False;
-  ImageURL:='';
-  If Trim(CoverPageURL)='' then begin result:=True; exit; end;
+  if not DownloadTextFile(CoverPageURL,Lines) then exit;
 
-  S:=FConfig.CoverRecordBaseURL;
-  If (S<>'') and (S[length(S)]<>'/') then S:=S+'/';
-  T:=CoverPageURL;
-  If (T<>'') and (T[1]='/') then T:=Copy(T,2,MaxInt);
-
-  if not DownloadTextFile(S+T,Lines) then exit;
-  result:=True;
+  {Scan for image URL in lines}
   GetGameCoverFromLines(Lines,FConfig.CoverRecord,ImageURL);
-
+  result:=(ImageURL<>'');
   If ImageURL<>'' then begin
     T:=Trim(ExtUpperCase(ImageURL));
     If (Copy(T,1,7)<>'HTTP:/'+'/') and (Copy(T,1,8)<>'HTTPS:/'+'/') then begin
@@ -412,6 +407,89 @@ begin
       If (T<>'') and (T[1]='/') then T:=Copy(T,2,MaxInt);
       ImageURL:=S+T;
     end;
+  end;
+
+  {Scan for other cover page URLs}
+  S:=CoverPageURL;
+  If S<>'' then SetLength(S,length(S)-1);
+  While (S<>'') and (S[length(S)]<>'/') do SetLength(S,length(S)-1);
+  preURL:='';
+  J:=0; For I:=1 to length(S) do If S[I]='/' then begin
+    inc(J); If J=3 then begin preURL:=Copy(S,1,I); S:=Copy(S,I+1,MaxInt); break; end;
+  end;
+  S:=ExtUpperCase(S);
+  If S='' then exit;
+
+  LinesUpper:=ExtUpperCase(Lines);
+  CharsBefore:=0;
+
+  I:=Pos(S,LinesUpper); While I>0 do begin
+    T:=Copy(LinesUpper,I,MaxInt);
+    J:=Pos('"',T); If J=0 then break;
+    PossibleNextURLs.Add(preURL+Copy(Lines,CharsBefore+I,J-1));
+
+    LinesUpper:=Copy(LinesUpper,(I-1)+J+1,MaxInt);
+    CharsBefore:=CharsBefore+(I-1)+J;
+
+    I:=Pos(S,LinesUpper);
+  end;
+end;
+
+function TDataReader.GetGameCover(const CoverPageURL : String; var ImageURL: String): Boolean;
+Var NewImageURL,S,T : String;
+    WaitingURLs, ImageURLs, ScannedURLsUpper, PossibleNextURLs : TStringList;
+    I : Integer;
+begin
+  ImageURL:='';
+  If Trim(CoverPageURL)='' then begin result:=True; exit; end;
+
+  WaitingURLs:=TStringList.Create;
+  try
+    {Get initial cover page URL}
+    S:=FConfig.CoverRecordBaseURL;
+    If (S<>'') and (S[length(S)]<>'/') then S:=S+'/';
+    T:=CoverPageURL;
+    If (T<>'') and (T[1]='/') then T:=Copy(T,2,MaxInt);
+    WaitingURLs.Add(S+T);
+
+    ImageURLs:=TStringList.Create;
+    ScannedURLsUpper:=TStringList.Create;
+    PossibleNextURLs:=TStringList.Create;
+    try
+      {While there are URLs in the queue}
+      While WaitingURLs.Count>0 do begin
+        PossibleNextURLs.Clear;
+        {Get next image URL and scan for more cover page URLs}
+        If GetImageURLAndNextURLsFromURL(WaitingURLs[0],NewImageURL,PossibleNextURLs) then begin
+          {Save new image URL}
+          ImageURLs.Add(NewImageURL);
+
+          {Remove cover page URL from queue and mark it as scanned}
+          ScannedURLsUpper.Add(ExtUpperCase(WaitingURLs[0]));
+          WaitingURLs.Delete(0);
+
+          {Check possible new cover page URLs for real new URLs}
+          For I:=0 to PossibleNextURLs.Count-1 do begin
+            S:=ExtUpperCase(PossibleNextURLs[I]);
+            If ScannedURLsUpper.IndexOf(S)<0 then WaitingURLs.Add(PossibleNextURLs[I]);
+          end;
+        end;
+
+        {Stop after max. 10 images}
+        If ImageURLs.Count>=10 then break;
+      end;
+
+      {Combine image URLs}
+      If ImageURLs.count>0 then ImageURL:=ImageURLs[0];
+      For I:=1 to ImageURLs.count-1 do ImageURL:=ImageURL+'$'+ImageURLs[I];
+      result:=(ImageURLs.count>0);
+    finally
+      ImageURLs.Free;
+      ScannedURLsUpper.Free;
+      PossibleNextURLs.Free;
+    end;
+  finally
+    WaitingURLs.Free;
   end;
 end;
 

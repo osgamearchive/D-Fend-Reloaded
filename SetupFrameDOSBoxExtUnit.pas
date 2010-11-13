@@ -24,7 +24,13 @@ type
     VideoModesCheckBox: TCheckBox;
     MIDICheckBox: TCheckBox;
     PixelShaderCheckBox: TCheckBox;
+    NetworkGroupBox: TGroupBox;
+    NE2000CheckBox: TCheckBox;
+    InnovaCheckBox: TCheckBox;
+    InfoLabel: TLabel;
+    InfoURLLabel: TLabel;
     procedure DefaultValueChanged(Sender: TObject);
+    procedure InfoURLLabelClick(Sender: TObject);
   private
     { Private-Deklarationen }
     GameDB : TGameDB;
@@ -46,7 +52,8 @@ type
 
 implementation
 
-uses LanguageSetupUnit, VistaToolsUnit, PrgSetupUnit, CommonTools, HelpConsts;
+uses ShellAPI, LanguageSetupUnit, VistaToolsUnit, PrgSetupUnit, CommonTools,
+     HelpConsts;
 
 {$R *.dfm}
 
@@ -74,8 +81,11 @@ begin
   NoFlicker(PixelShaderCheckBox);
   NoFlicker(SoundGroupBox);
   NoFlicker(MIDICheckBox);
+  NoFlicker(InnovaCheckBox);
   NoFlicker(PrinterGroupBox);
   NoFlicker(PrinterCheckBox);
+  NoFlicker(NetworkGroupBox);
+  NoFlicker(NE2000CheckBox);
 
   MultiFloppyImageCheckBox.Checked:=PrgSetup.AllowMultiFloppyImagesMount;
   PhysFSCheckBox.Checked:=PrgSetup.AllowPhysFSUsage;
@@ -96,8 +106,16 @@ begin
 
   MIDICheckBox.Checked:=DefaultValueOnList(GameDB.ConfOpt.MIDIDevice,'mt32');
   ValueChanged[2]:=False;
+  InnovaCheckBox.Checked:=PrgSetup.AllowInnova;
 
   PrinterCheckBox.Checked:=PrgSetup.AllowPrinterSettings;
+
+  NE2000CheckBox.Checked:=PrgSetup.AllowNe2000;
+
+  InnovaCheckBox.Visible:=PrgSetup.ActivateIncompleteFeatures;
+  NetworkGroupBox.Visible:=PrgSetup.ActivateIncompleteFeatures;
+  InfoLabel.Visible:=PrgSetup.ActivateIncompleteFeatures;
+  InfoURLLabel.Visible:=PrgSetup.ActivateIncompleteFeatures;
 end;
 
 procedure TSetupFrameDOSBoxExt.DefaultValueChanged(Sender: TObject);
@@ -140,8 +158,16 @@ begin
   PixelShaderCheckBox.Caption:=LanguageSetup.SetupFormDosBoxCVSPixelShader;
   SoundGroupBox.Caption:=LanguageSetup.SetupFormDosBoxCVSSoundGroup;
   MIDICheckBox.Caption:=LanguageSetup.SetupFormDosBoxCVSMidiModes;
+  InnovaCheckBox.Caption:=LanguageSetup.SetupFormDOSBoxCVSInnova;
   PrinterGroupBox.Caption:=LanguageSetup.SetupFormDosBoxCVSPrinterGroup;
   PrinterCheckBox.Caption:=LanguageSetup.SetupFormDosBoxCVSPrinter;
+  NetworkGroupBox.Caption:=LanguageSetup.SetupFormDOSBoxCVSNetworkGroup;
+  NE2000CheckBox.Caption:=LanguageSetup.SetupFormDOSBoxCVSNetworkNE2000;
+
+  InfoLabel.Caption:=LanguageSetup.SetupFormDOSBoxCVSInfo;
+  InfoURLLabel.Caption:='http:/'+'/ykhwong.x-y.net/';
+  with InfoURLLabel.Font do begin Color:=clBlue; Style:=[fsUnderline]; end;
+  InfoURLLabel.Cursor:=crHandPoint;
 
   HelpContext:=ID_FileOptionsDOSBoxCVSFeatures;
 end;
@@ -166,7 +192,9 @@ begin
   GlideEmulationCheckBox.Checked:=False;
   VGAChipsetCheckBox.Checked:=False;
   PixelShaderCheckBox.Checked:=False;
+  InnovaCheckBox.Checked:=False;
   PrinterCheckBox.Checked:=False;
+  NE2000CheckBox.Checked:=False;
 end;
 
 function TSetupFrameDOSBoxExt.DefaultValueChange(const OldList, Value: String; const SetIt: Boolean): String;
@@ -215,8 +243,16 @@ begin
   If ValueChanged[2] then begin
     GameDB.ConfOpt.MIDIDevice:=DefaultValueChange(GameDB.ConfOpt.MIDIDevice,'mt32',MIDICheckBox.Checked);
   end;
+  PrgSetup.AllowInnova:=InnovaCheckBox.Checked;
 
   PrgSetup.AllowPrinterSettings:=PrinterCheckBox.Checked;
+
+  PrgSetup.AllowNe2000:=NE2000CheckBox.Checked;
+end;
+
+procedure TSetupFrameDOSBoxExt.InfoURLLabelClick(Sender: TObject);
+begin
+  ShellExecute(Handle,'open',PChar((Sender as TLabel).Caption),nil,nil,SW_SHOW);
 end;
 
 end.

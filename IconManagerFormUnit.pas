@@ -21,9 +21,15 @@ type
     CustomIconButton: TSpeedButton;
     HelpButton: TBitBtn;
     Timer: TTimer;
-    PopupMenu: TPopupMenu;
+    AddPopupMenu: TPopupMenu;
     PopupAddIcon: TMenuItem;
     PopupAddAllIcons: TMenuItem;
+    ToolsButton: TBitBtn;
+    ToolsPopupMenu: TPopupMenu;
+    PopupToolsExplorer: TMenuItem;
+    N1: TMenuItem;
+    PopupToolsRenameUpper: TMenuItem;
+    PopupToolsRenameLower: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure ListViewDblClick(Sender: TObject);
     procedure OKButtonClick(Sender: TObject);
@@ -43,6 +49,7 @@ type
     procedure FormDestroy(Sender: TObject);
     procedure TimerTimer(Sender: TObject);
     procedure ListViewDragDrop(Sender, Source: TObject; X, Y: Integer);
+    procedure ToolsButtonClick(Sender: TObject);
   private
     { Private-Deklarationen }
     Dir, LastIcon : String;
@@ -51,6 +58,7 @@ type
     Procedure PostResize(var Msg : TMessage); Message WM_USER+1;
     Procedure ScanFolderForIcons(const Folder : String);
     Procedure AddIconFromFolder(const IconFile : String);
+    Procedure RenameIcons(const UpperExt : Boolean);
   public
     { Public-Deklarationen }
     IconName : String;
@@ -64,10 +72,12 @@ Function ShowIconManager(const AOwner : TComponent; var AIcon : String; const AD
 
 implementation
 
-uses LanguageSetupUnit, VistaToolsUnit, CommonTools, PrgConsts, PrgSetupUnit,
-     HelpConsts, IconLoaderUnit, ClassExtensions;
+uses ShellAPI, LanguageSetupUnit, VistaToolsUnit, CommonTools, PrgConsts,
+     PrgSetupUnit, HelpConsts, IconLoaderUnit, ClassExtensions;
 
 {$R *.dfm}
+
+const IconFileExts : Array[0..5] of String = ('ico','png','jpeg','jpg','gif','bmp');
 
 procedure TIconManagerForm.FormCreate(Sender: TObject);
 begin
@@ -80,11 +90,16 @@ begin
   CustomIconButton.Hint:=LanguageSetup.ChooseFile;
   OKButton.Caption:=LanguageSetup.OK;
   CancelButton.Caption:=LanguageSetup.Cancel;
-  HelpButton.Caption:=LanguageSetup.Help;
   AddButton.Caption:=LanguageSetup.Add;
   PopupAddIcon.Caption:=LanguageSetup.MenuExtrasIconManagerAddSingle;
   PopupAddAllIcons.Caption:=LanguageSetup.MenuExtrasIconManagerAddAll;
   DelButton.Caption:=LanguageSetup.Del;
+  HelpButton.Caption:=LanguageSetup.Help;
+  ToolsButton.Caption:=LanguageSetup.MenuExtrasIconManagerTools;
+  PopupToolsExplorer.Caption:=LanguageSetup.MenuExtrasIconManagerToolsExplorer;
+  PopupToolsRenameUpper.Caption:=LanguageSetup.MenuExtrasIconManagerToolsRenameUpper;
+  PopupToolsRenameLower.Caption:=LanguageSetup.MenuExtrasIconManagerToolsRenameLower;
+  ToolsButton.Visible:=PrgSetup.ActivateIncompleteFeatures;
 
   OpenDialog.Title:=LanguageSetup.MenuExtrasIconManagerDialog;
   OpenDialog.Filter:=LanguageSetup.MenuExtrasIconManagerFilter;
@@ -97,6 +112,7 @@ begin
   UserIconLoader.DialogImage(DI_Add,AddButton);
   UserIconLoader.DialogImage(DI_Delete,DelButton);
   UserIconLoader.DialogImage(DI_Help,HelpButton);
+  UserIconLoader.DialogImage(DI_Tools,ToolsButton);
 
   hIconsChangeNotification:=FindFirstChangeNotification(
     PChar(PrgDataDir+IconsSubDir),
@@ -130,13 +146,11 @@ begin
   end;
 end;
 
-
 procedure TIconManagerForm.LoadIcons;
-const FileExts : Array[0..5] of String = ('ico','png','jpeg','jpg','gif','bmp');
 Var I,J : Integer;
     Rec : TSearchRec;
     L : TListItem;
-    Icon : TIcon;
+    Icon, Icon2 : TIcon;
     B : Boolean;
     S : String;
 begin
@@ -148,13 +162,13 @@ begin
     ImageList.Clear;
     ListView.SortType:=stNone;
 
-    For J:=Low(FileExts) to High(FileExts) do begin
-      I:=FindFirst(Dir+'*.'+FileExts[J],faAnyFile,Rec);
+    For J:=Low(IconFileExts) to High(IconFileExts) do begin
+      I:=FindFirst(Dir+'*.'+IconFileExts[J],faAnyFile,Rec);
       try
         while I=0 do begin
           B:=True;
           try
-            If J=Low(FileExts) then begin
+            If J=Low(IconFileExts) then begin
               Icon:=TIcon.Create;
               Icon.LoadFromFile(Dir+Rec.Name);
             end else begin
@@ -165,7 +179,16 @@ begin
           end;
           try
             If B and (Icon<>nil) then begin
-              ImageList.AddIcon(Icon);
+              try
+                ImageList.AddIcon(Icon);
+              except
+                Icon2:=LoadIconFromExeFile(Dir+Rec.Name);
+                try
+                  If Icon2<>nil then ImageList.AddIcon(Icon2);
+                finally
+                  Icon2.Free;
+                end;
+              end;
               ListView.AddItem(Rec.Name,nil);
               L:=ListView.Items[ListView.Items.Count-1];
               L.ImageIndex:=ImageList.Count-1;
@@ -261,7 +284,7 @@ begin
   Case (Sender as TComponent).Tag of
     0 : begin
           P:=ClientToScreen(Point(AddButton.Left,AddButton.Top));
-          PopupMenu.Popup(P.X+5,P.Y+5);
+          AddPopupMenu.Popup(P.X+5,P.Y+5);
         end;
     1 : begin
           S:=ExtractFilePath(MakeAbsIconName(Trim(CustomIconEdit.Text)));
@@ -285,7 +308,7 @@ begin
           end;
           LoadIcons;
         end;
-  End;
+  end;
 end;
 
 procedure TIconManagerForm.ScanFolderForIcons(const Folder : String);
@@ -384,6 +407,43 @@ end;
 procedure TIconManagerForm.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
   If (Key=VK_F1) and (Shift=[]) then HelpButtonClick(Sender);
+end;
+
+procedure TIconManagerForm.ToolsButtonClick(Sender: TObject);
+Var P : TPoint;
+begin
+  Case (Sender as TComponent).Tag of
+    0 : begin
+          P:=ClientToScreen(Point(ToolsButton.Left,ToolsButton.Top));
+          ToolsPopupMenu.Popup(P.X+5,P.Y+5);
+        end;
+    1 : begin
+          ShellExecute(Handle,'explore',PChar(Dir),nil,PChar(Dir),SW_SHOW);
+        end;
+    2 : RenameIcons(True);
+    3 : RenameIcons(False);
+  end;
+end;
+
+procedure TIconManagerForm.RenameIcons(const UpperExt: Boolean);
+Var Rec : TSearchRec;
+    I,J : Integer;
+    NewName : String;
+begin
+  For J:=Low(IconFileExts) to High(IconFileExts) do begin
+    I:=FindFirst(Dir+'*.'+IconFileExts[J],faAnyFile,Rec);
+    try
+      While I=0 do begin
+        NewName:=ExtractFileExt(Rec.Name);
+        If UpperExt then NewName:=ExtUpperCase(NewName) else NewName:=ExtLowerCase(NewName);
+        NewName:=ChangeFileExt(Rec.Name,NewName);
+        RenameFile(Dir+Rec.Name,Dir+NewName);
+        I:=FindNext(Rec);
+      end;
+    finally
+      FindClose(Rec);
+    end;
+  end;
 end;
 
 { global }

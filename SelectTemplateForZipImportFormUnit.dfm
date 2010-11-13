@@ -139,7 +139,7 @@ object SelectTemplateForZipImportForm: TSelectTemplateForZipImportForm
     Height = 21
     Style = csDropDownList
     Anchors = [akLeft, akRight, akBottom]
-    ItemHeight = 0
+    ItemHeight = 13
     TabOrder = 5
     OnChange = TemplateComboBoxChange
     OnDropDown = ComboBoxDropDown
@@ -151,7 +151,7 @@ object SelectTemplateForZipImportForm: TSelectTemplateForZipImportForm
     Height = 21
     Style = csDropDownList
     Anchors = [akRight, akBottom]
-    ItemHeight = 0
+    ItemHeight = 13
     TabOrder = 6
     OnDropDown = ComboBoxDropDown
   end
@@ -173,7 +173,7 @@ object SelectTemplateForZipImportForm: TSelectTemplateForZipImportForm
     Height = 21
     Style = csDropDownList
     Anchors = [akRight, akBottom]
-    ItemHeight = 0
+    ItemHeight = 13
     TabOrder = 7
     OnDropDown = ComboBoxDropDown
   end

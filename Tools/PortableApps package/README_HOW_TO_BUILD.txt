@@ -3,3 +3,5 @@
 3.) Update version information in .\D-Fend Reloaded Portable\Other\Installer Source\PortableApps.comInstallerConfig.nsh
     and in .\D-Fend Reloaded Portable\App\AppInfo\appinfo.ini
 4.) Run .\D-Fend Reloaded Portable\Other\Installer Source\PortableApps.comInstaller.nsi
+
+(Or use the automated build scripts in ..\..\Install !)

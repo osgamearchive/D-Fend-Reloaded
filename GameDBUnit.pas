@@ -51,6 +51,7 @@ Type TConfOpt=class(TBasePrgSetup)
     property ScummVMLanguages : String index 39 read GetString write SetString;
     property CPUType : String index 40 read GetString write SetString;
     property OplEmu : String index 41 read GetString write SetString;
+    property GlideEmulation : String index 42 read GetString write SetString;
 end;
 
 const NR_Name=1;
@@ -136,7 +137,9 @@ const NR_Name=1;
       NR_VGAChipset=128;
       NR_VideoRam=129;
       NR_GlideEmulation=130;
-      NR_PixelShader=131;
+      NR_GlidePort=131;
+      NR_GlideLFB=132;
+      NR_PixelShader=133;
 
       NR_EnablePrinterEmulation=151;
       NR_PrinterResolution=152;
@@ -207,19 +210,28 @@ const NR_Name=1;
       NR_JoystickSwap34=289;
       NR_JoystickButtonwrap=290;
 
-      NR_Autoexec=301;
-      NR_AutoexecOverridegamestart=302;
-      NR_AutoexecOverrideMount=303;
-      NR_AutoexecBootImage=304;
-      NR_AutoexecFinalization=305;
+      NR_NE2000=301;
+      NR_NE2000Base=302;
+      NR_NE2000IRQ=303;
+      NR_NE2000MACAddress=304;
+      NR_NE2000RealInterface=305;
 
-      NR_CustomSettings=311;
-      NR_Environment=312;
+      NR_Innova=311;
+      NR_InnovaRate=312;
+      NR_InnovaBase=313;
+      NR_InnovaQuality=314;
 
-      NR_LastOpenTab=321;
-      NR_LastOpenTabModern=322;
+      NR_Autoexec=321;
+      NR_AutoexecOverridegamestart=322;
+      NR_AutoexecOverrideMount=323;
+      NR_AutoexecBootImage=324;
+      NR_AutoexecFinalization=325;
+      NR_CustomSettings=326;
+      NR_Environment=327;
 
-      NR_ProfileMode=331;
+      NR_LastOpenTab=331;
+      NR_LastOpenTabModern=332;
+      NR_ProfileMode=333;
 
       NR_ScummVMGame=341;
       NR_ScummVMPath=342;
@@ -401,7 +413,9 @@ Type TGameDB=class;
     property ScrollLockStatus : String index NR_ScrollLockStatus read GetString write SetString;
     property VGAChipset : String index NR_VGAChipset read GetString write SetString;
     property VideoRam : Integer index NR_VideoRam read GetInteger write SetInteger;
-    property GlideEmulation : Boolean index NR_GlideEmulation read GetBoolean write SetBoolean;
+    property GlideEmulation : String index NR_GlideEmulation read GetString write SetString;
+    property GlidePort : String index NR_GlidePort read GetString write SetString;
+    property GlideLFB : String index NR_GlideLFB read GetString write SetString;
     property PixelShader : String index NR_PixelShader read GetString write SetString;
 
     property EnablePrinterEmulation : Boolean index NR_EnablePrinterEmulation read GetBoolean write SetBoolean;
@@ -472,6 +486,17 @@ Type TGameDB=class;
     property JoystickAutoFire : Boolean index NR_JoystickAutoFire read GetBoolean write SetBoolean;
     property JoystickSwap34 : Boolean index NR_JoystickSwap34 read GetBoolean write SetBoolean;
     property JoystickButtonwrap : Boolean index NR_JoystickButtonwrap read GetBoolean write SetBoolean;
+
+    property NE2000 : Boolean index NR_NE2000 read GetBoolean write SetBoolean;
+    property NE2000Base : String index NR_NE2000Base read GetString write SetString;
+    property NE2000IRQ : Integer index NR_NE2000IRQ read GetInteger write SetInteger;
+    property NE2000MACAddress : String index NR_NE2000MACAddress read GetString write SetString;
+    property NE2000RealInterface : String index NR_NE2000RealInterface read GetString write SetString;
+
+    property Innova : Boolean index NR_Innova read GetBoolean write SetBoolean;
+    property InnovaRate : Integer index NR_InnovaRate read GetInteger write SetInteger;
+    property InnovaBase : String index NR_InnovaBase read GetString write SetString;
+    property InnovaQuality : Integer index NR_InnovaQuality read GetInteger write SetInteger;
 
     property Autoexec : String index NR_Autoexec read GetString write SetString;
     property AutoexecOverridegamestart : Boolean index NR_AutoexecOverridegamestart read GetBoolean write SetBoolean;
@@ -672,6 +697,7 @@ Const DefaultValuesResolutionFullscreen='original,320x200,320x240,640x432,640x48
       DefaultValuesScummVMLanguages='maniac:en-de-fr-it-es,zak:en-de-fr-it-es,dig_jp-zh-kr,comi:en-de-fr-it-pt-es-jp-zh-kr,sky:gb-en-de-fr-it-pt-es-se,sword1:en-de-fr-it-es-pt-cz,simon1:en-de-fr-it-es-hb-pl-ru,simon2:en-de-fr-it-es-hb-pl-ru';
       DefaultValuesCPUType='auto,386,386_slow,486_slow,pentium_slow,386_prefetch';
       DefaultValuesOplEmu='default,compat,fast,old';
+      DefaultValuesGlideEmulation='false,true,emu';
 
 implementation
 
@@ -727,6 +753,7 @@ begin
   AddStringRec(39,'ScummVMLanguages','value',DefaultValuesScummVMLanguages);
   AddStringRec(40,'CPUType','value',DefaultValuesCPUType);
   AddStringRec(41,'SBOplEmu','value',DefaultValuesOplEmu);
+  AddStringRec(42,'GlideEmulation','value',DefaultValuesGlideEmulation);
 
   CacheAllStrings;
 end;
@@ -859,7 +886,9 @@ begin
   AddStringRec(NR_ScrollLockStatus,'dos','ScrollLockStatus','');
   AddStringRec(NR_VGAChipset,'vga','svgachipset','3s');
   AddIntegerRec(NR_VideoRam,'vga','videoram',2048);
-  AddBooleanRec(NR_GlideEmulation,'glide','glide',False);
+  AddStringRec(NR_GlideEmulation,'glide','glide','false');
+  AddStringRec(NR_GlidePort,'glide','port','600');
+  AddStringRec(NR_GlideLFB,'glide','LFB','full');
   AddStringRec(NR_PixelShader,'vga','PixelShader','none');
 
   AddBooleanRec(NR_EnablePrinterEmulation,'printer','printer',False);
@@ -929,6 +958,18 @@ begin
   AddBooleanRec(NR_JoystickAutoFire,'joystick','autofire',False);
   AddBooleanRec(NR_JoystickSwap34,'joystick','swap34',False);
   AddBooleanRec(NR_JoystickButtonwrap,'joystick','buttonwrap',False);
+
+  AddBooleanRec(NR_NE2000,'ne2000','ne2000',false);
+  AddStringRec(NR_NE2000Base,'ne2000','ne2000base','300');
+  AddIntegerRec(NR_NE2000IRQ,'ne2000','ne2000irq',3);
+  AddStringRec(NR_NE2000MACAddress,'ne2000','macaddress','AC:DE:48:88:99:AA');
+  AddStringRec(NR_NE2000RealInterface,'ne2000','realinterface','');
+
+  AddBooleanRec(NR_Innova,'Innova','Innova',false);
+  AddIntegerRec(NR_InnovaRate,'Innova','rate',22050);
+  AddStringRec(NR_InnovaBase,'Innova','base','280');
+  AddIntegerRec(NR_InnovaQuality,'Innova','quality',0);
+
   AddStringRec(NR_Autoexec,'Extra','autoexec','');
   AddBooleanRec(NR_AutoexecOverridegamestart,'Extra','Overridegamestart',False);
   AddBooleanRec(NR_AutoexecOverrideMount,'Extra','OverrideMount',False);

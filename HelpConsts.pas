@@ -51,7 +51,7 @@ const ID_Index=1;
       ID_FileOptionsMoreEmulator=1133;
       ID_FileOptionsAutomaticConfiguration=1134;
       ID_FileOptionsDOSBoxGlobal=1135;
-      ID_FileOptionsDataPrivacy=ID_FileOptions; //...
+      ID_FileOptionsDataPrivacy=1136;
 
       ID_ViewQuickStarter=1501;
 

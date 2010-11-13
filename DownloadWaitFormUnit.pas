@@ -234,7 +234,7 @@ begin
 end;
 
 Procedure THTTPThread.FixSourceForgeDownload(const MSt : TMemoryStream);
-const SFURL='http://downloads.sourceforge.net/';
+const SFURL='http:/'+'/downloads.sourceforge.net/';
 Var St : TStringList;
     S : String;
     I,J,K : Integer;

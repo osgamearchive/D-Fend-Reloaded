@@ -121,6 +121,7 @@ begin
   AddString(P1+LanguageSetup.GameRender,GameDB.ConfOpt.Render);
   AddString(P1+LanguageSetup.GameVGAChipset,GameDB.ConfOpt.VGAChipsets);
   AddString(P1+LanguageSetup.GameVideoRam,GameDB.ConfOpt.VGAVideoRAM);
+  AddString(P1+LanguageSetup.GameGlideEmulation,GameDB.ConfOpt.GlideEmulation);
 
   AddString(P1+LanguageSetup.GameKeyboardLayout,GameDB.ConfOpt.KeyboardLayout);
   AddString(P1+LanguageSetup.GameKeyboardCodepage,GameDB.ConfOpt.Codepage);
@@ -205,6 +206,7 @@ begin
   GameDB.ConfOpt.Render:=GetString;
   GameDB.ConfOpt.VGAChipsets:=GetString;
   GameDB.ConfOpt.VGAVideoRAM:=GetString;
+  GameDB.ConfOpt.GlideEmulation:=GetString;
 
   GameDB.ConfOpt.KeyboardLayout:=GetString;
   GameDB.ConfOpt.Codepage:=GetString;
@@ -305,6 +307,7 @@ begin
   Work(DefaultValueRender);
   Work(DefaultValuesVGAChipsets);
   Work(DefaultValuesVGAVideoRAM);
+  Work(DefaultValuesGlideEmulation);
 
   Work(DefaultValuesKeyboardLayout);
   Work(DefaultValuesCodepage);

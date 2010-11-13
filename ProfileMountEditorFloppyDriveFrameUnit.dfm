@@ -67,7 +67,7 @@ object ProfileMountEditorFloppyDriveFrame: TProfileMountEditorFloppyDriveFrame
     Width = 145
     Height = 21
     Style = csDropDownList
-    ItemHeight = 0
+    ItemHeight = 13
     TabOrder = 1
     OnChange = FloppyDriveLetterComboBoxChange
   end

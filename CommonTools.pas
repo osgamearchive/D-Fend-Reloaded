@@ -157,12 +157,8 @@ Var I,J : Integer;
 begin
   result:=TStringList.Create;
   Value:=Trim(Value);
-  while Value<>'' do begin
 
-    {I:=Pos(Divider[1],Value);
-    For J:=2 to length(Divider) do If I=0 then I:=Pos(Divider[J],Value) else begin
-      If Pos(Divider[J],Value)>0 then I:=Min(I,Pos(Divider[J],Value));
-    end;}
+  while Value<>'' do begin
     I:=0;
     For J:=1 to length(Value) do If Pos(Value[J],Divider)<>0 then begin I:=J; break; end;
 
@@ -174,6 +170,8 @@ begin
       Value:='';
     end;
   end;
+
+  If Divider=';' then For I:=0 to result.count-1 do result[I]:=StringReplace(result[I],'<semicolon>',';',[rfReplaceAll,rfIgnoreCase]);
 end;
 
 Function ListToValue(const St : TStrings; Divider : Char) : String;
@@ -183,6 +181,7 @@ begin
   result:='';
   For I:=0 to St.Count-1 do begin
     S:=Trim(St[I]); If S='' then continue;
+    S:=StringReplace(S,';','<semicolon>',[rfReplaceAll]);
     If result<>'' then result:=result+Divider;
     result:=result+S;
   end;
@@ -1241,6 +1240,7 @@ Var Ext : String;
     GIFImage : TGIFImage;
     FSt : TFileStream;
     B : Array[0..1] of Byte;
+    I : TIcon;
 begin
   Ext:=Trim(ExtUpperCase(ExtractFileExt(FileName)));
 
@@ -1270,6 +1270,19 @@ begin
         FSt.Free;
       end;
     end;
+    If Ext='.ICO' then begin
+      result.LoadFromFile(FileName);
+      try
+        result.Icon.Handle; {Loading successful ?}
+      except
+        I:=LoadIconFromExeFile(FileName);
+        If I=nil then FreeAndNil(result) else begin
+          try result.Assign(I); finally I.Free; end;
+        end;
+      end;
+      exit;
+    end;
+
     result.LoadFromFile(FileName);
   except
     If result<>nil then FreeAndNil(result);

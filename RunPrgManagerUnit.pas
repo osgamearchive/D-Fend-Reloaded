@@ -33,7 +33,7 @@ var RunPrgManager : TRunPrgManager;
 
 implementation
 
-uses Classes, Windows, Dialogs, SysUtils, LanguageSetupUnit, CommonTools;
+uses Classes, Windows, Dialogs, Forms, SysUtils, ShellAPI, LanguageSetupUnit, CommonTools;
 
 { TRunPrgManager }
 
@@ -121,6 +121,9 @@ begin
   end;
 
   If not CreateProcess(nil,PChar(Command),nil,nil,False,0,nil,nil,StartupInfo,ProcessInformation) then begin
+    If GetLastError=ERROR_BAD_EXE_FORMAT then begin
+      if ShellExecute(Application.Handle,'open',PChar(Command),nil,nil,SW_SHOW)>32 then exit;
+    end;
     MessageDlg(Format(LanguageSetup.MessageCouldNotStartProgram,[Command]),mtError,[mbOK],0);
     exit;
   end;

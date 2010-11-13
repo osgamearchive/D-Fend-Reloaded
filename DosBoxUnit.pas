@@ -32,7 +32,7 @@ uses Windows, SysUtils, ShellAPI, Forms, Dialogs, ShlObj, Math,
      ZipManagerUnit, ScreensaverControlUnit, FullscreenInfoFormUnit,
      DOSBoxCountUnit, DOSBoxShortNameUnit, RunPrgManagerUnit,
      SelectCDDriveToMountFormUnit, SelectCDDriveToMountByDataFormUnit,
-     FileNameConvertor, DOSBoxTempUnit, WindowsFileWarningFormUnit;
+     FileNameConvertor, DOSBoxTempUnit, WindowsFileWarningFormUnit, MIDITools;
                                                                   
 var SpeedTestSt : TStringList = nil;
     LastSpeedTestStep : String = '';
@@ -1149,7 +1149,15 @@ begin
   If PrgSetup.AllowGlideSettings then begin
     result.Add('');
     result.Add('[glide]');
-    result.Add('glide='+BoolToStr(Game.GlideEmulation));
+    S:=Trim(ExtUpperCase(Game.GlideEmulation));
+    If (S='TRUE') or (S='1') then S:='true' else begin
+      If (S='FALSE') or (S='0') then S:='false' else S:=Trim(ExtLowerCase(Game.GlideEmulation));
+    end;
+    result.Add('glide='+S);
+    If S<>'false' then begin
+      result.Add('grport='+Game.GlidePort);
+      result.Add('lfb='+Game.GlideLFB);
+    end;
   end;
 
   result.Add('');
@@ -1177,10 +1185,10 @@ begin
   result.Add('mpu401='+Game.MIDIType);
   If DOSBoxVersion>0.72 then begin
     result.Add('mididevice='+Game.MIDIDevice);
-    result.Add('midiconfig='+Game.MIDIConfig);
+    result.Add('midiconfig='+MakeDOSBoxMIDIString(Game.MIDIConfig));
   end else begin
     result.Add('device='+Game.MIDIDevice);
-    result.Add('config='+Game.MIDIConfig);
+    result.Add('config='+MakeDOSBoxMIDIString(Game.MIDIConfig));
   end;
 
   result.Add('');
@@ -1221,6 +1229,15 @@ begin
   result.Add('tandyrate='+IntToStr(Game.SpeakerTandyRate));
   result.Add('disney='+BoolToStr(Game.SpeakerDisney));
 
+  if PrgSetup.AllowInnova then begin
+    result.Add('');
+    result.Add('[innova]');
+    result.Add('innova='+BoolToStr(Game.Innova));
+    result.Add('samplerate='+IntToStr(Game.InnovaRate));
+    result.Add('sidbase='+Game.InnovaBase);
+    result.Add('quality='+IntToStr(Game.InnovaQuality));
+  end;
+
   SpeedTestInfo('Build [dos] section of DOSBox conf file');
   result.Add('');
   result.Add('[dos]');
@@ -1255,6 +1272,16 @@ begin
   result.Add('autofire='+BoolToStr(Game.JoystickAutoFire));
   result.Add('swap34='+BoolToStr(Game.JoystickSwap34));
   result.Add('buttonwrap='+BoolToStr(Game.JoystickButtonwrap));
+
+  If PrgSetup.AllowNe2000 then begin
+    result.Add('');
+    result.Add('[ne2000]');
+    result.Add('ne2000='+BoolToStr(Game.NE2000));
+    result.Add('nicbase='+Game.NE2000Base);
+    result.Add('nicirq='+IntToStr(Game.NE2000IRQ));
+    result.Add('macaddr='+Game.NE2000MACAddress);
+    result.Add('realnic='+Game.NE2000RealInterface);
+  end;
 
   result.Add('');
   result.Add('[serial]');

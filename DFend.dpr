@@ -225,7 +225,9 @@ uses
   DOSBoxLangEditFormUnit in 'DOSBoxLangEditFormUnit.pas' {DOSBoxLangEditForm},
   DOSBoxLangTools in 'DOSBoxLangTools.pas',
   DOSBoxLangStartFormUnit in 'DOSBoxLangStartFormUnit.pas' {DOSBoxLangStartForm},
-  SetupFrameDataPrivacyUnit in 'SetupFrameDataPrivacyUnit.pas' {SetupFrameDataPrivacy: TFrame};
+  SetupFrameDataPrivacyUnit in 'SetupFrameDataPrivacyUnit.pas' {SetupFrameDataPrivacy: TFrame},
+  MIDITools in 'MIDITools.pas',
+  DOSBoxFailedForm2Unit in 'DOSBoxFailedForm2Unit.pas' {DOSBoxFailedForm2};
 
 {$R *.res}
 

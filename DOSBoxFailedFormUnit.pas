@@ -34,7 +34,7 @@ Procedure ShowDOSBoxFailedDialog(const AOwner : TComponent; const AGameDB : TGam
 
 implementation
 
-uses LanguageSetupUnit, VistaToolsUnit, CommonTools, IconLoaderUnit, PrgSetupUnit;
+uses LanguageSetupUnit, VistaToolsUnit, CommonTools, IconLoaderUnit, PrgSetupUnit, DOSBoxFailedForm2Unit;
 
 {$R *.dfm}
 
@@ -104,6 +104,11 @@ end;
 
 Procedure ShowDOSBoxFailedDialog(const AOwner : TComponent; const AGameDB : TGameDB; const AGame : TGame);
 begin
+  If PrgSetup.ActivateIncompleteFeatures then begin
+    DOSBoxFailedForm2Unit.ShowDOSBoxFailedDialog(AOwner,AGameDB,AGame);
+    exit;
+  end;
+
   If AGame.NoDOSBoxFailedDialog then exit;
   DOSBoxFailedForm:=TDOSBoxFailedForm.Create(AOwner);
   try

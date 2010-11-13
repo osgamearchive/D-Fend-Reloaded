@@ -124,7 +124,7 @@ Var I : Integer;
 begin
   {ImageFile;CDROMIMAGE;Letter;;;}
   S:=MakeRelPath(CDROMImageTab.Cells[0,0],PrgSetup.BaseDir); For I:=1 to CDROMImageTab.RowCount-1 do S:=S+'$'+MakeRelPath(CDROMImageTab.Cells[0,I],PrgSetup.BaseDir);
-  result:=S+';CDROMImage;'+CDROMImageDriveLetterComboBox.Text+';;;';
+  result:=StringReplace(S,';','<semicolon>',[rfReplaceAll])+';CDROMImage;'+CDROMImageDriveLetterComboBox.Text+';;;';
 end;
 
 function TProfileMountEditorCDImageFrame.CheckBeforeDone: Boolean;

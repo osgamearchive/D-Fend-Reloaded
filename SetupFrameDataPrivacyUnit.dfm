@@ -7,6 +7,24 @@ object SetupFrameDataPrivacy: TSetupFrameDataPrivacy
   DesignSize = (
     663
     531)
+  object OpenFileLabel: TLabel
+    Left = 16
+    Top = 144
+    Width = 144
+    Height = 13
+    Caption = 'Open histroy file in text editor'
+    OnClick = OpenFileLabelClick
+  end
+  object InfoLabel: TLabel
+    Left = 16
+    Top = 176
+    Width = 633
+    Height = 113
+    Anchors = [akLeft, akTop, akRight]
+    AutoSize = False
+    Caption = 'InfoLabel'
+    WordWrap = True
+  end
   object StoreHistoryCheckBox: TCheckBox
     Left = 16
     Top = 16

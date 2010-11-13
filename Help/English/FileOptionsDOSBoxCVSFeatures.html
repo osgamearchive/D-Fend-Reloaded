@@ -33,22 +33,22 @@ special CVS DOSBox build supporting this things.
 
 <ul class="big">
   <li>
-    <b>Allow multiple floppy images per drive</b><br>
-    If this option is activated the <a href="ProfileEditMount.html">mount dialog</a>
-    will offer to mount multiple floppy images for one virtual drive. You can swap
-    between the images in DOSBox by pressing <span class="Key">Ctrl</span>+<span class="Key">F4</span>.
+    Mounts editor features
+	<ul>
+	  <li>  
+        <b>Allow multiple floppy images per drive</b><br>
+        If this option is activated the <a href="ProfileEditMount.html">mount dialog</a>
+        will offer to mount multiple floppy images for one virtual drive. You can swap
+        between the images in DOSBox by pressing <span class="Key">Ctrl</span>+<span class="Key">F4</span>.
+      </li>
+      <li>
+        <b>Activate PhysFS tab</b><br />
+        The Phys file system allows to mount zip files in DOSBox as drives. DOSBox will use the
+        zip files as read only file systems and will perform all write operation into another folder.
+        With this checkbox you can activate the PhysFS function in the <a href="ProfileEditDrives.html">mount dialog</a>.
+      </li>
+	</ul>
   </li>
-  <li>
-    <b>Activate PhysFS tab</b><br />
-    The Phys file system allows to mount zip files in DOSBox as drives. DOSBox will use the
-    zip files as read only file systems and will perform all write operation into another folder.
-    With this checkbox you can activate the PhysFS function in the <a href="ProfileEditDrives.html">mount dialog</a>.
-  </li>
-  <li>
-    <b>Allow more IOCTL settings</b><br />
-	If this option is checked, you can choose some more methods for accessing CD drives in
-	the	<a href="ProfileEditDrives.html">mountings editor</a>.
-  </li>  
   <li>
     <b>Graphics setup features</b><br />
     In this box you can activate several extended graphical features in the
@@ -65,11 +65,13 @@ special CVS DOSBox build supporting this things.
     field, D-Fend Reloaded will offer you some printer setup options in the
     <a href="ProfileEdit.html">profile editor</a>.
   </li>
+  <!--
   <li>
-    <b>Activate CPU type setting</b><br />
-	If this option is checked, on the <a href="ProfileEditCPU.html">CPU</a> page of the
-	profile editor you can choose the cpu type DOSBox should emulate.
+    <b>Network setup features</b><br />
+	In this box you can activate NE2000 emulation setting on the
+	<a href="ProfileEditNetwork.html">Network</a> page of the profile editor.
   </li>
+  -->
 </ul>
  
 <p>&nbsp;</p>

@@ -45,7 +45,6 @@ object DOSBoxFailedForm: TDOSBoxFailedForm
     Anchors = [akLeft, akBottom]
     TabOrder = 3
     Kind = bkOK
-    ExplicitTop = 213
   end
   object CloseDOSBoxCheckBox: TCheckBox
     Left = 8
@@ -73,7 +72,6 @@ object DOSBoxFailedForm: TDOSBoxFailedForm
     Anchors = [akLeft, akRight, akBottom]
     Caption = 'DoNotShowAgainCheckBox'
     TabOrder = 4
-    ExplicitTop = 217
   end
   object ShowConsoleCheckBox: TCheckBox
     Left = 8

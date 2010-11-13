@@ -767,7 +767,7 @@ begin
           If (length(AlternateProfileNameSource)>0) and (AlternateProfileNameSource[length(AlternateProfileNameSource)]='\') then SetLength(AlternateProfileNameSource,length(AlternateProfileNameSource)-1);
           While Pos('\',AlternateProfileNameSource)>0 do AlternateProfileNameSource:=Copy(AlternateProfileNameSource,Pos('\',AlternateProfileNameSource)+1,MaxInt);
         end;
-        If not ShowSelectTemplateForZipImportDialog(Application.MainForm,AutoSetupDB,TemplateDB,StartableFiles,AutoSetup,ArchiveFileName,AlternateProfileNameSource,ProfileName,FileToStart,SetupFileToStart,ProfileFolder,Nr,NoDialogIfAutoSetupIsAvailable,DoNotCopyFolder,UseInstallSupport) then exit;
+        If not ShowSelectTemplateForZipImportDialog(Application.MainForm,AutoSetupDB,TemplateDB,StartableFiles,AutoSetup,ArchiveFileName,AlternateProfileNameSource,Dir,ProfileName,FileToStart,SetupFileToStart,ProfileFolder,Nr,NoDialogIfAutoSetupIsAvailable,DoNotCopyFolder,UseInstallSupport) then exit;
         If UseInstallSupport then begin
           If ArchiveFileName=''
             then result:=RunInstallationFromFolder(Application.MainForm,GameDB,Dir)

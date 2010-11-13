@@ -26,6 +26,8 @@ type
     YearLabel: TLabel;
     SearchTypeCheckBox: TCheckBox;
     NameCheckBox: TCheckBox;
+    NameLabel: TLabel;
+    DownloadCoverAllCheckBox: TCheckBox;
     procedure FormShow(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -77,10 +79,12 @@ begin
   SetVistaFonts(self);
   Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName);
 
+  NameLabel.Font.Style:=[fsBold];
   GenreLabel.Font.Style:=[fsBold];
   DeveloperLabel.Font.Style:=[fsBold];
   PublisherLabel.Font.Style:=[fsBold];
   YearLabel.Font.Style:=[fsBold];
+  NameLabel.Caption:='';
   GenreLabel.Caption:='';
   DeveloperLabel.Caption:='';
   PublisherLabel.Caption:='';
@@ -98,6 +102,8 @@ begin
   PublisherCheckBox.Caption:=LanguageSetup.GamePublisher;
   YearCheckBox.Caption:=LanguageSetup.GameYear;
   DownloadCoverCheckBox.Caption:=LanguageSetup.DataReaderCoverCheckbox;
+  DownloadCoverAllCheckBox.Caption:=LanguageSetup.DataReaderCoverAllCheckbox;
+  DownloadCoverAllCheckBox.Visible:=PrgSetup.ActivateIncompleteFeatures;
 
   InsertButton.Caption:=LanguageSetup.DataReaderInsert;
   CancelButton.Caption:=LanguageSetup.Cancel;
@@ -112,14 +118,15 @@ begin
   ShowCompleted:=True;
 
   S:=Trim(PrgSetup.DataReaderActiveSettings);
-  While length(S)<6 do S:=S+'X';
-  If length(S)>6 then S:=Copy(S,1,6);
+  While length(S)<7 do S:=S+'X';
+  If length(S)>7 then S:=Copy(S,1,7);
   NameCheckBox.Checked:=(S[1]<>'-');
   GenreCheckBox.Checked:=(S[2]<>'-');
   DeveloperCheckBox.Checked:=(S[3]<>'-');
   PublisherCheckBox.Checked:=(S[4]<>'-');
   YearCheckBox.Checked:=(S[5]<>'-');
   DownloadCoverCheckBox.Checked:=(S[6]<>'-');
+  DownloadCoverAllCheckBox.Checked:=(S[7]<>'-');
 end;
 
 procedure TDataReaderForm.FormDestroy(Sender: TObject);
@@ -132,6 +139,7 @@ begin
   If PublisherCheckBox.Checked then S:=S+'X' else S:=S+'-';
   If YearCheckBox.Checked then S:=S+'X' else S:=S+'-';
   If DownloadCoverCheckBox.Checked then S:=S+'X' else S:=S+'-';
+  If DownloadCoverAllCheckBox.Checked then S:=S+'X' else S:=S+'-';
   PrgSetup.DataReaderActiveSettings:=S;
 
   GenreSt.Free;
@@ -222,6 +230,7 @@ begin
     YearCheckBox.Enabled:=False;
     YearLabel.Caption:='';
     DownloadCoverCheckBox.Enabled:=False;
+    DownloadCoverAllCheckBox.Enabled:=False;
     exit;
   end;
 
@@ -245,6 +254,7 @@ begin
   end;
 
   GameDataBox.Caption:=ListBox.Items[Nr];
+  NameLabel.Caption:=ListBox.Items[Nr];
   NameCheckBox.Enabled:=True;
   GenreCheckBox.Enabled:=(Trim(GenreSt[Nr])<>'');
   GenreLabel.Caption:=GenreSt[Nr];
@@ -255,10 +265,13 @@ begin
   YearCheckBox.Enabled:=(Trim(YearSt[Nr])<>'');
   YearLabel.Caption:=YearSt[Nr];
   DownloadCoverCheckBox.Enabled:=(Trim(CoverSt[Nr])<>'');
+  DownloadCoverAllCheckBox.Enabled:=(Pos('$',CoverSt[Nr])>0);
   InsertButton.Enabled:=(Trim(GenreSt[Nr])<>'') or (Trim(DeveloperSt[Nr])<>'') or (Trim(PublisherSt[Nr])<>'') or (Trim(YearSt[Nr])<>'') or (Trim(CoverSt[Nr])<>'');
 end;
 
 procedure TDataReaderForm.InsertButtonClick(Sender: TObject);
+Var S,T : String;
+    I : Integer;
 begin
   Name:='';
   Genre:='';
@@ -272,8 +285,24 @@ begin
   If PublisherCheckBox.Enabled and PublisherCheckBox.Checked then Publisher:=PublisherLabel.Caption;
   If YearCheckBox.Enabled and YearCheckBox.Checked then Year:=YearLabel.Caption;
 
-  If DownloadCoverCheckBox.Enabled and DownloadCoverCheckBox.Checked and (CaptureDir<>'') then
-    ShowDataReaderInternetCoverWaitDialog(self,DataReader,CoverSt[ListBox.ItemIndex],CaptureDir,LanguageSetup.DataReaderDownloadCaption,LanguageSetup.DataReaderDownloadInfo,LanguageSetup.DataReaderDownloadError);
+  If DownloadCoverCheckBox.Enabled and DownloadCoverCheckBox.Checked and (CaptureDir<>'') then begin
+    S:=CoverSt[ListBox.ItemIndex];
+    If DownloadCoverAllCheckBox.Checked then begin
+      {Download all}
+      I:=Pos('$',S); While I>0 do begin
+        T:=Trim(Copy(S,1,I-1));
+        S:=Trim(Copy(S,I+1,MaxInt));
+        ShowDataReaderInternetCoverWaitDialog(self,DataReader,T,CaptureDir,LanguageSetup.DataReaderDownloadCaption,LanguageSetup.DataReaderDownloadInfo,LanguageSetup.DataReaderDownloadError);
+        If not DownloadCoverAllCheckBox.Checked then break;
+        I:=Pos('$',S);
+      end;
+      ShowDataReaderInternetCoverWaitDialog(self,DataReader,S,CaptureDir,LanguageSetup.DataReaderDownloadCaption,LanguageSetup.DataReaderDownloadInfo,LanguageSetup.DataReaderDownloadError);
+    end else begin
+      {Download first}
+      I:=Pos('$',S); If I>0 then S:=Trim(Copy(S,1,I-1));
+      ShowDataReaderInternetCoverWaitDialog(self,DataReader,S,CaptureDir,LanguageSetup.DataReaderDownloadCaption,LanguageSetup.DataReaderDownloadInfo,LanguageSetup.DataReaderDownloadError);
+    end;
+  end;
 end;
 
 { global }

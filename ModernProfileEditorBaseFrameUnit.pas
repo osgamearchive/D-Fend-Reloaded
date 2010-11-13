@@ -471,22 +471,23 @@ begin
     IconImage.Picture:=nil;
     exit;
   end;
+
+  S:=MakeAbsIconName(IconName);
+  If not FileExists(S) then exit;
+
   try
-    S:=MakeAbsIconName(IconName);
-    If FileExists(S) then begin
-      P:=LoadImageFromFile(S); If P=nil then exit;
+    P:=LoadImageFromFile(S); If P=nil then exit;
+    try
+      B:=TBitmap.Create;
       try
-        B:=TBitmap.Create;
-        try
-          B.SetSize(IconImage.Width,IconImage.Height);
-          ScaleImage(P,B);
-          IconImage.Picture.Bitmap:=B;
-        finally
-          B.Free;
-        end;
+        B.SetSize(IconImage.Width,IconImage.Height);
+        ScaleImage(P,B);
+        IconImage.Picture.Bitmap:=B;
       finally
-        P.Free;
+        B.Free;
       end;
+    finally
+      P.Free;
     end;
   except end;
 end;

@@ -1,5 +1,26 @@
 D-Fend Reloaded Changelog
 
+Version 1.0.3 (11/15/2010)
+==========================
+- When importing plain archive files or folders D-Fend Reloaded will look for a
+  FILE_ID.DIZ file and use if existent its content to suggest a profile name.
+- Files (like text files etc.) can be used as profile specific helper programs
+  to be started before or after the main program now.
+- The physical path names for drives mounts can contain semicolons now.
+- If the user selects a custom MIDI device to be used in a profile the device
+  will be stored by name and not by id anymore so the right device will be
+  selected when using the profile on an other system, too.
+- Now the DOSBox IPX network settings can be configurated in the mutli profile
+  editor, too.
+- Support for new glide=emu mode when using a ykhwong DOSBox build.
+- [Fix] Running profiles via command line parameters or via desktop or start
+  menu shortcuts was not working.
+- [Fix] Error messages when trying to load icons larger than 256x256 pixels.
+- [Fix] A cover image downloaded from mobygames via the profile editor was not
+  shown in the image viewer area of the main window at once if the profile
+  editor was closed by clicking on "Cancel".
+
+
 Version 1.0.2 (10/25/2010)
 ==========================
 - Updated DOSZip from 2.01 to 2.05.

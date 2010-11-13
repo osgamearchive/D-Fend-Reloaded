@@ -64,7 +64,7 @@ object ModernProfileEditorMIDIFrame: TModernProfileEditorMIDIFrame
     Width = 145
     Height = 21
     Style = csDropDownList
-    ItemHeight = 0
+    ItemHeight = 13
     TabOrder = 0
   end
   object DeviceComboBox: TComboBox
@@ -73,7 +73,7 @@ object ModernProfileEditorMIDIFrame: TModernProfileEditorMIDIFrame
     Width = 145
     Height = 21
     Style = csDropDownList
-    ItemHeight = 0
+    ItemHeight = 13
     TabOrder = 1
   end
   object AdditionalSettingsEdit: TLabeledEdit

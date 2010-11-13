@@ -112,7 +112,7 @@ end;
 function TProfileMountEditorFloppyImage1Frame.Done: String;
 begin
   {ImageFile;FLOPPYIMAGE;Letter;;;}
-  result:=MakeRelPath(FloppyImageEdit.Text,PrgSetup.BaseDir)+';FloppyImage;'+FloppyImageDriveLetterComboBox.Text+';;;';
+  result:=StringReplace(MakeRelPath(FloppyImageEdit.Text,PrgSetup.BaseDir),';','<semicolon>',[rfReplaceAll])+';FloppyImage;'+FloppyImageDriveLetterComboBox.Text+';;;';
 end;
 
 function TProfileMountEditorFloppyImage1Frame.GetName: String;

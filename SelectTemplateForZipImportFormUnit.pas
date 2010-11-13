@@ -40,6 +40,7 @@ type
     JustChanging : Boolean;
     Procedure InitialFolderCheck;
     Procedure SelectFilesFromAutoSetupTemplate;
+    Function GetProfileNameFromFileIdDiz(TempFolder : String) : String;
   public
     { Public-Deklarationen }
     ProfileNameChanged, UseInstallSupport : Boolean;
@@ -48,10 +49,10 @@ type
     PrgFiles, Templates : TStringList;
     FileToStart, SetupFileToStart, ProfileName, ProfileFolder : String;
     TemplateNr : Integer;
-    Procedure Prepare(const DoNotCopyFolder : Boolean);
+    Procedure Prepare(const DoNotCopyFolder : Boolean; const TempFolder : String);
   end;
 
-Function ShowSelectTemplateForZipImportDialog(const AOwner : TComponent; const AAutoSetupDB, ATemplateDB : TGameDB; const APrgFiles, ATemplates : TStringList; const AArchivFileName, AAlternateProfileNameSource : String; var AProfileName, AFileToStart, ASetupFileToStart, AFolder : String; var ATemplateNr : Integer; const NoDialogIfAutoSetupIsAvailable, DoNotCopyFolder : Boolean; var UseInstallSupport : Boolean) : Boolean;
+Function ShowSelectTemplateForZipImportDialog(const AOwner : TComponent; const AAutoSetupDB, ATemplateDB : TGameDB; const APrgFiles, ATemplates : TStringList; const AArchivFileName, AAlternateProfileNameSource, ATempFolder : String; var AProfileName, AFileToStart, ASetupFileToStart, AFolder : String; var ATemplateNr : Integer; const NoDialogIfAutoSetupIsAvailable, DoNotCopyFolder : Boolean; var UseInstallSupport : Boolean) : Boolean;
 
 var
   SelectTemplateForZipImportForm: TSelectTemplateForZipImportForm;
@@ -137,7 +138,30 @@ begin
   If St.Count>0 then result:=St[0];
 end;
 
-Procedure TSelectTemplateForZipImportForm.Prepare(const DoNotCopyFolder : Boolean);
+function TSelectTemplateForZipImportForm.GetProfileNameFromFileIdDiz(TempFolder: String): String;
+Var S,T : String;
+    St : TStringList;
+    I,J : Integer;
+begin
+  result:='';
+  S:=IncludeTrailingPathDelimiter(TempFolder)+'FILE_ID.DIZ';
+  If not FileExists(S) then exit;
+  St:=TStringList.Create;
+  try
+    try St.LoadFromFile(S); except exit; end;
+    For I:=0 to St.Count-1 do begin
+      S:=Trim(St[I]);
+      T:='';
+      For J:=1 to length(S) do if (S[J]>=#32) and (S[J]<=#127) then T:=T+S[J];
+      T:=Trim(T);
+      If length(T)>5 then begin result:=T; exit; end;
+    end;
+  finally
+    St.Free;
+  end;
+end;
+
+Procedure TSelectTemplateForZipImportForm.Prepare(const DoNotCopyFolder : Boolean; const TempFolder : String);
 Var I,J,Nr : Integer;
     S : String;
 begin
@@ -167,9 +191,12 @@ begin
     end else begin
       TemplateType1RadioButton.Enabled:=False;
       TemplateType3RadioButton.Checked:=True;
-      If Trim(ArchivFileName)<>''
-        then ProfileNameEdit.Text:=ChangeFileExt(ExtractFileName(ArchivFileName),'')
-        else ProfileNameEdit.Text:=AlternateProfileNameSource;
+      S:=GetProfileNameFromFileIdDiz(TempFolder);
+      If S<>'' then ProfileNameEdit.Text:=S else begin
+        If Trim(ArchivFileName)<>''
+          then ProfileNameEdit.Text:=ChangeFileExt(ExtractFileName(ArchivFileName),'')
+          else ProfileNameEdit.Text:=AlternateProfileNameSource;
+      end;
 
       If PrgFiles.Count>0 then begin
         If PrgFiles.Count=1 then begin
@@ -398,7 +425,7 @@ end;
 
 { global }
 
-Function ShowSelectTemplateForZipImportDialog(const AOwner : TComponent; const AAutoSetupDB, ATemplateDB : TGameDB; const APrgFiles, ATemplates : TStringList; const AArchivFileName, AAlternateProfileNameSource : String; var AProfileName, AFileToStart, ASetupFileToStart, AFolder : String; var ATemplateNr : Integer; const NoDialogIfAutoSetupIsAvailable, DoNotCopyFolder : Boolean; var UseInstallSupport : Boolean) : Boolean;
+Function ShowSelectTemplateForZipImportDialog(const AOwner : TComponent; const AAutoSetupDB, ATemplateDB : TGameDB; const APrgFiles, ATemplates : TStringList; const AArchivFileName, AAlternateProfileNameSource, ATempFolder : String; var AProfileName, AFileToStart, ASetupFileToStart, AFolder : String; var ATemplateNr : Integer; const NoDialogIfAutoSetupIsAvailable, DoNotCopyFolder : Boolean; var UseInstallSupport : Boolean) : Boolean;
 begin
   UseInstallSupport:=False;
   SelectTemplateForZipImportForm:=TSelectTemplateForZipImportForm.Create(AOwner);
@@ -409,7 +436,7 @@ begin
     SelectTemplateForZipImportForm.TemplateDB:=ATemplateDB;
     SelectTemplateForZipImportForm.PrgFiles:=APrgFiles;
     SelectTemplateForZipImportForm.Templates:=ATemplates;
-    SelectTemplateForZipImportForm.Prepare(DoNotCopyFolder);
+    SelectTemplateForZipImportForm.Prepare(DoNotCopyFolder,ATempFolder);
     If SelectTemplateForZipImportForm.TemplateType1RadioButton.Checked and (NoDialogIfAutoSetupIsAvailable or PrgSetup.ImportZipWithoutDialogIfPossible) then begin
       result:=True;
       SelectTemplateForZipImportForm.OKButtonClick(SelectTemplateForZipImportForm);

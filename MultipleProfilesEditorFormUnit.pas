@@ -555,6 +555,7 @@ end;
 procedure TMultipleProfilesEditorForm.InitSettings;
 Var St : TStringList;
     I : Integer;
+    S : String;
 begin
   {Game info}
   AddCaption(LanguageSetup.ProfileEditorGameInfoSheet);
@@ -624,7 +625,20 @@ begin
   AddSetting(5008,LanguageSetup.GameScale,ValueToList(GameDB.ConfOpt.Scale,';,'),False,-1,True);
   AddSpinSetting(5009,LanguageSetup.GameFrameskip,0,10,ValueWidth);
   If PrgSetup.AllowGlideSettings then begin
-    AddYesNoSetting(5101,LanguageSetup.GameGlideEmulation);
+
+    St:=ValueToList(GameDB.ConfOpt.GlideEmulation,';,');
+    try
+      For I:=0 to St.Count-1 do begin
+        S:=Trim(ExtUpperCase(St[I]));
+        if S='FALSE' then St[I]:=LanguageSetup.Off;
+        if S='TRUE' then St[I]:=LanguageSetup.On;
+      end;
+      AddSetting(5101,LanguageSetup.GameGlideEmulation,St,False,ValueWidth,False);
+    finally
+      St.Free;
+    end;
+    AddEditSetting(5102,LanguageSetup.GameGlidePort,'600',ValueWidth);
+    //... 1.1 More Glide settings (LFB access: full,read,write,none.)
   end;
   If PrgSetup.AllowVGAChipsetSettings then begin
     AddSetting(5301,LanguageSetup.GameVGAChipset,ValueToList(GameDB.ConfOpt.VGAChipsets,';,'),False,ValueWidth,True);
@@ -711,6 +725,11 @@ begin
   AddSetting(8302,LanguageSetup.ProfileEditorSoundMIDIDevice,ValueToList(GameDB.ConfOpt.MIDIDevice,';,'),False,ValueWidth,True);
   AddEditSetting(8303,LanguageSetup.ProfileEditorSoundMIDIConfigInfo,'',-1);
 
+  {Innova}
+  If PrgSetup.AllowInnova then begin
+    //... 1.1: Innova settings
+  end;
+
   {Joystick}
   AddCaption(LanguageSetup.ProfileEditorGeneralSheet+' - '+LanguageSetup.GameJoysticks);
   AddSetting(9001,LanguageSetup.ProfileEditorSoundJoystickType,ValueToList(GameDB.ConfOpt.Joysticks,';,'),False,ValueWidth,True);
@@ -742,6 +761,21 @@ begin
   AddCaption(LanguageSetup.ProfileEditorGeneralSheet+' - '+LanguageSetup.ProfileEditorStartingSheet);
   AddYesNoSetting(12001,LanguageSetup.ProfileEditorAutoexecOverrideGameStart);
   AddYesNoSetting(12002,LanguageSetup.ProfileEditorAutoexecOverrideMounting);
+
+  {Network}
+  AddCaption(LanguageSetup.ProfileEditorGeneralSheet+' - '+LanguageSetup.ProfileEditorNetworkSheet);
+  AddYesNoSetting(12501,LanguageSetup.GameIPX);
+  St:=TStringList.Create;
+  try
+    St.Add(LanguageSetup.GameIPXEstablishConnectionNone);
+    St.Add(LanguageSetup.GameIPXEstablishConnectionClient);
+    St.Add(LanguageSetup.GameIPXEstablishConnectionServer);
+    AddSetting(12502,LanguageSetup.GameIPXEstablishConnection,St,False,ValueWidth,False);
+  finally
+    St.Free;
+  end;
+  AddEditSetting(12503,LanguageSetup.GameIPXAddress,'',-1);
+  AddSpinSetting(12504,LanguageSetup.GameIPXPort,1,65535,ValueWidth);
 
   {ScummVM}
   AddCaption(LanguageSetup.ProfileEditorScummVMSheet);
@@ -957,7 +991,14 @@ begin
       end;
       If ValueActive(5009) then G.FrameSkip:=Max(0,Min(10,GetSpinValue));
       If PrgSetup.AllowGlideSettings then begin
-        If ValueActive(5101) then G.GlideEmulation:=GetYesNo;
+        If ValueActive(5101) then begin
+          S:=GetComboText;
+          If S=LanguageSetup.On then S:='true';
+          If S=LanguageSetup.Off then S:='false';
+          G.GlideEmulation:=S;
+        end;
+        If ValueActive(5102) then G.GlidePort:=GetEditText;
+        //... 1.1: More Glide settings (If ValueActive(5103) then G.GlideLFB:=...)
       end;
       If PrgSetup.AllowVGAChipsetSettings then begin
         If ValueActive(5301) then G.VGAChipset:=GetComboText;
@@ -1033,6 +1074,11 @@ begin
       If ValueActive(8302) then G.MIDIDevice:=GetComboText;
       If ValueActive(8303) then G.MIDIConfig:=GetEditText;
 
+      {Innova}
+      If PrgSetup.AllowInnova then begin
+        //... 1.1: Innova settings
+      end;
+
       {Joystick}
       If ValueActive(9001) then G.JoystickType:=GetComboText;
       If ValueActive(9002) then G.JoystickTimed:=GetYesNo;
@@ -1053,6 +1099,16 @@ begin
       {Starting}
       If ValueActive(12001) then G.AutoexecOverridegamestart:=GetYesNo;
       If ValueActive(12002) then G.AutoexecOverrideMount:=GetYesNo;
+
+      {Network}
+      If ValueActive(12501) then G.IPX:=GetYesNo;
+      If ValueActive(12502) then Case GetComboIndex of
+        0 : G.IPXType:='none';
+        1 : G.IPXType:='client';
+        2 : G.IPXType:='server';
+      end;
+      If ValueActive(12503) then G.IPXAddress:=GetEditText;
+      If ValueActive(12504) then G.IPXPort:=IntToStr(GetSpinValue);
     end;
 
     If ScummVM then begin

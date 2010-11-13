@@ -101,7 +101,7 @@ object ProfileMountEditorCDDriveFrame: TProfileMountEditorCDDriveFrame
     Height = 21
     Style = csDropDownList
     Anchors = [akLeft, akTop, akRight]
-    ItemHeight = 0
+    ItemHeight = 13
     TabOrder = 2
   end
   object CDROMDriveLetterComboBox: TComboBox
@@ -110,7 +110,7 @@ object ProfileMountEditorCDDriveFrame: TProfileMountEditorCDDriveFrame
     Width = 145
     Height = 21
     Style = csDropDownList
-    ItemHeight = 0
+    ItemHeight = 13
     TabOrder = 3
     OnChange = CDROMDriveLetterComboBoxChange
   end
@@ -120,7 +120,7 @@ object ProfileMountEditorCDDriveFrame: TProfileMountEditorCDDriveFrame
     Width = 242
     Height = 21
     Style = csDropDownList
-    ItemHeight = 0
+    ItemHeight = 13
     TabOrder = 4
     OnChange = CDMountTypeComboBoxChange
   end

@@ -24,7 +24,6 @@ type
     FrameSkipLabel: TLabel;
     FrameSkipEdit: TSpinEdit;
     TextModeLinesRadioGroup: TRadioGroup;
-    GlideEmulationCheckBox: TCheckBox;
     VGASettingsGroupBox: TGroupBox;
     VGAChipsetLabel: TLabel;
     VGAChipsetComboBox: TComboBox;
@@ -35,6 +34,8 @@ type
     PixelShaderComboBox: TComboBox;
     PixelShaderLabel: TLabel;
     ResolutionInfoLabel: TLabel;
+    GlideEmulationLabel: TLabel;
+    GlideEmulationComboBox: TComboBox;
     procedure PixelShaderComboBoxChange(Sender: TObject);
   private
     { Private-Deklarationen }
@@ -60,6 +61,8 @@ uses VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgSetupUnit, HelpConsts;
 
 procedure TModernProfileEditorGraphicsFrame.InitGUI(var InitData : TModernProfileEditorInitData);
 Var St : TStringList;
+    I : Integer;
+    S : String;
 begin
   InitData.OnShowFrame:=ShowFrame;
 
@@ -68,7 +71,7 @@ begin
   NoFlicker(StartFullscreenCheckBox);
   NoFlicker(DoublebufferingCheckBox);
   NoFlicker(KeepAspectRatioCheckBox);
-  NoFlicker(GlideEmulationCheckBox);
+  NoFlicker(GlideEmulationComboBox);
   NoFlicker(RenderComboBox);
   NoFlicker(VideoCardComboBox);
   NoFlicker(PixelShaderComboBox);
@@ -90,7 +93,21 @@ begin
   FullscreenInfoLabel.Caption:='('+LanguageSetup.GameStartFullscreenInfo+')';
   DoublebufferingCheckBox.Caption:=LanguageSetup.GameUseDoublebuffering;
   KeepAspectRatioCheckBox.Caption:=LanguageSetup.GameAspectCorrection;
-  GlideEmulationCheckBox.Caption:=LanguageSetup.GameGlideEmulation;
+  GlideEmulationLabel.Caption:=LanguageSetup.GameGlideEmulation;
+
+  St:=ValueToList(InitData.GameDB.ConfOpt.GlideEmulation,';,');
+  try
+    For I:=0 to St.Count-1 do begin
+      S:=Trim(ExtUpperCase(St[I]));
+      if S='FALSE' then St[I]:=LanguageSetup.Off;
+      if S='TRUE' then St[I]:=LanguageSetup.On;
+    end;
+    GlideEmulationComboBox.Items.Clear;
+    GlideEmulationComboBox.Items.AddStrings(St);
+  finally
+    St.Free;
+  end;
+  //... 1.1: Glide settings: (grport=600 (I/O port to use for host communication), lfb=full (LFB access: full,read,write,none.))
   RenderLabel.Caption:=LanguageSetup.GameRender;
   St:=ValueToList(InitData.GameDB.ConfOpt.Render,';,'); try RenderComboBox.Items.AddStrings(St); finally St.Free; end;
   VideoCardLabel.Caption:=LanguageSetup.GameVideoCard;
@@ -144,8 +161,18 @@ begin
   StartFullscreenCheckBox.Checked:=Game.StartFullscreen;
   DoublebufferingCheckBox.Checked:=Game.UseDoublebuffering;
   KeepAspectRatioCheckBox.Checked:=Game.AspectCorrection;
-  GlideEmulationCheckBox.Visible:=PrgSetup.AllowGlideSettings;
-  If PrgSetup.AllowGlideSettings then GlideEmulationCheckBox.Checked:=Game.GlideEmulation;
+  GlideEmulationLabel.Visible:=PrgSetup.AllowGlideSettings;
+  GlideEmulationComboBox.Visible:=PrgSetup.AllowGlideSettings;
+  If PrgSetup.AllowGlideSettings then begin
+    S:=Trim(ExtUpperCase(Game.GlideEmulation));
+    If (S='0') or (S='FALSE') then S:=LanguageSetup.Off;
+    If (S='1') or (S='TRUE') then S:=LanguageSetup.On;
+    S:=ExtUpperCase(S);
+    GlideEmulationComboBox.ItemIndex:=0;
+    For I:=0 to GlideEmulationComboBox.Items.Count-1 do If Trim(ExtUpperCase(GlideEmulationComboBox.Items[I]))=S then begin
+      GlideEmulationComboBox.ItemIndex:=I; break;
+    end;
+  end;
 
   S:=Trim(ExtUpperCase(Game.Render));
   RenderComboBox.ItemIndex:=0;
@@ -262,8 +289,12 @@ begin
   Game.StartFullscreen:=StartFullscreenCheckBox.Checked;
   Game.UseDoublebuffering:=DoublebufferingCheckBox.Checked;
   Game.AspectCorrection:=KeepAspectRatioCheckBox.Checked;
-  If PrgSetup.AllowGlideSettings then Game.GlideEmulation:=GlideEmulationCheckBox.Checked;
-
+  If PrgSetup.AllowGlideSettings then begin
+    S:=GlideEmulationComboBox.Items[GlideEmulationComboBox.ItemIndex];
+    If S=LanguageSetup.On then S:='true';
+    If S=LanguageSetup.Off then S:='false';
+    Game.GlideEmulation:=S;
+  end;
   Game.Render:=RenderComboBox.Text;
   S:=Trim(VideoCardComboBox.Text);
   If Pos('(',S)<>0 then S:=Trim(Copy(S,1,Pos('(',S)-1));

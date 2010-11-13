@@ -484,7 +484,9 @@ begin
     N2:=N.ChildNodes['Configuration'];
     If N2<>nil then begin
       N3:=N2.ChildNodes['Glide'];
-      If N3<>nil then G.GlideEmulation:=(N3.Text<>'0');
+      If N3<>nil then begin
+        if N3.Text='0' then G.GlideEmulation:='flase' else G.GlideEmulation:='true';
+      end;
       If ReadValue(N2,'VGAChipSet','VGAChipset',S) then G.VGAChipset:=S;
       If ReadValue(N2,'Printer','PrintOutput',S) then begin
         G.PrinterOutputFormat:=S;
