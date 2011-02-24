@@ -58,14 +58,11 @@ type
     DummyImageList2: TImageList;
     ImageList: TImageList;
     DescriptionEdit: TLabeledEdit;
-    ToolsButton: TBitBtn;
-    ToolsPopupMenu: TPopupMenu;
-    ToolsMenuFileChecksum: TMenuItem;
-    ToolsMenuMakePackageFromPlainZips: TMenuItem;
-    Makepackagefilefromplainzipfilesandaddautosetuptemplates1: TMenuItem;
-    Makepackagefilefromautosetuptemplates1: TMenuItem;
-    N1: TMenuItem;
-    N2: TMenuItem;
+    TabSheet7: TTabSheet;
+    ToolsCheckBox: TCheckBox;
+    ToolsRadioButton1: TRadioButton;
+    ToolsRadioButton2: TRadioButton;
+    ToolsRadioButton3: TRadioButton;
     procedure FormShow(Sender: TObject);
     procedure HelpButtonClick(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -79,10 +76,9 @@ type
     procedure GamesListViewColumnClick(Sender: TObject; Column: TListColumn);
     procedure AutoSetupListViewColumnClick(Sender: TObject;
       Column: TListColumn);
-    procedure ToolsButtonClick(Sender: TObject);
-    procedure ToolsMenuWork(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
+    procedure ToolsCheckBoxClick(Sender: TObject);
   private
     { Private-Deklarationen }
     ListSortGames, ListSortAutoSetups : TSortListBy;
@@ -131,7 +127,6 @@ begin
   OKButton.Caption:=LanguageSetup.OK;
   CancelButton.Caption:=LanguageSetup.Cancel;
   HelpButton.Caption:=LanguageSetup.Help;
-  ToolsButton.Caption:=LanguageSetup.ProfileEditorTools;
 
   TabSheet1.Caption:=LanguageSetup.PackageManagerPageGames;
   TabSheet2.Caption:=LanguageSetup.PackageManagerPageAutoSetups;
@@ -139,6 +134,7 @@ begin
   TabSheet6.Caption:=LanguageSetup.PackageManagerPageIconSets;
   TabSheet4.Caption:=LanguageSetup.PackageManagerPageLanguages;
   TabSheet5.Caption:=LanguageSetup.PackageManagerPageExePackages;
+  TabSheet7.Caption:=LanguageSetup.PackageManagerPageTools;
 
   DescriptionEdit.EditLabel.Caption:=LanguageSetup.PackageCreatorDescription;
   OutputFileEdit.EditLabel.Caption:=LanguageSetup.PackageCreatorOutputFile;
@@ -160,13 +156,17 @@ begin
   PackagesAddButton.Caption:=LanguageSetup.Add;
   PackagesEditButton.Caption:=LanguageSetup.Edit;
   PackagesDelButton.Caption:=LanguageSetup.Del;
+  ToolsCheckBox.Caption:=LanguageSetup.PackageManagerPageToolsSpecial;
+  ToolsRadioButton1.Caption:=LanguageSetup.PackageManagerPageToolsSpecial1;
+  ToolsRadioButton2.Caption:=LanguageSetup.PackageManagerPageToolsSpecial2;
+  ToolsRadioButton3.Caption:=LanguageSetup.PackageManagerPageToolsSpecial3;
 
   UserIconLoader.DirectLoad(ImageList,'PackageManager');
+  UserIconLoader.DialogImage(DI_Tools,ImageList,10); //... Remove this line and add tools button to regular list after release of 1.1
   UserIconLoader.DialogImage(DI_Add,PackagesAddButton);
   UserIconLoader.DialogImage(DI_Edit,PackagesEditButton);
   UserIconLoader.DialogImage(DI_Delete,PackagesDelButton);
   UserIconLoader.DialogImage(DI_SelectFolder,OutputFileButton);
-  UserIconLoader.DialogImage(DI_Tools,ToolsButton);
 
   OpenDialog.Title:=LanguageSetup.PackageManagerPageExePackagesSelect;
   OpenDialog.Filter:=LanguageSetup.BuildInstallerDestFileFilter;
@@ -180,7 +180,7 @@ begin
   InitListViewForGamesList(AutoSetupListView,True);
   LoadLists;
 
-  ToolsButton.Visible:=((GetKeyState(VK_LSHIFT) div 32)<>0) or ((GetKeyState(VK_RSHIFT) div 32)<>0);
+  TabSheet7.TabVisible:=PrgSetup.ActivateIncompleteFeatures;
 end;
 
 procedure TPackageCreationForm.FormDestroy(Sender: TObject);
@@ -382,7 +382,7 @@ begin
     For I:=0 to GamesListView.Items.Count-1 do If GamesListView.Items[I].Checked then begin
       G:=TGame(GamesListView.Items[I].Data);
       S:=OutputDir+ChangeFileExt(ExtractFileName(G.SetupFile),'.zip');
-      BuildZipPackage(self,G,S);
+      BuildZipPackage(self,G,S,True);
       if not AddPackageDataZip(Doc,G,S) then exit;
     end;
 
@@ -487,7 +487,7 @@ end;
 
 procedure TPackageCreationForm.OKButtonClick(Sender: TObject);
 Var St : TStringList;
-    OutputFile : String;
+    OutputFile,S : String;
 begin
   OutputFile:=OutputFileEdit.Text;
 
@@ -498,9 +498,27 @@ begin
   OutputFile:=MakeAbsPath(OutputFile,GetSpecialFolder(Handle,CSIDL_DESKTOPDIRECTORY));
   If ExtractFileExt(OutputFile)='' then OutputFile:=OutputFile+'.xml';
 
-  St:=CreatePackageFile(IncludeTrailingPathDelimiter(ExtractFilePath(OutputFile)));
-  If St=nil then exit;
+  St:=nil;
   try
+    If ToolsCheckBox.Checked then begin
+      If ToolsRadioButton1.Checked or ToolsRadioButton2.Checked then begin
+        If ToolsRadioButton2.Checked then begin
+          S:=GetNormalFileVersionAsString;
+          If not InputQuery(LanguageSetup.PackageManagerPageToolsSpecial2,LanguageSetup.PackageManagerPageToolsMaxVersionInfoGame,S) then exit;
+        end else begin
+          S:='';
+        end;
+        St:=CreatePackageFileForPlainZips(IncludeTrailingPathDelimiter(ExtractFilePath(OutputFile)),ToolsRadioButton2.Checked,S);
+      end;
+      If ToolsRadioButton3.Checked then begin
+        S:=GetNormalFileVersionAsString;
+        If not InputQuery(LanguageSetup.PackageManagerPageToolsSpecial3,LanguageSetup.PackageManagerPageToolsMaxVersionInfoAutoSetup,S) then exit;
+        St:=CreatePackageFileForAutoSetupTemplates(IncludeTrailingPathDelimiter(ExtractFilePath(OutputFile)),Trim(S));
+      end;
+    end else begin
+       St:=CreatePackageFile(IncludeTrailingPathDelimiter(ExtractFilePath(OutputFile)));
+    end;
+    If St=nil then begin ModalResult:=mrNone; exit; end;
     try
       St.SaveToFile(OutputFile);
     except
@@ -517,67 +535,11 @@ begin
   Application.HelpCommand(HELP_CONTEXT,ID_FileExportPackageListCreator); 
 end;
 
-procedure TPackageCreationForm.ToolsButtonClick(Sender: TObject);
-Var P : TPoint;
+procedure TPackageCreationForm.ToolsCheckBoxClick(Sender: TObject);
 begin
-  P:=ClientToScreen(Point(ToolsButton.Left,ToolsButton.Top));
-  ToolsPopupMenu.Popup(P.X+5,P.Y+5);
-end;
-
-procedure TPackageCreationForm.ToolsMenuWork(Sender: TObject);
-Var Dialog : TOpenDialog;
-    St : TStringList;
-    OutputFile,S : String;
-begin
-  Case (Sender as TComponent).Tag of
-    0 : begin
-          Dialog:=TOpenDialog.Create(self);
-          try
-            Dialog.Title:=LanguageSetup.ChooseFile;
-            Dialog.Filter:='All files (*.*)|*.*';
-            If not Dialog.Execute then exit;
-            Clipboard.AsText:=GetMD5Sum(Dialog.FileName);
-          finally
-            Dialog.Free;
-          end;
-        end;
-    1,2 : begin
-          OutputFile:=OutputFileEdit.Text;
-          If Trim(OutputFile)='' then begin MessageDlg(LanguageSetup.MessageNoFileName,mtError,[mbOK],0); exit; end;
-          OutputFile:=MakeAbsPath(OutputFile,GetSpecialFolder(Handle,CSIDL_DESKTOPDIRECTORY));
-
-          If (Sender as TComponent).Tag=2 then begin
-            S:=GetNormalFileVersionAsString;
-            If not InputQuery('Make package file from plain zip files and add auto setup templates','If you want to specify a maximum version for which the external templates are needed, enter it here. If the field is blank, the auto setup template will be assumed to be needed for all versions.',S) then exit;
-          end else begin
-            S:='';
-          end;
-
-          St:=CreatePackageFileForPlainZips(IncludeTrailingPathDelimiter(ExtractFilePath(OutputFile)),(Sender as TComponent).Tag=2,S);
-          If St=nil then exit;
-          try
-            try St.SaveToFile(OutputFile); except MessageDlg(Format(LanguageSetup.MessageCouldNotSaveFile,[OutputFile]),mtError,[mbOK],0); exit; end;
-          finally
-            St.Free;
-          end;
-          Close;
-        end;
-    3 : begin
-          OutputFile:=OutputFileEdit.Text;
-          If Trim(OutputFile)='' then begin MessageDlg(LanguageSetup.MessageNoFileName,mtError,[mbOK],0); exit; end;
-          OutputFile:=MakeAbsPath(OutputFile,GetSpecialFolder(Handle,CSIDL_DESKTOPDIRECTORY));
-          S:=GetNormalFileVersionAsString;
-          If not InputQuery('Make package file from auto setup templates','If you want to specify a maximum version for which this templates are needed, enter it here. If the field is blank, the auto setup template will be assumed to be needed for all versions.',S) then exit;
-          St:=CreatePackageFileForAutoSetupTemplates(IncludeTrailingPathDelimiter(ExtractFilePath(OutputFile)),Trim(S));
-          If St=nil then exit;
-          try
-            try St.SaveToFile(OutputFile); except MessageDlg(Format(LanguageSetup.MessageCouldNotSaveFile,[OutputFile]),mtError,[mbOK],0); exit; end;
-          finally
-            St.Free;
-          end;
-          Close;
-        end;
-  end;
+  ToolsRadioButton1.Enabled:=ToolsCheckBox.Checked;
+  ToolsRadioButton2.Enabled:=ToolsCheckBox.Checked;
+  ToolsRadioButton3.Enabled:=ToolsCheckBox.Checked;
 end;
 
 procedure TPackageCreationForm.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);

@@ -3,7 +3,7 @@ object ModernProfileEditorForm: TModernProfileEditorForm
   Top = 0
   BorderStyle = bsDialog
   Caption = 'ModernProfileEditorForm'
-  ClientHeight = 559
+  ClientHeight = 574
   ClientWidth = 778
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -21,12 +21,13 @@ object ModernProfileEditorForm: TModernProfileEditorForm
   TextHeight = 13
   object BottomPanel: TPanel
     Left = 0
-    Top = 524
+    Top = 539
     Width = 778
     Height = 35
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 1
+    ExplicitTop = 524
     object CancelButton: TBitBtn
       Left = 112
       Top = 6
@@ -134,14 +135,15 @@ object ModernProfileEditorForm: TModernProfileEditorForm
     Left = 0
     Top = 0
     Width = 778
-    Height = 524
+    Height = 539
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 0
+    ExplicitHeight = 524
     object Splitter1: TSplitter
       Left = 209
       Top = 0
-      Height = 524
+      Height = 539
       Beveled = True
       ResizeStyle = rsUpdate
       ExplicitLeft = 328
@@ -152,7 +154,7 @@ object ModernProfileEditorForm: TModernProfileEditorForm
       Left = 0
       Top = 0
       Width = 209
-      Height = 524
+      Height = 539
       Align = alLeft
       HideSelection = False
       Images = ImageList
@@ -160,15 +162,17 @@ object ModernProfileEditorForm: TModernProfileEditorForm
       ReadOnly = True
       TabOrder = 0
       OnChange = TreeChange
+      ExplicitHeight = 524
     end
     object RightPanel: TPanel
       Left = 212
       Top = 0
       Width = 566
-      Height = 524
+      Height = 539
       Align = alClient
       BevelOuter = bvNone
       TabOrder = 1
+      ExplicitHeight = 524
       object TopPanel: TPanel
         Left = 0
         Top = 0

@@ -104,8 +104,10 @@ end;
 procedure TUserInfoForm.AddButtonClick(Sender: TObject);
 Var M : TMenuItem;
     St : TStringList;
-    I : Integer;
+    I,J : Integer;
     P : TPoint;
+    S : String;
+    B : Boolean;
 begin
   If (Sender as TComponent).Tag>0 then begin
     If ((Sender as TComponent).Tag=1) or (Trim(Tab.Cells[0,Tab.RowCount-1])<>'') or (Trim(Tab.Cells[1,Tab.RowCount-1])<>'') then begin
@@ -130,14 +132,17 @@ begin
     M:=TMenuItem.Create(AddUserDataPopupMenu); M.Caption:='-';
     AddUserDataPopupMenu.Items.Add(M);
     For I:=0 to St.Count-1 do begin
-      M:=TMenuItem.Create(AddUserDataPopupMenu); M.Caption:=St[I]; M.Tag:=2; M.OnClick:=AddButtonClick;
+      S:=ExtUpperCase(St[I]); B:=True;
+      For J:=1 to Tab.RowCount-1 do If ExtUpperCase(Tab.Cells[0,J])=S then begin B:=False; break; end;
+      If not B then continue;
+      M:=TMenuItem.Create(AddUserDataPopupMenu); M.Caption:=MaskUnderlineAmpersand(St[I]); M.Tag:=2; M.OnClick:=AddButtonClick;
       AddUserDataPopupMenu.Items.Add(M);
     end;
   finally
     St.Free;
   end;
 
-  P:=ClientToScreen(Point((Sender as TControl).Left,(Sender as TControl).Top));
+  P:=Panel1.ClientToScreen(Point((Sender as TControl).Left,(Sender as TControl).Top));
   AddUserDataPopupMenu.Popup(P.X+5,P.Y+5);
 end;
 

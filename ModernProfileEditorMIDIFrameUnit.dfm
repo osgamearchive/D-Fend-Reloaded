@@ -22,10 +22,10 @@ object ModernProfileEditorMIDIFrame: TModernProfileEditorMIDIFrame
     Caption = 'DeviceLabel'
   end
   object MIDISelectLabel1: TLabel
-    Left = 255
+    Left = 320
     Top = 179
-    Width = 473
-    Height = 41
+    Width = 408
+    Height = 54
     Anchors = [akLeft, akTop, akRight]
     AutoSize = False
     Caption = 
@@ -90,7 +90,7 @@ object ModernProfileEditorMIDIFrame: TModernProfileEditorMIDIFrame
   object MIDISelectButton: TButton
     Left = 24
     Top = 179
-    Width = 225
+    Width = 290
     Height = 25
     Caption = 'Select MIDI device from device manager'
     TabOrder = 3
@@ -99,7 +99,7 @@ object ModernProfileEditorMIDIFrame: TModernProfileEditorMIDIFrame
   object MIDISelectListBox: TListBox
     Left = 24
     Top = 210
-    Width = 225
+    Width = 290
     Height = 97
     ItemHeight = 13
     TabOrder = 4

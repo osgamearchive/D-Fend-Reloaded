@@ -232,9 +232,7 @@ begin
   F:=TSetupFrameBase.Create(self); AddTreeNode(nil,F,TSetupFrameBase(F),False,0); Root:=F;
   F:=TSetupFrameDirectories.Create(self); AddTreeNode(Root,F,TSetupFrameDirectories(F),False,1);
   F:=TSetupFrameSecurity.Create(self); AddTreeNode(Root,F,TSetupFrameSecurity(F),True,5);
-  If PrgSetup.ActivateIncompleteFeatures then begin
-    F:=TSetupFrameDataPrivacy.Create(self); AddTreeNode(Root,F,TSetupFrameDataPrivacy(F),True,5);
-  end;
+  F:=TSetupFrameDataPrivacy.Create(self); AddTreeNode(Root,F,TSetupFrameDataPrivacy(F),True,5);
   F:=TSetupFrameCompression.Create(self); AddTreeNode(Root,F,TSetupFrameCompression(F),True,16);
   F:=TSetupFrameWine.Create(self); AddTreeNode(Root,F,TSetupFrameWine(F),True,19);
 

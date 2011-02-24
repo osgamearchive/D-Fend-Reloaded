@@ -10,11 +10,14 @@ const ID_Index=1;
 
       ID_FileExportConf=1001;
       ID_FileExportProf=1002;
+      ID_FileExportList=1003;
+
       ID_FileImportZip=1011;
       ID_FileImportDownload=1014;
       ID_FileExportBuildInstallers=1012;
       ID_FileExportBuildZipPackages=1013;
       ID_FileExportPackageListCreator=1015;
+
       ID_FileOptions=1100;
       ID_FileOptionsGeneral=1101;
       ID_FileOptionsDirectories=1102;
@@ -100,6 +103,7 @@ const ID_Index=1;
       ID_ProfileEditHelperPrograms=2124;
       ID_ProfileEditHardware=2125;
       ID_ProfileEditAdditionalChecksums=2126;
+      ID_ProfileEditSoundInnova=2127;
 
       ID_ExtrasManageIcons=3001;
       ID_ExtrasViewHistory=3002;
@@ -128,6 +132,7 @@ const ID_Index=1;
       ID_HelpOperationMode=4004;
       ID_HelpSearchForUpdates=4005;
       ID_HelpOldGames=4006;
+      ID_HelpGetGames=4007;
 
 implementation
 

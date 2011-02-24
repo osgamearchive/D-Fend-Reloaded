@@ -2,8 +2,6 @@ unit DownloadWaitFormUnit;
 
 interface
 
-{$DEFINE UseBackgroundThread}
-
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, ComCtrls, StdCtrls, Buttons, IdHTTP, IdComponent, IdFTP;
@@ -16,7 +14,8 @@ type
     procedure FormCreate(Sender: TObject);
   private
     { Private-Deklarationen }
-    Procedure WorkEvent(ASender: TObject; AWorkMode: TWorkMode; AWorkCount: Integer);
+    FWorkEvent1WorkSize : Int64;
+    Procedure WorkEvent(ASender: TObject; AWorkMode: TWorkMode; AWorkCount: Int64);
   public
     { Public-Deklarationen }
     Canceled : Boolean;
@@ -33,8 +32,8 @@ Procedure DoneDownloadWaitForm;
 
 Type TDownloadResult=(drSuccess, drFail, drCancel);
 
-Function DownloadFileWithDialog(const AOwner : TComponent; const Size : Integer; const AbsBase, URL, Referer, DestFile : String) : TDownloadResult;
-Function DownloadFileWithOutDialog(const AOwner : TComponent; const Size : Integer; const AbsBase, URL, Referer, DestFile : String) : TDownloadResult;
+Function DownloadFileWithDialog(const AOwner : TComponent; const Size : Int64; const AbsBase, URL, Referer, DestFile : String) : TDownloadResult;
+Function DownloadFileWithOutDialog(const AOwner : TComponent; const Size : Int64; const AbsBase, URL, Referer, DestFile : String) : TDownloadResult;
 Function MetaLinkDownload(const AOwner : TComponent; const ASize : Integer; const AbsBase, MetaLinkURL, Referer, DestFile : String) : TDownloadResult;
 
 implementation
@@ -55,6 +54,7 @@ begin
   Canceled:=False;
   HTTP:=nil;
   FTP:=nil;
+  FWorkEvent1WorkSize:=0;
 
   AbortButton.DoubleBuffered:=True;
   AbortButton.Caption:=LanguageSetup.MsgDlgAbort;
@@ -66,12 +66,19 @@ begin
   AbortButton.Enabled:=False;
 end;
 
-procedure TDownloadWaitForm.WorkEvent(ASender: TObject; AWorkMode: TWorkMode; AWorkCount: Integer);
+procedure TDownloadWaitForm.WorkEvent(ASender: TObject; AWorkMode: TWorkMode; AWorkCount: Int64);
 begin
   ProgressBar.Position:=AWorkCount;
   If DownloadWaitForm.ProgressBar.Max>1 then begin
-    ProgressBar.Position:=AWorkCount;
-    Caption:=LanguageSetup.PackageManagerDownloading+' ['+IntToStr(100*Int64(AWorkCount) div Int64(ProgressBar.Max))+'%]';
+    If FWorkEvent1WorkSize>100000000 then begin
+      ProgressBar.Position:=AWorkCount div 100000;
+      Caption:=LanguageSetup.PackageManagerDownloading+' ['+GetNiceFileSize(AWorkCount)+', '+IntToStr(AWorkCount div 1000 div Int64(ProgressBar.Max))+'%]';
+    end else begin
+      ProgressBar.Position:=AWorkCount;
+      Caption:=LanguageSetup.PackageManagerDownloading+' ['+GetNiceFileSize(AWorkCount)+', '+IntToStr(100*AWorkCount div Int64(ProgressBar.Max))+'%]';
+    end;
+  end else begin
+    Caption:=LanguageSetup.PackageManagerDownloading+' ['+GetNiceFileSize(AWorkCount)+']';  
   end;
   Invalidate;
   Paint;
@@ -115,15 +122,32 @@ begin
   If Assigned(DownloadWaitForm) then FreeAndNil(DownloadWaitForm);
 end;
 
-Function SimpleFileCheck(const MSt : TMemoryStream; const DestFile : String) : Boolean;
+Function SimpleFileCheck(const St : TStream; const DestFile : String) : Boolean;
 Type TCharArray=Array[0..MaxInt div 2-1] of Char;
 Var Ext : String;
+    MSt : TMemoryStream;
+    FSt : TFileStream;
+    C : Array[0..1] of Char;
+    SavePos : Int64;
 begin
   result:=True;
   Ext:=Trim(ExtUpperCase(ExtractFileExt(DestFile)));
   If (Ext<>'.ZIP') and (Ext<>'.EXE') then exit;
-  If Ext='.ZIP' then result:=(TCharArray(MSt.Memory^)[0]='P') and(TCharArray(MSt.Memory^)[1]='K');
-  If Ext='.EXE' then result:=(TCharArray(MSt.Memory^)[0]='M') and(TCharArray(MSt.Memory^)[1]='Z');
+
+  If St is TMemoryStream then begin
+    MSt:=TMemoryStream(St);
+    If Ext='.ZIP' then result:=(TCharArray(MSt.Memory^)[0]='P') and (TCharArray(MSt.Memory^)[1]='K');
+    If Ext='.EXE' then result:=(TCharArray(MSt.Memory^)[0]='M') and (TCharArray(MSt.Memory^)[1]='Z');
+  end;
+
+  If St is TFileStream then begin
+    FSt:=TFileStream(St);
+    SavePos:=FSt.Position;
+    FSt.Position:=0;
+    try FSt.ReadBuffer(C,2); finally FSt.Position:=SavePos; end;
+    If Ext='.ZIP' then result:=(C[0]='P') and (C[1]='K');
+    If Ext='.EXE' then result:=(C[0]='M') and (C[1]='Z');
+  end;
 end;
 
 Function CalcReferer(const URL, Referer : String) : String;
@@ -149,11 +173,11 @@ Type THTTPThread=class(TThread)
     FSuccess : TDownloadResult;
     FWorkEvent1Sender : TObject;
     FWorkEvent1WorkMode : TWorkMode;
-    FWorkEvent1WorkCount, FWorkEvent1WorkSize : Integer;
+    FWorkEvent1WorkCount, FWorkEvent1WorkSize : Int64;
     FTPDownloadHandled : Boolean;
     HTTP : TIdHTTP;
     FTP : TIdFTP;
-    FSize : Integer;
+    FSize : Int64;
     Procedure WorkEvent1(ASender: TObject; AWorkMode: TWorkMode; AWorkCount: Integer);
     Procedure WorkEvent2;
     Procedure RedirectEvent(Sender: TObject; var dest: string; var NumRedirect: Integer; var Handled: boolean; var VMethod: TIdHTTPMethod);
@@ -161,12 +185,12 @@ Type THTTPThread=class(TThread)
   protected
     Procedure Execute; override;
   public
-    Constructor Create(const AOwner : TComponent; const AURL, AReferer, ADestFile : String; const ASize : Integer; const ShowWaitDialog : Boolean);
+    Constructor Create(const AOwner : TComponent; const AURL, AReferer, ADestFile : String; const ASize : Int64; const ShowWaitDialog : Boolean);
     Destructor Destroy; override;
     property Success : TDownloadResult read FSuccess;
 end;
 
-Constructor THTTPThread.Create(const AOwner : TComponent; const AURL, AReferer, ADestFile : String; const ASize : Integer; const ShowWaitDialog : Boolean);
+Constructor THTTPThread.Create(const AOwner : TComponent; const AURL, AReferer, ADestFile : String; const ASize : Int64; const ShowWaitDialog : Boolean);
 begin
   inherited Create(True);
   FURL:=AURL;
@@ -187,6 +211,8 @@ end;
 
 Procedure THTTPThread.Execute;
 Var MSt : TMemoryStream;
+    FSt : TFileStream;
+    DeletePartialFile : Boolean;
     I : Integer;
     B: Boolean;
     V : TIdHTTPMethod;
@@ -202,30 +228,70 @@ begin
 
   HTTP:=TIdHTTP.Create(Application.MainForm);
   try
-    MSt:=TMemoryStream.Create;
-    try
-      If Assigned(DownloadWaitForm) then DownloadWaitForm.HTTP:=HTTP;
-      HTTP.Request.UserAgent:='User-Agent=Mozilla/5.0 (Windows; U; Windows NT 6.0)';
-      HTTP.Request.AcceptLanguage:='en';
-      HTTP.Request.Referer:=CalcReferer(FURL,FReferer);
-      HTTP.OnWork:=WorkEvent1;
-      HTTP.OnRedirect:=RedirectEvent;
-      HTTP.HandleRedirects:=True;
-      HTTP.ConnectTimeout:=10*1000;
+    If Assigned(DownloadWaitForm) then DownloadWaitForm.HTTP:=HTTP;
+    HTTP.Request.UserAgent:='User-Agent=Mozilla/5.0 (Windows; U; Windows NT 6.0)';
+    HTTP.Request.AcceptLanguage:='en';
+    HTTP.Request.Referer:=CalcReferer(FURL,FReferer);
+    HTTP.OnWork:=WorkEvent1;
+    HTTP.OnRedirect:=RedirectEvent;
+    HTTP.HandleRedirects:=True;
+    HTTP.ConnectTimeout:=10*1000;
+
+    If FSize<1024*1024 then begin
+      {Small file - download to memory stream}
+      MSt:=TMemoryStream.Create;
       try
-        HTTP.Get(FURL,MSt);
-        If (MSt.Size<30000) and ((FSize<=0) or (FSize<>MSt.Size)) then FixSourceForgeDownload(MSt);
-      except
-        If not FTPDownloadHandled then exit;
+        try
+          HTTP.Get(FURL,MSt);
+          If (MSt.Size<30000) and ((FSize<=0) or (FSize<>MSt.Size)) then FixSourceForgeDownload(MSt);
+        except
+          If not FTPDownloadHandled then exit;
+        end;
+        If not FTPDownloadHandled then begin
+          If not SimpleFileCheck(MSt,FDestFile) then exit;
+          If Assigned(DownloadWaitForm) and DownloadWaitForm.Canceled then begin FSuccess:=drCancel; exit; end;
+          MSt.SaveToFile(FDestFile);
+        end;
+        FSuccess:=drSuccess;
+      finally
+        MSt.Free;
       end;
-      If not FTPDownloadHandled then begin
-        If not SimpleFileCheck(MSt,FDestFile) then exit;
-        If Assigned(DownloadWaitForm) and DownloadWaitForm.Canceled then begin FSuccess:=drCancel; exit; end;
-        MSt.SaveToFile(FDestFile);
+    end else begin
+      {Large file - download to file}
+      FSt:=TFileStream.Create(FDestFile,fmCreate);
+      DeletePartialFile:=False;
+      try
+        try
+          try
+            HTTP.Get(FURL,FSt);
+          except
+            DeletePartialFile:=True; FSuccess:=drFail; exit;
+          end;
+          If (FSt.Size<30000) and ((FSize<=0) or (FSize<>FSt.Size)) then begin
+            MSt:=TMemoryStream.Create;
+            try
+              FSt.Position:=0;
+              MSt.LoadFromStream(FSt);
+              FreeAndNil(FSt); DeleteFile(FDestFile);
+              FixSourceForgeDownload(MSt);
+              FSt:=TFileStream.Create(FDestFile,fmCreate);
+              FSt.CopyFrom(MSt,0);
+            finally
+              MSt.Free;
+            end;
+          end;
+        except
+          If not FTPDownloadHandled then begin DeletePartialFile:=True; exit; end;
+        end;
+        If not FTPDownloadHandled then begin
+          If not SimpleFileCheck(FSt,FDestFile) then begin DeletePartialFile:=True; exit; end;
+          If Assigned(DownloadWaitForm) and DownloadWaitForm.Canceled then begin FSuccess:=drCancel; DeletePartialFile:=True; exit; end;
+        end;
+        FSuccess:=drSuccess;
+      finally
+        FSt.Free;
+        If DeletePartialFile then DeleteFile(FDestFile);
       end;
-      FSuccess:=drSuccess;
-    finally
-      MSt.Free;
     end;
   finally
     If Assigned(DownloadWaitForm) then DownloadWaitForm.HTTP:=nil;
@@ -284,7 +350,10 @@ Procedure THTTPThread.WorkEvent2;
 begin
   If not Assigned(DownloadWaitForm) then exit;
   If DownloadWaitForm.ProgressBar.Max=1 then begin
-    DownloadWaitForm.ProgressBar.Max:=FWorkEvent1WorkSize;
+    If FWorkEvent1WorkSize>100000000
+      then DownloadWaitForm.ProgressBar.Max:=FWorkEvent1WorkSize div 100000
+      else DownloadWaitForm.ProgressBar.Max:=FWorkEvent1WorkSize;
+    DownloadWaitForm.FWorkEvent1WorkSize:=FWorkEvent1WorkSize;
   end;
   DownloadWaitForm.WorkEvent(FWorkEvent1Sender,FWorkEvent1WorkMode,FWorkEvent1WorkCount);
 end;
@@ -334,74 +403,97 @@ end;}
 Procedure THTTPThread.RedirectEvent(Sender: TObject; var dest: string; var NumRedirect: Integer; var Handled: boolean; var VMethod: TIdHTTPMethod);
 {by Alexander Katz (skatz@svitonline.com)}
 Var MSt : TMemoryStream;
+    FSt : TFileStream;
     S, S1 : String;
     I : Integer;
+    DeletePartialFile : Boolean;
 begin
   If ExtUpperCase(Copy(dest,1,6))<>'FTP:/'+'/' then exit;
 
-  MSt:=TMemoryStream.Create;
+  FTP:=TIdFTP.Create(Application.MainForm);
   try
-    FTP:=TIdFTP.Create(Application.MainForm);
-    try
-      try
-        If Assigned(DownloadWaitForm) then DownloadWaitForm.FTP:=FTP;
-        S:=Copy(dest,7,MaxInt); I:=Pos('/',S); If I>0 then S:=Copy(S,1,I-1);
-        FTP.OnWork:=WorkEvent1;
-        I:=Pos('@',S);
-        If I>0 then
-        begin
-          S1:=Copy(S,1,I-1);
-          Delete(S,1,I);
-          I:=Pos(':',S1);
-          if I>0 then
-          begin
-            FTP.Username:=Copy(S1,1,I-1);
-            FTP.Password:=Copy(S1,I+1,MaxInt);
-          end
-          else
-          begin
-            FTP.Username:=S1;
-            FTP.Password:='';
-          end;
-        end
-        else
-        begin
-          FTP.Username:='anonymous';
-          FTP.Password:='sorry@nomail.com';
-        end;
-        I:=Pos(':',S);
-        if I>0  then
-        begin
-          FTP.Port:=StrToIntDef(Copy(S,I+1,MaxInt),21);
-          Delete(S,I+1,MaxInt);
-        end
-        else FTP.Port:=21;
-        FTP.Host:=S;
-        FTP.Passive:=True;
-        FTP.ConnectTimeout:=10*1000;
-        FTP.Connect;
-        S:=Copy(dest,7,MaxInt); I:=Pos('/',S); If I>0 then S:=Copy(S,I,MaxInt);
-        FWorkEvent1WorkSize:=FTP.Size(S);
-        FTP.Get(S,MSt);
-      except
-        exit;
+    If Assigned(DownloadWaitForm) then DownloadWaitForm.FTP:=FTP;
+    S:=Copy(dest,7,MaxInt); I:=Pos('/',S); If I>0 then S:=Copy(S,1,I-1);
+    FTP.OnWork:=WorkEvent1;
+    I:=Pos('@',S);
+    If I>0 then
+    begin
+      S1:=Copy(S,1,I-1);
+      Delete(S,1,I);
+      I:=Pos(':',S1);
+      if I>0 then
+      begin
+        FTP.Username:=Copy(S1,1,I-1);
+        FTP.Password:=Copy(S1,I+1,MaxInt);
+      end
+      else
+      begin
+        FTP.Username:=S1;
+        FTP.Password:='';
       end;
-    finally
-      if Assigned(DownloadWaitForm) then DownloadWaitForm.FTP:=nil;
-      FTP.Free;
+    end
+    else
+    begin
+      FTP.Username:='anonymous';
+      FTP.Password:='sorry@nomail.com';
     end;
-    If not SimpleFileCheck(MSt,FDestFile) then exit;
-    If Assigned(DownloadWaitForm) and DownloadWaitForm.Canceled then begin FSuccess:=drCancel; exit; end;
-    MSt.SaveToFile(FDestFile);
-    Handled:=False;
-    FTPDownloadHandled:=True;
+    I:=Pos(':',S);
+    if I>0  then
+    begin
+      FTP.Port:=StrToIntDef(Copy(S,I+1,MaxInt),21);
+      Delete(S,I+1,MaxInt);
+    end
+    else FTP.Port:=21;
+    FTP.Host:=S;
+    FTP.Passive:=True;
+    FTP.ConnectTimeout:=10*1000;
+    FTP.Connect;
+    S:=Copy(dest,7,MaxInt); I:=Pos('/',S); If I>0 then S:=Copy(S,I,MaxInt);
+    FWorkEvent1WorkSize:=FTP.Size(S);
+
+    If FSize<1024*1024 then begin
+      {Small file - download to memory stream}
+      MSt:=TMemoryStream.Create;
+      try
+        try
+          FTP.Get(S,MSt);
+        except
+          exit;
+        end;
+        If not SimpleFileCheck(MSt,FDestFile) then exit;
+        If Assigned(DownloadWaitForm) and DownloadWaitForm.Canceled then begin FSuccess:=drCancel; exit; end;
+        MSt.SaveToFile(FDestFile);
+        Handled:=False;
+        FTPDownloadHandled:=True;
+      finally
+        MSt.Free;
+      end;
+    end else begin
+      {Large file - download to file}
+      FSt:=TFileStream.Create(FDestFile,fmCreate);
+      DeletePartialFile:=False;
+      try
+        try
+          FTP.Get(S,FSt);
+        except
+          exit;
+        end;
+        If not SimpleFileCheck(FSt,FDestFile) then exit;
+        If Assigned(DownloadWaitForm) and DownloadWaitForm.Canceled then begin FSuccess:=drCancel; exit; end;
+        Handled:=False;
+        FTPDownloadHandled:=True;
+      finally
+        FSt.Free;
+        If DeletePartialFile then DeleteFile(FDestFile);
+      end;
+    end;
   finally
-    MSt.Free;
+    if Assigned(DownloadWaitForm) then DownloadWaitForm.FTP:=nil;
+    FTP.Free;
   end;
 end;
 
-Function DownloadFileFromInternet(const AOwner : TComponent; const Size : Integer; const URL, Referer, DestFile : String; const ShowWaitDialog : Boolean) : TDownloadResult;
-{$IFDEF UseBackgroundThread}
+Function DownloadSingleFileFromInternet(const AOwner : TComponent; const Size : Int64; const URL, Referer, DestFile : String; const ShowWaitDialog : Boolean) : TDownloadResult;
 Var HTTPThread : THTTPThread;
 begin
   HTTPThread:=THTTPThread.Create(AOwner,DecodeHTMLSymbols(URL),DecodeHTMLSymbols(Referer),DestFile,Size,ShowWaitDialog);
@@ -414,41 +506,61 @@ begin
     HTTPThread.Free;
   end;
 end;
-{$ELSE}
-Var HTTP : TIdHTTP;
-    MSt : TMemoryStream;
+
+Procedure MergeFiles(const SourceFiles : TStringList; DestFile : String);
+Var Input, Output : TFileStream;
+    I : Integer;
 begin
-  result:=False;
-  If ShowWaitDialog InitDownloadWaitForm(AOwner,Size);
+  Output:=TFileStream.Create(DestFile,fmCreate);
   try
-    HTTP:=TIdHTTP.Create(Application.MainForm);
-    try
-      MSt:=TMemoryStream.Create;
+    For I:=0 to SourceFiles.Count-1 do begin
+      Input:=TFileStream.Create(SourceFiles[I],fmOpenRead);
       try
-        If Assigned(DownloadWaitForm) then DownloadWaitForm.HTTP:=HTTP;
-        HTTP.Request.UserAgent:='User-Agent=Mozilla/5.0 (Windows; U; Windows NT 6.0)';
-        HTTP.Request.AcceptLanguage:='en';
-        HTTP.Request.Referer:=CalcReferer(URL,Referer);
-        If Assigned(DownloadWaitForm) then HTTP.OnWork:=DownloadWaitForm.WorkEvent;
-        HTTP.HandleRedirects:=True;
-        HTTP.ConnectTimeout:=10*1000;
-        HTTP.Get(ProcessURL(URL),MSt);
-        If not SimpleFileCheck(MSt,DestFile) then exit;
-        If Assigned(DownloadWaitForm) and DownloadWaitForm.Canceled then exit;
-        MSt.SaveToFile(DestFile);
-        result:=True;
+        Output.CopyFrom(Input,0);
       finally
-        MSt.Free;
+        Input.Free;
       end;
-    finally
-      if Assigned(DownloadWaitForm) then DownloadWaitForm.HTTP:=nil;
-      HTTP.Free;
     end;
   finally
-    DoneDownloadWaitForm;
+    Output.Free;
   end;
 end;
-{$ENDIF}
+
+Function DownloadFileFromInternet(const AOwner : TComponent; const Size : Int64; const URL, Referer, DestFile : String; const ShowWaitDialog : Boolean) : TDownloadResult;
+Var LoadSize : Int64;
+    I,Nr : Integer;
+    Files : TStringList;
+    S: String;
+begin
+  If Size<=PackageMaxFileSize then begin
+    result:=DownloadSingleFileFromInternet(AOwner,Size,URL,Referer,DestFile,ShowWaitDialog);
+    exit;
+  end;
+
+  result:=drFail;
+  Nr:=0;
+  ForceDirectories(TempDir+TempSubFolder);
+
+  Files:=TStringList.Create;
+  try
+    LoadSize:=Size;
+
+    While LoadSize>0 do begin
+      inc(Nr);
+      S:=TempDir+TempSubFolder+'\'+ExtractFileName(DestFile)+'.part'+IntToStr(Nr);
+      Files.Add(S);
+      result:=DownloadFileFromInternet(AOwner,Min(PackageMaxFileSize,LoadSize),URL+'.part'+IntToStr(Nr),Referer,S,ShowWaitDialog);
+      if result<>drSuccess then exit;
+      LoadSize:=LoadSize-Min(PackageMaxFileSize,LoadSize);
+    end;
+
+    MergeFiles(Files,DestFile);
+
+  finally
+    For I:=0 to Files.Count-1 do DeleteFile(Files[I]);
+    Files.Free;
+  end;
+end;
 
 Function CopyFileWithDialog(const AOwner : TComponent; const SourceFile, DestinationFile : String) : TDownloadResult;
 const BufSize=1024*1224;
@@ -491,7 +603,7 @@ begin
   result:=drSuccess;
 end;
 
-Function GetLocalFile(const AOwner : TComponent; const Size : Integer; const URL, DestFile : String) : TDownloadResult;
+Function GetLocalFile(const AOwner : TComponent; const URL, DestFile : String) : TDownloadResult;
 Var C : Char;
     I, SaveErrorMode : Integer;
     AlternateURL : String;
@@ -540,7 +652,7 @@ begin
   end;
 end;
 
-Function DownloadFileWithDialog(const AOwner : TComponent; const Size : Integer; const AbsBase, URL, Referer, DestFile : String) : TDownloadResult;
+Function DownloadFileWithDialog(const AOwner : TComponent; const Size : Int64; const AbsBase, URL, Referer, DestFile : String) : TDownloadResult;
 Var S : String;
 begin
   If IsInternetURL(URL) or IsInternetURL(AbsBase) then begin
@@ -548,11 +660,11 @@ begin
     result:=DownloadFileFromInternet(AOwner,Size,S,Referer,DestFile,True);
   end else begin
     S:=MakeAbsPath(URL,IncludeTrailingPathDelimiter(ExtractFilePath(AbsBase)));
-    result:=GetLocalFile(AOwner,Size,S,DestFile);
+    result:=GetLocalFile(AOwner,S,DestFile);
   end;
 end;
 
-Function DownloadFileWithOutDialog(const AOwner : TComponent; const Size : Integer; const AbsBase, URL, Referer, DestFile : String) : TDownloadResult;
+Function DownloadFileWithOutDialog(const AOwner : TComponent; const Size : Int64; const AbsBase, URL, Referer, DestFile : String) : TDownloadResult;
 Var S : String;
 begin
   If IsInternetURL(URL) or IsInternetURL(AbsBase) then begin
@@ -560,7 +672,7 @@ begin
     result:=DownloadFileFromInternet(AOwner,Size,S,Referer,DestFile,False);
   end else begin
     S:=MakeAbsPath(URL,IncludeTrailingPathDelimiter(ExtractFilePath(AbsBase)));
-    result:=GetLocalFile(AOwner,Size,S,DestFile);
+    result:=GetLocalFile(AOwner,S,DestFile);
   end;
 end;
 

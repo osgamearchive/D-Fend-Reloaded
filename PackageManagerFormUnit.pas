@@ -53,6 +53,11 @@ type
     IconSetsButton: TBitBtn;
     IconSetsListView: TListView;
     LanguagesListView: TListView;
+    GamesSizeLabel: TLabel;
+    AutoSetupSizeLabel: TLabel;
+    IconsSizeLabel: TLabel;
+    IconSetsSizeLabel: TLabel;
+    LanguageFilesSizeLabel: TLabel;
     procedure ButtonWork(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -70,6 +75,8 @@ type
     procedure IconsButtonClick(Sender: TObject);
     procedure IconSetsButtonClick(Sender: TObject);
     procedure ListViewClick(Sender: TObject);
+    procedure ListViewChanging(Sender: TObject; Item: TListItem;
+      Change: TItemChange; var AllowChange: Boolean);
   private
     { Private-Deklarationen }
     PackageDB : TPackageDB;
@@ -78,8 +85,9 @@ type
     AutoSetupChecksumScanner, IconChecksumScanner : TChecksumScanner;
     GamesFilter, AutoSetupFilter : TFilter;
     Procedure LoadLists;
-    Procedure PackageDBDownload(Sender : TObject; const Progress, Size : Integer; const Status : TDownloadStatus; var ContinueDownload : Boolean);
+    Procedure PackageDBDownload(Sender : TObject; const Progress, Size : Int64; const Status : TDownloadStatus; var ContinueDownload : Boolean);
     Procedure ProviderAction(const Data : Array of TDownloadData);
+    Procedure CheckList(const ListView : TListView; const Button : TBitBtn; const InfoLabel : TLabel);
   public
     { Public-Deklarationen }
     GameDB, AutoSetupDB : TGameDB;
@@ -96,10 +104,11 @@ Function DonwloadAndInstall(const Owner : TComponent; const URL : String; const 
 
 implementation
 
-uses ShellAPI, IniFiles, PackageDBToolsUnit, CommonTools, PrgConsts,
+uses ShellAPI, IniFiles, Math, PackageDBToolsUnit, CommonTools, PrgConsts,
      DownloadWaitFormUnit, PrgSetupUnit, VistaToolsUnit, LanguageSetupUnit,
      ZipPackageUnit, IconLoaderUnit, HelpConsts, ZipInfoFormUnit,
-     PackageManagerRepositoriesEditFormUnit, ProviderFormUnit, HashCalc;
+     PackageManagerRepositoriesEditFormUnit, ProviderFormUnit, HashCalc,
+     ClassExtensions;
 
 {$R *.dfm}
 
@@ -174,14 +183,20 @@ begin
   PackageDB.OnDownload:=PackageDBDownload;
   PackageDBCache:=TPackageDBCache.Create;
 
+  GamesListView:=TListView(NewWinControlType(GamesListView,TListViewSpecialHint,ctcmDangerousMagic));
+  AutoSetupListView:=TListView(NewWinControlType(AutoSetupListView,TListViewSpecialHint,ctcmDangerousMagic));
+  IconsListView:=TListView(NewWinControlType(IconsListView,TListViewSpecialHint,ctcmDangerousMagic));
+  IconSetsListView:=TListView(NewWinControlType(IconSetsListView,TListViewSpecialHint,ctcmDangerousMagic));
+  LanguagesListView:=TListView(NewWinControlType(LanguagesListView,TListViewSpecialHint,ctcmDangerousMagic));
+
   LanguageChecksumScanner1:=TLanguageFileChecksumScanner.Create(PrgDir+LanguageSubDir,False,nil);
   If PrgDir=PrgDataDir then begin
     LanguageChecksumScanner2:=nil;
   end else begin
     LanguageChecksumScanner2:=TLanguageFileChecksumScanner.Create(PrgDataDir+LanguageSubDir,False,nil);
   end;
-  AutoSetupChecksumScanner:=TChecksumScanner.Create(PrgDataDir+AutoSetupSubDir,'*.prof',True,Owner);
-  IconChecksumScanner:=TChecksumScanner.Create(PrgDataDir+IconsSubDir,'*.*',False,Owner);
+  AutoSetupChecksumScanner:=TChecksumScanner.Create(PrgDataDir+AutoSetupSubDir,'*.prof',True,True,Owner);
+  IconChecksumScanner:=TChecksumScanner.Create(PrgDataDir+IconsSubDir,'*.*',True,False,Owner);
 
   DoUpdateCheck:=False;
   Case PrgSetup.PackageListsCheckForUpdates of
@@ -262,13 +277,13 @@ begin
   InfoTip:=GetPackageManagerToolTip(TDownloadData(Item.Data));
 end;
 
-Procedure TPackageManagerForm.PackageDBDownload(Sender : TObject; const Progress, Size : Integer; const Status : TDownloadStatus; var ContinueDownload : Boolean);
+Procedure TPackageManagerForm.PackageDBDownload(Sender : TObject; const Progress, Size : Int64; const Status : TDownloadStatus; var ContinueDownload : Boolean);
 begin
   Case Status of
-    dsStart : begin Enabled:=False; InitDownloadWaitForm(self,Size); end;
+    dsStart : begin Enabled:=False; InitDownloadWaitForm(self,Size div 1024); end;
     dsProgress : begin
-                   If DownloadWaitForm.ProgressBar.Max=1 then DownloadWaitForm.ProgressBar.Max:=Size;
-                   ContinueDownload:=StepDownloadWaitForm(Progress);
+                   If DownloadWaitForm.ProgressBar.Max=1 then DownloadWaitForm.ProgressBar.Max:=Max(1,Size div 1024);
+                   ContinueDownload:=StepDownloadWaitForm(Progress div 1024);
                  end;
     dsDone : begin Enabled:=True; DoneDownloadWaitForm; end;
   End;
@@ -337,16 +352,33 @@ begin
   end;
 end;
 
-procedure TPackageManagerForm.ListViewClick(Sender: TObject);
-  Procedure CheckList(const ListView : TListView; const Button : TBitBtn);
-  Var I : Integer; B : Boolean;
-  begin B:=False; For I:=0 to ListView.Items.Count-1 do if ListView.Items[I].Checked then begin B:=True; break; end; Button.Enabled:=B; end;
+Procedure TPackageManagerForm.CheckList(const ListView : TListView; const Button : TBitBtn; const InfoLabel : TLabel);
+Var I : Integer;
+    B : Boolean;
+    Size : Int64;
 begin
-  If (Sender=GamesListView) or (Sender=nil) then CheckList(GamesListView,GamesButton);
-  If (Sender=AutoSetupListView) or (Sender=nil) then CheckList(AutoSetupListView,AutoSetupButton);
-  If (Sender=IconsListView) or (Sender=nil) then CheckList(IconsListView,IconsButton);
-  If (Sender=IconSetsListView) or (Sender=nil) then CheckList(IconSetsListView,IconSetsButton);
-  If (Sender=LanguagesListView) or (Sender=nil) then CheckList(LanguagesListView,LanguageButton);
+  B:=False;
+  Size:=0;
+  For I:=0 to ListView.Items.Count-1 do if (ListView.Items[I].Checked) and (ListView.Items[I].Data<>nil) then begin
+    Size:=Size+TDownloadZipData(ListView.Items[I].Data).Size;
+    B:=True;
+  end;
+  Button.Enabled:=B;
+  InfoLabel.Caption:=LanguageSetup.PackageManagerDownloadSize+': '+GetNiceFileSize(Size);
+end;
+
+procedure TPackageManagerForm.ListViewChanging(Sender: TObject; Item: TListItem; Change: TItemChange; var AllowChange: Boolean);
+begin
+  ListViewClick(Sender);
+end;
+
+procedure TPackageManagerForm.ListViewClick(Sender: TObject);
+begin
+  If (Sender=GamesListView) or (Sender=nil) then CheckList(GamesListView,GamesButton,GamesSizeLabel);
+  If (Sender=AutoSetupListView) or (Sender=nil) then CheckList(AutoSetupListView,AutoSetupButton,AutoSetupSizeLabel);
+  If (Sender=IconsListView) or (Sender=nil) then CheckList(IconsListView,IconsButton,IconsSizeLabel);
+  If (Sender=IconSetsListView) or (Sender=nil) then CheckList(IconSetsListView,IconSetsButton,IconSetsSizeLabel);
+  If (Sender=LanguagesListView) or (Sender=nil) then CheckList(LanguagesListView,LanguageButton,LanguageFilesSizeLabel);
 end;
 
 procedure TPackageManagerForm.FilterClick(Sender: TObject);
@@ -433,7 +465,7 @@ begin
           end;
         end;
         try
-          If not AutoSetupChecksumScanner.ChecksumInList(GetMD5Sum(PackageDB.DBDir+'DFRTemp.prof')) then begin
+          If not AutoSetupChecksumScanner.ChecksumInList(GetMD5Sum(PackageDB.DBDir+'DFRTemp.prof',True)) then begin
             J:=AutoSetupDB.Add(DownloadZipData[I].Name);
             G:=TGame.Create(PackageDB.DBDir+'DFRTemp.prof');
             try

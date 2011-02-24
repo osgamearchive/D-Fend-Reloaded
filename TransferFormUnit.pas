@@ -330,7 +330,7 @@ begin
         If Trim(PrgSetup.DOSBoxSettings[0].DosBoxLanguage)=''
           then NewSetup.DOSBoxSettings[0].DosBoxLanguage:=''
           else NewSetup.DOSBoxSettings[0].DosBoxLanguage:=DestPrgDir+'DOSBox\'+ExtractFileName(PrgSetup.DOSBoxSettings[0].DosBoxLanguage);
-        NewSetup.DOSBoxSettings[0].DosBoxMapperFile:='./'+ExtractFileName(PrgSetup.DOSBoxSettings[0].DosBoxMapperFile);
+        NewSetup.DOSBoxSettings[0].DosBoxMapperFile:='.\'+ExtractFileName(PrgSetup.DOSBoxSettings[0].DosBoxMapperFile);
         NewSetup.PathToFREEDOS:='.\VirtualHD\FREEDOS\';
         If FileExists(DestPrgDir+OggEncPrgFile) then NewSetup.WaveEncOgg:='.\'+OggEncPrgFile;
 

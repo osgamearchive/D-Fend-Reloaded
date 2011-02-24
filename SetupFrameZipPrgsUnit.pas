@@ -9,25 +9,28 @@ uses
 Type TPacker=record
   Name, FileName, Extensions : String;
   ExtractFile, CreateFile, UpdateFile : String;
+  TrailingBackslash : Boolean;
 end;
 
 type
   TSetupFrameZipPrgs = class(TFrame, ISetupFrame)
+    ScrollBox: TScrollBox;
     DeleteButton: TSpeedButton;
     UpButton: TSpeedButton;
     DownButton: TSpeedButton;
     AddButton: TSpeedButton;
-    SelectComboBox: TComboBox;
     SelectLabel: TLabel;
-    FilenameEdit: TLabeledEdit;
     FilenameButton: TSpeedButton;
-    PrgOpenDialog: TOpenDialog;
+    InfoLabel: TLabel;
+    SelectComboBox: TComboBox;
+    FilenameEdit: TLabeledEdit;
     ExtensionsEdit: TLabeledEdit;
     CommandExtractEdit: TLabeledEdit;
     CommandCreateEdit: TLabeledEdit;
     CommandAddEdit: TLabeledEdit;
-    InfoLabel: TLabel;
     AutoSetupButton: TBitBtn;
+    PrgOpenDialog: TOpenDialog;
+    TrailingBackslashCheckBox: TCheckBox;
     procedure SelectComboBoxChange(Sender: TObject);
     procedure FilenameButtonClick(Sender: TObject);
     procedure FilenameEditChange(Sender: TObject);
@@ -60,14 +63,17 @@ uses ShlObj, Math, LanguageSetupUnit, VistaToolsUnit, PrgSetupUnit, HelpConsts,
 
 Type TPackerDefaultValue=record
   Name, Extensions, CommandExtract, CommandCreate, CommandUpdate  : String;
+  TrainlingBackslash : Boolean;
 end;
 
-const PackerDefaultValuesCount=3;
+const PackerDefaultValuesCount=5;
 
 Var PackerDefaultValues : Array[0..PackerDefaultValuesCount-1] of TPackerDefaultValue =(
-  (Name: '7z'; Extensions: 'GZIP;BZIP2;TAR'; CommandExtract: 'e "%1" -o"%2" -y'; CommandCreate: 'a "%1" "%2*.*" -r'; CommandUpdate: 'u "%1" "%2*.*" -r'),
-  (Name: 'rar'; Extensions: 'RAR'; CommandExtract: 'x "%1" "%2" -y -c-'; CommandCreate: 'a -y -r0 -ep1 "%1" "%2*.*"'; CommandUpdate: 'u -y -r0 -ep1 "%1" "%2*.*"'),
-  (Name: 'winrar'; Extensions: 'RAR'; CommandExtract: 'x "%1" "%2" -y -c-'; CommandCreate: 'a -y -r0 -ep1 "%1" "%2*.*"'; CommandUpdate: 'u -y -r0 -ep1 "%1" "%2*.*"')
+  (Name: '7z'; Extensions: 'GZIP;BZIP2;TAR'; {7z/zip by default by internal packer} CommandExtract: 'e "%1" -o"%2" -y'; CommandCreate: 'a "%1" "%2*.*" -r'; CommandUpdate: 'u "%1" "%2*.*" -r'; TrainlingBackslash: True),
+  (Name: 'rar'; Extensions: 'RAR'; CommandExtract: 'x "%1" "%2" -y -c-'; CommandCreate: 'a -y -r0 -ep1 "%1" "%2*.*"'; CommandUpdate: 'u -y -r0 -ep1 "%1" "%2*.*"'; TrainlingBackslash: True),
+  (Name: 'winrar'; Extensions: 'RAR'; CommandExtract: 'x "%1" "%2" -y -c-'; CommandCreate: 'a -y -r0 -ep1 "%1" "%2*.*"'; CommandUpdate: 'u -y -r0 -ep1 "%1" "%2*.*"'; TrainlingBackslash: True),
+  (Name: 'uha'; Extensions: 'UHA'; CommandExtract: 'a -m3 -pe -ph+ -r+ -ed+ "%1" "%2*.*"'; CommandCreate: 'x -y+ -o+ -t"%2" "%1"'; CommandUpdate: 'x -y+ -o+ -t"%2" "%1"'; TrainlingBackslash: False),
+  (Name: 'arj32'; Extensions: 'ARJ'; CommandExtract: 'a -r -e1 -i6 -p1 -v1440 -hk -jm -jyv -vv "%1"'; CommandCreate: 'x -r -v -y "%1" "%2 "'; CommandUpdate: 'x -r -v -y "%1" "%2 "'; TrainlingBackslash: True)
 );
 
 { TSetupFrameZipPrgs }
@@ -86,6 +92,7 @@ begin
   NoFlicker(CommandExtractEdit);
   NoFlicker(CommandCreateEdit);
   NoFlicker(CommandAddEdit);
+  NoFlicker(TrailingBackslashCheckBox);
   NoFlicker(AutoSetupButton);
 
   SetLength(Packers,PrgSetup.PackerSettingsCount);
@@ -96,6 +103,7 @@ begin
     Packers[I].ExtractFile:=PrgSetup.PackerSettings[I].ExtractFile;
     Packers[I].CreateFile:=PrgSetup.PackerSettings[I].CreateFile;
     Packers[I].UpdateFile:=PrgSetup.PackerSettings[I].UpdateFile;
+    Packers[I].TrailingBackslash:=PrgSetup.PackerSettings[I].TrailingBackslash;
   end;
 
   UserIconLoader.DialogImage(DI_Add,AddButton);
@@ -122,6 +130,7 @@ begin
   CommandExtractEdit.EditLabel.Caption:=LanguageSetup.SetupFormExternalPackersCommandExtract;
   CommandCreateEdit.EditLabel.Caption:=LanguageSetup.SetupFormExternalPackersCommandCreate;
   CommandAddEdit.EditLabel.Caption:=LanguageSetup.SetupFormExternalPackersCommandAdd;
+  TrailingBackslashCheckBox.Caption:=LanguageSetup.SetupFormExternalPackersTrailingBackslash;
   InfoLabel.Caption:=LanguageSetup.SetupFormExternalPackersInfo;
 
   HelpContext:=ID_FileOptionsZipPackers;
@@ -135,7 +144,7 @@ begin
     0 : begin {Add}
           SelectComboBoxChange(Sender);
           I:=length(Packers); SetLength(Packers,I+1);
-          with Packers[I] do begin Name:='-'; FileName:=''; Extensions:=''; ExtractFile:=''; CreateFile:=''; UpdateFile:=''; end;
+          with Packers[I] do begin Name:='-'; FileName:=''; Extensions:=''; ExtractFile:=''; CreateFile:=''; UpdateFile:=''; TrailingBackslash:=True; end;
           SelectComboBox.Items.Add('-');
           SelectComboBox.ItemIndex:=SelectComboBox.Items.Count-1;
           LastIndex:=-1;
@@ -218,6 +227,7 @@ begin
     PrgSetup.PackerSettings[I].ExtractFile:=Packers[I].ExtractFile;
     PrgSetup.PackerSettings[I].CreateFile:=Packers[I].CreateFile;
     PrgSetup.PackerSettings[I].UpdateFile:=Packers[I].UpdateFile;
+    PrgSetup.PackerSettings[I].TrailingBackslash:=Packers[I].TrailingBackslash;
   end;
 end;
 
@@ -236,6 +246,7 @@ begin
       Packers[LastIndex].ExtractFile:=CommandExtractEdit.Text;
       Packers[LastIndex].CreateFile:=CommandCreateEdit.Text;
       Packers[LastIndex].UpdateFile:=CommandAddEdit.Text;
+      Packers[LastIndex].TrailingBackslash:=TrailingBackslashCheckBox.Checked;
     end;
 
     SelectComboBox.Enabled:=(SelectComboBox.Items.Count>0);
@@ -251,6 +262,7 @@ begin
     CommandExtractEdit.Visible:=B;
     CommandCreateEdit.Visible:=B;
     CommandAddEdit.Visible:=B;
+    TrailingBackslashCheckBox.Visible:=B;
     AutoSetupButton.Visible:=False;
     If B then begin
       S:=Trim(ExtUpperCase(Packers[SelectComboBox.ItemIndex].Name));
@@ -267,6 +279,7 @@ begin
     CommandExtractEdit.Text:=Packers[SelectComboBox.ItemIndex].ExtractFile;
     CommandCreateEdit.Text:=Packers[SelectComboBox.ItemIndex].CreateFile;
     CommandAddEdit.Text:=Packers[SelectComboBox.ItemIndex].UpdateFile;
+    TrailingBackslashCheckBox.Checked:=Packers[SelectComboBox.ItemIndex].TrailingBackslash;
   finally
     JustChanging:=False;
   end;
@@ -312,6 +325,7 @@ begin
     CommandExtractEdit.Text:=PackerDefaultValues[I].CommandExtract;
     CommandCreateEdit.Text:=PackerDefaultValues[I].CommandCreate;
     CommandAddEdit.Text:=PackerDefaultValues[I].CommandUpdate;
+    TrailingBackslashCheckBox.Checked:=PackerDefaultValues[I].TrainlingBackslash;
     break;
   end;
 end;

@@ -33,7 +33,7 @@ Function ShowMiniRunDialog(const AOwner : TComponent; const AGameDB : TGameDB) :
 implementation
 
 uses VistaToolsUnit, LanguageSetupUnit, CommonTools, DosBoxUnit, ScummVMUnit,
-     GameDBToolsUnit, WindowsProfileUnit, IconLoaderUnit;
+     GameDBToolsUnit, WindowsProfileUnit, IconLoaderUnit, MainUnit;
 
 {$R *.dfm}
 
@@ -119,7 +119,7 @@ begin
   end else begin
     If WindowsExeMode(G)
      then RunWindowsGame(G)
-     else RunGame(G);
+     else RunGame(G,DFendReloadedMainForm.DeleteOnExit);
   end;
 end;
 
@@ -132,7 +132,7 @@ begin
     MiniRunForm.GameDB:=AGameDB;
     result:=(MiniRunForm.ShowModal=mrOK);
   finally
-    MiniRunForm.Free;
+    FreeAndNil(MiniRunForm);
   end;
 end;
 

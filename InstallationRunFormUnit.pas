@@ -45,7 +45,7 @@ var
 implementation
 
 uses VistaToolsUnit, CommonTools, LanguageSetupUnit, PrgSetupUnit, DOSBoxUnit,
-     DOSBoxTempUnit, ZipInfoFormUnit, PrgConsts, GameDBToolsUnit;
+     DOSBoxTempUnit, ZipInfoFormUnit, PrgConsts, GameDBToolsUnit, MainUnit;
 
 {$R *.dfm}
 
@@ -413,7 +413,7 @@ begin
       St2.Free;
     end;
     TempGame.Game.StoreAllValues;
-    DOSBoxHandle:=RunCommandAndGetHandle(TempGame.Game,'',True);
+    DOSBoxHandle:=RunCommandAndGetHandle(TempGame.Game,DFendReloadedMainForm.DeleteOnExit,'',True);
     try
       While not (WaitForSingleObject(DOSBoxHandle,0)=WAIT_OBJECT_0) do begin
         Sleep(100);

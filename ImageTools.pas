@@ -21,7 +21,7 @@ begin
     result:='';
   end else begin
     try
-      LoDWORD:=GetFileSize(hFile,@HiDWORD);
+      LoDWORD:=Windows.GetFileSize(hFile,@HiDWORD);
       LoI:=LoDWORD; HiI:=HiDWORD;
       LoI:=LoI+$100000000*HiI;
       LoI:=LoI div 512 div 63 div 16;

@@ -637,8 +637,8 @@ begin
     finally
       St.Free;
     end;
-    AddEditSetting(5102,LanguageSetup.GameGlidePort,'600',ValueWidth);
-    //... 1.1 More Glide settings (LFB access: full,read,write,none.)
+    AddSetting(5102,LanguageSetup.GameGlideEmulationPort,ValueToList(GameDB.ConfOpt.GlideEmulationPort,';,'),True,ValueWidth,True);
+    AddSetting(5103,LanguageSetup.GameGlideEmulationLFB,ValueToList(GameDB.ConfOpt.GlideEmulationLFB,';,'),False,ValueWidth,True);
   end;
   If PrgSetup.AllowVGAChipsetSettings then begin
     AddSetting(5301,LanguageSetup.GameVGAChipset,ValueToList(GameDB.ConfOpt.VGAChipsets,';,'),False,ValueWidth,True);
@@ -727,7 +727,11 @@ begin
 
   {Innova}
   If PrgSetup.AllowInnova then begin
-    //... 1.1: Innova settings
+    AddCaption(LanguageSetup.ProfileEditorGeneralSheet+' - '+LanguageSetup.ProfileEditorSoundInnova);
+    AddYesNoSetting(8401,LanguageSetup.ProfileEditorSoundInnovaEnable);
+    AddSetting(8402,LanguageSetup.ProfileEditorSoundInnovaSampleRate,ValueToList(GameDB.ConfOpt.InnovaEmulationSampleRate,';,'),False,ValueWidth,True);
+    AddSetting(8403,LanguageSetup.ProfileEditorSoundInnovaBaseAddress,ValueToList(GameDB.ConfOpt.InnovaEmulationBaseAddress,';,'),False,ValueWidth,True);
+    AddSetting(8404,LanguageSetup.ProfileEditorSoundInnovaQuality,ValueToList(GameDB.ConfOpt.InnovaEmulationQuality,';,'),False,ValueWidth,True);
   end;
 
   {Joystick}
@@ -776,6 +780,13 @@ begin
   end;
   AddEditSetting(12503,LanguageSetup.GameIPXAddress,'',-1);
   AddSpinSetting(12504,LanguageSetup.GameIPXPort,1,65535,ValueWidth);
+  If PrgSetup.AllowNe2000 then begin
+    AddYesNoSetting(12601,LanguageSetup.GameNE2000);
+    AddSetting(12602,LanguageSetup.GameNE2000BaseAddress,ValueToList(GameDB.ConfOpt.NE2000EmulationBaseAddress,';,'),True,ValueWidth,True);
+    AddSetting(12603,LanguageSetup.GameNE2000Interrupt,ValueToList(GameDB.ConfOpt.NE2000EmulationInterrupt,';,'),True,ValueWidth,True);
+    AddEditSetting(12604,LanguageSetup.GameNE2000MACAddress,'AC:DE:48:88:99:AA',-1);
+    AddEditSetting(12605,LanguageSetup.GameNE2000RealInterface,'',-1);
+  end;
 
   {ScummVM}
   AddCaption(LanguageSetup.ProfileEditorScummVMSheet);
@@ -997,8 +1008,8 @@ begin
           If S=LanguageSetup.Off then S:='false';
           G.GlideEmulation:=S;
         end;
-        If ValueActive(5102) then G.GlidePort:=GetEditText;
-        //... 1.1: More Glide settings (If ValueActive(5103) then G.GlideLFB:=...)
+        If ValueActive(5102) then G.GlidePort:=GetComboText;
+        If ValueActive(5103) then G.GlideLFB:=GetComboText;
       end;
       If PrgSetup.AllowVGAChipsetSettings then begin
         If ValueActive(5301) then G.VGAChipset:=GetComboText;
@@ -1076,7 +1087,10 @@ begin
 
       {Innova}
       If PrgSetup.AllowInnova then begin
-        //... 1.1: Innova settings
+        If ValueActive(8401) then G.Innova:=GetYesNo;
+        If ValueActive(8402) then begin If TryStrToInt(GetComboText,J) then G.InnovaRate:=J; end;
+        If ValueActive(8403) then G.InnovaBase:=GetComboText;
+        If ValueActive(8404) then begin If TryStrToInt(GetComboText,J) then G.InnovaQuality:=J; end;
       end;
 
       {Joystick}
@@ -1109,6 +1123,13 @@ begin
       end;
       If ValueActive(12503) then G.IPXAddress:=GetEditText;
       If ValueActive(12504) then G.IPXPort:=IntToStr(GetSpinValue);
+      If PrgSetup.AllowNe2000 then begin
+        If ValueActive(12601) then G.NE2000:=GetYesNo;
+        If ValueActive(12602) then G.NE2000Base:=GetComboText;
+        If ValueActive(12603) then begin If TryStrToInt(GetComboText,J) then G.NE2000IRQ:=J; end;
+        If ValueActive(12604) then G.NE2000MACAddress:=GetEditText;
+        If ValueActive(12605) then G.NE2000RealInterface:=GetEditText;
+      end;
     end;
 
     If ScummVM then begin

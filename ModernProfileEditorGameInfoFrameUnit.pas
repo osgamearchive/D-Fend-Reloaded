@@ -60,6 +60,8 @@ uses Math, LanguageSetupUnit, VistaToolsUnit, CommonTools, HelpConsts,
 procedure TModernProfileEditorGameInfoFrame.InitGUI(var InitData : TModernProfileEditorInitData);
 Var St : TStringList;
 begin
+  InitData.AllowDefaultValueReset:=False;
+
   NoFlicker(GameInfoValueListEditor);
   NoFlicker(FavouriteCheckBox);
   NoFlicker(Tab);
@@ -184,7 +186,7 @@ begin
     If Game.Year<>'' then ValueFromIndex[3]:=Game.Year else GameInfoValueListEditor.Strings[3]:=GameInfoValueListEditor.Strings.Names[3]+'=';
     If Game.Language<>'' then ValueFromIndex[4]:=GetCustomLanguageName(Game.Language) else GameInfoValueListEditor.Strings[4]:=GameInfoValueListEditor.Strings.Names[4]+'=';
     If Game.WWW<>'' then ValueFromIndex[5]:=Game.WWW else GameInfoValueListEditor.Strings[5]:=GameInfoValueListEditor.Strings.Names[5]+'=';
-    S:=Game.License; If S<>'' then ValueFromIndex[6]:=S else GameInfoValueListEditor.Strings[6]:=GameInfoValueListEditor.Strings.Names[6]+'=';
+    If Game.License<>'' then ValueFromIndex[6]:=GetCustomLicenseName(Game.License) else GameInfoValueListEditor.Strings[6]:=GameInfoValueListEditor.Strings.Names[6]+'=';
   end;
   FavouriteCheckBox.Checked:=Game.Favorite;
 
@@ -224,7 +226,7 @@ begin
     Game.Year:=ValueFromIndex[3];
     Game.Language:=GetEnglishLanguageName(ValueFromIndex[4]);
     Game.WWW:=ValueFromIndex[5];
-    License:=Trim(ValueFromIndex[6]);
+    License:=GetEnglishLicenseName(ValueFromIndex[6]);
   end;
   Game.Favorite:=FavouriteCheckBox.Checked;
 
@@ -295,7 +297,7 @@ begin
       M:=TMenuItem.Create(AddUserDataPopupMenu); M.Caption:='-';
       AddUserDataPopupMenu.Items.Add(M);
       For I:=0 to St.Count-1 do begin
-        M:=TMenuItem.Create(AddUserDataPopupMenu); M.Caption:=St[I]; M.Tag:=2; M.OnClick:=AddButtonClick;
+        M:=TMenuItem.Create(AddUserDataPopupMenu); M.Caption:=MaskUnderlineAmpersand(St[I]); M.Tag:=2; M.OnClick:=AddButtonClick;
         AddUserDataPopupMenu.Items.Add(M);
       end;
     end;

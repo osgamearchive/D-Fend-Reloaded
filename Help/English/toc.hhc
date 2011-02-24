@@ -18,9 +18,13 @@
 		<param name="Local" value="Introduction.html">
 		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="How to get games">
+		<param name="Local" value="HelpGetGames.html">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="How to add games">
 		<param name="Local" value="Introduction2.html">
-		</OBJECT>		
+		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="Menu">
 		<param name="ImageNumber" value="1">
@@ -113,6 +117,10 @@
 					<LI> <OBJECT type="text/sitemap">
 						<param name="Name" value="Security">
 						<param name="Local" value="FileOptionsSecurity.html">
+						</OBJECT>
+					<LI> <OBJECT type="text/sitemap">
+						<param name="Name" value="Data privacy">
+						<param name="Local" value="FileOptionsDataPrivacy.html">
 						</OBJECT>
 					<LI> <OBJECT type="text/sitemap">
 						<param name="Name" value="Compression settings">
@@ -463,6 +471,10 @@
 								<param name="Name" value="MIDI">
 								<param name="Local" value="ProfileEditSoundMIDI.html">
 								</OBJECT>
+							<LI> <OBJECT type="text/sitemap">
+								<param name="Name" value="Innovation SSI-2001">
+								<param name="Local" value="ProfileEditSoundInnova.html">
+								</OBJECT>
 						</UL>
 						<LI> <OBJECT type="text/sitemap">
 							<param name="Name" value="Joystick">
@@ -497,10 +509,6 @@
 			<LI> <OBJECT type="text/sitemap">
 				<param name="Name" value="Copy">
 				<param name="Local" value="ProfileCopy.html">
-				</OBJECT>
-			<LI> <OBJECT type="text/sitemap">
-				<param name="Name" value="Delete">
-				<param name="Local" value="ProfileDelete.html">
 				</OBJECT>
 			<LI> <OBJECT type="text/sitemap">
 				<param name="Name" value="Uninstall">
@@ -676,6 +684,10 @@
 			</OBJECT>
 		<UL>
 			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="How to get games">
+				<param name="Local" value="HelpGetGames.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
 				<param name="Name" value="Adding games">
 				<param name="Local" value="Introduction2.html">
 				</OBJECT>
@@ -735,6 +747,10 @@
 					<LI> <OBJECT type="text/sitemap">
 						<param name="Name" value="Security">
 						<param name="Local" value="FileOptionsSecurity.html">
+						</OBJECT>
+					<LI> <OBJECT type="text/sitemap">
+						<param name="Name" value="Data privacy">
+						<param name="Local" value="FileOptionsDataPrivacy.html">
 						</OBJECT>
 					<LI> <OBJECT type="text/sitemap">
 						<param name="Name" value="Compression settings">
@@ -975,6 +991,10 @@
 							<LI> <OBJECT type="text/sitemap">
 								<param name="Name" value="MIDI">
 								<param name="Local" value="ProfileEditSoundMIDI.html">
+								</OBJECT>
+							<LI> <OBJECT type="text/sitemap">
+								<param name="Name" value="Innovation SSI-2001">
+								<param name="Local" value="ProfileEditSoundInnova.html">
 								</OBJECT>
 						</UL>
 						<LI> <OBJECT type="text/sitemap">

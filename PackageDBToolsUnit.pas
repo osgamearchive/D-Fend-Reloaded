@@ -3,6 +3,8 @@ interface
 
 uses Classes, XMLDoc, XMLIntf;
 
+const PackageMaxFileSize=MaxInt;
+
 Function LoadXMLDoc(const FileName : String; var XMLDoc : TXMLDocument; const OrigFileName : String ='') : String; overload;
 Function LoadXMLDoc(const FileName : String; const OrigFileName : String ='') : TXMLDocument; overload;
 
@@ -15,7 +17,7 @@ Function EncodeUpdateDate(const Date : TDateTime) : String;
 function DownloadFile(const URL: String; const Quite : Boolean): TMemoryStream; overload;
 function DownloadFile(const URL, FileName: String; const Quite : Boolean): Boolean; overload;
 
-Function GetNiceFileSize(const Size : Integer) : String;
+Function GetNiceFileSize(const Size : Int64) : String;
 
 Function ExtractFileNameFromURL(const URL, DefaultExtension : String; const RemoveDirs : Boolean) : String;
 Function URLFileNameFromFileName(const FileName : String) : String;
@@ -27,7 +29,7 @@ Function UpdatePackageDB(const Owner : TComponent; const UpdateAllListe, Quite :
 
 implementation
 
-uses Windows, SysUtils, Forms, Dialogs, Controls, IdHTTP, LanguageSetupUnit,
+uses Windows, SysUtils, Forms, Dialogs, Controls, Math, IdHTTP, LanguageSetupUnit,
      CommonTools, PrgConsts, PrgSetupUnit, PackageDBUnit, DownloadWaitFormUnit;
 
 Function LoadXMLDoc(const FileName : String; var XMLDoc : TXMLDocument; const OrigFileName : String) : String;
@@ -225,7 +227,7 @@ begin
   end;
 end;
 
-Function GetNiceFileSize(const Size : Integer) : String;
+Function GetNiceFileSize(const Size : Int64) : String;
 begin
   If Size<1024 then begin result:=IntToStr(Size)+' '+LanguageSetup.Bytes; exit; end;
   If Size<1024*1024 then begin result:=IntToStr(Size div 1024)+' '+LanguageSetup.KBytes; exit; end;
@@ -299,7 +301,7 @@ Type TPackageDownloadStatusClass=class
     FOwner : TComponent;
   public
     Constructor Create(const AOwner : TComponent);
-    Procedure PackageDBDownload(Sender : TObject; const Progress, Size : Integer; const Status : TDownloadStatus; var ContinueDownload : Boolean);
+    Procedure PackageDBDownload(Sender : TObject; const Progress, Size : Int64; const Status : TDownloadStatus; var ContinueDownload : Boolean);
 end;
 
 constructor TPackageDownloadStatusClass.Create(const AOwner: TComponent);
@@ -308,13 +310,13 @@ begin
   FOwner:=AOwner;
 end;
 
-Procedure TPackageDownloadStatusClass.PackageDBDownload(Sender : TObject; const Progress, Size : Integer; const Status : TDownloadStatus; var ContinueDownload : Boolean);
+Procedure TPackageDownloadStatusClass.PackageDBDownload(Sender : TObject; const Progress, Size : Int64; const Status : TDownloadStatus; var ContinueDownload : Boolean);
 begin
   Case Status of
-    dsStart : begin InitDownloadWaitForm(FOwner,Size); end;
+    dsStart : begin InitDownloadWaitForm(FOwner,Size div 1024); end;
     dsProgress : begin
-                   If DownloadWaitForm.ProgressBar.Max=1 then DownloadWaitForm.ProgressBar.Max:=Size;
-                   ContinueDownload:=StepDownloadWaitForm(Progress);
+                   If DownloadWaitForm.ProgressBar.Max=1 then DownloadWaitForm.ProgressBar.Max:=Max(1,Size div 1024);
+                   ContinueDownload:=StepDownloadWaitForm(Progress div 1024);
                  end;
     dsDone : begin DoneDownloadWaitForm; end;
   End;

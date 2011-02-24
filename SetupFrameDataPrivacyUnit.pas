@@ -34,7 +34,8 @@ type
 implementation
 
 uses LanguageSetupUnit, VistaToolsUnit, PrgSetupUnit, HelpConsts,
-     IconLoaderUnit, HistoryFormUnit, GameDBToolsUnit, CommonTools, PrgConsts;
+     IconLoaderUnit, HistoryFormUnit, GameDBToolsUnit, CommonTools, PrgConsts,
+     HistoryUnit;
 
 {$R *.dfm}
 
@@ -67,7 +68,7 @@ begin
   StoreHistoryCheckBox.Caption:=LanguageSetup.SetupFormDataPrivacyStoreHistory;
   ShowHistoryButton.Caption:=LanguageSetup.SetupFormDataPrivacyShowHistory;
   DeleteHistoryButton.Caption:=LanguageSetup.SetupFormDataPrivacyDeleteHistory;
-  OpenFileLabel.Caption:=LanguageSetup.SetupFormDataPrivacyOpenHistroyFile;
+  OpenFileLabel.Caption:=LanguageSetup.SetupFormDataPrivacyOpenHistoryFile;
   InfoLabel.Caption:=LanguageSetup.SetupFormDataPrivacyInfo;
 
   HelpContext:=ID_FileOptionsDataPrivacy;
@@ -102,7 +103,7 @@ end;
 
 procedure TSetupFrameDataPrivacy.DeleteHistoryButtonClick(Sender: TObject);
 begin
-  If ClearHistory then MessageDlg(LanguageSetup.SetupFormDataPrivacyDeleteHistoryDone,mtInformation,[mbOK],0);
+  If History.Clear then MessageDlg(LanguageSetup.SetupFormDataPrivacyDeleteHistoryDone,mtInformation,[mbOK],0);
 end;
 
 procedure TSetupFrameDataPrivacy.OpenFileLabelClick(Sender: TObject);

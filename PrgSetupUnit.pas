@@ -57,6 +57,7 @@ Type TPackerSetting=class
     FNr : Integer;
     FName, FZipFileName, FFileExtensions : String;
     FExtractFile, FCreateFile, FUpdateFile : String;
+    FTrailingBackslash : Boolean;
     Procedure ReadSettings;
     Procedure WriteSettings;
   public
@@ -70,6 +71,7 @@ Type TPackerSetting=class
     property ExtractFile : String read FExtractFile write FExtractFile;
     property CreateFile : String read FCreateFile write FCreateFile;
     property UpdateFile : String read FUpdateFile write FUpdateFile;
+    property TrailingBackslash : Boolean read FTrailingBackslash write FTrailingBackslash;
  end;
 
 Type TPrgSetup=class(TBasePrgSetup)
@@ -146,6 +148,9 @@ Type TPrgSetup=class(TBasePrgSetup)
     property RenameAllExpression : String index 40 read GetString write SetString;
     property DataReaderActiveSettings : String index 41 read GetString write SetString;
     property InstallerNames : String index 42 read GetString write SetString;
+    property ExportColumns : String index 43 read GetString write SetString;
+    property ArchiveIDFiles : String index 44 read GetString write SetString;
+    property LastSelectedProfile : String index 45 read GetString write SetString;
 
     property LinuxRemap[DriveLetter : Char] : String read GetDriveLetter write SetDriveLetter;
 
@@ -238,7 +243,10 @@ Type TPrgSetup=class(TBasePrgSetup)
     property DOSBoxStartLogging : Boolean index 77 read GetBoolean write SetBoolean;
     property DataReaderAllPlatforms : Boolean index 78 read GetBoolean write SetBoolean;
     property StoreHistory : Boolean index 79 read GetBoolean write SetBoolean;
-    property ActivateIncompleteFeatures : Boolean index 80 read GetBoolean write SetBoolean;
+    property RestoreLastSelectedProfile : Boolean index 80 read GetBoolean write SetBoolean;
+    property OldDeleteMenuItem : Boolean index 81 read GetBoolean write SetBoolean;
+    property DefaultUninstall : Boolean index 82 read GetBoolean write SetBoolean;
+    property ActivateIncompleteFeatures : Boolean index 83 read GetBoolean write SetBoolean;
 
     property MainLeft : Integer index 0 read GetInteger write SetInteger;
     property MainTop : Integer index 1 read GetInteger write SetInteger;
@@ -408,6 +416,7 @@ begin
   FExtractFile:=FPrgSetup.MemIni.ReadString(Section,'ExtractFile','');
   FCreateFile:=FPrgSetup.MemIni.ReadString(Section,'CreateFile','');
   FUpdateFile:=FPrgSetup.MemIni.ReadString(Section,'UpdateFile','');
+  FTrailingBackslash:=FPrgSetup.MemIni.ReadBool(Section,'TrailingBackslash',True);
 end;
 
 procedure TPackerSetting.WriteSettings;
@@ -421,6 +430,7 @@ begin
   PrgSetup.MemIni.WriteString(Section,'ExtractFile',FExtractFile);
   PrgSetup.MemIni.WriteString(Section,'CreateFile',FCreateFile);
   PrgSetup.MemIni.WriteString(Section,'UpdateFile',FUpdateFile);
+  PrgSetup.MemIni.WriteBool(Section,'TrailingBackslash',FTrailingBackslash);
 
   FPrgSetup.UpdateFile;
 end;
@@ -596,8 +606,8 @@ begin
   AddStringRec(1,'ProgramSets','DefLoc',PrgDataDir);
   AddStringRec(2,'ProgramSets','DefDataLoc',PrgDataDir+'GameData\');
   AddStringRec(3,'ProgramSets','LanguageFile','English.ini');
-  AddStringRec(4,'ProgramSets','ColOrder','1234567');
-  AddStringRec(5,'ProgramSets','ColVisible','1111110');
+  AddStringRec(4,'ProgramSets','ColOrder','12345678');
+  AddStringRec(5,'ProgramSets','ColVisible','11111100');
   AddStringRec(6,'ProgramSets','ILVS','List');
   AddStringRec(7,'ProgramSets','PathToFREEDOS','.\VirtualHD\FREEDOS\');
   AddStringRec(8,'ProgramSets','UpdateCheckURL',DFRHomepage+'UpdateInfo.txt');
@@ -635,6 +645,9 @@ begin
   AddStringRec(40,'ProgramSets','RenameAllExpression','%P_%N.%E');
   AddStringRec(41,'ProgramSets','ActiveDataReaderFields','-XXXXX');
   AddStringRec(42,'ProgramSets','InstallerNames',DefaultInstallerNames);
+  AddStringRec(43,'ProgramSets','ExportColumns','XXXXXXXXX');
+  AddStringRec(44,'ProgramSets','ArchiveIDFiles',DefaultArchiveIDFiles);
+  AddStringRec(45,'ProgramSets','LastSelectedProfile','');
 
   For I:=0 to 25 do AddStringRec(450+I,'WineSupport',chr(ord('A')+I),'');
 
@@ -729,7 +742,10 @@ begin
   AddBooleanRec(77,'ProgramSets','DOSBoxStartLogging',False);
   AddBooleanRec(78,'ProgramSets','DataReaderAllPlatforms',False);
   AddBooleanRec(79,'ProgramSets','StoreHistory',True);
-  AddBooleanRec(80,'ProgramSets','ActivateIncompleteFeatures',False);
+  AddBooleanRec(80,'ProgramSets','RestoreLastSelectedProfile',False);
+  AddBooleanRec(81,'ProgramSets','OldDeleteMenuItem',False);
+  AddBooleanRec(82,'ProgramSets','DefaultUninstall',True);
+  AddBooleanRec(83,'ProgramSets','ActivateIncompleteFeatures',False);
 
   AddIntegerRec(0,'ProgramSets','MainLeft',-1);
   AddIntegerRec(1,'ProgramSets','MainTop',-1);

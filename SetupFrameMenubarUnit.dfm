@@ -10,7 +10,7 @@ object SetupFrameMenubar: TSetupFrameMenubar
   object ShowMenubarLabel: TLabel
     Left = 30
     Top = 48
-    Width = 418
+    Width = 403
     Height = 57
     Anchors = [akLeft, akTop, akRight]
     AutoSize = False
@@ -20,7 +20,7 @@ object SetupFrameMenubar: TSetupFrameMenubar
   object ShowMenubarCheckBox: TCheckBox
     Left = 16
     Top = 16
-    Width = 432
+    Width = 417
     Height = 17
     Anchors = [akLeft, akTop, akRight]
     Caption = 'Show menubar'

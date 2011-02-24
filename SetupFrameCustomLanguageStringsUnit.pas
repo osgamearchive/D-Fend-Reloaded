@@ -255,7 +255,7 @@ begin
               M:=TMenuItem.Create(AddLinePopupMenu); M.Caption:='-';
               AddLinePopupMenu.Items.Add(M);
               For I:=0 to St.Count-1 do begin
-                M:=TMenuItem.Create(AddLinePopupMenu); M.Caption:=St[I]; M.Tag:=-2; M.OnClick:=ButtonWork;
+                M:=TMenuItem.Create(AddLinePopupMenu); M.Caption:=MaskUnderlineAmpersand(St[I]); M.Tag:=-2; M.OnClick:=ButtonWork;
                 AddLinePopupMenu.Items.Add(M);
               end;
             end;

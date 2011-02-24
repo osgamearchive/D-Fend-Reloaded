@@ -5,7 +5,7 @@ interface
 
 uses Windows, Classes, IniFiles, Math, Variants;
 
-Type ConfigRec=record
+Type TConfigRec=record
   Nr : Integer;
   Section, Key : String;
   DefaultBool : Boolean;
@@ -17,7 +17,8 @@ Type ConfigRec=record
   CacheValueString : String;
 end;
 
-Type TConfigRecArray=Array of ConfigRec;
+Type TConfigRecArray=Array of TConfigRec;
+     PConfigRec=^TConfigRec;
      PConfigRecArray=^TConfigRecArray;
      TConfigIndexArray=Array of Integer;
 
@@ -32,6 +33,7 @@ Type TBasePrgSetup=class
     Ini : TMemIniFile;
     FOwnINI : Boolean;
     BooleanList, IntegerList, StringList : TConfigRecArray;
+    BooleanListUsed, IntegerListUsed, StringListUsed : Integer;
     BooleanIndex, IntegerIndex, StringIndex : TConfigIndexArray;
     FStoreConfigOnExit : Boolean;
     FOnChanged : TNotifyEvent;
@@ -39,16 +41,19 @@ Type TBasePrgSetup=class
     FChanged : Boolean;
     Procedure ClearLists;
     Function IndexOf(const Nr : Integer; const List : TConfigRecArray; var Index : TConfigIndexArray) : Integer; inline;
-    Function AddRec(const Nr : Integer; const Section, Key : String; var List : TConfigRecArray) : Integer; inline;
+    Function AddRec(const ANr : Integer; const ASection, AKey : String; var List : TConfigRecArray) : Integer; inline;
+    function AddRecFast(const ANr: Integer; const ASection, AKey: String; var List: TConfigRecArray; var UsedCounter : Integer) : Integer; inline;
     Procedure ReadStringFromINI(const I : Integer);
     Procedure LoadBinConfig(const St : TStream; const PConfig : PConfigRecArray; const ConfigType : TConfigType);
     Procedure StoreBinConfig(const St : TStream; const PConfig : PConfigRecArray; const ConfigType : TConfigType);
     Procedure LoadIniNow; inline;
     Function GetIni : TMemIniFile;
   protected
-    Procedure AddBooleanRec(const Nr : Integer; const Section, Key : String; const Default : Boolean);
-    Procedure AddIntegerRec(const Nr : Integer; const Section, Key : String; const Default : Integer);
-    Procedure AddStringRec(const Nr : Integer; const Section, Key : String; const Default : String);
+    Procedure FastAddRecStart;
+    Procedure FastAddRecDone;
+    Procedure AddBooleanRec(const Nr : Integer; const Section, Key : String; const Default : Boolean); inline;
+    Procedure AddIntegerRec(const Nr : Integer; const Section, Key : String; const Default : Integer); inline;
+    Procedure AddStringRec(const Nr : Integer; const Section, Key : String; const Default : String); inline;
     function GetBoolean(const Index: Integer): Boolean;
     function GetInteger(const Index: Integer): Integer;
     procedure SetBoolean(const Index: Integer; const Value: Boolean);
@@ -106,6 +111,9 @@ end;
 constructor TBasePrgSetup.Create(const ASetupFile: String);
 begin
   inherited Create;
+  BooleanListUsed:=-1;
+  IntegerListUsed:=-1;
+  StringListUsed:=-1;
   FSetupFile:=ASetupFile;
   FLastTimeStamp:=0;
   FFirstRun:=not FileExists(ASetupFile);
@@ -123,6 +131,9 @@ end;
 constructor TBasePrgSetup.CreateNoTimeStampCheck(const ASetupFile: String);
 begin
   inherited Create;
+  BooleanListUsed:=-1;
+  IntegerListUsed:=-1;
+  StringListUsed:=-1;
   FSetupFile:=ASetupFile;
   FLastTimeStamp:=0;
   FFirstRun:=not FileExists(ASetupFile);
@@ -139,6 +150,9 @@ end;
 constructor TBasePrgSetup.Create(const ABasePrgSetup: TBasePrgSetup);
 begin
   inherited Create;
+  BooleanListUsed:=-1;
+  IntegerListUsed:=-1;
+  StringListUsed:=-1;
   FOwnINI:=False;
   FFirstRun:=False;
   Ini:=ABasePrgSetup.MemIni;
@@ -324,7 +338,21 @@ begin
   CheckAndUpdateTimeStamp;
 end;
 
-function TBasePrgSetup.AddRec(const Nr: Integer; const Section, Key: String; var List: TConfigRecArray) : Integer;
+procedure TBasePrgSetup.FastAddRecDone;
+begin
+  if BooleanListUsed>=0 then SetLength(BooleanList,BooleanListUsed);
+  If IntegerListUsed>=0 then SetLength(IntegerList,IntegerListUsed);
+  If StringListUsed>=0 then SetLength(StringList,StringListUsed);
+end;
+
+procedure TBasePrgSetup.FastAddRecStart;
+begin
+  BooleanListUsed:=0;
+  IntegerListUsed:=0;
+  StringListUsed:=0;
+end;
+
+function TBasePrgSetup.AddRec(const ANr: Integer; const ASection, AKey: String; var List: TConfigRecArray) : Integer;
 Var I,J : Integer;
 begin
   result:=length(List);
@@ -333,36 +361,77 @@ begin
   J:=result;
   {$IFDEF DoubleNumberCheck}
   For I:=0 to result-1 do begin
-    If (J=length(List)-1) and (Nr<List[I].Nr) then J:=I;
-    If Nr=List[I].Nr then ShowMessage('Double use of nr '+IntToStr(Nr));
+    If (J=length(List)-1) and (ANr<List[I].Nr) then J:=I;
+    If ANr=List[I].Nr then ShowMessage('Double use of nr '+IntToStr(ANr));
   end;
   For I:=result-1 downto J do List[I+1]:=List[I];
+  result:=J;
   {$ELSE}
-  If Nr<List[result-1].Nr then begin
-    For I:=0 to result-1 do If Nr<List[I].Nr then begin J:=I; break; end;
+  If ANr<List[result-1].Nr then begin
+    For I:=0 to result-1 do If ANr<List[I].Nr then begin J:=I; break; end;
     For I:=result-1 downto J do List[I+1]:=List[I];
+    result:=J;
   end;
   {$ENDIF}
 
-  List[J].Nr:=Nr;
-  List[J].Section:=Section;
-  List[J].Key:=Key;
-  List[J].Cached:=False;
+  with List[J] do begin
+    Nr:=ANr;
+    Section:=ASection;
+    Key:=AKey;
+    Cached:=False;
+  end;
+end;
+
+function TBasePrgSetup.AddRecFast(const ANr: Integer; const ASection, AKey: String; var List: TConfigRecArray; var UsedCounter : Integer) : Integer;
+Var I,J : Integer;
+begin
+  if UsedCounter=length(List) then SetLength(List,UsedCounter+50);
+  result:=UsedCounter;
+  inc(UsedCounter);
+
+  J:=result;
+  {$IFDEF DoubleNumberCheck}
+  For I:=0 to result-1 do begin
+    If (J=result) and (ANr<List[I].Nr) then J:=I;
+    If ANr=List[I].Nr then ShowMessage('Double use of nr '+IntToStr(ANr));
+  end;
+  For I:=result-1 downto J do List[I+1]:=List[I];
+  result:=J;
+  {$ELSE}
+  If ANr<List[result-1].Nr then begin
+    For I:=0 to result-1 do If ANr<List[I].Nr then begin J:=I; break; end;
+    For I:=result-1 downto J do List[I+1]:=List[I];
+    result:=J;
+  end;
+  {$ENDIF}
+
+  with List[J] do begin
+    Nr:=ANr;
+    Section:=ASection;
+    Key:=AKey;
+    Cached:=False;
+  end;
 end;
 
 procedure TBasePrgSetup.AddBooleanRec(const Nr: Integer; const Section, Key: String; const Default : Boolean);
 begin
-  BooleanList[AddRec(Nr,Section,Key,BooleanList)].DefaultBool:=Default;
+  if BooleanListUsed>=0
+    then BooleanList[AddRecFast(Nr,Section,Key,BooleanList,BooleanListUsed)].DefaultBool:=Default
+    else BooleanList[AddRec(Nr,Section,Key,BooleanList)].DefaultBool:=Default;
 end;
 
 procedure TBasePrgSetup.AddIntegerRec(const Nr: Integer; const Section, Key: String; const Default : Integer);
 begin
-  IntegerList[AddRec(Nr,Section,Key,IntegerList)].DefaultInteger:=Default;
+  If IntegerListUsed>=0
+    then IntegerList[AddRecFast(Nr,Section,Key,IntegerList,IntegerListUsed)].DefaultInteger:=Default
+    else IntegerList[AddRec(Nr,Section,Key,IntegerList)].DefaultInteger:=Default;
 end;
 
 procedure TBasePrgSetup.AddStringRec(const Nr: Integer; const Section, Key: String; const Default : String);
 begin
-  StringList[AddRec(Nr,Section,Key,StringList)].DefaultString:=Default;
+  If StringListUsed>=0
+    then StringList[AddRecFast(Nr,Section,Key,StringList,StringListUsed)].DefaultString:=Default
+    else StringList[AddRec(Nr,Section,Key,StringList)].DefaultString:=Default;
 end;
 
 function TBasePrgSetup.GetBoolean(const Index: Integer): Boolean;
@@ -479,16 +548,18 @@ end;
 Procedure TBasePrgSetup.LoadBinConfig(const St : TStream; const PConfig : PConfigRecArray; const ConfigType : TConfigType);
 Var I,J : Integer;
 begin
-  For I:=0 to length(PConfig^)-1 do begin
-    Case ConfigType of
-      ctBoolean : St.ReadBuffer(PConfig^[I].CacheValueBool,SizeOf(Boolean));
-      ctInteger : St.ReadBuffer(PConfig^[I].CacheValueInteger,SizeOf(Integer));
-      ctString : begin
-                   St.ReadBuffer(J,SizeOf(Integer));
-                   SetLength(PConfig^[I].CacheValueString,J); St.ReadBuffer(PConfig^[I].CacheValueString[1],J);
+  Case ConfigType of
+    ctBoolean : For I:=0 to length(PConfig^)-1 do begin St.Read(PConfig^[I].CacheValueBool,SizeOf(Boolean)); PConfig^[I].Cached:=True; end;
+    ctInteger : For I:=0 to length(PConfig^)-1 do begin St.Read(PConfig^[I].CacheValueInteger,SizeOf(Integer)); PConfig^[I].Cached:=True; end;
+    ctString : For I:=0 to length(PConfig^)-1 do begin
+                 St.Read(J,SizeOf(Integer));
+                 If J>0 then begin
+                   SetLength(PConfig^[I].CacheValueString,J); St.Read(PConfig^[I].CacheValueString[1],J);
+                 end else begin
+                   PConfig^[I].CacheValueString:='';
                  end;
-    end;
-    PConfig^[I].Cached:=True;
+                 PConfig^[I].Cached:=True;
+               end;
   end;
 end;
 
@@ -516,7 +587,7 @@ begin
   LoadBinConfig(St,@BooleanList,ctBoolean);
   LoadBinConfig(St,@IntegerList,ctInteger);
   LoadBinConfig(St,@StringList,ctString);
-  St.ReadBuffer(FLastTimeStamp,SizeOf(FLastTimeStamp));
+  St.Read(FLastTimeStamp,SizeOf(FLastTimeStamp));
   FChanged:=False;
 end;
 

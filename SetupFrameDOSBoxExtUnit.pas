@@ -111,11 +111,6 @@ begin
   PrinterCheckBox.Checked:=PrgSetup.AllowPrinterSettings;
 
   NE2000CheckBox.Checked:=PrgSetup.AllowNe2000;
-
-  InnovaCheckBox.Visible:=PrgSetup.ActivateIncompleteFeatures;
-  NetworkGroupBox.Visible:=PrgSetup.ActivateIncompleteFeatures;
-  InfoLabel.Visible:=PrgSetup.ActivateIncompleteFeatures;
-  InfoURLLabel.Visible:=PrgSetup.ActivateIncompleteFeatures;
 end;
 
 procedure TSetupFrameDOSBoxExt.DefaultValueChanged(Sender: TObject);

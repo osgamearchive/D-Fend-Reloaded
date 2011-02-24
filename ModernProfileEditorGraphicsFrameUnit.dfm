@@ -23,28 +23,28 @@ object ModernProfileEditorGraphicsFrame: TModernProfileEditorGraphicsFrame
   end
   object RenderLabel: TLabel
     Left = 24
-    Top = 272
+    Top = 296
     Width = 60
     Height = 13
     Caption = 'RenderLabel'
   end
   object VideoCardLabel: TLabel
     Left = 184
-    Top = 272
+    Top = 296
     Width = 74
     Height = 13
     Caption = 'VideoCardLabel'
   end
   object ScaleLabel: TLabel
     Left = 24
-    Top = 328
+    Top = 352
     Width = 50
     Height = 13
     Caption = 'ScaleLabel'
   end
   object FrameSkipLabel: TLabel
-    Left = 424
-    Top = 328
+    Left = 422
+    Top = 352
     Width = 74
     Height = 13
     Anchors = [akTop, akRight]
@@ -61,8 +61,8 @@ object ModernProfileEditorGraphicsFrame: TModernProfileEditorGraphicsFrame
     WordWrap = True
   end
   object PixelShaderLabel: TLabel
-    Left = 504
-    Top = 328
+    Left = 520
+    Top = 352
     Width = 81
     Height = 13
     Anchors = [akTop, akRight]
@@ -86,13 +86,27 @@ object ModernProfileEditorGraphicsFrame: TModernProfileEditorGraphicsFrame
     Height = 13
     Caption = 'GlideEmulationLabel'
   end
+  object GlideEmulationPortLabel: TLabel
+    Left = 184
+    Top = 240
+    Width = 114
+    Height = 13
+    Caption = 'GlideEmulationPortLabel'
+  end
+  object GlideEmulationLFBLabel: TLabel
+    Left = 363
+    Top = 240
+    Width = 111
+    Height = 13
+    Caption = 'GlideEmulationLFBLabel'
+  end
   object WindowResolutionComboBox: TComboBox
     Left = 24
     Top = 32
     Width = 145
     Height = 21
     Style = csDropDownList
-    ItemHeight = 0
+    ItemHeight = 13
     TabOrder = 0
   end
   object FullscreenResolutionComboBox: TComboBox
@@ -101,7 +115,7 @@ object ModernProfileEditorGraphicsFrame: TModernProfileEditorGraphicsFrame
     Width = 145
     Height = 21
     Style = csDropDownList
-    ItemHeight = 0
+    ItemHeight = 13
     TabOrder = 1
   end
   object StartFullscreenCheckBox: TCheckBox
@@ -133,46 +147,46 @@ object ModernProfileEditorGraphicsFrame: TModernProfileEditorGraphicsFrame
   end
   object RenderComboBox: TComboBox
     Left = 24
-    Top = 291
+    Top = 315
     Width = 145
     Height = 21
     Style = csDropDownList
-    ItemHeight = 0
-    TabOrder = 6
+    ItemHeight = 13
+    TabOrder = 8
   end
   object VideoCardComboBox: TComboBox
     Left = 184
-    Top = 291
-    Width = 284
+    Top = 315
+    Width = 330
     Height = 21
     Style = csDropDownList
-    ItemHeight = 0
-    TabOrder = 7
+    ItemHeight = 13
+    TabOrder = 9
   end
   object ScaleComboBox: TComboBox
     Left = 24
-    Top = 347
-    Width = 377
+    Top = 371
+    Width = 385
     Height = 21
     Style = csDropDownList
     Anchors = [akLeft, akTop, akRight]
-    ItemHeight = 0
-    TabOrder = 8
+    ItemHeight = 13
+    TabOrder = 10
   end
   object FrameSkipEdit: TSpinEdit
     Left = 422
-    Top = 347
-    Width = 60
+    Top = 371
+    Width = 92
     Height = 22
     Anchors = [akTop, akRight]
     MaxValue = 10
     MinValue = 0
-    TabOrder = 9
+    TabOrder = 11
     Value = 0
   end
   object TextModeLinesRadioGroup: TRadioGroup
     Left = 24
-    Top = 381
+    Top = 405
     Width = 169
     Height = 76
     Caption = 'TextModeLinesRadioGroup'
@@ -181,17 +195,17 @@ object ModernProfileEditorGraphicsFrame: TModernProfileEditorGraphicsFrame
       '25'
       '28'
       '50')
-    TabOrder = 11
+    TabOrder = 13
     Visible = False
   end
   object VGASettingsGroupBox: TGroupBox
     Left = 207
-    Top = 381
+    Top = 405
     Width = 417
     Height = 105
     Anchors = [akLeft, akTop, akRight]
     Caption = 'VGASettingsGroupBox'
-    TabOrder = 12
+    TabOrder = 14
     Visible = False
     DesignSize = (
       417
@@ -226,7 +240,7 @@ object ModernProfileEditorGraphicsFrame: TModernProfileEditorGraphicsFrame
       Width = 145
       Height = 21
       Style = csDropDownList
-      ItemHeight = 0
+      ItemHeight = 13
       TabOrder = 0
     end
     object VideoRamComboBox: TComboBox
@@ -235,29 +249,46 @@ object ModernProfileEditorGraphicsFrame: TModernProfileEditorGraphicsFrame
       Width = 145
       Height = 21
       Style = csDropDownList
-      ItemHeight = 0
+      ItemHeight = 13
       TabOrder = 1
     end
   end
   object PixelShaderComboBox: TComboBox
-    Left = 504
-    Top = 347
-    Width = 120
+    Left = 520
+    Top = 371
+    Width = 104
     Height = 21
     Style = csDropDownList
     Anchors = [akTop, akRight]
-    ItemHeight = 0
-    TabOrder = 10
+    ItemHeight = 13
+    TabOrder = 12
     Visible = False
     OnChange = PixelShaderComboBoxChange
   end
   object GlideEmulationComboBox: TComboBox
-    Left = 184
-    Top = 236
+    Left = 24
+    Top = 259
     Width = 105
     Height = 21
     Style = csDropDownList
-    ItemHeight = 0
+    ItemHeight = 13
     TabOrder = 5
+  end
+  object GlideEmulationPortComboBox: TComboBox
+    Left = 184
+    Top = 259
+    Width = 105
+    Height = 21
+    ItemHeight = 13
+    TabOrder = 6
+  end
+  object GlideEmulationLFBComboBox: TComboBox
+    Left = 363
+    Top = 259
+    Width = 105
+    Height = 21
+    Style = csDropDownList
+    ItemHeight = 13
+    TabOrder = 7
   end
 end

@@ -144,7 +144,7 @@ begin
   TemplateType1List.Items.Clear;
   TemplateType2List.Items.Clear;
 
-  GameCheckSum:=GetMD5Sum(MakeAbsPath(GameFile,PrgSetup.BaseDir));
+  GameCheckSum:=GetMD5Sum(MakeAbsPath(GameFile,PrgSetup.BaseDir),False);
   If Trim(GameFile)='' then GameFileShort:='' else GameFileShort:=Trim(ExtUpperCase(ExtractFileName(GameFile)));
 
   {Find matching auto setup templates}

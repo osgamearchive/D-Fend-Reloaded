@@ -39,7 +39,7 @@ implementation
 
 uses ShellAPI, VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgSetupUnit,
      GameDBUnit, DOSBoxUnit, ImageTools, HelpConsts, IconLoaderUnit,
-     DOSBoxTempUnit, PrgConsts;
+     DOSBoxTempUnit, PrgConsts, MainUnit;
 
 {$R *.dfm}
 
@@ -167,7 +167,7 @@ begin
     end;
 
     TempGame.Game.StoreAllValues;
-    RunCommand(TempGame.Game,'',True);
+    RunCommand(TempGame.Game,DFendReloadedMainForm.DeleteOnExit,'',True);
   finally
     TempGame.Game.Free;
   end;

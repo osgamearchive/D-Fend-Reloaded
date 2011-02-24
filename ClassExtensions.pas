@@ -137,6 +137,7 @@ procedure TListViewSpecialHint.CMHintShow(var Message: TCMHintShow);
 Var Item : TListItem;
     InfoTip : String;
     ItemRect: TRect;
+    P : TPoint;    
 begin
   Message.Result:=1;
   Item:=GetItemAt(Message.HintInfo^.CursorPos.X,Message.HintInfo^.CursorPos.Y);
@@ -150,11 +151,16 @@ begin
   ItemRect.TopLeft := ClientToScreen(ItemRect.TopLeft);
   ItemRect.BottomRight := ClientToScreen(ItemRect.BottomRight);
 
+  P:=ClientToScreen(Point(Left,Top));
+
   with Message.HintInfo^ do begin
     CursorRect := ItemRect;
     HintStr:=InfoTip;
-    HintPos.Y := CursorRect.Top + GetSystemMetrics(SM_CYCURSOR);
-    HintPos.X := CursorRect.Left + GetSystemMetrics(SM_CXCURSOR);
+    {HintPos.Y := CursorRect.Top + GetSystemMetrics(SM_CYCURSOR);
+    HintPos.X := CursorRect.Left + GetSystemMetrics(SM_CXCURSOR);}
+    HintPos.X:=P.X+CursorPos.X;
+    HintPos.Y:=P.Y+CursorPos.Y+(GetSystemMetrics(SM_CYCURSOR) div 2);
+
     HintMaxWidth:=Screen.DesktopLeft+Screen.DesktopWidth-HintPos.x;
     HideTimeout:=100000;
     HintWindowClass:=TDFRHintWindow;
@@ -168,6 +174,7 @@ procedure TListViewAcceptingFilesAndSpecialHint.CMHintShow(var Message: TCMHintS
 Var Item : TListItem;
     InfoTip : String;
     ItemRect: TRect;
+    P : TPoint;
 begin
   Message.Result:=1;
   Item:=GetItemAt(Message.HintInfo^.CursorPos.X,Message.HintInfo^.CursorPos.Y);
@@ -181,15 +188,27 @@ begin
   ItemRect.TopLeft := ClientToScreen(ItemRect.TopLeft);
   ItemRect.BottomRight := ClientToScreen(ItemRect.BottomRight);
 
+  P:=ClientToScreen(Point(Left,Top));
+
   with Message.HintInfo^ do begin
-    CursorRect := ItemRect;
+    CursorRect:=ItemRect;
     HintStr:=InfoTip;
-    HintPos.Y := CursorRect.Top + GetSystemMetrics(SM_CYCURSOR);
-    HintPos.X := CursorRect.Left + GetSystemMetrics(SM_CXCURSOR);
-    HintMaxWidth:=Screen.DesktopLeft+Screen.DesktopWidth-HintPos.x;
+
+    {HintPos.X:=CursorRect.Left+GetSystemMetrics(SM_CXCURSOR);
+    HintPos.Y:=CursorRect.Top+GetSystemMetrics(SM_CYCURSOR);
+    If HintPos.X<P.X then HintPos.X:=P.X+GetSystemMetrics(SM_CXCURSOR);
+    If HintPos.X>P.X+Width then HintPos.X:=P.X+Width-GetSystemMetrics(SM_CXCURSOR);
+    If HintPos.Y<P.Y then HintPos.Y:=P.Y+GetSystemMetrics(SM_CYCURSOR);
+    If HintPos.Y>P.Y+Height then HintPos.Y:=P.Y+Height-GetSystemMetrics(SM_CYCURSOR);}
+
+    HintPos.X:=P.X+CursorPos.X;
+    HintPos.Y:=P.Y+CursorPos.Y+(GetSystemMetrics(SM_CYCURSOR) div 2);
+
+    HintMaxWidth:=Screen.DesktopLeft+Screen.DesktopWidth-HintPos.X;
     HideTimeout:=100000;
     HintWindowClass:=TDFRHintWindow;
   end;
+
   Message.Result:=0;
 end;
 

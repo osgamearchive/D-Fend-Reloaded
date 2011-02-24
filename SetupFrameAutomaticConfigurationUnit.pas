@@ -8,11 +8,14 @@ uses
 
 type
   TSetupFrameAutomaticConfiguration = class(TFrame, ISetupFrame)
-    ZipImportGroupBox: TGroupBox;
-    WizardRadioGroup: TRadioGroup;
-    ZipImportCheckBox: TCheckBox;
-    InstallerNamesLabel: TLabel;
+    ScrollBox: TScrollBox;
     InstallerNamesMemo: TMemo;
+    InstallerNamesLabel: TLabel;
+    WizardRadioGroup: TRadioGroup;
+    ZipImportGroupBox: TGroupBox;
+    ZipImportCheckBox: TCheckBox;
+    ArchiveIDFilesLabel: TLabel;
+    ArchiveIDFilesMemo: TMemo;
   private
     { Private-Deklarationen }
   public
@@ -53,6 +56,7 @@ begin
   NoFlicker(ZipImportCheckBox);
   NoFlicker(WizardRadioGroup);
   NoFlicker(InstallerNamesMemo);
+  NoFlicker(ArchiveIDFilesMemo);
 
   ZipImportCheckBox.Checked:=PrgSetup.ImportZipWithoutDialogIfPossible;
   WizardRadioGroup.ItemIndex:=Max(0,Min(2,PrgSetup.LastWizardMode));
@@ -61,6 +65,14 @@ begin
   try
     InstallerNamesMemo.Lines.Clear;
     InstallerNamesMemo.Lines.AddStrings(St);
+  finally
+    St.Free;
+  end;
+
+  St:=ValueToList(PrgSetup.ArchiveIDFiles);
+  try
+    ArchiveIDFilesMemo.Lines.Clear;
+    ArchiveIDFilesMemo.Lines.AddStrings(St);
   finally
     St.Free;
   end;
@@ -82,6 +94,7 @@ begin
   WizardRadioGroup.Items[2]:=LanguageSetup.WizardFormWizardModeAlwaysAllPages;
   WizardRadioGroup.ItemIndex:=I;
   InstallerNamesLabel.Caption:=LanguageSetup.SetupFormAutomaticConfigurationInstallerNames;
+  ArchiveIDFilesLabel.Caption:=LanguageSetup.SetupFormAutomaticConfigurationArchiveIDFiles;
 
   HelpContext:=ID_FileOptionsAutomaticConfiguration;
 end;
@@ -110,6 +123,13 @@ begin
   finally
     St.Free;
   end;
+  St:=ValueToList(DefaultArchiveIDFiles);
+  try
+    ArchiveIDFilesMemo.Lines.Clear;
+    ArchiveIDFilesMemo.Lines.AddStrings(St);
+  finally
+    St.Free;
+  end;
 end;
 
 procedure TSetupFrameAutomaticConfiguration.SaveSetup;
@@ -126,6 +146,16 @@ begin
       If S<>'' then St.Add(S);
     end;
     PrgSetup.InstallerNames:=ListToValue(St);
+  finally
+    St.Free;
+  end;
+  St:=TStringList.Create;
+  try
+    For I:=0 to ArchiveIDFilesMemo.Lines.Count-1 do begin
+      S:=Trim(ArchiveIDFilesMemo.Lines[I]);
+      If S<>'' then St.Add(S);
+    end;
+    PrgSetup.ArchiveIDFiles:=ListToValue(St);
   finally
     St.Free;
   end;

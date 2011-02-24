@@ -22,7 +22,6 @@ type
     procedure MIDISelectListBoxClick(Sender: TObject);
   private
     { Private-Deklarationen }
-    Procedure ShowFrame(Sender : TObject); 
   public
     { Public-Deklarationen }
     Procedure InitGUI(var InitData : TModernProfileEditorInitData);
@@ -57,13 +56,7 @@ begin
   AddDefaultValueHint(TypeComboBox);
   AddDefaultValueHint(DeviceComboBox);
 
-  InitData.OnShowFrame:=ShowFrame;
-
   HelpContext:=ID_ProfileEditSoundMIDI;
-end;
-
-procedure TModernProfileEditorMIDIFrame.ShowFrame(Sender: TObject);
-begin
 end;
 
 Procedure SetComboBox(const ComboBox : TComboBox; const Value : String; const Default : Integer); overload;

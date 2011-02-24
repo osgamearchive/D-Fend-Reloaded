@@ -2,13 +2,13 @@ object SetupFrameDOSBoxExt: TSetupFrameDOSBoxExt
   Left = 0
   Top = 0
   Width = 585
-  Height = 648
+  Height = 675
   TabOrder = 0
   object ScrollBox: TScrollBox
     Left = 0
     Top = 0
     Width = 585
-    Height = 648
+    Height = 675
     HorzScrollBar.Visible = False
     VertScrollBar.Smooth = True
     VertScrollBar.Tracking = True
@@ -17,7 +17,7 @@ object SetupFrameDOSBoxExt: TSetupFrameDOSBoxExt
     TabOrder = 0
     DesignSize = (
       585
-      648)
+      675)
     object WarningLabel: TLabel
       Left = 16
       Top = 16
@@ -29,15 +29,15 @@ object SetupFrameDOSBoxExt: TSetupFrameDOSBoxExt
       WordWrap = True
     end
     object InfoLabel: TLabel
-      Left = 24
-      Top = 584
+      Left = 16
+      Top = 608
       Width = 281
       Height = 13
       Caption = 'You can download DOSBoxs supporting this features here:'
     end
     object InfoURLLabel: TLabel
-      Left = 24
-      Top = 603
+      Left = 16
+      Top = 627
       Width = 64
       Height = 13
       Caption = 'InfoURLLabel'
@@ -148,13 +148,13 @@ object SetupFrameDOSBoxExt: TSetupFrameDOSBoxExt
       Left = 16
       Top = 368
       Width = 545
-      Height = 57
+      Height = 73
       Anchors = [akLeft, akTop, akRight]
       Caption = 'SoundGroupBox'
       TabOrder = 2
       DesignSize = (
         545
-        57)
+        73)
       object MIDICheckBox: TCheckBox
         Tag = 2
         Left = 16
@@ -168,7 +168,7 @@ object SetupFrameDOSBoxExt: TSetupFrameDOSBoxExt
       end
       object InnovaCheckBox: TCheckBox
         Left = 16
-        Top = 40
+        Top = 47
         Width = 513
         Height = 17
         Anchors = [akLeft, akTop, akRight]
@@ -178,7 +178,7 @@ object SetupFrameDOSBoxExt: TSetupFrameDOSBoxExt
     end
     object PrinterGroupBox: TGroupBox
       Left = 16
-      Top = 439
+      Top = 455
       Width = 545
       Height = 58
       Anchors = [akLeft, akTop, akRight]
@@ -199,7 +199,7 @@ object SetupFrameDOSBoxExt: TSetupFrameDOSBoxExt
     end
     object NetworkGroupBox: TGroupBox
       Left = 16
-      Top = 512
+      Top = 528
       Width = 545
       Height = 58
       Caption = 'NetworkGroupBox'

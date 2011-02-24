@@ -52,6 +52,13 @@ Type TConfOpt=class(TBasePrgSetup)
     property CPUType : String index 40 read GetString write SetString;
     property OplEmu : String index 41 read GetString write SetString;
     property GlideEmulation : String index 42 read GetString write SetString;
+    property GlideEmulationPort : String index 43 read GetString write SetString;
+    property GlideEmulationLFB : String index 44 read GetString write SetString;
+    property InnovaEmulationSampleRate : String index 45 read GetString write SetString;
+    property InnovaEmulationBaseAddress : String index 46 read GetString write SetString;
+    property InnovaEmulationQuality : String index 47 read GetString write SetString;
+    property NE2000EmulationBaseAddress : String index 48 read GetString write SetString;
+    property NE2000EmulationInterrupt : String index 49 read GetString write SetString;
 end;
 
 const NR_Name=1;
@@ -625,7 +632,7 @@ end;
 
 Var DefaultValueReaderGame : TGame = nil;
 
-Const DefaultValuesResolutionFullscreen='original,320x200,320x240,640x432,640x480,720x480,800x600,1024x768,1152x864,1280x720,1280x768,1280x960,1280x1024,1366x760,1366x768,1600x1200,1920x1080,1920x1200,0x0';
+Const DefaultValuesResolutionFullscreen='original,320x200,320x240,640x432,640x480,720x480,800x600,1024x768,1152x864,1280x720,1280x768,1280x960,1280x1024,1366x760,1366x768,1600x1200,1680x1050,1920x1080,1920x1200,0x0';
       DefaultValuesResolutionWindow='original,320x200,320x240,640x432,640x480,720x480,800x600,1024x768,1152x864,1280x720,1280x768,1280x960,1280x1024,1366x760,1366x768,1600x1200,1920x1080,1920x1200';
       DefaultValuesJoysticks='none,auto,2axis,4axis,4axis_2,fcs,ch';
       DefaultValuesScale='No Scaling (none),Nearest neighbor upscaling with factor 2 (normal2x),Nearest neighbor upscaling with factor 3 (normal3x),'+
@@ -698,6 +705,13 @@ Const DefaultValuesResolutionFullscreen='original,320x200,320x240,640x432,640x48
       DefaultValuesCPUType='auto,386,386_slow,486_slow,pentium_slow,386_prefetch';
       DefaultValuesOplEmu='default,compat,fast,old';
       DefaultValuesGlideEmulation='false,true,emu';
+      DefaultValuesGlideEmulationPort='400,500,600';
+      DefaultValuesGlideEmulationLFB='full,read,write,none';
+      DefaultValuesInnovaEmulationSampleRate='44100,48000,32000,22050,16000,11025,8000,49716';
+      DefaultValuesInnovaEmulationBaseAddress='240,220,260,280,2a0,2c0,2e0,300';
+      DefaultValuesInnovaEmulationQuality='0,1,2,3';
+      DefaultValuesNE2000EmulationBaseAddress='300,400,500';
+      DefaultValuesNE2000EmulationInterrupt='3,5,7,10,11';
 
 implementation
 
@@ -754,6 +768,13 @@ begin
   AddStringRec(40,'CPUType','value',DefaultValuesCPUType);
   AddStringRec(41,'SBOplEmu','value',DefaultValuesOplEmu);
   AddStringRec(42,'GlideEmulation','value',DefaultValuesGlideEmulation);
+  AddStringRec(43,'GlideEmulationPort','value',DefaultValuesGlideEmulationPort);
+  AddStringRec(44,'GlideEmulationLFB','value',DefaultValuesGlideEmulationLFB);
+  AddStringRec(45,'InnovaEmulationSampleRate','value',DefaultValuesInnovaEmulationSampleRate);
+  AddStringRec(46,'InnovaEmulationBaseAddress','value',DefaultValuesInnovaEmulationBaseAddress);
+  AddStringRec(47,'InnovaEmulationQuality','value',DefaultValuesInnovaEmulationQuality);
+  AddStringRec(48,'NE2000EmulationBaseAddress','value',DefaultValuesNE2000EmulationBaseAddress);
+  AddStringRec(49,'NE2000EmulationInterrupt','value',DefaultValuesNE2000EmulationInterrupt);
 
   CacheAllStrings;
 end;
@@ -801,6 +822,8 @@ begin
   S:=ExtractFileName(SetupFile);
   while (S<>'') and (S[length(S)]<>'.') do Delete(S,length(S),1);
   If (S<>'') and (S[length(S)]='.') then Delete(S,length(S),1);
+
+  FastAddRecStart;
 
   AddStringRec(NR_Name,'ExtraInfo','Name',S);
 
@@ -1035,6 +1058,8 @@ begin
   AddStringRec(NR_AddtionalChecksumFile4Checksum,'ExtraGameIdentify','File4.Checksum','');
   AddStringRec(NR_AddtionalChecksumFile5,'ExtraGameIdentify','File5.Filename','');
   AddStringRec(NR_AddtionalChecksumFile5Checksum,'ExtraGameIdentify','File5.Checksum','');
+
+  FastAddRecDone;
 end;
 
 Function TGame.GetExtraPrgFile(I : Integer) : String;
@@ -1127,7 +1152,7 @@ Var St : TStringList;
 begin
   If not DOSBoxMode(self) then exit;
 
-  St:=BuildConfFile(self,False,False,-1);
+  St:=BuildConfFile(self,False,False,-1,nil);
   try
     St.SaveToFile(ChangeFileExt(SetupFile,'.conf'));
   finally
@@ -1297,7 +1322,7 @@ begin
         C2:=GetTickCount;
         If Integer(C2-C1)*List.Count div 100>150 then WaitForm:=CreateWaitForm(nil,LanguageSetup.MessageLoadingDataBase,List.Count);
         For I:=100 to List.Count-1 do begin
-          If (WaitForm<>nil) and ((I mod 25)=0) then WaitForm.Step(I);
+          If (WaitForm<>nil) and ((I mod 50)=0) then WaitForm.Step(I);
           LoadGameFromFile(FDir+List[I],Integer(List.Objects[I]));
           If (I mod 10)=0 then Application.ProcessMessages;
         end;

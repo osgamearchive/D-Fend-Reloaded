@@ -8,7 +8,7 @@ Type TPackageList=class;
      TDownloadData=class
   protected
     FName, FURL, FPackageChecksum : String;
-    FSize : Integer;
+    FSize : Int64;
     FChecksumXMLName : String;
     FPackageFileURL : String;
     FPackageList : TPackageList;
@@ -18,7 +18,7 @@ Type TPackageList=class;
     Function LoadFromXMLNode(const N : IXMLNode) : Boolean; virtual;
     property Name : String read FName;
     property URL : String read FURL;
-    property Size : Integer read FSize;
+    property Size : Int64 read FSize;
     property PackageChecksum : String read FPackageChecksum;
     property PackageFileURL : String read FPackageFileURL;
     property PackageList : TPackageList read FPackageList;
@@ -175,7 +175,7 @@ Type TPackageListFile=class
 end;
 
 Type TDownloadStatus=(dsStart,dsProgress,dsDone);
-Type TDownloadEvent=Procedure(Sender : TObject; const Progress, Size : Integer; const Status : TDownloadStatus; var ContinueDownload : Boolean) of object;
+Type TDownloadEvent=Procedure(Sender : TObject; const Progress, Size : Int64; const Status : TDownloadStatus; var ContinueDownload : Boolean) of object;
 
 Type TPackageDB=class
   private
@@ -234,7 +234,7 @@ begin
   if not CheckAttributes(N,['Name',FChecksumXMLName,'Size']) then exit;
   FName:=DecodeHTMLSymbols(N.Attributes['Name']);
   FPackageChecksum:=N.Attributes[FChecksumXMLName];
-  if not TryStrToInt(N.Attributes['Size'],FSize) then FSize:=0;
+  if not TryStrToInt64(N.Attributes['Size'],FSize) then FSize:=0;
   FURL:=N.NodeValue; If (FURL='') then exit;
   result:=True;
 end;

@@ -4,7 +4,7 @@ object SetupFrameDOSBoxForm: TSetupFrameDOSBoxForm
   BorderStyle = bsDialog
   Caption = 'SetupFrameDOSBoxForm'
   ClientHeight = 448
-  ClientWidth = 818
+  ClientWidth = 744
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -17,13 +17,13 @@ object SetupFrameDOSBoxForm: TSetupFrameDOSBoxForm
   OnDestroy = FormDestroy
   OnShow = FormShow
   DesignSize = (
-    818
+    744
     448)
   PixelsPerInch = 96
   TextHeight = 13
   object DosBoxMapperButton: TSpeedButton
     Tag = 2
-    Left = 787
+    Left = 713
     Top = 114
     Width = 23
     Height = 22
@@ -45,6 +45,7 @@ object SetupFrameDOSBoxForm: TSetupFrameDOSBoxForm
     ParentShowHint = False
     ShowHint = True
     OnClick = ButtonWork
+    ExplicitLeft = 787
   end
   object SDLVideodriverLabel: TLabel
     Left = 14
@@ -56,7 +57,7 @@ object SetupFrameDOSBoxForm: TSetupFrameDOSBoxForm
   object SDLVideodriverInfoLabel: TLabel
     Left = 14
     Top = 358
-    Width = 767
+    Width = 693
     Height = 50
     Anchors = [akLeft, akTop, akRight]
     AutoSize = False
@@ -64,9 +65,10 @@ object SetupFrameDOSBoxForm: TSetupFrameDOSBoxForm
       'Falls es nicht per Keymapper behebbare Probleme mit der Tastatur' +
       'belegung gibt, so kann das Umschalten auf "Win DIB" helfen.'
     WordWrap = True
+    ExplicitWidth = 767
   end
   object DosBoxButton: TSpeedButton
-    Left = 758
+    Left = 684
     Top = 24
     Width = 23
     Height = 22
@@ -88,10 +90,11 @@ object SetupFrameDOSBoxForm: TSetupFrameDOSBoxForm
     ParentShowHint = False
     ShowHint = True
     OnClick = ButtonWork
+    ExplicitLeft = 758
   end
   object FindDosBoxButton: TSpeedButton
     Tag = 1
-    Left = 787
+    Left = 713
     Top = 24
     Width = 23
     Height = 22
@@ -113,6 +116,7 @@ object SetupFrameDOSBoxForm: TSetupFrameDOSBoxForm
     ParentShowHint = False
     ShowHint = True
     OnClick = ButtonWork
+    ExplicitLeft = 787
   end
   object DosBoxLangLabel: TLabel
     Left = 14
@@ -122,7 +126,7 @@ object SetupFrameDOSBoxForm: TSetupFrameDOSBoxForm
     Caption = 'DosBoxLangLabel'
   end
   object WarningButton: TSpeedButton
-    Left = 729
+    Left = 655
     Top = 24
     Width = 23
     Height = 22
@@ -140,6 +144,7 @@ object SetupFrameDOSBoxForm: TSetupFrameDOSBoxForm
     ShowHint = True
     Visible = False
     OnClick = WarningButtonClick
+    ExplicitLeft = 729
   end
   object DOSBoxKeyboardLayoutLabel: TLabel
     Left = 216
@@ -158,31 +163,34 @@ object SetupFrameDOSBoxForm: TSetupFrameDOSBoxForm
   object DosBoxMapperEdit: TLabeledEdit
     Left = 14
     Top = 114
-    Width = 738
+    Width = 664
     Height = 21
     Anchors = [akLeft, akTop, akRight]
     EditLabel.Width = 90
     EditLabel.Height = 13
     EditLabel.Caption = 'DosBoxMapperEdit'
     TabOrder = 4
+    ExplicitWidth = 738
   end
   object HideDosBoxConsoleCheckBox: TCheckBox
     Left = 14
     Top = 200
-    Width = 767
+    Width = 693
     Height = 17
     Anchors = [akLeft, akTop, akRight]
     Caption = 'DosBox-Console ausblenden'
     TabOrder = 6
+    ExplicitWidth = 767
   end
   object CenterDOSBoxCheckBox: TCheckBox
     Left = 14
     Top = 223
-    Width = 767
+    Width = 693
     Height = 17
     Anchors = [akLeft, akTop, akRight]
     Caption = 'CenterDOSBoxCheckBox'
     TabOrder = 7
+    ExplicitWidth = 767
   end
   object SDLVideoDriverComboBox: TComboBox
     Left = 14
@@ -201,22 +209,24 @@ object SetupFrameDOSBoxForm: TSetupFrameDOSBoxForm
   object DisableScreensaverCheckBox: TCheckBox
     Left = 14
     Top = 246
-    Width = 767
+    Width = 693
     Height = 17
     Anchors = [akLeft, akTop, akRight]
     Caption = 'Disable screensaver when DOSBox is running'
     TabOrder = 8
+    ExplicitWidth = 767
   end
   object CommandLineEdit: TLabeledEdit
     Left = 14
     Top = 160
-    Width = 738
+    Width = 664
     Height = 21
     Anchors = [akLeft, akTop, akRight]
     EditLabel.Width = 84
     EditLabel.Height = 13
     EditLabel.Caption = 'CommandLineEdit'
     TabOrder = 5
+    ExplicitWidth = 738
   end
   object OKButton: TBitBtn
     Left = 8
@@ -265,7 +275,7 @@ object SetupFrameDOSBoxForm: TSetupFrameDOSBoxForm
   object DosBoxDirEdit: TLabeledEdit
     Left = 14
     Top = 24
-    Width = 738
+    Width = 664
     Height = 21
     Anchors = [akLeft, akTop, akRight]
     EditLabel.Width = 67
@@ -273,6 +283,7 @@ object SetupFrameDOSBoxForm: TSetupFrameDOSBoxForm
     EditLabel.Caption = 'DosBoxDirEdit'
     TabOrder = 0
     OnChange = DosBoxDirEditChange
+    ExplicitWidth = 738
   end
   object DosBoxLangEditComboBox: TComboBox
     Left = 14
@@ -286,11 +297,12 @@ object SetupFrameDOSBoxForm: TSetupFrameDOSBoxForm
   object WaitOnErrorCheckBox: TCheckBox
     Left = 14
     Top = 269
-    Width = 767
+    Width = 693
     Height = 17
     Anchors = [akLeft, akTop, akRight]
     Caption = 'Wait on error'
     TabOrder = 9
+    ExplicitWidth = 767
   end
   object DOSBoxKeyboardLayoutComboBox: TComboBox
     Left = 216
@@ -312,7 +324,7 @@ object SetupFrameDOSBoxForm: TSetupFrameDOSBoxForm
   end
   object DosBoxTxtOpenDialog: TOpenDialog
     DefaultExt = 'txt'
-    Left = 768
+    Left = 600
     Top = 63
   end
 end

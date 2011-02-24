@@ -11,8 +11,9 @@ Var MinimizedAtWindowsGameStart : Boolean = False;
 
 implementation
 
-uses Windows, SysUtils, Dialogs, Forms, ShellAPI, LanguageSetupUnit, CommonTools,
-     PrgSetupUnit, GameDBToolsUnit, DOSBoxUnit, RunPrgManagerUnit, DOSBoxCountUnit;
+uses Windows, SysUtils, Dialogs, Forms, ShellAPI, LanguageSetupUnit,
+     CommonTools, PrgSetupUnit, GameDBToolsUnit, DOSBoxUnit, RunPrgManagerUnit,
+     DOSBoxCountUnit, HistoryUnit;
 
 Function RunFile(const FileName, Parameters : String) : THandle;
 Var StartupInfo : TStartupInfo;
@@ -101,7 +102,7 @@ begin
 
   If not WindowsRunCheck(S) then exit;
   if not RunCheck(Game,RunSetup) then exit;
-  AddToHistory(Game.Name);
+  History.Add(Game.Name);
 
   try
     RunPrgManager.RunBeforeExecutionCommand(Game);
@@ -143,7 +144,7 @@ begin
 
   If not WindowsRunCheck(S) then exit;
   if not RunCheck(Game,False,Nr) then exit;
-  AddToHistory(Game.Name);
+  History.Add(Game.Name);
 
   try
     RunPrgManager.RunBeforeExecutionCommand(Game);

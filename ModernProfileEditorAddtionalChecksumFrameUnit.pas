@@ -130,7 +130,7 @@ begin
              if not OpenDialog.Execute then exit;
              LastDir:=ExtractFilePath(OpenDialog.FileName);
              TEdit(FindComponent('FilenameEdit'+IntToStr((Sender as TComponent).Tag+1))).Text:=ExtractFileName(OpenDialog.FileName);
-             TEdit(FindComponent('ChecksumEdit'+IntToStr((Sender as TComponent).Tag+1))).Text:=GetMD5Sum(OpenDialog.FileName);
+             TEdit(FindComponent('ChecksumEdit'+IntToStr((Sender as TComponent).Tag+1))).Text:=GetMD5Sum(OpenDialog.FileName,False);
            end;
     5..9 : begin
              TEdit(FindComponent('FilenameEdit'+IntToStr((Sender as TComponent).Tag-4))).Text:='';

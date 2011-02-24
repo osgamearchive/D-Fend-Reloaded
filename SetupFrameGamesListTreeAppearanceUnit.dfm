@@ -100,7 +100,7 @@ object SetupFrameGamesListTreeAppearance: TSetupFrameGamesListTreeAppearance
   object UserKeysList: TBitBtn
     Left = 183
     Top = 202
-    Width = 178
+    Width = 202
     Height = 25
     Caption = 'Existierende Benutzerschl'#252'ssel'
     TabOrder = 7

@@ -87,7 +87,6 @@ Section "$(LANGNAME_DFendReloaded)" ID_DFend
   SetOutPath "$INSTDIR"
   SetDetailsPrint none  
   File "..\DFend.exe"
-  File "..\Readme_OperationMode.txt"
   
   SetDetailsPrint listonly
   SetOutPath "$INSTDIR\Bin"  
@@ -113,6 +112,7 @@ Section "$(LANGNAME_DFendReloaded)" ID_DFend
   SetDetailsPrint none  
   File "..\Lang\*.ini"
   File "..\Lang\*.chm"
+  File "..\Lang\Readme_OperationMode.txt"
 
   SetDetailsPrint listonly
   SetOutPath "$INSTDIR\IconSets"
@@ -120,7 +120,12 @@ Section "$(LANGNAME_DFendReloaded)" ID_DFend
   File /r /x Thumbs.db "..\IconSets\*.*"
   Delete "$INSTDIR\IconSets\Modern\Thumbs.db"
   
-  ; Remove files in $INSTDIR for which the new position is $INSTDIR\Bin
+  SetDetailsPrint listonly
+  SetOutPath "$DataInstDir\Settings"
+  SetDetailsPrint none
+  File "..\Bin\Cheats.xml"
+  
+  ; Remove files in $INSTDIR for which the new position is $INSTDIR\Bin or $INSTDIR\Lang
   
   IfFileExists "$INSTDIR\License.txt" 0 +2
     CopyFiles /SILENT "$INSTDIR\License.txt" "$INSTDIR\Bin\License.txt"
@@ -141,6 +146,7 @@ Section "$(LANGNAME_DFendReloaded)" ID_DFend
   Delete "$INSTDIR\InstallVideoCodec.exe"
   Delete "$INSTDIR\mkdosfs.exe"
   Delete "$INSTDIR\mediaplr.dll"
+  Delete "$INSTDIR\Readme_OperationMode.txt"
   
   ; Update templates
 

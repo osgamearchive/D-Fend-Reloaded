@@ -125,17 +125,19 @@ begin
     InstallButton.Visible:=False;
     PlayPauseButton.Enabled:=False;
     Panel1.Visible:=False;
+    ZoomButton.Enabled:=False;
     exit;
   end else begin
     InfoLabel.Caption:=LanguageSetup.CaptureVideosInstallCodecInfo;
   end;
 
   loadMediaFile(FileName, MediaPanel.Handle);
-  OK:= MediaStreamAvailable and VideoAvailable;
+  OK:=MediaStreamAvailable and VideoAvailable;
   InfoLabel.Visible:=not OK;
   InstallButton.Visible:=not OK;
   PlayPauseButton.Enabled:=Ok;
   Panel1.Visible:=Ok;
+  ZoomButton.Enabled:=Ok;
 
   if Ok then begin
     Width:=getVideoWidth+(Width-MediaPanel.ClientWidth+10);
@@ -161,6 +163,7 @@ begin
 
   try FSt:=TFileStream.Create(S,fmOpenRead); except exit; end;
   try
+    If FSt.Size<4 then begin result:=True; exit; end;
     try FSt.ReadBuffer(C,4); except result:=True; exit; end;
     If (C[0]<>'R') or (C[1]<>'I') or (C[2]<>'F') or (C[3]<>'F') then begin result:=True; exit; end;
   finally
@@ -181,6 +184,8 @@ Var I,J : Integer;
 begin
   If WindowState=wsMaximized then WindowState:=wsNormal;
 
+  If getVideoWidth=0 then exit;
+
   I:=(MediaPanel.ClientWidth+10)*100 div getVideoWidth;
   J:=(MediaPanel.ClientHeight+10)*100 div getCoupledVideoHeight(getVideoWidth);
 
@@ -199,7 +204,9 @@ procedure TPlayVideoForm.ZoomPopupMenuPopup(Sender: TObject);
 Var I,J : Integer;
     S : String;
 begin
-  I:=(MediaPanel.ClientWidth+10)*100 div getVideoWidth;
+  I:=getVideoWidth; If I=0 then exit;
+  
+  I:=(MediaPanel.ClientWidth+10)*100 div I;
   J:=(MediaPanel.ClientHeight+10)*100 div getCoupledVideoHeight(getVideoWidth);
   J:=Round(Min(I,J)/25)*25;
 
@@ -327,7 +334,7 @@ begin
             playMediaStream;
           end;
         end;
-    4 : begin
+    4 : if VideoAvailable then begin
           If WindowState=wsMaximized then WindowState:=wsNormal;
           S:=RemoveUnderline((Sender as TMenuItem).Caption);
           F:=StrToInt(Copy(S,1,length(S)-1))/100;

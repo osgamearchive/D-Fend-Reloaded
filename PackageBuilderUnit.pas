@@ -20,30 +20,36 @@ uses Windows, SysUtils, Dialogs, IniFiles, XMLIntf, MSXMLDOM, CommonTools,
      HashCalc, PackageDBToolsUnit, LanguageSetupUnit, GameDBToolsUnit,
      PrgConsts, ZipInfoFormUnit, ZipPackageUnit;
 
-Function GetFileSize(const FileName : String) : String;
+Function FileOK(const DataFileName : String) : Boolean;
+begin
+  result:=FileExists(DataFileName);
+  If not result then result:=FileExists(DataFileName+'.part1');
+  If not result then MessageDlg(Format(LanguageSetup.MessageFileNotFound,[DataFileName]),mtError,[mbOK],0);
+end;
+
+Function MultiFileSize(const FileName : String) : Int64;
 Var Rec : TSearchRec;
     I : Integer;
 begin
-  result:='';
-  I:=FindFirst(FileName,faAnyFile,Rec);
+  result:=0;
+  I:=FindFirst(FileName+'.part*',faAnyFile,Rec);
   try
-    If I=0 then result:=IntToStr(Rec.Size);
+    While I=0 do begin
+      result:=result+Rec.Size;
+      I:=FindNext(Rec);
+    end;
   finally
     FindClose(Rec);
   end;
 end;
 
-Function FileOK(const DataFileName : String) : Boolean;
-begin
-  result:=FileExists(DataFileName);
-  If not result then MessageDlg(Format(LanguageSetup.MessageFileNotFound,[DataFileName]),mtError,[mbOK],0);
-end;
-
 Function AddPackageDataZip(const Doc : TXMLDocument; const Game : TGame; const DataFileName : String) : Boolean;
 Var S : String;
     N : IXMLNode;
+    LargeFile : Boolean;
 begin
   result:=FileOK(DataFileName); if not result then exit;
+  LargeFile:=(not FileExists(DataFileName)) and FileExists(DataFileName+'.part1');
 
   N:=Doc.DocumentElement.AddChild('Game');
   If Game=nil then S:='' else S:=Game.CacheName;
@@ -60,10 +66,12 @@ begin
   N.Attributes['Language']:=S;
   If Game=nil then S:='' else S:=Game.License;
   N.Attributes['License']:=S;
-  N.Attributes['PackageChecksum']:=GetMD5Sum(DataFileName);
+  If LargeFile then S:=GetMD5Sum(DataFileName+'.part1',False) else GetMD5Sum(DataFileName,False);
+  N.Attributes['PackageChecksum']:=S;
   CreateGameCheckSum(Game,False);
   N.Attributes['GameExeChecksum']:=Game.GameExeMD5;
-  N.Attributes['Size']:=GetFileSize(DataFileName);
+  If LargeFile then S:=IntToStr(MultiFileSize(DataFileName)) else S:=IntToStr(GetFileSize(DataFileName));
+  N.Attributes['Size']:=S;
   N.NodeValue:=URLFileNameFromFileName(ExtractFileName(DataFileName));
 end;
 
@@ -82,7 +90,7 @@ begin
     N.Attributes['Publisher']:=Ini.ReadString('ExtraInfo','Publisher','');
     N.Attributes['Year']:=Ini.ReadString('ExtraInfo','Year','');
     N.Attributes['Language']:=Ini.ReadString('ExtraInfo','Language','');
-    N.Attributes['PackageChecksum']:=GetMD5Sum(DataFileName);
+    N.Attributes['PackageChecksum']:=GetMD5Sum(DataFileName,False);
     N.Attributes['GameExeChecksum']:=Ini.ReadString('Extra','ExeMD5','');
     N.Attributes['Size']:=GetFileSize(DataFileName);
     If Trim(MaxVersion)<>'' then N.Attributes['MaxVersion']:=MaxVersion;
@@ -99,7 +107,7 @@ begin
 
   N:=Doc.DocumentElement.AddChild('Icon');
   N.Attributes['Name']:=ChangeFileExt(ExtractFileName(DataFileName),'');
-  N.Attributes['FileChecksum']:=GetMD5Sum(DataFileName);
+  N.Attributes['FileChecksum']:=GetMD5Sum(DataFileName,False);
   N.Attributes['Size']:=GetFileSize(DataFileName);
   N.NodeValue:=URLFileNameFromFileName(ExtractFileName(DataFileName));
 end;
@@ -116,7 +124,7 @@ begin
   try
     N:=Doc.DocumentElement.AddChild('IconSet');
     N.Attributes['Name']:=Ini.ReadString('Information','Name',ChangeFileExt(ExtractFileName(DataFileName),''));
-    N.Attributes['FileChecksum']:=GetMD5Sum(DataFileName);
+    N.Attributes['FileChecksum']:=GetMD5Sum(DataFileName,False);
     I:=VersionToInt(GetNormalFileVersionAsString); S:=IntToStr(I div 10000)+'.'+IntToStr((I div 100) mod 100)+'.';
     N.Attributes['MinVersion']:=S+'0';
     N.Attributes['MaxVersion']:=S+'99';
@@ -144,7 +152,7 @@ begin
     N.Attributes['MinVersion']:=S+'0';
     N.Attributes['MaxVersion']:=S+'99';
     N.Attributes['Author']:=Ini.ReadString('Author','Name','');
-    N.Attributes['PackageChecksum']:=GetMD5Sum(DataFileName);
+    N.Attributes['PackageChecksum']:=GetMD5Sum(DataFileName,False);
     N.Attributes['Size']:=GetFileSize(DataFileName);
     N.NodeValue:=URLFileNameFromFileName(ExtractFileName(DataFileName));
   finally
@@ -160,7 +168,7 @@ begin
   N:=Doc.DocumentElement.AddChild('ExePackage');
   N.Attributes['Name']:=ChangeFileExt(ExtractFileName(DataFileName),'');
   N.Attributes['Description']:='';
-  N.Attributes['PackageChecksum']:=GetMD5Sum(DataFileName);
+  N.Attributes['PackageChecksum']:=GetMD5Sum(DataFileName,False);
   N.Attributes['Size']:=GetFileSize(DataFileName);
   N.NodeValue:=URLFileNameFromFileName(ExtractFileName(DataFileName));
 end;
@@ -232,7 +240,7 @@ begin
       N.Attributes['Year']:=Template.CacheYear;
       N.Attributes['Language']:=Template.CacheLanguage;
       N.Attributes['License']:=Template.License;
-      N.Attributes['PackageChecksum']:=GetMD5Sum(DataFileName);
+      N.Attributes['PackageChecksum']:=GetMD5Sum(DataFileName,False);
       N.Attributes['GameExeChecksum']:=Template.GameExeMD5;
       N.Attributes['Size']:=GetFileSize(DataFileName);
       If AddAutoSetups then begin

@@ -8,7 +8,8 @@ Function MakeDOSBoxMIDIString(const ProfileString : String) : String;
 
 implementation
 
-uses SysUtils, LanguageSetupUnit, DOSBoxTempUnit, DOSBoxUnit, CommonTools;
+uses SysUtils, LanguageSetupUnit, DOSBoxTempUnit, DOSBoxUnit, CommonTools,
+     MainUnit;
 
 Procedure ProcessMIDIInfoLine(const Line : String; const List : TStringList);
 Var I : Integer;
@@ -41,7 +42,7 @@ begin
       St.Free;
     end;
     TempGame.Game.StoreAllValues;
-    RunCommandAndWait(TempGame.Game,'',True);
+    RunCommandAndWait(TempGame.Game,DFendReloadedMainForm.DeleteOnExit,'',True);
     St:=TStringList.Create;
     try
       try St.LoadFromFile(TempDir+MIDIListFile); except end;

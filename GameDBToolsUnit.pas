@@ -8,7 +8,7 @@ uses Windows, Classes, ComCtrls, Controls, Graphics, Menus, CheckLst,
 
 { Load Data to GUI }
 
-Type TSortListBy=(slbName=1, slbSetup=2, slbGenre=3, slbDeveloper=4, slbPublisher=5, slbYear=6, slbLanguage=7, slbComment=8);
+Type TSortListBy=(slbName=1, slbSetup=2, slbGenre=3, slbDeveloper=4, slbPublisher=5, slbYear=6, slbLanguage=7, slbComment=8, slbStartCount=9);
 
 Procedure InitTreeViewForGamesList(const ATreeView : TTreeView; const GameDB : TGameDB);
 Procedure InitListViewForGamesList(const AListView : TListView; const ShowExtraInfo : Boolean);
@@ -58,20 +58,18 @@ Var FreeDOSInitThreadRunning : Boolean = False;
 
 { Extras }
 
-Procedure ExportGamesList(const GameDB : TGameDB; const FileName : String);
+Type TGamesListExportColumn=(glecEmulationType=1, glecGenre=2, glecDeveloper=3, glecPublisher=4, glecYear=5, glecLanguage=6, glecWWW=7, glecLicense=8, glecStartCount=9, glecUserFields=10, glecNotes=11);
+Type TGamesListExportColumns=set of TGamesListExportColumn;
+Type TGamesListExportFormat=(glefAuto=0, glefText=1, glefTable=2, glefHTML=3, glefXML=4);
+
+Function GetGamesListExportLanguageColumns : TStringList;
+Procedure ExportGamesList(const GameDB : TGameDB; const FileName : String; const Columns : TGamesListExportColumns; const Format : TGamesListExportFormat);
 Procedure EditDefaultProfile(const AOwner : TComponent; const GameDB : TGameDB; const ASearchLinkFile : TLinkFile; const ADeleteOnExit : TStringList);
 Procedure CreateConfFilesForProfiles(const GameDB : TGameDB; const Dir : String);
 
 Function EncodeUserHTMLSymbolsOnly(const S : String) : String;
 Function EncodeHTMLSymbols(const S : String) : String;
 Function DecodeHTMLSymbols(const S : String) : String;
-
-{ History }
-
-Procedure AddToHistory(const GameName : String);
-Procedure LoadHistory(const AListView : TListView);
-Procedure LoadHistoryStatistics(const AListView : TListView);
-Function ClearHistory : Boolean;
 
 { Import }
 
@@ -135,7 +133,8 @@ uses SysUtils, Forms, Dialogs, ShellAPI, ShlObj, IniFiles, Math,  PNGImage,
      JPEG, GIFImage, CommonTools, LanguageSetupUnit, PrgConsts, PrgSetupUnit,
      ProfileEditorFormUnit, ModernProfileEditorFormUnit, HashCalc,
      SmallWaitFormUnit, ChecksumFormUnit, WaitFormUnit, ImageCacheUnit,
-     DosBoxUnit, ScummVMUnit, ImageStretch, MainUnit, GameDBFilterUnit;
+     DosBoxUnit, ScummVMUnit, ImageStretch, MainUnit, GameDBFilterUnit,
+     HistoryUnit;
 
 Function GroupMatch(const GameGroupUpper, SelectedGroupUpper : String) : Boolean; forward;
 
@@ -219,6 +218,17 @@ begin
       AddTypeSelector(ATreeView,LanguageSetup.GamePublisher,GameDB.GetPublisherList);
       AddTypeSelector(ATreeView,LanguageSetup.GameYear,GameDB.GetYearList);
       AddTypeSelector(ATreeView,LanguageSetup.GameLanguage,GetCustomLanguageName(GameDB.GetLanguageList));
+      AddTypeSelector(ATreeView,LanguageSetup.GameLicense,GetCustomLicenseName(GameDB.GetLicenseList));
+
+      N:=ATreeView.Items.AddChild(nil,LanguageSetup.GameEmulationType);
+      N.ImageIndex:=12; N.SelectedIndex:=12;
+      N2:=ATreeView.Items.AddChild(N,LanguageSetup.GameEmulationTypeDOSBox); N2.ImageIndex:=16; N2.SelectedIndex:=16;
+      N2:=ATreeView.Items.AddChild(N,LanguageSetup.GameEmulationTypeScummVM); N2.ImageIndex:=37; N2.SelectedIndex:=37;
+      N2:=ATreeView.Items.AddChild(N,LanguageSetup.GameEmulationTypeWindows); N2.ImageIndex:=40; N2.SelectedIndex:=40;
+      For I:=0 to PrgSetup.WindowsBasedEmulatorsNames.Count-1 do begin
+        N2:=ATreeView.Items.AddChild(N,PrgSetup.WindowsBasedEmulatorsNames[I]); N2.ImageIndex:=40; N2.SelectedIndex:=40;
+      end;
+
       UserGroups:=RemoveDoubleEntrys(StringToStringList(PrgSetup.UserGroups));
       try
         For I:=0 to UserGroups.Count-1 do
@@ -226,12 +236,6 @@ begin
       finally
         UserGroups.Free;
       end;
-
-      N:=ATreeView.Items.AddChild(nil,LanguageSetup.GameEmulationType);
-      N.ImageIndex:=12; N.SelectedIndex:=12;
-      N2:=ATreeView.Items.AddChild(N,LanguageSetup.GameEmulationTypeDOSBox); N2.ImageIndex:=16; N2.SelectedIndex:=16;
-      N2:=ATreeView.Items.AddChild(N,LanguageSetup.GameEmulationTypeScummVM); N2.ImageIndex:=37; N2.SelectedIndex:=37;
-      N2:=ATreeView.Items.AddChild(N,LanguageSetup.GameEmulationTypeWindows); N2.ImageIndex:=40; N2.SelectedIndex:=40;
 
       If Group='' then exit;
 
@@ -259,8 +263,8 @@ begin
 
   I:=Pos(';',V);
   If I>0 then begin VUser:=Trim(Copy(V,I+1,MaxInt)); V:=Trim(Copy(V,1,I-1)); end else VUser:='';
-  while length(V)<7 do V:=V+'1';
-  If Length(V)>7 then V:=Copy(V,1,7);
+  while length(V)<8 do V:=V+'1';
+  If Length(V)>8 then V:=Copy(V,1,8);
   If VUser<>'' then PrgSetup.ColVisible:=V+';'+VUser else PrgSetup.ColVisible:=V;
 
   O:=PrgSetup.ColOrder;
@@ -270,10 +274,10 @@ begin
     I:=Pos(';',S); If I=0 then break;
     S:=Trim(Copy(S,I+1,MaxInt));
   end;
-  while length(O)<7+UserCount do If length(O)<9
+  while length(O)<8+UserCount do If length(O)<9
     then O:=O+chr(length(O)+Ord('1'))
     else O:=O+chr(length(O)-9+Ord('A'));
-  If Length(O)>7+UserCount then O:=Copy(O,1,7+UserCount);
+  If Length(O)>8+UserCount then O:=Copy(O,1,8+UserCount);
   PrgSetup.ColOrder:=O;
 end;
 
@@ -306,10 +310,10 @@ begin
             'a'..'z' : Nr:=Ord(O[I+1])-Ord('a')+10;
           end;
           If Nr<1 then continue;
-          If Nr<=7 then begin
+          If Nr<=8 then begin
             If V[Nr]='0' then continue;
           end else begin
-            If Nr-7>VUserSt.Count then continue;
+            If Nr-8>VUserSt.Count then continue;
           end;
           inc(C);
           If C=ColumnIndex then begin
@@ -321,7 +325,8 @@ begin
               4 : SetListSort(slbYear);
               5 : SetListSort(slbLanguage);
               6 : SetListSort(slbComment);
-              else SetListSort(TSortListBy((Nr-8+10)));
+              7 : SetListSort(slbStartCount);
+              else SetListSort(TSortListBy((Nr-9+10)));
             end;
             break;
           end;
@@ -413,26 +418,26 @@ Var SubSelect, SubUnselect,M : TMenuItem;
     I : Integer;
 begin
   SubSelect:=TMenuItem.Create(Popup);
-  SubSelect.Caption:=Name;
+  SubSelect.Caption:=MaskUnderlineAmpersand(Name);
   SubSelect.Tag:=Tag;
   MenuSelect.Add(SubSelect);
 
   SubUnselect:=TMenuItem.Create(Popup);
-  SubUnselect.Caption:=Name;
+  SubUnselect.Caption:=MaskUnderlineAmpersand(Name);
   SubUnselect.Tag:=Tag;
   MenuUnselect.Add(SubUnselect);
 
   For I:=0 to Items.Count-1 do begin
-      M:=TMenuItem.Create(Popup);
-      M.Caption:=Items[I];
-      M.Tag:=I;
-      M.OnClick:=OnClick;
-      SubSelect.Add(M);
-      M:=TMenuItem.Create(Popup);
-      M.Caption:=Items[I];
-      M.Tag:=I;
-      M.OnClick:=OnClick;
-      SubUnselect.Add(M);
+    M:=TMenuItem.Create(Popup);
+    M.Caption:=MaskUnderlineAmpersand(Items[I]);
+    M.Tag:=I;
+    M.OnClick:=OnClick;
+    SubSelect.Add(M);
+    M:=TMenuItem.Create(Popup);
+    M.Caption:=MaskUnderlineAmpersand(Items[I]);
+    M.Tag:=I;
+    M.OnClick:=OnClick;
+    SubUnselect.Add(M);
   end;
 end;
 
@@ -495,12 +500,15 @@ begin
   St:=GetCustomLanguageName(GameDB.GetLanguageList(WithDefaultProfile,HideWindowsProfiles));
   try BuildSelectPopupSubMenu(Popup,LanguageSetup.GameLanguage,MenuSelect,MenuUnselect,4,OnClick,St); finally St.Free; end;
 
+  St:=GetCustomLicenseName(GameDB.GetLicenseList(WithDefaultProfile,HideWindowsProfiles));
+  try BuildSelectPopupSubMenu(Popup,LanguageSetup.GameLanguage,MenuSelect,MenuUnselect,5,OnClick,St); finally St.Free; end;
+
   St:=TStringList.Create;
   try
     St.Add(LanguageSetup.GameEmulationTypeDOSBox);
     St.Add(LanguageSetup.GameEmulationTypeScummVM);
     If not HideWindowsProfiles then St.Add(LanguageSetup.GameEmulationTypeWindows);
-    BuildSelectPopupSubMenu(Popup,LanguageSetup.GameEmulationType,MenuSelect,MenuUnselect,5,OnClick,St);
+    BuildSelectPopupSubMenu(Popup,LanguageSetup.GameEmulationType,MenuSelect,MenuUnselect,6,OnClick,St);
   finally
     St.Free;
   end;
@@ -615,7 +623,8 @@ begin
         2 : S:=G.CachePublisher;
         3 : S:=G.CacheYear;
         4 : S:=GetCustomLanguageName(G.CacheLanguage);
-        5 : begin
+        5 : S:=GetCustomLicenseName(G.License);
+        6 : begin
               S:='DOSBox';
               If ScummVMMode(G) then S:='ScummVM';
               If WindowsExeMode(G) then S:='Windows';
@@ -737,10 +746,10 @@ begin
           'a'..'z' : Nr:=Ord(O[I+1])-Ord('a')+10;
         end;
         If Nr<1 then continue;
-        If Nr<=7 then begin
+        If Nr<=8 then begin
           If V[Nr]='0' then continue;
         end else begin
-          If Nr-7>VUserSt.Count then continue;
+          If Nr-8>VUserSt.Count then continue;
         end;
 
         C:=AListView.Columns.Add;
@@ -752,7 +761,8 @@ begin
           4 : C.Caption:=LanguageSetup.GameYear;
           5 : C.Caption:=GetCustomLanguageName(LanguageSetup.GameLanguage);
           6 : C.Caption:=LanguageSetup.GameNotes;
-          else C.Caption:=VUserSt[Nr-8];
+          7 : C.Caption:=LanguageSetup.GameStartCount;
+          else C.Caption:=VUserSt[Nr-9];
         end;
         If Nr-1=0 then C.Width:=-2 else C.Width:=-1;
       end;
@@ -952,10 +962,10 @@ begin
             'a'..'z' : Nr:=Ord(O[I+1])-Ord('a')+10;
           end;
           If Nr<1 then continue;
-          If Nr<=7 then begin
+          If Nr<=8 then begin
             If V[Nr]='0' then continue;
           end else begin
-            If Nr-7>VUserSt.Count then continue;
+            If Nr-8>VUserSt.Count then continue;
           end;
           Case Nr-1 of
             0 : If Trim(Game.SetupExe)<>'' then S:=LanguageSetupFastYes else S:=LanguageSetupFastNo;
@@ -970,7 +980,8 @@ begin
                   If length(S)>100 then S:=Copy(S,1,100)+'...';
                   If Trim(S)='' then S:=T;
                 end;
-            else S:=UserInfoGetValue(Game.UserInfo,VUserSt[Nr-8]);
+            7 : S:=IntToStr(History.GameStartCount(Game.CacheName));
+            else S:=UserInfoGetValue(Game.UserInfo,VUserSt[(Nr-1)-8]);
           end;
           If SubUsed<SubCount then SubItems[SubUsed]:=S else SubItems.Add(S);
           inc(SubUsed);
@@ -1034,6 +1045,11 @@ begin
   result:=False;
 end;
 
+Function SortByStartCount(Item1, Item2: Pointer) : Integer;
+begin
+  result:=History.GameStartCount(TGame(Item2).CacheName)-History.GameStartCount(TGame(Item1).CacheName);
+end;
+
 Procedure AddGamesToList(const AListView : TListView; const AListViewImageList, AListViewIconImageList, AImageList : TImageList; const GameDB : TGameDB; const Game : TGame; const Group, SubGroup, SearchString : String; const ShowExtraInfo : Boolean; const SortBy : TSortListBy; const ReverseOrder, HideScummVMProfiles, HideWindowsProfiles, HideDefaultProfile,  ScreenshotViewMode : Boolean); overload;
 Var I,J,K,Nr,ItemsUsed : Integer;
     GroupUpper, SubGroupUpper : String;
@@ -1044,6 +1060,7 @@ Var I,J,K,Nr,ItemsUsed : Integer;
     S,T : String;
     O,V,VUser : String;
     EmType1,EmType2, EmType3 : String;
+    EmTypeUser : Array of String;
     Bitmap : TBitmap;
     VUserSt : TStringList;
     W : TWinControl;
@@ -1115,17 +1132,20 @@ begin
       end else begin
         GroupUpper:=Trim(ExtUpperCase(Group));
         If SubGroup=LanguageSetup.NotSet then SubGroupUpper:='' else SubGroupUpper:=ExtUpperCase(SubGroup);
-        Nr:=6;
+        Nr:=7;
         If Group=LanguageSetup.GameGenre then Nr:=0;
         If Group=LanguageSetup.GameDeveloper then Nr:=1;
         If Group=LanguageSetup.GamePublisher then Nr:=2;
         If Group=LanguageSetup.GameYear then Nr:=3;
         If Group=LanguageSetup.GameLanguage then Nr:=4;
         If Group=LanguageSetup.GameEmulationType then Nr:=5;
+        If Group=LanguageSetup.GameLicense then Nr:=6;
 
         EmType1:=ExtUpperCase(LanguageSetup.GameEmulationTypeDOSBox);
         EmType2:=ExtUpperCase(LanguageSetup.GameEmulationTypeScummVM);
         EmType3:=ExtUpperCase(LanguageSetup.GameEmulationTypeWindows);
+        SetLength(EmTypeUser,PrgSetup.WindowsBasedEmulatorsNames.Count);
+        For I:=0 to PrgSetup.WindowsBasedEmulatorsNames.Count-1 do EmTypeUser[I]:=ExtUpperCase(PrgSetup.WindowsBasedEmulatorsNames[I]);
 
         For I:=0 to GameDB.Count-1 do begin
           If HideScummVMProfiles and (ScummVMMode(GameDB[I]) or WindowsExeMode(GameDB[I])) then continue;
@@ -1138,11 +1158,20 @@ begin
             3 : B:=GroupMatch(GameDB[I].CacheYearUpper,SubGroupUpper);
             4 : B:=GroupMatch(ExtUpperCase(GetCustomLanguageName(GameDB[I].CacheLanguage)),SubGroupUpper);
             5 : begin
-                  If (SubGroupUpper=EmType1) then B:=DOSBoxMode(GameDB[I]);
-                  If (SubGroupUpper=EmType2) then B:=ScummVMMode(GameDB[I]);
-                  If (SubGroupUpper=EmType3) then B:=WindowsExeMode(GameDB[I]);
+                  If SubGroupUpper=EmType1 then B:=DOSBoxMode(GameDB[I]) else begin
+                    If SubGroupUpper=EmType2 then B:=ScummVMMode(GameDB[I]) else begin
+                      If SubGroupUpper=EmType3 then B:=WindowsExeMode(GameDB[I]) else begin
+                        B:=False;
+                        If WindowsExeMode(GameDB[I]) then For J:=0 to Length(EmTypeUser)-1 do If SubGroupUpper=EmTypeUser[J] then begin
+                          B:=(ExtUpperCase(GameDB[I].GameExe)=ExtUpperCase(PrgSetup.WindowsBasedEmulatorsPrograms[J]));
+                          break;
+                        end;
+                      end;
+                    end;
+                  end;
                 end;
-            6 : begin
+            6 : B:=GroupMatch(ExtUpperCase(GetCustomLicenseName(GameDB[I].License)),SubGroupUpper);
+            7 : begin
                   B:=(SubGroupUpper='');
                   St2:=StringToStringList(GameDB[I].CacheUserInfo);
                   try
@@ -1175,24 +1204,34 @@ begin
       GetColOrderAndVisible(O,V,VUser);
       VUserSt:=ValueToList(VUser);
       try
-        For I:=0 to List.Count-1 do begin
-          Case SortBy of
-            slbName : St.AddObject(TGame(List[I]).CacheName,TGame(List[I]));
-            slbSetup : If Trim(TGame(List[I]).SetupExe)<>''
-                         then St.AddObject(RemoveUnderline(LanguageSetup.Yes),TGame(List[I]))
-                         else St.AddObject(RemoveUnderline(LanguageSetup.No),TGame(List[I]));
-            slbGenre : St.AddObject(GetCustomGenreName(TGame(List[I]).CacheGenre),TGame(List[I]));
-            slbDeveloper : St.AddObject(TGame(List[I]).CacheDeveloper,TGame(List[I]));
-            slbPublisher : St.AddObject(TGame(List[I]).CachePublisher,TGame(List[I]));
-            slbYear : St.AddObject(TGame(List[I]).CacheYear,TGame(List[I]));
-            slbLanguage : St.AddObject(GetCustomLanguageName(TGame(List[I]).CacheLanguage),TGame(List[I]));
-            slbComment : St.AddObject(TGame(List[I]).Notes,TGame(List[I]));
-          End;
-          If Integer(SortBy)>=10 then begin
-            St.AddObject(UserInfoGetValue(TGame(List[I]).UserInfo,VUserSt[Min(VUserSt.Count-1,Integer(SortBy)-10)]),TGame(List[I]));
+        If SortBy<>slbStartCount then begin
+          For I:=0 to List.Count-1 do begin
+            Case SortBy of
+              slbName : St.AddObject(TGame(List[I]).CacheName,TGame(List[I]));
+              slbSetup : If Trim(TGame(List[I]).SetupExe)<>''
+                           then St.AddObject(RemoveUnderline(LanguageSetup.Yes),TGame(List[I]))
+                           else St.AddObject(RemoveUnderline(LanguageSetup.No),TGame(List[I]));
+              slbGenre : St.AddObject(GetCustomGenreName(TGame(List[I]).CacheGenre),TGame(List[I]));
+              slbDeveloper : St.AddObject(TGame(List[I]).CacheDeveloper,TGame(List[I]));
+              slbPublisher : St.AddObject(TGame(List[I]).CachePublisher,TGame(List[I]));
+              slbYear : St.AddObject(TGame(List[I]).CacheYear,TGame(List[I]));
+              slbLanguage : St.AddObject(GetCustomLanguageName(TGame(List[I]).CacheLanguage),TGame(List[I]));
+              slbComment : St.AddObject(TGame(List[I]).Notes,TGame(List[I]));
+              {slbStartCount : begin
+                                S:=IntToStr(History.GameStartCount(TGame(List[I]).CacheName));
+                                while length(S)<6 do S:='0'+S;
+                                St.AddObject(S,TGame(List[I]));
+                              end;}
+            End;
+            If Integer(SortBy)>=10 then begin
+              St.AddObject(UserInfoGetValue(TGame(List[I]).UserInfo,VUserSt[Min(VUserSt.Count-1,Integer(SortBy)-10)]),TGame(List[I]));
+            end;
           end;
+          St.Sort;
+        end else begin
+          List.Sort(SortByStartCount);
+          For I:=0 to List.Count-1 do St.AddObject('',TGame(List[I]));
         end;
-        St.Sort;
 
         {Add games to list}
         ItemsUsed:=0;
@@ -1262,8 +1301,8 @@ begin
     If PrgSetup.ShowExtraInfo then begin
       St:=ValueToList(PrgSetup.ColumnWidths);
       try
-        while St.Count<8 do St.Add('-1');
-        For I:=7 to St.Count-1 do St[I]:='-1';
+        while St.Count<9 do St.Add('-1');
+        For I:=8 to St.Count-1 do St[I]:='-1';
         St[0]:=IntToStr(AListView.Column[0].Width);
         C:=0;
         For I:=0 to length(O)-1 do begin
@@ -1274,10 +1313,10 @@ begin
             'a'..'z' : Nr:=Ord(O[I+1])-Ord('a')+10;
           end;
           If Nr<1 then continue;
-          If Nr<=7 then begin
+          If Nr<=8 then begin
             If V[Nr]='0' then continue;
           end else begin
-            If Nr-7>VUserSt.Count then continue;
+            If Nr-8>VUserSt.Count then continue;
           end;
           inc(C);
           If AListView.Columns.Count>C then begin
@@ -1315,7 +1354,7 @@ begin
     If PrgSetup.ShowExtraInfo then begin
       St:=ValueToList(Data);
       try
-        while St.Count<8+VUserSt.Count do St.Add('');
+        while St.Count<9+VUserSt.Count do St.Add('');
         If TryStrToInt(St[0],W) and (W>=-2) and (W<1000) then AListView.Column[0].Width:=W;
         C:=0;
         For I:=0 to length(O)-1 do begin
@@ -1326,10 +1365,10 @@ begin
             'a'..'z' : Nr:=Ord(O[I+1])-Ord('a')+10;
           end;
           If Nr<1 then continue;
-          If Nr<=7 then begin
+          If Nr<=8 then begin
             If V[Nr]='0' then continue;
           end else begin
-            If Nr-7>VUserSt.Count then continue;
+            If Nr-8>VUserSt.Count then continue;
           end;
           inc(C);
           If Nr<St.Count then begin
@@ -1394,7 +1433,8 @@ begin
   {also too wide ?}
   If NewW>MaxW then begin NewW:=MaxW; NewH:=Round(NewW/F); end;
 end;
-Var I : Integer;
+const Exts : Array[0..4] of String = ('png','jpg','jpeg','gif','bmp');
+Var I,K : Integer;
     Rec : TSearchRec;
     P : TPNGObject;
     J : TJPEGImage;
@@ -1403,20 +1443,36 @@ Var I : Integer;
     L : TListItem;
     OK : Boolean;
     NewW, NewH : Integer;
+    St : TStringList;
+    S : String;
 begin
+  AListView.SortType:=stNone;
   Dir:=IncludeTrailingPathDelimiter(Dir);
 
-  I:=FindFirst(Dir+'*.png',faAnyFile,Rec);
+  St:=TStringList.Create;
   try
-    while I=0 do begin
-      P:=TPNGObject.Create;
-      try
-        OK:=True; try P.LoadFromFile(Dir+Rec.Name); except OK:=False; end;
-        if P=nil then OK:=False;
-        If OK then begin
-          B:=TBitmap.Create;
-          try
-            try
+    {Get files list}
+    For K:=Low(Exts) to High(Exts) do begin
+      I:=FindFirst(Dir+'*.'+Exts[K],faAnyFile,Rec);
+      try while I=0 do begin St.Add(Rec.Name); I:=FindNext(Rec); end; finally FindClose(Rec); end;
+    end;
+
+    {Sort list}
+    St.Sort;
+
+    {Add games to list view}
+    For K:=0 to St.Count-1 do begin
+      S:=ExtUpperCase(ExtractFileExt(St[K]));
+      OK:=False;
+
+      If S='.PNG' then begin
+        P:=TPNGObject.Create;
+        try
+          OK:=True; try P.LoadFromFile(Dir+St[K]); except OK:=False; end;
+          if P=nil then OK:=False;
+          If OK then begin
+            B:=TBitmap.Create;
+            try try
               {not working well: B.Assign(P);}
               B.Width:=P.Width;
               B.Height:=P.Height;
@@ -1431,35 +1487,18 @@ begin
               finally
                 B2.Free;
               end;
-            except OK:=True; end;
-            If OK then begin
-              L:=AListView.Items.Add;
-              L.Caption:=Rec.Name;
-              L.ImageIndex:=AImageList.Count-1;
-            end;
-          finally
-            B.Free;
+            except OK:=True; end; finally B.Free; end;
           end;
-        end;
-      finally
-        P.Free;
+        finally P.Free; end;
       end;
-      I:=FindNext(Rec);
-    end;
-  finally
-    FindClose(Rec);
-  end;
 
-  I:=FindFirst(Dir+'*.jpg',faAnyFile,Rec);
-  try
-    while I=0 do begin
-      J:=TJPEGImage.Create;
-      try
-        OK:=True; try J.LoadFromFile(Dir+Rec.Name); except OK:=False; end;
-        If OK then begin
-          B:=TBitmap.Create;
-          try
-            try
+      If (S='.JPG') or (S='.JPEG') then begin
+        J:=TJPEGImage.Create;
+        try
+          OK:=True; try J.LoadFromFile(Dir+St[K]); except OK:=False; end;
+          If OK then begin
+            B:=TBitmap.Create;
+            try try
               B.Assign(J);
               B2:=TBitmap.Create;
               try
@@ -1470,74 +1509,18 @@ begin
               finally
                 B2.Free;
               end;
-            except OK:=False; end;
-            If OK then begin
-              L:=AListView.Items.Add;
-              L.Caption:=Rec.Name;
-              L.ImageIndex:=AImageList.Count-1;
-            end;
-          finally
-            B.Free;
+            except OK:=False; end; finally B.Free; end;
           end;
-        end;
-      finally
-        J.Free;
+        finally J.Free; end;
       end;
-      I:=FindNext(Rec);
-    end;
-  finally
-    FindClose(Rec);
-  end;
 
-  I:=FindFirst(Dir+'*.jpeg',faAnyFile,Rec);
-  try
-    while I=0 do begin
-      J:=TJPEGImage.Create;
-      try
-        OK:=True; try J.LoadFromFile(Dir+Rec.Name); except OK:=False; end;
-        If OK then begin
-          B:=TBitmap.Create;
-          try
-            try
-              B.Assign(J);
-              B2:=TBitmap.Create;
-              try
-                B2.SetSize(AImageList.Width,AImageList.Height);
-                CalcWH(B.Width,B.Height,AImageList.Width,AImageList.Height,NewW,NewH);
-                ScaleImage(B,B2,NewW,NewH);
-                AImageList.AddMasked(B2,clNone);
-              finally
-                B2.Free;
-              end;
-            except OK:=False end;
-            If OK then begin
-              L:=AListView.Items.Add;
-              L.Caption:=Rec.Name;
-              L.ImageIndex:=AImageList.Count-1;
-            end;
-          finally
-            B.Free;
-          end;
-        end;
-      finally
-        J.Free;
-      end;
-      I:=FindNext(Rec);
-    end;
-  finally
-    FindClose(Rec);
-  end;
-
-  I:=FindFirst(Dir+'*.gif',faAnyFile,Rec);
-  try
-    while I=0 do begin
-      G:=TGifImage.Create;
-      try
-        OK:=True; try G.LoadFromFile(Dir+Rec.Name); except OK:=False; end;
-        If OK then begin
-          B:=TBitmap.Create;
-          try
-            try
+      If S='.GIF' then begin
+        G:=TGifImage.Create;
+        try
+          OK:=True; try G.LoadFromFile(Dir+St[K]); except OK:=False; end;
+          If OK then begin
+            B:=TBitmap.Create;
+            try try
               B.Assign(G);
               B2:=TBitmap.Create;
               try
@@ -1548,56 +1531,36 @@ begin
               finally
                 B2.Free;
               end;
-            except OK:=False; end;
-            If OK then begin
-              L:=AListView.Items.Add;
-              L.Caption:=Rec.Name;
-              L.ImageIndex:=AImageList.Count-1;
-            end;
-          finally
-            B.Free;
+            except OK:=False; end; finally B.Free; end;
           end;
-        end;
-      finally
-        G.Free;
+        finally G.Free; end;
       end;
-      I:=FindNext(Rec);
-    end;
-  finally
-    FindClose(Rec);
-  end;
 
-  I:=FindFirst(Dir+'*.bmp',faAnyFile,Rec);
-  try
-    while I=0 do begin
-      B:=TBitmap.Create;
-      try
-        OK:=True; try B.LoadFromFile(Dir+Rec.Name); except OK:=False; end;
-        If OK then begin
-          B2:=TBitmap.Create;
-          try
-            try
+      If S='.BMP' then begin
+        B:=TBitmap.Create;
+        try
+          OK:=True; try B.LoadFromFile(Dir+Rec.Name); except OK:=False; end;
+          If OK then begin
+            B2:=TBitmap.Create;
+            try try
               B2.SetSize(AImageList.Width,AImageList.Height);
                 CalcWH(B.Width,B.Height,AImageList.Width,AImageList.Height,NewW,NewH);
                 ScaleImage(B,B2,NewW,NewH);
               AImageList.AddMasked(B2,clNone);
-            except OK:=False; end;
-          finally
-            B2.Free;
+            except OK:=False; end; finally B2.Free; end;
           end;
-          If Ok then begin
-            L:=AListView.Items.Add;
-            L.Caption:=Rec.Name;
-            L.ImageIndex:=AImageList.Count-1;
-          end;
-        end;
-      finally
-        B.Free;
+        finally B.Free; end;
       end;
-      I:=FindNext(Rec);
+
+      If OK then begin
+        L:=AListView.Items.Add;
+        L.Caption:=St[K];
+        L.ImageIndex:=AImageList.Count-1;
+      end;
+
     end;
   finally
-    FindClose(Rec);
+    St.Free;
   end;
 
   AListView.SortType:=stNone;
@@ -1862,7 +1825,7 @@ begin
 end;
 
 Procedure UpdateUserDataFolderAndSettingsAfterUpgrade(const GameDB : TGameDB; const LastVersion : Integer);
-Var Source : String;
+Var Source,S : String;
     I : Integer;
     DB : TGameDB;
     G : TGame;
@@ -1977,7 +1940,23 @@ begin
     end;
   end;
 
+  {Add new games list column}
+  If LastVersion<10009 then begin
+    PrgSetup.ColVisible:=Copy(PrgSetup.ColVisible,1,7)+'0'+Copy(PrgSetup.ColVisible,8,MaxInt);
+    S:=Trim(PrgSetup.ColOrder);
+    For I:=0 to length(S) do begin
+      If S[I]='8' then begin S[I]:='9'; continue; end;
+      If S[I]='9' then begin S[I]:='A'; continue; end;
+      If (ExtUpperCase(S[I])>='A') and (ExtUpperCase(S[I])<='Y') then S[I]:=chr(ord(S[I])+1);
+    end;
+    PrgSetup.ColOrder:=S;
+  end;
+
   {Update settings in ConfOpt.dat}
+  If LastVersion<11100 then begin
+    GameDB.ConfOpt.ResolutionFullscreen:=DefaultValuesResolutionFullscreen;
+    GameDB.ConfOpt.ResolutionWindow:=DefaultValuesResolutionWindow;
+  end;
   If LastVersion<10000 then begin
     GameDB.ConfOpt.Video:=DefaultValuesVideo;
     GameDB.ConfOpt.ResolutionFullscreen:=DefaultValuesResolutionFullscreen;
@@ -2272,115 +2251,218 @@ begin
     CopyTemplates(PrgDir+NewUserDataSubDir+'\'+AutoSetupSubDir,PrgDataDir+AutoSetupSubDir);
 end;
 
-Procedure ExportGamesListTextFile(const GameDB : TGameDB; const St : TStringList);
-Var St2 : TStringList;
-    I,J,Len : Integer;
-    S1,S2,S3,S4,S5,S6,S7 : String;
-    L : TList;
+Function GetGamesListExportLanguageColumns : TStringList;
 begin
-  S1:=LanguageSetup.GameGenre;
-  S2:=LanguageSetup.GameDeveloper;
-  S3:=LanguageSetup.GamePublisher;
-  S4:=LanguageSetup.GameYear;
-  S5:=LanguageSetup.GameLanguage;
-  S6:=LanguageSetup.GameWWW;
-  S7:=LanguageSetup.GameNotes;
+  result:=TStringList.Create;
 
-  Len:=Max(Max(Max(Max(Max(length(S1),length(S2)),length(S3)),length(S4)),length(S5)),length(S6));
-
-  For I:=0 to GameDB.Count-1 do begin
-    St2:=StringToStringList(GameDB[I].UserInfo);
-    try
-      For J:=0 to St2.Count-1 do If Pos('=',St2[J])>0 then Len:=Max(Len,length(Trim(Copy(St2[J],1,Pos('=',St2[J])-1))));
-    finally
-      St2.Free;
-    end;
-  end;
-
-  while length(S1)<Len do S1:=S1+' ';
-  while length(S2)<Len do S2:=S2+' ';
-  while length(S3)<Len do S3:=S3+' ';
-  while length(S4)<Len do S4:=S4+' ';
-  while length(S5)<Len do S5:=S5+' ';
-  while length(S6)<Len do S6:=S6+' ';
-
-  L:=GameDB.GetSortedGamesList;
-  try
-    For I:=0 to L.Count-1 do with TGame(L[I]) do begin
-      If I<>0 then St.Add('');
-
-      St.Add(Name);
-      St.Add(S1+' : '+GetCustomGenreName(Genre));
-      St.Add(S2+' : '+Developer);
-      St.Add(S3+' : '+Publisher);
-      St.Add(S4+' : '+Year);
-      St.Add(S5+' : '+GetCustomLanguageName(Language));
-      St.Add(S6+' : '+WWW);
-      If UserInfo<>'' then begin
-        St2:=StringToStringList(UserInfo);
-        try
-          For J:=0 to St2.Count-1 do If Pos('=',St2[J])>0 then begin
-            S7:=Trim(Copy(St2[J],1,Pos('=',St2[J])-1));
-            while length(S7)<Len do S7:=S7+' ';
-            St.Add(S7+' : '+Copy(St2[J],Pos('=',St2[J])+1,MaxInt));
-          end;
-        finally
-          St2.Free;
-        end;
-      end;
-      If Notes<>'' then begin
-        St.Add(LanguageSetup.GameNotes+':');
-        St2:=StringToStringList(Notes); try St.AddStrings(St2); finally St2.Free; end;
-      end;
-    end;
-  finally
-    L.Free;
-  end;
+  result.Add(LanguageSetup.GameName);
+  result.Add(LanguageSetup.GameEmulationType);
+  result.Add(LanguageSetup.GameGenre);
+  result.Add(LanguageSetup.GameDeveloper);
+  result.Add(LanguageSetup.GamePublisher);
+  result.Add(LanguageSetup.GameYear);
+  result.Add(LanguageSetup.GameLanguage);
+  result.Add(LanguageSetup.GameWWW);
+  result.Add(LanguageSetup.GameLicense);
+  result.Add(LanguageSetup.GameStartCount);
 end;
 
-Procedure ExportGamesListTableFile(const GameDB : TGameDB; const St : TStringList);
-Var I,J,K : Integer;
-    L : TList;
-    UserList, UserListUpper, St2 : TStringList;
-    S,T : String;
+Function GetGamesListExportXMLColumns : TStringList;
 begin
-  UserList:=TStringList.Create;
-  UserListUpper:=TStringList.Create;
-  try
+  result:=TStringList.Create;
 
-    For I:=0 to GameDB.Count-1 do begin
+  result.Add('Name');
+  result.Add('EmulationType');
+  result.Add('Genre');
+  result.Add('Developer');
+  result.Add('Publisher');
+  result.Add('Year');
+  result.Add('Language');
+  result.Add('WWW');
+  result.Add('License');
+  result.Add('StartCount');
+end;
+
+Function GetGamesListExportColumnValue(const Game : TGame; const Column : TGamesListExportColumn; const WWWEncode : Boolean = False) : String;
+begin
+  result:='';
+  Case Column of
+    glecEmulationType : If ScummVMMode(Game) then result:=LanguageSetup.GameEmulationTypeScummVM else begin If WindowsExeMode(Game) then result:=LanguageSetup.GameEmulationTypeWindows else result:=LanguageSetup.GameEmulationTypeDOSBox; end;
+    glecGenre : result:=GetCustomGenreName(Game.CacheGenre);
+    glecDeveloper : result:=Game.CacheDeveloper;
+    glecPublisher : result:=Game.CachePublisher;
+    glecYear : result:=Game.CacheYear;
+    glecLanguage : result:=GetCustomLanguageName(Game.CacheLanguage);
+    glecWWW : If WWWEncode and (ExtUpperCase(Copy(Trim(Game.WWW),1,4))='HTTP') then result:='<a href="'+Game.WWW+'" target="_blank">'+Game.WWW+'</a>' else result:=Game.WWW;
+    glecLicense : result:=GetCustomLicenseName(Game.License);
+    glecStartCount : result:=IntToStr(History.GameStartCount(Game.CacheName));
+    else result:='';
+  end;
+  If WWWEncode and (Column<>glecWWW) then result:=EncodeHTMLSymbols(result);
+end;
+
+Procedure ExportGamesListTextFile(const GameDB : TGameDB; const Columns : TGamesListExportColumns; const St : TStringList);
+Var St2 : TStringList;
+    I,J,Len : Integer;
+    ColumnNames : TStringList;
+    S,T : String;
+    L : TList;
+begin
+  ColumnNames:=GetGamesListExportLanguageColumns;
+  try
+    {Calculate maximum column name length}
+    Len:=0;
+    For I:=0 to ColumnNames.Count-1 do If TGamesListExportColumn(I) in Columns then Len:=max(Len,length(ColumnNames[I]));
+    If glecUserFields in Columns then For I:=0 to GameDB.Count-1 do begin
       St2:=StringToStringList(GameDB[I].UserInfo);
       try
         For J:=0 to St2.Count-1 do If Pos('=',St2[J])>0 then begin
           S:=Trim(Copy(St2[J],1,Pos('=',St2[J])-1));
-          If UserListUpper.IndexOf(ExtUpperCase(S))<0 then begin UserList.Add(S); UserListUpper.Add(ExtUpperCase(S)); end;
+          If ExtUpperCase(S)='LICENSE' then continue;
+          Len:=max(Len,length(S));
         end;
       finally
         St2.Free;
       end;
     end;
 
-    S:=Format('"%s";"%s";"%s";"%s";"%s";"%s";"%s"',[LanguageSetup.GameName,LanguageSetup.GameGenre,LanguageSetup.GameDeveloper,LanguageSetup.GamePublisher,LanguageSetup.GameYear,LanguageSetup.GameLanguage,LanguageSetup.GameWWW]);
-    For I:=0 to UserList.Count-1 do S:=S+';"'+UserList[I]+'"';
-    St.Add(S);
+    {Make all column names have the same length}
+    For I:=0 to ColumnNames.Count-1 do while length(ColumnNames[I])<Len do ColumnNames[I]:=ColumnNames[I]+' ';
+
+    {Output list}
     L:=GameDB.GetSortedGamesList;
     try
-      For I:=0 to L.Count-1 do with TGame(L[I]) do begin
-        S:=Format('"%s";"%s";"%s";"%s";"%s";"%s";"%s"',[Name,GetCustomGenreName(Genre),Developer,Publisher,Year,GetCustomLanguageName(Language),WWW]);
-        St2:=StringToStringList(UserInfo);
+      For I:=0 to L.Count-1 do begin
+        If I<>0 then St.Add('');
+
+        St.Add(ColumnNames[0]+' : '+TGame(L[I]).CacheName);
+
+        For J:=1 to ColumnNames.Count-1 do If TGamesListExportColumn(J) in Columns then begin
+          S:=ColumnNames[J]+' : '+GetGamesListExportColumnValue(TGame(L[I]),TGamesListExportColumn(J));
+          St.Add(S);
+        end;
+
+        If (glecUserFields in Columns) and (Trim(TGame(L[I]).CacheUserInfo)<>'') then begin
+          St2:=StringToStringList(TGame(L[I]).CacheUserInfo);
+          try
+            For J:=0 to St2.Count-1 do If Pos('=',St2[J])>0 then begin
+              S:=Trim(Copy(St2[J],1,Pos('=',St2[J])-1));
+              If ExtUpperCase(S)='LICENSE' then continue;
+              while length(S)<Len do S:=S+' ';
+              St.Add(S+' : '+Copy(St2[J],Pos('=',St2[J])+1,MaxInt));
+            end;
+          finally
+            St2.Free;
+          end;
+        end;
+
+        If (glecNotes in Columns) and (Trim(TGame(L[I]).Notes)<>'') then begin
+          St2:=StringToStringList(Trim(TGame(L[I]).Notes));
+          try
+            If St2.Count=1 then begin
+              T:=LanguageSetup.GameNotes;
+              While length(T)<Len do T:=T+' ';
+              St.Add(T+' : '+St2[0]);
+            end else begin
+              St.Add(LanguageSetup.GameNotes+':');
+              St.AddStrings(St2);
+            end;
+          finally
+            St2.Free;
+          end;
+        end;
+      end;
+    finally
+      L.Free;
+    end;
+  finally
+    ColumnNames.Free;
+  end;
+end;
+
+Function EncodeCSV(S : String) : String;
+Var I : Integer;
+begin
+  result:='';
+  I:=Pos('"',S);
+  While I>0 do begin
+    result:=result+Copy(S,1,I-1)+'""';
+    S:=Copy(S,I+1,MaxInt);
+    I:=Pos('"',S);
+  end;
+  result:=result+S;
+end;
+
+Procedure ExportGamesListTableFile(const GameDB : TGameDB; const Columns : TGamesListExportColumns; const St : TStringList);
+Var I,J,K : Integer;
+    L : TList;
+    UserList, UserListUpper, St2 : TStringList;
+    S,T : String;
+    ColumnNames : TStringList;
+begin
+  ColumnNames:=GetGamesListExportLanguageColumns;
+  UserList:=TStringList.Create;
+  UserListUpper:=TStringList.Create;
+  try
+    {Output heading line}
+    S:='"'+EncodeCSV(ColumnNames[0])+'"';
+    For I:=1 to ColumnNames.Count-1 do If TGamesListExportColumn(I) in Columns then S:=S+';"'+EncodeCSV(ColumnNames[I])+'"';
+    If glecUserFields in Columns then begin
+      For I:=0 to GameDB.Count-1 do begin
+        St2:=StringToStringList(GameDB[I].CacheUserInfo);
         try
-          For J:=0 to UserList.Count-1 do begin
+          For J:=0 to St2.Count-1 do If Pos('=',St2[J])>0 then begin
+            T:=Trim(Copy(St2[J],1,Pos('=',St2[J])-1));
+            If ExtUpperCase(T)='LICENSE' then continue;            
+            If UserListUpper.IndexOf(ExtUpperCase(T))<0 then begin UserList.Add(T); UserListUpper.Add(ExtUpperCase(T)); end;
+          end;
+        finally
+          St2.Free;
+        end;
+      end;
+      For I:=0 to UserList.Count-1 do S:=S+';"'+EncodeCSV(UserList[I])+'"';
+    end;
+    If glecNotes in Columns then S:=S+';"'+EncodeCSV(LanguageSetup.GameNotes)+'"';
+    St.Add(S);
+
+    {Output list}
+    L:=GameDB.GetSortedGamesList;
+    try
+      For I:=0 to L.Count-1 do begin
+        S:='"'+EncodeCSV(TGame(L[I]).CacheName)+'"';
+
+        For J:=1 to ColumnNames.Count-1 do If TGamesListExportColumn(J) in Columns then
+          S:=S+';"'+EncodeCSV(GetGamesListExportColumnValue(TGame(L[I]),TGamesListExportColumn(J)))+'"';
+
+        If glecUserFields in Columns then begin
+          St2:=StringToStringList(TGame(L[I]).CacheUserInfo);
+          try
+            For J:=0 to UserList.Count-1 do begin
             T:='';
             For K:=0 to St2.Count-1 do If Pos('=',St2[K])>0 then begin
               If Trim(ExtUpperCase(Copy(St2[K],1,Pos('=',St2[K])-1)))=UserListUpper[J] then begin
                 T:=Trim(Copy(St2[K],Pos('=',St2[K])+1,MaxInt)); break;
               end;
             end;
-            S:=S+';"'+T+'"';
+            S:=S+';"'+EncodeCSV(T)+'"';
           end;
-        finally
-          St2.Free;
+          finally
+            St2.Free;
+          end;
         end;
+
+        If glecNotes in Columns then begin
+          S:=S+';"';
+          St2:=StringToStringList(TGame(L[I]).Notes);
+          try
+            For J:=0 to St2.Count-1 do begin
+              If J>0 then S:=S+' ';
+              S:=S+EncodeCSV(St2[J]);
+            end;
+          finally St2.Free; end;
+          S:=S+'"';
+        end;
+
         St.Add(S);
       end;
     finally
@@ -2389,6 +2471,7 @@ begin
   finally
     UserList.Free;
     UserListUpper.Free;
+    ColumnNames.Free;
   end;
 end;
 
@@ -2414,24 +2497,14 @@ begin
 end;
 
 Function EncodeHTMLSymbols(const S : String) : String;
-{Var I : Integer;
-    A : String;}
 begin
   result:=S;
   result:=Replace(result,'&','&amp;'); {must be the first, otherweise "ä" -> "&auml;" -> "&amp;auml;" will happen}
   result:=Replace(result,'<','&lt;');
   result:=Replace(result,'>','&gt;');
   result:=Replace(result,'"','&quot;');
-  result:=Replace(result,'''','&apos;');
+  {result:=Replace(result,'''','&apos;'); only valid in XHTML}
   result:=EncodeUserHTMLSymbolsOnly(result);
-
-  {I:=1;
-  While I<=length(result) do begin
-    If (ord(result[I])>=32) and (ord(result[I])<=127) then begin inc(I); continue; end;
-    A:='&#'+IntToStr(ord(result[I]))+';';
-    result:=copy(result,1,I-1)+A+copy(result,I+1,MaxInt);
-    inc(I,length(A));
-  end;}
 end;
 
 Function TryStrToHex(const S : String; var Hex : Integer) : Boolean;
@@ -2492,28 +2565,38 @@ begin
   end;
 end;
 
-Procedure ExportGamesListHTMLFile(const GameDB : TGameDB; const St : TStringList);
-Var I,J,K : Integer;
-    L : TList;
-    UserList, UserListUpper, St2 : TStringList;
+Procedure GetUserLists(const GameDB : TGameDB; var UserList, UserListUpper : TStringLIst);
+Var I,J : Integer;
     S : String;
+    St2 : TStringList;
 begin
   UserList:=TStringList.Create;
   UserListUpper:=TStringList.Create;
-  try
 
-    For I:=0 to GameDB.Count-1 do begin
-      St2:=StringToStringList(GameDB[I].UserInfo);
-      try
-        For J:=0 to St2.Count-1 do If Pos('=',St2[J])>0 then begin
-          S:=Trim(Copy(St2[J],1,Pos('=',St2[J])-1));
-          If UserListUpper.IndexOf(ExtUpperCase(S))<0 then begin UserList.Add(S); UserListUpper.Add(ExtUpperCase(S)); end;
-        end;
-      finally
-        St2.Free;
+  For I:=0 to GameDB.Count-1 do begin
+    St2:=StringToStringList(GameDB[I].UserInfo);
+    try
+      For J:=0 to St2.Count-1 do If Pos('=',St2[J])>0 then begin
+        S:=Trim(Copy(St2[J],1,Pos('=',St2[J])-1));
+        If ExtUpperCase(S)='LICENSE' then continue;
+        If UserListUpper.IndexOf(ExtUpperCase(S))<0 then begin UserList.Add(S); UserListUpper.Add(ExtUpperCase(S)); end;
       end;
+    finally
+      St2.Free;
     end;
+  end;
+end;
 
+Procedure ExportGamesListHTMLFile(const GameDB : TGameDB; const Columns : TGamesListExportColumns; const St : TStringList);
+Var I,J,K : Integer;
+    L : TList;
+    UserList, UserListUpper, St2 : TStringList;
+    S,T : String;
+    ColumnNames : TStringList;
+begin
+  ColumnNames:=GetGamesListExportLanguageColumns;
+  GetUserLists(GameDB,UserList,UserListUpper);
+  try
     St.Add('<!DOCTYPE HTML PUBLIC "-/'+'/W3C/'+'/DTD HTML 4.01 Transitional/'+'/EN">');
     St.Add('<html>');
     St.Add('  <head>');
@@ -2533,42 +2616,51 @@ begin
     St.Add('    <h1>'+EncodeHTMLSymbols(LanguageSetup.MenuFileExportGamesListHTMLTitle)+'</h1>');
     St.Add('    <table>');
     St.Add('      <tr>');
-    St.Add(Format('        <th>%s</th>',[EncodeHTMLSymbols(LanguageSetup.GameName)]));
-    St.Add(Format('        <th>%s</th>',[EncodeHTMLSymbols(LanguageSetup.GameGenre)]));
-    St.Add(Format('        <th>%s</th>',[EncodeHTMLSymbols(LanguageSetup.GameDeveloper)]));
-    St.Add(Format('        <th>%s</th>',[EncodeHTMLSymbols(LanguageSetup.GamePublisher)]));
-    St.Add(Format('        <th>%s</th>',[EncodeHTMLSymbols(LanguageSetup.GameYear)]));
-    St.Add(Format('        <th>%s</th>',[EncodeHTMLSymbols(LanguageSetup.GameLanguage)]));
-    St.Add(Format('        <th>%s</th>',[EncodeHTMLSymbols(LanguageSetup.GameWWW)]));
-    For I:=0 to UserList.Count-1 do St.Add(Format('        <th>%s</th>',[EncodeHTMLSymbols(UserList[I])]));
+    For I:=0 to ColumnNames.Count-1 do If (I=0) or (TGamesListExportColumn(I) in Columns) then St.Add(Format('        <th>%s</th>',[EncodeHTMLSymbols(ColumnNames[I])]));
+    If glecUserFields in Columns then For I:=0 to UserList.Count-1 do St.Add(Format('        <th>%s</th>',[EncodeHTMLSymbols(UserList[I])]));
+    If glecNotes in Columns then St.Add(Format('        <th>%s</th>',[EncodeHTMLSymbols(LanguageSetup.GameNotes)]));
     St.Add('      </tr>');
+
     L:=GameDB.GetSortedGamesList;
     try
-      For I:=0 to L.Count-1 do with TGame(L[I]) do begin
+      For I:=0 to L.Count-1 do begin
         St.Add('      <tr>');
-        St.Add(Format('        <td>%s</td>',[EncodeHTMLSymbols(Name)]));
-        St.Add(Format('        <td>%s</td>',[EncodeHTMLSymbols(GetCustomGenreName(Genre))]));
-        St.Add(Format('        <td>%s</td>',[EncodeHTMLSymbols(Developer)]));
-        St.Add(Format('        <td>%s</td>',[EncodeHTMLSymbols(Publisher)]));
-        St.Add(Format('        <td>%s</td>',[EncodeHTMLSymbols(Year)]));
-        St.Add(Format('        <td>%s</td>',[EncodeHTMLSymbols(GetCustomLanguageName(Language))]));
-        If Trim(WWW)<>''
-          then St.Add(Format('        <td><a href="%s">%s</a></td>',[WWW,WWW]))
-          else St.Add('        <td></td>');
-        St2:=StringToStringList(UserInfo);
-        try
-          For J:=0 to UserList.Count-1 do begin
-            S:='';
-            For K:=0 to St2.Count-1 do If Pos('=',St2[K])>0 then begin
-              If Trim(ExtUpperCase(Copy(St2[K],1,Pos('=',St2[K])-1)))=UserListUpper[J] then begin
-                S:=Trim(Copy(St2[K],Pos('=',St2[K])+1,MaxInt)); break;
+        St.Add(Format('        <td>%s</td>',[EncodeHTMLSymbols(TGame(L[I]).CacheName)]));
+
+        For J:=1 to ColumnNames.Count-1 do If TGamesListExportColumn(J) in Columns then
+          St.Add(Format('        <td>%s</td>',[GetGamesListExportColumnValue(TGame(L[I]),TGamesListExportColumn(J),True)]));
+
+        If glecUserFields in Columns then begin
+          St2:=StringToStringList(TGame(L[I]).CacheUserInfo);
+          try
+            For J:=0 to UserList.Count-1 do begin
+              S:='';
+              For K:=0 to St2.Count-1 do If Pos('=',St2[K])>0 then begin
+                If Trim(ExtUpperCase(Copy(St2[K],1,Pos('=',St2[K])-1)))=UserListUpper[J] then begin
+                  S:=Trim(Copy(St2[K],Pos('=',St2[K])+1,MaxInt)); break;
+                end;
               end;
+              St.Add(Format('        <td>%s</td>',[EncodeHTMLSymbols(S)]));
             end;
-            St.Add(Format('        <td>%s</td>',[EncodeHTMLSymbols(S)]));
+          finally
+            St2.Free;
           end;
-        finally
-          St2.Free;
         end;
+
+        If glecNotes in Columns then begin
+          T:='        <td>';
+          St2:=StringToStringList(TGame(L[I]).Notes);
+          try
+            For J:=0 to St2.Count-1 do begin
+              If J>0 then T:=T+'<br>';
+              T:=T+EncodeHTMLSymbols(St2[J]);
+            end;
+          finally
+            St2.Free;
+          end;
+          St.Add(T+'</td>');
+        end;
+
         St.Add('      </tr>');
       end;
     finally
@@ -2580,21 +2672,106 @@ begin
   finally
     UserList.Free;
     UserListUpper.Free;
+    ColumnNames.Free;
   end;
 end;
 
-Procedure ExportGamesList(const GameDB : TGameDB; const FileName : String);
+Procedure ExportGamesListXMLFile(const GameDB : TGameDB; const Columns : TGamesListExportColumns; const St : TStringList);
+Var I,J,K : Integer;
+    L : TList;
+    UserList, UserListUpper, St2 : TStringList;
+    S,T : String;
+    ColumnNames : TStringList;
+    Year, Month, Day : Word;
+begin
+  ColumnNames:=GetGamesListExportXMLColumns;
+  GetUserLists(GameDB,UserList,UserListUpper);
+  try
+    St.Add('<?xml version="1.0" encoding="'+LanguageSetup.CharsetHTMLCharset+'" standalone="no"?>');
+    St.Add('<!DOCTYPE GamesList SYSTEM "http://dfendreloaded.sourceforge.net/GamesListExport/GamesListExport.dtd">');
+    St.Add('');
+    DecodeDate(Date,Year,Month,Day);
+    St.Add('<GamesList DFRVersion="'+GetNormalFileVersionAsString+'" ExportDate="'+Format('%d-%.2d-%.2d',[Year,Month,Day])+'">');
+    L:=GameDB.GetSortedGamesList;
+    try
+      For I:=0 to L.Count-1 do begin
+        St.Add('');
+        St.Add('  <Game>');
+
+        St.Add(Format('    <Name>%s</Name>',[EncodeHTMLSymbols(TGame(L[I]).CacheName)]));
+
+        For J:=1 to ColumnNames.Count-1 do If TGamesListExportColumn(J) in Columns then begin
+          S:=GetGamesListExportColumnValue(TGame(L[I]),TGamesListExportColumn(J),False);
+          If TGamesListExportColumn(J)<>glecWWW then S:=EncodeHTMLSymbols(S);
+          If Trim(S)<>'' then St.Add(Format('    <%s>%s</%s>',[ColumnNames[J],S,ColumnNames[J]]));
+        end;
+
+        If glecUserFields in Columns then begin
+          St2:=StringToStringList(TGame(L[I]).CacheUserInfo);
+          try
+            For J:=0 to UserList.Count-1 do begin
+              S:='';
+              For K:=0 to St2.Count-1 do If Pos('=',St2[K])>0 then begin
+                If Trim(ExtUpperCase(Copy(St2[K],1,Pos('=',St2[K])-1)))=UserListUpper[J] then begin
+                  S:=Trim(Copy(St2[K],Pos('=',St2[K])+1,MaxInt)); break;
+                end;
+              end;
+              S:=EncodeHTMLSymbols(S);
+              if Trim(S)<>'' then begin
+                St.Add('    <UserData>');
+                St.Add(Format('      <Name>%s</Name>',[EncodeHTMLSymbols(UserList[J])]));
+                St.Add(Format('      <Value>%s</Value>',[S]));
+                St.Add('    </UserData>');
+              end;
+            end;
+          finally
+            St2.Free;
+          end;
+        end;
+
+        If glecNotes in Columns then begin
+          T:='';
+          St2:=StringToStringList(TGame(L[I]).Notes);
+          try
+            For J:=0 to St2.Count-1 do T:=T+EncodeHTMLSymbols(St2[J])+#13;
+          finally
+            St2.Free;
+          end;
+          If T<>'' then St.Add('    <Notes>'+#13+'    <![CDATA['+#13+T+'    ]]>'+#13+'    </Notes>');
+        end;
+
+        St.Add('  </Game>');
+      end;
+
+      If L.Count>0 then St.Add('');
+    finally
+      L.Free;
+    end;
+    St.Add('</GamesList>');
+  finally
+    UserList.Free;
+    UserListUpper.Free;
+    ColumnNames.Free;
+  end;
+end;
+
+Procedure ExportGamesList(const GameDB : TGameDB; const FileName : String; const Columns : TGamesListExportColumns; const Format : TGamesListExportFormat);
 Var S : String;
     St : TStringList;
 begin
   St:=TStringList.Create;
   try
-    S:=ExtUpperCase(Trim(ExtractFileExt(FileName)));
-
-    If S='.CSV' then ExportGamesListTableFile(GameDB,St);
-    If (S='.HTML') or (S='.HTM') then ExportGamesListHTMLFile(GameDB,St);
-    If St.Count=0 then ExportGamesListTextFile(GameDB,St);
-
+    If Format=glefAuto then begin
+      S:=ExtUpperCase(Trim(ExtractFileExt(FileName)));
+      If S='.CSV' then ExportGamesListTableFile(GameDB,Columns,St);
+      If (S='.HTML') or (S='.HTM') then ExportGamesListHTMLFile(GameDB,Columns,St);
+      If S='.XML' then ExportGamesListXMLFile(GameDB,Columns,St);
+      If St.Count=0 then ExportGamesListTextFile(GameDB,Columns,St);
+    end;
+    If Format=glefText then ExportGamesListTextFile(GameDB,Columns,St);
+    If Format=glefTable then ExportGamesListTableFile(GameDB,Columns,St);
+    If Format=glefHTML then ExportGamesListHTMLFile(GameDB,Columns,St);
+    If Format=glefXML then ExportGamesListXMLFile(GameDB,Columns,St);
     try
       St.SaveToFile(FileName);
     except
@@ -2663,7 +2840,7 @@ begin
       If not DOSBoxMode(GameDB[I]) then continue;
       S:=GameDB[I].SetupFile; T:=ChangeFileExt(S,'.conf');
       If NeedUpdate(S,T) then begin
-        St2:=BuildConfFile(GameDB[I],False,False,-1);
+        St2:=BuildConfFile(GameDB[I],False,False,-1,nil);
         try St2.SaveToFile(T); finally St2.Free; end;
       end;
       J:=St.IndexOf(ExtUpperCase(ExtractFileName(T))); If J>=0 then St.Delete(J);
@@ -2674,191 +2851,6 @@ begin
   finally
     St.Free;
   end;
-end;
-
-Procedure AddToHistory(const GameName : String);
-Var F : TextFile;
-begin
-  If (Trim(GameName)='') or (not PrgSetup.StoreHistory) then exit;
-
-  try
-    AssignFile(F,PrgDataDir+SettingsFolder+'\'+HistoryFileName);
-    If FileExists(PrgDataDir+SettingsFolder+'\'+HistoryFileName) then Append(F) else Rewrite(F);
-    try
-      writeln(F,GameName+';'+DateToStr(Now)+';'+TimeToStr(Now));
-    finally
-      CloseFile(F);
-    end;
-  except
-    MessageDlg(Format(LanguageSetup.MessageCouldNotSaveFile,[PrgDataDir+SettingsFolder+'\'+HistoryFileName]),mtError,[mbOK],0);
-  end;
-end;
-
-Type TInfoRec=record
-  Count : Integer;
-  First, Last : TDateTime;
-end;
-
-Var StatisticData : Array of TInfoRec;
-
-Function LoadStatisticData(var RawList, Games : TStringList) : Boolean;
-Var I,J : Integer;
-    S : String;
-    D : TDateTime;
-    Line : TStringList;
-begin
-  RawList:=nil;
-  Games:=nil;
-  SetLength(StatisticData,0);
-  result:=False;
-
-  if not FileExists(PrgDataDir+SettingsFolder+'\'+HistoryFileName) then exit;
-
-  RawList:=TStringList.Create;
-  Games:=TStringList.Create;
-
-  try
-    RawList.LoadFromFile(PrgDataDir+SettingsFolder+'\'+HistoryFileName);
-  except
-    MessageDlg(Format(LanguageSetup.MessageCouldNotOpenFile,[PrgDataDir+SettingsFolder+'\'+HistoryFileName]),mtError,[mbOK],0);
-    FreeAndNil(RawList);
-    FreeAndNil(Games);
-    SetLength(StatisticData,0);
-    exit;
-  end;
-
-  try
-    For I:=0 to RawList.Count-1 do begin
-      S:=Trim(RawList[I]);
-      If S='' then continue;
-      Line:=ValueToList(S);
-      try
-        If Line.Count<0 then continue;
-        J:=Games.IndexOf(Line[0]);
-        If J<0 then begin
-          J:=Games.Add(Line[0]);
-          SetLength(StatisticData,J+1);
-          with StatisticData[J] do begin Count:=0; First:=0; Last:=0; end;
-        end;
-        inc(StatisticData[J].Count);
-        If Line.Count<3 then continue;
-        try
-          D:=StrToDate(Line[1])+StrToTime(Line[2]);
-          If (StatisticData[J].First=0) or (StatisticData[J].First>D) then StatisticData[J].First:=D;
-          If StatisticData[J].Last<D then StatisticData[J].Last:=D;
-         except end;
-      finally
-        Line.Free;
-      end;
-    end;
-  except
-    FreeAndNil(RawList);
-    FreeAndNil(Games);
-    SetLength(StatisticData,0);
-    exit;
-  end;
-
-  result:=True;
-end;
-
-Procedure LoadHistory(const AListView : TListView);
-Var C : TListColumn;
-    RawList, Games, Line : TStringList;
-    I,J : Integer;
-    S : String;
-    L : TListItem;
-begin
-  AListView.Items.BeginUpdate;
-  try
-    C:=AListView.Columns.Add;
-    C.Caption:=LanguageSetup.HistoryGame;
-    C.Width:=-2;
-    C:=AListView.Columns.Add;
-    C.Caption:=LanguageSetup.HistoryDate;
-    C.Width:=-2;
-    C:=AListView.Columns.Add;
-    C.Caption:=LanguageSetup.HistoryTime;
-    C.Width:=-2;
-    C:=AListView.Columns.Add;
-    C.Caption:=LanguageSetup.HistoryStarts;
-    C.Width:=-2;
-
-    if not LoadStatisticData(RawList,Games) then exit;
-    try
-      For I:=0 to RawList.Count-1 do begin
-        S:=Trim(RawList[I]);
-        If S='' then continue;
-        Line:=ValueToList(S);
-        try
-          If Line.Count<1 then continue;
-          L:=AListView.Items.Add;
-          L.Caption:=Line[0];
-          If Line.Count<2 then continue;
-          L.SubItems.Add(Line[1]);
-          If Line.Count<3 then continue;
-          L.SubItems.Add(Line[2]);
-          J:=Games.IndexOf(Line[0]);
-          If J>=0 then L.SubItems.Add(IntToStr(StatisticData[J].Count)) else L.SubItems.Add('-');
-        finally
-          Line.Free;
-        end;
-      end;
-    finally
-      RawList.Free;
-      Games.Free;
-      SetLength(StatisticData,0);
-    end;
-  finally
-    AListView.Items.EndUpdate;
-  end;
-end;
-
-Procedure LoadHistoryStatistics(const AListView : TListView);
-Var C : TListColumn;
-    RawList,Games : TStringList;
-    I : Integer;
-    L : TListItem;
-begin
-  AListView.Items.BeginUpdate;
-  try
-    C:=AListView.Columns.Add;
-    C.Caption:=LanguageSetup.HistoryGame;
-    C.Width:=-2;
-    C:=AListView.Columns.Add;
-    C.Caption:=LanguageSetup.HistoryStarts;
-    C.Width:=-2;
-    C:=AListView.Columns.Add;
-    C.Caption:=LanguageSetup.HistoryFirst;
-    C.Width:=-2;
-    C:=AListView.Columns.Add;
-    C.Caption:=LanguageSetup.HistoryLast;
-    C.Width:=-2;
-
-    if not LoadStatisticData(RawList,Games) then exit;
-    try
-      For I:=0 to Games.Count-1 do begin
-        L:=AListView.Items.Add;
-        L.Caption:=Games[I];
-        L.SubItems.Add(IntToStr(StatisticData[I].Count));
-        If StatisticData[I].First>0 then L.SubItems.Add(DateToStr(StatisticData[I].First)+' '+TimeToStr(StatisticData[I].First)) else L.SubItems.Add('-');
-        If StatisticData[I].Last>0 then L.SubItems.Add(DateToStr(StatisticData[I].Last)+' '+TimeToStr(StatisticData[I].Last)) else L.SubItems.Add('-');
-      end;
-    finally
-      RawList.Free;
-      Games.Free;
-      SetLength(StatisticData,0);
-    end;
-  finally
-    AListView.Items.EndUpdate;
-  end;
-end;
-
-Function ClearHistory : Boolean;
-begin
-  result:=True;
-  if not FileExists(PrgDataDir+SettingsFolder+'\'+HistoryFileName) then exit;
-  result:=ExtDeleteFile(PrgDataDir+SettingsFolder+'\'+HistoryFileName,ftProfile);
-  if not result then MessageDlg(Format(LanguageSetup.MessageCouldNotDeleteFile,[PrgDataDir+SettingsFolder+'\'+HistoryFileName]),mtError,[mbOK],0);
 end;
 
 Function StrToBool(S : String) : Boolean;
@@ -3102,7 +3094,7 @@ begin
   If AGame.GameExe='' then exit;
   T:=MakeAbsPath(AGame.GameExe,PrgSetup.BaseDir);
   If not FileExists(T) then exit;
-  S:=GetMD5Sum(T); If S='' then exit;
+  S:=GetMD5Sum(T,False); If S='' then exit;
   result:=(S=AGame.GameExeMD5);
 end;
 
@@ -3114,7 +3106,7 @@ begin
   If AGame.SetupExe='' then exit;
   T:=MakeAbsPath(AGame.SetupExe,PrgSetup.BaseDir);
   If not FileExists(T) then exit;
-  S:=GetMD5Sum(T); If S='' then exit;
+  S:=GetMD5Sum(T,False); If S='' then exit;
   result:=(S=AGame.SetupExeMD5);
 end;
 
@@ -3126,7 +3118,7 @@ begin
   If AGame.GameExe='' then exit;
   S:=MakeAbsPath(AGame.GameExe,PrgSetup.BaseDir);
   if not FileExists(S) then exit;
-  AGame.GameExeMD5:=GetMD5Sum(S);
+  AGame.GameExeMD5:=GetMD5Sum(S,False);
 end;
 
 Procedure CreateSetupCheckSum(const AGame : TGame; const OverwriteExistingCheckSum : Boolean);
@@ -3137,7 +3129,7 @@ begin
   If AGame.SetupExe='' then exit;
   S:=MakeAbsPath(AGame.SetupExe,PrgSetup.BaseDir);
   if not FileExists(S) then exit;
-  AGame.SetupExeMD5:=GetMD5Sum(S);
+  AGame.SetupExeMD5:=GetMD5Sum(S,False);
 end;
 
 Function ChecksumForGameOK(const AGame : TGame) : Boolean;
@@ -3287,7 +3279,6 @@ begin
 end;
 
 Function GetAdditionalChecksumData(const AGame : TGame; Path : String; DataNeeded : Integer; var Files, Checksums : T5StringArray) : Integer;
-const GoodFileExt : Array[0..11] of String = ('EXE','COM','DAT','ICO','HLP','DRV','DLL','PAK','PIC','LFL','BIN','OVL');
 Var I,J : Integer;
     Exe1,Exe2,S : String;
     Rec : TSearchRec;
@@ -3307,10 +3298,11 @@ begin
         If (S<>Exe1) and (S<>Exe2) then begin
           S:=ExtractFileExt(Rec.Name); If (S<>'') and (S[1]='.') then S:=Copy(S,2,MaxInt);
           OK:=False;
-          For J:=Low(GoodFileExt) to High(GoodFileExt) do If GoodFileExt[J]=S then begin OK:=True; break; end;
+          For J:=Low(AdditionalChecksumDataGoodFileExt) to High(AdditionalChecksumDataGoodFileExt) do If AdditionalChecksumDataGoodFileExt[J]=S then begin OK:=True; break; end;
+          If OK then For J:=Low(AdditionalChecksumDataExcludeFiles) to High(AdditionalChecksumDataExcludeFiles) do if Pos(AdditionalChecksumDataExcludeFiles[J],S)<>0 then begin Ok:=False; break; end;
           If OK then begin
             Files[result]:=Rec.Name;
-            Checksums[result]:=GetMD5Sum(Path+Rec.Name);
+            Checksums[result]:=GetMD5Sum(Path+Rec.Name,False);
             inc(result); dec(DataNeeded);
           end;
         end;
@@ -3592,7 +3584,7 @@ begin
   end else begin
     S:=TempDir+ChangeFileExt(ExtractFileName(Game.SetupFile),'.conf');
     T:='DOSBox';
-    St:=BuildConfFile(Game,False,False,-1);
+    St:=BuildConfFile(Game,False,False,-1,nil);
     If St=nil then exit;
   end;
     try

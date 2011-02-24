@@ -10,11 +10,16 @@ type
   TDOSBoxFailedForm = class(TForm)
     OKButton: TBitBtn;
     InfoLabel: TLabel;
+    DoNotShowAgainCheckBox: TCheckBox;
+    ProfileGroupBox: TGroupBox;
     CloseDOSBoxCheckBox: TCheckBox;
+    ShowConsoleCheckBox: TCheckBox;
     RenderLabel: TLabel;
     RenderComboBox: TComboBox;
-    DoNotShowAgainCheckBox: TCheckBox;
-    ShowConsoleCheckBox: TCheckBox;
+    GlobalGroupBox: TGroupBox;
+    SDLLabel: TLabel;
+    SDLComboBox: TComboBox;
+    RemoteLabel: TLabel;
     procedure FormShow(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
@@ -34,7 +39,7 @@ Procedure ShowDOSBoxFailedDialog(const AOwner : TComponent; const AGameDB : TGam
 
 implementation
 
-uses LanguageSetupUnit, VistaToolsUnit, CommonTools, IconLoaderUnit, PrgSetupUnit, DOSBoxFailedForm2Unit;
+uses LanguageSetupUnit, VistaToolsUnit, CommonTools, IconLoaderUnit, PrgSetupUnit;
 
 {$R *.dfm}
 
@@ -46,10 +51,16 @@ begin
 
   Caption:=LanguageSetup.DOSBoxStartFailed;
   InfoLabel.Caption:=LanguageSetup.DOSBoxStartFailedInfo;
+
+  ProfileGroupBox.Caption:=LanguageSetup.DOSBoxStartFailedProfileSettings;
+  GlobalGroupBox.Caption:=LanguageSetup.DOSBoxStartFailedGlobalSettings;
   CloseDOSBoxCheckBox.Caption:=LanguageSetup.GameCloseDOSBoxAfterGameExit;
   ShowConsoleCheckBox.Caption:=LanguageSetup.DOSBoxStartFailedShowConsole;
   RenderLabel.Caption:=LanguageSetup.GameRender;
-    St:=ValueToList(GameDB.ConfOpt.Render,';,'); try RenderComboBox.Items.AddStrings(St); finally St.Free; end;
+  St:=ValueToList(GameDB.ConfOpt.Render,';,'); try RenderComboBox.Items.AddStrings(St); finally St.Free; end;
+  SDLLabel.Caption:=LanguageSetup.SetupFormDOSBoxSDLVideodriver;
+  SDLComboBox.Items[0]:=SDLComboBox.Items[0]+' ('+LanguageSetup.Default+')';
+  RemoteLabel.Caption:=LanguageSetup.DOSBoxStartFailedRemoteInfo;
   DoNotShowAgainCheckBox.Caption:=LanguageSetup.DOSBoxStartFailedTurnOff;
 
   OKButton.Caption:=LanguageSetup.OK;
@@ -85,6 +96,9 @@ begin
   For I:=0 to RenderComboBox.Items.Count-1 do If Trim(ExtUpperCase(RenderComboBox.Items[I]))=S then begin
     RenderComboBox.ItemIndex:=I; break;
   end;
+
+  If Trim(ExtUpperCase(PrgSetup.DOSBoxSettings[0].SDLVideodriver))='WINDIB' then SDLComboBox.ItemIndex:=1 else SDLComboBox.ItemIndex:=0;
+  RemoteLabel.Visible:=IsRemoteSession and (SDLComboBox.ItemIndex=0);
 end;
 
 procedure TDOSBoxFailedForm.FormClose(Sender: TObject; var Action: TCloseAction);
@@ -98,17 +112,14 @@ begin
   Game.Render:=RenderComboBox.Text;
   Game.NoDOSBoxFailedDialog:=DoNotShowAgainCheckBox.Checked;
   Game.StoreAllValues;
+
+  If SDLComboBox.ItemIndex=1 then PrgSetup.DOSBoxSettings[0].SDLVideodriver:='WinDIB' else PrgSetup.DOSBoxSettings[0].SDLVideodriver:='DirectX';
 end;
 
 { global }
 
 Procedure ShowDOSBoxFailedDialog(const AOwner : TComponent; const AGameDB : TGameDB; const AGame : TGame);
 begin
-  If PrgSetup.ActivateIncompleteFeatures then begin
-    DOSBoxFailedForm2Unit.ShowDOSBoxFailedDialog(AOwner,AGameDB,AGame);
-    exit;
-  end;
-
   If AGame.NoDOSBoxFailedDialog then exit;
   DOSBoxFailedForm:=TDOSBoxFailedForm.Create(AOwner);
   try
@@ -119,5 +130,6 @@ begin
     DOSBoxFailedForm.Free;
   end;
 end;
+
 
 end.

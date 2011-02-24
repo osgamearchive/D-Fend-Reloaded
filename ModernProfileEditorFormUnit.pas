@@ -47,6 +47,8 @@ Type TFrameRecord=record
   AllowDefaultValueReset : Boolean;
 end;
 
+Type TPageResetMode=(rmThis, rmAll, rmAllButThis);
+
 type
   TModernProfileEditorForm = class(TForm)
     BottomPanel: TPanel;
@@ -87,7 +89,7 @@ type
     Procedure PopupMenuWork(Sender: TObject);
     Procedure OpenTempConfigurationFile;
     Procedure RunGameWithCurrentConfig;
-    Procedure ResetTo(const Template : TGame; const AllPages : Boolean);
+    Procedure ResetTo(const Template : TGame; const PageResetMode : TPageResetMode);
     Function GetFrame(const FrameClass : TFrameClass) : TFrame;
   public
     { Public-Deklarationen }
@@ -132,9 +134,10 @@ uses ShellAPI, Math, VistaToolsUnit, LanguageSetupUnit,
      ModernProfileEditorScummVMSoundFrameUnit, ModernProfileEditorPrinterFrameUnit,
      ModernProfileEditorScummVMGameFrameUnit, ModernProfileEditorHelperProgramsFrameUnit,
      ModernProfileEditorScummVMHardwareFrameUnit, ModernProfileEditorAddtionalChecksumFrameUnit,
+     ModernProfileEditorInnovaFrameUnit,
      IconLoaderUnit, GameDBToolsUnit, PrgSetupUnit, CommonTools, DOSBoxUnit,
      PrgConsts, HelpConsts, SelectAutoSetupFormUnit, ScummVMUnit,
-     WindowsProfileUnit, DOSBoxTempUnit;
+     WindowsProfileUnit, DOSBoxTempUnit, MainUnit;
 
 {$R *.dfm}
 
@@ -243,17 +246,29 @@ begin
   M.ImageIndex:=3;
   M.Tag:=6; M.OnClick:=PopupMenuWork; ToolsPopupMenu.Items.Add(M);
 
-  {Reset to template}
+
+  {Line}
   M:=TMenuItem.Create(ToolsPopupMenu); M.Caption:='-'; ToolsPopupMenu.Items.Add(M);
 
+  {Reset to default data}
   M:=TMenuItem.Create(ToolsPopupMenu);
   M.Caption:=LanguageSetup.ProfileEditorToolsResetPage;
   M.Tag:=2; M.OnClick:=PopupMenuWork; ToolsPopupMenu.Items.Add(M); AddThisPageMenuItem(M);
+
+  M:=TMenuItem.Create(ToolsPopupMenu);
+  M.Caption:=LanguageSetup.ProfileEditorToolsResetAllButThis;
+  M.Tag:=7; M.OnClick:=PopupMenuWork; ToolsPopupMenu.Items.Add(M); AddThisPageMenuItem(M);
+
   M:=TMenuItem.Create(ToolsPopupMenu);
   M.Caption:=LanguageSetup.ProfileEditorToolsResetAll;
   M.Tag:=3; M.OnClick:=PopupMenuWork; ToolsPopupMenu.Items.Add(M);
+
   If ScummVM or WindowsMode then exit;
 
+  {Line}
+  M:=TMenuItem.Create(ToolsPopupMenu); M.Caption:='-'; ToolsPopupMenu.Items.Add(M);
+
+  {Reset to template}
   TemplateDB:=TGameDB.Create(PrgDataDir+TemplateSubDir,False);
   try
     If TemplateDB.Count>0 then begin
@@ -270,6 +285,10 @@ begin
         M3:=TMenuItem.Create(ToolsPopupMenu);
         M3.Caption:=LanguageSetup.ProfileEditorToolsResetToTemplatePage;
         M3.Tag:=10000+I; M3.OnClick:=PopupMenuWork; M2.Add(M3); AddThisPageMenuItem(M3);
+
+        M3:=TMenuItem.Create(ToolsPopupMenu);
+        M3.Caption:=LanguageSetup.ProfileEditorToolsResetToTemplateAllButThis;
+        M3.Tag:=30000+I; M3.OnClick:=PopupMenuWork; M2.Add(M3); AddThisPageMenuItem(M3);
 
         M3:=TMenuItem.Create(ToolsPopupMenu);
         M3.Caption:=LanguageSetup.ProfileEditorToolsResetToTemplateAll;
@@ -326,7 +345,7 @@ begin
       If WindowsExeMode(TempGame.Game) then begin
         RunWindowsGame(TempGame.Game);
       end else begin
-        RunGame(TempGame.Game);
+        RunGame(TempGame.Game,DFendReloadedMainForm.DeleteOnExit);
       end;
     end;
   finally
@@ -335,21 +354,32 @@ begin
   end;
 end;
 
-Procedure TModernProfileEditorForm.ResetTo(const Template : TGame; const AllPages : Boolean);
+Procedure TModernProfileEditorForm.ResetTo(const Template : TGame; const PageResetMode : TPageResetMode);
 Var I : Integer;
 begin
-  If AllPages then begin
-    If MessageDlg(LanguageSetup.ProfileEditorToolsResetAllConfirm,mtConfirmation,[mbYes,mbNo],0)<>mrYes then exit;
-    For I:=0 to length(FrameList)-1 do begin
-      If not FrameList[I].AllowDefaultValueReset then continue;
-      If Assigned(FrameList[I].ResetToDefault) then FrameList[I].ResetToDefault(self,Template) else FrameList[I].IFrame.SetGame(Template,True);
-    end;
-  end else begin
-    If Tree.Selected=nil then exit;
-    I:=Integer(Tree.Selected.Data);
-    If FrameList[I].AllowDefaultValueReset then begin
-      If Assigned(FrameList[I].ResetToDefault) then FrameList[I].ResetToDefault(self,Template) else FrameList[I].IFrame.SetGame(Template,True);
-    end;
+  Case PageResetMode of
+    rmThis :       begin
+                     If Tree.Selected=nil then exit;
+                     I:=Integer(Tree.Selected.Data);
+                     If FrameList[I].AllowDefaultValueReset then begin
+                       If Assigned(FrameList[I].ResetToDefault) then FrameList[I].ResetToDefault(self,Template) else FrameList[I].IFrame.SetGame(Template,True);
+                     end;
+                   end;
+    rmAll :        begin
+                     If MessageDlg(LanguageSetup.ProfileEditorToolsResetAllConfirm,mtConfirmation,[mbYes,mbNo],0)<>mrYes then exit;
+                     For I:=0 to length(FrameList)-1 do begin
+                       If not FrameList[I].AllowDefaultValueReset then continue;
+                       If Assigned(FrameList[I].ResetToDefault) then FrameList[I].ResetToDefault(self,Template) else FrameList[I].IFrame.SetGame(Template,True);
+                     end;
+                   end;
+    rmAllButThis : begin
+                     If MessageDlg(LanguageSetup.ProfileEditorToolsResetAllButThisConfirm,mtConfirmation,[mbYes,mbNo],0)<>mrYes then exit;
+                     For I:=0 to length(FrameList)-1 do begin
+                       If not FrameList[I].AllowDefaultValueReset then continue;
+                       If I=Integer(Tree.Selected.Data) then continue;
+                       If Assigned(FrameList[I].ResetToDefault) then FrameList[I].ResetToDefault(self,Template) else FrameList[I].IFrame.SetGame(Template,True);
+                     end;
+                   end;
   end;
 end;
 
@@ -364,17 +394,17 @@ begin
     1 : RunGameWithCurrentConfig;
     2 : begin
           G:=TGame.Create(PrgSetup);
-          try ResetTo(G,False); finally G.Free; end;
+          try ResetTo(G,rmThis); finally G.Free; end;
         end;
     3 : begin
           G:=TGame.Create(PrgSetup);
-          try ResetTo(G,True); finally G.Free; end;
+          try ResetTo(G,rmAll); finally G.Free; end;
         end;
     4 : begin
           DB:=TGameDB.Create(PrgDataDir+AutoSetupSubDir,False);
           try
             Nr:=ShowSelectAutoSetupDialog(self,DB);
-            If Nr>=0 then ResetTo(DB[Nr],False);
+            If Nr>=0 then ResetTo(DB[Nr],rmThis);
           finally
             DB.Free;
           end;
@@ -383,7 +413,7 @@ begin
           DB:=TGameDB.Create(PrgDataDir+AutoSetupSubDir,False);
           try
             Nr:=ShowSelectAutoSetupDialog(self,DB);
-            If Nr>=0 then ResetTo(DB[Nr],True);
+            If Nr>=0 then ResetTo(DB[Nr],rmAll);
           finally
             DB.Free;
           end;
@@ -394,13 +424,21 @@ begin
           S:=ExtractFilePath(MakeAbsPath(S,PrgSetup.BaseDir));
           ShellExecute(Handle,'open',PChar(S),nil,PChar(S),SW_SHOW);
         end;
+    7: begin
+          G:=TGame.Create(PrgSetup);
+          try ResetTo(G,rmAllButThis); finally G.Free; end;
+       end;
     10000..19999 : begin
                      DB:=TGameDB.Create(PrgDataDir+TemplateSubDir,False);
-                     try ResetTo(DB[(Sender as TComponent).Tag-10000],False); finally DB.Free; end;
+                     try ResetTo(DB[(Sender as TComponent).Tag-10000],rmThis); finally DB.Free; end;
                    end;
     20000..29999 : begin
                      DB:=TGameDB.Create(PrgDataDir+TemplateSubDir,False);
-                     try ResetTo(DB[(Sender as TComponent).Tag-20000],True); finally DB.Free; end;
+                     try ResetTo(DB[(Sender as TComponent).Tag-20000],rmAll); finally DB.Free; end;
+                   end;
+    30000..39999 : begin
+                     DB:=TGameDB.Create(PrgDataDir+TemplateSubDir,False);
+                     try ResetTo(DB[(Sender as TComponent).Tag-20000],rmAllButThis); finally DB.Free; end;
                    end;
   end;
 end;
@@ -492,14 +530,7 @@ begin
         F:=TModernProfileEditorGUSFrame.Create(self); AddTreeNode(N2,F,TModernProfileEditorGUSFrame(F),LanguageSetup.ProfileEditorSoundGUS,5,20);
         F:=TModernProfileEditorMIDIFrame.Create(self); AddTreeNode(N2,F,TModernProfileEditorMIDIFrame(F),LanguageSetup.ProfileEditorSoundMIDI,5,21);
         If PrgSetup.AllowInnova then begin
-          //... 1.1: Add Innova profile editor page
-          {
-          [innova]
-          innova=false (Enable the Innovation SSI-2001 emulation.)
-          samplerate=22050 (Sample rate of Innovation SSI-2001 emulation. Possible values: 44100, 48000, 32000, 22050, 16000, 11025, 8000, 49716.)
-          sidbase=280 (SID base port (typically 280h). Possible values: 240, 220, 260, 280, 2a0, 2c0, 2e0, 300.)
-          quality=0 (Set SID emulation quality level (0 to 3). Possible values: 0, 1, 2, 3.)
-          }
+          F:=TModernProfileEditorInnovaFrame.Create(self); AddTreeNode(N2,F,TModernProfileEditorInnovaFrame(F),LanguageSetup.ProfileEditorSoundInnova,5,5);
         end;
         F:=TModernProfileEditorJoystickFrame.Create(self); AddTreeNode(N,F,TModernProfileEditorJoystickFrame(F),LanguageSetup.ProfileEditorSoundJoystick,5,16);
         F:=TModernProfileEditorDrivesFrame.Create(self); AddTreeNode(N,F,TModernProfileEditorDrivesFrame(F),LanguageSetup.ProfileEditorMountingSheet,4,4);

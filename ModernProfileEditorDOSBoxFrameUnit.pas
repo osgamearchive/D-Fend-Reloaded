@@ -45,6 +45,7 @@ type
     Procedure UpdateLanguageList;
     Procedure SelectInLanguageList(const LangName : String);
     Procedure SelectInConsoleList;
+    Procedure UpdateDOSBoxInstallationString;
   public
     { Public-Deklarationen }
     Constructor Create(AOwner : TComponent); override;
@@ -241,6 +242,15 @@ begin
   end;
 end;
 
+procedure TModernProfileEditorDOSBoxFrame.UpdateDOSBoxInstallationString;
+begin
+  If DefaultDOSBoxInstallationRadioButton.Checked then begin
+    ProfileDOSBoxInstallation^:=PrgSetup.DOSBoxSettings[DOSBoxInstallationComboBox.ItemIndex].Name;
+  end else begin
+    ProfileDOSBoxInstallation^:=CustomDOSBoxInstallationEdit.Text;
+  end;
+end;
+
 procedure TModernProfileEditorDOSBoxFrame.UpdateLanguageList;
 Var Save,DosBoxDir : String;
 begin
@@ -342,6 +352,7 @@ begin
   UpdateLanguageList;
   If not UserLanguageCheckBox.Checked then SelectInLanguageList('');
   If not UserConsoleCheckBox.Checked then SelectInConsoleList;
+  UpdateDOSBoxInstallationString;
 end;
 
 procedure TModernProfileEditorDOSBoxFrame.DOSBoxInstallationComboBoxChange(Sender: TObject);
@@ -350,6 +361,7 @@ begin
   UpdateLanguageList;
   If not UserLanguageCheckBox.Checked then SelectInLanguageList('');
   If not UserConsoleCheckBox.Checked then SelectInConsoleList;
+  UpdateDOSBoxInstallationString;
 end;
 
 procedure TModernProfileEditorDOSBoxFrame.CustomDOSBoxInstallationEditChange(Sender: TObject);
@@ -357,6 +369,7 @@ begin
   CustomDOSBoxInstallationRadioButton.Checked:=True;
   UpdateLanguageList;
   If not UserLanguageCheckBox.Checked then SelectInLanguageList('');
+  UpdateDOSBoxInstallationString;
 end;
 
 procedure TModernProfileEditorDOSBoxFrame.ButtonWork(Sender: TObject);

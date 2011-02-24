@@ -14,7 +14,7 @@ Function GetTempDOSBoxEnglishLangFile : String;
 implementation
 
 uses Windows, SysUtils, Math, CommonTools, PrgConsts, PrgSetupUnit,
-     DOSBoxTempUnit, DOSBoxUnit;
+     DOSBoxTempUnit, DOSBoxUnit, MainUnit;
 
 const SpecialChars : Array[0..6] of Char = (#27, 'É','Í','º','»','È','¼');
       SpecialSymbols : Array[0..6] of String = ('<ESC>','<UL>','<->','<|>','<UR>','<LL>','<LR>');
@@ -235,7 +235,7 @@ begin
     TempGame.Game.CloseDosBoxAfterGameExit:=True;
     TempGame.Game.CustomDOSBoxLanguage:='ENGLISH';
     TempGame.Game.StoreAllValues;
-    RunCommandAndWait(TempGame.Game,'CONFIG -writelang "'+result+'"'+#13+'exit',true);
+    RunCommandAndWait(TempGame.Game,DFendReloadedMainForm.DeleteOnExit,'CONFIG -writelang "'+result+'"'+#13+'exit',true);
   finally
     TempGame.Free;
   end;

@@ -94,7 +94,7 @@ object OperationModeInfoForm: TOperationModeInfoForm
     Width = 597
     Height = 17
     Anchors = [akLeft, akTop, akRight]
-    Caption = 'Useable without admin rights and under Windows Vista'
+    Caption = 'Useable without admin rights and under Windows Vista or higher'
     Enabled = False
     TabOrder = 5
   end

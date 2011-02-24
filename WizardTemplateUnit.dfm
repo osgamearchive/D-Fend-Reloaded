@@ -168,7 +168,7 @@ object WizardTemplateFrame: TWizardTemplateFrame
     Height = 21
     Style = csDropDownList
     Anchors = [akLeft, akTop, akRight]
-    ItemHeight = 13
+    ItemHeight = 0
     TabOrder = 1
     OnChange = IndirectTypeChange
   end
@@ -180,7 +180,7 @@ object WizardTemplateFrame: TWizardTemplateFrame
     Height = 21
     Style = csDropDownList
     Anchors = [akLeft, akTop, akRight]
-    ItemHeight = 13
+    ItemHeight = 0
     TabOrder = 3
     OnChange = IndirectTypeChange
   end
@@ -201,7 +201,7 @@ object WizardTemplateFrame: TWizardTemplateFrame
     Height = 21
     Style = csDropDownList
     Anchors = [akLeft, akTop, akRight]
-    ItemHeight = 13
+    ItemHeight = 0
     TabOrder = 7
     OnChange = IndirectTypeChange
   end
@@ -229,7 +229,7 @@ object WizardTemplateFrame: TWizardTemplateFrame
     Height = 21
     Style = csDropDownList
     Anchors = [akLeft, akTop, akRight]
-    ItemHeight = 13
+    ItemHeight = 0
     TabOrder = 5
     OnChange = IndirectTypeChange
   end
@@ -248,14 +248,13 @@ object WizardTemplateFrame: TWizardTemplateFrame
       Left = 16
       Top = 16
       Width = 71
-      Height = 42
+      Height = 13
       Anchors = [akLeft, akTop, akRight, akBottom]
       Caption = 'PanelInfoLabel'
       Color = clBtnFace
       ParentColor = False
       Transparent = True
       WordWrap = True
-      ExplicitHeight = 13
     end
     object OKButton: TBitBtn
       Left = 16

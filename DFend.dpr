@@ -220,14 +220,16 @@ uses
   FirstRunWizardFormUnit in 'FirstRunWizardFormUnit.pas' {FirstRunWizardForm},
   LoggingUnit in 'LoggingUnit.pas',
   WindowsFileWarningFormUnit in 'WindowsFileWarningFormUnit.pas' {WindowsFileWarningForm},
-  DOSBoxFailedFormUnit in 'DOSBoxFailedFormUnit.pas' {DOSBoxFailedForm},
   SetupFrameDOSBoxGlobalUnit in 'SetupFrameDOSBoxGlobalUnit.pas' {SetupFrameDOSBoxGlobal: TFrame},
   DOSBoxLangEditFormUnit in 'DOSBoxLangEditFormUnit.pas' {DOSBoxLangEditForm},
   DOSBoxLangTools in 'DOSBoxLangTools.pas',
   DOSBoxLangStartFormUnit in 'DOSBoxLangStartFormUnit.pas' {DOSBoxLangStartForm},
   SetupFrameDataPrivacyUnit in 'SetupFrameDataPrivacyUnit.pas' {SetupFrameDataPrivacy: TFrame},
   MIDITools in 'MIDITools.pas',
-  DOSBoxFailedForm2Unit in 'DOSBoxFailedForm2Unit.pas' {DOSBoxFailedForm2};
+  DOSBoxFailedFormUnit in 'DOSBoxFailedFormUnit.pas' {DOSBoxFailedForm},
+  ModernProfileEditorInnovaFrameUnit in 'ModernProfileEditorInnovaFrameUnit.pas' {ModernProfileEditorInnovaFrame: TFrame},
+  HistoryUnit in 'HistoryUnit.pas',
+  ExportGamesListFormUnit in 'ExportGamesListFormUnit.pas' {ExportGamesListForm};
 
 {$R *.res}
 

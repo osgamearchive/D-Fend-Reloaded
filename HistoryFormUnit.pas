@@ -38,7 +38,7 @@ Procedure ShowHistoryDialog(const AOwner : TComponent);
 implementation
 
 uses GameDBToolsUnit, LanguageSetupUnit, VistaToolsUnit, CommonTools,
-     HelpConsts, PrgSetupUnit, IconLoaderUnit;
+     HelpConsts, PrgSetupUnit, IconLoaderUnit, HistoryUnit;
 
 {$R *.dfm}
 
@@ -64,15 +64,15 @@ begin
   UserIconLoader.DialogImage(DI_Clear,ClearButton);
   UserIconLoader.DialogImage(DI_Help,HelpButton);
 
-  LoadHistory(ListView);
-  LoadHistoryStatistics(ListView2);
+  History.LoadHistory(ListView);
+  History.LoadStatistics(ListView2);
 
   List1CompareMode:=0; List2CompareMode:=0;
 end;
 
 procedure THistoryForm.ClearButtonClick(Sender: TObject);
 begin
-  ClearHistory;
+  History.Clear;
   Close;
 end;
 
@@ -96,17 +96,52 @@ end;
 
 procedure THistoryForm.ListViewCompare(Sender: TObject; Item1, Item2: TListItem; Data: Integer; var Compare: Integer);
 Var I : Integer;
+    J1,J2 : Integer;
+    D1,D2 : TDateTime;
 begin
   If Sender=ListView then I:=List1CompareMode else I:=List2CompareMode;
   Compare:=0;
-  If I=0 then exit;
-  If Abs(I)=1 then begin
-    If Item1.Caption>Item2.Caption then Compare:=1*I;
-    If Item1.Caption<Item2.Caption then Compare:=-1*I;
-  end else begin
-    If Item1.SubItems[Abs(I)-2]>Item2.SubItems[Abs(I)-2] then Compare:=1*I;
-    If Item1.SubItems[Abs(I)-2]<Item2.SubItems[Abs(I)-2] then Compare:=-1*I;
-  end;
+  Case Abs(I) of
+    0 : exit;
+    1 : begin
+          {Name}
+          If Item1.Caption>Item2.Caption then Compare:=1*I;
+          If Item1.Caption<Item2.Caption then Compare:=-1*I;
+        end;
+    2 : If Sender=ListView then begin
+          {Start date&time}
+          D1:=History.StartDateTime[Integer(Item1.Data)];
+          D2:=History.StartDateTime[Integer(Item2.Data)];
+          If D1>D2 then Compare:=1*I;
+          If D1<D2 then Compare:=-1*I;
+        end else begin
+          {Number of starts}
+          J1:=History.StartCount[Integer(Item1.Data)];
+          J2:=History.StartCount[Integer(Item2.Data)];
+          If J1>J2 then Compare:=1*I;
+          If J1<J2 then Compare:=-1*I;
+        end;
+    3 : If Sender=ListView then begin
+          {Number of starts}
+          J1:=History.StartCount[Integer(Item1.Data)];
+          J2:=History.StartCount[Integer(Item2.Data)];
+          If J1>J2 then Compare:=1*I;
+          If J1<J2 then Compare:=-1*I;
+        end else begin
+          {First start}
+          D1:=History.StartDateTimeFirst[Integer(Item1.Data)];
+          D2:=History.StartDateTimeFirst[Integer(Item2.Data)];
+          If D1>D2 then Compare:=1*I;
+          If D1<D2 then Compare:=-1*I;
+        end;
+    4 : If Sender<>ListView then begin
+          {Last start}
+          D1:=History.StartDateTimeLast[Integer(Item1.Data)];
+          D2:=History.StartDateTimeLast[Integer(Item2.Data)];
+          If D1>D2 then Compare:=1*I;
+          If D1<D2 then Compare:=-1*I;
+        end;
+  End;
 end;
 
 procedure THistoryForm.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);

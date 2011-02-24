@@ -124,7 +124,7 @@ implementation
 uses ShellAPI, Math, CommonTools, VistaToolsUnit, LanguageSetupUnit,
      PrgSetupUnit, PrgConsts, DOSBoxUnit, HelpConsts, IconLoaderUnit,
      ViewImageFormUnit, PlaySoundFormUnit, PlayVideoFormUnit, GameDBToolsUnit,
-     ClassExtensions, DOSBoxTempUnit;
+     ClassExtensions, DOSBoxTempUnit, MainUnit;
 
 {$R *.dfm}
 
@@ -1039,7 +1039,7 @@ begin
 
     TempGame.Game.GameExe:=FileName;
 
-    RunGame(TempGame.Game);
+    RunGame(TempGame.Game,DFendReloadedMainForm.DeleteOnExit);
   finally
     Sleep(100);
     TempGame.Free;

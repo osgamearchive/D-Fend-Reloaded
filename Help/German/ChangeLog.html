@@ -16,6 +16,7 @@
 <h1>Versionsgeschichte</h1>
 
 <p class="small">
+  <a href="#ver110">Version 1.1.0 (25.02.2011)</a><br />
   <a href="#ver103">Version 1.0.3 (15.11.2010)</a><br />
   <a href="#ver102">Version 1.0.2 (25.10.2010)</a><br />
   <a href="#ver101">Version 1.0.1 (13.09.2010)</a><br />
@@ -45,6 +46,43 @@
 <p>
 Die einzelnen Eintr&auml;ge zur Versionsgeschichte liegen leider nur auf Englisch vor.
 </p>
+
+<a onclick="Work('ver110')" name="ver110" href="#"><h2>&raquo; Version 1.1.0 (02/25/2011)</h2></a>
+<div id="ver110">
+<ul>
+  <li>Updated DOSZip from 2.05 to 2.08.</li>
+  <li>New option in the mobygames data reader to download all images available for some game.</li>
+  <li>Setup option to configure if history information of started games shall be collected or not.</li>
+  <li>Support for more special ykhwong DOSBox builds features.</li>
+  <li>New optional games list column: Number of starts of the profile.</li>
+  <li>When exporting the games list you can choose which fields to export.</li>
+  <li>Now the package list creation and package download system can handle packages larger than 2 GB by splitting them.</li>
+  <li>The names for the files to look for a profile name suggestion when importing plain archive files (default: FILE_ID.DIZ) is configurareable now.</li>
+  <li>The history viewer dialog opens much faster now.</li>
+  <li>The games list tooltips now also tells how often the selected profile has been started.</li>
+  <li>New setup dialog option to configure whether D-Fend Reloaded should add a trailing backslash to path names when calling an external packer or not. (uha needs path names without trailing backslashs.)</li>
+  <li>Default command line parameter values for the external packers uha and arj32 are included now.</li>
+  <li>User defined emulators will be listed as sub entries below "Emulation type" in the games list filter tree.</li>
+  <li>A new option to filter the games list by game license is offered in the filter tree.</li>
+  <li>Setup option to rename all media files in all profiles.</li>
+  <li>The "Starting DOSBox failed" dialog now also allows to change the selected SDL video driver.</li>
+  <li>Option to reselect the last selected profile on program restart.</li>
+  <li>The games list can be exported as a xml file now.</li>
+  <li>New option in the icons library to rename all icon files to have upper or lower file extensions.</li>
+  <li>The package manager will display the download size of the selected games now.</li>
+  <li>Some more new auto setup templates.</li>
+  <li>The package manager will open faster now.</li>
+  <li>Lower memory consumption on downloading large files via the package manager.</li>
+  <li>Tuned the game and setup file detection code.</li>
+  <li>[Fix] The automatic translation of the license fields in the profiles failed.</li>
+  <li>[Fix] Sorting the columns in the history dialog by clicking the column headers did not work for all columns correctly.</li>
+  <li>[Fix] The second last games list column could not be moved down (to be the last column) on the games list columns editor in the setup dialog.</li>
+  <li>[Fix] Template names and custom game information keys containing "&amp;" can cause problems.</li>
+  <li>[Fix] When running from a network share not connected to a drive letter starting DOSBox failed.</li>
+  <li>[Fix] When clicking the zoom button in the video previewer while a damaged video file is selected or the needed codec is missing a division by zero error message appeared.</li>
+  <li>[Fix] Access violation when using the "Start" dialog from the tray icon menu and opening a second dialog from the tray icon menu while the first dialog is still open.</li>
+</ul>
+</div>
 
 <a onclick="Work('ver103')" name="ver103" href="#"><h2>&raquo; Version 1.0.3 (11/15/2010)</h2></a>
 <div id="ver103">

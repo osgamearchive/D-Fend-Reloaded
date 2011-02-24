@@ -3,8 +3,8 @@ object UninstallForm: TUninstallForm
   Top = 0
   BorderIcons = [biSystemMenu]
   BorderStyle = bsSizeToolWin
-  Caption = 'Programm deinstallieren'
-  ClientHeight = 276
+  Caption = 'Uninstall program'
+  ClientHeight = 277
   ClientWidth = 684
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -23,9 +23,9 @@ object UninstallForm: TUninstallForm
   TextHeight = 13
   object ListBox: TCheckListBox
     Left = 0
-    Top = 33
+    Top = 81
     Width = 684
-    Height = 209
+    Height = 162
     Align = alClient
     ItemHeight = 13
     TabOrder = 0
@@ -34,21 +34,47 @@ object UninstallForm: TUninstallForm
     Left = 0
     Top = 0
     Width = 684
-    Height = 33
+    Height = 81
     Align = alTop
     BevelOuter = bvNone
     TabOrder = 1
+    DesignSize = (
+      684
+      81)
     object InfoLabel: TLabel
       Left = 8
-      Top = 10
-      Width = 264
+      Top = 62
+      Width = 201
       Height = 13
-      Caption = 'Bitte w'#228'hlen Sie die zu deinstallierenden Komponenten:'
+      Anchors = [akLeft, akBottom]
+      Caption = 'Please select the components to uninstall:'
+    end
+    object DeleteRadioButton: TRadioButton
+      Left = 8
+      Top = 9
+      Width = 665
+      Height = 17
+      Anchors = [akLeft, akTop, akRight]
+      Caption = 'Only remove profile, keep game files'
+      Checked = True
+      TabOrder = 0
+      TabStop = True
+      OnClick = RadioButtonWork
+    end
+    object UninstallRadioButton: TRadioButton
+      Left = 8
+      Top = 32
+      Width = 665
+      Height = 17
+      Anchors = [akLeft, akTop, akRight]
+      Caption = 'Uninstall selected components'
+      TabOrder = 1
+      OnClick = RadioButtonWork
     end
   end
   object Panel2: TPanel
     Left = 0
-    Top = 242
+    Top = 243
     Width = 684
     Height = 34
     Align = alBottom

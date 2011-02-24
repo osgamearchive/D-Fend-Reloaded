@@ -69,7 +69,6 @@ object IconManagerForm: TIconManagerForm
     OnDblClick = ListViewDblClick
     OnDragDrop = ListViewDragDrop
     OnKeyDown = ListViewKeyDown
-    ExplicitWidth = 551
   end
   object OKButton: TBitBtn
     Left = 8
@@ -148,7 +147,6 @@ object IconManagerForm: TIconManagerForm
     Checked = True
     TabOrder = 1
     TabStop = True
-    ExplicitWidth = 535
   end
   object CustomIconRadioButton: TRadioButton
     Left = 8
@@ -167,7 +165,6 @@ object IconManagerForm: TIconManagerForm
     Anchors = [akLeft, akRight, akBottom]
     TabOrder = 3
     OnChange = CustomIconEditChange
-    ExplicitWidth = 285
   end
   object HelpButton: TBitBtn
     Left = 420

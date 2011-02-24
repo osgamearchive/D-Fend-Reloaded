@@ -119,6 +119,7 @@ ProfileEditSoundVolume.html
 ProfileEditSoundSoundBlaster.html
 ProfileEditSoundGUS.html
 ProfileEditSoundMIDI.html
+ProfileEditSoundInnova.html
 ProfileEditJoystick.html
 ProfileEditDrives.html
 ProfileEditSerialPorts.html
@@ -128,7 +129,6 @@ ProfileEditDOSEnvironment.html
 ProfileEditStarting.html
 ProfileEditClassic.html
 ProfileCopy.html
-ProfileDelete.html
 ProfileUninstall.html
 ProfileMakeInstallerPackage.html
 ProfileMakeZipPackage.html
@@ -168,6 +168,7 @@ HelpOldGames.html
 HelpStatistics.html
 HelpOperationMode.html
 HelpSearchForUpdates.html
+HelpGetGames.html
 Changelog.html
 FAQ.html
 GPL3.html
@@ -182,6 +183,7 @@ GPL3.html
 
 #define FileExportConf 1001
 #define FileExportProf 1002
+#define FileExportList 1003
 #define FileImportZip 1011
 #define FileImportPackage 1014
 #define FileExportBuildInstallers 1012
@@ -273,6 +275,7 @@ GPL3.html
 #define ProfileEditHelperPrograms 2124
 #define ProfileEditHardware 2125
 #define ProfileEditAdditionalChecksums 2126
+#define ProfileEditSoundInnova 2127
 
 #define ExtrasManageIcons 3001
 #define ExtrasViewHistory 3002
@@ -297,10 +300,11 @@ GPL3.html
 #define ExtrasLanguageEditorDOSBox 3023
 
 #define HelpForum 4001
-#define HelpOldGames 4006
 #define HelpStatistics 4003
 #define HelpOperationMode 4004
 #define HelpSearchForUpdates 4005
+#define HelpOldGames 4006
+#define HelpGetGames 4007
 
 [INFOTYPES]
 

@@ -3,7 +3,7 @@ object WizardForm: TWizardForm
   Top = 0
   BorderStyle = bsDialog
   Caption = 'WizardForm'
-  ClientHeight = 526
+  ClientHeight = 574
   ClientWidth = 604
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -23,12 +23,13 @@ object WizardForm: TWizardForm
   TextHeight = 13
   object BottomPanel: TPanel
     Left = 0
-    Top = 485
+    Top = 533
     Width = 604
     Height = 41
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 0
+    ExplicitTop = 485
     object PreviousButton: TBitBtn
       Left = 8
       Top = 8

@@ -40,6 +40,7 @@ type
     JustChanging : Boolean;
     Procedure InitialFolderCheck;
     Procedure SelectFilesFromAutoSetupTemplate;
+    Function GetProfileNameFromFile(TempFolder: String; const FileName : String) : String;
     Function GetProfileNameFromFileIdDiz(TempFolder : String) : String;
   public
     { Public-Deklarationen }
@@ -138,13 +139,13 @@ begin
   If St.Count>0 then result:=St[0];
 end;
 
-function TSelectTemplateForZipImportForm.GetProfileNameFromFileIdDiz(TempFolder: String): String;
+Function TSelectTemplateForZipImportForm.GetProfileNameFromFile(TempFolder: String; const FileName : String) : String;
 Var S,T : String;
     St : TStringList;
     I,J : Integer;
 begin
   result:='';
-  S:=IncludeTrailingPathDelimiter(TempFolder)+'FILE_ID.DIZ';
+  S:=IncludeTrailingPathDelimiter(TempFolder)+FileName;
   If not FileExists(S) then exit;
   St:=TStringList.Create;
   try
@@ -152,9 +153,24 @@ begin
     For I:=0 to St.Count-1 do begin
       S:=Trim(St[I]);
       T:='';
-      For J:=1 to length(S) do if (S[J]>=#32) and (S[J]<=#127) then T:=T+S[J];
+      For J:=1 to length(S) do if (S[J]>=#32) and (S[J]<=#127) and (S[J]<>'=') and (S[J]<>'|') then T:=T+S[J];
       T:=Trim(T);
       If length(T)>5 then begin result:=T; exit; end;
+    end;
+  finally
+    St.Free;
+  end;
+end;
+
+function TSelectTemplateForZipImportForm.GetProfileNameFromFileIdDiz(TempFolder: String) : String;
+Var St : TStringList;
+    I : Integer;
+begin
+  St:=ValueToList(PrgSetup.ArchiveIDFiles);
+  try
+    For I:=0 to St.Count-1 do begin
+      result:=GetProfileNameFromFile(TempFolder,St[I]);
+      If result<>'' then break;
     end;
   finally
     St.Free;

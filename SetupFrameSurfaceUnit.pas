@@ -64,7 +64,7 @@ Var I : Integer;
     S : String;
 begin
   NoFlicker(StartSizeComboBox);
-  NoFlicker(IconSetListbox);
+  {NoFlicker(IconSetListbox); - will cause trouble}
 
   StartSizeComboBox.ItemIndex:=Max(0,Min(StartSizeComboBox.Items.Count-1,PrgSetup.StartWindowSize));
 

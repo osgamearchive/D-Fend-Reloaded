@@ -32,6 +32,7 @@ type
     ShowTooltipsCheckBox: TCheckBox;
     NoteInTooltipLabel: TLabel;
     NoteInTooltipEdit: TSpinEdit;
+    RestoreSelectedCheckBox: TCheckBox;
     procedure GamesListBackgroundColorBoxChange(Sender: TObject);
     procedure GamesListBackgroundEditChange(Sender: TObject);
     procedure GamesListBackgroundButtonClick(Sender: TObject);
@@ -93,6 +94,7 @@ begin
   NoFlicker(WindowsExeIconsCheckBox);
   NoFlicker(ShowTooltipsCheckBox);
   NoFlicker(NoteInTooltipEdit);
+  NoFlicker(RestoreSelectedCheckBox);
 
   S:=Trim(PrgSetup.GamesListViewBackground);
   If S='' then GamesListBackgroundRadioButton1.Checked:=True else begin
@@ -129,6 +131,8 @@ begin
   ShowTooltipsCheckBox.Checked:=PrgSetup.ShowTooltips;
   NoteInTooltipEdit.Value:=Min(100,Max(1,PrgSetup.NoteLinesInTooltips));
 
+  RestoreSelectedCheckBox.Checked:=PrgSetup.RestoreLastSelectedProfile;
+
   UserIconLoader.DialogImage(DI_SelectFile,GamesListBackgroundButton);
 end;
 
@@ -164,6 +168,7 @@ begin
   WindowsExeIconsCheckBox.Caption:=LanguageSetup.SetupFormUseWindowsExeIcons;
   ShowTooltipsCheckBox.Caption:=LanguageSetup.MenuViewShowTooltips;
   NoteInTooltipLabel.Caption:=LanguageSetup.SetupFormNoteLinesInTooltips;
+  RestoreSelectedCheckBox.Caption:=LanguageSetup.SetupFormRestoreSelectedProfile;
 
   HelpContext:=ID_FileOptionsAppearanceList;
 end;
@@ -206,6 +211,7 @@ begin
   WindowsExeIconsCheckBox.Checked:=True;
   ShowTooltipsCheckBox.Checked:=True;
   NoteInTooltipEdit.Value:=5;
+  RestoreSelectedCheckBox.Checked:=False;
 end;
 
 procedure TSetupFrameGamesListAppearance.SaveSetup;
@@ -224,6 +230,7 @@ begin
   PrgSetup.UseWindowsExeIcons:=WindowsExeIconsCheckBox.Checked;
   PrgSetup.ShowTooltips:=ShowTooltipsCheckBox.Checked;
   PrgSetup.NoteLinesInTooltips:=NoteInTooltipEdit.Value;
+  PrgSetup.RestoreLastSelectedProfile:=RestoreSelectedCheckBox.Checked;
 end;
 
 procedure TSetupFrameGamesListAppearance.GamesListBackgroundColorBoxChange(Sender: TObject);

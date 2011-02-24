@@ -36,6 +36,10 @@ type
     ResolutionInfoLabel: TLabel;
     GlideEmulationLabel: TLabel;
     GlideEmulationComboBox: TComboBox;
+    GlideEmulationPortLabel: TLabel;
+    GlideEmulationPortComboBox: TComboBox;
+    GlideEmulationLFBLabel: TLabel;
+    GlideEmulationLFBComboBox: TComboBox;
     procedure PixelShaderComboBoxChange(Sender: TObject);
   private
     { Private-Deklarationen }
@@ -53,7 +57,7 @@ type
 
 implementation
 
-uses VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgSetupUnit, HelpConsts;
+uses Math, VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgSetupUnit, HelpConsts;
 
 {$R *.dfm}
 
@@ -72,6 +76,8 @@ begin
   NoFlicker(DoublebufferingCheckBox);
   NoFlicker(KeepAspectRatioCheckBox);
   NoFlicker(GlideEmulationComboBox);
+  NoFlicker(GlideEmulationPortComboBox);
+  NoFlicker(GlideEmulationLFBComboBox);
   NoFlicker(RenderComboBox);
   NoFlicker(VideoCardComboBox);
   NoFlicker(PixelShaderComboBox);
@@ -94,6 +100,8 @@ begin
   DoublebufferingCheckBox.Caption:=LanguageSetup.GameUseDoublebuffering;
   KeepAspectRatioCheckBox.Caption:=LanguageSetup.GameAspectCorrection;
   GlideEmulationLabel.Caption:=LanguageSetup.GameGlideEmulation;
+  GlideEmulationPortLabel.Caption:=LanguageSetup.GameGlideEmulationPort;
+  GlideEmulationLFBLabel.Caption:=LanguageSetup.GameGlideEmulationLFB;
 
   St:=ValueToList(InitData.GameDB.ConfOpt.GlideEmulation,';,');
   try
@@ -107,7 +115,20 @@ begin
   finally
     St.Free;
   end;
-  //... 1.1: Glide settings: (grport=600 (I/O port to use for host communication), lfb=full (LFB access: full,read,write,none.))
+  St:=ValueToList(InitData.GameDB.ConfOpt.GlideEmulationPort,';,');
+  try
+    GlideEmulationPortComboBox.Items.Clear;
+    GlideEmulationPortComboBox.Items.AddStrings(St);
+  finally
+    St.Free;
+  end;
+  St:=ValueToList(InitData.GameDB.ConfOpt.GlideEmulationLFB,';,');
+  try
+    GlideEmulationLFBComboBox.Items.Clear;
+    GlideEmulationLFBComboBox.Items.AddStrings(St);
+  finally
+    St.Free;
+  end;
   RenderLabel.Caption:=LanguageSetup.GameRender;
   St:=ValueToList(InitData.GameDB.ConfOpt.Render,';,'); try RenderComboBox.Items.AddStrings(St); finally St.Free; end;
   VideoCardLabel.Caption:=LanguageSetup.GameVideoCard;
@@ -163,6 +184,10 @@ begin
   KeepAspectRatioCheckBox.Checked:=Game.AspectCorrection;
   GlideEmulationLabel.Visible:=PrgSetup.AllowGlideSettings;
   GlideEmulationComboBox.Visible:=PrgSetup.AllowGlideSettings;
+  GlideEmulationPortLabel.Visible:=PrgSetup.AllowGlideSettings;
+  GlideEmulationPortComboBox.Visible:=PrgSetup.AllowGlideSettings;
+  GlideEmulationLFBLabel.Visible:=PrgSetup.AllowGlideSettings;
+  GlideEmulationLFBComboBox.Visible:=PrgSetup.AllowGlideSettings;
   If PrgSetup.AllowGlideSettings then begin
     S:=Trim(ExtUpperCase(Game.GlideEmulation));
     If (S='0') or (S='FALSE') then S:=LanguageSetup.Off;
@@ -171,6 +196,16 @@ begin
     GlideEmulationComboBox.ItemIndex:=0;
     For I:=0 to GlideEmulationComboBox.Items.Count-1 do If Trim(ExtUpperCase(GlideEmulationComboBox.Items[I]))=S then begin
       GlideEmulationComboBox.ItemIndex:=I; break;
+    end;
+    S:=Trim(ExtUpperCase(Game.GlidePort));
+    GlideEmulationPortComboBox.ItemIndex:=0;
+    For I:=0 to GlideEmulationPortComboBox.Items.Count-1 do If Trim(ExtUpperCase(GlideEmulationPortComboBox.Items[I]))=S then begin
+      GlideEmulationPortComboBox.ItemIndex:=I; break;
+    end;
+    S:=Trim(ExtUpperCase(Game.GlideLFB));
+    GlideEmulationLFBComboBox.ItemIndex:=0;
+    For I:=0 to GlideEmulationLFBComboBox.Items.Count-1 do If Trim(ExtUpperCase(GlideEmulationLFBComboBox.Items[I]))=S then begin
+      GlideEmulationLFBComboBox.ItemIndex:=I; break;
     end;
   end;
 
@@ -294,6 +329,8 @@ begin
     If S=LanguageSetup.On then S:='true';
     If S=LanguageSetup.Off then S:='false';
     Game.GlideEmulation:=S;
+    Game.GlidePort:=GlideEmulationPortComboBox.Text;
+    Game.GlideLFB:=GlideEmulationLFBComboBox.Items[max(0,GlideEmulationLFBComboBox.ItemIndex)];
   end;
   Game.Render:=RenderComboBox.Text;
   S:=Trim(VideoCardComboBox.Text);

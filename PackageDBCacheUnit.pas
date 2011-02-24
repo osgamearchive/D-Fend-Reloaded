@@ -54,7 +54,7 @@ begin
   FName:=AName;
   FDescription:=ADescription;
   FFilename:=AFilename;
-  FPackageChecksum:=GetMD5Sum(FFilename);
+  FPackageChecksum:=GetMD5Sum(FFilename,False);
 
   If not FileExists(FFilename) then exit;
   I:=FindFirst(FFilename,faAnyFile,Rec);

@@ -168,18 +168,20 @@ const NR_Author=1;
       NR_MessageWindowsExeExecuteWarning=20044;
       NR_MessageWindowsExeExecuteWarningTurnOff=20045;
       NR_MessageWindowsExeEditWarning=20046;
-      NR_MessageDOSExeExecuteWarning=20047;
-      NR_MessageDOSExeEditWarning=20048;
-      NR_MessageZipImportError=20049;
-      NR_MessageFolderImportError=20050;
-      NR_MessageConfirmationDeleteFile=20051;
-      NR_MessageConfirmationDeleteFolder=20052;
-      NR_MessageDOSBoxOutdated=20053;
-      NR_MessageDOSBoxOutdatedShort=20054;
-      NR_MessageDirectoryAlreadyExists=20055;
-      NR_MessageCouldNotCopyDirectoriesToCapture=20056;
-      NR_MessageNoFolderNameForMounting=20057;
-      NR_MessageCouldNotFindScummVM=20058;
+      NR_MessageWindowsExeImportArchiveWarning=20047;
+      NR_MessageWindowsExeImportFolderWarning=20048;
+      NR_MessageDOSExeExecuteWarning=20049;
+      NR_MessageDOSExeEditWarning=20050;
+      NR_MessageZipImportError=20051;
+      NR_MessageFolderImportError=20052;
+      NR_MessageConfirmationDeleteFile=20053;
+      NR_MessageConfirmationDeleteFolder=20054;
+      NR_MessageDOSBoxOutdated=20055;
+      NR_MessageDOSBoxOutdatedShort=20056;
+      NR_MessageDirectoryAlreadyExists=20057;
+      NR_MessageCouldNotCopyDirectoriesToCapture=20058;
+      NR_MessageNoFolderNameForMounting=20059;
+      NR_MessageCouldNotFindScummVM=20060;
       NR_MessageShortNameErrorParentNotFound=20101;
       NR_MessageShortNameErrorDelimiterInFileName=20102;
       NR_MessageShortNameErrorFileNotFound=20103;
@@ -215,16 +217,27 @@ const NR_Author=1;
       NR_MenuFileExportGamesList=30019;
       NR_MenuFileExportGamesListDialog=30020;
       NR_MenuFileExportGamesListFilter=30021;
-      NR_MenuFileExportGamesListHTMLTitle=30022;
-      NR_MenuFileExportPackageList=30023;
-      NR_MenuFileCreateConf=30024;
-      NR_MenuFileCreateProf=30025;
-      NR_MenuFileCreateZIP=30026;
-      NR_MenuFileCreateInstaller=30027;
-      NR_MenuFileExportBuildInstaller=30028;
-      NR_MenuFileExportBuildZipPackages=30029;
-      NR_MenuFileSetup=30030;
-      NR_MenuFileQuit=30031;
+      NR_MenuFileExportGamesListFormat=30022;
+      NR_MenuFileExportGamesListFormatAuto=30023;
+      NR_MenuFileExportGamesListFormatText=30024;
+      NR_MenuFileExportGamesListFormatTable=30025;
+      NR_MenuFileExportGamesListFormatHTML=30026;
+      NR_MenuFileExportGamesListFormatXML=30027;
+      NR_MenuFileExportGamesListFileNameInfo=30028;
+      NR_MenuFileExportGamesListHTMLTitle=30029;
+      NR_MenuFileExportGamesListListBoxLabel=30030;
+      NR_MenuFileExportGamesListFileNameEdit=30031;
+      NR_MenuFileExportPackageList=30032;
+      NR_MenuFileCreateConf=30033;
+      NR_MenuFileCreateProf=30034;
+      NR_MenuFileCreateZIP=30035;
+      NR_MenuFileCreateInstaller=30036;
+      NR_MenuFileExportBuildInstaller=30037;
+      NR_MenuFileExportBuildZipPackages=30038;
+      NR_MenuFileExportBuildZipPackagesWait=30039;
+      NR_MenuFileExportBuildZipPackagesSplit=30040;
+      NR_MenuFileSetup=30041;
+      NR_MenuFileQuit=30042;
       NR_MenuView=31001;
       NR_MenuViewShowMenubar=31002;
       NR_MenuViewShowMenubarWarning=31003;
@@ -357,6 +370,7 @@ const NR_Author=1;
       NR_MenuHelpContent=35036;
       NR_MenuHelpIntroduction=35037;
       NR_MenuHelpAddingGames=35038;
+      NR_MenuHelpGetGames=35039;
       NR_ButtonClose=36001;
       NR_ButtonRun=36002;
       NR_ButtonRunSetup=36003;
@@ -543,7 +557,7 @@ const NR_Author=1;
       NR_ProfileEditorSoundMIDIConfigButtonInfo=40630;
       NR_ProfileEditorSoundMIDIConfigID=40631;
       NR_ProfileEditorSoundMIDIConfigIDInfo=40632;
-      NR_ProfileEditorSoundJoystickType=406233;
+      NR_ProfileEditorSoundJoystickType=40633;
       NR_ProfileEditorSoundJoystickTimed=40634;
       NR_ProfileEditorSoundJoystickAutoFire=40635;
       NR_ProfileEditorSoundJoystickSwap34=40636;
@@ -561,6 +575,11 @@ const NR_Author=1;
       NR_ProfileEditorSoundMiscPCSpeaker=40648;
       NR_ProfileEditorSoundFM=40649;
       NR_ProfileEditorSoundCD=40650;
+      NR_ProfileEditorSoundInnova=40651;
+      NR_ProfileEditorSoundInnovaEnable=40652;
+      NR_ProfileEditorSoundInnovaSampleRate=40653;
+      NR_ProfileEditorSoundInnovaBaseAddress=40654;
+      NR_ProfileEditorSoundInnovaQuality=40655;
       NR_ProfileEditorAutoexecSheet=40701;
       NR_ProfileEditorAutoexecOverrideGameStart=40702;
       NR_ProfileEditorAutoexecOverrideMounting=40703;
@@ -657,16 +676,19 @@ const NR_Author=1;
       NR_ProfileEditorDefaultValueHint=40998;
       NR_ProfileEditorTools=41000;
       NR_ProfileEditorToolsRun=41001;
-      NR_ProfileEditorToolsResetAllConfirm=41002;
-      NR_ProfileEditorToolsResetPage=41003;
-      NR_ProfileEditorToolsResetAll=41004;
-      NR_ProfileEditorToolsResetToTemplate=41005;
-      NR_ProfileEditorToolsResetToTemplatePage=41006;
-      NR_ProfileEditorToolsResetToTemplateAll=41007;
-      NR_ProfileEditorToolsResetToAutoSetup=41008;
-      NR_ProfileEditorToolsResetToAutoSetupPage=41009;
-      NR_ProfileEditorToolsResetToAutoSetupAll=41010;
-      NR_ProfileEditorToolsResetToAutoSetupSelect=41011;
+      NR_ProfileEditorToolsResetAllButThisConfirm=41002;
+      NR_ProfileEditorToolsResetAllConfirm=41003;
+      NR_ProfileEditorToolsResetPage=41004;
+      NR_ProfileEditorToolsResetAllButThis=41005;
+      NR_ProfileEditorToolsResetAll=41006;
+      NR_ProfileEditorToolsResetToTemplate=41007;
+      NR_ProfileEditorToolsResetToTemplatePage=41008;
+      NR_ProfileEditorToolsResetToTemplateAllButThis=41009;
+      NR_ProfileEditorToolsResetToTemplateAll=41010;
+      NR_ProfileEditorToolsResetToAutoSetup=41011;
+      NR_ProfileEditorToolsResetToAutoSetupPage=41012;
+      NR_ProfileEditorToolsResetToAutoSetupAll=41013;
+      NR_ProfileEditorToolsResetToAutoSetupSelect=41014;
 
       NR_ProfileMounting=42001;
       NR_ProfileMountingFolderSheet=42002;
@@ -978,22 +1000,23 @@ const NR_Author=1;
       NR_SetupFormShowGridLines=43940;
       NR_SetupFormUseWindowsExeIcons=43941;
       NR_SetupFormNoteLinesInTooltips=43942;
-      NR_SetupFormStoreColumnWidths=43943;
-      NR_SetupFormTextEditor=43944;
-      NR_SetupFormTextEditorDefault=43945;
-      NR_SetupFormTextEditorDefaultFallback=43946;
-      NR_SetupFormTextEditorNotepad=43947;
-      NR_SetupFormTextEditorCustom=43948;
-      NR_SetupFormTextEditorCustomOpenCaption=43949;
-      NR_SetupFormTextEditorFixLineWrap=43950;
-      NR_SetupFormTextMediaViewer=43951;
-      NR_SetupFormTextMediaViewerImages=43952;
-      NR_SetupFormTextMediaViewerSounds=43953;
-      NR_SetupFormTextMediaViewerVideos=43954;
-      NR_SetupFormTextMediaViewerInterval=43955;
-      NR_SetupFormTextMediaViewerDefault=43956;
-      NR_SetupFormTextMediaViewerCustom=43957;
-      NR_SetupFormTextMediaViewerCustomOpenCaption=43958;
+      NR_SetupFormRestoreSelectedProfile=43943;
+      NR_SetupFormStoreColumnWidths=43944;
+      NR_SetupFormTextEditor=43945;
+      NR_SetupFormTextEditorDefault=43946;
+      NR_SetupFormTextEditorDefaultFallback=43947;
+      NR_SetupFormTextEditorNotepad=43948;
+      NR_SetupFormTextEditorCustom=43949;
+      NR_SetupFormTextEditorCustomOpenCaption=43950;
+      NR_SetupFormTextEditorFixLineWrap=43951;
+      NR_SetupFormTextMediaViewer=43952;
+      NR_SetupFormTextMediaViewerImages=43953;
+      NR_SetupFormTextMediaViewerSounds=43954;
+      NR_SetupFormTextMediaViewerVideos=43955;
+      NR_SetupFormTextMediaViewerInterval=43956;
+      NR_SetupFormTextMediaViewerDefault=43957;
+      NR_SetupFormTextMediaViewerCustom=43958;
+      NR_SetupFormTextMediaViewerCustomOpenCaption=43959;
 
       NR_SetupFormWine=44001;
       NR_SetupFormWineEnable=44002;
@@ -1032,6 +1055,7 @@ const NR_Author=1;
       NR_SetupFormExternalPackersCommandAdd=44308;
       NR_SetupFormExternalPackersInfo=44309;
       NR_SetupFormExternalPackersSetupButton=44310;
+      NR_SetupFormExternalPackersTrailingBackslash=44311;
 
       NR_SetupFormGamesListTranslations=44401;
       NR_SetupFormGamesListTranslationsEnglish=44402;
@@ -1080,22 +1104,22 @@ const NR_Author=1;
       NR_SetupFormAutomaticConfigurationArchiveImport=44751;
       NR_SetupFormAutomaticConfigurationArchiveImportNoDialog=44752;
       NR_SetupFormAutomaticConfigurationInstallerNames=44753;
+      NR_SetupFormAutomaticConfigurationArchiveIDFiles=44754;
 
       NR_SetupFormDataPrivacy=44800;
       NR_SetupFormDataPrivacyStoreHistory=44801;
       NR_SetupFormDataPrivacyShowHistory=44802;
       NR_SetupFormDataPrivacyDeleteHistory=44803;
       NR_SetupFormDataPrivacyDeleteHistoryDone=44804;
-      NR_SetupFormDataPrivacyOpenHistroyFile=44805;
+      NR_SetupFormDataPrivacyOpenHistoryFile=44805;
       NR_SetupFormDataPrivacyInfo=44806;
 
       NR_HistoryForm=44901;
       NR_HistoryGame=44902;
-      NR_HistoryDate=44903;
-      NR_HistoryTime=44904;
-      NR_HistoryStarts=44905;
-      NR_HistoryFirst=44906;
-      NR_HistoryLast=44907;
+      NR_HistoryDateTime=44903;
+      NR_HistoryStarts=44904;
+      NR_HistoryFirst=44905;
+      NR_HistoryLast=44906;
 
       NR_TemplateForm=45001;
       NR_TemplateFormAutoSetupCaption=45002;
@@ -1121,14 +1145,16 @@ const NR_Author=1;
 
       NR_UninstallForm=46001;
       NR_UninstallFormLabel=46002;
-      NR_UninstallFormProfileRecord=46003;
-      NR_UninstallFormProgramDir=46004;
-      NR_UninstallFormSaveDir=46005;
-      NR_UninstallFormCaptureFolder=46006;
-      NR_UninstallFormDataDir=46007;
-      NR_UninstallFormExtraFile=46008;
-      NR_UninstallFormExtraDir=46009;
-      NR_UninstallFormIcon=46010;
+      NR_UninstallFormDelete=46003;
+      NR_UninstallFormUninstall=46004;
+      NR_UninstallFormProfileRecord=46005;
+      NR_UninstallFormProgramDir=46006;
+      NR_UninstallFormSaveDir=46007;
+      NR_UninstallFormCaptureFolder=46008;
+      NR_UninstallFormDataDir=46009;
+      NR_UninstallFormExtraFile=46010;
+      NR_UninstallFormExtraDir=46011;
+      NR_UninstallFormIcon=46012;
 
       NR_UninstallSelectForm=47001;
       NR_UninstallSelectFormInfo=47002;
@@ -1151,6 +1177,7 @@ const NR_Author=1;
       NR_CreateConfFormInfo=49003;
       NR_CreateConfFormSelectFolder=49004;
       NR_CreateConfFormAutoSetup=49005;
+      NR_CreateConfFormSelectGamesWithoutAutoSetup=49006;
 
       NR_WizardForm=50001;
       NR_WizardFormButtonPrevious=50002;
@@ -1353,6 +1380,8 @@ const NR_Author=1;
       NR_GameLanguageCustom=60021;
       NR_GameLicenseEnglish=60022;
       NR_GameLicenseCustom=60023;
+      NR_GameStartCount=60024;
+      NR_GameStartCountTooltip=60025;
       NR_GameWindowResolution=61001;
       NR_GameFullscreenResolution=61002;
       NR_GameResolutionInfo=61003;
@@ -1382,23 +1411,24 @@ const NR_Author=1;
       NR_GameUseDoublebuffering=61027;
       NR_GameAspectCorrection=61028;
       NR_GameGlideEmulation=61029;
-      NR_GameGlidePort=61030;
-      NR_GameUseScanCodes=61031;
-      NR_GameMouseSensitivity=61032;
-      NR_GamePriorityForeground=61033;
-      NR_GamePriorityBackground=61034;
-      NR_GamePriorityPause=61035;
-      NR_GamePriorityLower=61036;
-      NR_GamePriorityNormal=61037;
-      NR_GamePriorityHigher=61038;
-      NR_GamePriorityHighest=61039;
-      NR_GameDOSBoxVersion=61040;
-      NR_GameDOSBoxVersionDefault=61041;
-      NR_GameDOSBoxVersionCustom=61042;
-      NR_GameDOSBoxLanguageCustom=61043;
-      NR_GameDOSBoxConsole=61044;
-      NR_GameDOSBoxConsoleHide=61045;
-      NR_GameDOSBoxConsoleShow=61046;
+      NR_GameGlideEmulationPort=61030;
+      NR_GameGlideEmulationLFB=61031;
+      NR_GameUseScanCodes=61032;
+      NR_GameMouseSensitivity=61033;
+      NR_GamePriorityForeground=61034;
+      NR_GamePriorityBackground=61035;
+      NR_GamePriorityPause=61036;
+      NR_GamePriorityLower=61037;
+      NR_GamePriorityNormal=61038;
+      NR_GamePriorityHigher=61039;
+      NR_GamePriorityHighest=61040;
+      NR_GameDOSBoxVersion=61041;
+      NR_GameDOSBoxVersionDefault=61042;
+      NR_GameDOSBoxVersionCustom=61043;
+      NR_GameDOSBoxLanguageCustom=61044;
+      NR_GameDOSBoxConsole=61045;
+      NR_GameDOSBoxConsoleHide=61046;
+      NR_GameDOSBoxConsoleShow=61047;
       NR_GameXMS=62001;
       NR_GameEMS=62002;
       NR_GameUMB=62003;
@@ -1436,8 +1466,15 @@ const NR_Author=1;
       NR_GameIPXEstablishConnectionClient=62035;
       NR_GameIPXEstablishConnectionServer=62036;
       NR_GameIPXAddress=62037;
-      NR_GameIPXPort=62038;
-      NR_GameReportedDOSVersion=62039;
+      NR_GameIPXPort=62038;   
+      NR_GameNE2000=62039;
+      NR_GameNE2000BaseAddress=62040;
+      NR_GameNE2000Interrupt=62041;
+      NR_GameNE2000MACAddress=62042;
+      NR_GameNE2000MACAddressReset=62043;
+      NR_GameNE2000RealInterface=62044;
+      NR_GameNE2000RealInterfaceList=62045;
+      NR_GameReportedDOSVersion=62046;
 
       NR_GameEnablePrinterEmulation=62135;
       NR_GamePrinterResolution=62136;
@@ -1808,37 +1845,44 @@ const NR_Author=1;
       NR_PackageManagerPageIconSets=96010;
       NR_PackageManagerPageLanguages=96011;
       NR_PackageManagerPageExePackages=96012;
-      NR_PackageManagerPageExePackagesSelect=96013;
-      NR_PackageManagerAllListsEmpty=96014;
-      NR_PackageManagerDownloading=96015;
-      NR_PackageManagerDownloadSize=96016;
-      NR_PackageManagerPackageAlreadyDownloaded=96017;
-      NR_PackageManagerOldPackageAlreadyDownloaded=96018;
-      NR_PackageManagerPackageOnlyInCache=96019;
-      NR_PackageManagerDownloadFailed=96020;
-      NR_PackageManagerDownloadFailedUseOldVersion=96021;
-      NR_PackageManagerLanguageDownloaded=96022;
-      NR_PackageManagerLanguageDownloadedSingle=96023;
-      NR_PackageManagerIconSetDownloaded=96024;
-      NR_PackageManagerScanning=96025;
-      NR_PackageManagerFilterList=96026;
-      NR_PackageManagerNoFilter=96027;
-      NR_PackageManagerInstallGames=96028;
-      NR_PackageManagerInstallAutoSetups=96029;
-      NR_PackageManagerInstallIcons=96030;
-      NR_PackageManagerInstallIconSets=96031;
-      NR_PackageManagerInstallLanguages=96032;
-      NR_PackageManagerInstallPackage=96033;
-      NR_PackageManagerDeletePackage=96034;
-      NR_PackageManagerListLicense=96035;
-      NR_PackageManagerListDescription=96036;
-      NR_PackageManagerListAuthor=96037;
-      NR_PackageManagerProviderCaption=96038;
-      NR_PackageManagerProviderFiles=96039;
-      NR_PackageManagerProviderProvider=96040;
-      NR_PackageManagerProviderInformation=96041;
-      NR_PackageManagerProviderHomepage=96042;
-      NR_PackageManagerProviderProfileString=96043;
+      NR_PackageManagerPageTools=96013;
+      NR_PackageManagerPageExePackagesSelect=96014;
+      NR_PackageManagerAllListsEmpty=96015;
+      NR_PackageManagerDownloading=96016;
+      NR_PackageManagerDownloadSize=96017;
+      NR_PackageManagerPackageAlreadyDownloaded=96018;
+      NR_PackageManagerOldPackageAlreadyDownloaded=96019;
+      NR_PackageManagerPackageOnlyInCache=96020;
+      NR_PackageManagerDownloadFailed=96021;
+      NR_PackageManagerDownloadFailedUseOldVersion=96022;
+      NR_PackageManagerLanguageDownloaded=96023;
+      NR_PackageManagerLanguageDownloadedSingle=96024;
+      NR_PackageManagerIconSetDownloaded=96025;
+      NR_PackageManagerScanning=96026;
+      NR_PackageManagerFilterList=96027;
+      NR_PackageManagerNoFilter=96028;
+      NR_PackageManagerInstallGames=96029;
+      NR_PackageManagerInstallAutoSetups=96030;
+      NR_PackageManagerInstallIcons=96031;
+      NR_PackageManagerInstallIconSets=96032;
+      NR_PackageManagerInstallLanguages=96033;
+      NR_PackageManagerInstallPackage=96034;
+      NR_PackageManagerDeletePackage=96035;
+      NR_PackageManagerListLicense=96036;
+      NR_PackageManagerListDescription=96037;
+      NR_PackageManagerListAuthor=96038;
+      NR_PackageManagerProviderCaption=96039;
+      NR_PackageManagerProviderFiles=96040;
+      NR_PackageManagerProviderProvider=96041;
+      NR_PackageManagerProviderInformation=96042;
+      NR_PackageManagerProviderHomepage=96043;
+      NR_PackageManagerProviderProfileString=96044;
+      NR_PackageManagerPageToolsSpecial=96045;
+      NR_PackageManagerPageToolsSpecial1=96046;
+      NR_PackageManagerPageToolsSpecial2=96047;
+      NR_PackageManagerPageToolsSpecial3=96048;
+      NR_PackageManagerPageToolsMaxVersionInfoGame=96049;
+      NR_PackageManagerPageToolsMaxVersionInfoAutoSetup=96050;
 
       NR_RepositoriesEditor=96100;
       NR_RepositoriesEditorActivateSource=96101;
@@ -2265,6 +2309,8 @@ Type TLanguageSetup=class(TBasePrgSetup)
     property MessageWindowsExeExecuteWarning : String index NR_MessageWindowsExeExecuteWarning read GetString write SetString;
     property MessageWindowsExeExecuteWarningTurnOff : String index NR_MessageWindowsExeExecuteWarningTurnOff read GetString write SetString;
     property MessageWindowsExeEditWarning : String index NR_MessageWindowsExeEditWarning read GetString write SetString;
+    property MessageWindowsExeImportArchiveWarning : String index NR_MessageWindowsExeImportArchiveWarning read GetString2 write SetString2;
+    property MessageWindowsExeImportFolderWarning : String index NR_MessageWindowsExeImportFolderWarning read GetString2 write SetString2;
     property MessageDOSExeExecuteWarning : String index NR_MessageDOSExeExecuteWarning read GetString write SetString;
     property MessageDOSExeEditWarning : String index NR_MessageDOSExeEditWarning read GetString write SetString;
     property MessageZipImportError : String index NR_MessageZipImportError read GetString write SetString;
@@ -2312,7 +2358,16 @@ Type TLanguageSetup=class(TBasePrgSetup)
     property MenuFileExportGamesList : String index NR_MenuFileExportGamesList read GetString write SetString;
     property MenuFileExportGamesListDialog : String index NR_MenuFileExportGamesListDialog read GetString write SetString;
     property MenuFileExportGamesListFilter : String index NR_MenuFileExportGamesListFilter read GetString write SetString;
+    property MenuFileExportGamesListFormat : String index NR_MenuFileExportGamesListFormat read GetString write SetString;
+    property MenuFileExportGamesListFormatAuto : String index NR_MenuFileExportGamesListFormatAuto read GetString write SetString;
+    property MenuFileExportGamesListFormatText : String index NR_MenuFileExportGamesListFormatText read GetString write SetString;
+    property MenuFileExportGamesListFormatTable : String index NR_MenuFileExportGamesListFormatTable read GetString write SetString;
+    property MenuFileExportGamesListFormatHTML : String index NR_MenuFileExportGamesListFormatHTML read GetString write SetString;
+    property MenuFileExportGamesListFormatXML : String index NR_MenuFileExportGamesListFormatXML read GetString write SetString;
+    property MenuFileExportGamesListFileNameInfo : String index NR_MenuFileExportGamesListFileNameInfo read GetString write SetString;
     property MenuFileExportGamesListHTMLTitle : String index NR_MenuFileExportGamesListHTMLTitle read GetString write SetString;
+    property MenuFileExportGamesListListBoxLabel : String index NR_MenuFileExportGamesListListBoxLabel read GetString write SetString;
+    property MenuFileExportGamesListFileNameEdit : String index NR_MenuFileExportGamesListFileNameEdit read GetString write SetString;
     property MenuFileExportPackageList : String index NR_MenuFileExportPackageList read GetString write SetString;
     property MenuFileCreateConf : String index NR_MenuFileCreateConf read GetString write SetString;
     property MenuFileCreateProf : String index NR_MenuFileCreateProf read GetString write SetString;
@@ -2320,6 +2375,8 @@ Type TLanguageSetup=class(TBasePrgSetup)
     property MenuFileCreateInstaller : String index NR_MenuFileCreateInstaller read GetString write SetString;
     property MenuFileExportBuildInstaller : String index NR_MenuFileExportBuildInstaller read GetString write SetString;
     property MenuFileExportBuildZipPackages : String index NR_MenuFileExportBuildZipPackages read GetString write SetString;
+    property MenuFileExportBuildZipPackagesWait : String index NR_MenuFileExportBuildZipPackagesWait read GetString write SetString;
+    property MenuFileExportBuildZipPackagesSplit : String index NR_MenuFileExportBuildZipPackagesSplit read GetString write SetString;
     property MenuFileSetup : String index NR_MenuFileSetup read GetString write SetString;
     property MenuFileQuit : String index NR_MenuFileQuit read GetString write SetString;
     property MenuView : String index NR_MenuView read GetString write SetString;
@@ -2393,10 +2450,10 @@ Type TLanguageSetup=class(TBasePrgSetup)
     property MenuExtrasIconManagerIconCustom : String index NR_MenuExtrasIconManagerIconCustom read GetString write SetString;
     property MenuExtrasIconManagerAddSingle : String index NR_MenuExtrasIconManagerAddSingle read GetString write SetString;
     property MenuExtrasIconManagerAddAll : String index NR_MenuExtrasIconManagerAddAll read GetString write SetString;
-    property MenuExtrasIconManagerTools : String index NR_MenuExtrasIconManagerTools read GetString2 write SetString2;
-    property MenuExtrasIconManagerToolsExplorer : String index NR_MenuExtrasIconManagerToolsExplorer read GetString2 write SetString2;
-    property MenuExtrasIconManagerToolsRenameUpper : String index NR_MenuExtrasIconManagerToolsRenameUpper read GetString2 write SetString2;
-    property MenuExtrasIconManagerToolsRenameLower : String index NR_MenuExtrasIconManagerToolsRenameLower read GetString2 write SetString2;
+    property MenuExtrasIconManagerTools : String index NR_MenuExtrasIconManagerTools read GetString write SetString;
+    property MenuExtrasIconManagerToolsExplorer : String index NR_MenuExtrasIconManagerToolsExplorer read GetString write SetString;
+    property MenuExtrasIconManagerToolsRenameUpper : String index NR_MenuExtrasIconManagerToolsRenameUpper read GetString write SetString;
+    property MenuExtrasIconManagerToolsRenameLower : String index NR_MenuExtrasIconManagerToolsRenameLower read GetString write SetString;
     property MenuExtrasViewLogs : String index NR_MenuExtrasViewLogs read GetString write SetString;
     property MenuExtrasViewLogsOpenGamesFolder : String index NR_MenuExtrasOpenGamesFolder read GetString write SetString;
     property MenuExtrasTemplates : String index NR_MenuExtrasTemplates read GetString write SetString;
@@ -2453,6 +2510,7 @@ Type TLanguageSetup=class(TBasePrgSetup)
     property MenuHelpContent : String index NR_MenuHelpContent read GetString write SetString;
     property MenuHelpIntroduction : String index NR_MenuHelpIntroduction read GetString write SetString;
     property MenuHelpAddingGames : String index NR_MenuHelpAddingGames read GetString write SetString;
+    property MenuHelpGetGames : String index NR_MenuHelpGetGames read GetString write SetString;
     property ButtonClose : String index NR_ButtonClose read GetString write SetString;
     property ButtonRun : String index NR_ButtonRun read GetString write SetString;
     property ButtonRunSetup : String index NR_ButtonRunSetup read GetString write SetString;
@@ -2657,6 +2715,11 @@ Type TLanguageSetup=class(TBasePrgSetup)
     property ProfileEditorSoundMiscPCSpeaker : String index NR_ProfileEditorSoundMiscPCSpeaker read GetString write SetString;
     property ProfileEditorSoundFM : String index NR_ProfileEditorSoundFM read GetString write SetString;
     property ProfileEditorSoundCD : String index NR_ProfileEditorSoundCD read GetString write SetString;
+    property ProfileEditorSoundInnova : String index NR_ProfileEditorSoundInnova read GetString write SetString;
+    property ProfileEditorSoundInnovaEnable : String index NR_ProfileEditorSoundInnovaEnable read GetString write SetString;
+    property ProfileEditorSoundInnovaSampleRate : String index NR_ProfileEditorSoundInnovaSampleRate read GetString write SetString;
+    property ProfileEditorSoundInnovaBaseAddress : String index NR_ProfileEditorSoundInnovaBaseAddress read GetString write SetString;
+    property ProfileEditorSoundInnovaQuality : String index NR_ProfileEditorSoundInnovaQuality read GetString write SetString;
     property ProfileEditorAutoexecSheet : String index NR_ProfileEditorAutoexecSheet read GetString write SetString;
     property ProfileEditorAutoexecOverrideGameStart : String index NR_ProfileEditorAutoexecOverrideGameStart read GetString write SetString;
     property ProfileEditorAutoexecOverrideMounting : String index NR_ProfileEditorAutoexecOverrideMounting read GetString write SetString;
@@ -2753,11 +2816,14 @@ Type TLanguageSetup=class(TBasePrgSetup)
     property ProfileEditorDefaultValueHint : String index NR_ProfileEditorDefaultValueHint read GetString write SetString;
     property ProfileEditorTools : String index NR_ProfileEditorTools read GetString write SetString;
     property ProfileEditorToolsRun : String index NR_ProfileEditorToolsRun read GetString write SetString;
+    property ProfileEditorToolsResetAllButThisConfirm : String index NR_ProfileEditorToolsResetAllButThisConfirm read GetString write SetString;
     property ProfileEditorToolsResetAllConfirm : String index NR_ProfileEditorToolsResetAllConfirm read GetString write SetString;
     property ProfileEditorToolsResetPage : String index NR_ProfileEditorToolsResetPage read GetString write SetString;
+    property ProfileEditorToolsResetAllButThis : String index NR_ProfileEditorToolsResetAllButThis read GetString write SetString;
     property ProfileEditorToolsResetAll : String index NR_ProfileEditorToolsResetAll read GetString write SetString;
     property ProfileEditorToolsResetToTemplate : String index NR_ProfileEditorToolsResetToTemplate read GetString write SetString;
     property ProfileEditorToolsResetToTemplatePage : String index NR_ProfileEditorToolsResetToTemplatePage read GetString write SetString;
+    property ProfileEditorToolsResetToTemplateAllButThis : String index NR_ProfileEditorToolsResetToTemplateAllButThis read GetString write SetString;
     property ProfileEditorToolsResetToTemplateAll : String index NR_ProfileEditorToolsResetToTemplateAll read GetString write SetString;
     property ProfileEditorToolsResetToAutoSetup : String index NR_ProfileEditorToolsResetToAutoSetup read GetString write SetString;
     property ProfileEditorToolsResetToAutoSetupPage : String index NR_ProfileEditorToolsResetToAutoSetupPage read GetString write SetString;
@@ -2928,12 +2994,12 @@ Type TLanguageSetup=class(TBasePrgSetup)
     property SetupFormDosBoxCVSPixelShader : String index NR_SetupFormDosBoxCVSPixelShader read GetString write SetString;
     property SetupFormDOSBoxCVSSoundGroup : String index NR_SetupFormDOSBoxCVSSoundGroup read GetString write SetString;
     property SetupFormDOSBoxCVSMidiModes : String index NR_SetupFormDOSBoxCVSMidiModes read GetString write SetString;
-    property SetupFormDOSBoxCVSInnova : String index NR_SetupFormDOSBoxCVSInnova read GetString2 write SetString2;
+    property SetupFormDOSBoxCVSInnova : String index NR_SetupFormDOSBoxCVSInnova read GetString write SetString;
     property SetupFormDOSBoxCVSPrinterGroup : String index NR_SetupFormDOSBoxCVSPrinterGroup read GetString write SetString;
     property SetupFormDOSBoxCVSPrinter : String index NR_SetupFormDOSBoxCVSPrinter read GetString write SetString;
-    property SetupFormDOSBoxCVSNetworkGroup : String index NR_SetupFormDOSBoxCVSNetworkGroup read GetString2 write SetString2;
-    property SetupFormDOSBoxCVSNetworkNE2000 : String index NR_SetupFormDOSBoxCVSNetworkNE2000 read GetString2 write SetString2;
-    property SetupFormDOSBoxCVSInfo : String index NR_SetupFormDOSBoxCVSInfo read GetString2 write SetString2;
+    property SetupFormDOSBoxCVSNetworkGroup : String index NR_SetupFormDOSBoxCVSNetworkGroup read GetString write SetString;
+    property SetupFormDOSBoxCVSNetworkNE2000 : String index NR_SetupFormDOSBoxCVSNetworkNE2000 read GetString write SetString;
+    property SetupFormDOSBoxCVSInfo : String index NR_SetupFormDOSBoxCVSInfo read GetString write SetString;
     property SetupFormDOSBoxFREEDOSPath : String index NR_SetupFormDOSBoxFREEDOSPath read GetString write SetString;
     property SetupFormFreeDOSDir : String index NR_SetupFormFreeDOSDir read GetString write SetString;
     property SetupFormFreeDOS : String index NR_SetupFormFreeDOS read GetString write SetString;
@@ -3003,7 +3069,7 @@ Type TLanguageSetup=class(TBasePrgSetup)
     property SetupFormService6 : String index NR_SetupFormService6 read GetString write SetString;
     property SetupFormService7 : String index NR_SetupFormService7 read GetString write SetString;
     property SetupFormService8 : String index NR_SetupFormService8 read GetString write SetString;
-    property SetupFormService9 : String index NR_SetupFormService9 read GetString2 write SetString2;
+    property SetupFormService9 : String index NR_SetupFormService9 read GetString write SetString;
     property SetupFormUpdate0 : String index NR_SetupFormUpdate0 read GetString write SetString;
     property SetupFormUpdate1 : String index NR_SetupFormUpdate1 read GetString write SetString;
     property SetupFormUpdate2 : String index NR_SetupFormUpdate2 read GetString write SetString;
@@ -3068,6 +3134,7 @@ Type TLanguageSetup=class(TBasePrgSetup)
     property SetupFormShowGridLines : String index NR_SetupFormShowGridLines read GetString write SetString;
     property SetupFormUseWindowsExeIcons : String index NR_SetupFormUseWindowsExeIcons read GetString write SetString;
     property SetupFormNoteLinesInTooltips : String index NR_SetupFormNoteLinesInTooltips read GetString write SetString;
+    property SetupFormRestoreSelectedProfile : String index NR_SetupFormRestoreSelectedProfile read GetString write SetString;
     property SetupFormStoreColumnWidths : String index NR_SetupFormStoreColumnWidths read GetString write SetString;
     property SetupFormTextEditor : String index NR_SetupFormTextEditor read GetString write SetString;
     property SetupFormTextEditorDefault : String index NR_SetupFormTextEditorDefault read GetString write SetString;
@@ -3122,6 +3189,7 @@ Type TLanguageSetup=class(TBasePrgSetup)
     property SetupFormExternalPackersCommandAdd : String index NR_SetupFormExternalPackersCommandAdd read GetString write SetString;
     property SetupFormExternalPackersInfo : String index NR_SetupFormExternalPackersInfo read GetString write SetString;
     property SetupFormExternalPackersSetupButton : String index NR_SetupFormExternalPackersSetupButton read GetString write SetString;
+    property SetupFormExternalPackersTrailingBackslash : String index NR_SetupFormExternalPackersTrailingBackslash read GetString write SetString;
 
     property SetupFormGamesListTranslations : String index NR_SetupFormGamesListTranslations read GetString write SetString;
     property SetupFormGamesListTranslationsEnglish : String index NR_SetupFormGamesListTranslationsEnglish read GetString write SetString;
@@ -3170,19 +3238,19 @@ Type TLanguageSetup=class(TBasePrgSetup)
     property SetupFormAutomaticConfigurationArchiveImport : String index NR_SetupFormAutomaticConfigurationArchiveImport read GetString write SetString;
     property SetupFormAutomaticConfigurationArchiveImportNoDialog : String index NR_SetupFormAutomaticConfigurationArchiveImportNoDialog read GetString write SetString;
     property SetupFormAutomaticConfigurationInstallerNames : String index NR_SetupFormAutomaticConfigurationInstallerNames read GetString write SetString;
+    property SetupFormAutomaticConfigurationArchiveIDFiles : String index NR_SetupFormAutomaticConfigurationArchiveIDFiles read GetString write SetString;
 
-    property SetupFormDataPrivacy : String index NR_SetupFormDataPrivacy read GetString2 write SetString2;
-    property SetupFormDataPrivacyStoreHistory : String index NR_SetupFormDataPrivacyStoreHistory read GetString2 write SetString2;
-    property SetupFormDataPrivacyShowHistory : String index NR_SetupFormDataPrivacyShowHistory read GetString2 write SetString2;
-    property SetupFormDataPrivacyDeleteHistory : String index NR_SetupFormDataPrivacyDeleteHistory read GetString2 write SetString2;
-    property SetupFormDataPrivacyDeleteHistoryDone : String index NR_SetupFormDataPrivacyDeleteHistoryDone read GetString2 write SetString2;
-    property SetupFormDataPrivacyOpenHistroyFile : String index NR_SetupFormDataPrivacyOpenHistroyFile read GetString2 write SetString2;
-    property SetupFormDataPrivacyInfo : String index NR_SetupFormDataPrivacyInfo read GetString2 write SetString2;
+    property SetupFormDataPrivacy : String index NR_SetupFormDataPrivacy read GetString write SetString;
+    property SetupFormDataPrivacyStoreHistory : String index NR_SetupFormDataPrivacyStoreHistory read GetString write SetString;
+    property SetupFormDataPrivacyShowHistory : String index NR_SetupFormDataPrivacyShowHistory read GetString write SetString;
+    property SetupFormDataPrivacyDeleteHistory : String index NR_SetupFormDataPrivacyDeleteHistory read GetString write SetString;
+    property SetupFormDataPrivacyDeleteHistoryDone : String index NR_SetupFormDataPrivacyDeleteHistoryDone read GetString write SetString;
+    property SetupFormDataPrivacyOpenHistoryFile : String index NR_SetupFormDataPrivacyOpenHistoryFile read GetString write SetString;
+    property SetupFormDataPrivacyInfo : String index NR_SetupFormDataPrivacyInfo read GetString write SetString;
 
     property HistoryForm : String index NR_HistoryForm read GetString write SetString;
     property HistoryGame : String index NR_HistoryGame read GetString write SetString;
-    property HistoryDate : String index NR_HistoryDate read GetString write SetString;
-    property HistoryTime : String index NR_HistoryTime read GetString write SetString;
+    property HistoryDateTime : String index NR_HistoryDateTime read GetString write SetString;
     property HistoryStarts : String index NR_HistoryStarts read GetString write SetString;
     property HistoryFirst : String index NR_HistoryFirst read GetString write SetString;
     property HistoryLast : String index NR_HistoryLast read GetString write SetString;
@@ -3211,6 +3279,8 @@ Type TLanguageSetup=class(TBasePrgSetup)
 
     property UninstallForm : String index NR_UninstallForm read GetString write SetString;
     property UninstallFormLabel : String index NR_UninstallFormLabel read GetString write SetString;
+    property UninstallFormDelete : String index NR_UninstallFormDelete read GetString write SetString;
+    property UninstallFormUninstall : String index NR_UninstallFormUninstall read GetString write SetString;
     property UninstallFormProfileRecord : String index NR_UninstallFormProfileRecord read GetString write SetString;
     property UninstallFormProgramDir : String index NR_UninstallFormProgramDir read GetString write SetString;
     property UninstallFormSaveDir : String index NR_UninstallFormSaveDir read GetString write SetString;
@@ -3241,6 +3311,7 @@ Type TLanguageSetup=class(TBasePrgSetup)
     property CreateConfFormInfo : String index NR_CreateConfFormInfo read GetString write SetString;
     property CreateConfFormSelectFolder : String index NR_CreateConfFormSelectFolder read GetString write SetString;
     property CreateConfFormAutoSetup : String index NR_CreateConfFormAutoSetup read GetString write SetString;
+    property CreateConfFormSelectGamesWithoutAutoSetup : String index NR_CreateConfFormSelectGamesWithoutAutoSetup read GetString2 write SetString2;
 
     property WizardForm : String index NR_WizardForm read GetString write SetString;
     property WizardFormButtonPrevious : String index NR_WizardFormButtonPrevious read GetString write SetString;
@@ -3443,6 +3514,8 @@ Type TLanguageSetup=class(TBasePrgSetup)
     property GameLanguageCustom : String index NR_GameLanguageCustom read GetString write SetString;
     property GameLicenseEnglish : String index NR_GameLicenseEnglish read GetString write SetString;
     property GameLicenseCustom : String index NR_GameLicenseCustom read GetString write SetString;
+    property GameStartCount : String index NR_GameStartCount read GetString write SetString;
+    property GameStartCountTooltip : String index NR_GameStartCountTooltip read GetString write SetString;
     property GameWindowResolution : String index NR_GameWindowResolution read GetString write SetString;
     property GameFullscreenResolution : String index NR_GameFullscreenResolution read GetString write SetString;
     property GameResolutionInfo : String index NR_GameResolutionInfo read GetString write SetString;
@@ -3472,7 +3545,8 @@ Type TLanguageSetup=class(TBasePrgSetup)
     property GameUseDoublebuffering : String index NR_GameUseDoublebuffering read GetString write SetString;
     property GameAspectCorrection : String index NR_GameAspectCorrection read GetString write SetString;
     property GameGlideEmulation : String index NR_GameGlideEmulation read GetString write SetString;
-    property GameGlidePort : String index NR_GameGlidePort read GetString2 write SetString2;
+    property GameGlideEmulationPort : String index NR_GameGlideEmulationPort read GetString write SetString;
+    property GameGlideEmulationLFB : String index NR_GameGlideEmulationLFB read GetString write SetString;
     property GameUseScanCodes : String index NR_GameUseScanCodes read GetString write SetString;
     property GameMouseSensitivity : String index NR_GameMouseSensitivity read GetString write SetString;
     property GamePriorityForeground : String index NR_GamePriorityForeground read GetString write SetString;
@@ -3527,6 +3601,13 @@ Type TLanguageSetup=class(TBasePrgSetup)
     property GameIPXEstablishConnectionServer : String index NR_GameIPXEstablishConnectionServer read GetString write SetString;
     property GameIPXAddress : String index NR_GameIPXAddress read GetString write SetString;
     property GameIPXPort : String index NR_GameIPXPort read GetString write SetString;
+    property GameNE2000 : String index NR_GameNE2000 read GetString write SetString;
+    property GameNE2000BaseAddress : String index NR_GameNE2000BaseAddress read GetString write SetString;
+    property GameNE2000Interrupt : String index NR_GameNE2000Interrupt read GetString write SetString;
+    property GameNE2000MACAddress : String index NR_GameNE2000MACAddress read GetString write SetString;
+    property GameNE2000MACAddressReset : String index NR_GameNE2000MACAddressReset read GetString write SetString;
+    property GameNE2000RealInterface : String index NR_GameNE2000RealInterface read GetString write SetString;
+    property GameNE2000RealInterfaceList : String index NR_GameNE2000RealInterfaceList read GetString write SetString;
     property GameReportedDOSVersion : String index NR_GameReportedDOSVersion read GetString write SetString;
     property GameEnablePrinterEmulation : String index NR_GameEnablePrinterEmulation read GetString write SetString;
     property GamePrinterResolution : String index NR_GamePrinterResolution read GetString write SetString;
@@ -3896,6 +3977,7 @@ Type TLanguageSetup=class(TBasePrgSetup)
     property PackageManagerPageIconSets : String index NR_PackageManagerPageIconSets read GetString write SetString;
     property PackageManagerPageLanguages : String index NR_PackageManagerPageLanguages read GetString write SetString;
     property PackageManagerPageExePackages : String index NR_PackageManagerPageExePackages read GetString write SetString;
+    property PackageManagerPageTools : String index NR_PackageManagerPageTools read GetString2 write SetString2;
     property PackageManagerPageExePackagesSelect : String index NR_PackageManagerPageExePackagesSelect read GetString write SetString;
     property PackageManagerAllListsEmpty : String index NR_PackageManagerAllListsEmpty read GetString write SetString;
     property PackageManagerDownloading : String index NR_PackageManagerDownloading read GetString write SetString;
@@ -3927,6 +4009,12 @@ Type TLanguageSetup=class(TBasePrgSetup)
     property PackageManagerProviderInformation : String index NR_PackageManagerProviderInformation read GetString write SetString;
     property PackageManagerProviderHomepage : String index NR_PackageManagerProviderHomepage read GetString write SetString;
     property PackageManagerProviderProfileString : String index NR_PackageManagerProviderProfileString read GetString write SetString;
+    property PackageManagerPageToolsSpecial : String index NR_PackageManagerPageToolsSpecial read GetString2 write SetString2;
+    property PackageManagerPageToolsSpecial1 : String index NR_PackageManagerPageToolsSpecial1 read GetString2 write SetString2;
+    property PackageManagerPageToolsSpecial2 : String index NR_PackageManagerPageToolsSpecial2 read GetString2 write SetString2;
+    property PackageManagerPageToolsSpecial3 : String index NR_PackageManagerPageToolsSpecial3 read GetString2 write SetString2;
+    property PackageManagerPageToolsMaxVersionInfoGame : String index NR_PackageManagerPageToolsMaxVersionInfoGame read GetString2 write SetString2;
+    property PackageManagerPageToolsMaxVersionInfoAutoSetup : String index NR_PackageManagerPageToolsMaxVersionInfoAutoSetup read GetString2 write SetString2;
 
     property RepositoriesEditor : String index NR_RepositoriesEditor read GetString write SetString;
     property RepositoriesEditorActivateSource : String index NR_RepositoriesEditorActivateSource read GetString write SetString;
@@ -3975,7 +4063,7 @@ Type TLanguageSetup=class(TBasePrgSetup)
     property DataReaderSearchResults : String index NR_DataReaderSearchResults read GetString write SetString;
     property DataReaderNoSearchResults : String index NR_DataReaderNoSearchResults read GetString write SetString;
     property DataReaderCoverCheckbox : String index NR_DataReaderCoverCheckbox read GetString write SetString;
-    property DataReaderCoverAllCheckbox : String index NR_DataReaderCoverAllCheckbox read GetString2 write SetString2;
+    property DataReaderCoverAllCheckbox : String index NR_DataReaderCoverAllCheckbox read GetString write SetString;
     property DataReaderInsert : String index NR_DataReaderInsert read GetString write SetString;
     property DataReaderDownloadCaption : String index NR_DataReaderDownloadCaption read GetString write SetString;
     property DataReaderDownloadInfo : String index NR_DataReaderDownloadInfo read GetString write SetString;
@@ -4160,9 +4248,9 @@ Type TLanguageSetup=class(TBasePrgSetup)
     property DOSBoxStartFailedInfo : String index NR_DOSBoxStartFailedInfo read GetString write SetString;
     property DOSBoxStartFailedShowConsole : String index NR_DOSBoxStartFailedShowConsole read GetString write SetString;
     property DOSBoxStartFailedTurnOff : String index NR_DOSBoxStartFailedTurnOff read GetString write SetString;
-    property DOSBoxStartFailedProfileSettings : String index NR_DOSBoxStartFailedProfileSettings read GetString2 write SetString2;
-    property DOSBoxStartFailedGlobalSettings : String index NR_DOSBoxStartFailedGlobalSettings read GetString2 write SetString2;
-    property DOSBoxStartFailedRemoteInfo : String index NR_DOSBoxStartFailedRemoteInfo read GetString2 write SetString2;
+    property DOSBoxStartFailedProfileSettings : String index NR_DOSBoxStartFailedProfileSettings read GetString write SetString;
+    property DOSBoxStartFailedGlobalSettings : String index NR_DOSBoxStartFailedGlobalSettings read GetString write SetString;
+    property DOSBoxStartFailedRemoteInfo : String index NR_DOSBoxStartFailedRemoteInfo read GetString write SetString;
 
     property DOSBoxLangEditorStartNew : String index NR_DOSBoxLangEditorStartNew read GetString write SetString;
     property DOSBoxLangEditorStartNewName : String index NR_DOSBoxLangEditorStartNewName read GetString write SetString;
@@ -4177,6 +4265,7 @@ Type TLanguageSetup=class(TBasePrgSetup)
     property DOSBoxLangEditorCancelConfirmation : String index NR_DOSBoxLangEditorCancelConfirmation read GetString write SetString;
   end;
 
+Function MaskUnderlineAmpersand(const S : String) : String;
 Function RemoveUnderline(const S : String) : String;
 Procedure LoadLanguage(const LanguageFile : String);
 
@@ -4237,28 +4326,34 @@ begin
     SetChanged;
   end;
 
-  If (Trim(ExtUpperCase(FileName))=ExtUpperCase(DefaultLanguageFile)) or (Trim(FileName)='') then begin
-    AddStringRec(NR_Author,'Author','Name','Alexander Herzog');
-    AddStringRec(NR_MaxVersion,'LanguageFileInfo','MaxVersion',GetNormalFileVersionAsString);
-    AddStringRec(NR_DownloadChecksum,'LanguageFileInfo','DownloadChecksum','');
-    AddStringRec(NR_NSISLanguageID,'LanguageFileInfo','NSISLanguageID','1033');
-    AddStringRec(NR_LocalLanguageName,'LanguageFileInfo','LocalLanguageName','English');
-    AddStringRec(NR_HelpFile,'LanguageFileInfo','HelpFile','English.chm');
-  end else begin
-    AddStringRec(NR_Author,'Author','Name','No Author defined');
-    AddStringRec(NR_MaxVersion,'LanguageFileInfo','MaxVersion','0');
-    AddStringRec(NR_DownloadChecksum,'LanguageFileInfo','DownloadChecksum','');
-    AddStringRec(NR_NSISLanguageID,'LanguageFileInfo','NSISLanguageID','');
-    AddStringRec(NR_LocalLanguageName,'LanguageFileInfo','LocalLanguageName','');
-    AddStringRec(NR_HelpFile,'LanguageFileInfo','HelpFile','English.chm');
+  FastAddRecStart;
+  try
+
+    If (Trim(ExtUpperCase(FileName))=ExtUpperCase(DefaultLanguageFile)) or (Trim(FileName)='') then begin
+      AddStringRec(NR_Author,'Author','Name','Alexander Herzog');
+      AddStringRec(NR_MaxVersion,'LanguageFileInfo','MaxVersion',GetNormalFileVersionAsString);
+      AddStringRec(NR_DownloadChecksum,'LanguageFileInfo','DownloadChecksum','');
+      AddStringRec(NR_NSISLanguageID,'LanguageFileInfo','NSISLanguageID','1033');
+      AddStringRec(NR_LocalLanguageName,'LanguageFileInfo','LocalLanguageName','English');
+      AddStringRec(NR_HelpFile,'LanguageFileInfo','HelpFile','English.chm');
+    end else begin
+      AddStringRec(NR_Author,'Author','Name','No Author defined');
+      AddStringRec(NR_MaxVersion,'LanguageFileInfo','MaxVersion','0');
+      AddStringRec(NR_DownloadChecksum,'LanguageFileInfo','DownloadChecksum','');
+      AddStringRec(NR_NSISLanguageID,'LanguageFileInfo','NSISLanguageID','');
+      AddStringRec(NR_LocalLanguageName,'LanguageFileInfo','LocalLanguageName','');
+      AddStringRec(NR_HelpFile,'LanguageFileInfo','HelpFile','English.chm');
+    end;
+
+    if MinimalInit then exit;
+
+    SetupLanguageStrings1;
+    SetupLanguageStrings2;
+    SetupLanguageStrings3;
+    {Needed to split this; compiler said "Too many local constants. Use shorter procedures."}
+  finally
+    FastAddRecDone;
   end;
-
-  if MinimalInit then exit;
-
-  SetupLanguageStrings1;
-  SetupLanguageStrings2;
-  SetupLanguageStrings3;
-  {Needed to split this; compiler said "Too many local constants. Use shorter procedures."}
 end;
 
 Procedure TLanguageSetup.SetupLanguageStrings1;
@@ -4468,8 +4563,17 @@ begin
   AddStringRec(NR_MenuFileExport,'Menu','File.Export','Export');
   AddStringRec(NR_MenuFileExportGamesList,'Menu','File.Export.GamesList','Export &gamelist...');
   AddStringRec(NR_MenuFileExportGamesListDialog,'Menu','File.Export.GamesList.DialogTitle','Export gamelist');
-  AddStringRec(NR_MenuFileExportGamesListFilter,'Menu','File.Export.GamesList.Filter','Text files (*.txt)|*.txt|Tabular separated files (*.csv)|*.csv|HTML-Files (*.html)|*.html|All files (*.*)|*.*');
+  AddStringRec(NR_MenuFileExportGamesListFilter,'Menu','File.Export.GamesList.Filter','Text files (*.txt)|*.txt|Tabular separated files (*.csv)|*.csv|HTML files (*.html, *.htm)|*.html;*.htm|XML files (*.xml)|*.xml|All files (*.*)|*.*');
+  AddStringRec(NR_MenuFileExportGamesListFormat,'Menu','File.Export.GamesList.Format','Export format');
+  AddStringRec(NR_MenuFileExportGamesListFormatAuto,'Menu','File.Export.GamesList.Format.Auto','Auto select format from file extension');
+  AddStringRec(NR_MenuFileExportGamesListFormatText,'Menu','File.Export.GamesList.Format.Text','Export as text file');
+  AddStringRec(NR_MenuFileExportGamesListFormatTable,'Menu','File.Export.GamesList.Format.Table','Export as table');
+  AddStringRec(NR_MenuFileExportGamesListFormatHTML,'Menu','File.Export.GamesList.Format.HTML','Export as HTML file');
+  AddStringRec(NR_MenuFileExportGamesListFormatXML,'Menu','File.Export.GamesList.Format.XML','Export as XML file');
+  AddStringRec(NR_MenuFileExportGamesListFileNameInfo,'Menu','File.Export.GamesList.Info','If "Auto select" is chosen as export format the games list will be exported as text file, table, html page or xml file depending on the file extension ("txt", "csv", "html" or "xml").');
   AddStringRec(NR_MenuFileExportGamesListHTMLTitle,'Menu','File.Export.GamesList.HTMLTitle','D-Fend Reloaded games list');
+  AddStringRec(NR_MenuFileExportGamesListListBoxLabel,'Menu','File.Export.GamesList.DialogColumnsList','Columns to export');
+  AddStringRec(NR_MenuFileExportGamesListFileNameEdit,'Menu','File.Export.GamesList.DialogFileNameField','File name for the games list');
   AddStringRec(NR_MenuFileExportPackageList,'Menu','File.Export.PackageList','Create package list file...');
   AddStringRec(NR_MenuFileCreateConf,'Menu','File.Export.CreateConf','Create &conf files...');
   AddStringRec(NR_MenuFileCreateProf,'Menu','File.Export.CreateProf','Create &prof files...');
@@ -4477,6 +4581,8 @@ begin
   AddStringRec(NR_MenuFileCreateInstaller,'Menu','File.Export.CreateInstaller','&Create installer package...');
   AddStringRec(NR_MenuFileExportBuildInstaller,'Menu','File.Export.BuildInstaller','&Build installer for multiple games...');
   AddStringRec(NR_MenuFileExportBuildZipPackages,'Menu','File.Export.BuildZipPackages','Build &archive file packages for multiple games...');
+  AddStringRec(NR_MenuFileExportBuildZipPackagesWait,'Menu','File.Export.BuildZipPackages.PrepaingExport','Preparing game export');
+  AddStringRec(NR_MenuFileExportBuildZipPackagesSplit,'Menu','File.Export.BuildZipPackages.SplitLargeFile','Spliting archive file larger than 2GB');
   AddStringRec(NR_MenuFileSetup,'Menu','File.Setup','&Program options...');
   AddStringRec(NR_MenuFileQuit,'Menu','File.Quit','&Quit');
   AddStringRec(NR_MenuView,'Menu','View','&View');
@@ -4525,7 +4631,7 @@ begin
   AddStringRec(NR_MenuProfileCopyPrompt,'Menu','Profile.Copy.Prompt','Name of the new Profile:');
   AddStringRec(NR_MenuProfileCopyUpdateScreenshotFolder,'Menu','Profile.Copy.UpdateScreenshotFolder','Set new screenshot folder');
   AddStringRec(NR_MenuProfileCopyRemoveDataFolderRecord,'Menu','Profile.Copy.RemoveDataFolderRecord','Remove data folder record');
-  AddStringRec(NR_MenuProfileDelete,'Menu','Profile.Delete','&Delete');
+  AddStringRec(NR_MenuProfileDelete,'Menu','Profile.Delete','&Delete...');
   AddStringRec(NR_MenuProfileOpenFolder,'Menu','Profile.OpenFolder','Open &program folder');
   AddStringRec(NR_MenuProfileOpenCaptureFolder,'Menu','Profile.OpenCaptureFolder','Open &capture folder');
   AddStringRec(NR_MenuProfileOpenDataFolder,'Menu','Profile.OpenDataFolder','Open &data folder');
@@ -4550,6 +4656,10 @@ begin
   AddStringRec(NR_MenuExtrasIconManagerIconCustom,'Menu','Extras.IconManager.IconType.Custom','Use custom icon');
   AddStringRec(NR_MenuExtrasIconManagerAddSingle,'Menu','Extras.IconManager.Add.Single','Add single icon');
   AddStringRec(NR_MenuExtrasIconManagerAddAll,'Menu','Extras.IconManager.Add.All','Scan games folder and add all icons');
+  AddStringRec(NR_MenuExtrasIconManagerTools,'Menu','Extras.Tools','Tools');
+  AddStringRec(NR_MenuExtrasIconManagerToolsExplorer,'Menu','Extras.Tools.Explorer','Open icons folder in Explorer');
+  AddStringRec(NR_MenuExtrasIconManagerToolsRenameUpper,'Menu','Extras.Tools.RenameUpper','Rename all icons to have upper case ICO extensions');
+  AddStringRec(NR_MenuExtrasIconManagerToolsRenameLower,'Menu','Extras.Tools.RenameLower','Rename all icons to have lower case ico extensions');
   AddStringRec(NR_MenuExtrasViewLogs,'Menu','Extras.ViewLogs','View &history...');
   AddStringRec(NR_MenuExtrasOpenGamesFolder,'Menu','Extras.OpenGamesFolder','Open &games folder...');
   AddStringRec(NR_MenuExtrasTemplates,'Menu','Extras.Templates','&Templates...');
@@ -4608,6 +4718,7 @@ begin
   AddStringRec(NR_MenuHelpContent,'Menu','Help.HelpContent','Help contents');
   AddStringRec(NR_MenuHelpIntroduction,'Menu','Help.Introduction','Introduction');
   AddStringRec(NR_MenuHelpAddingGames,'Menu','Help.AddingGames','Adding games');
+  AddStringRec(NR_MenuHelpGetGames,'Menu','Help.GetGames','How to get games');
 
   AddStringRec(NR_ButtonClose,'Menu','Button.Close','&Close');
   AddStringRec(NR_ButtonRun,'Menu','Button.Run','&Run');
@@ -4630,7 +4741,7 @@ begin
   AddStringRec(NR_PopupRunExtraFile,'Menu','Popup.RunExtraFile','Additional program file');
   AddStringRec(NR_PopupEdit,'Menu','Popup.Edit','&Edit...');
   AddStringRec(NR_PopupCopy,'Menu','Popup.Copy','&Copy...');
-  AddStringRec(NR_PopupDelete,'Menu','Popup.Delete','&Delete');
+  AddStringRec(NR_PopupDelete,'Menu','Popup.Delete','&Delete...');
   AddStringRec(NR_PopupOpenFolder,'Menu','Popup.OpenFolder','Open &program folder');
   AddStringRec(NR_PopupOpenCaptureFolder,'Menu','Popup.OpenCaptureFolder','Open &capture folder');
   AddStringRec(NR_PopupOpenDataFolder,'Menu','Popup.OpenDataFolder','Open &data folder');
@@ -4812,6 +4923,11 @@ begin
   AddStringRec(NR_ProfileEditorSoundMiscPCSpeaker,'ProfileEditorForm','Sound.PCSpeaker','PC speaker');
   AddStringRec(NR_ProfileEditorSoundFM,'ProfileEditorForm','Sound.FM','FM');
   AddStringRec(NR_ProfileEditorSoundCD,'ProfileEditorForm','Sound.CD','CD audio');
+  AddStringRec(NR_ProfileEditorSoundInnova,'ProfileEditorForm','Sound.Innova','Innovation SSI-2001');
+  AddStringRec(NR_ProfileEditorSoundInnovaEnable,'ProfileEditorForm','Sound.Innova.Enable','Enable Innovation SSI-2001 emulation');
+  AddStringRec(NR_ProfileEditorSoundInnovaSampleRate,'ProfileEditorForm','Sound.Innova.SampleRate','Innovation SSI-2001 sample rate');
+  AddStringRec(NR_ProfileEditorSoundInnovaBaseAddress,'ProfileEditorForm','Sound.Innova.BaseAddress','Innovation SSI-2001 base address');
+  AddStringRec(NR_ProfileEditorSoundInnovaQuality,'ProfileEditorForm','Sound.Innova.Quality','Innovation SSI-2001 emulation quality');
   AddStringRec(NR_ProfileEditorAutoexecSheet,'ProfileEditorForm','AutoexecSheet','Autoexec');
   AddStringRec(NR_ProfileEditorAutoexecOverrideGameStart,'ProfileEditorForm','Autoexec.OverrideGameStart','Override game start');
   AddStringRec(NR_ProfileEditorAutoexecOverrideMounting,'ProfileEditorForm','Autoexec.OverrideMounting','Override mounting');
@@ -4909,11 +5025,14 @@ begin
   AddStringRec(NR_ProfileEditorDefaultValueHint,'ProfileEditorForm','DefaultValueHint','You can edit the values offered in this box on the "Default values" page of the setup dialog.');
   AddStringRec(NR_ProfileEditorTools,'ProfileEditorForm','Tools','Tools');
   AddStringRec(NR_ProfileEditorToolsRun,'ProfileEditorForm','Tools.Run','Run game with current configuration');
+  AddStringRec(NR_ProfileEditorToolsResetAllButThisConfirm,'ProfileEditorForm','Tools.ResetAllPagesButThisConfirm','Do you really want to reset all pages but this?');
   AddStringRec(NR_ProfileEditorToolsResetAllConfirm,'ProfileEditorForm','Tools.ResetAllPagesConfirm','Do you really want to reset all pages?');
   AddStringRec(NR_ProfileEditorToolsResetPage,'ProfileEditorForm','Tools.ResetPage','Reset this page to the default values');
+  AddStringRec(NR_ProfileEditorToolsResetAllButThis,'ProfileEditorForm','Tools.ResetAllPagesButThis','Reset all pages but this to the default values');
   AddStringRec(NR_ProfileEditorToolsResetAll,'ProfileEditorForm','Tools.ResetAllPages','Reset all pages to the default values');
   AddStringRec(NR_ProfileEditorToolsResetToTemplate,'ProfileEditorForm','Tools.ResetToTemplate','Reset to template');
   AddStringRec(NR_ProfileEditorToolsResetToTemplatePage,'ProfileEditorForm','Tools.ResetToTemplate.Page','Reset this page');
+  AddStringRec(NR_ProfileEditorToolsResetToTemplateAllButThis,'ProfileEditorForm','Tools.ResetToTemplate.AllPagesButThis','Reset all pages but this');
   AddStringRec(NR_ProfileEditorToolsResetToTemplateAll,'ProfileEditorForm','Tools.ResetToTemplate.AllPages','Reset all pages');
   AddStringRec(NR_ProfileEditorToolsResetToAutoSetup,'ProfileEditorForm','Tools.ResetToAutoSetup','Reset to auto setup template');
   AddStringRec(NR_ProfileEditorToolsResetToAutoSetupPage,'ProfileEditorForm','Tools.ResetToAutoSetup.Page','Select auto setup template and reset this page...');
@@ -5081,8 +5200,12 @@ begin
   AddStringRec(NR_SetupFormDosBoxCVSPixelShader,'SetupForm','DOSBoxCVS.PixelShader','Activate pixel shader settings');
   AddStringRec(NR_SetupFormDOSBoxCVSSoundGroup,'SetupForm','DOSBoxCVS.SoundGroup','Sound setup features');
   AddStringRec(NR_SetupFormDOSBoxCVSMidiModes,'SetupForm','DOSBoxCVS.MIDIModes','Add "mt32" MIDI device');
+  AddStringRec(NR_SetupFormDOSBoxCVSInnova,'SetupForm','DOSBoxCVS.Innova','Activate Innovation SSI-2001 emulation settings');
   AddStringRec(NR_SetupFormDOSBoxCVSPrinterGroup,'SetupForm','DOSBoxCVS.PrinterGroup','Printer setup features');
   AddStringRec(NR_SetupFormDOSBoxCVSPrinter,'SetupForm','DOSBoxCVS.Printer','Activate printer settings');
+  AddStringRec(NR_SetupFormDOSBoxCVSNetworkGroup,'SetupForm','DOSBoxCVS.NetworkGroup','Network setup features');
+  AddStringRec(NR_SetupFormDOSBoxCVSNetworkNE2000,'SetupForm','DOSBoxCVS.NE2000','Activate NE2000 emulation settings');
+  AddStringRec(NR_SetupFormDOSBoxCVSInfo,'SetupForm','DOSBoxCVS.Info','You can download DOSBoxs supporting this features here:');
   AddStringRec(NR_SetupFormDOSBoxFREEDOSPath,'SetupForm','PathToFreeDOS','Path to FreeDOS');
   AddStringRec(NR_SetupFormFreeDOSDir,'SetupForm','FreeDOSDir','FreeDOS folder');
   AddStringRec(NR_SetupFormFreeDOS,'SetupForm','FreeDOS','FreeDOS');
@@ -5158,6 +5281,7 @@ begin
   AddStringRec(NR_SetupFormService6,'SetupForm','Service6','Clear package cache and lists');
   AddStringRec(NR_SetupFormService7,'SetupForm','Service7','Create capture folders for all profiles');
   AddStringRec(NR_SetupFormService8,'SetupForm','Service8','Create game data folders for all profiles');
+  AddStringRec(NR_SetupFormService9,'SetupForm','Service9','Rename all media files for all profiles');
   AddStringRec(NR_SetupFormUpdate0,'SetupForm','Update0','Only manual update checks (Menu: Help|Check for updates)');
   AddStringRec(NR_SetupFormUpdate1,'SetupForm','Update1','Check once a week');
   AddStringRec(NR_SetupFormUpdate2,'SetupForm','Update2','Check once every day');
@@ -5222,6 +5346,7 @@ begin
   AddStringRec(NR_SetupFormShowGridLines,'SetupForm','ShowGridLinesInDetailsMode','Show grid lines in view style "report"');
   AddStringRec(NR_SetupFormUseWindowsExeIcons,'SetupForm','UseWindowsExeIcons','Use program file icon for Windows games profiles');
   AddStringRec(NR_SetupFormNoteLinesInTooltips,'SetupForm','NoteLinesInTooltips','Number of note lines in the tooltips in the games list');
+  AddStringRec(NR_SetupFormRestoreSelectedProfile,'SetupForm','RestoreSelectedProfile','Restore last selected profile on program restart');
   AddStringRec(NR_SetupFormStoreColumnWidths,'SetupForm','RestoreColumnWidthsOnStart','Restore column widths on program start');
   AddStringRec(NR_SetupFormTextEditor,'SetupForm','TextEditor','Text editor');
   AddStringRec(NR_SetupFormTextEditorDefault,'SetupForm','TextEditor.Default','Use default editor for file type');
@@ -5276,6 +5401,7 @@ begin
   AddStringRec(NR_SetupFormExternalPackersCommandAdd,'SetupForm','ExternalPackers.CommandAdd','Commandline for adding files / updating an archive file (%1=file, %2=source folder)');
   AddStringRec(NR_SetupFormExternalPackersInfo,'SetupForm','ExternalPackers.Info','If you define a archiving program for the extensions "zip" or "7z" this external program will be used instead of the internal packer.');
   AddStringRec(NR_SetupFormExternalPackersSetupButton,'SetupForm','ExternalPackers.SetupButton','Set default values for');
+  AddStringRec(NR_SetupFormExternalPackersTrailingBackslash,'SetupForm','ExternalPackers.TrailingBackslash','Add trailing "\" to path names.');
 
   AddStringRec(NR_SetupFormGamesListTranslations,'SetupForm','GamesListTranslations','Non English translations for the games list');
   AddStringRec(NR_SetupFormGamesListTranslationsEnglish,'SetupForm','GamesListTranslations.EnglishNames','English names');
@@ -5324,11 +5450,19 @@ begin
   AddStringRec(NR_SetupFormAutomaticConfigurationArchiveImport,'SetupForm','AutomaticConfiguration.ArchiveImport','Archive file import');
   AddStringRec(NR_SetupFormAutomaticConfigurationArchiveImportNoDialog,'SetupForm','AutomaticConfiguration.ArchiveImport.NoDialog','Do not show dialog if the game can be identifed by an auto setup template');
   AddStringRec(NR_SetupFormAutomaticConfigurationInstallerNames,'SetupForm','AutomaticConfiguration.InstallerNames','Program file names to identify games that need to be installed');
+  AddStringRec(NR_SetupFormAutomaticConfigurationArchiveIDFiles,'SetupForm','AutomaticConfiguration.ArchiveIDFiles','Description files for the content of archive files');
+
+  AddStringRec(NR_SetupFormDataPrivacy,'SetupForm','DataPrivacy','Data privacy');
+  AddStringRec(NR_SetupFormDataPrivacyStoreHistory,'SetupForm','DataPrivacy.StoreHistory','Store history of started games');
+  AddStringRec(NR_SetupFormDataPrivacyShowHistory,'SetupForm','DataPrivacy.ShowHistory','Show recorded history');
+  AddStringRec(NR_SetupFormDataPrivacyDeleteHistory,'SetupForm','DataPrivacy.DeleteHistory','Delete recorded history');
+  AddStringRec(NR_SetupFormDataPrivacyDeleteHistoryDone,'SetupForm','DataPrivacy.DeleteHistory.Done','All recorded history information have been deleted.');
+  AddStringRec(NR_SetupFormDataPrivacyOpenHistoryFile,'SetupForm','DataPrivacy.OpenHistoryFile','Open history file in text editor');
+  AddStringRec(NR_SetupFormDataPrivacyInfo,'SetupForm','DataPrivacy.Info','The recorded history information is stored locally only and is shown when opening the "View history" dialog from the "Extras" menu.');
 
   AddStringRec(NR_HistoryForm,'HistoryForm','Caption','History');
   AddStringRec(NR_HistoryGame,'HistoryForm','Game','Game');
-  AddStringRec(NR_HistoryDate,'HistoryForm','Date','Date');
-  AddStringRec(NR_HistoryTime,'HistoryForm','Time','Time');
+  AddStringRec(NR_HistoryDateTime,'HistoryForm','DateTime','Date and time');
   AddStringRec(NR_HistoryStarts,'HistoryForm','Starts','Number of starts');
   AddStringRec(NR_HistoryFirst,'HistoryForm','First','First run');
   AddStringRec(NR_HistoryLast,'HistoryForm','Last','Last run');
@@ -5357,6 +5491,8 @@ begin
 
   AddStringRec(NR_UninstallForm,'DeinstallGame','Caption','Uninstall program');
   AddStringRec(NR_UninstallFormLabel,'DeinstallGame','Info','Please select the components to uninstall:');
+  AddStringRec(NR_UninstallFormDelete,'DeinstallGame','Option.Delete','Only remove profile, keep game files');
+  AddStringRec(NR_UninstallFormUninstall,'DeinstallGame','Option.Uninstall','Uninstall selected components');
   AddStringRec(NR_UninstallFormProfileRecord,'DeinstallGame','ProfileRecord','Profile list record');
   AddStringRec(NR_UninstallFormProgramDir,'DeinstallGame','ProgramDir','Program folder');
   AddStringRec(NR_UninstallFormSaveDir,'DeinstallGame','SaveDir','Saved games folder');
@@ -5606,6 +5742,8 @@ begin
   AddStringRec(NR_GameLanguageCustom,'GameSetup','Language.CustomNames','');
   AddStringRec(NR_GameLicenseEnglish,'GameSetup','License.EnglishNames','');
   AddStringRec(NR_GameLicenseCustom,'GameSetup','License.CustomNames','');
+  AddStringRec(NR_GameStartCount,'GameSetup','StartCount','Number of starts');
+  AddStringRec(NR_GameStartCountTooltip,'GameSetup','StartCount.Tooltip','started %d times');
   AddStringRec(NR_GameWindowResolution,'GameSetup','Resolution.Window','Window resolution');
   AddStringRec(NR_GameFullscreenResolution,'GameSetup','Resolution.Fullscreen','Fullscreen resolution');
   AddStringRec(NR_GameResolutionInfo,'GameSetup','Resolution.Info','The resolution "original" means using the resolution chosen by the game. The fullscreen resolution "0x0" means using the native screen resolution and scaling the game output.');
@@ -5635,6 +5773,8 @@ begin
   AddStringRec(NR_GameUseDoublebuffering,'GameSetup','UseDoublebuffering','Use double buffering');
   AddStringRec(NR_GameAspectCorrection,'GameSetup','AspectCorrection','Keep correct aspect');
   AddStringRec(NR_GameGlideEmulation,'GameSetup','GlideEmulation','Glide emulation');
+  AddStringRec(NR_GameGlideEmulationPort,'GameSetup','GlideEmulation.Port','Glide communication port');
+  AddStringRec(NR_GameGlideEmulationLFB,'GameSetup','GlideEmulation.LFB','Glide LFB');
   AddStringRec(NR_GameUseScanCodes,'GameSetup','UseScanCodes','Use scan codes');
   AddStringRec(NR_GameMouseSensitivity,'GameSetup','MouseSensitivity','Mouse sensitivity');
   AddStringRec(NR_GamePriorityForeground,'GameSetup','PriorityForeground','DOSBox priority (foreground)');
@@ -5689,6 +5829,13 @@ begin
   AddStringRec(NR_GameIPXEstablishConnectionServer,'GameSetup','IPX.EstablishConnection.Server','Server');
   AddStringRec(NR_GameIPXAddress,'GameSetup','IPX.Address','IPX server IP address (for Client-mode)');
   AddStringRec(NR_GameIPXPort,'GameSetup','IPX.Port','IPX Port');
+  AddStringRec(NR_GameNE2000,'GameSetup','NE2000','Activate NE2000 emulation');
+  AddStringRec(NR_GameNE2000BaseAddress,'GameSetup','NE2000.BaseAddress','Base address');
+  AddStringRec(NR_GameNE2000Interrupt,'GameSetup','NE2000.Interrupt','Interrupt');
+  AddStringRec(NR_GameNE2000MACAddress,'GameSetup','NE2000.MACAddress','MAC address');
+  AddStringRec(NR_GameNE2000MACAddressReset,'GameSetup','NE2000.MACAddress.Reset','Reset to default');
+  AddStringRec(NR_GameNE2000RealInterface,'GameSetup','NE2000.RealInterface','Real network interface');
+  AddStringRec(NR_GameNE2000RealInterfaceList,'GameSetup','NE2000.RealInterface.List','List real network devices');
   AddStringRec(NR_GameReportedDOSVersion,'GameSetup','ReportedDOSVersion','Reported DOS version');
   AddStringRec(NR_GameEnablePrinterEmulation,'GameSetup','EnablePrinterEmulation','Enable printer emulation');
   AddStringRec(NR_GamePrinterResolution,'GameSetup','PrinterResolution','Resolution (in dpi)');
@@ -5880,11 +6027,14 @@ begin
   AddStringRec(NR_OperationModeInfoPrgSettingsPrgDir,'OperationMode','InfoPrgSettingsPrgDir','Program settings are stored in program folder');
   AddStringRec(NR_OperationModeInfoPrgSettingsUserDir,'OperationMode','InfoPrgSettingsUserDir','Program settings are stored in the user profile folder');
   AddStringRec(NR_OperationModeInfoUsersShareSettings,'OperationMode','InfoUsersShareSettings','All users on this system share settings and profiles');
-  AddStringRec(NR_OperationModeInfoVistaCompatible,'OperationMode','InfoVistaCompatible','Useable without admin rights and under Windows Vista');
+  AddStringRec(NR_OperationModeInfoVistaCompatible,'OperationMode','InfoVistaCompatible','Useable without admin rights and under Windows Vista or higher');
   AddStringRec(NR_OperationModeInfoDOSBoxRelative,'OperationMode','InfoDOSBoxRelative','DOSBox and games directories are stored relative to D-Fend Reloaded folder (for portable use)');
   AddStringRec(NR_OperationModePrgDir,'OperationMode','PrgDir','Directory for D-Fend Reloaded program files');
   AddStringRec(NR_OperationModeDataDir,'OperationMode','DataDir','Directory for data files (games, profiles, settings, etc.)');
+end;
 
+Procedure TLanguageSetup.SetupLanguageStrings3;
+begin
   AddStringRec(NR_ZipFormCaptionExtract,'ZipForm','Caption.Extract','Extracting');
   AddStringRec(NR_ZipFormCaptionCreate,'ZipForm','Caption.Create','Compressing');
   AddStringRec(NR_ZipFormCaptionAdd,'ZipForm','Caption.Add','Updating');
@@ -5913,10 +6063,7 @@ begin
   AddStringRec(NR_ZipWaitInfoFormDriveScummVM,'ZipWaitForm','Drive.ScummVM','ScummVM drive');
   AddStringRec(NR_ZipWaitInfoFormZipFile,'ZipWaitForm','ZipFile','Archive file');
   AddStringRec(NR_ZipWaitInfoFormFolder,'ZipWaitForm','Folder','Folder');
-end;
 
-Procedure TLanguageSetup.SetupLanguageStrings3;
-begin
   AddStringRec(NR_ViewDataFilesSetup,'ViewDataFiles','Setup','Setup data folder');
   AddStringRec(NR_ViewDataFilesSetupInfo,'ViewDataFiles','Setup.Info','There is no data folder defined for this profile. Click on "Setup data folder" to set "%s" as data folder for this profile.');
   AddStringRec(NR_ViewDataFilesUpdate,'ViewDataFiles','Update','Update');
@@ -6149,6 +6296,7 @@ begin
   AddStringRec(NR_DataReaderSearchResults,'DataReader','SearchResults','Search results');
   AddStringRec(NR_DataReaderNoSearchResults,'DataReader','NoGameSelected','No game name selected');
   AddStringRec(NR_DataReaderCoverCheckbox,'DataReader','CoverCheckbox','Download cover and store it in the capture folder');
+  AddStringRec(NR_DataReaderCoverAllCheckbox,'DataReader','AllCoverCheckbox','Download all available images');
   AddStringRec(NR_DataReaderInsert,'DataReader','InsertButton','Insert');
   AddStringRec(NR_DataReaderDownloadCaption,'DataReader','Download.Caption','Receiving data');
   AddStringRec(NR_DataReaderDownloadInfo,'DataReader','Download.Info','Loading data from %s, please wait...');
@@ -6336,6 +6484,9 @@ begin
                                                                    'If DOSBox itself fails to start, you can try some other render methods.');
   AddStringRec(NR_DOSBoxStartFailedShowConsole,'DOSBoxStartFailed','ShowConsole','Show DOSBox console window');
   AddStringRec(NR_DOSBoxStartFailedTurnOff,'DOSBoxStartFailed','TurnOff','Do not show this dialog for this profile again (not recommended)');
+  AddStringRec(NR_DOSBoxStartFailedProfileSettings,'DOSBoxStartFailed','ProfileSettings','Profile specific settings');
+  AddStringRec(NR_DOSBoxStartFailedGlobalSettings,'DOSBoxStartFailed','GlobalSettings','Settings for all profiles');
+  AddStringRec(NR_DOSBoxStartFailedRemoteInfo,'DOSBoxStartFailed','RemoteInfo','When running DOSBox via a remote session using DirectX could cause problems.');
 
   AddStringRec(NR_DOSBoxLangEditorStartNew,'DOSBoxLanguageEditor','Start.New','Start new DOSBox language file');
   AddStringRec(NR_DOSBoxLangEditorStartNewName,'DOSBoxLanguageEditor','Start.New.Name','Filename (without extension)');
@@ -6358,49 +6509,66 @@ end;
 
 Function TLanguageSetup.GetString2(Index : Integer) : String;
 begin
-  //... Move to language files after 1.0.3final
+  //... Add to language files after release of 1.1
   result:='';
-  Case Index of
-    NR_MenuExtrasIconManagerTools : result:=ProfileEditorTools;
-    NR_MenuExtrasIconManagerToolsExplorer : result:='Open icons folder in Explorer';
-    NR_MenuExtrasIconManagerToolsRenameUpper : result:='Rename all icons to have upper case ICO extensions';
-    NR_MenuExtrasIconManagerToolsRenameLower : result:='Rename all icons to have lower case ico extensions';
+  If Trim(ExtUpperCase(ExtractFileName(SetupFile)))='GERMAN.INI' then begin
+    Case Index of
+      NR_MessageWindowsExeImportArchiveWarning : result:='Bei dem Inhalt des Archives scheint es sich um eine Windows-Programm zu handeln. Windows-Programme können nicht auf diese Weise in D-Fend Reloaded importiert werden. Soll dennoch versucht werden, die Datei zu importieren?';
+      NR_MessageWindowsExeImportFolderWarning : result:='Bei dem Inhalt des Ordners scheint es sich um eine Windows-Programm zu handeln. Windows-Programme können nicht auf diese Weise in D-Fend Reloaded importiert werden. Soll dennoch versucht werden, den Ordner zu importieren?';
+      NR_CreateConfFormSelectGamesWithoutAutoSetup : result:='Spiele, für die keine passende AutoSetup-Vorlage existiert';
+      NR_PackageManagerPageTools : result:=ProfileEditorTools;
+      NR_PackageManagerPageToolsSpecial : result:='Auf den anderen Dialogseiten gewählte Einträge ignorieren und folgendes ausführen:';
+      NR_PackageManagerPageToolsSpecial1 : result:='Paketlistendatei von den einfachen Archivdateien im Paketlistendatei-Verzeichnis erstellen';
+      NR_PackageManagerPageToolsSpecial2 : result:='Paketlistendatei von den einfachen Archivdateien im Paketlistendatei-Verzeichnis erstellen und AutoSetup-Vorlagen erstellen';
+      NR_PackageManagerPageToolsSpecial3 : result:='Paketlistendatei von den AutoSetup-Vorlagen im Paketlistendatei-Verzeichnis erstellen';
 
-    NR_GameGlidePort : result:='Glide communication port';
-
-    NR_SetupFormDOSBoxCVSInnova : result:='Activate Innova emulation settings (NOT YET AVAILABLE)';
-    NR_SetupFormDOSBoxCVSNetworkGroup : result:='Network setup features';
-    NR_SetupFormDOSBoxCVSNetworkNE2000 : result:='Activate NE2000 emulation settings (NOT YET AVAILABLE)';
-    NR_SetupFormDOSBoxCVSInfo : result:='You can download DOSBoxs supporting this features here:';
-
-    NR_SetupFormService9 : result:='Rename all media files for all profiles';
-    NR_SetupFormDataPrivacy : result:='Data privacy';
-    NR_SetupFormDataPrivacyStoreHistory : result:='Store history of started games';
-    NR_SetupFormDataPrivacyShowHistory : result:='Show recorded history';
-    NR_SetupFormDataPrivacyDeleteHistory : result:='Delete recorded history';
-    NR_SetupFormDataPrivacyDeleteHistoryDone : result:='All recorded history information have been deleted.';
-    NR_SetupFormDataPrivacyOpenHistroyFile : result:='Open histroy file in text editor';
-    NR_SetupFormDataPrivacyInfo : result:='The recorded histroy information is stored locally only and is shown when opening the "View history" dialog from the "Extras" menu.';
-
-    NR_DataReaderCoverAllCheckbox : result:='Download all available images';
-
-    NR_DOSBoxStartFailedProfileSettings : result:='Profile specific settings';
-    NR_DOSBoxStartFailedGlobalSettings : result:='Settings for all profiles';
-    NR_DOSBoxStartFailedRemoteInfo : result:='When running DOSBox via a remote session using DirectX could cause problems.';
-  End;
+      NR_PackageManagerPageToolsMaxVersionInfoGame : result:='If you want to specify a maximum version for which the external templates are needed, enter it here. If the field is blank, the auto setup template will be assumed to be needed for all versions.';
+      NR_PackageManagerPageToolsMaxVersionInfoAutoSetup : result:='If you want to specify a maximum version for which this templates are needed, enter it here. If the field is blank, the auto setup template will be assumed to be needed for all versions.';
+    End;
+  end else begin
+    Case Index of
+      NR_MessageWindowsExeImportArchiveWarning : result:='The content of this archive looks like a Windows program. Windows programs cannot be imported this way to D-Fend Reloaded. Do you really want to continue importing this file?';
+      NR_MessageWindowsExeImportFolderWarning : result:='The content of this folder looks like a Windows program. Windows programs cannot be imported this way to D-Fend Reloaded. Do you really want to continue importing this file?';
+      NR_CreateConfFormSelectGamesWithoutAutoSetup : result:='Games for which there is no auto setup template';
+      NR_PackageManagerPageTools : result:=ProfileEditorTools;
+      NR_PackageManagerPageToolsSpecial : result:='Ignore records selected on the other pages and do this:';
+      NR_PackageManagerPageToolsSpecial1 : result:='Make package list file from plain archive files in package list folder';
+      NR_PackageManagerPageToolsSpecial2 : result:='Make package list file from plain archive files in package list folder and add auto setup templates';
+      NR_PackageManagerPageToolsSpecial3 : result:='Make package list file from auto setup templates in package list folder';
+      NR_PackageManagerPageToolsMaxVersionInfoGame : result:='If you want to specify a maximum version for which the external templates are needed, enter it here. If the field is blank, the auto setup template will be assumed to be needed for all versions.';
+      NR_PackageManagerPageToolsMaxVersionInfoAutoSetup : result:='If you want to specify a maximum version for which this templates are needed, enter it here. If the field is blank, the auto setup template will be assumed to be needed for all versions.';
+    End;
+  end;
 end;
 
 Procedure TLanguageSetup.SetString2(Index : Integer; S : String);
 begin
 end;
 
+Function MaskUnderlineAmpersand(const S : String) : String;
+Var J : Integer;
+begin
+  J:=Pos('&',S);
+  If J=0 then begin result:=S; exit; end;
+  result:=Copy(S,1,J-1);
+  for J := J to Length(S) do
+    if(S[J]='&') then result:=result+'&&'
+    else result:=result+S[J];
+end;
+ 
 Function RemoveUnderline(const S : String) : String;
 Var I,J : Integer;
 begin
   J:=Pos('&',S);
   If J=0 then begin result:=S; exit; end;
   result:=Copy(S,1,J-1);
-  for I:=J+1 to length(S) do if S[I]<>'&' then result:=result+S[I];
+  I:=J;
+  while(I<=length(S)) do begin
+    if S[I]<>'&' then result:=result+S[I]
+    else if(I=length(S)) then result:=result+' '
+    else if(S[I+1]='&') then begin result:=result+'&';Inc(I);end;
+    Inc(I);
+  end;
 end;
 
 Procedure CheckDefaultLanguageFile;
@@ -6665,7 +6833,6 @@ end;
 Function GetEnglishLicenseName(const S : String) : String;
 begin
   result:=TranslateCustomString(S,LanguageSetupCustomLicensesUpper,LanguageSetupEnglishLicenses);
-  result:=S;
 end;
 
 Function ExtGenreList(const St : TStringList) : TStringList;

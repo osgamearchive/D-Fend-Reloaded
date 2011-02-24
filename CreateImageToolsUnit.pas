@@ -16,7 +16,7 @@ Function DiskImageCreatorUpgradeSize(const IsHDImage : Boolean; const Upgrades :
 implementation
 
 uses Windows, SysUtils, Math, Dialogs, CommonTools, PrgConsts, PrgSetupUnit,
-     LanguageSetupUnit, DOSBoxUnit, ImageTools, DOSBoxTempUnit;
+     LanguageSetupUnit, DOSBoxUnit, ImageTools, DOSBoxTempUnit, MainUnit;
 
 {Creating plain and fat disk images}
 
@@ -333,7 +333,7 @@ begin
 
     TempGame.Game.Cycles:='max';
     TempGame.Game.StoreAllValues;
-    RunCommandAndWait(TempGame.Game,'',True);
+    RunCommandAndWait(TempGame.Game,DFendReloadedMainForm.DeleteOnExit,'',True);
   finally
     TempGame.Free;
   end;
@@ -362,7 +362,7 @@ begin
 
     TempGame.Game.Cycles:='max';
     TempGame.Game.StoreAllValues;
-    RunCommandAndWait(TempGame.Game,'',True);
+    RunCommandAndWait(TempGame.Game,DFendReloadedMainForm.DeleteOnExit,'',True);
   finally
     TempGame.Free;
   end;
@@ -526,7 +526,7 @@ begin
 
     TempGame.Game.Cycles:='max';
     TempGame.Game.StoreAllValues;
-    RunCommandAndWait(TempGame.Game,'',True);
+    RunCommandAndWait(TempGame.Game,DFendReloadedMainForm.DeleteOnExit,'',True);
   finally
     TempGame.Free;
   end;

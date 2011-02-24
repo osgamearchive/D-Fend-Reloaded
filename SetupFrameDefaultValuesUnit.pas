@@ -84,7 +84,7 @@ end;
 procedure TSetupFrameDefaultValues.LoadLanguage;
 Procedure AddString(const Lang, S : String); begin DefaultValueComboBox.Items.AddObject(Lang,ValueToList(S,';,')); end;
 Var I,J : Integer;
-    P1,P2,S1,S2,S3 : String;
+    P1,P2,S1,S2,S3,S4 : String;
 begin
   DefaultValueLabel.Caption:=LanguageSetup.SetupFormDefaultValueLabel;
   DefaultValueSpeedButton.Caption:=LanguageSetup.SetupFormDefaultValueReset;
@@ -105,6 +105,7 @@ begin
   S1:='SoundBlaster ';
   S2:='GUS ';
   S3:='MIDI ';
+  S4:='NE2000 ';
 
   AddString(P1+LanguageSetup.GameCore,GameDB.ConfOpt.Core);
   AddString(P1+LanguageSetup.GameCPUType,GameDB.ConfOpt.CPUType);
@@ -122,6 +123,8 @@ begin
   AddString(P1+LanguageSetup.GameVGAChipset,GameDB.ConfOpt.VGAChipsets);
   AddString(P1+LanguageSetup.GameVideoRam,GameDB.ConfOpt.VGAVideoRAM);
   AddString(P1+LanguageSetup.GameGlideEmulation,GameDB.ConfOpt.GlideEmulation);
+  AddString(P1+LanguageSetup.GameGlideEmulationPort,GameDB.ConfOpt.GlideEmulationPort);
+  AddString(P1+LanguageSetup.GameGlideEmulationLFB,GameDB.ConfOpt.GlideEmulationLFB);
 
   AddString(P1+LanguageSetup.GameKeyboardLayout,GameDB.ConfOpt.KeyboardLayout);
   AddString(P1+LanguageSetup.GameKeyboardCodepage,GameDB.ConfOpt.Codepage);
@@ -148,9 +151,16 @@ begin
   AddString(P1+LanguageSetup.ProfileEditorSoundMIDIDevice,GameDB.ConfOpt.MIDIDevice);
   AddString(P1+S3+LanguageSetup.ProfileEditorSoundMIDIType,GameDB.ConfOpt.MPU401);
 
+  AddString(P1+LanguageSetup.ProfileEditorSoundInnovaSampleRate,GameDB.ConfOpt.InnovaEmulationSampleRate);
+  AddString(P1+LanguageSetup.ProfileEditorSoundInnovaBaseAddress,GameDB.ConfOpt.InnovaEmulationBaseAddress);
+  AddString(P1+LanguageSetup.ProfileEditorSoundInnovaQuality,GameDB.ConfOpt.InnovaEmulationQuality);
+
   AddString(P1+LanguageSetup.ProfileEditorSoundMiscPCSpeakerRate,GameDB.ConfOpt.PCRate);
   AddString(P1+LanguageSetup.ProfileEditorSoundMiscTandyRate,GameDB.ConfOpt.TandyRate);
   AddString(P1+LanguageSetup.GameJoysticks,GameDB.ConfOpt.Joysticks);
+
+  AddString(P1+S4+LanguageSetup.GameNE2000BaseAddress,GameDB.ConfOpt.NE2000EmulationBaseAddress);
+  AddString(P1+S4+LanguageSetup.GameNE2000Interrupt,GameDB.ConfOpt.NE2000EmulationInterrupt);
 
   AddString(P2+LanguageSetup.ProfileEditorScummVMPlatform,GameDB.ConfOpt.ScummVMPlatform);
   AddString(P2+LanguageSetup.ProfileEditorScummVMLanguageLong,GameDB.ConfOpt.ScummVMLanguages);
@@ -207,6 +217,8 @@ begin
   GameDB.ConfOpt.VGAChipsets:=GetString;
   GameDB.ConfOpt.VGAVideoRAM:=GetString;
   GameDB.ConfOpt.GlideEmulation:=GetString;
+  GameDB.ConfOpt.GlideEmulationPort:=GetString;
+  GameDB.ConfOpt.GlideEmulationLFB:=GetString;
 
   GameDB.ConfOpt.KeyboardLayout:=GetString;
   GameDB.ConfOpt.Codepage:=GetString;
@@ -233,9 +245,16 @@ begin
   GameDB.ConfOpt.MIDIDevice:=GetString;
   GameDB.ConfOpt.MPU401:=GetString;
 
+  GameDB.ConfOpt.InnovaEmulationSampleRate:=GetString;
+  GameDB.ConfOpt.InnovaEmulationBaseAddress:=GetString;
+  GameDB.ConfOpt.InnovaEmulationQuality:=GetString;
+
   GameDB.ConfOpt.PCRate:=GetString;
   GameDB.ConfOpt.TandyRate:=GetString;
   GameDB.ConfOpt.Joysticks:=GetString;
+
+  GameDB.ConfOpt.NE2000EmulationBaseAddress:=GetString;
+  GameDB.ConfOpt.NE2000EmulationInterrupt:=GetString;
 
   GameDB.ConfOpt.ScummVMPlatform:=GetString;
   GameDB.ConfOpt.ScummVMLanguages:=GetString;
@@ -308,6 +327,8 @@ begin
   Work(DefaultValuesVGAChipsets);
   Work(DefaultValuesVGAVideoRAM);
   Work(DefaultValuesGlideEmulation);
+  Work(DefaultValuesGlideEmulationPort);
+  Work(DefaultValuesGlideEmulationLFB);
 
   Work(DefaultValuesKeyboardLayout);
   Work(DefaultValuesCodepage);
@@ -334,9 +355,16 @@ begin
   Work(DefaultValuesMIDIDevice);
   Work(DefaultValuesMPU401);
 
+  Work(DefaultValuesInnovaEmulationSampleRate);
+  Work(DefaultValuesInnovaEmulationBaseAddress);
+  Work(DefaultValuesInnovaEmulationQuality);
+
   Work(DefaultValuesPCRate);
   Work(DefaultValuesTandyRate);
   Work(DefaultValuesJoysticks);
+
+  Work(DefaultValuesNE2000EmulationBaseAddress);
+  Work(DefaultValuesNE2000EmulationInterrupt);
 
   Work(DefaultValuesScummVMPlatform);
   Work(DefaultValuesScummVMLanguages);

@@ -99,7 +99,6 @@ begin
   PopupToolsExplorer.Caption:=LanguageSetup.MenuExtrasIconManagerToolsExplorer;
   PopupToolsRenameUpper.Caption:=LanguageSetup.MenuExtrasIconManagerToolsRenameUpper;
   PopupToolsRenameLower.Caption:=LanguageSetup.MenuExtrasIconManagerToolsRenameLower;
-  ToolsButton.Visible:=PrgSetup.ActivateIncompleteFeatures;
 
   OpenDialog.Title:=LanguageSetup.MenuExtrasIconManagerDialog;
   OpenDialog.Filter:=LanguageSetup.MenuExtrasIconManagerFilter;

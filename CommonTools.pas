@@ -81,6 +81,7 @@ Function GetDefaultEditor(Extension : String; const FileTypeFallback : Boolean; 
 Procedure OpenFileInEditor(const FileName : String);
 Function OpenMediaFile(const SetupString, FileName : String) : Boolean; {true=request handled by external program}
 
+function GetFileSize(const AFileName : String): Int64;
 Function FileSizeToStr(const Size : Int64) : String;
 
 Function BaseDirSecuriryCheck(const DirToDelete : String) : Boolean;
@@ -282,11 +283,14 @@ end;
 Function MakeRelPath(Path, Rel : String; const NoEmptyRelPath : Boolean) : String;
 Var FileName : String;
 begin
+  {No conversion if path DOSBox relative to DOSBox internal file system}
   If (ExtUpperCase(Copy(Trim(Path),1,7))='DOSBOX:') or (Trim(Path)='') then begin result:=Path; exit; end;
 
+  {Check base path}
   Rel:=Trim(Rel); if Rel='' then begin result:=Path; exit; end;
   Rel:=IncludeTrailingPathDelimiter(Rel);
 
+  {Split path into path an file name}
   If DirectoryExists(Path) then begin
     FileName:='';
     Path:=IncludeTrailingPathDelimiter(Path);
@@ -295,32 +299,45 @@ begin
     Path:=IncludeTrailingPathDelimiter(ExtractFilePath(Path));
   end;
 
+  {Convert}
   If (length(Path)>=length(Rel)) and (ExtUpperCase(Copy(Path,1,length(Rel)))=ExtUpperCase(Rel)) then begin
+    {Path is relative to Rel}
     Path:='.\'+Copy(Path,length(Rel)+1,MaxInt);
   end else begin
     Rel:=IncludeTrailingPathDelimiter(ShortName(Rel));
+    {May be Path is relative to the short version of Rel}
     If (length(Path)>=length(Rel)) and (ExtUpperCase(Copy(Path,1,length(Rel)))=ExtUpperCase(Rel)) then
       Path:='.\'+Copy(Path,length(Rel)+1,MaxInt);
   end;
+
+  {Remove useless parts}
   If (Path='.\') or (Path='\') then Path:='';
+
+  {Add file name again}
   result:=Path+FileName;
 
+  {Set path to ".\" if empty and empty not allowed}
   if NoEmptyRelPath and (result='') then result:='.\';
 end;
 
 Function MakeAbsPath(Path, Rel : String) : string;
 begin
+  {No conversion if path DOSBox relative to DOSBox internal file system}
   If (ExtUpperCase(Copy(Trim(Path),1,7))='DOSBOX:') or (Trim(Path)='') then begin result:=Path; exit; end;
 
+  {Check base path}
   Rel:=Trim(Rel); if Rel='' then begin result:=Path; exit; end;
   Rel:=IncludeTrailingPathDelimiter(Rel);
 
-  If (length(Path)>=2) and (Path[2]=':') then begin result:=Path; exit; end;
+  {Check if path is already absolute}
+  If (length(Path)>=2) and ((Path[2]=':') or (copy(Path,1,2)='\\')) then begin result:=Path; exit; end;
 
+  {Remove leading ".\" or "\"}
   Path:=Trim(Path);
   If Copy(Path,1,2)='.\' then Path:=Trim(Copy(Path,3,MaxInt));
   If Copy(Path,1,1)='\' then Path:=Trim(Copy(Path,2,MaxInt));
 
+  {Combine base path and relative path}
   result:=Rel+Path;
 end;
 
@@ -328,11 +345,14 @@ Function MakeExtRelPath(Path, Rel : String) : String;
 Var FileName,S,T,ShortPath : String;
     C : Integer;
 begin
+  {No conversion if path DOSBox relative to DOSBox internal file system}
   If (ExtUpperCase(Copy(Trim(Path),1,7))='DOSBOX:') or (Trim(Path)='') then begin result:=Path; exit; end;
 
+  {Check base path}
   Rel:=Trim(Rel); if Rel='' then begin result:=Path; exit; end;
   Rel:=IncludeTrailingPathDelimiter(Rel);
 
+  {Split path into path an file name}
   If DirectoryExists(Path) then begin
     FileName:='';
     Path:=IncludeTrailingPathDelimiter(Path);
@@ -341,14 +361,18 @@ begin
     Path:=IncludeTrailingPathDelimiter(ExtractFilePath(Path));
   end;
 
+  {Convert}
   If (length(Path)>=length(Rel)) and (ExtUpperCase(Copy(Path,1,length(Rel)))=ExtUpperCase(Rel)) then begin
+    {Path is relative to Rel}
     Path:='.\'+Copy(Path,length(Rel)+1,MaxInt);
   end else begin
+    {May be Path is relative to the short version of Rel}
     Rel:=IncludeTrailingPathDelimiter(ShortName(Rel));
     If (length(Path)>=length(Rel)) and (ExtUpperCase(Copy(Path,1,length(Rel)))=ExtUpperCase(Rel)) then
       Path:='.\'+Copy(Path,length(Rel)+1,MaxInt);
   end;
 
+  {Check if path is ".." path to base path}
   If Copy(Path,1,2)<>'.\' then begin
     C:=0;
     S:=ShortName(Rel);
@@ -366,27 +390,35 @@ begin
     until False;
   end;
 
+  {Remove useless parts}
   If Path='.\' then Path:='';
+
+  {Combine base path and relative path}
   result:=Path+FileName;
 end;
 
 Function MakeExtAbsPath(Path, Rel : String) : string;
 begin
+  {No conversion if path DOSBox relative to DOSBox internal file system}
   If (ExtUpperCase(Copy(Trim(Path),1,7))='DOSBOX:') or (Trim(Path)='') then begin result:=Path; exit; end;
 
+  {Check base path}
   Rel:=Trim(Rel); if Rel='' then begin result:=Path; exit; end;
   Rel:=IncludeTrailingPathDelimiter(Rel);
 
-  If (length(Path)>=2) and (Path[2]=':') then begin result:=Path; exit; end;
+  {Check if path is already absolute}
+  If (length(Path)>=2) and ((Path[2]=':') or (copy(Path,1,2)='\\')) then begin result:=Path; exit; end;
 
   Path:=Trim(Path);
 
+  {Remove leading ".\" and directly combine base path and relative path (so next rule can't apply)}
   If Copy(Path,1,2)='.\' then begin
     Path:=Trim(Copy(Path,3,MaxInt));
     result:=Rel+Path;
     exit;
   end;
 
+  {If path starts with "..\": remove it and remove last part in base path}
   If Copy(Path,1,3)='..\' then begin
     while Copy(Path,1,3)='..\' do begin
       If Rel='' then break;
@@ -398,6 +430,7 @@ begin
     exit;
   end;
 
+  {Combine base path and relative path}
   result:=Rel+Path;
 end;
 
@@ -1751,6 +1784,19 @@ begin
   end;
 
   result:=False;
+end;
+
+Function GetFileSize(const AFileName : String) : Int64;
+Var Rec : TSearchRec;
+    I : Integer;
+begin
+  result:=0;
+  I:=FindFirst(AFileName,faAnyFile,Rec);
+  try
+    If I=0 then result:=Rec.Size;
+  finally
+    FindClose(Rec);
+  end;
 end;
 
 Function FileSizeToStr(const Size : Int64) : String;

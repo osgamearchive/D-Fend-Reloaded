@@ -2,11 +2,11 @@ object WizardGameInfoFrame: TWizardGameInfoFrame
   Left = 0
   Top = 0
   Width = 592
-  Height = 506
+  Height = 550
   TabOrder = 0
   DesignSize = (
     592
-    506)
+    550)
   object InfoLabel: TLabel
     Left = 8
     Top = 16
@@ -31,21 +31,21 @@ object WizardGameInfoFrame: TWizardGameInfoFrame
   end
   object UserDefinedDataLabel: TLabel
     Left = 8
-    Top = 343
+    Top = 360
     Width = 107
     Height = 13
     Caption = 'UserDefinedDataLabel'
   end
   object NotesLabel: TLabel
     Left = 8
-    Top = 433
+    Top = 458
     Width = 69
     Height = 13
     Caption = 'Bemerkungen:'
   end
   object AddButton: TSpeedButton
     Left = 531
-    Top = 336
+    Top = 352
     Width = 23
     Height = 22
     Anchors = [akTop, akRight]
@@ -69,7 +69,7 @@ object WizardGameInfoFrame: TWizardGameInfoFrame
   end
   object DelButton: TSpeedButton
     Left = 556
-    Top = 336
+    Top = 352
     Width = 23
     Height = 22
     Anchors = [akTop, akRight]
@@ -122,9 +122,9 @@ object WizardGameInfoFrame: TWizardGameInfoFrame
   end
   object Tab: TStringGrid
     Left = 8
-    Top = 359
+    Top = 376
     Width = 571
-    Height = 68
+    Height = 76
     Anchors = [akLeft, akTop, akRight]
     ColCount = 2
     FixedCols = 0
@@ -134,9 +134,9 @@ object WizardGameInfoFrame: TWizardGameInfoFrame
   end
   object NotesMemo: TRichEdit
     Left = 8
-    Top = 447
+    Top = 472
     Width = 571
-    Height = 55
+    Height = 74
     Anchors = [akLeft, akTop, akRight, akBottom]
     PlainText = True
     ScrollBars = ssBoth
@@ -352,6 +352,6 @@ object WizardGameInfoFrame: TWizardGameInfoFrame
   end
   object AddUserDataPopupMenu: TPopupMenu
     Left = 541
-    Top = 364
+    Top = 380
   end
 end

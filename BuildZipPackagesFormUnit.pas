@@ -116,7 +116,7 @@ begin
   try
     For I:=0 to ListBox.Items.Count-1 do If ListBox.Checked[I] then begin
       G:=TGame(ListBox.Items.Objects[I]);
-      BuildZipPackage(self,G,Dir+ChangeFileExt(ExtractFileName(G.SetupFile),'.zip'));
+      BuildZipPackage(self,G,Dir+ChangeFileExt(ExtractFileName(G.SetupFile),'.zip'),False);
     end;
   finally
     Enabled:=True;

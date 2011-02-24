@@ -5,16 +5,16 @@ interface
 
 uses Classes, GameDBUnit;
 
-Procedure RunGame(const Game : TGame; const RunSetup : Boolean = False; const DosBoxCommandLine : String =''; const Wait : Boolean = False);
-Function RunGameAndGetHandle(const Game : TGame; const RunSetup : Boolean = False; const DosBoxCommandLine : String ='') : THandle;
-Procedure RunExtraFile(const Game : TGame; const ExtraFile : Integer);
-Procedure RunCommand(const Game : TGame; const Command : String; const DisableFullscreen : Boolean = False);
-Procedure RunCommandAndWait(const Game : TGame; const Command : String; const DisableFullscreen : Boolean = False);
-Function RunCommandAndGetHandle(const Game : TGame; const Command : String; const DisableFullscreen : Boolean = False) : THandle;
-Procedure RunWithCommandline(const Game : TGame; const CommandLine : String; const DisableFullscreen : Boolean = False);
-Procedure RunWithCommandlineAndWait(const Game : TGame; const CommandLine : String; const DisableFullscreen : Boolean = False);
+Procedure RunGame(const Game : TGame; const DeleteOnExit : TStringList; const RunSetup : Boolean = False; const DosBoxCommandLine : String =''; const Wait : Boolean = False);
+Function RunGameAndGetHandle(const Game : TGame; const DeleteOnExit : TStringList; const RunSetup : Boolean = False; const DosBoxCommandLine : String ='') : THandle;
+Procedure RunExtraFile(const Game : TGame; const DeleteOnExit : TStringList; const ExtraFile : Integer);
+Procedure RunCommand(const Game : TGame; const DeleteOnExit : TStringList; const Command : String; const DisableFullscreen : Boolean = False);
+Procedure RunCommandAndWait(const Game : TGame; const DeleteOnExit : TStringList; const Command : String; const DisableFullscreen : Boolean = False);
+Function RunCommandAndGetHandle(const Game : TGame; const DeleteOnExit : TStringList; const Command : String; const DisableFullscreen : Boolean = False) : THandle;
+Procedure RunWithCommandline(const Game : TGame; const DeleteOnExit : TStringList; const CommandLine : String; const DisableFullscreen : Boolean = False);
+Procedure RunWithCommandlineAndWait(const Game : TGame; const DeleteOnExit : TStringList; const CommandLine : String; const DisableFullscreen : Boolean = False);
 
-Function BuildConfFile(const Game : TGame; const RunSetup : Boolean; const WarnIfNotReachable : Boolean; const RunExtraFile : Integer) : TStringList;
+Function BuildConfFile(const Game : TGame; const RunSetup : Boolean; const WarnIfNotReachable : Boolean; const RunExtraFile : Integer; const DeleteOnExit : TStringList) : TStringList;
 Function BuildAutoexec(const Game : TGame; const RunSetup : Boolean; const St : TStringList; const WarnIfNotReachable : Boolean; const RunExtraFile : Integer; const WarnIfWindowsExe, SelectCD : Boolean) : Boolean;
 
 Function IsWindowsExe(const FileName : String) : Boolean;
@@ -32,7 +32,8 @@ uses Windows, SysUtils, ShellAPI, Forms, Dialogs, ShlObj, Math,
      ZipManagerUnit, ScreensaverControlUnit, FullscreenInfoFormUnit,
      DOSBoxCountUnit, DOSBoxShortNameUnit, RunPrgManagerUnit,
      SelectCDDriveToMountFormUnit, SelectCDDriveToMountByDataFormUnit,
-     FileNameConvertor, DOSBoxTempUnit, WindowsFileWarningFormUnit, MIDITools;
+     FileNameConvertor, DOSBoxTempUnit, WindowsFileWarningFormUnit, MIDITools,
+     HistoryUnit;
                                                                   
 var SpeedTestSt : TStringList = nil;
     LastSpeedTestStep : String = '';
@@ -1064,7 +1065,7 @@ begin
   end;
 end;
 
-Function BuildConfFile(const Game : TGame; const RunSetup : Boolean; const WarnIfNotReachable : Boolean; const RunExtraFile : Integer) : TStringList;
+Function BuildConfFile(const Game : TGame; const RunSetup : Boolean; const WarnIfNotReachable : Boolean; const RunExtraFile : Integer; const DeleteOnExit : TStringList) : TStringList;
 Var St : TStringList;
     S,T : String;
     DOSBoxNr : Integer;
@@ -1119,7 +1120,17 @@ begin
 
     T:=ExtractFileName(S);
     If FileExists(PrgDataDir+LanguageSubDir+'\'+T) then S:=PrgDataDir+LanguageSubDir+'\'+T;
-    If FileExists(S) then result.Add('language='+UnmapDrive(S,ptDOSBox));
+    {Check if language file is on network share (which DOSBox can't handle)}
+    If Copy(S,1,2)='\\' then begin
+      if Assigned(DeleteOnExit) then begin
+        CopyFile(PChar(S),PChar(TempDir+ExtractFileName(S)),False);
+        DeleteOnExit.Add(TempDir+ExtractFileName(S));
+      end;
+      S:=TempDir+ExtractFileName(S);
+      result.Add('language='+UnmapDrive(S,ptDOSBox));
+    end else begin
+      If FileExists(S) then result.Add('language='+UnmapDrive(S,ptDOSBox));
+    end;
   end;
   S:=Game.VideoCard; T:=Trim(ExtUpperCase((S)));
   If DOSBoxVersion>0.72 then begin
@@ -1464,7 +1475,7 @@ begin
   DOSBoxCounter.Add(result);
 end;
 
-Function RunGameInt(const Game : TGame; const RunSetup : Boolean; const DosBoxCommandLine : String; const RunExtraFile : Integer = -1) : THandle;
+Function RunGameInt(const Game : TGame; const RunSetup : Boolean; const DosBoxCommandLine : String; const DeleteOnExit : TStringList; const RunExtraFile : Integer = -1) : THandle;
 Var St : TStringList;
     T : String;
     ZipRecNr : Integer;
@@ -1492,7 +1503,7 @@ begin
     ForceDirectories(T);
     SpeedTestInfoOnly('Capture folder: '+T);
 
-    St:=BuildConfFile(Game,RunSetup,True,RunExtraFile);
+    St:=BuildConfFile(Game,RunSetup,True,RunExtraFile,DeleteOnExit);
     If St=nil then exit;
 
     try
@@ -1508,7 +1519,7 @@ begin
       If Game.CacheName<>TempDOSBoxName then begin
         SpeedTestInfo('Adding historiy');
         SpeedTestInfoOnly('Game name: '+Game.CacheName);
-        AddToHistory(Game.CacheName);
+        History.Add(Game.CacheName);
       end;
 
       If DOSBoxNr>=0 then T:=MakeAbsPath(PrgSetup.DOSBoxSettings[DOSBoxNr].DosBoxDir,PrgSetup.BaseDir) else T:=Trim(Game.CustomDOSBoxDir);
@@ -1541,11 +1552,11 @@ begin
   end;
 end;
 
-Procedure RunGame(const Game : TGame; const RunSetup : Boolean; const DosBoxCommandLine : String; const Wait : Boolean);
+Procedure RunGame(const Game : TGame; const DeleteOnExit : TStringList; const RunSetup : Boolean; const DosBoxCommandLine : String; const Wait : Boolean);
 Var DOSBoxHandle : THandle;
     B : Boolean;
 begin
-  DOSBoxHandle:=RunGameInt(Game,RunSetup,DosBoxCommandLine);
+  DOSBoxHandle:=RunGameInt(Game,RunSetup,DosBoxCommandLine,DeleteOnExit);
   try
     If Wait then begin
       WaitForSingleObject(DOSBoxHandle,INFINITE);
@@ -1568,19 +1579,19 @@ begin
   end;
 end;
 
-Function RunGameAndGetHandle(const Game : TGame; const RunSetup : Boolean = False; const DosBoxCommandLine : String ='') : THandle;
+Function RunGameAndGetHandle(const Game : TGame; const DeleteOnExit : TStringList; const RunSetup : Boolean = False; const DosBoxCommandLine : String ='') : THandle;
 begin
-  result:=RunGameInt(Game,RunSetup,DosBoxCommandLine);
+  result:=RunGameInt(Game,RunSetup,DosBoxCommandLine,DeleteOnExit);
 end;
 
-Procedure RunExtraFile(const Game : TGame; const ExtraFile : Integer);
+Procedure RunExtraFile(const Game : TGame; const DeleteOnExit : TStringList; const ExtraFile : Integer);
 Var DOSBoxHandle : THandle;
 begin
-  DOSBoxHandle:=RunGameInt(Game,False,'',ExtraFile);
+  DOSBoxHandle:=RunGameInt(Game,False,'',DeleteOnExit,ExtraFile);
   CloseHandle(DOSBoxHandle);
 end;
 
-Function RunCommandInt(const Game : TGame; const Command : String; const DisableFullscreen : Boolean) : THandle;
+Function RunCommandInt(const Game : TGame; const DeleteOnExit : TStringList; const Command : String; const DisableFullscreen : Boolean) : THandle;
 Var St : TStringList;
     AutoexecSave, FinalizationSave : String;
     FullscreenSave : Boolean;
@@ -1597,7 +1608,7 @@ begin
       St.Free;
     end;
     if DisableFullscreen then Game.StartFullscreen:=False;
-    result:=RunGameAndGetHandle(Game,False,'');
+    result:=RunGameAndGetHandle(Game,DeleteOnExit,False,'');
   finally
     Game.Autoexec:=AutoexecSave;
     Game.AutoexecFinalization:=FinalizationSave;
@@ -1605,17 +1616,17 @@ begin
   end;
 end;
 
-Procedure RunCommand(const Game : TGame; const Command : String; const DisableFullscreen : Boolean);
+Procedure RunCommand(const Game : TGame; const DeleteOnExit : TStringList; const Command : String; const DisableFullscreen : Boolean);
 Var DOSBoxHandle : THandle;
 begin
-  DOSBoxHandle:=RunCommandInt(Game,Command,DisableFullscreen);
+  DOSBoxHandle:=RunCommandInt(Game,DeleteOnExit,Command,DisableFullscreen);
   CloseHandle(DOSBoxHandle);
 end;
 
-Procedure RunCommandAndWait(const Game : TGame; const Command : String; const DisableFullscreen : Boolean);
+Procedure RunCommandAndWait(const Game : TGame; const DeleteOnExit : TStringList; const Command : String; const DisableFullscreen : Boolean);
 Var DOSBoxHandle : THandle;
 begin
-  DOSBoxHandle:=RunCommandInt(Game,Command,DisableFullscreen);
+  DOSBoxHandle:=RunCommandInt(Game,DeleteOnExit,Command,DisableFullscreen);
   try
     WaitForSingleObject(DOSBoxHandle,INFINITE);
   finally
@@ -1623,30 +1634,30 @@ begin
   end;
 end;
 
-Function RunCommandAndGetHandle(const Game : TGame; const Command : String; const DisableFullscreen : Boolean = False) : THandle;
+Function RunCommandAndGetHandle(const Game : TGame; const DeleteOnExit : TStringList; const Command : String; const DisableFullscreen : Boolean = False) : THandle;
 begin
-  result:=RunCommandInt(Game,Command,DisableFullscreen);
+  result:=RunCommandInt(Game,DeleteOnExit,Command,DisableFullscreen);
 end;
 
-Procedure RunWithCommandline(const Game : TGame; const CommandLine : String; const DisableFullscreen : Boolean = False);
+Procedure RunWithCommandline(const Game : TGame; const DeleteOnExit : TStringList; const CommandLine : String; const DisableFullscreen : Boolean = False);
 Var FullscreenSave : Boolean;
 begin
   FullscreenSave:=Game.StartFullscreen;
   try
     if DisableFullscreen then Game.StartFullscreen:=False;
-    RunGame(Game,False,CommandLine);
+    RunGame(Game,DeleteOnExit,False,CommandLine);
   finally
     Game.StartFullscreen:=FullscreenSave;
   end;
 end;
 
-Procedure RunWithCommandlineAndWait(const Game : TGame; const CommandLine : String; const DisableFullscreen : Boolean = False);
+Procedure RunWithCommandlineAndWait(const Game : TGame; const DeleteOnExit : TStringList; const CommandLine : String; const DisableFullscreen : Boolean = False);
 Var FullscreenSave : Boolean;
 begin
   FullscreenSave:=Game.StartFullscreen;
   try
     if DisableFullscreen then Game.StartFullscreen:=False;
-    RunGame(Game,False,CommandLine,True);
+    RunGame(Game,DeleteOnExit,False,CommandLine,True);
   finally
     Game.StartFullscreen:=FullscreenSave;
   end;

@@ -439,5 +439,14 @@
     <Transaction>2010.11.07 18:27:29.836.pas,C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\Unit1.pas=C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\MIDITools.pas</Transaction>
     <Transaction>2010.11.07 19:57:11.276.pas,C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\Unit1.pas=C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\DOSBoxFailedForm2Unit.pas</Transaction>
     <Transaction>2010.11.07 19:57:11.276.dfm,C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\Unit1.dfm=C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\DOSBoxFailedForm2Unit.dfm</Transaction>
+    <Transaction>2010.11.23 09:03:53.430.pas,C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\DOSBoxFailedFormUnit.pas=</Transaction>
+    <Transaction>2010.11.23 09:03:53.430.dfm,C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\DOSBoxFailedFormUnit.dfm=</Transaction>
+    <Transaction>2010.11.23 09:04:03.988.pas,C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\DOSBoxFailedForm2Unit.pas=C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\DOSBoxFailedFormUnit.pas</Transaction>
+    <Transaction>2010.11.23 09:04:03.988.dfm,C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\DOSBoxFailedForm2Unit.dfm=C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\DOSBoxFailedFormUnit.dfm</Transaction>
+    <Transaction>2010.11.23 14:36:47.914.pas,C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\Unit1.pas=C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\ModernProfileEditorInnovaFrameUnit.pas</Transaction>
+    <Transaction>2010.11.23 14:36:47.914.dfm,C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\Unit1.dfm=C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\ModernProfileEditorInnovaFrameUnit.dfm</Transaction>
+    <Transaction>2010.11.24 14:08:00.361.pas,C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\Unit1.pas=C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\HistoryUnit.pas</Transaction>
+    <Transaction>2010.11.26 22:33:49.879.pas,C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\Unit1.pas=C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\ExportGamesListFormUnit.pas</Transaction>
+    <Transaction>2010.11.26 22:33:49.886.dfm,C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\Unit1.dfm=C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\ExportGamesListFormUnit.dfm</Transaction>
   </Transactions>
 </BorlandProject>

@@ -223,6 +223,15 @@ object SetupFrameGamesListAppearance: TSetupFrameGamesListAppearance
     TabOrder = 11
     Value = 1
   end
+  object RestoreSelectedCheckBox: TCheckBox
+    Left = 16
+    Top = 345
+    Width = 551
+    Height = 17
+    Anchors = [akLeft, akTop, akRight]
+    Caption = 'Restore last selected profile on program restart'
+    TabOrder = 12
+  end
   object ImageOpenDialog: TOpenDialog
     DefaultExt = 'jpeg'
     Left = 296

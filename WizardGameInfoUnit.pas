@@ -176,7 +176,7 @@ begin
       If Trim(Template.Year)<>'' then ValueFromIndex[3]:=Template.Year;
       If Trim(Template.Language)<>'' then ValueFromIndex[4]:=GetCustomLanguageName(Template.Language);
       If Trim(Template.WWW)<>'' then ValueFromIndex[5]:=Template.WWW;
-      S:=Template.License; If S<>'' then ValueFromIndex[6]:=S else GameInfoValueListEditor.Strings[6]:=GameInfoValueListEditor.Strings.Names[6]+'=';
+      If Trim(Template.License)<>'' then ValueFromIndex[6]:=GetCustomLicenseName(Template.License) else GameInfoValueListEditor.Strings[6]:=GameInfoValueListEditor.Strings.Names[6]+'=';
     end;
 
     St:=StringToStringList(Template.UserInfo);
@@ -251,7 +251,7 @@ begin
       M:=TMenuItem.Create(AddUserDataPopupMenu); M.Caption:='-';
       AddUserDataPopupMenu.Items.Add(M);
       For I:=0 to St.Count-1 do begin
-        M:=TMenuItem.Create(AddUserDataPopupMenu); M.Caption:=St[I]; M.Tag:=2; M.OnClick:=AddButtonClick;
+        M:=TMenuItem.Create(AddUserDataPopupMenu); M.Caption:=MaskUnderlineAmpersand(St[I]); M.Tag:=2; M.OnClick:=AddButtonClick;
         AddUserDataPopupMenu.Items.Add(M);
       end;
     end;

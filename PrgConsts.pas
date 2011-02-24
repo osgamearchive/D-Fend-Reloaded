@@ -73,16 +73,37 @@ const DosBoxFileName='DOSBOX.EXE';
 
 
 const DefaultInstallerNames : String = 'INSTALL;SETUP;INSTHD;INST;INSTALAR;INSTALLE';
+      DefaultArchiveIDFiles : String = 'FILE_ID.DIZ';
       ProgramExts : Array[1..3] of String = ('EXE','COM','BAT');
 
-      IgnoreGameExeFilesIgnore : Array[1..32] of String = ('README','DECIDE','DEICE','CATALOG','FACTORY','LIST','LHARC','ARJ','UNARJ','UNZIP','HELPME','ORDER','DEALERS','ULTRAMID','PRINTME','UNIVBE','SWCBBS','INSTHELP','COMMIT','SETMAIN','BOOTMKR','IMUSE','KEYCONFI','32RTM','LOADPATS','MAKESWP','XPHELP','IBMSND','MIDPAK','SBLASTER','ALIVECAT','READDOC');
+      IgnoreGameExeFilesIgnore : Array[1..52] of String = (
+        'README','DECIDE','DEICE','CATALOG','FACTORY','LIST','LHARC','ARJ',
+        'UNARJ','UNZIP','HELPME','ORDER','DEALERS','ULTRAMID','PRINTME',
+        'UNIVBE','SWCBBS','INSTHELP','COMMIT','SETMAIN','BOOTMKR','IMUSE',
+        'KEYCONFI','32RTM','LOADPATS','MAKESWP','XPHELP','IBMSND','MIDPAK',
+        'SBLASTER','ALIVECAT','READDOC','CWSDPMI','PSETD','PSETM','ADLIB',
+        'ADLIBG','CMIDPAK','CVXSND','DIGISP','DIGVESA','LANTSND','MULTISND',
+        'NOSOUND','PAUDIO','SBCLONE','SBLASTER','SMSND','SNDSYS','VMSND',
+        'CWSDPMI','READTHIS'
+      );
 
       SetupExeFilesLevel1 : Array[1..2] of String = ('SETUP','CONFIG');
       SetupExeFilesLevel2 : Array[1..4] of String = ('SETSOUND','SETSND','SETBLAST','SOUND');
-      SetupExeFilesLevel3 : Array[1..4] of String = ('XINSTALL','SETUPAQ','SETUPDP','SETUPVC');
+      SetupExeFilesLevel3 : Array[1..6] of String = ('XINSTALL','SETUPAQ','SETUPDP','SETUPVC','MSETUP','DSETUP32');
       SetupExeFilesLevel4 : Array[1..1] of String = ('INSTALL');
 
       ProgramExeFiles : Array[1..1] of String = ('GO');
+
+      AdditionalChecksumDataGoodFileExt : Array[0..11] of String = (
+        'EXE','COM','DAT','ICO','HLP','DRV','DLL','PAK','PIC','LFL','BIN','OVL'
+      );
+      AdditionalChecksumDataExcludeFiles : Array[0..33] of String = (
+        'SCORE','DOS4GW','CATALOG','LHARC','ARJ','UNARJ','UNZIP','ORDER',
+        'DEALERS','ULTRAMID','UNIVBE','SWCBBS','COMMIT','SETMAIN','IMUSE',
+        'CWSDPMI','PSETD','PSETM','ADLIB','ADLIBG','CMIDPAK','CVXSND','DIGISP',
+        'DIGVESA','LANTSND','MULTISND','NOSOUND','PAUDIO','SBCLONE','SBLASTER',
+        'SMSND','SNDSYS','VMSND','CWSDPMI'
+      );
 
 var MainSetupFile : String;
     OperationModeConfig : String;

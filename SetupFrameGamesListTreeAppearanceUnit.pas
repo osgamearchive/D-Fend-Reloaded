@@ -191,8 +191,9 @@ begin
     St:=FGameDB.GetUserKeys;
     try
       For I:=0 to St.Count-1 do If St2.IndexOf(ExtUpperCase(St[I]))<0 then begin
+      If Trim(ExtUpperCase(St[I]))='LICENSE' then continue;
         M:=TMenuItem.Create(PopupMenu);
-        M.Caption:=St[I];
+        M.Caption:=MaskUnderlineAmpersand(St[I]);
         M.OnClick:=PopupMenuWork;
         PopupMenu.Items.Add(M);
       end;

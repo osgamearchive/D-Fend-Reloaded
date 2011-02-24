@@ -17,6 +17,8 @@ type
     SelectAllButton: TBitBtn;
     SelectNoneButton: TBitBtn;
     HelpButton: TBitBtn;
+    DeleteRadioButton: TRadioButton;
+    UninstallRadioButton: TRadioButton;
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure OKButtonClick(Sender: TObject);
@@ -24,9 +26,11 @@ type
     procedure SelectButtonClick(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure HelpButtonClick(Sender: TObject);
+    procedure RadioButtonWork(Sender: TObject);
   private
     { Private-Deklarationen }
     DirList : TStringList;
+    CheckList : Array of Boolean;
   public
     { Public-Deklarationen }
     GameDB : TGameDB;
@@ -58,6 +62,8 @@ begin
   Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName);
 
   Caption:=LanguageSetup.UninstallForm;
+  DeleteRadioButton.Caption:=LanguageSetup.UninstallFormDelete;
+  UninstallRadioButton.Caption:=LanguageSetup.UninstallFormUninstall;
   InfoLabel.Caption:=LanguageSetup.UninstallFormLabel;
   OKButton.Caption:=LanguageSetup.OK;
   CancelButton.Caption:=LanguageSetup.Cancel;
@@ -178,28 +184,56 @@ begin
     Folders.Free;
   end;
 
-  For I:=0 to ListBox.Items.Count-1 do ListBox.Checked[I]:=True; 
+  For I:=0 to ListBox.Items.Count-1 do ListBox.Checked[I]:=True;
+
+  DeleteRadioButton.Checked:=not PrgSetup.DefaultUninstall;
+  UninstallRadioButton.Checked:=PrgSetup.DefaultUninstall;
+  RadioButtonWork(Sender);
 end;
 
 procedure TUninstallForm.OKButtonClick(Sender: TObject);
 Var I : Integer;
     ContinueNext : Boolean;
 begin
-  SetCurrentDir(PrgDataDir);
+  If DeleteRadioButton.Checked then begin
+    GameDB.Delete(Game);
+  end else begin
+    SetCurrentDir(PrgDataDir);
 
-  For I:=1 to ListBox.Count-1 do If ListBox.Checked[I] then begin
-    If Integer(DirList.Objects[I])<>0 then begin
-      If BaseDirSecuriryCheck(ExtractFilePath(DirList[I])) then begin
-        If (not ExtDeleteFile(DirList[I],ftUninstall,True,ContinueNext)) and (not ContinueNext) then exit;
+    For I:=1 to ListBox.Count-1 do If ListBox.Checked[I] then begin
+      If Integer(DirList.Objects[I])<>0 then begin
+        If BaseDirSecuriryCheck(ExtractFilePath(DirList[I])) then begin
+          If (not ExtDeleteFile(DirList[I],ftUninstall,True,ContinueNext)) and (not ContinueNext) then exit;
+        end;
+      end else begin
+        If BaseDirSecuriryCheck(DirList[I]) then begin
+          If (not ExtDeleteFolder(DirList[I],ftUninstall,True,ContinueNext)) and (not ContinueNext) then exit;
+        end;
       end;
+    end;
+
+    If ListBox.Checked[0] then GameDB.Delete(Game);
+  end;
+end;
+
+procedure TUninstallForm.RadioButtonWork(Sender: TObject);
+Var I : Integer;
+begin
+  If ListBox.Enabled<>UninstallRadioButton.Checked then begin
+    If UninstallRadioButton.Checked then begin
+      For I:=0 to length(CheckList)-1 do ListBox.Checked[I]:=CheckList[I];
     end else begin
-      If BaseDirSecuriryCheck(DirList[I]) then begin
-        If (not ExtDeleteFolder(DirList[I],ftUninstall,True,ContinueNext)) and (not ContinueNext) then exit;
-      end;
+      SetLength(CheckList,ListBox.Items.Count);
+      For I:=0 to length(CheckList)-1 do CheckList[I]:=ListBox.Checked[I];
+      ListBox.Checked[0]:=True;
+      For I:=1 to ListBox.Items.Count-1 do ListBox.Checked[I]:=False;
     end;
   end;
 
-  If ListBox.Checked[0] then GameDB.Delete(Game);
+  ListBox.Enabled:=UninstallRadioButton.Checked;
+  InfoLabel.Enabled:=UninstallRadioButton.Checked;
+  SelectAllButton.Enabled:=UninstallRadioButton.Checked;
+  SelectNoneButton.Enabled:=UninstallRadioButton.Checked;
 end;
 
 procedure TUninstallForm.SelectButtonClick(Sender: TObject);
@@ -211,6 +245,7 @@ end;
 procedure TUninstallForm.FormDestroy(Sender: TObject);
 begin
   DirList.Free;
+  PrgSetup.DefaultUninstall:=UninstallRadioButton.Checked;
 end;
 
 procedure TUninstallForm.HelpButtonClick(Sender: TObject);

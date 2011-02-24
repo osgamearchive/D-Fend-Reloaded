@@ -45,6 +45,8 @@ type
     procedure Image3Click(Sender: TObject);
     procedure LicenseComboBoxChange(Sender: TObject);
     procedure ChangeLogComboBoxChange(Sender: TObject);
+    procedure LanguageAuthorsTabMouseMove(Sender: TObject; Shift: TShiftState;
+      X, Y: Integer);
   private
     { Private-Deklarationen }
     FImage : TImage;
@@ -95,8 +97,8 @@ begin
   LanguageAuthorsTab.Cells[1,0]:=LanguageSetup.InfoFormLanguageAuthor;
   LanguageAuthorsTab.Cells[2,0]:=LanguageSetup.InfoFormLanguageVersion;
   LanguageAuthorsTab.ColWidths[0]:=175;
-  LanguageAuthorsTab.ColWidths[2]:=75;
-  LanguageAuthorsTab.ColWidths[1]:=LanguageAuthorsTab.ClientWidth-LanguageAuthorsTab.ColWidths[0]-LanguageAuthorsTab.ColWidths[2]-5;
+  LanguageAuthorsTab.ColWidths[2]:=50;
+  LanguageAuthorsTab.ColWidths[1]:=LanguageAuthorsTab.ClientWidth-LanguageAuthorsTab.ColWidths[0]-LanguageAuthorsTab.ColWidths[2]-25;
 
   LicenseComboBox.Items.AddObject('D-Fend Reloaded',TObject(0));
   LicenseComboBox.Items.AddObject('DOSBox',TObject(1));
@@ -200,6 +202,32 @@ begin
   FImage:=TImage.Create(MainSheet); FImage.Parent:=MainSheet; Dir:=3;
   with FImage do begin AutoSize:=True; Transparent:=True; Top:=0; Left:=-100; Picture.Assign(EasterImage1.Picture); DoubleBuffered:=True; end;
   Timer.Enabled:=True;
+end;
+
+procedure TInfoForm.LanguageAuthorsTabMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
+Var I,J,Nr : Integer;
+    R : TRect;
+begin
+  ShowHint:=False;
+  Application.ProcessMessages;
+  ShowHint:=True;
+  Application.ProcessMessages;
+
+  Nr:=-1;
+  For I:=0 to LanguageAuthorsTab.ColCount-1 do begin
+    For J:=0 to LanguageAuthorsTab.RowCount-1 do begin
+      R:=LanguageAuthorsTab.CellRect(I,J);
+      If (R.Left<=X) and (R.Right>=X) and (R.Top<=Y) and (R.Bottom>=Y) then begin Nr:=J; break; end;
+    end;
+    If Nr>=0 then break;
+  end;
+
+  If Nr<=0 then Hint:='' else begin
+    Hint:=
+      LanguageSetup.InfoFormLanguageFile+': '+LanguageAuthorsTab.Cells[0,Nr]+#13+
+      LanguageSetup.InfoFormLanguageAuthor+': '+LanguageAuthorsTab.Cells[1,Nr]+#13+
+      LanguageSetup.InfoFormLanguageVersion+': '+LanguageAuthorsTab.Cells[2,Nr];
+  end; 
 end;
 
 procedure TInfoForm.LicenseComboBoxChange(Sender: TObject);

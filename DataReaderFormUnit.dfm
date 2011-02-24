@@ -76,7 +76,6 @@ object DataReaderForm: TDataReaderForm
     ItemHeight = 13
     TabOrder = 2
     OnClick = ListBoxClick
-    ExplicitHeight = 278
   end
   object GameDataBox: TGroupBox
     Left = 232
@@ -86,7 +85,6 @@ object DataReaderForm: TDataReaderForm
     Anchors = [akLeft, akTop, akRight, akBottom]
     Caption = 'GameDataBox'
     TabOrder = 3
-    ExplicitHeight = 279
     DesignSize = (
       352
       299)
@@ -179,6 +177,7 @@ object DataReaderForm: TDataReaderForm
       Checked = True
       State = cbChecked
       TabOrder = 5
+      OnClick = DownloadCoverCheckBoxClick
     end
     object NameCheckBox: TCheckBox
       Left = 16
@@ -230,7 +229,6 @@ object DataReaderForm: TDataReaderForm
       333A333333333333333338330000333333333333333333333333333333333333
       0000}
     NumGlyphs = 2
-    ExplicitTop = 373
   end
   object CancelButton: TBitBtn
     Left = 128
@@ -240,7 +238,6 @@ object DataReaderForm: TDataReaderForm
     Anchors = [akLeft, akBottom]
     TabOrder = 5
     Kind = bkCancel
-    ExplicitTop = 373
   end
   object SearchTypeCheckBox: TCheckBox
     Left = 16

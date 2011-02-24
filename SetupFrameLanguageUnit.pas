@@ -261,7 +261,7 @@ begin
     LanguageInfoLabel.Visible:=True;
     LanguageInfoLabel.Caption:=LanguageSetup.LanguageNoVersion;
   end else begin
-    If VersionStringToInt(S)<VersionStringToInt(GetNormalFileVersionAsString) then begin
+    If (VersionStringToInt(S) div 256)<(VersionStringToInt(GetNormalFileVersionAsString) div 256) then begin
       LanguageInfoLabel.Visible:=True;
       LanguageInfoLabel.Caption:=Format(LanguageSetup.LanguageOutdated,[LanguageSetup.MaxVersion,GetNormalFileVersionAsString]);
     end else begin

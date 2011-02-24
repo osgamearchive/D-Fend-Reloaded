@@ -63,7 +63,7 @@ Var ColOrder,ColVisible,ColVisibleUser : String;
     B : Boolean;
     ColVisibleUserSt : TStringList;
 begin
-  NoFlicker(ListViewListBox);
+  {NoFlicker(ListViewListBox); - will cause trouble}
   NoFlicker(GridLinesCheckBox);
   NoFlicker(StoreColumnWidthsCheckBox);
 
@@ -72,7 +72,7 @@ begin
   GetColOrderAndVisible(ColOrder,ColVisible,ColVisibleUser);
   ColVisibleUserSt:=ValueToList(ColVisibleUser);
   try
-    For I:=0 to 6+ColVisibleUserSt.Count do begin
+    For I:=0 to 7+ColVisibleUserSt.Count do begin
       Nr:=-1;
       Case ColOrder[I+1] of
         '1'..'9' : Nr:=StrToInt(ColOrder[I+1]);
@@ -80,8 +80,8 @@ begin
         'a'..'z' : Nr:=Ord(ColOrder[I+1])-Ord('a')+10;
       end;
       If Nr<1 then continue;
-      If Nr>7 then begin
-        If Nr-7>ColVisibleUserSt.Count then continue;
+      If Nr>8 then begin
+        If Nr-8>ColVisibleUserSt.Count then continue;
       end;
       Case Nr-1 of
         0 : ListViewListBox.Items.AddObject(LanguageSetup.GameSetup,Pointer(Nr-1));
@@ -91,11 +91,12 @@ begin
         4 : ListViewListBox.Items.AddObject(LanguageSetup.GameYear,Pointer(Nr-1));
         5 : ListViewListBox.Items.AddObject(LanguageSetup.GameLanguage,Pointer(Nr-1));
         6 : ListViewListBox.Items.AddObject(LanguageSetup.GameNotes,Pointer(Nr-1));
-        else ListViewListBox.Items.AddObject(ColVisibleUserSt[Nr-8],Pointer(100));
+        7 : ListViewListBox.Items.AddObject(LanguageSetup.GameStartCount,Pointer(Nr-1));
+        else ListViewListBox.Items.AddObject(ColVisibleUserSt[Nr-9],Pointer(100));
       end;
       ListViewListBox.Checked[ListViewListBox.Items.Count-1]:=(ColVisible[Nr]<>'0');
     end;
-    For I:=0 to 6 do begin
+    For I:=0 to 7 do begin
       B:=False;
       For J:=0 to ListViewListBox.Items.Count-1 do If Integer(ListViewListBox.Items.Objects[J])=I then begin
         B:=True; break;
@@ -109,6 +110,7 @@ begin
         4 : ListViewListBox.Items.AddObject(LanguageSetup.GameYear,Pointer(I));
         5 : ListViewListBox.Items.AddObject(LanguageSetup.GameLanguage,Pointer(I));
         6 : ListViewListBox.Items.AddObject(LanguageSetup.GameNotes,Pointer(I));
+        7 : ListViewListBox.Items.AddObject(LanguageSetup.GameStartCount,Pointer(I));
       end;
       ListViewListBox.Checked[ListViewListBox.Items.Count-1]:=(ColVisible[I+1]<>'0');
     end;
@@ -166,8 +168,8 @@ begin
   S1:=PrgSetup.ColVisible;
   S2:=PrgSetup.ColOrder;
   try
-    PrgSetup.ColVisible:='1111110';
-    PrgSetup.ColOrder:='1234567';
+    PrgSetup.ColVisible:='11111100';
+    PrgSetup.ColOrder:='12345678';
     ListViewListBox.Items.Clear;
     InitData.GameDB:=nil;
     InitGUIAndLoadSetup(InitData);
@@ -188,7 +190,7 @@ begin
   {Remove unchecked user column from list}
   I:=0;
   While I<=ListViewListBox.Items.Count-1 do begin
-    If (Integer(ListViewListBox.Items.Objects[I])>=7) and (not ListViewListBox.Checked[I]) then begin
+    If (Integer(ListViewListBox.Items.Objects[I])>=8) and (not ListViewListBox.Checked[I]) then begin
       ListViewListBox.Items.Delete(I);
       continue;
     end;
@@ -199,7 +201,7 @@ begin
   S:=''; UserCount:=0;
   For I:=0 to ListViewListBox.Items.Count-1 do begin
     J:=Integer(ListViewListBox.Items.Objects[I])+1;
-    If J=100 then begin J:=8+UserCount; inc(UserCount); end;
+    If J=100 then begin J:=9+UserCount; inc(UserCount); end;
     Case J of
       1..9 : S:=S+IntToStr(J);
       10..35 : S:=S+Chr(Ord('A')+J-10);
@@ -209,14 +211,14 @@ begin
 
   {Store column visible state (of the default columns, invisible user columns have already been removed}
   S:='';
-  For I:=0 to 6 do begin
+  For I:=0 to 8 do begin
     B:=False;
     for J:=0 to ListViewListBox.Items.Count-1 do If Integer(ListViewListBox.Items.Objects[J])=I then begin
       B:=ListViewListBox.Checked[J]; break;
     end;
     If B then S:=S+'1' else S:=S+'0';
   end;
-  For I:=0 to ListViewListBox.Items.Count-1 do If Integer(ListViewListBox.Items.Objects[I])>=7 then begin
+  For I:=0 to ListViewListBox.Items.Count-1 do If Integer(ListViewListBox.Items.Objects[I])>=8 then begin
     S:=S+';'+ListViewListBox.Items[I];
   end;
   PrgSetup.ColVisible:=S;
@@ -229,7 +231,9 @@ procedure TSetupFrameGamesListColumns.ListViewListBoxClick(Sender: TObject);
 Var I : Integer;
 begin
   I:=ListViewListBox.ItemIndex;
-  DelButton.Visible:=(I>=0) and (Integer(ListViewListBox.Items.Objects[I])>=7);
+  DelButton.Visible:=(I>=0) and (Integer(ListViewListBox.Items.Objects[I])>=8);
+  ListViewUpButton.Enabled:=(I>0);
+  ListViewDownButton.Enabled:=(I<ListViewListBox.Items.Count-1);
 end;
 
 procedure TSetupFrameGamesListColumns.ListViewMoveButtonClick(Sender: TObject);
@@ -241,7 +245,7 @@ begin
           ListViewListBox.Items.Exchange(ListViewListBox.ItemIndex,ListViewListBox.ItemIndex-1);
           ListViewListBoxClick(Sender);
         end;
-    1 : If (ListViewListBox.ItemIndex>=0) and (ListViewListBox.ItemIndex<ListViewListBox.Items.Count-2) then begin
+    1 : If (ListViewListBox.ItemIndex>=0) and (ListViewListBox.ItemIndex<ListViewListBox.Items.Count-1) then begin
           ListViewListBox.Items.Exchange(ListViewListBox.ItemIndex,ListViewListBox.ItemIndex+1);
           ListViewListBoxClick(Sender);
         end;
@@ -275,7 +279,7 @@ begin
   For I:=0 to UserDataList.Count-1 do begin
     If ListViewListBox.Items.IndexOf(UserDataList[I])>=0 then continue;
     M:=TMenuItem.Create(PopupMenu);
-    M.Caption:=UserDataList[I];
+    M.Caption:=MaskUnderlineAmpersand(UserDataList[I]);
     M.Tag:=4;
     M.OnClick:=ListViewMoveButtonClick;
     PopupMenu.Items.Add(M);

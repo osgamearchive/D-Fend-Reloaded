@@ -3,7 +3,7 @@ object PackageManagerForm: TPackageManagerForm
   Top = 0
   BorderIcons = [biSystemMenu, biMaximize]
   Caption = 'Packages manager'
-  ClientHeight = 364
+  ClientHeight = 464
   ClientWidth = 709
   Color = clBtnFace
   Constraints.MinHeight = 300
@@ -111,7 +111,7 @@ object PackageManagerForm: TPackageManagerForm
     Left = 0
     Top = 26
     Width = 709
-    Height = 297
+    Height = 397
     ActivePage = TabSheet1
     Align = alClient
     Images = ImageList
@@ -119,18 +119,21 @@ object PackageManagerForm: TPackageManagerForm
     object TabSheet1: TTabSheet
       Caption = 'Games'
       ImageIndex = 4
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object GamesPanel: TPanel
         Left = 0
-        Top = 236
+        Top = 336
         Width = 701
         Height = 32
         Align = alBottom
         BevelOuter = bvNone
         TabOrder = 0
+        object GamesSizeLabel: TLabel
+          Left = 416
+          Top = 11
+          Width = 76
+          Height = 13
+          Caption = 'GamesSizeLabel'
+        end
         object GamesButton: TBitBtn
           Left = 81
           Top = 5
@@ -168,7 +171,7 @@ object PackageManagerForm: TPackageManagerForm
         Left = 0
         Top = 0
         Width = 701
-        Height = 236
+        Height = 336
         Align = alClient
         Checkboxes = True
         Columns = <>
@@ -178,6 +181,7 @@ object PackageManagerForm: TPackageManagerForm
         ShowHint = True
         TabOrder = 1
         ViewStyle = vsReport
+        OnChanging = ListViewChanging
         OnClick = ListViewClick
         OnInfoTip = ListViewInfoTip
       end
@@ -185,18 +189,21 @@ object PackageManagerForm: TPackageManagerForm
     object TabSheet2: TTabSheet
       Caption = 'Auto setup templates'
       ImageIndex = 5
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object AutoSetupPanel: TPanel
         Left = 0
-        Top = 236
+        Top = 336
         Width = 701
         Height = 32
         Align = alBottom
         BevelOuter = bvNone
         TabOrder = 0
+        object AutoSetupSizeLabel: TLabel
+          Left = 416
+          Top = 11
+          Width = 95
+          Height = 13
+          Caption = 'AutoSetupSizeLabel'
+        end
         object AutoSetupButton: TBitBtn
           Left = 81
           Top = 5
@@ -235,7 +242,7 @@ object PackageManagerForm: TPackageManagerForm
         Left = 0
         Top = 0
         Width = 701
-        Height = 236
+        Height = 336
         Align = alClient
         Checkboxes = True
         Columns = <>
@@ -245,6 +252,7 @@ object PackageManagerForm: TPackageManagerForm
         ShowHint = True
         TabOrder = 1
         ViewStyle = vsReport
+        OnChanging = ListViewChanging
         OnClick = ListViewClick
         OnInfoTip = ListViewInfoTip
       end
@@ -252,18 +260,21 @@ object PackageManagerForm: TPackageManagerForm
     object TabSheet5: TTabSheet
       Caption = 'Icons'
       ImageIndex = 6
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object IconsPanel: TPanel
         Left = 0
-        Top = 236
+        Top = 336
         Width = 701
         Height = 32
         Align = alBottom
         BevelOuter = bvNone
         TabOrder = 0
+        object IconsSizeLabel: TLabel
+          Left = 336
+          Top = 11
+          Width = 70
+          Height = 13
+          Caption = 'IconsSizeLabel'
+        end
         object IconsButton: TBitBtn
           Left = 0
           Top = 5
@@ -292,7 +303,7 @@ object PackageManagerForm: TPackageManagerForm
         Left = 0
         Top = 0
         Width = 701
-        Height = 236
+        Height = 336
         Align = alClient
         Checkboxes = True
         Columns = <>
@@ -302,24 +313,28 @@ object PackageManagerForm: TPackageManagerForm
         ShowHint = True
         TabOrder = 1
         ViewStyle = vsReport
+        OnChanging = ListViewChanging
         OnClick = ListViewClick
       end
     end
     object TabSheet6: TTabSheet
       Caption = 'Icon sets'
       ImageIndex = 7
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object IconSetsPanel: TPanel
         Left = 0
-        Top = 236
+        Top = 336
         Width = 701
         Height = 32
         Align = alBottom
         BevelOuter = bvNone
         TabOrder = 0
+        object IconSetsSizeLabel: TLabel
+          Left = 336
+          Top = 11
+          Width = 86
+          Height = 13
+          Caption = 'IconSetsSizeLabel'
+        end
         object IconSetsButton: TBitBtn
           Left = 0
           Top = 5
@@ -348,7 +363,7 @@ object PackageManagerForm: TPackageManagerForm
         Left = 0
         Top = 0
         Width = 701
-        Height = 236
+        Height = 336
         Align = alClient
         Checkboxes = True
         Columns = <>
@@ -358,27 +373,31 @@ object PackageManagerForm: TPackageManagerForm
         ShowHint = True
         TabOrder = 1
         ViewStyle = vsReport
+        OnChanging = ListViewChanging
         OnClick = ListViewClick
       end
     end
     object TabSheet3: TTabSheet
       Caption = 'Language files'
       ImageIndex = 8
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object LanguagePanel: TPanel
         Left = 0
-        Top = 236
+        Top = 336
         Width = 701
         Height = 32
         Align = alBottom
         BevelOuter = bvNone
         TabOrder = 0
+        object LanguageFilesSizeLabel: TLabel
+          Left = 336
+          Top = 11
+          Width = 112
+          Height = 13
+          Caption = 'LanguageFilesSizeLabel'
+        end
         object LanguageButton: TBitBtn
           Left = 0
-          Top = 4
+          Top = 5
           Width = 316
           Height = 25
           Caption = 'Download and install selected languages'
@@ -404,7 +423,7 @@ object PackageManagerForm: TPackageManagerForm
         Left = 0
         Top = 0
         Width = 701
-        Height = 236
+        Height = 336
         Align = alClient
         Checkboxes = True
         Columns = <>
@@ -414,6 +433,7 @@ object PackageManagerForm: TPackageManagerForm
         ShowHint = True
         TabOrder = 1
         ViewStyle = vsReport
+        OnChanging = ListViewChanging
         OnClick = ListViewClick
         OnInfoTip = ListViewInfoTip
       end
@@ -421,14 +441,10 @@ object PackageManagerForm: TPackageManagerForm
     object TabSheet4: TTabSheet
       Caption = 'Multiple games packages'
       ImageIndex = 9
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object Splitter1: TSplitter
         Left = 241
         Top = 0
-        Height = 268
+        Height = 368
         ExplicitLeft = 168
         ExplicitTop = 136
         ExplicitHeight = 100
@@ -437,7 +453,7 @@ object PackageManagerForm: TPackageManagerForm
         Left = 0
         Top = 0
         Width = 241
-        Height = 268
+        Height = 368
         Align = alLeft
         ItemHeight = 13
         TabOrder = 0
@@ -447,13 +463,13 @@ object PackageManagerForm: TPackageManagerForm
         Left = 244
         Top = 0
         Width = 457
-        Height = 268
+        Height = 368
         Align = alClient
         BevelOuter = bvNone
         TabOrder = 1
         object ExePackagesPanel2: TPanel
           Left = 0
-          Top = 238
+          Top = 338
           Width = 457
           Height = 30
           Align = alBottom
@@ -510,7 +526,7 @@ object PackageManagerForm: TPackageManagerForm
           Left = 0
           Top = 0
           Width = 457
-          Height = 238
+          Height = 338
           Align = alClient
           BorderStyle = bsNone
           PlainText = True
@@ -522,7 +538,7 @@ object PackageManagerForm: TPackageManagerForm
   end
   object InfoPanel: TPanel
     Left = 0
-    Top = 323
+    Top = 423
     Width = 709
     Height = 41
     Align = alBottom

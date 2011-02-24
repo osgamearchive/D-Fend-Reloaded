@@ -3,7 +3,7 @@ object DOSBoxFailedForm: TDOSBoxFailedForm
   Top = 0
   BorderStyle = bsDialog
   Caption = 'DOSBoxFailedForm'
-  ClientHeight = 228
+  ClientHeight = 357
   ClientWidth = 645
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -17,69 +17,121 @@ object DOSBoxFailedForm: TDOSBoxFailedForm
   OnShow = FormShow
   DesignSize = (
     645
-    228)
+    357)
   PixelsPerInch = 96
   TextHeight = 13
   object InfoLabel: TLabel
     Left = 8
     Top = 8
-    Width = 629
+    Width = 628
     Height = 73
     Anchors = [akLeft, akTop, akRight]
     AutoSize = False
     Caption = 'InfoLabel'
     WordWrap = True
-  end
-  object RenderLabel: TLabel
-    Left = 8
-    Top = 139
-    Width = 60
-    Height = 13
-    Caption = 'RenderLabel'
-  end
-  object OKButton: TBitBtn
-    Left = 8
-    Top = 198
-    Width = 97
-    Height = 25
-    Anchors = [akLeft, akBottom]
-    TabOrder = 3
-    Kind = bkOK
-  end
-  object CloseDOSBoxCheckBox: TCheckBox
-    Left = 8
-    Top = 87
-    Width = 629
-    Height = 17
-    Anchors = [akLeft, akTop, akRight]
-    Caption = 'CloseDOSBoxCheckBox'
-    TabOrder = 0
-  end
-  object RenderComboBox: TComboBox
-    Left = 8
-    Top = 158
-    Width = 225
-    Height = 21
-    Style = csDropDownList
-    ItemHeight = 13
-    TabOrder = 2
+    ExplicitWidth = 905
   end
   object DoNotShowAgainCheckBox: TCheckBox
     Left = 128
-    Top = 202
-    Width = 508
+    Top = 328
+    Width = 509
     Height = 17
     Anchors = [akLeft, akRight, akBottom]
     Caption = 'DoNotShowAgainCheckBox'
-    TabOrder = 4
+    TabOrder = 0
   end
-  object ShowConsoleCheckBox: TCheckBox
+  object OKButton: TBitBtn
     Left = 8
-    Top = 110
-    Width = 629
-    Height = 17
-    Anchors = [akLeft, akTop, akRight]
-    Caption = 'ShowConsoleCheckBox'
+    Top = 324
+    Width = 97
+    Height = 25
+    Anchors = [akLeft, akBottom]
     TabOrder = 1
+    Kind = bkOK
+  end
+  object ProfileGroupBox: TGroupBox
+    Left = 8
+    Top = 96
+    Width = 629
+    Height = 129
+    Anchors = [akLeft, akTop, akRight]
+    Caption = 'Profile specific settings'
+    TabOrder = 2
+    DesignSize = (
+      629
+      129)
+    object RenderLabel: TLabel
+      Left = 8
+      Top = 75
+      Width = 60
+      Height = 13
+      Caption = 'RenderLabel'
+    end
+    object CloseDOSBoxCheckBox: TCheckBox
+      Left = 8
+      Top = 23
+      Width = 605
+      Height = 17
+      Anchors = [akLeft, akTop, akRight]
+      Caption = 'CloseDOSBoxCheckBox'
+      TabOrder = 0
+    end
+    object ShowConsoleCheckBox: TCheckBox
+      Left = 8
+      Top = 46
+      Width = 605
+      Height = 17
+      Anchors = [akLeft, akTop, akRight]
+      Caption = 'ShowConsoleCheckBox'
+      TabOrder = 1
+    end
+    object RenderComboBox: TComboBox
+      Left = 8
+      Top = 90
+      Width = 225
+      Height = 21
+      Style = csDropDownList
+      ItemHeight = 13
+      TabOrder = 2
+    end
+  end
+  object GlobalGroupBox: TGroupBox
+    Left = 8
+    Top = 240
+    Width = 629
+    Height = 73
+    Anchors = [akLeft, akTop, akRight]
+    Caption = 'Settings for all profiles'
+    TabOrder = 3
+    object SDLLabel: TLabel
+      Left = 8
+      Top = 24
+      Width = 78
+      Height = 13
+      Caption = 'SDL video driver'
+    end
+    object RemoteLabel: TLabel
+      Left = 248
+      Top = 24
+      Width = 378
+      Height = 41
+      AutoSize = False
+      Caption = 'RemoteLabel'
+      WordWrap = True
+    end
+    object SDLComboBox: TComboBox
+      Left = 8
+      Top = 39
+      Width = 225
+      Height = 21
+      Style = csDropDownList
+      ItemHeight = 13
+      ItemIndex = 0
+      TabOrder = 0
+      Text = 'Direct X'
+      Items.Strings = (
+        'Direct X'
+        'Win DIB')
+    end
   end
 end

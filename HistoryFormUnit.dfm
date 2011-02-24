@@ -2,9 +2,11 @@ object HistoryForm: THistoryForm
   Left = 0
   Top = 0
   Caption = 'Verlauf'
-  ClientHeight = 413
-  ClientWidth = 554
+  ClientHeight = 464
+  ClientWidth = 684
   Color = clBtnFace
+  Constraints.MinHeight = 450
+  Constraints.MinWidth = 570
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
@@ -16,13 +18,13 @@ object HistoryForm: THistoryForm
   OnKeyDown = FormKeyDown
   OnShow = FormShow
   DesignSize = (
-    554
-    413)
+    684
+    464)
   PixelsPerInch = 96
   TextHeight = 13
   object CloseButton: TBitBtn
     Left = 8
-    Top = 383
+    Top = 434
     Width = 97
     Height = 25
     Anchors = [akLeft, akBottom]
@@ -47,10 +49,11 @@ object HistoryForm: THistoryForm
       333333333333888888F3333F00003333330000003333333333338FFFF8F3333F
       0000}
     NumGlyphs = 2
+    ExplicitTop = 383
   end
   object ClearButton: TBitBtn
     Left = 111
-    Top = 383
+    Top = 434
     Width = 97
     Height = 25
     Anchors = [akLeft, akBottom]
@@ -72,32 +75,38 @@ object HistoryForm: THistoryForm
       BBB35555F55555575F555550555555550BBB55575555555575F5555555555555
       50BB555555555555575F555555555555550B5555555555555575}
     NumGlyphs = 2
+    ExplicitTop = 383
   end
   object HelpButton: TBitBtn
     Left = 214
-    Top = 383
+    Top = 434
     Width = 97
     Height = 25
     Anchors = [akLeft, akBottom]
     TabOrder = 2
     OnClick = HelpButtonClick
     Kind = bkHelp
+    ExplicitTop = 383
   end
   object PageControl: TPageControl
     Left = 0
     Top = 0
-    Width = 554
-    Height = 377
+    Width = 684
+    Height = 428
     ActivePage = TabSheet1
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 3
+    ExplicitWidth = 554
+    ExplicitHeight = 377
     object TabSheet1: TTabSheet
       Caption = 'Verlauf'
+      ExplicitWidth = 546
+      ExplicitHeight = 349
       object ListView: TListView
         Left = 0
         Top = 0
-        Width = 546
-        Height = 349
+        Width = 676
+        Height = 400
         Align = alClient
         BorderStyle = bsNone
         Columns = <>
@@ -106,20 +115,20 @@ object HistoryForm: THistoryForm
         ViewStyle = vsReport
         OnColumnClick = ListViewColumnClick
         OnCompare = ListViewCompare
+        ExplicitWidth = 546
+        ExplicitHeight = 349
       end
     end
     object TabSheet2: TTabSheet
       Caption = 'Statistik'
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
+      ExplicitWidth = 546
+      ExplicitHeight = 349
       object ListView2: TListView
         Left = 0
         Top = 0
-        Width = 546
-        Height = 349
+        Width = 676
+        Height = 400
         Align = alClient
         BorderStyle = bsNone
         Columns = <>
@@ -128,7 +137,8 @@ object HistoryForm: THistoryForm
         ViewStyle = vsReport
         OnColumnClick = ListViewColumnClick
         OnCompare = ListViewCompare
-        ExplicitHeight = 369
+        ExplicitWidth = 546
+        ExplicitHeight = 349
       end
     end
   end

@@ -2,9 +2,9 @@ DOSZIP.TXT--
 Copyright 2010 Hjort Nidudsson.
 
 DOSZIP COMMANDER
-Version 2.05
+Version 2.08
 
-Welcome to Doszip Commander Version 2.05!
+Welcome to Doszip Commander Version 2.08!
 =========================================
 
 	Topics covered in this file include:
@@ -400,6 +400,7 @@ Shortkey Table
 	Alt-C		Toggle Command Line
 	Alt-L		Create List File
 	Alt-X		Quit
+	Alt-P		Load Directory
 
 	Ctrl-[0..9]	Load Directory defined in section [Directory]
 	Ctrl-Tab	File search (Ctrl-S)

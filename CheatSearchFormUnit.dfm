@@ -29,7 +29,6 @@ object CheatSearchForm: TCheatSearchForm
     Width = 550
     Height = 286
     Anchors = [akLeft, akTop, akRight, akBottom]
-    PageIndex = 3
     TabOrder = 0
     object TPage
       Left = 0
@@ -99,7 +98,7 @@ object CheatSearchForm: TCheatSearchForm
       object SearchNameDeleteButton: TBitBtn
         Left = 32
         Top = 197
-        Width = 193
+        Width = 209
         Height = 25
         Caption = 'Delete selected search data'
         TabOrder = 4

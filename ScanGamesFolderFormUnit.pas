@@ -603,10 +603,10 @@ begin
       G.AssignFrom(AutoSetupDB[NewGame.SelectedTemplate]);
     end;
     G.GameExe:=MakeRelPath(NewGame.ExeFile,PrgSetup.BaseDir);
-    G.GameExeMD5:=GetMD5Sum(MakeAbsPath(G.GameExe,PrgSetup.BaseDir));
+    G.GameExeMD5:=GetMD5Sum(MakeAbsPath(G.GameExe,PrgSetup.BaseDir),False);
     If (Trim(G.SetupExe)<>'') and FileExists(IncludeTrailingPathDelimiter(ExtractFilePath(MakeAbsPath(G.GameExe,PrgSetup.BaseDir)))+ExtractFileName(G.SetupExe)) then begin
       G.SetupExe:=MakeRelPath(IncludeTrailingPathDelimiter(ExtractFilePath(MakeAbsPath(G.GameExe,PrgSetup.BaseDir)))+ExtractFileName(G.SetupExe),PrgSetup.BaseDir);
-      G.SetupExeMD5:=GetMD5Sum(MakeAbsPath(G.SetupExe,PrgSetup.BaseDir));
+      G.SetupExeMD5:=GetMD5Sum(MakeAbsPath(G.SetupExe,PrgSetup.BaseDir),False);
     end else begin
       G.SetupExe:='';
       G.SetupExeMD5:='';

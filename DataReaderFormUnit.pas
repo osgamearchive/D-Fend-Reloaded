@@ -36,6 +36,7 @@ type
     procedure InsertButtonClick(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure SearchTypeCheckBoxClick(Sender: TObject);
+    procedure DownloadCoverCheckBoxClick(Sender: TObject);
   private
     { Private-Deklarationen }
     GenreSt, DeveloperSt, PublisherSt, YearSt, CoverSt : TStringList;
@@ -103,7 +104,6 @@ begin
   YearCheckBox.Caption:=LanguageSetup.GameYear;
   DownloadCoverCheckBox.Caption:=LanguageSetup.DataReaderCoverCheckbox;
   DownloadCoverAllCheckBox.Caption:=LanguageSetup.DataReaderCoverAllCheckbox;
-  DownloadCoverAllCheckBox.Visible:=PrgSetup.ActivateIncompleteFeatures;
 
   InsertButton.Caption:=LanguageSetup.DataReaderInsert;
   CancelButton.Caption:=LanguageSetup.Cancel;
@@ -126,6 +126,7 @@ begin
   PublisherCheckBox.Checked:=(S[4]<>'-');
   YearCheckBox.Checked:=(S[5]<>'-');
   DownloadCoverCheckBox.Checked:=(S[6]<>'-');
+  DownloadCoverAllCheckBox.Enabled:=DownloadCoverCheckBox.Checked;
   DownloadCoverAllCheckBox.Checked:=(S[7]<>'-');
 end;
 
@@ -148,6 +149,11 @@ begin
   YearSt.Free;
   CoverSt.Free;
   DataReader.Free;
+end;
+
+procedure TDataReaderForm.DownloadCoverCheckBoxClick(Sender: TObject);
+begin
+  DownloadCoverAllCheckBox.Enabled:=DownloadCoverCheckBox.Checked;
 end;
 
 procedure TDataReaderForm.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -265,7 +271,7 @@ begin
   YearCheckBox.Enabled:=(Trim(YearSt[Nr])<>'');
   YearLabel.Caption:=YearSt[Nr];
   DownloadCoverCheckBox.Enabled:=(Trim(CoverSt[Nr])<>'');
-  DownloadCoverAllCheckBox.Enabled:=(Pos('$',CoverSt[Nr])>0);
+  DownloadCoverAllCheckBox.Enabled:=DownloadCoverCheckBox.Enabled and (Pos('$',CoverSt[Nr])>0);
   InsertButton.Enabled:=(Trim(GenreSt[Nr])<>'') or (Trim(DeveloperSt[Nr])<>'') or (Trim(PublisherSt[Nr])<>'') or (Trim(YearSt[Nr])<>'') or (Trim(CoverSt[Nr])<>'');
 end;
 

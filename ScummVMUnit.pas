@@ -15,7 +15,8 @@ implementation
 
 uses Windows, Forms, Dialogs, SysUtils, IniFiles, ShlObj, PrgSetupUnit,
      CommonTools, PrgConsts, GameDBToolsUnit, LanguageSetupUnit,
-     ScummVMToolsUnit, ZipManagerUnit, DOSBoxCountUnit, RunPrgManagerUnit;
+     ScummVMToolsUnit, ZipManagerUnit, DOSBoxCountUnit, RunPrgManagerUnit,
+     HistoryUnit;
 
 Function FindScummVMIni(UseSecondOne : Boolean) : String;
 Var S : String;
@@ -320,7 +321,7 @@ begin
         MessageDlg(Format(LanguageSetup.MessageCouldNotSaveFile,[TempDir+ScummVMConfFileName]),mtError,[mbOK],0);
         exit;
       end;
-      AddToHistory(Game.Name);
+      History.Add(Game.Name);
 
       S:='';
       If Trim(Game.CaptureFolder)<>'' then begin

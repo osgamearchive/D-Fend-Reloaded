@@ -3,10 +3,10 @@ object SetupForm: TSetupForm
   Top = 0
   BorderIcons = [biSystemMenu]
   Caption = 'SetupForm'
-  ClientHeight = 404
+  ClientHeight = 434
   ClientWidth = 709
   Color = clBtnFace
-  Constraints.MinHeight = 400
+  Constraints.MinHeight = 470
   Constraints.MinWidth = 710
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -23,12 +23,13 @@ object SetupForm: TSetupForm
   TextHeight = 13
   object BottomPanel: TPanel
     Left = 0
-    Top = 369
+    Top = 399
     Width = 709
     Height = 35
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 0
+    ExplicitTop = 369
     object ModeLabel: TLabel
       Left = 532
       Top = 10
@@ -107,14 +108,15 @@ object SetupForm: TSetupForm
     Left = 0
     Top = 0
     Width = 709
-    Height = 369
+    Height = 399
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 1
+    ExplicitHeight = 369
     object Splitter1: TSplitter
       Left = 209
       Top = 0
-      Height = 369
+      Height = 399
       Beveled = True
       ResizeStyle = rsUpdate
       ExplicitLeft = 328
@@ -125,7 +127,7 @@ object SetupForm: TSetupForm
       Left = 0
       Top = 0
       Width = 209
-      Height = 369
+      Height = 399
       Align = alLeft
       HideSelection = False
       Images = ImageList
@@ -133,15 +135,17 @@ object SetupForm: TSetupForm
       ReadOnly = True
       TabOrder = 0
       OnChange = TreeChange
+      ExplicitHeight = 369
     end
     object RightPanel: TPanel
       Left = 212
       Top = 0
       Width = 497
-      Height = 369
+      Height = 399
       Align = alClient
       BevelOuter = bvNone
       TabOrder = 1
+      ExplicitHeight = 369
       object TopPanel: TPanel
         Left = 0
         Top = 0

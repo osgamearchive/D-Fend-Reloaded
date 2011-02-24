@@ -108,7 +108,6 @@ Section "$(LANGNAME_DFendReloaded)" ID_DFend
 
   SetOutPath "$INSTDIR"
   File "..\DFend.exe"
-  File "..\Readme_OperationMode.txt"
   
   SetOutPath "$INSTDIR\Bin"
   File "..\Bin\mkdosfs.exe"  
@@ -131,12 +130,16 @@ Section "$(LANGNAME_DFendReloaded)" ID_DFend
   SetOutPath "$INSTDIR\Lang"
   File "..\Lang\*.ini"
   File "..\Lang\*.chm"
+  File "..\Lang\Readme_OperationMode.txt"
 
   SetOutPath "$INSTDIR\IconSets"
   File /r /x Thumbs.db "..\IconSets\*.*"
   Delete "$INSTDIR\IconSets\Modern\Thumbs.db"
+  
+  SetOutPath "$DataInstDir\Settings"
+  File "..\Bin\Cheats.xml"
 
-  ; Remove files in $INSTDIR for which the new position is $INSTDIR\Bin
+  ; Remove files in $INSTDIR for which the new position is $INSTDIR\Bin or $INSTDIR\Lang
   
   Delete "$INSTDIR\oggenc2.exe"
   Delete "$INSTDIR\LicenseComponents.txt"
@@ -154,6 +157,7 @@ Section "$(LANGNAME_DFendReloaded)" ID_DFend
   Delete "$INSTDIR\InstallVideoCodec.exe"
   Delete "$INSTDIR\mkdosfs.exe"
   Delete "$INSTDIR\mediaplr.dll"
+  Delete "$INSTDIR\Readme_OperationMode.txt"
 
   ; Install templates  
   
@@ -440,6 +444,12 @@ Var FONT
   SectionSetFlags ${SectionID} $R0
 !macroend
 
+!macro DeactivateSection SectionID
+  SectionGetFlags ${SectionID} $R0
+  IntOp $R0 $R0 & 0xFFFFFFFE
+  SectionSetFlags ${SectionID} $R0
+!macroend
+
 Function InstallMode
   IntOp $FastInstallationMode 0 + 0
   IntCmp $AdminOK 0 InstallModePageFinish
@@ -450,8 +460,20 @@ Function InstallMode
   !insertmacro MUI_INSTALLOPTIONS_READ $9 "$(LANGNAME_ioFile2)" "Field 1" "HWND"
   CreateFont $FONT "$(^Font)" "$(^FontSize)" "600"
   SendMessage $9 ${WM_SETFONT} $FONT 0
+  
+  !insertmacro MUI_INSTALLOPTIONS_READ $9 "$(LANGNAME_ioFile2)" "Field 5" "HWND"
+  CreateFont $FONT "$(^Font)" "$(^FontSize)" "600"
+  SendMessage $9 ${WM_SETFONT} $FONT 0  
 
   !insertmacro MUI_INSTALLOPTIONS_SHOW
+
+  !insertmacro MUI_INSTALLOPTIONS_READ $9 "$(LANGNAME_ioFile2)" "Field 5" "State"
+  IntCmp $9 1 CreateShortCutFile2On
+  !insertmacro DeactivateSection ${ID_DesktopShortcut}
+  Goto CreateShortCutFile2Done
+  CreateShortCutFile2On:
+  !insertmacro ActivateSection ${ID_DesktopShortcut}
+  CreateShortCutFile2Done:
 
   !insertmacro MUI_INSTALLOPTIONS_READ $9 "$(LANGNAME_ioFile2)" "Field 1" "State"
   IntCmp $9 1 FastMode
@@ -464,7 +486,6 @@ Function InstallMode
   !insertmacro ActivateSection ${ID_Tools}
   !insertmacro ActivateSection ${ID_FreeDosTools}
   !insertmacro ActivateSection ${ID_Doszip}
-  !insertmacro ActivateSection ${ID_DesktopShortcut}
   StrCpy $INSTDIR "$PROGRAMFILES\D-Fend Reloaded\"
   IntOp $InstallDataType 1 + 0
   IntOp $FastInstallationMode 1 + 0

@@ -433,7 +433,11 @@ begin
     result:=False;
     exit;
   end;
-  Parameters:=Copy(Parameters,1,I-1)+Folder+Copy(Parameters,I+2,MaxInt);
+  If PrgSetup.PackerSettings[Nr].TrailingBackslash then begin
+    Parameters:=Copy(Parameters,1,I-1)+IncludeTrailingPathDelimiter(Folder)+Copy(Parameters,I+2,MaxInt);
+  end else begin
+    Parameters:=Copy(Parameters,1,I-1)+ExcludeTrailingPathDelimiter(Folder)+Copy(Parameters,I+2,MaxInt);
+  end;
 
   StartupInfo.cb:=SizeOf(StartupInfo);
   with StartupInfo do begin lpReserved:=nil; lpDesktop:=nil; lpTitle:=nil; dwFlags:=0; cbReserved2:=0; lpReserved2:=nil; end;

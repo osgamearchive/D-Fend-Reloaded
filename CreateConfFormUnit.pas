@@ -29,6 +29,8 @@ type
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
   private
     { Private-Deklarationen }
+    Procedure SelectGamesWithoutTemplate;
+    Function FindAutoSetupForGame(const Game : TGame; const AutoSetupDB : TGameDB) : Boolean;
   public
     { Public-Deklarationen }
     GameDB : TGameDB;
@@ -45,7 +47,7 @@ implementation
 
 uses ShlObj, VistaToolsUnit, LanguageSetupUnit, DosBoxUnit, CommonTools,
      PrgSetupUnit, GameDBToolsUnit, ScummVMUnit, HelpConsts, TemplateFormUnit,
-     IconLoaderUnit;
+     IconLoaderUnit, PrgConsts, HashCalc;
 
 {$R *.dfm}
 
@@ -74,6 +76,7 @@ begin
 end;
 
 procedure TCreateConfForm.FormShow(Sender: TObject);
+Var M : TMenuItem;
 begin
   If ProfFileMode then begin
     Caption:=LanguageSetup.CreateConfFormProfMode;
@@ -82,6 +85,13 @@ begin
 
   BuildCheckList(ListBox,GameDB,True,False,True);
   BuildSelectPopupMenu(PopupMenu,GameDB,SelectButtonClick,True,True);
+
+  If PrgSetup.ActivateIncompleteFeatures then begin
+    M:=TMenuItem.Create(self); M.Caption:='-';
+    PopupMenu.Items[0].Add(M);
+    M:=TMenuItem.Create(self); M.Caption:=LanguageSetup.CreateConfFormSelectGamesWithoutAutoSetup; M.Tag:=-2; M.OnClick:=SelectButtonClick;
+    PopupMenu.Items[0].Add(M);
+  end;
 
   FolderEdit.Text:=GetSpecialFolder(Handle,CSIDL_DESKTOPDIRECTORY);
 end;
@@ -101,7 +111,14 @@ begin
     exit;
   end;
 
-  SelectGamesByPopupMenu(Sender,ListBox);
+  If Sender is TMenuItem then begin
+    If (Sender as TMenuItem).Tag=-2 then begin
+      SelectGamesWithoutTemplate;
+      ExportAutoSetupTemplatesCheckBox.Checked:=True;
+    end else begin
+      SelectGamesByPopupMenu(Sender,ListBox);
+    end;
+  end;
 end;
 
 procedure TCreateConfForm.SelectFolderButtonClick(Sender: TObject);
@@ -109,6 +126,95 @@ Var S : String;
 begin
   S:=FolderEdit.Text; If S='' then S:=PrgDataDir;
   if SelectDirectory(Handle,LanguageSetup.SetupFormBaseDir,S) then FolderEdit.Text:=S;
+end;
+
+function TCreateConfForm.FindAutoSetupForGame(const Game: TGame; const AutoSetupDB: TGameDB): Boolean;
+Var I,J : Integer;
+    File1,File2,Hash1,Hash2,S : String;
+    Files, Hashs : TStringList;
+    A : TGame;
+    Rec : TSearchRec;
+begin
+  If Trim(Game.GameExe)='' then begin result:=False; exit; end;
+  result:=True;
+
+  {Level 1: Check if there is an auto setup template matching with exactly the same files to start}
+
+  {Calc Hash values}
+  File1:=Trim(ExtUpperCase(ExtractFileName(MakeAbsPath(Game.GameExe,PrgSetup.BaseDir))));
+  Hash1:=GetMD5Sum(MakeAbsPath(Game.GameExe,PrgSetup.BaseDir),False);
+  If Trim(Game.SetupExe)<>'' then begin
+    File2:=Trim(ExtUpperCase(ExtractFileName(MakeAbsPath(Game.SetupExe,PrgSetup.BaseDir))));
+    Hash2:=GetMD5Sum(MakeAbsPath(Game.SetupExe,PrgSetup.BaseDir),False)
+  end else begin
+    File2:='';
+    Hash2:='';
+  end;
+
+  {Check auto setup templates}
+  for I:=0 to AutoSetupDB.Count-1 do begin
+    A:=AutoSetupDB[I]; If (A.GameExe='') or (A.GameExeMD5='') then continue;
+    If (Trim(ExtUpperCase(A.GameExe))<>File1) or (A.GameExeMD5<>Hash1) then continue;
+    If (Trim(A.SetupExe)<>'') and (File2<>'') then begin
+      If (Trim(ExtUpperCase(A.SetupExe))<>File2) or (A.SetupExeMD5<>Hash2) then continue;
+    end;
+    exit;
+  end;
+
+  {Level 2: Check if there is an auto setup template matching the game but using some other files to start (game.exe -> start.bat for example)}
+
+  {Calc Hash values}
+  Files:=TStringList.Create;
+  Hashs:=TStringList.Create;
+  try
+    S:=IncludeTrailingPathDelimiter(ExtractFilePath(MakeAbsPath(Game.GameExe,PrgSetup.BaseDir)));
+    I:=FindFirst(S+'*.exe',faAnyFile,Rec);
+    try While I=0 do begin Files.Add(ExtUpperCase(Rec.Name)); Hashs.Add(GetMD5Sum(S+Rec.Name,False)); I:=FindNext(Rec); end;
+    finally FindClose(Rec); end;
+    I:=FindFirst(S+'*.com',faAnyFile,Rec);
+    try While I=0 do begin Files.Add(ExtUpperCase(Rec.Name)); Hashs.Add(GetMD5Sum(S+Rec.Name,False)); I:=FindNext(Rec); end;
+    finally FindClose(Rec); end;
+    I:=FindFirst(S+'*.bat',faAnyFile,Rec);
+    try While I=0 do begin Files.Add(ExtUpperCase(Rec.Name)); Hashs.Add(GetMD5Sum(S+Rec.Name,False)); I:=FindNext(Rec); end;
+    finally FindClose(Rec); end;
+
+    {Check auto setup templates}
+    for I:=0 to AutoSetupDB.Count-1 do begin
+      A:=AutoSetupDB[I]; If (A.GameExe='') or (A.GameExeMD5='') then continue;
+
+      J:=Files.IndexOf(Trim(ExtUpperCase(A.GameExe)));
+      If (J<0) or (Hashs[J]<>A.GameExeMD5) then continue;
+      If Trim(A.SetupExe)<>'' then begin
+        J:=Files.IndexOf(Trim(ExtUpperCase(A.SetupExe)));
+        If (J<0) or (Hashs[J]<>A.SetupExeMD5) then continue;
+      end;
+      exit;
+    end;
+  finally
+    Files.Free;
+    Hashs.Free;
+  end;
+
+  {Nothing found}
+  result:=False;
+end;
+
+procedure TCreateConfForm.SelectGamesWithoutTemplate;
+Var I : Integer;
+    G : TGame;
+    AutoSetupDB : TGameDB;
+begin
+  AutoSetupDB:=TGameDB.Create(PrgDataDir+AutoSetupSubDir,False);
+  try
+    For I:=0 to ListBox.Items.Count-1 do If not ListBox.Checked[I] then begin
+      G:=TGame(ListBox.Items.Objects[I]);
+      If ScummVMMode(G) or WindowsExeMode(G) then continue;
+      If G.Name=DosBoxDOSProfile then continue;
+      If not FindAutoSetupForGame(G,AutoSetupDB) then ListBox.Checked[I]:=True;
+    end;
+  finally
+    AutoSetupDB.Free;
+  end;
 end;
 
 procedure TCreateConfForm.OKButtonClick(Sender: TObject);
@@ -158,7 +264,7 @@ begin
         St:=BuildScummVMIniFile(G);
       end else begin
         S:=Dir+ChangeFileExt(ExtractFileName(G.SetupFile),'.conf');
-        St:=BuildConfFile(G,False,False,-1);
+        St:=BuildConfFile(G,False,False,-1,nil);
         If St=nil then continue;
       end;
       try

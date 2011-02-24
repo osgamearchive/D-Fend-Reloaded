@@ -37,7 +37,7 @@ object SetupFrameDataPrivacy: TSetupFrameDataPrivacy
   object ShowHistoryButton: TBitBtn
     Left = 16
     Top = 56
-    Width = 169
+    Width = 185
     Height = 25
     Caption = 'Show recorded history'
     TabOrder = 1
@@ -60,7 +60,7 @@ object SetupFrameDataPrivacy: TSetupFrameDataPrivacy
   object DeleteHistoryButton: TBitBtn
     Left = 16
     Top = 96
-    Width = 169
+    Width = 185
     Height = 25
     Caption = 'Delete recorded history'
     TabOrder = 2

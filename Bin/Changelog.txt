@@ -1,5 +1,60 @@
 D-Fend Reloaded Changelog
 
+Version 1.1.0 (02/25/2011)
+==========================
+- Updated DOSZip from 2.05 to 2.08.
+- New option in the mobygames data reader to download all images available for
+  some game.
+- Setup option to configure if history information of started games shall be
+  collected or not.
+- Support for more special ykhwong DOSBox builds features.
+- New optional games list column: Number of starts of the profile.
+- When exporting the games list you can choose which fields to export.
+- Now the package list creation and package download system can handle packages
+  larger than 2 GB by splitting them.
+- The names for the files to look for a profile name suggestion when importing
+  plain archive files (default: FILE_ID.DIZ) is configurareable now.
+- The history viewer dialog opens much faster now.
+- The games list tooltips now also tells how often the selected profile has
+  been started.
+- New setup dialog option to configure whether D-Fend Reloaded should add a
+  trailing backslash to path names when calling an external packer or not. (uha
+  needs path names without trailing backslashs.)
+- Default command line parameter values for the external packers uha and arj32
+  are included now.
+- User defined emulators will be listed as sub entries below "Emulation type"
+  in the games list filter tree.
+- A new option to filter the games list by game license is offered in the
+  filter tree.
+- Setup option to rename all media files in all profiles.
+- The "Starting DOSBox failed" dialog now also allows to change the selected
+  SDL video driver.
+- Option to reselect the last selected profile on program restart.
+- The games list can be exported as a xml file now.
+- New option in the icons library to rename all icon files to have upper or
+  lower file extensions.
+- The package manager will display the download size of the selected games now.
+- Some more new auto setup templates.
+- The package manager will open faster now.
+- Lower memory consumption on downloading large files via the package manager.
+- Tuned the game and setup file detection code.
+- [Fix] The automatic translation of the license fields in the profiles failed.
+- [Fix] Sorting the columns in the history dialog by clicking the column
+  headers did not work for all columns correctly.
+- [Fix] The second last games list column could not be moved down (to be the
+  last column) on the games list columns editor in the setup dialog.
+- [Fix] Template names and custom game information keys containing "&" can
+  cause problems.
+- [Fix] When running from a network share not connected to a drive letter
+  starting DOSBox failed.
+- [Fix] When clicking the zoom button in the video previewer while a damaged
+  video file is selected or the needed codec is missing a division by zero
+  error message appeared.
+- [Fix] Access violation when using the "Start" dialog from the tray icon menu
+  and opening a second dialog from the tray icon menu while the first dialog is
+  still open.
+
+
 Version 1.0.3 (11/15/2010)
 ==========================
 - When importing plain archive files or folders D-Fend Reloaded will look for a

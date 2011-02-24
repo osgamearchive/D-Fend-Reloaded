@@ -161,7 +161,7 @@ begin
     ConfFile:=IncludeTrailingPathDelimiter(ExtractFilePath(SaveDialog.FileName))+ExtractFileName(MakeAbsPath(ChangeFileExt(Game.SetupFile,'.conf'),PrgSetup.BaseDir));
     St:=TStringList.Create;
     try
-      St2:=BuildConfFile(Game,False,False,-1);
+      St2:=BuildConfFile(Game,False,False,-1,nil);
       if St2=nil then exit;
       try
         try

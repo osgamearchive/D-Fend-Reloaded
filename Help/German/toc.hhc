@@ -18,9 +18,13 @@
 		<param name="Local" value="Introduction.html">
 		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="Wo findet man Spiele">
+		<param name="Local" value="HelpGetGames.html">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="Hinzufügen von Spielen">
 		<param name="Local" value="Introduction2.html">
-		</OBJECT>		
+		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="Menü">
 		<param name="ImageNumber" value="1">
@@ -113,6 +117,10 @@
 					<LI> <OBJECT type="text/sitemap">
 						<param name="Name" value="Sicherheit">
 						<param name="Local" value="FileOptionsSecurity.html">
+						</OBJECT>
+					<LI> <OBJECT type="text/sitemap">
+						<param name="Name" value="Datenschutz">
+						<param name="Local" value="FileOptionsDataPrivacy.html">
 						</OBJECT>
 					<LI> <OBJECT type="text/sitemap">
 						<param name="Name" value="Kompressionseinstellungen">
@@ -461,6 +469,10 @@
 								<param name="Name" value="MIDI">
 								<param name="Local" value="ProfileEditSoundMIDI.html">
 								</OBJECT>
+							<LI> <OBJECT type="text/sitemap">
+								<param name="Name" value="Innovation SSI-2001">
+								<param name="Local" value="ProfileEditSoundInnova.html">
+								</OBJECT>
 						</UL>
 						<LI> <OBJECT type="text/sitemap">
 							<param name="Name" value="Joystick">
@@ -495,10 +507,6 @@
 			<LI> <OBJECT type="text/sitemap">
 				<param name="Name" value="Kopieren">
 				<param name="Local" value="ProfileCopy.html">
-				</OBJECT>
-			<LI> <OBJECT type="text/sitemap">
-				<param name="Name" value="Löschen">
-				<param name="Local" value="ProfileDelete.html">
 				</OBJECT>
 			<LI> <OBJECT type="text/sitemap">
 				<param name="Name" value="Deinstallieren">
@@ -674,6 +682,10 @@
 			</OBJECT>
 		<UL>
 			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="Wo findet man Spiele">
+				<param name="Local" value="HelpGetGames.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
 				<param name="Name" value="Hinzufügen von Spielen">
 				<param name="Local" value="Introduction2.html">
 				</OBJECT>
@@ -733,6 +745,10 @@
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="Sicherheit">
 					<param name="Local" value="FileOptionsSecurity.html">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="Datenschutz">
+					<param name="Local" value="FileOptionsDataPrivacy.html">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="Kompressionseinstellungen">
@@ -973,6 +989,10 @@
 							<LI> <OBJECT type="text/sitemap">
 								<param name="Name" value="MIDI">
 								<param name="Local" value="ProfileEditSoundMIDI.html">
+								</OBJECT>
+							<LI> <OBJECT type="text/sitemap">
+								<param name="Name" value="Innovation SSI-2001">
+								<param name="Local" value="ProfileEditSoundInnova.html">
 								</OBJECT>
 						</UL>
 						<LI> <OBJECT type="text/sitemap">
