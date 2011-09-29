@@ -38,7 +38,7 @@ type
     Procedure BeforeChangeLanguage;
     Procedure LoadLanguage;
     Procedure DOSBoxDirChanged;
-    Procedure ShowFrame(const AdvencedMode : Boolean);
+    Procedure ShowFrame(const AdvancedMode : Boolean);
     procedure HideFrame;
     Procedure RestoreDefaults;
     Procedure SaveSetup;
@@ -85,7 +85,6 @@ begin
   NoFlicker(ParametersEdit);
   NoFlicker(ExtensionsEdit);
 
-
   UserIconLoader.DialogImage(DI_Add,AddButton);
   UserIconLoader.DialogImage(DI_Delete,DelButton);
   UserIconLoader.DialogImage(DI_Up,UpButton);
@@ -124,7 +123,7 @@ procedure TSetupFrameMoreEmulators.DOSBoxDirChanged;
 begin
 end;
 
-procedure TSetupFrameMoreEmulators.ShowFrame(const AdvencedMode: Boolean);
+procedure TSetupFrameMoreEmulators.ShowFrame(const AdvancedMode: Boolean);
 begin
 end;
 
@@ -173,10 +172,10 @@ begin
     If Trim(NameEdit.Text)<>''
       then Names[LastItem]:=Trim(NameEdit.Text)
       else Names[LastItem]:=Trim(ChangeFileExt(ExtractFileName(ProgramEdit.Text),''));
+    ComboBox.Items[LastItem]:=Names[LastItem];
     Programs[LastItem]:=Trim(ProgramEdit.Text);
     Parameters[LastItem]:=Trim(ParametersEdit.Text);
     Extensions[LastItem]:=Trim(ExtensionsEdit.Text);
-    ComboBox.Items[LastItem]:=ExtractFileName(Trim(ProgramEdit.Text));
   end;
 
   LastItem:=ComboBox.ItemIndex;
@@ -248,10 +247,10 @@ begin
         end;
     3 : begin
           ComboBox.Items.Exchange(LastItem,LastItem+1);
-          Names.Exchange(LastItem,LastItem-1);
-          Programs.Exchange(LastItem,LastItem-1);
-          Parameters.Exchange(LastItem,LastItem-1);
-          Extensions.Exchange(LastItem,LastItem-1);
+          Names.Exchange(LastItem,LastItem+1);
+          Programs.Exchange(LastItem,LastItem+1);
+          Parameters.Exchange(LastItem,LastItem+1);
+          Extensions.Exchange(LastItem,LastItem+1);
           inc(LastItem);
           ComboBox.ItemIndex:=LastItem;
           UpButton.Enabled:=(LastItem>=1);

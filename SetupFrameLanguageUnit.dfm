@@ -69,7 +69,7 @@ object SetupFrameLanguage: TSetupFrameLanguage
     ItemHeight = 13
     ParentShowHint = False
     ShowHint = True
-    TabOrder = 1
+    TabOrder = 3
     OnChange = DosBoxLangEditComboBoxChange
     OnDropDown = ComboBoxDropDown
   end
@@ -79,7 +79,7 @@ object SetupFrameLanguage: TSetupFrameLanguage
     Width = 153
     Height = 25
     Caption = 'Spracheditor '#246'ffnen'
-    TabOrder = 2
+    TabOrder = 1
     OnClick = ButtonWork
   end
   object LanguageNew: TBitBtn
@@ -89,7 +89,7 @@ object SetupFrameLanguage: TSetupFrameLanguage
     Width = 153
     Height = 25
     Caption = 'Neue Sprache anlegen'
-    TabOrder = 3
+    TabOrder = 4
     OnClick = ButtonWork
   end
   object InstallerLangEditComboBox: TComboBox
@@ -99,7 +99,7 @@ object SetupFrameLanguage: TSetupFrameLanguage
     Height = 21
     Style = csDropDownList
     ItemHeight = 13
-    TabOrder = 4
+    TabOrder = 2
     OnChange = InstallerLangEditComboBoxChange
     OnDropDown = ComboBoxDropDown
   end

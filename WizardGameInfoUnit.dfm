@@ -107,6 +107,7 @@ object WizardGameInfoFrame: TWizardGameInfoFrame
     Strings.Strings = (
       '=')
     TabOrder = 2
+    OnEditButtonClick = GameInfoValueListEditorEditButtonClick
     ColWidths = (
       150
       415)

@@ -1,5 +1,65 @@
 D-Fend Reloaded Changelog
 
+Version 1.2.0 (09/29/2011)
+==========================
+- Updated DOSZip from 2.08 to 2.17.
+- Added about 300 new auto setup templates.
+- New "Select by" option in the profiles export dialog: Games for which there
+  is no auto setup template.
+- New option to create package list xml files for plain archive files.
+- In the extra program files dialog of the profile editor parameters for the
+  additional program files can be entered now.
+- New function in the icons manager to add all icons from a selected folder
+  and its subfolders.
+- Setup option to allow or block multiple instances of D-Fend Reloaded at the
+  same time.
+- New option to setup the font style (bold, italic, underlined) for normal
+  games list entries.
+- D-Fend Reloaded can store up to 9 internet addresses per profile now.
+- Setup option to use the image viewer as a non-modal window.
+- New option to change pixel shader settings in the multiple profiles editor.
+- More ScummVM settings in the multiple profiles editor.
+- The modes "hardware2x" and "hardware3x" will be added automatically to the
+  scalers list when activating the pixel shader GUI.
+- New input fields on the MIDI page of the profile editor to setup MT32.
+- Now you can set up custom DOSBox settings per DOSBox installation, too.
+- Improved detection if the per profile keyboard mapper file is the same as the
+  global keyboard mapper file on the keyboard page of the profile editor.
+- Additional user-defined command line parameters can be passed to ScummVM now.
+- Now the icon manager will show icons located in sub folders of the icons
+  folder, too.
+- Some smaller improvements to the first run wizard.
+- [Fix] Incompatibility with ScummVM 1.3.x is fixed.
+- [Fix] Storing the order of user defined columns in the games list did not
+  work correctly.
+- [Fix] The package manager can handle splitted packages larger than 2 GB from
+  local sources now.
+- [Fix] The options "Video chipset" and "Video RAM" in the multiple profiles
+  editor did not work correctly.
+- [Fix] Displaying multiple bmp files in the screenshots previewer did not work
+  correctly.
+- [Fix] Opening the profile editor for an auto setup template could rise an
+  expection under some conditions.
+- [Fix] The function "Convert absolute to relative paths" from the service page
+  of the program options dialog could rise an expection under some conditions.
+- [Fix] Clicking the down button to reorder the list of user-defined emulators
+  on the "Other emulators" setup dialog page cause some settings to be
+  overwritten.
+- [Fix] The names of the user-defined emulators in the dropdown box on the
+  "Other emulators" setup dialog page were not always correct.
+- [Fix] When filtering the games list by emulation type when selecting
+  "Windows" also games using some user-defined emulators were listed.
+- [Fix] The download/copy progress dialog shows wrong percent values in the
+  caption when copying large files from local sources.
+- [Fix] When changing the program language the language of the entries in the
+  games list columns listbox did not change at once.
+- [Fix] The list available of licenses was not displayed correctly in the
+  "Select by" menu.
+- [Fix] The preferences for opening text, image and video files were not
+  respected when opening files from the data folder via the context or the
+  profile menu.
+
+
 Version 1.1.0 (02/25/2011)
 ==========================
 - Updated DOSZip from 2.05 to 2.08.

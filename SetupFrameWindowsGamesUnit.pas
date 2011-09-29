@@ -11,6 +11,8 @@ type
     MinimizeDFendCheckBox: TCheckBox;
     RestoreWindowCheckBox: TCheckBox;
     AutoRestoreInfoLabel: TLabel;
+    AllowWindowsPackagesCheckBox: TCheckBox;
+    AllowWindowsPackagesLabel: TLabel;
     procedure MinimizeDFendCheckBoxClick(Sender: TObject);
   private
     { Private-Deklarationen }
@@ -21,7 +23,7 @@ type
     Procedure BeforeChangeLanguage;
     Procedure LoadLanguage;
     Procedure DOSBoxDirChanged;
-    Procedure ShowFrame(const AdvencedMode : Boolean);
+    Procedure ShowFrame(const AdvancedMode : Boolean);
     procedure HideFrame;
     Procedure RestoreDefaults;
     Procedure SaveSetup;
@@ -48,6 +50,8 @@ begin
   MinimizeDFendCheckBox.Checked:=PrgSetup.MinimizeOnWindowsGameStart;
   RestoreWindowCheckBox.Checked:=PrgSetup.RestoreWhenWindowsGameCloses;
 
+  AllowWindowsPackagesCheckBox.Checked:=PrgSetup.AllowPackingWindowsGames;
+
   MinimizeDFendCheckBoxClick(self);
 end;
 
@@ -60,6 +64,8 @@ begin
   MinimizeDFendCheckBox.Caption:=LanguageSetup.SetupFormWindowsMinimizeDFendWindowsGame;
   RestoreWindowCheckBox.Caption:=LanguageSetup.SetupFormWindowsRestoreWhenWindowsGameCloses;
   AutoRestoreInfoLabel.Caption:=LanguageSetup.SetupFormWindowsRestoreWhenWindowsGameClosesInfo;
+  AllowWindowsPackagesCheckBox.Caption:=LanguageSetup.SetupFormWindowsAllowPackages;
+  AllowWindowsPackagesLabel.Caption:=LanguageSetup.SetupFormWindowsAllowPackagesInfo;
 
   HelpContext:=ID_FileOptionsWindows;
 end;
@@ -73,7 +79,7 @@ procedure TSetupFrameWindowsGames.DOSBoxDirChanged;
 begin
 end;
 
-procedure TSetupFrameWindowsGames.ShowFrame(const AdvencedMode: Boolean);
+procedure TSetupFrameWindowsGames.ShowFrame(const AdvancedMode: Boolean);
 begin
 end;
 
@@ -85,6 +91,7 @@ procedure TSetupFrameWindowsGames.RestoreDefaults;
 begin
   MinimizeDFendCheckBox.Checked:=False;
   RestoreWindowCheckBox.Checked:=False;
+  AllowWindowsPackagesCheckBox.Checked:=False;
   MinimizeDFendCheckBoxClick(self);
 end;
 
@@ -92,6 +99,7 @@ procedure TSetupFrameWindowsGames.SaveSetup;
 begin
   PrgSetup.MinimizeOnWindowsGameStart:=MinimizeDFendCheckBox.Checked;
   PrgSetup.RestoreWhenWindowsGameCloses:=RestoreWindowCheckBox.Checked;
+  PrgSetup.AllowPackingWindowsGames:=AllowWindowsPackagesCheckBox.Checked;
 end;
 
 end.

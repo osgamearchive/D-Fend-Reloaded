@@ -32,16 +32,20 @@ type
     procedure AddButtonClick(Sender: TObject);
     procedure DelButtonClick(Sender: TObject);
     procedure SearchClick(Sender: TObject);
+    procedure GameInfoValueListEditorEditButtonClick(Sender: TObject);
   private
     { Private-Deklarationen }
     LinkFile : TLinkFile;
     GameDB : TGameDB;
     TempCaptureDir : String;
+    WWWNames, WWWLinks : TStringList;
     Procedure LoadLinks;
     Procedure TabListForCell(ACol, ARow: Integer; var UseDropdownListForCell : Boolean);
     Procedure TabGetListForCell(ACol, ARow: Integer; DropdownListForCell : TStrings);
   public
     { Public-Deklarationen }
+    Constructor Create(AOwner: TComponent); override;
+    Destructor Destroy; override;
     Procedure Init(const AGameDB : TGameDB; const ALinkFile : TLinkFile);
     Procedure SetGameName(const AName : String; const Template : TGame);
     Procedure WriteDataToGame(const Game : TGame);
@@ -51,11 +55,25 @@ implementation
 
 uses VistaToolsUnit, LanguageSetupUnit, CommonTools, ClassExtensions,
      IconLoaderUnit, TextEditPopupUnit, DataReaderFormUnit, GameDBToolsUnit,
-     PrgSetupUnit;
+     PrgSetupUnit, LinkFileEditFormUnit;
 
 {$R *.dfm}
 
 { TWizardGameInfoFrame }
+
+constructor TWizardGameInfoFrame.Create(AOwner: TComponent);
+begin
+  inherited Create(AOwner);
+  WWWNames:=TStringList.Create;
+  WWWLinks:=TStringList.Create;
+end;
+
+destructor TWizardGameInfoFrame.Destroy;
+begin
+  WWWNames.Free;
+  WWWLinks.Free;
+  inherited Destroy;
+end;
 
 procedure TWizardGameInfoFrame.Init(const AGameDB: TGameDB; const ALinkFile : TLinkFile);
 Var St : TStringList;
@@ -89,6 +107,7 @@ begin
     ItemProps[Strings.Count-1].EditStyle:=esPickList;
     St:=ExtLanguageList(GetCustomLanguageName(AGameDB.GetLanguageList)); try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
     Strings.Add(LanguageSetup.GameWWW+'=');
+    ItemProps[Strings.Count-1].EditStyle:=esEllipsis;
     Strings.Add(LanguageSetup.GameLicense+'=');
     ItemProps[Strings.Count-1].EditStyle:=esPickList;
     St:=ExtLicenseList(GetCustomLicenseName(AGameDB.GetLicenseList)); try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
@@ -175,9 +194,10 @@ begin
       If Trim(Template.Publisher)<>'' then ValueFromIndex[2]:=Template.Publisher;
       If Trim(Template.Year)<>'' then ValueFromIndex[3]:=Template.Year;
       If Trim(Template.Language)<>'' then ValueFromIndex[4]:=GetCustomLanguageName(Template.Language);
-      If Trim(Template.WWW)<>'' then ValueFromIndex[5]:=Template.WWW;
+      If Trim(Template.WWW[1])<>'' then ValueFromIndex[5]:=Template.WWW[1];
       If Trim(Template.License)<>'' then ValueFromIndex[6]:=GetCustomLicenseName(Template.License) else GameInfoValueListEditor.Strings[6]:=GameInfoValueListEditor.Strings.Names[6]+'=';
     end;
+    For I:=1 to 9 do begin WWWNames.Add(Template.WWWName[I]); WWWLinks.Add(Template.WWW[I]); end;
 
     St:=StringToStringList(Template.UserInfo);
     try
@@ -297,10 +317,12 @@ begin
     Game.Publisher:=ValueFromIndex[2];
     Game.Year:=ValueFromIndex[3];
     Game.Language:=GetEnglishLanguageName(ValueFromIndex[4]);
-    Game.WWW:=ValueFromIndex[5];
+    Game.WWW[1]:=ValueFromIndex[5];
     License:=Trim(ValueFromIndex[6]);
   end;
   Game.Favorite:=FavouriteCheckBox.Checked;
+  Game.WWWName[1]:=WWWNames[0];
+  For I:=1 to 8 do begin Game.WWWName[I+1]:=WWWNames[I]; Game.WWW[I+1]:=WWWLinks[I]; end;
 
   St:=TStringList.Create;
   try
@@ -341,6 +363,13 @@ begin
   finally
     St.Free;
   end;
+end;
+
+procedure TWizardGameInfoFrame.GameInfoValueListEditorEditButtonClick(Sender: TObject);
+begin
+  WWWLinks[0]:=GameInfoValueListEditor.Strings.ValueFromIndex[5];
+  ShowLinkFileEditDialog(self,WWWNames,WWWLinks,False,True,-1);
+  If WWWLinks[0]<>'' then GameInfoValueListEditor.Strings.ValueFromIndex[5]:=WWWLinks[0];
 end;
 
 end.

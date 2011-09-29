@@ -455,14 +455,47 @@ begin
   For I:=1 to length(Name) do If Pos(Name[I],AllowedCharsDefault)>0 then result:=result+Name[I];
 end;
 
+Function FindIconInSubfolders(const Folder, Icon : String) : String;
+Var Rec : TSearchRec;
+    I : Integer;
+    St : TStringList;
+    F : String;
+begin
+  result:='';
+  F:=IncludeTrailingPathDelimiter(Folder);
+  St:=TStringList.Create;
+  try
+    I:=FindFirst(F+'*.*',faDirectory,Rec);
+    try
+      While I=0 do begin
+        If (Rec.Name<>'.') and (Rec.Name<>'..') and ((Rec.Attr and faDirectory)<>0) then St.Add(Rec.Name);
+        I:=FindNext(Rec);
+      end;
+    finally
+      FindClose(Rec);
+    end;
+    For I:=0 to St.Count-1 do If FileExists(F+St[I]+'\'+Icon) then begin result:=F+St[I]+'\'+Icon; exit; end;
+    For I:=0 to St.Count-1 do begin result:=FindIconInSubfolders(F+St[I],Icon); If result<>'' then exit; end;
+  finally
+    St.Free;
+  end;
+end;
+
 Function MakeAbsIconName(const Icon : String) : String;
 Var S : String;
 begin
   If Trim(Icon)='' then begin result:=''; exit; end;
   S:=ExtractFilePath(Icon);
-  If S=''
-    then result:=PrgDataDir+IconsSubDir+'\'+Icon
-    else result:=MakeAbsPath(Icon,PrgSetup.BaseDir);
+
+  {Get icon from user defined folder}
+  If S<>'' then begin result:=MakeAbsPath(Icon,PrgSetup.BaseDir); exit; end;
+
+  {Get icon from icon folder (or its subdfolders}
+  result:=PrgDataDir+IconsSubDir+'\'+Icon;
+
+  If FileExists(result) then exit;
+  S:=FindIconInSubfolders(PrgDataDir+IconsSubDir,Icon);
+  If S<>'' then result:=S;
 end;
 
 function bffCallback(DlgHandle: HWND; Msg: Integer; lParam: Integer; lpData: Integer) : Integer; stdcall;
@@ -1612,15 +1645,34 @@ begin
   end;
 end;
 
-Function GetEditorForInt(Extension : String; const RegKey : String; const RemoveParameters : Boolean) : String;
+Function GetEditorForIntTry1(const Extension : String; const RegKey : String) : String;
 Var Reg : TRegistry;
-    S,T : String;
-    I,J,K : Integer;
+    S : String;
 begin
   result:='';
-  If Extension='' then exit;
-  If Extension[1]<>'.' then Extension:='.'+Extension;
-  Extension:=LowerCase(Extension);
+
+  Reg:=TRegistry.Create;
+  try
+    {find type name of "*.txt" files}
+    Reg.RootKey:=HKEY_CURRENT_USER;
+    If not Reg.OpenKeyReadOnly('\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\'+Extension+'\UserChoise') then exit;
+    S:=Reg.ReadString('Progid');
+    If S='' then exit;
+
+    {find program to open files of this type}
+    Reg.RootKey:=HKEY_CLASSES_ROOT;
+    if not Reg.OpenKeyReadOnly('\'+S+RegKey) then exit;
+    result:=Reg.ReadString('');
+  finally
+    Reg.Free;
+  end;
+end;
+
+Function GetEditorForIntTry2(const Extension : String; const RegKey : String) : String;
+Var Reg : TRegistry;
+    S : String;
+begin
+  result:='';
 
   Reg:=TRegistry.Create;
   try
@@ -1632,51 +1684,95 @@ begin
 
     {find program to open files of this type}
     if not Reg.OpenKeyReadOnly('\'+S+RegKey) then exit;
-    S:=Reg.ReadString('');
+    result:=Reg.ReadString('');
+  finally
+    Reg.Free;
+  end;
+end;
 
-    {remove leading and trailing "}
-    If  (S<>'') and (S[1]='"') then begin
-      Delete(S,1,1);
-      For I:=1 to length(S) do If S[I]='"' then begin Delete(S,I,1); break; end;
-    end;
+Function GetEditorForIntTry3(const Extension : String; const RegKey : String) : String;
+Var Reg : TRegistry;
+    S,T : String;
+    St : TStringList;
+    I : Integer;
+begin
+  result:='';
 
-    If RemoveParameters then begin
-      {remove "%1"}
-      I:=Pos('"%1"',S); If I>0 then S:=Copy(S,1,I-1)+Copy(S,I+4,MaxInt);
-      I:=Pos('%1',S); If I>0 then S:=Copy(S,1,I-1)+Copy(S,I+2,MaxInt);
-    end;
-
-    {Translate %SystemRoot% etc.}
-    I:=1;
-    While I<length(S) do begin
-      If S[I]='%' then begin
-        K:=-1;
-        For J:=I+1 to length(S)-1 do if S[J]='%' then begin K:=J; break; end;
-        If K=-1 then break;
-        If TranslateExtendedEnvironmentString(Copy(S,I,K-I+1),T) then begin
-          S:=Copy(S,1,I-1)+T+Copy(S,K+1,MaxInt);
-          continue;
-        end;
+  Reg:=TRegistry.Create;
+  try
+    {find type name of "*.txt" files}
+    Reg.RootKey:=HKEY_CURRENT_USER;
+    If not Reg.OpenKeyReadOnly('\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\'+Extension+'\OpenWithProgids') then exit;
+    St:=TStringList.Create;
+    try
+      Reg.GetValueNames(St);
+      T:=Copy(Extension,2,MaxInt)+'file';
+      S:=''; For I:=0 to St.Count-1 do If (St[I]<>T) and (St[I]<>'') then begin S:=St[I]; break; end;
+      If S='' then begin
+        If S='' then exit;
+        S:=''; For I:=0 to St.Count-1 do If St[I]<>'' then begin S:=St[I]; break; end;
       end;
-      inc(I);
+    finally
+      St.Free;
     end;
 
-    If (Pos('%1',S)=0) and (not FileExists(S)) then exit;
-    result:=Trim(S);
+    {find program to open files of this type}
+    Reg.RootKey:=HKEY_CLASSES_ROOT;
+    if not Reg.OpenKeyReadOnly('\'+S+RegKey) then exit;
+    result:=Reg.ReadString('');
   finally
     Reg.Free;
   end;
 end;
 
 Function GetEditorFor(Extension : String; const RemoveParameters : Boolean) : String;
-Var S : String;
+Var S,T : String;
+    I,J,K : Integer;
 begin
-  result:=GetEditorForInt(Extension,'\shell\edit\command',RemoveParameters);
+  result:='';
+  If Extension='' then exit;
+  If Extension[1]<>'.' then Extension:='.'+Extension;
+  Extension:=LowerCase(Extension);
 
-  S:=ExtUpperCase(Extension); If (S<>'') and (S[1]<>'.') then S:='.'+S;
-  If S='.TXT' then begin
-    If result='' then result:=GetEditorForInt(Extension,'\shell\open\command',RemoveParameters);
+  S:=GetEditorForIntTry1(Extension,'\shell\edit\command');
+  If S=''then S:=GetEditorForIntTry2(Extension,'\shell\edit\command');
+  If S=''then S:=GetEditorForIntTry3(Extension,'\shell\edit\command');
+  if (S='') and (Extension='.txt') then begin
+    S:=GetEditorForIntTry1(Extension,'\shell\open\command');
+    If S='' then S:=GetEditorForIntTry2(Extension,'\shell\open\command');
+    if S='' then S:=GetEditorForIntTry3(Extension,'\shell\open\command');
   end;
+  If S='' then exit;
+
+  {remove leading and trailing "}
+  If  (S<>'') and (S[1]='"') then begin
+    Delete(S,1,1);
+    For I:=1 to length(S) do If S[I]='"' then begin Delete(S,I,1); break; end;
+  end;
+
+  If RemoveParameters then begin
+    {remove "%1"}
+    I:=Pos('"%1"',S); If I>0 then S:=Copy(S,1,I-1)+Copy(S,I+4,MaxInt);
+    I:=Pos('%1',S); If I>0 then S:=Copy(S,1,I-1)+Copy(S,I+2,MaxInt);
+  end;
+
+  {Translate %SystemRoot% etc.}
+  I:=1;
+  While I<length(S) do begin
+    If S[I]='%' then begin
+      K:=-1;
+      For J:=I+1 to length(S)-1 do if S[J]='%' then begin K:=J; break; end;
+      If K=-1 then break;
+      If TranslateExtendedEnvironmentString(Copy(S,I,K-I+1),T) then begin
+        S:=Copy(S,1,I-1)+T+Copy(S,K+1,MaxInt);
+        continue;
+      end;
+    end;
+    inc(I);
+  end;
+
+  If (Pos('%1',S)=0) and (not FileExists(S)) then exit;
+  result:=Trim(S);
 end;
 
 Procedure TestAndFixLineWrap(const FileName : String);

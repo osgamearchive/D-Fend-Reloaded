@@ -85,7 +85,7 @@ Var S : String;
 begin
   DirList:=TStringList.Create;
 
-  ListBox.Items.Add(LanguageSetup.UninstallFormProfileRecord+': '+Game.Name);
+  ListBox.Items.Add(LanguageSetup.UninstallFormProfileRecord+': "'+Game.Name+'" ('+Game.SetupFile+')');
   DirList.Add('');
 
   If ScummVMMode(Game) then begin

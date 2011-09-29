@@ -70,6 +70,7 @@ type
     Procedure AddSettingWithEdit(const ID : Integer; const Name : String; const Values : TStringList; const Editable : Boolean; const ValueWidth : Integer; const FreeValues : Boolean = False);
     Procedure AddSpinSetting(const ID : Integer; const Name : String; const MinVal, MaxVal : Integer; const ValueWidth : Integer; const DefaultVal : Integer =-1);
     Procedure AddReplaceMountingSetting(const ID : Integer; const Name, FromLabel, ToLabel : String);
+    function DefaultValueOnList(const List, Value: String): Boolean;
   public
     { Public-Deklarationen }
     TemplateMode : Boolean;
@@ -479,6 +480,22 @@ begin
   inc(S^.LastRelY,SpinEdit.Height);
 end;
 
+function TMultipleProfilesEditorForm.DefaultValueOnList(const List, Value: String): Boolean;
+Var St : TStringList;
+    I : Integer;
+    S : String;
+begin
+  result:=False;
+
+  S:=Trim(ExtUpperCase(Value));
+  St:=ValueToList(List,';,');
+  try
+    For I:=0 to St.Count-1 do If Trim(ExtUpperCase(St[I]))=S then begin result:=True; exit; end;
+  finally
+    St.Free;
+  end;
+end;
+
 Procedure TMultipleProfilesEditorForm.AddReplaceMountingSetting(const ID : Integer; const Name, FromLabel, ToLabel : String);
 Var CheckBox : TCheckBox;
     Label1, Label2 : TLabel;
@@ -554,7 +571,7 @@ end;
 
 procedure TMultipleProfilesEditorForm.InitSettings;
 Var St : TStringList;
-    I : Integer;
+    I,J : Integer;
     S : String;
 begin
   {Game info}
@@ -565,13 +582,16 @@ begin
   AddSetting(1004,LanguageSetup.GameYear,GameDB.GetYearList,True,-1,True);
   AddSetting(1005,LanguageSetup.GameLanguage,ExtLanguageList(GetCustomLanguageName(GameDB.GetLanguageList)),True,-1,True);
   AddSetting(1006,LanguageSetup.GameFavorite,nil,False,ValueWidth);
-  AddSetting(1007,LanguageSetup.GameWWW,GameDB.GetWWWList,True,-1,True);
   St:=GetAllUserInfoKeys(GameDB);
   try
-    AddSettingWithEdit(1008,LanguageSetup.ChangeProfilesFormSetUserInfo,St,True,ValueWidth);
-    If St.Count>0 then AddSetting(1009,LanguageSetup.ChangeProfilesFormDelUserInfo,St,False,ValueWidth);
+    AddSettingWithEdit(1007,LanguageSetup.ChangeProfilesFormSetUserInfo,St,True,ValueWidth);
+    If St.Count>0 then AddSetting(1008,LanguageSetup.ChangeProfilesFormDelUserInfo,St,False,ValueWidth);
   finally
     St.Free;
+  end;
+  For J:=1 to 9 do begin
+    AddSetting(1010+(J-1)*2,LanguageSetup.GameWWWName+' ('+IntToStr(J)+')',GameDB.GetWWWNameList,True,-1,True);
+    AddSetting(1011+(J-1)*2,LanguageSetup.GameWWW+' ('+IntToStr(J)+')',GameDB.GetWWWList,True,-1,True);
   end;
 
   {DOSBox}
@@ -642,10 +662,14 @@ begin
   end;
   If PrgSetup.AllowVGAChipsetSettings then begin
     AddSetting(5301,LanguageSetup.GameVGAChipset,ValueToList(GameDB.ConfOpt.VGAChipsets,';,'),False,ValueWidth,True);
-    AddSetting(5301,LanguageSetup.GameVideoRam,ValueToList(GameDB.ConfOpt.VGAVideoRAM,';,'),False,ValueWidth,True);
+    AddSetting(5302,LanguageSetup.GameVideoRam,ValueToList(GameDB.ConfOpt.VGAVideoRAM,';,'),False,ValueWidth,True);
+  end;
+  If PrgSetup.AllowPixelShader then begin
+    St:=GetPixelShaders(PrgSetup.DOSBoxSettings[0].DosBoxDir);
+    AddSetting(5401,LanguageSetup.GamePixelShader,St,False,-1,True);
   end;
   If PrgSetup.AllowTextModeLineChange then begin
-    AddSetting(5401,LanguageSetup.GameTextModeLines,ValueToList('25;28;50',';,'),False,ValueWidth,True);
+    AddSetting(5501,LanguageSetup.GameTextModeLines,ValueToList('25;28;50',';,'),False,ValueWidth,True);
   end;
 
   {Keyboard}
@@ -725,6 +749,12 @@ begin
   AddSetting(8302,LanguageSetup.ProfileEditorSoundMIDIDevice,ValueToList(GameDB.ConfOpt.MIDIDevice,';,'),False,ValueWidth,True);
   AddEditSetting(8303,LanguageSetup.ProfileEditorSoundMIDIConfigInfo,'',-1);
 
+  If DefaultValueOnList(GameDB.ConfOpt.MIDIDevice,'mt32') then begin
+    AddSetting(8351,'MT32 '+LanguageSetup.ProfileEditorSoundMIDIMT32Mode,ValueToList(GameDB.ConfOpt.MT32ReverbMode,';,'),False,ValueWidth,True);
+    AddSetting(8352,'MT32 '+LanguageSetup.ProfileEditorSoundMIDIMT32Time,ValueToList(GameDB.ConfOpt.MT32ReverbTime,';,'),False,ValueWidth,True);
+    AddSetting(8353,'MT32 '+LanguageSetup.ProfileEditorSoundMIDIMT32Level,ValueToList(GameDB.ConfOpt.MT32ReverbLevel,';,'),False,ValueWidth,True);
+  end;
+
   {Innova}
   If PrgSetup.AllowInnova then begin
     AddCaption(LanguageSetup.ProfileEditorGeneralSheet+' - '+LanguageSetup.ProfileEditorSoundInnova);
@@ -795,6 +825,11 @@ begin
   AddSetting(13003,LanguageSetup.ProfileEditorScummVMRenderMode,ValueToList(GameDB.ConfOpt.ScummVMRenderMode,';,'),False,ValueWidth,True);
   AddYesNoSetting(13004,LanguageSetup.GameStartFullscreen);
   AddYesNoSetting(13005,LanguageSetup.GameAspectCorrection);
+  AddEditSetting(13006,LanguageSetup.ProfileEditorScummVMCommandLine,'',-1);
+  AddYesNoSetting(13007,LanguageSetup.ProfileEditorScummVMSubtitles);
+  AddYesNoSetting(13008,LanguageSetup.ProfileEditorScummVMConfirmExit);
+  AddSpinSetting(13009,LanguageSetup.ProfileEditorScummVMAutosave,1,86400,ValueWidth);
+  AddSpinSetting(13010,LanguageSetup.ProfileEditorScummVMTextSpeed,1,1000,ValueWidth);
 
   {ScummVM sound}
   AddCaption(LanguageSetup.ProfileEditorScummVMSheet+' - '+LanguageSetup.ProfileEditorSoundSheet);
@@ -945,9 +980,12 @@ begin
     If ValueActive(1004) then G.Year:=GetComboText;
     If ValueActive(1005) then G.Language:=GetEnglishLanguageName(GetComboText);
     If ValueActive(1006) then G.Favorite:=GetYesNo;
-    If ValueActive(1007) then G.WWW:=GetComboText;
-    If ValueActive(1008) then SetUserInfo(G,GetComboText,TEdit(GetControl(1)).Text);
-    If ValueActive(1009) then DelUserInfo(G,GetComboText);
+    If ValueActive(1007) then SetUserInfo(G,GetComboText,TEdit(GetControl(1)).Text);
+    If ValueActive(1008) then DelUserInfo(G,GetComboText);
+    For J:=1 to 9 do begin
+      If ValueActive(1010+(J-1)*2) then G.WWWName[J]:=GetComboText;
+      If ValueActive(1011+(J-1)*2) then G.WWW[J]:=GetComboText;
+    end;
 
     If (not ScummVM) and (not WindowsMode) then begin
 
@@ -1015,8 +1053,11 @@ begin
         If ValueActive(5301) then G.VGAChipset:=GetComboText;
         If ValueActive(5302) then begin try J:=StrToInt(GetComboText); except J:=512; end; G.VideoRam:=J; end;
       end;
+      If PrgSetup.AllowPixelShader then begin
+        If ValueActive(5401) then G.PixelShader:=GetComboText;
+      end;
       If PrgSetup.AllowTextModeLineChange then begin
-        If ValueActive(5401) then begin try J:=StrToInt(GetComboText); except J:=25; end; G.TextModeLines:=J; end;
+        If ValueActive(5501) then begin try J:=StrToInt(GetComboText); except J:=25; end; G.TextModeLines:=J; end;
       end;
 
       {Keyboard}
@@ -1085,6 +1126,12 @@ begin
       If ValueActive(8302) then G.MIDIDevice:=GetComboText;
       If ValueActive(8303) then G.MIDIConfig:=GetEditText;
 
+      If DefaultValueOnList(GameDB.ConfOpt.MIDIDevice,'mt32') then begin
+        If ValueActive(8351) then G.MIDIMT32Mode:=GetComboText;
+        If ValueActive(8352) then G.MIDIMT32Time:=GetComboText;
+        If ValueActive(8353) then G.MIDIMT32Level:=GetComboText;
+      end;
+
       {Innova}
       If PrgSetup.AllowInnova then begin
         If ValueActive(8401) then G.Innova:=GetYesNo;
@@ -1151,6 +1198,11 @@ begin
       end;
       If ValueActive(13004) then G.StartFullscreen:=GetYesNo;
       If ValueActive(13005) then G.AspectCorrection:=GetYesNo;
+      If ValueActive(13006) then G.ScummVMParameters:=GetEditText;
+      If ValueActive(13007) then G.ScummVMSubtitles:=GetYesNo;
+      If ValueActive(13008) then G.ScummVMConfirmExit:=GetYesNo;
+      If ValueActive(13009) then G.ScummVMAutosave:=GetSpinValue;
+      If ValueActive(13010) then G.ScummVMTalkSpeed:=GetSpinValue;
 
       {ScummVM sound}
       If ValueActive(14001) then G.ScummVMMusicVolume:=GetSpinValue;

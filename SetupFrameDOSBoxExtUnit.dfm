@@ -133,7 +133,7 @@ object SetupFrameDOSBoxExt: TSetupFrameDOSBoxExt
         OnClick = DefaultValueChanged
       end
       object PixelShaderCheckBox: TCheckBox
-        Tag = 1
+        Tag = 3
         Left = 16
         Top = 141
         Width = 513

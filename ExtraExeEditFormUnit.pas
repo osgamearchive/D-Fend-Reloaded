@@ -10,20 +10,22 @@ type
   TExtraExeEditForm = class(TForm)
     OKButton: TBitBtn;
     CancelButton: TBitBtn;
-    List: TValueListEditor;
     InfoLabel: TLabel;
     HelpButton: TBitBtn;
+    Tab: TStringGrid;
+    SelectButton: TBitBtn;
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure OKButtonClick(Sender: TObject);
-    procedure ListEditButtonClick(Sender: TObject);
     procedure HelpButtonClick(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure SelectButtonClick(Sender: TObject);
+    procedure TabClick(Sender: TObject);
   private
     { Private-Deklarationen }
   public
     { Public-Deklarationen }
-    ExeFiles : TStringList;
+    ExeFiles, Parameters : TStringList;
     WindowsMode : Boolean;
     GameExe, SetupExe : String;
   end;
@@ -31,7 +33,7 @@ type
 var
   ExtraExeEditForm: TExtraExeEditForm;
 
-Function ShowExtraExeEditDialog(const AOwner : TComponent; const AExeFiles : TStringList; const AWindowsMode : Boolean; const AGameExe, AGameSetup : String) : Boolean;
+Function ShowExtraExeEditDialog(const AOwner : TComponent; const AExeFiles, AParameters : TStringList; const AWindowsMode : Boolean; const AGameExe, AGameSetup : String) : Boolean;
 
 implementation
 
@@ -43,26 +45,28 @@ uses Math, LanguageSetupUnit, CommonTools, VistaToolsUnit, PrgSetupUnit,
 { TExtraExeEditForm }
 
 procedure TExtraExeEditForm.FormCreate(Sender: TObject);
-Var I : Integer;
 begin
   SetVistaFonts(self);
   Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName);
 
   Caption:=LanguageSetup.ExtraExeEditCaption;
-  List.TitleCaptions[0]:=LanguageSetup.ExtraExeEditDescription;
-  List.TitleCaptions[1]:=LanguageSetup.ExtraExeEditFileName;
-  For I:=0 to 9 do begin
-    List.Strings.Add(' =');
-    List.ItemProps[List.Strings.Count-1].EditStyle:=esEllipsis;
-  end;
+  Tab.Cells[0,0]:=LanguageSetup.ExtraExeEditDescription;
+  Tab.Cells[1,0]:=LanguageSetup.ExtraExeEditFileName;
+  Tab.Cells[2,0]:=LanguageSetup.ExtraExeEditParameters;
+  SelectButton.Caption:=LanguageSetup.ExtraExeEditFileNameSelect;
   InfoLabel.Caption:=LanguageSetup.ExtraExeEditInfo;
   OKButton.Caption:=LanguageSetup.OK;
   CancelButton.Caption:=LanguageSetup.Cancel;
   HelpButton.Caption:=LanguageSetup.Help;
 
+  Tab.ColWidths[0]:=(Tab.ClientWidth-10)*2 div 7;
+  Tab.ColWidths[1]:=(Tab.ClientWidth-10)*4 div 7;
+  Tab.ColWidths[2]:=(Tab.ClientWidth-10)*1 div 7;
+
   UserIconLoader.DialogImage(DI_OK,OKButton);
   UserIconLoader.DialogImage(DI_Cancel,CancelButton);
   UserIconLoader.DialogImage(DI_Help,HelpButton);
+  UserIconLoader.DialogImage(DI_SelectFile,SelectButton);
 
   WindowsMode:=False;
   GameExe:='';
@@ -73,32 +77,46 @@ procedure TExtraExeEditForm.FormShow(Sender: TObject);
 Var I,J,K : Integer;
     S : String;
 begin
-  J:=0;
+  J:=1;
   For I:=0 to Min(9,ExeFiles.Count-1) do begin
     S:=Trim(ExeFiles[I]);
     If S<>'' then begin
       K:=Pos(';',S);
-      If K>0 then List.Strings[J]:=Copy(S,1,K-1)+'='+Copy(S,K+1,MaxInt); inc(J); end;
+      If K>0 then begin
+         Tab.Cells[0,J]:=Copy(S,1,K-1);
+         Tab.Cells[1,J]:=Copy(S,K+1,MaxInt);
+         Tab.Cells[2,J]:=Parameters[I];
+         inc(J);
+       end;
+    end;
   end;
 end;
 
-procedure TExtraExeEditForm.ListEditButtonClick(Sender: TObject);
+procedure TExtraExeEditForm.TabClick(Sender: TObject);
+begin
+  SelectButton.Enabled:=(Tab.Row>=1);
+end;
+
+procedure TExtraExeEditForm.SelectButtonClick(Sender: TObject);
 Var S : String;
 begin
-  S:=MakeAbsPath(List.Strings.ValueFromIndex[List.Row-1],PrgSetup.BaseDir);
-  If SelectProgramFile(S,GameExe,SetupExe,WindowsMode,-1,self) then List.Strings.ValueFromIndex[List.Row-1]:=S;
+  if Tab.Row<1 then exit;
+  S:=MakeAbsPath(Tab.Cells[1,Tab.Row],PrgSetup.BaseDir);
+  If SelectProgramFile(S,GameExe,SetupExe,WindowsMode,-1,self) then Tab.Cells[1,Tab.Row]:=S;
 end;
 
 procedure TExtraExeEditForm.OKButtonClick(Sender: TObject);
-Var I,J : Integer;
-    S : String;
+Var I : Integer;
+    S,T : String;
 begin
   ExeFiles.Clear;
-  For I:=0 to List.Strings.Count-1 do begin
-    S:=Trim(List.Strings[I]);
-    If (S<>'') and (S<>'=') then begin
-      J:=Pos('=',S);
-      If J>0 then ExeFiles.Add(Copy(S,1,J-1)+';'+Copy(S,J+1,MaxInt));
+  Parameters.Clear;
+  For I:=1 to 19 do begin
+    S:=Trim(Tab.Cells[0,I]);
+    T:=Trim(Tab.Cells[1,I]);
+    If (S<>'') and (T<>'') then begin
+      ExeFiles.Add(S+';'+T);
+      Parameters.Add(Tab.Cells[2,I]);
     end;
   end;
 end;
@@ -115,11 +133,12 @@ end;
 
 { global }
 
-Function ShowExtraExeEditDialog(const AOwner : TComponent; const AExeFiles : TStringList; const AWindowsMode : Boolean; const AGameExe, AGameSetup : String) : Boolean;
+Function ShowExtraExeEditDialog(const AOwner : TComponent; const AExeFiles, AParameters : TStringList; const AWindowsMode : Boolean; const AGameExe, AGameSetup : String) : Boolean;
 begin
   ExtraExeEditForm:=TExtraExeEditForm.Create(AOwner);
   try
     ExtraExeEditForm.ExeFiles:=AExeFiles;
+    ExtraExeEditForm.Parameters:=AParameters;
     ExtraExeEditForm.WindowsMode:=AWindowsMode;
     ExtraExeEditForm.GameExe:=AGameExe;
     ExtraExeEditForm.SetupExe:=AGameSetup;

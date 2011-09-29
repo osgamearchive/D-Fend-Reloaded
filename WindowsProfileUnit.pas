@@ -139,7 +139,7 @@ begin
     S:=Trim(Game.GameExe); T:=Game.GameParameters;
   end else begin
     S:=Copy(S,I+1,MaxInt);
-    T:='';
+    T:=Game.ExtraPrgFileParameter[Nr];
   end;
 
   If not WindowsRunCheck(S) then exit;

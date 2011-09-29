@@ -44,7 +44,7 @@ type
     Procedure BeforeChangeLanguage;
     Procedure LoadLanguage;
     Procedure DOSBoxDirChanged;
-    Procedure ShowFrame(const AdvencedMode : Boolean);
+    Procedure ShowFrame(const AdvancedMode : Boolean);
     procedure HideFrame;
     Procedure RestoreDefaults;
     Procedure SaveSetup;
@@ -133,13 +133,13 @@ procedure TSetupFrameDOSBox.DOSBoxDirChanged;
 begin
 end;
 
-procedure TSetupFrameDOSBox.ShowFrame(const AdvencedMode: Boolean);
+procedure TSetupFrameDOSBox.ShowFrame(const AdvancedMode: Boolean);
 begin
-  MoreSettingsButton.Visible:=AdvencedMode;
+  MoreSettingsButton.Visible:=AdvancedMode;
   PortableModeInfoButton.Visible:=(OperationMode=omPortable);
 
 
-  If AdvencedMode then begin
+  If AdvancedMode then begin
     If PortableModeInfoButton.Visible
       then DOSBoxDownloadURLInfo.Top:=PortableModeInfoButton.Top+PortableModeInfoButton.Height+10
       else DOSBoxDownloadURLInfo.Top:=MoreSettingsButton.Top+MoreSettingsButton.Height+10;

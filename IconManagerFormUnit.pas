@@ -30,6 +30,7 @@ type
     N1: TMenuItem;
     PopupToolsRenameUpper: TMenuItem;
     PopupToolsRenameLower: TMenuItem;
+    PopupAddIconsFromFolder: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure ListViewDblClick(Sender: TObject);
     procedure OKButtonClick(Sender: TObject);
@@ -92,6 +93,7 @@ begin
   CancelButton.Caption:=LanguageSetup.Cancel;
   AddButton.Caption:=LanguageSetup.Add;
   PopupAddIcon.Caption:=LanguageSetup.MenuExtrasIconManagerAddSingle;
+  PopupAddIconsFromFolder.Caption:=LanguageSetup.MenuExtrasIconManagerAddIconsFromFolder;
   PopupAddAllIcons.Caption:=LanguageSetup.MenuExtrasIconManagerAddAll;
   DelButton.Caption:=LanguageSetup.Del;
   HelpButton.Caption:=LanguageSetup.Help;
@@ -145,13 +147,57 @@ begin
   end;
 end;
 
-procedure TIconManagerForm.LoadIcons;
-Var I,J : Integer;
+Function GetIconsListForSingleDir(const Folder : String) : TStringList;
+Var S : String;
+    I,J : Integer;
     Rec : TSearchRec;
+begin
+  S:=IncludeTrailingPathDelimiter(Folder);
+  result:=TStringList.Create;
+
+  For J:=Low(IconFileExts) to High(IconFileExts) do begin
+    I:=FindFirst(S+'*.'+IconFileExts[J],faAnyFile,Rec);
+    try
+      while I=0 do begin
+        result.Add(S+Rec.Name);
+        I:=FindNext(Rec);
+      end;
+    finally
+      FindClose(Rec);
+    end;
+  end;
+end;
+
+Function GetIconsList(const Folder : String) : TStringList;
+Var S : String;
+    I : Integer;
+    Rec : TSearchRec;
+    St : TStringList;
+begin
+  S:=IncludeTrailingPathDelimiter(Folder);
+  result:=GetIconsListForSingleDir(Folder);
+
+  I:=FindFirst(S+'*.*',faDirectory,Rec);
+  try
+    while I=0 do begin
+      If (Rec.Name<>'.') and (Rec.Name<>'..') and ((Rec.Attr and faDirectory)<>0) then begin
+        St:=GetIconsList(S+Rec.Name);
+        try result.AddStrings(St); finally St.Free; end;
+      end;
+      I:=FindNext(Rec);
+    end;
+  finally
+    FindClose(Rec);
+  end;
+end;
+
+procedure TIconManagerForm.LoadIcons;
+Var I : Integer;
     L : TListItem;
     Icon, Icon2 : TIcon;
     B : Boolean;
     S : String;
+    St : TStringList;
 begin
   ForceDirectories(Dir);
 
@@ -161,45 +207,42 @@ begin
     ImageList.Clear;
     ListView.SortType:=stNone;
 
-    For J:=Low(IconFileExts) to High(IconFileExts) do begin
-      I:=FindFirst(Dir+'*.'+IconFileExts[J],faAnyFile,Rec);
-      try
-        while I=0 do begin
-          B:=True;
-          try
-            If J=Low(IconFileExts) then begin
-              Icon:=TIcon.Create;
-              Icon.LoadFromFile(Dir+Rec.Name);
-            end else begin
-              Icon:=LoadImageAsIconFromFile(Dir+Rec.Name);
-            end;
-          except
-            B:=False;
+    St:=GetIconsList(Dir);
+    try
+      For I:=0 To St.Count-1 do begin
+        B:=True;
+        try
+          If ExtUpperCase(ExtractFileExt(St[I]))='.ICO' then begin
+            Icon:=TIcon.Create;
+            Icon.LoadFromFile(St[I]);
+          end else begin
+            Icon:=LoadImageAsIconFromFile(St[I]);
           end;
-          try
-            If B and (Icon<>nil) then begin
-              try
-                ImageList.AddIcon(Icon);
-              except
-                Icon2:=LoadIconFromExeFile(Dir+Rec.Name);
-                try
-                  If Icon2<>nil then ImageList.AddIcon(Icon2);
-                finally
-                  Icon2.Free;
-                end;
-              end;
-              ListView.AddItem(Rec.Name,nil);
-              L:=ListView.Items[ListView.Items.Count-1];
-              L.ImageIndex:=ImageList.Count-1;
-            end;
-          finally
-            If (Icon<>nil) then FreeAndNil(Icon);
-          end;
-          I:=FindNext(Rec);
+        except
+          B:=False;
         end;
-      finally
-        FindClose(Rec);
+        try
+          If B and (Icon<>nil) then begin
+            try
+              ImageList.AddIcon(Icon);
+            except
+              Icon2:=LoadIconFromExeFile(St[I]);
+              try
+                If Icon2<>nil then ImageList.AddIcon(Icon2);
+              finally
+                Icon2.Free;
+              end;
+            end;
+            ListView.AddItem(ExtractFileName(St[I]),nil);
+            L:=ListView.Items[ListView.Items.Count-1];
+            L.ImageIndex:=ImageList.Count-1;
+          end;
+        finally
+          If (Icon<>nil) then FreeAndNil(Icon);
+        end;
       end;
+    finally
+      St.Free;
     end;
 
     If ExtractFilePath(Trim(LastIcon))='' then begin
@@ -302,6 +345,17 @@ begin
           Enabled:=False;
           try
             ScanFolderForIcons(MakeAbsPath(PrgSetup.GameDir,PrgSetup.BaseDir));
+          finally
+            Enabled:=True;
+          end;
+          LoadIcons;
+        end;
+    3 : begin
+          Enabled:=False;
+          try
+            S:=MakeAbsPath(PrgSetup.GameDir,PrgSetup.BaseDir);
+            if not SelectDirectory(Handle,LanguageSetup.MenuExtrasIconManagerAddIconsFromFolderCaption,S) then exit;
+            ScanFolderForIcons(S);
           finally
             Enabled:=True;
           end;

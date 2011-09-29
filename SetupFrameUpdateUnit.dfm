@@ -6,7 +6,7 @@ object SetupFrameUpdate: TSetupFrameUpdate
   TabOrder = 0
   object DataReaderInfoLabel: TLabel
     Left = 16
-    Top = 170
+    Top = 174
     Width = 199
     Height = 13
     Caption = 'Mobygames reader configuration update:'

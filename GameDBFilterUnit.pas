@@ -189,7 +189,7 @@ begin
     ftPublisher : result:=NotPrefix xor Compare(AGame.CachePublisherUpper);
     ftYear      : result:=NotPrefix xor Compare(AGame.CacheYearUpper,sptNumber);
     ftNotes     : begin St:=StringToStringList(AGame.Notes); try result:=NotPrefix xor Compare(St.Text); finally St.Free; end; end;
-    ftWWW       : result:=NotPrefix xor Compare(ExtUpperCase(AGame.WWW));
+    ftWWW       : result:=NotPrefix xor (Compare(ExtUpperCase(AGame.WWW[1])) or Compare(ExtUpperCase(AGame.WWW[2])) or Compare(ExtUpperCase(AGame.WWW[3])) or Compare(ExtUpperCase(AGame.WWW[4])) or Compare(ExtUpperCase(AGame.WWW[5])) or Compare(ExtUpperCase(AGame.WWW[6])) or Compare(ExtUpperCase(AGame.WWW[7])) or Compare(ExtUpperCase(AGame.WWW[8])) or Compare(ExtUpperCase(AGame.WWW[9])));
     ftLanguage  : result:=NotPrefix xor Compare(AGame.CacheLanguage,sptLanguage);
     ftLicense   : result:=NotPrefix xor Compare(AGame.License,sptLicense);
     ftUserData  : result:=NotPrefix xor Compare(ExtUpperCase(GetUserData(AGame)));

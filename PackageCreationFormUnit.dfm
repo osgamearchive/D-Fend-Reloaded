@@ -75,7 +75,6 @@ object PackageCreationForm: TPackageCreationForm
     TabOrder = 3
     OnClick = OKButtonClick
     Kind = bkOK
-    ExplicitTop = 483
   end
   object CancelButton: TBitBtn
     Left = 104
@@ -85,7 +84,6 @@ object PackageCreationForm: TPackageCreationForm
     Anchors = [akLeft, akBottom]
     TabOrder = 4
     Kind = bkCancel
-    ExplicitTop = 483
   end
   object HelpButton: TBitBtn
     Left = 201
@@ -96,7 +94,6 @@ object PackageCreationForm: TPackageCreationForm
     TabOrder = 5
     OnClick = HelpButtonClick
     Kind = bkHelp
-    ExplicitTop = 483
   end
   object PageControl: TPageControl
     Left = -1
@@ -107,13 +104,9 @@ object PackageCreationForm: TPackageCreationForm
     Anchors = [akLeft, akTop, akRight, akBottom]
     Images = ImageList
     TabOrder = 0
-    ExplicitWidth = 680
-    ExplicitHeight = 347
     object TabSheet1: TTabSheet
       Caption = 'Games'
       ImageIndex = 4
-      ExplicitWidth = 672
-      ExplicitHeight = 318
       object GamesPanel: TPanel
         Left = 0
         Top = 305
@@ -122,8 +115,6 @@ object PackageCreationForm: TPackageCreationForm
         Align = alBottom
         BevelOuter = bvNone
         TabOrder = 1
-        ExplicitTop = 282
-        ExplicitWidth = 672
         object GamesSelectAllButton: TBitBtn
           Left = 0
           Top = 6
@@ -166,15 +157,15 @@ object PackageCreationForm: TPackageCreationForm
         TabOrder = 0
         ViewStyle = vsReport
         OnColumnClick = GamesListViewColumnClick
-        ExplicitWidth = 672
-        ExplicitHeight = 282
       end
     end
     object TabSheet2: TTabSheet
       Caption = 'Auto setup templates'
       ImageIndex = 5
-      ExplicitWidth = 672
-      ExplicitHeight = 318
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object AutoSetupPanel: TPanel
         Left = 0
         Top = 305
@@ -183,8 +174,6 @@ object PackageCreationForm: TPackageCreationForm
         Align = alBottom
         BevelOuter = bvNone
         TabOrder = 1
-        ExplicitTop = 282
-        ExplicitWidth = 672
         object AutoSetupSelectAllButton: TBitBtn
           Tag = 3
           Left = 0
@@ -228,15 +217,15 @@ object PackageCreationForm: TPackageCreationForm
         TabOrder = 0
         ViewStyle = vsReport
         OnColumnClick = AutoSetupListViewColumnClick
-        ExplicitWidth = 672
-        ExplicitHeight = 282
       end
     end
     object TabSheet3: TTabSheet
       Caption = 'Icons'
       ImageIndex = 6
-      ExplicitWidth = 672
-      ExplicitHeight = 318
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object IconsPanel: TPanel
         Left = 0
         Top = 305
@@ -245,8 +234,6 @@ object PackageCreationForm: TPackageCreationForm
         Align = alBottom
         BevelOuter = bvNone
         TabOrder = 1
-        ExplicitTop = 282
-        ExplicitWidth = 672
         object IconsSelectAllButton: TBitBtn
           Tag = 6
           Left = 0
@@ -285,15 +272,15 @@ object PackageCreationForm: TPackageCreationForm
         SmallImages = IconsImageList
         TabOrder = 0
         ViewStyle = vsReport
-        ExplicitWidth = 672
-        ExplicitHeight = 282
       end
     end
     object TabSheet6: TTabSheet
       Caption = 'Icon sets'
       ImageIndex = 7
-      ExplicitWidth = 672
-      ExplicitHeight = 318
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object IconSetsPanel: TPanel
         Left = 0
         Top = 305
@@ -302,8 +289,6 @@ object PackageCreationForm: TPackageCreationForm
         Align = alBottom
         BevelOuter = bvNone
         TabOrder = 1
-        ExplicitTop = 282
-        ExplicitWidth = 672
         object IconSetsSelectAllButton: TBitBtn
           Tag = 8
           Left = 0
@@ -333,15 +318,15 @@ object PackageCreationForm: TPackageCreationForm
         Align = alClient
         ItemHeight = 13
         TabOrder = 0
-        ExplicitWidth = 672
-        ExplicitHeight = 282
       end
     end
     object TabSheet4: TTabSheet
       Caption = 'Language files'
       ImageIndex = 8
-      ExplicitWidth = 672
-      ExplicitHeight = 318
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object LanguageFilesPanel: TPanel
         Left = 0
         Top = 305
@@ -350,8 +335,6 @@ object PackageCreationForm: TPackageCreationForm
         Align = alBottom
         BevelOuter = bvNone
         TabOrder = 1
-        ExplicitTop = 282
-        ExplicitWidth = 672
         object LanguageFilesSelectAllButton: TBitBtn
           Tag = 10
           Left = 0
@@ -381,15 +364,15 @@ object PackageCreationForm: TPackageCreationForm
         Align = alClient
         ItemHeight = 13
         TabOrder = 0
-        ExplicitWidth = 672
-        ExplicitHeight = 282
       end
     end
     object TabSheet5: TTabSheet
       Caption = 'Multiple games packages'
       ImageIndex = 9
-      ExplicitWidth = 672
-      ExplicitHeight = 318
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object PackagesPanel: TPanel
         Left = 0
         Top = 305
@@ -398,8 +381,6 @@ object PackageCreationForm: TPackageCreationForm
         Align = alBottom
         BevelOuter = bvNone
         TabOrder = 1
-        ExplicitTop = 282
-        ExplicitWidth = 672
         object PackagesAddButton: TBitBtn
           Tag = 12
           Left = 0
@@ -484,15 +465,11 @@ object PackageCreationForm: TPackageCreationForm
         OnClick = PackagesListBoxClick
         OnDblClick = PackagesListBoxDblClick
         OnKeyDown = PackagesListBoxKeyDown
-        ExplicitWidth = 672
-        ExplicitHeight = 282
       end
     end
     object TabSheet7: TTabSheet
       Caption = 'Tools'
       ImageIndex = 10
-      ExplicitWidth = 672
-      ExplicitHeight = 318
       DesignSize = (
         699
         341)
@@ -505,7 +482,6 @@ object PackageCreationForm: TPackageCreationForm
         Caption = 'Ignore records selected on the other pages and do this:'
         TabOrder = 0
         OnClick = ToolsCheckBoxClick
-        ExplicitWidth = 609
       end
       object ToolsRadioButton1: TRadioButton
         Left = 16
@@ -557,8 +533,6 @@ object PackageCreationForm: TPackageCreationForm
     EditLabel.Height = 13
     EditLabel.Caption = 'Filename of the package list file'
     TabOrder = 2
-    ExplicitTop = 415
-    ExplicitWidth = 632
   end
   object DescriptionEdit: TLabeledEdit
     Left = 8
@@ -570,8 +544,6 @@ object PackageCreationForm: TPackageCreationForm
     EditLabel.Height = 13
     EditLabel.Caption = 'DescriptionEdit'
     TabOrder = 1
-    ExplicitTop = 370
-    ExplicitWidth = 632
   end
   object OpenDialog: TOpenDialog
     DefaultExt = 'exe'
@@ -607,7 +579,7 @@ object PackageCreationForm: TPackageCreationForm
     Left = 456
     Top = 504
     Bitmap = {
-      494C01010B000C00040010001000FFFFFFFFFF00FFFFFFFFFFFFFFFF424D3600
+      494C01010B000C00040010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000003000000001002000000000000030
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -1007,6 +979,7 @@ object PackageCreationForm: TPackageCreationForm
       C007E00F0000E00FC007C4470000C007C0078C6300008003C0079C7300008003
       C0073FF900000001C0073EF900000001C0073C7F00000001C0073C7F00000001
       C0073C4100000001C0079C6100008003C0078C7100008003C007C4410000C007
-      C007E00DFFFFE00FC007F83FFFFFF83F}
+      C007E00DFFFFE00FC007F83FFFFFF83F00000000000000000000000000000000
+      000000000000}
   end
 end

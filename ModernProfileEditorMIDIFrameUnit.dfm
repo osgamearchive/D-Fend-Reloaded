@@ -75,6 +75,7 @@ object ModernProfileEditorMIDIFrame: TModernProfileEditorMIDIFrame
     Style = csDropDownList
     ItemHeight = 13
     TabOrder = 1
+    OnChange = DeviceComboBoxChange
   end
   object AdditionalSettingsEdit: TLabeledEdit
     Left = 24
@@ -105,5 +106,61 @@ object ModernProfileEditorMIDIFrame: TModernProfileEditorMIDIFrame
     TabOrder = 4
     Visible = False
     OnClick = MIDISelectListBoxClick
+  end
+  object MT32SettingsGroupBox: TGroupBox
+    Left = 24
+    Top = 368
+    Width = 425
+    Height = 81
+    Caption = 'MT32SettingsGroupBox'
+    TabOrder = 5
+    object MT32ModeLabel: TLabel
+      Left = 16
+      Top = 24
+      Width = 77
+      Height = 13
+      Caption = 'MT32ModeLabel'
+    end
+    object MT32TimeLabel: TLabel
+      Left = 152
+      Top = 24
+      Width = 73
+      Height = 13
+      Caption = 'MT32TimeLabel'
+    end
+    object MT32LevelLabel: TLabel
+      Left = 288
+      Top = 24
+      Width = 76
+      Height = 13
+      Caption = 'MT32LevelLabel'
+    end
+    object MT32ModeComboBox: TComboBox
+      Left = 16
+      Top = 40
+      Width = 121
+      Height = 21
+      Style = csDropDownList
+      ItemHeight = 13
+      TabOrder = 0
+    end
+    object MT32TimeComboBox: TComboBox
+      Left = 152
+      Top = 40
+      Width = 121
+      Height = 21
+      Style = csDropDownList
+      ItemHeight = 13
+      TabOrder = 1
+    end
+    object MT32LevelComboBox: TComboBox
+      Left = 288
+      Top = 40
+      Width = 121
+      Height = 21
+      Style = csDropDownList
+      ItemHeight = 13
+      TabOrder = 2
+    end
   end
 end

@@ -162,7 +162,6 @@ begin
   ToolsRadioButton3.Caption:=LanguageSetup.PackageManagerPageToolsSpecial3;
 
   UserIconLoader.DirectLoad(ImageList,'PackageManager');
-  UserIconLoader.DialogImage(DI_Tools,ImageList,10); //... Remove this line and add tools button to regular list after release of 1.1
   UserIconLoader.DialogImage(DI_Add,PackagesAddButton);
   UserIconLoader.DialogImage(DI_Edit,PackagesEditButton);
   UserIconLoader.DialogImage(DI_Delete,PackagesDelButton);
@@ -179,8 +178,6 @@ begin
   InitListViewForGamesList(GamesListView,True);
   InitListViewForGamesList(AutoSetupListView,True);
   LoadLists;
-
-  TabSheet7.TabVisible:=PrgSetup.ActivateIncompleteFeatures;
 end;
 
 procedure TPackageCreationForm.FormDestroy(Sender: TObject);

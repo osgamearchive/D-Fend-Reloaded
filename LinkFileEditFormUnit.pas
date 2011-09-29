@@ -37,15 +37,15 @@ type
     Function GetLinks : TStringList;
   public
     { Public-Deklarationen }
-    Links : TStringList;
-    AllowLinesAndSubs : Boolean;
+    Names, Links : TStringList;
+    AllowLinesAndSubs, FixedNumber : Boolean;
     HelpID : Integer;
   end;
 
 var
   LinkFileEditForm: TLinkFileEditForm;
 
-Function ShowLinkFileEditDialog(const AOwner : TComponent; const ALinks : TStringList; const AAllowLinesAndSubs : Boolean; const AHelpID : Integer) : Boolean;
+Function ShowLinkFileEditDialog(const AOwner : TComponent; const ANames, ALinks : TStringList; const AAllowLinesAndSubs, AFixedNumber : Boolean; const AHelpID : Integer) : Boolean;
 
 implementation
 
@@ -97,25 +97,25 @@ end;
 
 procedure TLinkFileEditForm.FormShow(Sender: TObject);
 Var I : Integer;
-    S : String;
 begin
   If not AllowLinesAndSubs then InfoPanel.Visible:=False;
 
   Tab.RowCount:=Max(2,Links.Count+1);
   If Links.Count=0 then exit;
-  For I:=0 to Links.Count-1 do begin
-    S:=Trim(Links[I]);
-    If (S<>'') and (Pos(';',S)>0) then begin
-      Tab.Cells[0,I+1]:=Trim(Copy(S,1,Pos(';',S)-1));;
-      Tab.Cells[1,I+1]:=Trim(Copy(S,Pos(';',S)+1,MaxInt));;
-    end;
+  For I:=0 to Names.Count-1 do begin
+    Tab.Cells[0,I+1]:=Names[I];
+    Tab.Cells[1,I+1]:=Links[I];
   end;
   TabClick(Sender);
+
+  HelpButton.Visible:=(HelpID>=0);
+  AddButton.Enabled:=not FixedNumber;
+  DeleteButton.Enabled:=not FixedNumber;
 end;
 
 procedure TLinkFileEditForm.TabClick(Sender: TObject);
 begin
-  DeleteButton.Enabled:=(Tab.RowCount>2);
+  DeleteButton.Enabled:=(Tab.RowCount>2) and (not FixedNumber);
   MoveUpButton.Enabled:=(Tab.Row>1);
   MoveDownButton.Enabled:=(Tab.Row<Tab.RowCount-1);
 end;
@@ -206,15 +206,19 @@ begin
 end;
 
 procedure TLinkFileEditForm.OKButtonClick(Sender: TObject);
-Var St : TStringList;
+Var I : Integer;
 begin
+  Names.Clear;
   Links.Clear;
-  St:=GetLinks; try Links.AddStrings(St); finally St.Free; end;
+  For I:=1 to Tab.RowCount-1 do begin
+    Names.Add(Trim(Tab.Cells[0,I]));
+    Links.Add(Trim(Tab.Cells[1,I]));
+  end;
 end;
 
 procedure TLinkFileEditForm.HelpButtonClick(Sender: TObject);
 begin
-  Application.HelpCommand(HELP_CONTEXT,HelpID);
+  If HelpID>=0 then Application.HelpCommand(HELP_CONTEXT,HelpID);
 end;
 
 procedure TLinkFileEditForm.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -230,18 +234,19 @@ end;
 
 { global }
 
-Function ShowLinkFileEditDialog(const AOwner : TComponent; const ALinks : TStringList; const AAllowLinesAndSubs : Boolean; const AHelpID : Integer) : Boolean;
+Function ShowLinkFileEditDialog(const AOwner : TComponent; const ANames, ALinks : TStringList; const AAllowLinesAndSubs, AFixedNumber : Boolean; const AHelpID : Integer) : Boolean;
 begin
   LinkFileEditForm:=TLinkFileEditForm.Create(AOwner);
   try
+    LinkFileEditForm.Names:=ANames;
     LinkFileEditForm.Links:=ALinks;
     LinkFileEditForm.AllowLinesAndSubs:=AAllowLinesAndSubs;
+    LinkFileEditForm.FixedNumber:=AFixedNumber;
     LinkFileEditForm.HelpID:=AHelpID;
     result:=(LinkFileEditForm.ShowModal=mrOK);
   finally
     LinkFileEditForm.Free;
   end;
-
 end;
 
 end.

@@ -30,6 +30,9 @@ object LanguageEditorForm: TLanguageEditorForm
     Align = alTop
     BevelOuter = bvNone
     TabOrder = 0
+    DesignSize = (
+      659
+      32)
     object CloseButton: TBitBtn
       Left = 4
       Top = 4
@@ -39,11 +42,12 @@ object LanguageEditorForm: TLanguageEditorForm
       Kind = bkClose
     end
     object SectionComboBox: TComboBox
-      Left = 304
+      Left = 344
       Top = 5
-      Width = 169
+      Width = 305
       Height = 21
       Style = csDropDownList
+      Anchors = [akLeft, akTop, akRight]
       ItemHeight = 13
       TabOrder = 2
       OnChange = SectionComboBoxChange
@@ -52,7 +56,7 @@ object LanguageEditorForm: TLanguageEditorForm
     object ShowComboBox: TComboBox
       Left = 120
       Top = 5
-      Width = 169
+      Width = 201
       Height = 21
       Style = csDropDownList
       ItemHeight = 13

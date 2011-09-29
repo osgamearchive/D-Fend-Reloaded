@@ -33,7 +33,7 @@ type
     Procedure BeforeChangeLanguage;
     Procedure LoadLanguage;
     Procedure DOSBoxDirChanged;
-    Procedure ShowFrame(const AdvencedMode : Boolean);
+    Procedure ShowFrame(const AdvancedMode : Boolean);
     procedure HideFrame;
     Procedure RestoreDefaults;
     Procedure SaveSetup;
@@ -150,6 +150,9 @@ begin
 
   AddString(P1+LanguageSetup.ProfileEditorSoundMIDIDevice,GameDB.ConfOpt.MIDIDevice);
   AddString(P1+S3+LanguageSetup.ProfileEditorSoundMIDIType,GameDB.ConfOpt.MPU401);
+  AddString(P1+S3+LanguageSetup.ProfileEditorSoundMIDIMT32+' '+LanguageSetup.ProfileEditorSoundMIDIMT32Mode,GameDB.ConfOpt.MT32ReverbMode);
+  AddString(P1+S3+LanguageSetup.ProfileEditorSoundMIDIMT32+' '+LanguageSetup.ProfileEditorSoundMIDIMT32Time,GameDB.ConfOpt.MT32ReverbTime);
+  AddString(P1+S3+LanguageSetup.ProfileEditorSoundMIDIMT32+' '+LanguageSetup.ProfileEditorSoundMIDIMT32Level,GameDB.ConfOpt.MT32ReverbLevel);
 
   AddString(P1+LanguageSetup.ProfileEditorSoundInnovaSampleRate,GameDB.ConfOpt.InnovaEmulationSampleRate);
   AddString(P1+LanguageSetup.ProfileEditorSoundInnovaBaseAddress,GameDB.ConfOpt.InnovaEmulationBaseAddress);
@@ -181,7 +184,7 @@ procedure TSetupFrameDefaultValues.DOSBoxDirChanged;
 begin
 end;
 
-procedure TSetupFrameDefaultValues.ShowFrame(const AdvencedMode: Boolean);
+procedure TSetupFrameDefaultValues.ShowFrame(const AdvancedMode: Boolean);
 begin
 end;
 
@@ -244,6 +247,9 @@ begin
 
   GameDB.ConfOpt.MIDIDevice:=GetString;
   GameDB.ConfOpt.MPU401:=GetString;
+  GameDB.ConfOpt.MT32ReverbMode:=GetString;
+  GameDB.ConfOpt.MT32ReverbTime:=GetString;
+  GameDB.ConfOpt.MT32ReverbLevel:=GetString;
 
   GameDB.ConfOpt.InnovaEmulationSampleRate:=GetString;
   GameDB.ConfOpt.InnovaEmulationBaseAddress:=GetString;
@@ -354,6 +360,9 @@ begin
 
   Work(DefaultValuesMIDIDevice);
   Work(DefaultValuesMPU401);
+  Work(DefaultValuesMT32ReverbMode);
+  Work(DefaultValuesMT32ReverbTime);
+  Work(DefaultValuesMT32ReverbLevel);
 
   Work(DefaultValuesInnovaEmulationSampleRate);
   Work(DefaultValuesInnovaEmulationBaseAddress);

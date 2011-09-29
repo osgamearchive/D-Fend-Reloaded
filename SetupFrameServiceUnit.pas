@@ -33,7 +33,7 @@ type
     Procedure BeforeChangeLanguage;
     Procedure LoadLanguage;
     Procedure DOSBoxDirChanged;
-    Procedure ShowFrame(const AdvencedMode : Boolean);
+    Procedure ShowFrame(const AdvancedMode : Boolean);
     procedure HideFrame;
     Procedure RestoreDefaults;
     Procedure SaveSetup;
@@ -109,15 +109,15 @@ procedure TSetupFrameService.DOSBoxDirChanged;
 begin
 end;
 
-procedure TSetupFrameService.ShowFrame(const AdvencedMode: Boolean);
+procedure TSetupFrameService.ShowFrame(const AdvancedMode: Boolean);
 begin
-  Service1Button.Visible:=AdvencedMode;
-  Service2Button.Visible:=AdvencedMode;
-  Service5Button.Visible:=AdvencedMode;
-  Service6Button.Visible:=AdvencedMode;
-  Service7Button.Visible:=AdvencedMode;
-  Service8Button.Visible:=AdvencedMode;
-  Service9Button.Visible:=AdvencedMode;
+  Service1Button.Visible:=AdvancedMode;
+  Service2Button.Visible:=AdvancedMode;
+  Service5Button.Visible:=AdvancedMode;
+  Service6Button.Visible:=AdvancedMode;
+  Service7Button.Visible:=AdvancedMode;
+  Service8Button.Visible:=AdvancedMode;
+  Service9Button.Visible:=AdvancedMode;
 end;
 
 procedure TSetupFrameService.HideFrame;

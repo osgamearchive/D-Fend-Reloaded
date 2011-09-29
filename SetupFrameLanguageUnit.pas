@@ -35,6 +35,7 @@ type
     InstallerLang : Integer;
     LangTimerCounter : Integer;
     procedure ReadCurrentInstallerLanguage;
+    Function ExtendLanguageName(const ShortName : String) : String;
   public
     { Public-Deklarationen }
     Constructor Create(AOwner: TComponent); override;
@@ -44,7 +45,7 @@ type
     Procedure BeforeChangeLanguage;
     Procedure LoadLanguage;
     Procedure DOSBoxDirChanged;
-    Procedure ShowFrame(const AdvencedMode : Boolean);
+    Procedure ShowFrame(const AdvancedMode : Boolean);
     procedure HideFrame;
     Procedure RestoreDefaults;
     Procedure SaveSetup;
@@ -79,8 +80,7 @@ end;
 
 procedure TSetupFrameLanguage.InitGUIAndLoadSetup(var InitData: TInitData);
 Var St : TStringList;
-    I,J : Integer;
-    S : String;
+    I : Integer;
 begin
   NoFlicker(LanguageComboBox);
   NoFlicker(LanguageOpenEditor);
@@ -111,12 +111,9 @@ begin
       end;
     end;
 
-    LanguageComboBoxChange(self); {to setup outdated warning}
+    LanguageComboBoxChange(self); {to set up outdated warning}
 
-    DOSBoxDirChanged;
-    I:=-1; S:=ExtractFileName(PrgSetup.DOSBoxSettings[0].DosBoxLanguage);
-    For J:=0 to DosBoxLang.Count-1 do if S=ExtractFileName(DosBoxLang[J]) then begin I:=J; break; end;
-    If I>=0 then DosBoxLangEditComboBox.ItemIndex:=I else DosBoxLangEditComboBox.ItemIndex:=0;
+    ShowFrame(True); {set DOSBox languag combo box}
 
     ReadCurrentInstallerLanguage;
   finally
@@ -184,19 +181,53 @@ begin
   end;
 end;
 
+Function TSetupFrameLanguage.ExtendLanguageName(const ShortName : String) : String;
+Var I : Integer;
+    ShortNameUpper : String;
+    S,T : String;
+begin
+  ShortNameUpper:=ExtUpperCase(ShortName);
+  For I:=0 to LanguageComboBox.Items.Count-1 do begin
+    S:=LanguageComboBox.Items[I];
+    If Pos('(',S)=0 then continue;
+    T:=Copy(S,Pos('(',S)+1,MaxInt);
+    If Pos(')',S)=0 then continue;
+    T:=Copy(T,1,Pos(')',T)-1);
+    If ExtUpperCase(T)=ShortNameUpper then begin result:=S; exit; end;
+  end;
+
+  result:=ShortName;
+end;
+
 procedure TSetupFrameLanguage.DOSBoxDirChanged;
-Var S : String;
+Var S,S2 : String;
+    St : TStringList;
+    I,J : Integer;
 begin
   S:=DosBoxLangEditComboBox.Text;
+  If Pos('(',S)>0 then begin
+    S2:=Copy(S,Pos('(',S)+1);
+    If Pos(')',S2)>0 then S2:=Copy(S2,1,Pos(')',S2)-1);
+    If S2<>'' then S:=S2;
+  end;
+
   DosBoxLangEditComboBox.Items.Clear;
   DosBoxLang.Clear;
 
-  DosBoxLangEditComboBox.Items.Add('English');
-  DosBoxLang.Add('');
+  St:=TStringList.Create;
+  try
+    St.Add('English'); DosBoxLang.Add('');
+    FindAndAddLngFiles(IncludeTrailingPathDelimiter(PDosBoxDir^),St,DosBoxLang);
+    FindAndAddLngFiles(PrgDir+LanguageSubDir+'\',St,DosBoxLang);
 
-  FindAndAddLngFiles(IncludeTrailingPathDelimiter(PDosBoxDir^),DosBoxLangEditComboBox.Items,DosBoxLang);
-  FindAndAddLngFiles(PrgDir+LanguageSubDir+'\',DosBoxLangEditComboBox.Items,DosBoxLang);
-  DosBoxLangEditComboBox.ItemIndex:=Max(0,DosBoxLangEditComboBox.Items.IndexOf(S));
+    I:=St.IndexOf(S);
+    If I<0 then I:=St.IndexOf('English');
+
+    For J:=0 to St.Count-1 do DosBoxLangEditComboBox.Items.Add(ExtendLanguageName(St[J]));
+    If St.Count>0 then DosBoxLangEditComboBox.ItemIndex:=Max(0,I);
+  finally
+    St.Free;
+  end;
 end;
 
 procedure TSetupFrameLanguage.DosBoxLangEditComboBoxChange(Sender: TObject);
@@ -205,7 +236,7 @@ begin
   SetComboHint(DosBoxLangEditComboBox);
 end;
 
-procedure TSetupFrameLanguage.ShowFrame(const AdvencedMode: Boolean);
+procedure TSetupFrameLanguage.ShowFrame(const AdvancedMode: Boolean);
 Var I,J : Integer;
     S : String;
 begin

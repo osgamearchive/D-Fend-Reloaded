@@ -65,6 +65,7 @@ object PackageManagerRepositoriesEditURLForm: TPackageManagerRepositoriesEditURL
     Checked = True
     TabOrder = 0
     TabStop = True
+    OnClick = RadioButtonOrEditChange
   end
   object RadioButtonLocalFile: TRadioButton
     Left = 16
@@ -73,6 +74,7 @@ object PackageManagerRepositoriesEditURLForm: TPackageManagerRepositoriesEditURL
     Height = 17
     Caption = 'Local file'
     TabOrder = 3
+    OnClick = RadioButtonOrEditChange
   end
   object URLEdit: TEdit
     Left = 35

@@ -89,6 +89,7 @@ RunSetup.html
 RunDOSBox.html
 RunDOSBoxKeymapper.html
 RunDOSBoxConfig.html
+RunDOSBoxOutputTest.html
 RunScummVM.html
 RunScummVMConfig.html
 ProfileAdd.html
@@ -229,6 +230,8 @@ GPL3.html
 #define FileOptionsDataPrivacy 1136
 
 #define ViewQuickStarter 1501
+
+#define RunDOSBoxOutputTest 1751
 
 #define ProfileWithWizard 2001
 #define ProfileEditClassic 2002

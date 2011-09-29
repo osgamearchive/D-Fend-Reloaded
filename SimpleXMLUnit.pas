@@ -14,7 +14,7 @@ uses XMLDoc, XMLIntf, SysUtils, Forms, Math, CommonTools, PrgSetupUnit,
      DOSBoxUnit, GameDBToolsUnit, LanguageSetupUnit;
 
 Procedure WriteProfilesToDOGXML(const St : TStringList; const GamesList : TList);
-Var I,J,K : Integer;
+Var I,J,K,L : Integer;
     G : TGame;
     St2 : TStringList;
     S : String;
@@ -162,9 +162,9 @@ begin
     end;
     St.Add('      </CustomInformation>');
     St.Add('      <LinkedFiles>');
-    If Trim(G.WWW)<>'' then begin
-       St.Add('        <Title0>WWW</Title0>');
-       St.Add('      <Link0>'+G.WWW+'</Link0>');
+    For L:=1 to 9 do If Trim(G.WWW[L])<>'' then begin
+       St.Add('        <Title'+IntToStr(L-1)+'>'+G.WWWName[L]+'</Title'+IntToStr(L-1)+'>');
+       St.Add('      <Link'+IntToStr(L-1)+'>'+G.WWW[L]+'</Link'+IntToStr(L-1)+'>');
     end;
     St.Add('      </LinkedFiles>');
     St.Add('    </Information>');
@@ -215,7 +215,7 @@ begin
 end;
 
 Procedure WriteProfilesToDBGLXML(const St : TStringList; const GamesList : TList);
-Var I,J : Integer;
+Var I,J,K : Integer;
     G : TGame;
     S : String;
     St2 : TStringList;
@@ -261,10 +261,9 @@ begin
     finally
       St2.Free;
     end;
-    St.Add('    <link1>'+G.WWW+'</link1>');
-    St.Add('    <link2></link2>');
-    St.Add('    <link3></link3>');
-    St.Add('    <link4></link4>');
+    For K:=1 to 9 do If Trim(G.WWW[K])<>'' then begin
+      St.Add('    <link'+IntToStr(K)+'>'+G.WWW[K]+'</link'+IntToStr(K)+'>');
+    end;
     St.Add('  </meta-info>');
     St.Add('  <full-configuration>');
     St2:=BuildConfFile(G,False,False,-1,nil); if St2=nil then exit;
@@ -336,7 +335,7 @@ end;
 Procedure LoadMetaInfoFromXML(const G : TGame; Profile : IXMLNode; const XMLType : TXMLType);
 Var St : TStringList;
     N,N2,N3 : IXMLNode;
-    I,J : Integer;
+    I,J,K : Integer;
     S : String;
 begin
   St:=TStringList.Create;
@@ -351,7 +350,7 @@ begin
         If S='YEAR' then begin G.Year:=N2.Text; continue; end;
         If S='GENRE' then begin G.Genre:=N2.Text; continue; end;
         If S='NOTES' then begin G.Notes:=N2.Text; continue; end;
-        If S='LINK1' then begin G.WWW:=N2.Text; continue; end;
+        For K:=1 to 9 do If S='LINK'+IntToStr(K) then begin G.WWW[K]:=N2.Text; continue; end;
         St.Add(N2.NodeName+'='+N2.Text);
       end;
     end;

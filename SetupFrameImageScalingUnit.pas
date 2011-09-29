@@ -19,7 +19,7 @@ type
     Procedure BeforeChangeLanguage;
     Procedure LoadLanguage;
     Procedure DOSBoxDirChanged;
-    Procedure ShowFrame(const AdvencedMode : Boolean);
+    Procedure ShowFrame(const AdvancedMode : Boolean);
     procedure HideFrame;
     Procedure RestoreDefaults;
     Procedure SaveSetup;
@@ -80,7 +80,7 @@ procedure TSetupFrameImageScaling.DOSBoxDirChanged;
 begin
 end;
 
-procedure TSetupFrameImageScaling.ShowFrame(const AdvencedMode: Boolean);
+procedure TSetupFrameImageScaling.ShowFrame(const AdvancedMode: Boolean);
 begin
 end;
 

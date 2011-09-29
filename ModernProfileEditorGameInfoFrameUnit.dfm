@@ -86,6 +86,7 @@ object ModernProfileEditorGameInfoFrame: TModernProfileEditorGameInfoFrame
     Strings.Strings = (
       '=')
     TabOrder = 1
+    OnEditButtonClick = GameInfoValueListEditorEditButtonClick
     ColWidths = (
       150
       449)

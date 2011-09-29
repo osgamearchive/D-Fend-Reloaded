@@ -57,7 +57,8 @@ type
 
 implementation
 
-uses Math, VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgSetupUnit, HelpConsts;
+uses Math, VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgSetupUnit,
+     HelpConsts, GameDBToolsUnit;
 
 {$R *.dfm}
 
@@ -285,25 +286,21 @@ begin
 end;
 
 procedure TModernProfileEditorGraphicsFrame.ShowFrame;
-Var Rec : TSearchRec;
-    I : Integer;
+Var I : Integer;
     S : String;
+    St : TStringList;
 begin
   PixelShaderLabel.Visible:=PrgSetup.AllowPixelShader;
   PixelShaderComboBox.Visible:=PrgSetup.AllowPixelShader;
 
   If PixelShaderComboBox.Items.Count>0 then LastPixelShader:=PixelShaderComboBox.Text;
   PixelShaderComboBox.Items.Clear;
-  PixelShaderComboBox.Items.Add('none');
 
-  I:=FindFirst(GetDOSBoxDir+'Shaders\*.fx',faAnyFile,Rec);
+  St:=GetPixelShaders(GetDOSBoxDir);
   try
-    While I=0 do begin
-      PixelShaderComboBox.Items.Add(ChangeFileExt(Rec.Name,''));
-      I:=FindNext(Rec);
-    end;
+    PixelShaderComboBox.Items.AddStrings(St);
   finally
-    FindClose(rec);
+    St.Free;
   end;
 
   PixelShaderComboBox.ItemIndex:=0;

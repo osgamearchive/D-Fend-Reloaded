@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, 
   Dialogs, StdCtrls, Spin, Buttons, GameDBUnit, ModernProfileEditorFormUnit,
-  ComCtrls;
+  ComCtrls, ExtCtrls;
 
 type
   TModernProfileEditorScummVMFrame = class(TFrame, IModernProfileEditorFrame)
@@ -33,6 +33,7 @@ type
     ExtraDirEdit: TEdit;
     ExtraDirButton: TSpeedButton;
     CustomLanguageEdit: TEdit;
+    CommandLineEdit: TLabeledEdit;
     procedure SavePathEditButtonClick(Sender: TObject);
     procedure SavePathEditChange(Sender: TObject);
     procedure ButtonWork(Sender: TObject);
@@ -77,6 +78,7 @@ begin
   NoFlicker(SavePathEdit);
   NoFlicker(ExtraDirCheckBox);
   NoFlicker(ExtraDirEdit);
+  NoFlicker(CommandLineEdit);
   {NoFlicker(CustomSetsMemo); - will hide text in Memo}
   NoFlicker(CustomSetsClearButton);
   NoFlicker(CustomSetsLoadButton);
@@ -95,6 +97,7 @@ begin
   SavePathEditButton.Hint:=LanguageSetup.ChooseFolder;
   ExtraDirCheckBox.Caption:=LanguageSetup.ProfileEditorScummVMExtraPath;
   ExtraDirButton.Hint:=LanguageSetup.ChooseFolder;
+  CommandLineEdit.EditLabel.Caption:=LanguageSetup.ProfileEditorScummVMCommandLine;
   CustomSetsLabel.Caption:=LanguageSetup.ProfileEditorCustomSetsSheet;
   CustomSetsMemo.Font.Name:='Courier New';
   CustomSetsClearButton.Caption:=LanguageSetup.Del;
@@ -128,6 +131,8 @@ begin
   ExtraDirEditChange(self);
 
   SaveLang:=Game.ScummVMLanguage;
+
+  CommandLineEdit.Text:=Game.ScummVMParameters;
 
   St:=StringToStringList(Game.CustomSettings);
   try
@@ -215,7 +220,8 @@ begin
   Game.ScummVMSubtitles:=SubtitlesCheckBox.Checked;
   Game.ScummVMConfirmExit:=ConfirmExitCheckBox.Checked;
   If SavePathDefaultRadioButton.Checked then Game.ScummVMSavePath:='' else Game.ScummVMSavePath:=Trim(SavePathEdit.Text);
-  If ExtraDirCheckBox.Checked then Game.ScummVMExtraPath:=Trim(ExtraDirEdit.Text) else Game.ScummVMExtraPath:=''; 
+  If ExtraDirCheckBox.Checked then Game.ScummVMExtraPath:=Trim(ExtraDirEdit.Text) else Game.ScummVMExtraPath:='';
+  Game.ScummVMParameters:=CommandLineEdit.Text; 
   Game.CustomSettings:=StringListToString(CustomSetsMemo.Lines);
 end;
 

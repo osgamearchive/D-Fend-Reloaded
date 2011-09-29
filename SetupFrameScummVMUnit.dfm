@@ -2,11 +2,11 @@ object SetupFrameScummVM: TSetupFrameScummVM
   Left = 0
   Top = 0
   Width = 663
-  Height = 324
+  Height = 347
   TabOrder = 0
   DesignSize = (
     663
-    324)
+    347)
   object ScummVMButton: TSpeedButton
     Tag = 16
     Left = 594
@@ -61,14 +61,14 @@ object SetupFrameScummVM: TSetupFrameScummVM
   end
   object ScummVMDownloadURLInfo: TLabel
     Left = 16
-    Top = 240
+    Top = 304
     Width = 162
     Height = 13
     Caption = 'You can download ScummVM from'
   end
   object ScummVMDownloadURL: TLabel
     Left = 16
-    Top = 259
+    Top = 323
     Width = 113
     Height = 13
     Caption = 'ScummVMDownloadURL'
@@ -111,7 +111,7 @@ object SetupFrameScummVM: TSetupFrameScummVM
     Height = 17
     Anchors = [akLeft, akTop, akRight]
     Caption = 'D-Fend minimieren, wenn ScummVM gestartet wird'
-    TabOrder = 2
+    TabOrder = 3
     OnClick = MinimizeDFendScummVMCheckBoxClick
   end
   object ScummVMShowListButton: TBitBtn
@@ -121,7 +121,7 @@ object SetupFrameScummVM: TSetupFrameScummVM
     Width = 289
     Height = 25
     Caption = 'Liste unterst'#252'tzter Spiele anzeigen'
-    TabOrder = 4
+    TabOrder = 2
     OnClick = ButtonWork
     Glyph.Data = {
       76010000424D7601000000000000760000002800000020000000100000000100
@@ -163,6 +163,16 @@ object SetupFrameScummVM: TSetupFrameScummVM
     Height = 17
     Anchors = [akLeft, akTop, akRight]
     Caption = 'Restore program window when ScummVM is closed'
-    TabOrder = 3
+    TabOrder = 4
+  end
+  object CommandLineEdit: TLabeledEdit
+    Left = 16
+    Top = 256
+    Width = 630
+    Height = 21
+    EditLabel.Width = 84
+    EditLabel.Height = 13
+    EditLabel.Caption = 'CommandLineEdit'
+    TabOrder = 7
   end
 end

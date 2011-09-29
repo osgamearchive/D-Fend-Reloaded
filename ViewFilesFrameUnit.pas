@@ -446,7 +446,12 @@ begin
   T:=ExtUpperCase(ExtractFileExt(List.Selected.Caption));
   If (T='.JPG') or (T='.JPEG') or (T='.BMP') or (T='.PNG') or (T='.GIF') or (T='.TIF') or (T='.TIFF') then begin
     T:=Trim(ExtUpperCase(PrgSetup.ImageViewer));
-    If (not ForceExternalViewer) or ((T<>'') and (T<>'INTERNAL')) then begin ShowImageDialog(Owner,S+List.Selected.Caption,nil,nil); exit; end;
+    If (not ForceExternalViewer) or ((T<>'') and (T<>'INTERNAL')) then begin
+      If PrgSetup.NonModalViewer
+        then ShowNonModalImageDialog(Owner,S+List.Selected.Caption,nil,nil)
+        else ShowImageDialog(Owner,S+List.Selected.Caption,nil,nil);
+      exit;
+     end;
   end;
   If (T='.WAV') or (T='.MP3') or (T='.OGG') then begin
     T:=Trim(ExtUpperCase(PrgSetup.SoundPlayer));
@@ -456,7 +461,7 @@ begin
     T:=Trim(ExtUpperCase(PrgSetup.VideoPlayer));
     If (not ForceExternalViewer) or ((T<>'') and (T<>'INTERNAL')) then begin PlayVideoDialog(Owner,S+List.Selected.Caption,nil,nil); exit; end;
   end;
-  If (T='.TXT') or (T='.NFO') or (T='.DIZ') or (T='.1ST') then begin
+  If (T='.TXT') or (T='.NFO') or (T='.DIZ') or (T='.1ST') or (T='.INI') then begin
     OpenFileInEditor(S+List.Selected.Caption);
     exit;
   end;

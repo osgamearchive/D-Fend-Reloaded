@@ -1,14 +1,14 @@
 [Closed Files]
-File_0=TSourceModule,'C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\InfoFormUnit.pas',0,1,75,29,90,0,0,,{0
-File_1=TSourceModule,'c:\program files\codegear\rad studio\5.0\SOURCE\WIN32\VCL\Forms.pas',0,1,97,38,110,0,0,,
-File_2=TSourceModule,'c:\program files\codegear\rad studio\5.0\SOURCE\WIN32\VCL\Controls.pas',0,1,4308,1,4310,0,0,,
-File_3=TSourceModule,'c:\program files\codegear\rad studio\5.0\SOURCE\WIN32\VCL\Grids.pas',0,1,2017,1,1926,0,0,,
-File_4=TSourceModule,'C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\PrgConsts.pas',0,1,41,18,64,0,0,,
-File_5=TSourceModule,'C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\CheatDBToolsUnit.pas',0,1,22,47,43,0,0,,
-File_6=TSourceModule,'C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\PackageCreationFormUnit.pas',0,1,148,1,164,0,0,,{0
-File_7=TSourceModule,'C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\LanguageSetupUnit.pas',0,1,6502,51,6525,0,0,,
-File_8=TSourceModule,'C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\UpdateCheckFormUnit.pas',0,1,131,34,152,0,0,,
-File_9=TSourceModule,'C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\PackageManagerFormUnit.pas',0,1,315,40,336,0,0,,
+File_0=TSourceModule,'C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\ViewImageFormUnit.pas',0,1,351,1,364,0,0,,
+File_1=TSourceModule,'C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\LanguageSetupUnit.pas',0,1,6150,68,6174,0,0,,
+File_2=TSourceModule,'C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\CommonTools.pas',0,1,1707,30,1723,0,0,,
+File_3=TSourceModule,'c:\program files\codegear\rad studio\5.0\source\Win32\rtl\common\Registry.pas',0,1,1,3,26,0,0,,
+File_4=TSourceModule,'C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\UninstallFormUnit.pas',0,1,71,35,98,0,0,,
+File_5=TSourceModule,'C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\SetupFrameEditorUnit.pas',0,1,40,24,61,0,0,,
+File_6=TSourceModule,'C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\FirstRunWizardFormUnit.pas',0,1,190,24,207,0,0,,
+File_7=TSourceModule,'C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\SetupFrameZipPrgsUnit.pas',0,1,64,19,83,0,0,,
+File_8=TSourceModule,'C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\ZipPackageUnit.pas',0,1,247,106,276,0,0,,
+File_9=TSourceModule,'c:\program files\codegear\rad studio\5.0\source\Win32\rtl\win\ShlObj.pas',0,1,2073,22,2095,0,0,,
 
 [Modules]
 Module0=C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\MainUnit.pas
@@ -57,12 +57,12 @@ BottomMiddelPanelData=0000080001000100000009000000446F636B5369746530301900000000
 [View0]
 CustomEditViewType=TEditView
 Module=C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\MainUnit.pas
-CursorX=1
-CursorY=1
-TopLine=1
+CursorX=70
+CursorY=491
+TopLine=466
 LeftCol=1
 Elisions=
-Bookmarks={0,1636,1}{9,1287,1}
+Bookmarks={0,583,14}{8,3311,48}{9,1858,14}
 EditViewName=C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\MainUnit.pas
 
 [Watches]
@@ -90,7 +90,9 @@ Dockable=1
 StayOnTop=0
 
 [Breakpoints]
-Count=0
+Count=2
+Breakpoint0='C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\QuickStartFormUnit.pas',301,'',0,1,'',1,0,0,'',1,'','','',0
+Breakpoint1='C:\Users\Alexander Herzog\Documents\RAD Studio\Projekte\D-Fend\QuickStartFormUnit.pas',293,'',0,1,'',1,0,0,'',1,'','','',0
 
 [AddressBreakpoints]
 Count=0
@@ -378,6 +380,11 @@ Dockable=1
 StayOnTop=0
 SplitPos=111
 
+[PropInspDesignerSelection]
+ArrangeBy=Name
+SelectedItem=Caption,OnClick
+ExpandedItems=Anchors=0,BorderIcons=0,Constraints=0,Font=0,GlassFrame=0,HorzScrollBar=0,Margins=0,Padding=0,VertScrollBar=0,EdgeBorders=0,GradientDrawingOptions=0,BevelEdges=0,EditLabel=0,EditLabel.Font=0,EditLabel.Margins=0,Options=0,ActiveControl=0,Menu=0
+
 [ModelViewTool]
 PercentageSizes=1
 Create=1
@@ -580,7 +587,7 @@ Dockable=1
 StayOnTop=0
 TabPosition=1
 ActiveTabID=RefactoringForm
-TabDockClients=RefactoringForm,FindReferencsForm,ToDo List,QAView,MetricsView,RefactoringsView,UsagesView
+TabDockClients=RefactoringForm,FindReferencsForm,ToDo List,RefactoringsView,UsagesView,QAView,MetricsView
 
 [DockSite1]
 HostDockSite=DockBottomPanel
@@ -628,7 +635,7 @@ Dockable=1
 StayOnTop=0
 TabPosition=0
 ActiveTabID=PropertyInspector
-TabDockClients=PropertyInspector,ProjectManager,ModelViewTool,DataExplorer
+TabDockClients=PropertyInspector,ProjectManager,DataExplorer,ModelViewTool
 
 [DockSite3]
 HostDockSite=DockRightPanel

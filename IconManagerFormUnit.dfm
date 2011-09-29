@@ -223,7 +223,12 @@ object IconManagerForm: TIconManagerForm
     Top = 272
     object PopupAddIcon: TMenuItem
       Tag = 1
-      Caption = 'Add single icon'
+      Caption = 'Add single icon...'
+      OnClick = AddButtonClick
+    end
+    object PopupAddIconsFromFolder: TMenuItem
+      Tag = 3
+      Caption = 'Add all icons from folder...'
       OnClick = AddButtonClick
     end
     object PopupAddAllIcons: TMenuItem

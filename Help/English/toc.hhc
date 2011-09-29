@@ -342,6 +342,10 @@
 				<param name="Local" value="RunDOSBoxConfig.html">
 				</OBJECT>
 			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="DOSBox output methods test">
+				<param name="Local" value="RunDOSBoxOutputTest.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
 				<param name="Name" value="Run ScummVM">
 				<param name="Local" value="RunScummVM.html">
 				</OBJECT>
@@ -895,9 +899,13 @@
 						</OBJECT>
 				</UL>
 			</UL>
-  	<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="Quick starter window">
-			<param name="Local" value="ViewQuickStarter.html">
+		<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="Quick starter window">
+				<param name="Local" value="ViewQuickStarter.html">
+				</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="DOSBox output methods test">
+			<param name="Local" value="RunDOSBoxOutputTest.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="Profile editor">

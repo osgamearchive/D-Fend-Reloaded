@@ -20,7 +20,7 @@ object SetupFrameZipPrgs: TSetupFrameZipPrgs
       398)
     object DeleteButton: TSpeedButton
       Tag = 1
-      Left = 651
+      Left = 643
       Top = 27
       Width = 23
       Height = 22
@@ -46,7 +46,7 @@ object SetupFrameZipPrgs: TSetupFrameZipPrgs
     end
     object UpButton: TSpeedButton
       Tag = 2
-      Left = 680
+      Left = 672
       Top = 27
       Width = 23
       Height = 22
@@ -72,7 +72,7 @@ object SetupFrameZipPrgs: TSetupFrameZipPrgs
     end
     object DownButton: TSpeedButton
       Tag = 3
-      Left = 709
+      Left = 701
       Top = 27
       Width = 23
       Height = 22
@@ -97,7 +97,7 @@ object SetupFrameZipPrgs: TSetupFrameZipPrgs
       ExplicitLeft = 717
     end
     object AddButton: TSpeedButton
-      Left = 622
+      Left = 614
       Top = 27
       Width = 23
       Height = 22
@@ -129,7 +129,7 @@ object SetupFrameZipPrgs: TSetupFrameZipPrgs
       Caption = 'Name of archiving program:'
     end
     object FilenameButton: TSpeedButton
-      Left = 709
+      Left = 701
       Top = 76
       Width = 23
       Height = 22
@@ -154,7 +154,7 @@ object SetupFrameZipPrgs: TSetupFrameZipPrgs
     object InfoLabel: TLabel
       Left = 16
       Top = 311
-      Width = 681
+      Width = 673
       Height = 49
       Anchors = [akLeft, akTop, akRight]
       AutoSize = False
@@ -163,23 +163,23 @@ object SetupFrameZipPrgs: TSetupFrameZipPrgs
         'z" this external program will be used instead of the internal pa' +
         'cker.'
       WordWrap = True
+      ExplicitWidth = 681
     end
     object SelectComboBox: TComboBox
       Left = 16
       Top = 27
-      Width = 600
+      Width = 592
       Height = 21
       Style = csDropDownList
       Anchors = [akLeft, akTop, akRight]
-      ItemHeight = 13
+      ItemHeight = 0
       TabOrder = 0
       OnChange = SelectComboBoxChange
-      ExplicitWidth = 608
     end
     object FilenameEdit: TLabeledEdit
       Left = 16
       Top = 76
-      Width = 681
+      Width = 673
       Height = 21
       Anchors = [akLeft, akTop, akRight]
       EditLabel.Width = 83
@@ -192,7 +192,7 @@ object SetupFrameZipPrgs: TSetupFrameZipPrgs
     object ExtensionsEdit: TLabeledEdit
       Left = 16
       Top = 120
-      Width = 681
+      Width = 673
       Height = 21
       Anchors = [akLeft, akTop, akRight]
       EditLabel.Width = 230
@@ -204,7 +204,7 @@ object SetupFrameZipPrgs: TSetupFrameZipPrgs
     object CommandExtractEdit: TLabeledEdit
       Left = 16
       Top = 164
-      Width = 681
+      Width = 673
       Height = 21
       Anchors = [akLeft, akTop, akRight]
       EditLabel.Width = 368
@@ -218,7 +218,7 @@ object SetupFrameZipPrgs: TSetupFrameZipPrgs
     object CommandCreateEdit: TLabeledEdit
       Left = 16
       Top = 204
-      Width = 681
+      Width = 673
       Height = 21
       Anchors = [akLeft, akTop, akRight]
       EditLabel.Width = 337
@@ -232,7 +232,7 @@ object SetupFrameZipPrgs: TSetupFrameZipPrgs
     object CommandAddEdit: TLabeledEdit
       Left = 16
       Top = 244
-      Width = 681
+      Width = 673
       Height = 21
       Anchors = [akLeft, akTop, akRight]
       EditLabel.Width = 404
@@ -256,11 +256,12 @@ object SetupFrameZipPrgs: TSetupFrameZipPrgs
     object TrailingBackslashCheckBox: TCheckBox
       Left = 16
       Top = 280
-      Width = 681
+      Width = 673
       Height = 17
       Anchors = [akLeft, akTop, akRight]
       Caption = 'Add trailing "\" to path names.'
       TabOrder = 7
+      ExplicitWidth = 681
     end
   end
   object PrgOpenDialog: TOpenDialog

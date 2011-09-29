@@ -47,6 +47,7 @@ type
     procedure LoadAndSetupLanguageList;
     Procedure LoadGUILanguage;
     procedure LoadAndSetupDOSBoxLanguages(const ResetLang : Boolean);
+    Function ExtendLanguageName(const ShortName : String) : String;
   public
     { Public-Deklarationen }
   end;
@@ -176,6 +177,7 @@ procedure TFirstRunWizardForm.LoadAndSetupLanguageList;
 Var I,J : Integer;
     St : TStringList;
     Reg : TRegistry;
+    InstallerLanguageOK : Boolean;
 begin
   JustLoadingLanguage:=True;
   try
@@ -190,13 +192,13 @@ begin
     end;
 
     {Read installer language}
-    J:=1033;
+    J:=1033; InstallerLanguageOK:=False;
     Reg:=TRegistry.Create;
     try
       Reg.Access:=KEY_READ;
       Reg.RootKey:=HKEY_LOCAL_MACHINE;
       If Reg.OpenKey('\Software\D-Fend Reloaded',False) and Reg.ValueExists('Installer Language') then begin
-        try J:=StrToInt(Reg.ReadString('Installer Language')); except end;
+        try J:=StrToInt(Reg.ReadString('Installer Language')); InstallerLanguageOK:=True; except end;
       end;
     finally
       Reg.Free;
@@ -206,6 +208,14 @@ begin
     ProgramLanguageComboBox.ItemIndex:=0;
     For I:=0 to ProgramLanguageComboBox.Items.Count-1 do If Integer(ProgramLanguageComboBox.Items.Objects[I])=J then begin
       ProgramLanguageComboBox.ItemIndex:=I; break;
+    end;
+
+    {Set program language to system language}
+    If not InstallerLanguageOK then begin
+      J:=GetSystemDefaultLangID;
+      For I:=0 to ProgramLanguageComboBox.Items.Count-1 do If Integer(ProgramLanguageComboBox.Items.Objects[I])=J then begin
+        ProgramLanguageComboBox.ItemIndex:=I; break;
+      end;
     end;
   finally
     JustLoadingLanguage:=False;
@@ -323,16 +333,78 @@ begin
   end;
 end;
 
+Function TFirstRunWizardForm.ExtendLanguageName(const ShortName : String) : String;
+Var I : Integer;
+    ShortNameUpper : String;
+    S,T : String;
+begin
+  ShortNameUpper:=ExtUpperCase(ShortName);
+  For I:=0 to ProgramLanguageComboBox.Items.Count-1 do begin
+    S:=ProgramLanguageComboBox.Items[I];
+    If Pos('(',S)=0 then continue;
+    T:=Copy(S,Pos('(',S)+1,MaxInt);
+    If Pos(')',S)=0 then continue;
+    T:=Copy(T,1,Pos(')',T)-1);
+    If ExtUpperCase(T)=ShortNameUpper then begin result:=S; exit; end;
+  end;
+
+  result:=ShortName;
+end;
+
 procedure TFirstRunWizardForm.LoadAndSetupDOSBoxLanguages(const ResetLang : Boolean);
 Var I,J : Integer;
     S,Save : String;
-    St : TStringList;
+    St,St2 : TStringList;
 begin
   Save:=DOSBoxLanguageComboBox.Text;
+  If Pos('(',Save)>0 then begin
+    S:=Copy(Save,Pos('(',Save)+1);
+    If Pos(')',S)>0 then S:=Copy(S,1,Pos(')',S)-1);
+    If S<>'' then Save:=S;
+  end;
+
+  I:=-1;
 
   DosBoxLang.Clear;
   DOSBoxLanguageComboBox.Items.Clear;
-  GetDOSBoxLangNamesAndFiles(IncludeTrailingPathDelimiter(MakeAbsPath(DosBoxEdit.Text,PrgSetup.BaseDir)),DOSBoxLanguageComboBox.Items,DosBoxLang,True);
+  St:=TStringList.Create;
+  try
+    GetDOSBoxLangNamesAndFiles(IncludeTrailingPathDelimiter(MakeAbsPath(DosBoxEdit.Text,PrgSetup.BaseDir)),St,DosBoxLang,True);
+
+    {Restore old value}
+    If (Save<>'') and not ResetLang then I:=St.IndexOf(Save);
+
+    {Get value from program language list}
+    If I<0 then begin
+      S:=ShortLanguageName(ProgramLanguageComboBox.Items[ProgramLanguageComboBox.ItemIndex]);
+      I:=St.IndexOf(S);
+      If (I<0) and (Pos(' ',S)>0) then begin
+        St2:=ValueToList(S,' ');
+        try
+          For J:=0 to St2.Count-1 do begin
+            I:=St.IndexOf(St2[J]);
+            If I>=0 then break;
+          end;
+        finally
+          St2.Free;
+        end;
+      end;
+    end;
+
+    {Get value from program language list for language name "German"}
+    If (I<0) and (ExtUpperCase(S)='GERMAN') then I:=St.IndexOf('Deutsch');
+
+    {Fall back to "English"}
+    If I<0 then I:=St.IndexOf('English');
+
+
+    For J:=0 to St.Count-1 do DOSBoxLanguageComboBox.Items.Add(ExtendLanguageName(St[J]));
+    DOSBoxLanguageComboBox.ItemIndex:=I;
+  finally
+    St.Free;
+  end;
+
+  If I>=0 then begin DOSBoxLanguageComboBox.ItemIndex:=I; exit; end;
 
   If (Save<>'') and not ResetLang then begin
     I:=DOSBoxLanguageComboBox.Items.IndexOf(Save);

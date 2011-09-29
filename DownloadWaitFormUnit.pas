@@ -109,7 +109,7 @@ begin
   If not Assigned(DownloadWaitForm) then exit;
   If DownloadWaitForm.ProgressBar.Max>1 then begin
     DownloadWaitForm.ProgressBar.Position:=Pos;
-    DownloadWaitForm.Caption:=LanguageSetup.PackageManagerDownloading+' ['+IntToStr(100*Pos div DownloadWaitForm.ProgressBar.Max)+'%]';
+    DownloadWaitForm.Caption:=LanguageSetup.PackageManagerDownloading+' ['+IntToStr(100*Int64(Pos) div Int64(DownloadWaitForm.ProgressBar.Max))+'%]';
   end;
   DownloadWaitForm.Invalidate;
   DownloadWaitForm.Paint;
@@ -603,7 +603,7 @@ begin
   result:=drSuccess;
 end;
 
-Function GetLocalFile(const AOwner : TComponent; const URL, DestFile : String) : TDownloadResult;
+Function GetSingleLocalFile(const AOwner : TComponent; const URL, DestFile : String) : TDownloadResult;
 Var C : Char;
     I, SaveErrorMode : Integer;
     AlternateURL : String;
@@ -635,6 +635,41 @@ begin
   until False;
 end;
 
+Function GetLocalFile(const AOwner : TComponent; const Size : Int64; const URL, DestFile : String) : TDownloadResult;
+Var LoadSize : Int64;
+    I,Nr : Integer;
+    Files : TStringList;
+    S: String;
+begin
+  If Size<=PackageMaxFileSize then begin
+    result:=GetSingleLocalFile(AOwner,URL,DestFile);
+    exit;
+  end;
+
+  result:=drFail;
+  Nr:=0;
+  ForceDirectories(TempDir+TempSubFolder);
+
+  Files:=TStringList.Create;
+  try
+    LoadSize:=Size;
+
+    While LoadSize>0 do begin
+      inc(Nr);
+      S:=TempDir+TempSubFolder+'\'+ExtractFileName(DestFile)+'.part'+IntToStr(Nr);
+      Files.Add(S);
+      result:=GetSingleLocalFile(AOwner,URL+'.part'+IntToStr(Nr),S);
+      if result<>drSuccess then exit;
+      LoadSize:=LoadSize-Min(PackageMaxFileSize,LoadSize);
+    end;
+    MergeFiles(Files,DestFile);
+
+  finally
+    For I:=0 to Files.Count-1 do DeleteFile(Files[I]);
+    Files.Free;
+  end;
+end;
+
 Function IsInternetURL(const URL : String) : Boolean;
 Var S : String;
 begin
@@ -660,7 +695,7 @@ begin
     result:=DownloadFileFromInternet(AOwner,Size,S,Referer,DestFile,True);
   end else begin
     S:=MakeAbsPath(URL,IncludeTrailingPathDelimiter(ExtractFilePath(AbsBase)));
-    result:=GetLocalFile(AOwner,S,DestFile);
+    result:=GetLocalFile(AOwner,Size,S,DestFile);
   end;
 end;
 
@@ -672,7 +707,7 @@ begin
     result:=DownloadFileFromInternet(AOwner,Size,S,Referer,DestFile,False);
   end else begin
     S:=MakeAbsPath(URL,IncludeTrailingPathDelimiter(ExtractFilePath(AbsBase)));
-    result:=GetLocalFile(AOwner,S,DestFile);
+    result:=GetLocalFile(AOwner,Size,S,DestFile);
   end;
 end;
 

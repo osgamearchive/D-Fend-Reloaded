@@ -30,6 +30,7 @@ type
     procedure AddButtonClick(Sender: TObject);
     procedure DelButtonClick(Sender: TObject);
     Procedure SearchClick(Sender : TObject);
+    procedure GameInfoValueListEditorEditButtonClick(Sender: TObject);
   private
     { Private-Deklarationen }
     LinkFile : TLinkFile;
@@ -37,11 +38,14 @@ type
     GameDB : TGameDB;
     ProfileExe,ProfileSetup,ProfileScummVMGameName,ProfileScummVMPath,ProfileDOSBoxInstallation,ProfileCaptureDir : PString;
     FOnProfileNameChange : TTextEvent;
+    WWWNames, WWWLinks : TStringList;
     Procedure LoadLinks;
     Procedure TabListForCell(ACol, ARow: Integer; var UseDropdownListForCell : Boolean);
     Procedure TabGetListForCell(ACol, ARow: Integer; DropdownListForCell : TStrings);
   public
     { Public-Deklarationen }
+    Constructor Create(AOwner: TComponent); override;
+    Destructor Destroy; override;
     Procedure InitGUI(var InitData : TModernProfileEditorInitData);
     Procedure SetGame(const Game : TGame; const LoadFromTemplate : Boolean);
     Procedure GetGame(const Game : TGame);
@@ -51,11 +55,25 @@ implementation
 
 uses Math, LanguageSetupUnit, VistaToolsUnit, CommonTools, HelpConsts,
      ClassExtensions, IconLoaderUnit, TextEditPopupUnit, DataReaderFormUnit,
-     PrgSetupUnit;
+     PrgSetupUnit, LinkFileEditFormUnit;
 
 {$R *.dfm}
 
 { TModernProfileEditorGameInfoFrame }
+
+constructor TModernProfileEditorGameInfoFrame.Create(AOwner: TComponent);
+begin
+  inherited Create(AOwner);
+  WWWNames:=TStringList.Create;
+  WWWLinks:=TStringList.Create;
+end;
+
+destructor TModernProfileEditorGameInfoFrame.Destroy;
+begin
+  WWWNames.Free;
+  WWWLinks.Free;
+  inherited Destroy;
+end;
 
 procedure TModernProfileEditorGameInfoFrame.InitGUI(var InitData : TModernProfileEditorInitData);
 Var St : TStringList;
@@ -90,6 +108,7 @@ begin
     ItemProps[Strings.Count-1].EditStyle:=esPickList;
     St:=ExtLanguageList(GetCustomLanguageName(InitData.GameDB.GetLanguageList)); try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
     Strings.Add(LanguageSetup.GameWWW+'=');
+    ItemProps[Strings.Count-1].EditStyle:=esEllipsis;
     Strings.Add(LanguageSetup.GameLicense+'=');
     ItemProps[Strings.Count-1].EditStyle:=esPickList;
     St:=ExtLicenseList(GetCustomLicenseName(InitData.GameDB.GetLicenseList)); try ItemProps[Strings.Count-1].PickList.Assign(St); finally St.Free; end;
@@ -185,10 +204,11 @@ begin
     If Game.Publisher<>'' then ValueFromIndex[2]:=Game.Publisher else GameInfoValueListEditor.Strings[2]:=GameInfoValueListEditor.Strings.Names[2]+'=';
     If Game.Year<>'' then ValueFromIndex[3]:=Game.Year else GameInfoValueListEditor.Strings[3]:=GameInfoValueListEditor.Strings.Names[3]+'=';
     If Game.Language<>'' then ValueFromIndex[4]:=GetCustomLanguageName(Game.Language) else GameInfoValueListEditor.Strings[4]:=GameInfoValueListEditor.Strings.Names[4]+'=';
-    If Game.WWW<>'' then ValueFromIndex[5]:=Game.WWW else GameInfoValueListEditor.Strings[5]:=GameInfoValueListEditor.Strings.Names[5]+'=';
+    If Game.WWW[1]<>'' then ValueFromIndex[5]:=Game.WWW[1] else GameInfoValueListEditor.Strings[5]:=GameInfoValueListEditor.Strings.Names[5]+'=';
     If Game.License<>'' then ValueFromIndex[6]:=GetCustomLicenseName(Game.License) else GameInfoValueListEditor.Strings[6]:=GameInfoValueListEditor.Strings.Names[6]+'=';
   end;
   FavouriteCheckBox.Checked:=Game.Favorite;
+  For I:=1 to 9 do begin WWWNames.Add(Game.WWWName[I]); WWWLinks.Add(Game.WWW[I]); end;
 
   St:=StringToStringList(Game.UserInfo);
   try
@@ -225,10 +245,12 @@ begin
     Game.Publisher:=ValueFromIndex[2];
     Game.Year:=ValueFromIndex[3];
     Game.Language:=GetEnglishLanguageName(ValueFromIndex[4]);
-    Game.WWW:=ValueFromIndex[5];
+    Game.WWW[1]:=ValueFromIndex[5];
     License:=GetEnglishLicenseName(ValueFromIndex[6]);
   end;
   Game.Favorite:=FavouriteCheckBox.Checked;
+  Game.WWWName[1]:=WWWNames[0];
+  For I:=1 to 8 do begin Game.WWWName[I+1]:=WWWNames[I]; Game.WWW[I+1]:=WWWLinks[I]; end;
 
   St:=TStringList.Create;
   try
@@ -345,6 +367,13 @@ begin
   finally
     St.Free;
   end;
+end;
+
+procedure TModernProfileEditorGameInfoFrame.GameInfoValueListEditorEditButtonClick(Sender: TObject);
+begin
+  WWWLinks[0]:=GameInfoValueListEditor.Strings.ValueFromIndex[5];
+  ShowLinkFileEditDialog(self,WWWNames,WWWLinks,False,True,-1);
+  If WWWLinks[0]<>'' then GameInfoValueListEditor.Strings.ValueFromIndex[5]:=WWWLinks[0];
 end;
 
 end.

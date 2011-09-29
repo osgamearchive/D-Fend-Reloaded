@@ -999,12 +999,12 @@ begin
       SpeedTestInfo('Selecting file to run');
       If RunExtraFile>=0 then begin
         T:=Trim(Game.ExtraPrgFile[RunExtraFile]);
-        I:=Pos(';',T);
+        I:=Pos(';',T); {ExtraPrgFile=Description;PathAndFile}
         If (T='') or (I=0) then begin
           result:=BuildRunCommands(St,Game.GameExe,Game.GameParameters,Game.LoadFix,Game.LoadFixMemory,Game.Use4DOS,Game.UseDOS32A,Game,FreeDriveLetters,WarnIfNotReachable,WarnIfWindowsExe);
         end else begin
           T:=Copy(T,I+1,MaxInt);
-          result:=BuildRunCommands(St,T,'',Game.LoadFix,Game.LoadFixMemory,Game.Use4DOS,False,Game,FreeDriveLetters,WarnIfNotReachable,WarnIfWindowsExe);
+          result:=BuildRunCommands(St,T,Game.ExtraPrgFileParameter[RunExtraFile],Game.LoadFix,Game.LoadFixMemory,Game.Use4DOS,False,Game,FreeDriveLetters,WarnIfNotReachable,WarnIfWindowsExe);
         end;
       end else begin
         If RunSetup then begin
@@ -1200,6 +1200,11 @@ begin
   end else begin
     result.Add('device='+Game.MIDIDevice);
     result.Add('config='+MakeDOSBoxMIDIString(Game.MIDIConfig));
+    If ExtUpperCase(Game.MIDIDevice)='MT32' then begin
+      result.Add('mt32reverb.mode='+Game.MIDIMT32Mode);
+      result.Add('mt32reverb.time='+Game.MIDIMT32Time);
+      result.Add('mt32reverb.level='+Game.MIDIMT32Level);
+    end;
   end;
 
   result.Add('');
@@ -1328,6 +1333,13 @@ begin
   SpeedTestInfo('Add custom settings to DOSBox conf file');
 
   St:=StringToStringList(Game.CustomSettings);
+  try
+    if result<>nil then result.AddStrings(St);
+  finally
+    St.Free;
+  end;
+
+  St:=StringToStringList(PrgSetup.DOSBoxSettings[DOSBoxNr].CustomSettings);
   try
     if result<>nil then result.AddStrings(St);
   finally

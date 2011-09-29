@@ -75,13 +75,13 @@ begin
   FCurrentProfileName:=InitData.CurrentProfileName;
 
   ScreenshotFolderEdit.EditLabel.Caption:=LanguageSetup.ProfileEditorCaptureFolder;
-  ScreenshotFolderEditButton.Hint:=LanguageSetup.ChooseFile;
+  ScreenshotFolderEditButton.Hint:=LanguageSetup.ChooseFolder;
   GenerateScreenshotFolderNameButton.Caption:=LanguageSetup.ProfileEditorGenerateScreenshotFolderName;
   UserIconLoader.DialogImage(DI_SelectFolder,ScreenshotFolderEditButton);
   UserIconLoader.DialogImage(DI_Screenshot,GenerateScreenshotFolderNameButton);
 
   DataFolderEdit.EditLabel.Caption:=LanguageSetup.GameDataDir;
-  DataFolderEditButton.Hint:=LanguageSetup.ChooseFile;
+  DataFolderEditButton.Hint:=LanguageSetup.ChooseFolder;
   DataFolderInfoLabel.Caption:=LanguageSetup.GameDataDirEditInfo;
   GenerateGameDataFolderNameButton.Caption:=LanguageSetup.ProfileEditorGenerateGameDataFolder;
   UserIconLoader.DialogImage(DI_SelectFolder,DataFolderEditButton);
@@ -150,16 +150,19 @@ end;
 procedure TModernProfileEditorDirectoryFrame.ShowFrame;
 begin
   If IsWindowsMode then begin
-    ExtraFilesLabel.Visible:=False;
-    ExtraFilesListBox.Visible:=False;
-    ExtraFilesAddButton.Visible:=False;
-    ExtraFilesEditButton.Visible:=False;
-    ExtraFilesDelButton.Visible:=False;
-    ExtraDirsLabel.Visible:=False;
-    ExtraDirsListBox.Visible:=False;
-    ExtraDirsAddButton.Visible:=False;
-    ExtraDirsEditButton.Visible:=False;
-    ExtraDirsDelButton.Visible:=False;
+
+ExtraFilesLabel.Visible:=False;
+    ExtraFilesLabel.Visible:=PrgSetup.AllowPackingWindowsGames;
+    ExtraFilesListBox.Visible:=PrgSetup.AllowPackingWindowsGames;
+    ExtraFilesAddButton.Visible:=PrgSetup.AllowPackingWindowsGames;
+    ExtraFilesEditButton.Visible:=PrgSetup.AllowPackingWindowsGames;
+    ExtraFilesDelButton.Visible:=PrgSetup.AllowPackingWindowsGames;
+    ExtraDirsLabel.Visible:=PrgSetup.AllowPackingWindowsGames;
+    ExtraDirsLabel.Caption:=LanguageSetup.ProfileEditorExtraDirsWindowsProfile;
+    ExtraDirsListBox.Visible:=PrgSetup.AllowPackingWindowsGames;
+    ExtraDirsAddButton.Visible:=PrgSetup.AllowPackingWindowsGames;
+    ExtraDirsEditButton.Visible:=PrgSetup.AllowPackingWindowsGames;
+    ExtraDirsDelButton.Visible:=PrgSetup.AllowPackingWindowsGames;
     ExtraDirsInfoLabel.Visible:=False;
   end;
 end;

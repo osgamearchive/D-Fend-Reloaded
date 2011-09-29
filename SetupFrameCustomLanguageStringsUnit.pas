@@ -16,6 +16,7 @@ type
     DownButton: TSpeedButton;
     InfoLabel: TLabel;
     AddLinePopupMenu: TPopupMenu;
+    EnglsihLabel: TLabel;
     procedure ButtonWork(Sender: TObject);
     procedure FrameResize(Sender: TObject);
     procedure TypeComboBoxChange(Sender: TObject);
@@ -33,7 +34,7 @@ type
     Procedure BeforeChangeLanguage;
     Procedure LoadLanguage;
     Procedure DOSBoxDirChanged;
-    Procedure ShowFrame(const AdvencedMode : Boolean);
+    Procedure ShowFrame(const AdvancedMode : Boolean);
     Procedure HideFrame;
     Procedure RestoreDefaults;
     Procedure SaveSetup;
@@ -114,6 +115,7 @@ end;
 
 procedure TSetupFrameCustomLanguageStrings.LoadLanguage;
 Var I : Integer;
+    Engl : Boolean;
 begin
   I:=TypeComboBox.ItemIndex;
   TypeComboBox.Items[0]:=LanguageSetup.GameGenre;
@@ -122,7 +124,7 @@ begin
   TypeComboBox.ItemIndex:=I;
 
   AddButton.Hint:=LanguageSetup.AddNewEmptyLine;
-  DelButton.Hint:=LanguageSetup.Del;
+  DelButton.Hint:=RemoveUnderline(LanguageSetup.Del);
   UpButton.Hint:=LanguageSetup.MoveUp;
   DownButton.Hint:=LanguageSetup.MoveDown;
 
@@ -153,18 +155,39 @@ begin
 
   LastType:=-1;
   TypeComboBoxChange(self);
+
+  Engl:=(ExtUpperCase(LanguageSetup.LocalLanguageName)='ENGLISH');
+  EnglsihLabel.Visible:=Engl;
+  TypeComboBox.Visible:=not Engl;
+  AddButton.Visible:=not Engl;
+  DelButton.Visible:=not Engl;
+  UpButton.Visible:=not Engl;
+  DownButton.Visible:=not Engl;
+  Tab.Visible:=not Engl;
+  InfoLabel.Visible:=not Engl;
 end;
 
 procedure TSetupFrameCustomLanguageStrings.DOSBoxDirChanged;
 begin
 end;
 
-procedure TSetupFrameCustomLanguageStrings.ShowFrame(const AdvencedMode: Boolean);
+procedure TSetupFrameCustomLanguageStrings.ShowFrame(const AdvancedMode: Boolean);
+Var Engl : Boolean;
 begin
   FrameResize(Self);
   LastType:=-1;
   TypeComboBox.ItemIndex:=0;
   TypeComboBoxChange(self);
+
+  Engl:=(ExtUpperCase(LanguageSetup.LocalLanguageName)='ENGLISH');
+  EnglsihLabel.Visible:=Engl;
+  TypeComboBox.Visible:=True; TypeComboBox.Visible:=not Engl;
+  AddButton.Visible:=not Engl;
+  DelButton.Visible:=not Engl;
+  UpButton.Visible:=not Engl;
+  DownButton.Visible:=not Engl;
+  Tab.Visible:=True; Tab.Visible:=not Engl;
+  InfoLabel.Visible:=not Engl;
 end;
 
 procedure TSetupFrameCustomLanguageStrings.HideFrame;

@@ -49,6 +49,7 @@ type
     procedure StatusBarMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
     procedure TimerTimer(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
     { Private-Deklarationen }
     IntPicture : TPicture;
@@ -60,11 +61,15 @@ type
     { Public-Deklarationen }
     ImageFile : String;
     PrevImages, NextImages : TStringList;
+    NonModal : Boolean;
+    Procedure LoadLanguage;
+    Procedure UpdateImageList;
   end;
 
 var
-  ViewImageForm: TViewImageForm;
+  ViewImageForm: TViewImageForm = nil;
 
+Procedure ShowNonModalImageDialog(const AOwner : TComponent; const AImageFile : String; APrevImages, ANextImages : TStringList);
 Procedure ShowImageDialog(const AOwner : TComponent; const AImageFile : String; const APrevImages, ANextImages : TStringList);
 
 implementation
@@ -93,12 +98,31 @@ begin
   end;
 end;
 
+procedure TViewImageForm.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  If (Action=caHide) and NonModal then Action:=caFree;
+end;
+
 procedure TViewImageForm.FormCreate(Sender: TObject);
 begin
   SetVistaFonts(self);
-  Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName);
   DoubleBuffered:=True;
 
+  PrevImages:=TStringList.Create;
+  NextImages:=TStringList.Create;
+
+  NonModal:=False;
+end;
+
+procedure TViewImageForm.FormShow(Sender: TObject);
+begin
+  LoadLanguage;
+  LoadImage(True);
+end;
+
+procedure TViewImageForm.LoadLanguage;
+begin
+  Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName);
   Caption:=LanguageSetup.ViewImageForm;
   PreviousButton.Caption:=LanguageSetup.Previous;
   PreviousButton.Hint:=LanguageSetup.PreviousHintMediaViewer;
@@ -116,14 +140,6 @@ begin
   BackgroundButton.Hint:=LanguageSetup.ViewImageFormBackgroundButtonHint;
 
   CoolBar.Font.Size:=PrgSetup.ToolbarFontSize;
-
-  PrevImages:=TStringList.Create;
-  NextImages:=TStringList.Create;
-end;
-
-procedure TViewImageForm.FormShow(Sender: TObject);
-begin
-  LoadImage(True);
 
   UserIconLoader.DialogImage(DI_CopyToClipboard,ImageList,0);
   UserIconLoader.DialogImage(DI_Save,ImageList,1);
@@ -143,7 +159,7 @@ begin
   PreviousButton.Enabled:=(PrevImages.Count>0);
   NextButton.Enabled:=(NextImages.Count>0);
 
-  IntPicture:=LoadImageFromFile(ImageFile);
+  If ImageFile='' then IntPicture:=nil else IntPicture:=LoadImageFromFile(ImageFile);
   if IntPicture=nil then begin
     IntPicture:=TPicture.Create;
     IntPicture.Bitmap.Width:=10;
@@ -155,12 +171,17 @@ begin
   W:=Image.Picture.Width; H:=Image.Picture.Height;
   If (H<Screen.Height div 3) and (W<Screen.Width div 3) then begin W:=W*2; H:=H*2; end;
   ClientHeight:=Min(Max(100,H+(ClientHeight-Image.Height)),Screen.WorkAreaHeight-10-(Height-Image.ClientHeight));
-  ClientWidth:=Min(Max(850,W),Screen.WorkAreaWidth-10-(Width-Image.ClientWidth));
+  ClientWidth:=Min(Max(640,W),Screen.WorkAreaWidth-10-(Width-Image.ClientWidth));
 
   If MoveWindow or (Left+Width>=Screen.WorkAreaWidth-10) or (Top+Height>=Screen.WorkAreaHeight-10) then CenterWindow;
 
   FormResize(self);
   TimerTimer(self);
+end;
+
+procedure TViewImageForm.UpdateImageList;
+begin
+  LoadImage(False);
 end;
 
 procedure TViewImageForm.StatusBarMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
@@ -263,6 +284,7 @@ begin
   NextImages.Free;
   If IntPicture<>nil then FreeAndNil(IntPicture);
   If IntBitmap100<>nil then FreeAndNil(IntBitmap100);
+  If NonModal then ViewImageForm:=nil;
 end;
 
 procedure TViewImageForm.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -327,9 +349,24 @@ end;
 
 { global }
 
+Procedure ShowNonModalImageDialog(const AOwner : TComponent; const AImageFile : String; APrevImages, ANextImages : TStringList);
+begin
+  If AImageFile<>'' then begin
+    If OpenMediaFile(PrgSetup.ImageViewer,AImageFile) then exit;
+  end;
+
+  If not Assigned(ViewImageForm) then ViewImageForm:=TViewImageForm.Create(AOwner);
+  ViewImageForm.ImageFile:=AImageFile;
+  If APrevImages<>nil then ViewImageForm.PrevImages.Assign(APrevImages);
+  If ANextImages<>nil then ViewImageForm.NextImages.Assign(ANextImages);
+  ViewImageForm.NonModal:=True;
+  If ViewImageForm.Visible then ViewImageForm.UpdateImageList else ViewImageForm.Show;
+end;
+
 Procedure ShowImageDialog(const AOwner : TComponent; const AImageFile : String; const APrevImages, ANextImages : TStringList);
 begin
   If OpenMediaFile(PrgSetup.ImageViewer,AImageFile) then exit;
+  If Assigned(ViewImageForm) then FreeAndNil(ViewImageForm);
 
   ViewImageForm:=TViewImageForm.Create(AOwner);
   try
@@ -343,7 +380,7 @@ begin
     end;
     ViewImageForm.ShowModal;
   finally
-    ViewImageForm.Free;
+    FreeAndNil(ViewImageForm);
   end;
 end;
 

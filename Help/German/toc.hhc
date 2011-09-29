@@ -340,6 +340,10 @@
 				<param name="Local" value="RunDOSBoxConfig.html">
 				</OBJECT>
 			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="DOSBox Ausgabemethoden testen">
+				<param name="Local" value="RunDOSBoxOutputTest.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
 				<param name="Name" value="ScummVM starten">
 				<param name="Local" value="RunScummVM.html">
 				</OBJECT>
@@ -896,6 +900,10 @@
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="Schnellstarter Fenster">
 			<param name="Local" value="ViewQuickStarter.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="DOSBox Ausgabemethoden testen">
+			<param name="Local" value="RunDOSBoxOutputTest.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="Profileditor-Dialog">

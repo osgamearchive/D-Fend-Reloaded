@@ -27,7 +27,7 @@ type
     Procedure BeforeChangeLanguage;
     Procedure LoadLanguage;
     Procedure DOSBoxDirChanged;
-    Procedure ShowFrame(const AdvencedMode : Boolean);
+    Procedure ShowFrame(const AdvancedMode : Boolean);
     procedure HideFrame;
     Procedure RestoreDefaults;
     Procedure SaveSetup;
@@ -108,7 +108,7 @@ procedure TSetupFrameWaveEncoder.DOSBoxDirChanged;
 begin
 end;
 
-procedure TSetupFrameWaveEncoder.ShowFrame(const AdvencedMode: Boolean);
+procedure TSetupFrameWaveEncoder.ShowFrame(const AdvancedMode: Boolean);
 begin
 end;
 

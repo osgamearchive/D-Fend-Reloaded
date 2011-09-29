@@ -152,7 +152,8 @@ begin
       St.Add('You can also run the game from this package without having D-Fend Reloaded');
       St.Add('installed. All you need is ScummVM (http:/'+'/www.scummvm.org/). You can just use');
       St.Add('the ini file from this folder to run the game inside ScummVM.');
-    end else begin
+    end;
+    if DOSBoxMode(Game) then begin
       St.Add('You can also run the game from this package without having D-Fend Reloaded');
       St.Add('installed. All you need is DOSBox (http:/'+'/www.dosbox.com). You can just use');
       St.Add('the conf file from this folder to run the game inside DOSBox.');
@@ -173,7 +174,7 @@ begin
 end;
 
 Function CopyFilesToTempDir(const Game : TGame; const Dir : String; const ProcessMessages : Boolean) : Boolean;
-Var S,T : String;
+Var S,T,U,V : String;
     St,Files,Folders : TStringList;
     I : Integer;
 begin
@@ -208,6 +209,7 @@ begin
       end;
     end;
 
+    {*** SCUMMVM ***}
     If ScummVMMode(Game) then begin
 
       {ScummVM: Games folder}
@@ -244,8 +246,11 @@ begin
         end;
         if not CopyFolderWithMsg(MakeAbsPath(S,PrgSetup.BaseDir),MakeAbsPath(S,Dir),ProcessMessages,False) then exit;
       end;
-    end else begin
 
+    end;
+
+    {*** DOSBOX ***}
+    if DOSBoxMode(Game) then begin
       {DOSBox: Games folder}
       S:=Trim(Game.GameExe);
       If ExtUpperCase(Copy(S,1,7))='DOSBOX:' then S:='';
@@ -258,6 +263,32 @@ begin
           result:=False; exit;
         end;
         if not CopyFolderWithMsg(MakeAbsPath(S,PrgSetup.BaseDir),MakeAbsPath(S,Dir),ProcessMessages,False) then exit;
+      end;
+    end;
+
+    {*** WINDOWS ***}
+    if WindowsExeMode(Game) then begin
+      S:=Trim(Game.GameExe);
+      If S='' then S:=Trim(Game.SetupExe);
+      If S<>'' then begin
+        S:=IncludeTrailingPathDelimiter(MakeRelPath(ExtractFilePath(S),PrgSetup.BaseDir));
+        If Copy(S,2,2)=':\' then begin
+          If ExtUpperCase(IncludeTrailingPathDelimiter(GetSpecialFolder(Application.MainForm.Handle,CSIDL_WINDOWS)))=ExtUpperCase(IncludeTrailingPathDelimiter(S)) then begin
+            MessageDlg(Format(LanguageSetup.MessagePathNotRelative,[S,Game.Name,PrgSetup.BaseDir]),mtError,[mbOK],0);
+            result:=False; exit;
+          end;
+          S:=MakeAbsPath(S,PrgSetup.BaseDir);
+          T:=ExcludeTrailingPathDelimiter(S);
+          While Pos('\',T)>0 do T:=Copy(T,Pos('\',T)+1,MaxInt);
+          U:=ExcludeTrailingPathDelimiter(MakeRelPath(PrgSetup.GameDir,PrgSetup.BaseDir));
+          If Copy(U,1,2)='.\' then U:=Copy(U,3,MaxInt) else begin
+            While Pos('\',U)>0 do U:=Copy(U,Pos('\',U)+1,MaxInt);
+          end;
+          T:=IncludeTrailingPathDelimiter(Dir)+U+'\'+T+'\';
+          if not CopyFolderWithMsg(S,T,ProcessMessages,False) then exit;
+        end else begin
+          if not CopyFolderWithMsg(MakeAbsPath(S,PrgSetup.BaseDir),MakeAbsPath(S,Dir),ProcessMessages,False) then exit;
+        end;
       end;
     end;
 
@@ -310,14 +341,23 @@ begin
         For I:=0 to St.Count-1 do If Trim(St[I])<>'' then begin
           S:=MakeRelPath(St[I],PrgSetup.BaseDir);
           If Copy(S,2,2)=':\' then begin
-            MessageDlg(Format(LanguageSetup.MessagePathNotRelative,[S,Game.Name,PrgSetup.BaseDir]),mtError,[mbOK],0);
-            result:=False; exit;
+            If (not WindowsExeMode(Game)) or (ExtUpperCase(IncludeTrailingPathDelimiter(GetSpecialFolder(Application.MainForm.Handle,CSIDL_WINDOWS)))=ExtUpperCase(IncludeTrailingPathDelimiter(S))) then begin
+              MessageDlg(Format(LanguageSetup.MessagePathNotRelative,[S,Game.Name,PrgSetup.BaseDir]),mtError,[mbOK],0);
+              result:=False; exit;
+            end;
+            S:=MakeAbsPath(S,PrgSetup.BaseDir);
+            V:=ExtractFileName(S); S:=ExtractFilePath(S);
+            T:=ExcludeTrailingPathDelimiter(S);
+            While Pos('\',T)>0 do T:=Copy(T,Pos('\',T)+1,MaxInt);
+            T:=IncludeTrailingPathDelimiter(Dir)+T+'\';
+            if not CopyFileWithMsg(IncludeTrailingPathDelimiter(S)+V,IncludeTrailingPathDelimiter(T)+V,ProcessMessages,False) then exit;
+          end else begin
+            T:=ExtractFilePath(S);
+            If (T<>'') and (T[1]='.') then Delete(T,1,1);
+            If (T<>'') and (T[1]='\') then Delete(T,1,1);
+            If (T<>'') and (T[length(T)]='\') then Delete(T,length(T),1);
+            if not CopyFileWithMsg(MakeAbsPath(S,PrgSetup.BaseDir),Dir+T+'\'+ExtractFileName(S),ProcessMessages,False) then exit;
           end;
-          T:=ExtractFilePath(S);
-          If (T<>'') and (T[1]='.') then Delete(T,1,1);
-          If (T<>'') and (T[1]='\') then Delete(T,1,1);
-          If (T<>'') and (T[length(T)]='\') then Delete(T,length(T),1);
-          if not CopyFileWithMsg(MakeAbsPath(S,PrgSetup.BaseDir),Dir+T+'\'+ExtractFileName(S),ProcessMessages,False) then exit;
         end;
       finally
         St.Free;
@@ -332,10 +372,18 @@ begin
         For I:=0 to St.Count-1 do If Trim(St[I])<>'' then begin
           S:=IncludeTrailingPathDelimiter(MakeRelPath(IncludeTrailingPathDelimiter(St[I]),PrgSetup.BaseDir,True));
           If Copy(S,2,2)=':\' then begin
-            MessageDlg(Format(LanguageSetup.MessagePathNotRelative,[S,Game.Name,PrgSetup.BaseDir]),mtError,[mbOK],0);
-            result:=False; exit;
+            If (not WindowsExeMode(Game)) or (ExtUpperCase(IncludeTrailingPathDelimiter(GetSpecialFolder(Application.MainForm.Handle,CSIDL_WINDOWS)))=ExtUpperCase(IncludeTrailingPathDelimiter(S))) then begin
+              MessageDlg(Format(LanguageSetup.MessagePathNotRelative,[S,Game.Name,PrgSetup.BaseDir]),mtError,[mbOK],0);
+              result:=False; exit;
+            end;
+            S:=MakeAbsPath(S,PrgSetup.BaseDir);
+            T:=ExcludeTrailingPathDelimiter(S);
+            While Pos('\',T)>0 do T:=Copy(T,Pos('\',T)+1,MaxInt);
+            T:=IncludeTrailingPathDelimiter(Dir)+T+'\';
+            if not CopyFolderWithMsg(S,T,ProcessMessages,False) then exit;
+          end else begin
+            if not CopyFolderWithMsg(MakeAbsPath(S,PrgSetup.BaseDir),MakeAbsPath(S,Dir),ProcessMessages,False) then exit;
           end;
-          if not CopyFolderWithMsg(MakeAbsPath(S,PrgSetup.BaseDir),MakeAbsPath(S,Dir),ProcessMessages,False) then exit;
         end;
       finally
         St.Free;
@@ -426,7 +474,7 @@ Var Temp : String;
     Msg : tagMSG;
     B : Boolean;
 begin
-  If WindowsExeMode(AGame) then exit;
+  If WindowsExeMode(AGame) and (not PrgSetup.AllowPackingWindowsGames) then exit;
 
   Temp:=IncludeTrailingPathDelimiter(TempDir+TempSubFolder);
   If not ForceDirectories(Temp) then begin
@@ -858,6 +906,66 @@ begin
   end;
 end;
 
+Procedure FixFileNamesForWindowsProfiles(const Game : TGame);
+Function FixSingleFileRecord(S : String; const GameDir : Boolean) : String;
+Var T : String;
+begin
+  S:=Trim(S);
+  If (S<>'') and (Copy(S,1,2)<>'.\') then begin
+    T:=ExtractFileName(S); S:=ExtractFilePath(S);
+    S:=ExcludeTrailingPathDelimiter(S); While Pos('\',S)>0 do S:=Copy(S,Pos('\',S)+1,MaxInt);
+    If GameDir then S:=IncludeTrailingPathDelimiter(MakeRelPath(PrgSetup.GameDir,PrgSetup.BaseDir))+S else S:='.\'+S;
+    result:=IncludeTrailingPathDelimiter(S)+T;
+  end else result:=S;
+end;
+Function FixSingleFolderRecord(S : String; const GameDir : Boolean) : String;
+begin
+  S:=Trim(S);
+  If (S<>'') and (Copy(S,1,2)<>'.\') then begin
+    S:=ExcludeTrailingPathDelimiter(S); While Pos('\',S)>0 do S:=Copy(S,Pos('\',S)+1,MaxInt);
+    If GameDir then S:=IncludeTrailingPathDelimiter(MakeRelPath(PrgSetup.GameDir,PrgSetup.BaseDir))+S else S:='.\'+S;
+    result:=IncludeTrailingPathDelimiter(S);
+  end else result:=S;
+end;
+
+Var I : Integer;
+    S : String;
+    St : TStringList;
+begin
+  Game.GameExe:=FixSingleFileRecord(Game.GameExe,True);
+  Game.SetupExe:=FixSingleFileRecord(Game.SetupExe,True);
+
+  For I:=0 to 9 do begin
+    S:=Game.ExtraPrgFile[I];
+    If Pos(';',S)=0 then continue;
+    Game.ExtraPrgFile[I]:=Copy(S,1,Pos(';',S)-1)+';'+FixSingleFileRecord(Copy(S,Pos(';',S)+1,MaxInt),True);
+  end;
+
+  S:=Trim(Game.ExtraFiles);
+  If S<>'' then begin
+    St:=ValueToList(S);
+    try
+      for I:=0 to St.Count-1 do St[I]:=FixSingleFileRecord(St[I],False);
+      Game.ExtraFiles:=ListToValue(St);
+    finally
+      St.Free;
+    end;
+  end;
+
+  S:=Trim(Game.ExtraDirs);
+  If S<>'' then begin
+    St:=ValueToList(S);
+    try
+      for I:=0 to St.Count-1 do St[I]:=FixSingleFolderRecord(St[I],False);
+      Game.ExtraDirs:=ListToValue(St);
+    finally
+      St.Free;
+    end;
+  end;
+
+  Game.StoreAllValues;
+end;
+
 Function CreateGameFromDFRPackageFolder(const Dir : String; const GameDB : TGameDB; const TempProfFile : String; const MoveFiles : Boolean) : TGame;
 Var ProfFile : String;
     I : Integer;
@@ -879,6 +987,7 @@ begin
 
   result:=TGame.Create(ProfFile);
   GameDB.Add(result);
+  If WindowsExeMode(result) then FixFileNamesForWindowsProfiles(result);
 
   {Add files}
   B:=False;
@@ -1001,7 +1110,7 @@ begin
 end;
 
 Function CreateGameFromDBGLPackage(const Dir : String; const GameDB : TGameDB; const GameNode : IXMLNode; const CustomNames : TStringList; const MoveFiles : Boolean) : TGame;
-Var I,J,K : Integer;
+Var I,J,K,L : Integer;
     N,N2 : IXMLNode;
     S,Capture,GameDir,ID,Config : String;
     CustomValues,St : TStringList;
@@ -1033,7 +1142,9 @@ begin
         If (N2.NodeName='favorite') and TextNodeNotEmpty(N2) then result.Favorite:=(ExtUpperCase(N2.NodeValue)<>'FALSE');
         If (N2.NodeName='notes') and TextNodeNotEmpty(N2) then result.Notes:=N2.NodeValue;
         For K:=1 to 10 do If (N2.NodeName='custom'+IntToStr(K)) and TextNodeNotEmpty(N2) then CustomValues[K-1]:=N2.NodeValue;
-        If N2.NodeName='link1' then For K:=0 to N2.ChildNodes.Count-1 do if (N2.ChildNodes[K].NodeName='raw') and TextNodeNotEmpty(N2.ChildNodes[K]) then result.WWW:=N2.ChildNodes[K].NodeValue;
+        For L:=1 to 9 do begin
+          If N2.NodeName='link'+IntToStr(L) then For K:=0 to N2.ChildNodes.Count-1 do if (N2.ChildNodes[K].NodeName='raw') and TextNodeNotEmpty(N2.ChildNodes[K]) then result.WWW[L]:=N2.ChildNodes[K].NodeValue;
+        end;
       end;
       If (N.NodeName='full-configuration') and TextNodeNotEmpty(N) then Config:=N.NodeValue;
     end;
@@ -1260,7 +1371,9 @@ begin
   try
     if not ExtractZipFile(AOwner,AFileName,Temp) then exit;
 
-    If not FolderWindowsTest(Temp,True) then exit;
+    If not PrgSetup.AllowPackingWindowsGames then begin
+      If not FolderWindowsTest(Temp,True) then exit;
+    end;
 
     If TestInstallationSupportNeeded(Temp) then begin
       If MessageDlg(LanguageSetup.InstallationSupportArchiveCheck,mtConfirmation,[mbYes,mbNo],0)=mrYes then InstSupport:=True;

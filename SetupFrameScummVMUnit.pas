@@ -19,6 +19,7 @@ type
     CenterScummVMCheckBox: TCheckBox;
     HideConsoleCheckBox: TCheckBox;
     RestoreWindowCheckBox: TCheckBox;
+    CommandLineEdit: TLabeledEdit;
     procedure ButtonWork(Sender: TObject);
     procedure ScummVMDownloadURLClick(Sender: TObject);
     procedure MinimizeDFendScummVMCheckBoxClick(Sender: TObject);
@@ -31,7 +32,7 @@ type
     Procedure BeforeChangeLanguage;
     Procedure LoadLanguage;
     Procedure DOSBoxDirChanged;
-    Procedure ShowFrame(const AdvencedMode : Boolean);
+    Procedure ShowFrame(const AdvancedMode : Boolean);
     procedure HideFrame;
     Procedure RestoreDefaults;
     Procedure SaveSetup;
@@ -60,12 +61,14 @@ begin
   Noflicker(RestoreWindowCheckBox);
   NoFlicker(CenterScummVMCheckBox);
   NoFlicker(HideConsoleCheckBox);
+  NoFlicker(CommandLineEdit);
 
   ScummVMDirEdit.Text:=PrgSetup.ScummVMPath;
   MinimizeDFendScummVMCheckBox.Checked:=PrgSetup.MinimizeOnScummVMStart;
   RestoreWindowCheckBox.Checked:=PrgSetup.RestoreWhenScummVMCloses;
   CenterScummVMCheckBox.Checked:=PrgSetup.CenterScummVMWindow;
   HideConsoleCheckBox.Checked:=PrgSetup.HideScummVMConsole;
+  CommandLineEdit.Text:=PrgSetup.ScummVMAdditionalCommandLine;
 
   UserIconLoader.DialogImage(DI_SelectFile,ScummVMButton);
   UserIconLoader.DialogImage(DI_FindFile,FindScummVMButton);
@@ -90,6 +93,8 @@ begin
   RestoreWindowCheckBox.Caption:=LanguageSetup.SetupFormRestoreWhenScummVMCloses;
   CenterScummVMCheckBox.Caption:=LanguageSetup.SetupFormCenterScummVMWindow;
   HideConsoleCheckBox.Caption:=LanguageSetup.SetupFormHideScummVMConsole;
+  CommandLineEdit.EditLabel.Caption:=LanguageSetup.SetupFormScummVMAdditionalParameters;
+
   ScummVMDownloadURLInfo.Caption:=LanguageSetup.SetupFormScummVMDownloadURL;
   ScummVMDownloadURL.Caption:='http:/'+'/www.scummvm.org/downloads.php';
   with ScummVMDownloadURL.Font do begin Color:=clBlue; Style:=[fsUnderline]; end;
@@ -107,20 +112,20 @@ procedure TSetupFrameScummVM.DOSBoxDirChanged;
 begin
 end;
 
-procedure TSetupFrameScummVM.ShowFrame(const AdvencedMode: Boolean);
-begin                                                
-  MinimizeDFendScummVMCheckBox.Visible:=AdvencedMode;
-  RestoreWindowCheckBox.Visible:=AdvencedMode;
-  CenterScummVMCheckBox.Visible:=AdvencedMode;
-  HideConsoleCheckBox.Visible:=AdvencedMode;
+procedure TSetupFrameScummVM.ShowFrame(const AdvancedMode: Boolean);
+begin
+  MinimizeDFendScummVMCheckBox.Visible:=AdvancedMode;
+  RestoreWindowCheckBox.Visible:=AdvancedMode;
+  CenterScummVMCheckBox.Visible:=AdvancedMode;
+  HideConsoleCheckBox.Visible:=AdvancedMode;
+  CommandLineEdit.Visible:=AdvancedMode;
 
-  If AdvencedMode then begin
-    ScummVMDownloadURLInfo.Top:=HideConsoleCheckBox.Top+HideConsoleCheckBox.Height+18;
+  If AdvancedMode then begin
+    ScummVMDownloadURLInfo.Top:=CommandLineEdit.Top+CommandLineEdit.Height+18;
   end else begin
     ScummVMDownloadURLInfo.Top:=MinimizeDFendScummVMCheckBox.Top;
   end;
   ScummVMDownloadURL.Top:=ScummVMDownloadURLInfo.Top+19;
-
 end;
 
 procedure TSetupFrameScummVM.HideFrame;
@@ -134,6 +139,7 @@ begin
   CenterScummVMCheckBox.Checked:=False;
   HideConsoleCheckBox.Checked:=False;
   MinimizeDFendScummVMCheckBoxClick(self);
+  CommandLineEdit.Text:='';
 end;
 
 procedure TSetupFrameScummVM.SaveSetup;
@@ -145,6 +151,7 @@ begin
   PrgSetup.RestoreWhenScummVMCloses:=RestoreWindowCheckBox.Checked;
   PrgSetup.CenterScummVMWindow:=CenterScummVMCheckBox.Checked;
   PrgSetup.HideScummVMConsole:=HideConsoleCheckBox.Checked;
+  PrgSetup.ScummVMAdditionalCommandLine:=CommandLineEdit.Text;
 end;
 
 procedure TSetupFrameScummVM.ButtonWork(Sender: TObject);

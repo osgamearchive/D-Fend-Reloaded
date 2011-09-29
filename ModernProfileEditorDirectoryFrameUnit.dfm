@@ -34,7 +34,7 @@ object ModernProfileEditorDirectoryFrame: TModernProfileEditorDirectoryFrame
   object DataFolderEditButton: TSpeedButton
     Tag = 1
     Left = 584
-    Top = 128
+    Top = 124
     Width = 23
     Height = 22
     Anchors = [akTop, akRight]
@@ -155,7 +155,7 @@ object ModernProfileEditorDirectoryFrame: TModernProfileEditorDirectoryFrame
   end
   object DataFolderInfoLabel: TLabel
     Left = 357
-    Top = 160
+    Top = 156
     Width = 250
     Height = 53
     Anchors = [akLeft, akTop, akRight]
@@ -284,7 +284,7 @@ object ModernProfileEditorDirectoryFrame: TModernProfileEditorDirectoryFrame
   end
   object DataFolderEdit: TLabeledEdit
     Left = 24
-    Top = 128
+    Top = 124
     Width = 554
     Height = 21
     Anchors = [akLeft, akTop, akRight]
@@ -296,7 +296,7 @@ object ModernProfileEditorDirectoryFrame: TModernProfileEditorDirectoryFrame
   object GenerateGameDataFolderNameButton: TBitBtn
     Tag = 19
     Left = 24
-    Top = 155
+    Top = 151
     Width = 321
     Height = 25
     Caption = 'Daten-Verzeichnis automatisch erstellen'

@@ -5022,7 +5022,7 @@ object FirstRunWizardForm: TFirstRunWizardForm
     Width = 249
     Height = 21
     Style = csDropDownList
-    ItemHeight = 0
+    ItemHeight = 13
     TabOrder = 0
     OnChange = ProgramLanguageComboBoxChange
   end
@@ -5032,7 +5032,7 @@ object FirstRunWizardForm: TFirstRunWizardForm
     Width = 248
     Height = 21
     Style = csDropDownList
-    ItemHeight = 0
+    ItemHeight = 13
     TabOrder = 3
   end
   object UpdatesCheckBox: TCheckBox
@@ -5050,7 +5050,7 @@ object FirstRunWizardForm: TFirstRunWizardForm
     Width = 248
     Height = 21
     Style = csDropDownList
-    ItemHeight = 0
+    ItemHeight = 13
     TabOrder = 1
     OnChange = DOSBoxComboBoxChange
   end

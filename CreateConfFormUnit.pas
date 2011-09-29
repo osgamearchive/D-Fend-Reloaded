@@ -86,12 +86,10 @@ begin
   BuildCheckList(ListBox,GameDB,True,False,True);
   BuildSelectPopupMenu(PopupMenu,GameDB,SelectButtonClick,True,True);
 
-  If PrgSetup.ActivateIncompleteFeatures then begin
-    M:=TMenuItem.Create(self); M.Caption:='-';
-    PopupMenu.Items[0].Add(M);
-    M:=TMenuItem.Create(self); M.Caption:=LanguageSetup.CreateConfFormSelectGamesWithoutAutoSetup; M.Tag:=-2; M.OnClick:=SelectButtonClick;
-    PopupMenu.Items[0].Add(M);
-  end;
+  M:=TMenuItem.Create(self); M.Caption:='-';
+  PopupMenu.Items[0].Add(M);
+  M:=TMenuItem.Create(self); M.Caption:=LanguageSetup.CreateConfFormSelectGamesWithoutAutoSetup; M.Tag:=-2; M.OnClick:=SelectButtonClick;
+  PopupMenu.Items[0].Add(M);
 
   FolderEdit.Text:=GetSpecialFolder(Handle,CSIDL_DESKTOPDIRECTORY);
 end;

@@ -10,6 +10,7 @@ const DosBoxFileName='DOSBOX.EXE';
       HistoryFileName='History.dat';
       IconsConfFile='Icons.ini';
       DosBoxDOSProfile='DOSBox DOS';
+      RenderTestTempFile='Output.txt';
 
       GameListSubDir='Confs';
       IconsSubDir='IconLibrary';

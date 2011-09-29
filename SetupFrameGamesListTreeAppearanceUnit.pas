@@ -36,7 +36,7 @@ type
     Procedure BeforeChangeLanguage;
     Procedure LoadLanguage;
     Procedure DOSBoxDirChanged;
-    Procedure ShowFrame(const AdvencedMode : Boolean);
+    Procedure ShowFrame(const AdvancedMode : Boolean);
     procedure HideFrame;
     Procedure RestoreDefaults;
     Procedure SaveSetup;
@@ -124,7 +124,7 @@ procedure TSetupFrameGamesListTreeAppearance.DOSBoxDirChanged;
 begin
 end;
 
-procedure TSetupFrameGamesListTreeAppearance.ShowFrame(const AdvencedMode: Boolean);
+procedure TSetupFrameGamesListTreeAppearance.ShowFrame(const AdvancedMode: Boolean);
 begin
 end;
 

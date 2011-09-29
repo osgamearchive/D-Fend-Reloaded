@@ -65,7 +65,7 @@ type
     Procedure CalcCheckBoxTop;
   public
     { Public-Deklarationen }
-    ExtraExeFiles : TStringList;
+    ExtraExeFiles, ExtraExeFilesParameters : TStringList;
     Constructor Create(AOwner : TComponent); override;
     Destructor Destroy; override;
     Procedure InitGUI(var InitData : TModernProfileEditorInitData);
@@ -88,11 +88,13 @@ constructor TModernProfileEditorBaseFrame.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   ExtraExeFiles:=TStringList.Create;
+  ExtraExeFilesParameters:=TStringList.Create;
 end;
 
 destructor TModernProfileEditorBaseFrame.Destroy;
 begin
   ExtraExeFiles.Free;
+  ExtraExeFilesParameters.Free;
   inherited Destroy;
 end;
 
@@ -268,7 +270,10 @@ begin
       TurnOffDOSBoxFailedWarningCheckBox.Checked:=Game.NoDOSBoxFailedDialog;
     end;
     { Windows and DOSBox mode }
-    For I:=0 to 9 do If Trim(Game.ExtraPrgFile[I])<>'' then ExtraExeFiles.Add(Game.ExtraPrgFile[I]);
+    For I:=0 to 9 do If Trim(Game.ExtraPrgFile[I])<>'' then begin
+      ExtraExeFiles.Add(Game.ExtraPrgFile[I]);
+      ExtraExeFilesParameters.Add(Game.ExtraPrgFileParameter[I]);
+    end;
   end;
 end;
 
@@ -373,8 +378,11 @@ begin
       Game.NoDOSBoxFailedDialog:=TurnOffDOSBoxFailedWarningCheckBox.Checked;
     end;
 
-    For I:=0 to 9 do Game.ExtraPrgFile[I]:='';
-    For I:=0 to Min(9,ExtraExeFiles.Count-1) do Game.ExtraPrgFile[I]:=Trim(ExtraExeFiles[I]);
+    For I:=0 to 9 do begin Game.ExtraPrgFile[I]:=''; Game.ExtraPrgFileParameter[I]:=''; end;
+    For I:=0 to Min(9,ExtraExeFiles.Count-1) do begin
+      Game.ExtraPrgFile[I]:=Trim(ExtraExeFiles[I]);
+      Game.ExtraPrgFileParameter[I]:=Trim(ExtraExeFilesParameters[I]);
+    end;
   end;
 
   If not ProfileNameEdit.ReadOnly then begin
@@ -536,7 +544,7 @@ end;
 
 procedure TModernProfileEditorBaseFrame.ExtraExeFilesButtonClick(Sender: TObject);
 begin
-  ShowExtraExeEditDialog(self,ExtraExeFiles,WindowsMode,GameExeEdit.Text,SetupExeEdit.Text);
+  ShowExtraExeEditDialog(self,ExtraExeFiles,ExtraExeFilesParameters,WindowsMode,GameExeEdit.Text,SetupExeEdit.Text);
 end;
 
 end.

@@ -58,6 +58,8 @@ const ID_Index=1;
 
       ID_ViewQuickStarter=1501;
 
+      ID_RunDOSBoxOutputTest=1751;
+
       ID_ProfileWithWizard=2001;
       ID_ProfileEditClassic=2002;
       ID_ProfileCopy=2003;

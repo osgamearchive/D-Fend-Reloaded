@@ -12,6 +12,8 @@ Type TPacker=record
   TrailingBackslash : Boolean;
 end;
 
+Procedure FirstRunPackerAutoSetup();
+
 type
   TSetupFrameZipPrgs = class(TFrame, ISetupFrame)
     ScrollBox: TScrollBox;
@@ -48,7 +50,7 @@ type
     Procedure BeforeChangeLanguage;
     Procedure LoadLanguage;
     Procedure DOSBoxDirChanged;
-    Procedure ShowFrame(const AdvencedMode : Boolean);
+    Procedure ShowFrame(const AdvancedMode : Boolean);
     procedure HideFrame;
     Procedure RestoreDefaults;
     Procedure SaveSetup;
@@ -64,17 +66,34 @@ uses ShlObj, Math, LanguageSetupUnit, VistaToolsUnit, PrgSetupUnit, HelpConsts,
 Type TPackerDefaultValue=record
   Name, Extensions, CommandExtract, CommandCreate, CommandUpdate  : String;
   TrainlingBackslash : Boolean;
+  DefaultFileName : String;
 end;
 
 const PackerDefaultValuesCount=5;
 
 Var PackerDefaultValues : Array[0..PackerDefaultValuesCount-1] of TPackerDefaultValue =(
-  (Name: '7z'; Extensions: 'GZIP;BZIP2;TAR'; {7z/zip by default by internal packer} CommandExtract: 'e "%1" -o"%2" -y'; CommandCreate: 'a "%1" "%2*.*" -r'; CommandUpdate: 'u "%1" "%2*.*" -r'; TrainlingBackslash: True),
-  (Name: 'rar'; Extensions: 'RAR'; CommandExtract: 'x "%1" "%2" -y -c-'; CommandCreate: 'a -y -r0 -ep1 "%1" "%2*.*"'; CommandUpdate: 'u -y -r0 -ep1 "%1" "%2*.*"'; TrainlingBackslash: True),
-  (Name: 'winrar'; Extensions: 'RAR'; CommandExtract: 'x "%1" "%2" -y -c-'; CommandCreate: 'a -y -r0 -ep1 "%1" "%2*.*"'; CommandUpdate: 'u -y -r0 -ep1 "%1" "%2*.*"'; TrainlingBackslash: True),
-  (Name: 'uha'; Extensions: 'UHA'; CommandExtract: 'a -m3 -pe -ph+ -r+ -ed+ "%1" "%2*.*"'; CommandCreate: 'x -y+ -o+ -t"%2" "%1"'; CommandUpdate: 'x -y+ -o+ -t"%2" "%1"'; TrainlingBackslash: False),
-  (Name: 'arj32'; Extensions: 'ARJ'; CommandExtract: 'a -r -e1 -i6 -p1 -v1440 -hk -jm -jyv -vv "%1"'; CommandCreate: 'x -r -v -y "%1" "%2 "'; CommandUpdate: 'x -r -v -y "%1" "%2 "'; TrainlingBackslash: True)
+  (Name: '7z'; Extensions: 'GZIP;BZIP2;TAR'; {7z/zip by default by internal packer} CommandExtract: 'e "%1" -o"%2" -y'; CommandCreate: 'a "%1" "%2*.*" -r'; CommandUpdate: 'u "%1" "%2*.*" -r'; TrainlingBackslash: True; DefaultFileName: '7-Zip\7z.exe'),
+  (Name: 'rar'; Extensions: 'RAR'; CommandExtract: 'x "%1" "%2" -y -c-'; CommandCreate: 'a -y -r0 -ep1 "%1" "%2*.*"'; CommandUpdate: 'u -y -r0 -ep1 "%1" "%2*.*"'; TrainlingBackslash: True; DefaultFileName: ''),
+  (Name: 'winrar'; Extensions: 'RAR'; CommandExtract: 'x "%1" "%2" -y -c-'; CommandCreate: 'a -y -r0 -ep1 "%1" "%2*.*"'; CommandUpdate: 'u -y -r0 -ep1 "%1" "%2*.*"'; TrainlingBackslash: True; DefaultFileName: 'winrar\winrar.exe'),
+  (Name: 'uha'; Extensions: 'UHA'; CommandExtract: 'a -m3 -pe -ph+ -r+ -ed+ "%1" "%2*.*"'; CommandCreate: 'x -y+ -o+ -t"%2" "%1"'; CommandUpdate: 'x -y+ -o+ -t"%2" "%1"'; TrainlingBackslash: False; DefaultFileName: ''),
+  (Name: 'arj32'; Extensions: 'ARJ'; CommandExtract: 'a -r -e1 -i6 -p1 -v1440 -hk -jm -jyv -vv "%1"'; CommandCreate: 'x -r -v -y "%1" "%2 "'; CommandUpdate: 'x -r -v -y "%1" "%2 "'; TrainlingBackslash: True; DefaultFileName: '')
 );
+
+Procedure FirstRunPackerAutoSetup();
+Var Prg : String;
+    I,J : Integer;
+begin
+  Prg:=IncludeTrailingPathDelimiter(GetSpecialFolder(Application.MainForm.Handle,CSIDL_PROGRAM_FILES));
+  For I:=0 to PackerDefaultValuesCount-1 do if (Trim(PackerDefaultValues[I].DefaultFileName)<>'') and FileExists(Prg+PackerDefaultValues[I].DefaultFileName) then begin
+    J:=PrgSetup.AddPackerSettings(PackerDefaultValues[I].Name);
+    PrgSetup.PackerSettings[J].ZipFileName:=Prg+PackerDefaultValues[I].DefaultFileName;
+    PrgSetup.PackerSettings[J].FileExtensions:=PackerDefaultValues[I].Extensions;
+    PrgSetup.PackerSettings[J].ExtractFile:=PackerDefaultValues[I].CommandExtract;
+    PrgSetup.PackerSettings[J].CreateFile:=PackerDefaultValues[I].CommandCreate;
+    PrgSetup.PackerSettings[J].UpdateFile:=PackerDefaultValues[I].CommandUpdate;
+    PrgSetup.PackerSettings[J].TrailingBackslash:=PackerDefaultValues[I].TrainlingBackslash;
+  end;
+end;
 
 { TSetupFrameZipPrgs }
 
@@ -198,7 +217,7 @@ procedure TSetupFrameZipPrgs.DOSBoxDirChanged;
 begin
 end;
 
-procedure TSetupFrameZipPrgs.ShowFrame(const AdvencedMode: Boolean);
+procedure TSetupFrameZipPrgs.ShowFrame(const AdvancedMode: Boolean);
 begin
   If SelectComboBox.Items.Count>0 then SelectComboBox.ItemIndex:=0;
   SelectComboBoxChange(self);

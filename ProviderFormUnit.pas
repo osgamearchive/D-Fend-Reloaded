@@ -100,6 +100,7 @@ end;
 
 Procedure WriteProverInfoToProfile(const AProfile : TGame; const AProviderName, AProviderURL : String);
 Var St : TStringList;
+    I : Integer;
 begin
   St:=StringToStringList(AProfile.Notes);
   try
@@ -109,7 +110,11 @@ begin
   finally
     St.Free;
   end;
-  If Trim(AProviderURL)<>'' then AProfile.WWW:=AProviderURL;
+  If Trim(AProviderURL)<>'' then For I:=1 to 9 do if (Trim(AProfile.WWW[I])='') or (I=9) then begin
+    AProfile.WWWName[I]:=LanguageSetup.PackageManagerProviderHomepage;
+    AProfile.WWW[I]:=AProviderURL;
+    break;
+  end;
   AProfile.LoadCache;
   AProfile.StoreAllValues;
 end;

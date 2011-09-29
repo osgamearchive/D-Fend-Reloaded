@@ -28,7 +28,7 @@ Type ISetupFrame=interface
   Procedure BeforeChangeLanguage;
   Procedure LoadLanguage;
   Procedure DOSBoxDirChanged;
-  Procedure ShowFrame(const AdvencedMode : Boolean);
+  Procedure ShowFrame(const AdvancedMode : Boolean);
   Procedure HideFrame;
   Procedure RestoreDefaults;
   Procedure SaveSetup;
@@ -37,7 +37,7 @@ end;
 Type TFrameRecord=record
   Frame : TFrame;
   IFrame : ISetupFrame;
-  AdvencedModeOnly : Boolean;
+  AdvancedModeOnly : Boolean;
   ParentFrame : TFrame;
   ImageIndex : Integer;
   IsEmpty : Boolean;
@@ -78,7 +78,7 @@ type
     LanguageFrame, TreeListFrame, ToolbarFrame, IconSetFrame, UpdateFrame : TFrame;
     InternalDOSBoxDir, InternalDOSBoxLang, InternalBaseDir : String;
     Procedure InitFramesList;
-    Procedure AddTreeNode(const ParentFrame, NewFrame : TFrame; NewFrameInterface : ISetupFrame; const AdvencedModeOnly : Boolean; const ImageIndex : Integer; const IsEmpty : Boolean = False);
+    Procedure AddTreeNode(const ParentFrame, NewFrame : TFrame; NewFrameInterface : ISetupFrame; const AdvancedModeOnly : Boolean; const ImageIndex : Integer; const IsEmpty : Boolean = False);
     Procedure BeforeChangeLanguage;
     Procedure LoadLanguage;
     Procedure DOSBoxDirChanged;
@@ -183,7 +183,7 @@ begin
   For I:=0 to length(Frames)-1 do If Frames[I].Frame is FrameClass then begin result:=Frames[I].Frame; exit; end;
 end;
 
-Procedure TSetupForm.AddTreeNode(const ParentFrame, NewFrame : TFrame; NewFrameInterface : ISetupFrame; const AdvencedModeOnly : Boolean; const ImageIndex : Integer; const IsEmpty : Boolean);
+Procedure TSetupForm.AddTreeNode(const ParentFrame, NewFrame : TFrame; NewFrameInterface : ISetupFrame; const AdvancedModeOnly : Boolean; const ImageIndex : Integer; const IsEmpty : Boolean);
 Var C : Integer;
     InitData : TInitData;
 begin
@@ -213,7 +213,7 @@ begin
     Frame:=NewFrame;
     IFrame:=NewFrameInterface;
   end;
-  Frames[C].AdvencedModeOnly:=AdvencedModeOnly;
+  Frames[C].AdvancedModeOnly:=AdvancedModeOnly;
   Frames[C].ParentFrame:=ParentFrame;
   Frames[C].ImageIndex:=ImageIndex;
   Frames[C].IsEmpty:=IsEmpty;
@@ -328,20 +328,20 @@ begin
 end;
 
 procedure TSetupForm.ModeComboBoxChange(Sender: TObject);
-Var AdvencedMode : Boolean;
+Var AdvancedMode : Boolean;
     LastFrame,I : Integer;
     ParentNode,Node,LastNode : TTreeNode;
 begin
   If Tree.Selected=nil then LastFrame:=-1 else LastFrame:=Integer(Tree.Selected.Data);
   LastNode:=nil;
-  AdvencedMode:=SetAdvanced or (ModeComboBox.ItemIndex=1);
+  AdvancedMode:=SetAdvanced or (ModeComboBox.ItemIndex=1);
   Tree.Selected:=nil;
 
   Tree.Items.BeginUpdate;
   try
     Tree.Items.Clear;
 
-    For I:=0 to length(Frames)-1 do If (not Frames[I].AdvencedModeOnly) or AdvencedMode then begin
+    For I:=0 to length(Frames)-1 do If (not Frames[I].AdvancedModeOnly) or AdvancedMode then begin
       ParentNode:=FindNodeFromFrame(Frames[I].ParentFrame);
       Node:=Tree.Items.AddChildObject(ParentNode,Frames[I].IFrame.GetName,Pointer(I));
       Node.ImageIndex:=Frames[I].ImageIndex;
@@ -428,7 +428,7 @@ begin
 
   {Add pages}
   For I:=0 to length(Frames)-1 do If not Frames[I].IsEmpty then begin
-    If Frames[I].AdvencedModeOnly and (not SetAdvanced) and (ModeComboBox.ItemIndex=0) then continue;
+    If Frames[I].AdvancedModeOnly and (not SetAdvanced) and (ModeComboBox.ItemIndex=0) then continue;
     M:=TMenuItem.Create(PopupMenu);
     with M do begin
       Caption:=Frames[I].IFrame.GetName;

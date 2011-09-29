@@ -127,6 +127,14 @@ Function SelectProgramFile(var FileName : String; const HintFirstFile, HintSecon
 Function BuildGameDirMountData(const Template : TGame; const ProgrammFileDir, SetupFileDir : String) : TStringList; overload;
 Procedure BuildGameDirMountData(const Mounting : TStringList; const ProgrammFileDir, SetupFileDir : String); overload;
 
+{Check if auto setup template is available}
+
+Procedure CheckAutoSetupTemplates(const AutoSetupDB : TGameDB; const NewAutoSetupTemplatesFolder : String);
+
+{Get Pixel shader list}
+
+Function GetPixelShaders(const DOSBoxDir : String) : TStringList;
+
 implementation
 
 uses SysUtils, Forms, Dialogs, ShellAPI, ShlObj, IniFiles, Math,  PNGImage,
@@ -361,48 +369,49 @@ begin
     For I:=0 to Mounting.Count-1 do begin
       St:=ValueToList(Mounting[I]);
       try
-        L:=MountingListView.Items.Add;
+        If St.Count>0 then begin
+          L:=MountingListView.Items.Add;
 
-        S:=Trim(St[0]);
-        If St.Count>1 then begin
-          T:=Trim(ExtUpperCase(St[1]));
-          If Pos('$',S)<>0 then begin
-            If (T='PHYSFS') or (T='ZIP')
-              then S:=Copy(S,Pos('$',S)+1,MaxInt)+' (+ '+Copy(S,1,Pos('$',S)-1)+')'
-              else S:=Copy(S,1,Pos('$',S)-1)+' (+'+LanguageSetup.More+')';
+          S:=Trim(St[0]);
+          If St.Count>1 then begin
+            T:=Trim(ExtUpperCase(St[1]));
+            If Pos('$',S)<>0 then begin
+              If (T='PHYSFS') or (T='ZIP')
+                then S:=Copy(S,Pos('$',S)+1,MaxInt)+' (+ '+Copy(S,1,Pos('$',S)-1)+')'
+                else S:=Copy(S,1,Pos('$',S)-1)+' (+'+LanguageSetup.More+')';
+            end;
+            If (T='CDROM') and (S='ASK') then S:=LanguageSetup.ProfileMountingCDDriveTypeAskShort;
+            If (T='CDROM') and (Pos(':',S)<>0) then begin
+              U:=Trim(Copy(S,1,Pos(':',S)-1));
+              If U='NUMBER' then S:=Format(LanguageSetup.ProfileMountingCDDriveTypeNumberShort,[Copy(S,Pos(':',S)+1,MaxInt)]);
+              If U='LABEL' then S:=Format(LanguageSetup.ProfileMountingCDDriveTypeLabelShort,[Copy(S,Pos(':',S)+1,MaxInt)]);
+              If U='FILE' then S:=Format(LanguageSetup.ProfileMountingCDDriveTypeFileShort,[Copy(S,Pos(':',S)+1,MaxInt)]);
+              If U='FOLDER' then S:=Format(LanguageSetup.ProfileMountingCDDriveTypeFolderShort,[Copy(S,Pos(':',S)+1,MaxInt)]);
+            end;
           end;
-          If (T='CDROM') and (S='ASK') then S:=LanguageSetup.ProfileMountingCDDriveTypeAskShort;
-          If (T='CDROM') and (Pos(':',S)<>0) then begin
-            U:=Trim(Copy(S,1,Pos(':',S)-1));
-            If U='NUMBER' then S:=Format(LanguageSetup.ProfileMountingCDDriveTypeNumberShort,[Copy(S,Pos(':',S)+1,MaxInt)]);
-            If U='LABEL' then S:=Format(LanguageSetup.ProfileMountingCDDriveTypeLabelShort,[Copy(S,Pos(':',S)+1,MaxInt)]);
-            If U='FILE' then S:=Format(LanguageSetup.ProfileMountingCDDriveTypeFileShort,[Copy(S,Pos(':',S)+1,MaxInt)]);
-            If U='FOLDER' then S:=Format(LanguageSetup.ProfileMountingCDDriveTypeFolderShort,[Copy(S,Pos(':',S)+1,MaxInt)]);
+          L.Caption:=S;
+
+          If St.Count>1 then begin
+            S:=Trim(ExtUpperCase(St[1])); B:=False;
+            If (not B) and (S='DRIVE') then begin L.SubItems.Add(LanguageSetup.ProfileEditorMountingDriveTypeDRIVE); B:=True; end;
+            If (not B) and (S='CDROM') then begin L.SubItems.Add(LanguageSetup.ProfileEditorMountingDriveTypeCDROM); B:=True; end;
+            If (not B) and (S='CDROMIMAGE') then begin L.SubItems.Add(LanguageSetup.ProfileEditorMountingDriveTypeCDROMIMAGE); B:=True; end;
+            If (not B) and (S='FLOPPY') then begin L.SubItems.Add(LanguageSetup.ProfileEditorMountingDriveTypeFLOPPY); B:=True; end;
+            If (not B) and (S='FLOPPYIMAGE') then begin L.SubItems.Add(LanguageSetup.ProfileEditorMountingDriveTypeFLOPPYIMAGE); B:=True; end;
+            If (not B) and (S='IMAGE') then begin L.SubItems.Add(LanguageSetup.ProfileEditorMountingDriveTypeIMAGE); B:=True; end;
+            If (not B) and (S='PHYSFS') then begin L.SubItems.Add(LanguageSetup.ProfileEditorMountingDriveTypePHYSFS); B:=True; end;
+            If (not B) and (S='ZIP') then begin L.SubItems.Add(LanguageSetup.ProfileEditorMountingDriveTypeZIP); B:=True; end;
+            If not B then L.SubItems.Add(St[1]);
+          end else begin
+            L.SubItems.Add('');
           end;
+
+          If St.Count>2 then L.SubItems.Add(St[2]) else L.SubItems.Add('');
+          If St.Count>4 then L.SubItems.Add(St[4]) else L.SubItems.Add('');
+          If St.Count>3 then begin
+            If Trim(ExtUpperCase(St[3]))='TRUE' then L.SubItems.Add(RemoveUnderline(LanguageSetup.Yes)) else L.SubItems.Add(RemoveUnderline(LanguageSetup.No));
+          end else L.SubItems.Add(RemoveUnderline(LanguageSetup.No));
         end;
-        L.Caption:=S;
-
-        If St.Count>1 then begin
-          S:=Trim(ExtUpperCase(St[1])); B:=False;
-          If (not B) and (S='DRIVE') then begin L.SubItems.Add(LanguageSetup.ProfileEditorMountingDriveTypeDRIVE); B:=True; end;
-          If (not B) and (S='CDROM') then begin L.SubItems.Add(LanguageSetup.ProfileEditorMountingDriveTypeCDROM); B:=True; end;
-          If (not B) and (S='CDROMIMAGE') then begin L.SubItems.Add(LanguageSetup.ProfileEditorMountingDriveTypeCDROMIMAGE); B:=True; end;
-          If (not B) and (S='FLOPPY') then begin L.SubItems.Add(LanguageSetup.ProfileEditorMountingDriveTypeFLOPPY); B:=True; end;
-          If (not B) and (S='FLOPPYIMAGE') then begin L.SubItems.Add(LanguageSetup.ProfileEditorMountingDriveTypeFLOPPYIMAGE); B:=True; end;
-          If (not B) and (S='IMAGE') then begin L.SubItems.Add(LanguageSetup.ProfileEditorMountingDriveTypeIMAGE); B:=True; end;
-          If (not B) and (S='PHYSFS') then begin L.SubItems.Add(LanguageSetup.ProfileEditorMountingDriveTypePHYSFS); B:=True; end;
-          If (not B) and (S='ZIP') then begin L.SubItems.Add(LanguageSetup.ProfileEditorMountingDriveTypeZIP); B:=True; end;
-          If not B then L.SubItems.Add(St[1]);
-        end else begin
-          L.SubItems.Add('');
-        end;
-
-        If St.Count>2 then L.SubItems.Add(St[2]) else L.SubItems.Add('');
-        If St.Count>4 then L.SubItems.Add(St[4]) else L.SubItems.Add('');
-        If St.Count>3 then begin
-          If Trim(ExtUpperCase(St[3]))='TRUE' then L.SubItems.Add(RemoveUnderline(LanguageSetup.Yes)) else L.SubItems.Add(RemoveUnderline(LanguageSetup.No));
-        end else L.SubItems.Add(RemoveUnderline(LanguageSetup.No));
-
       finally
         St.Free;
       end;
@@ -501,7 +510,7 @@ begin
   try BuildSelectPopupSubMenu(Popup,LanguageSetup.GameLanguage,MenuSelect,MenuUnselect,4,OnClick,St); finally St.Free; end;
 
   St:=GetCustomLicenseName(GameDB.GetLicenseList(WithDefaultProfile,HideWindowsProfiles));
-  try BuildSelectPopupSubMenu(Popup,LanguageSetup.GameLanguage,MenuSelect,MenuUnselect,5,OnClick,St); finally St.Free; end;
+  try BuildSelectPopupSubMenu(Popup,LanguageSetup.GameLicense,MenuSelect,MenuUnselect,5,OnClick,St); finally St.Free; end;
 
   St:=TStringList.Create;
   try
@@ -529,6 +538,7 @@ begin
           If (S='') or (T='') then continue;
 
           SUpper:=ExtUpperCase(S);
+		  If SUpper='LICENSE' then continue;
           Nr:=-1;
           For K:=0 to length(UserData)-1 do If UserData[K].NameUpper=SUpper then begin Nr:=K; break; end;
           If Nr<0 then begin
@@ -1160,7 +1170,15 @@ begin
             5 : begin
                   If SubGroupUpper=EmType1 then B:=DOSBoxMode(GameDB[I]) else begin
                     If SubGroupUpper=EmType2 then B:=ScummVMMode(GameDB[I]) else begin
-                      If SubGroupUpper=EmType3 then B:=WindowsExeMode(GameDB[I]) else begin
+                      If SubGroupUpper=EmType3 then begin
+                        B:=WindowsExeMode(GameDB[I]);
+                        If B then For J:=0 to Length(EmTypeUser)-1 do begin
+                          if ExtUpperCase(GameDB[I].GameExe)=ExtUpperCase(PrgSetup.WindowsBasedEmulatorsPrograms[J]) then begin
+                            B:=False;
+                            break;
+                          end;
+                        end;
+                       end else begin
                         B:=False;
                         If WindowsExeMode(GameDB[I]) then For J:=0 to Length(EmTypeUser)-1 do If SubGroupUpper=EmTypeUser[J] then begin
                           B:=(ExtUpperCase(GameDB[I].GameExe)=ExtUpperCase(PrgSetup.WindowsBasedEmulatorsPrograms[J]));
@@ -1539,7 +1557,7 @@ begin
       If S='.BMP' then begin
         B:=TBitmap.Create;
         try
-          OK:=True; try B.LoadFromFile(Dir+Rec.Name); except OK:=False; end;
+          OK:=True; try B.LoadFromFile(Dir+St[K]); except OK:=False; end;
           If OK then begin
             B2:=TBitmap.Create;
             try try
@@ -1730,7 +1748,7 @@ begin
 
     For J:=0 to G.NrOfMounts-1 do begin
       St:=ValueToList(G.Mount[J]);
-      try
+      If St.Count>0 then try
         S:=Trim(St[0]); T:='';
         K:=Pos('$',S);
         while K>0 do begin
@@ -2134,7 +2152,7 @@ begin
   result.StartFullscreen:=False;
   result.CaptureFolder:=MakeRelPath(IncludeTrailingPathDelimiter(PrgSetup.CaptureDir)+DosBoxDOSProfile,PrgSetup.BaseDir);
   result.Genre:='Program';
-  result.WWW:='http:/'+'/www.dosbox.com';
+  result.WWW[1]:='http:/'+'/www.dosbox.com';
   result.Name:=DosBoxDOSProfile;
   result.Favorite:=True;
   result.Developer:='DOSBox Team';
@@ -2284,6 +2302,8 @@ begin
 end;
 
 Function GetGamesListExportColumnValue(const Game : TGame; const Column : TGamesListExportColumn; const WWWEncode : Boolean = False) : String;
+Var I : Integer;
+    S : String;
 begin
   result:='';
   Case Column of
@@ -2293,7 +2313,13 @@ begin
     glecPublisher : result:=Game.CachePublisher;
     glecYear : result:=Game.CacheYear;
     glecLanguage : result:=GetCustomLanguageName(Game.CacheLanguage);
-    glecWWW : If WWWEncode and (ExtUpperCase(Copy(Trim(Game.WWW),1,4))='HTTP') then result:='<a href="'+Game.WWW+'" target="_blank">'+Game.WWW+'</a>' else result:=Game.WWW;
+    glecWWW : for I:=1 to 9 do begin
+                S:='';
+                If WWWEncode and (ExtUpperCase(Copy(Trim(Game.WWW[I]),1,4))='HTTP') then result:='<a href="'+Game.WWW[I]+'" target="_blank">'+Game.WWWName[I]+'</a>' else result:=Game.WWWName[I]+' ('+Game.WWW[I]+')';
+                If S='' then continue;
+                If result<>'' then result:=result+'<br>';
+                result:=result+S;
+              end;
     glecLicense : result:=GetCustomLicenseName(Game.License);
     glecStartCount : result:=IntToStr(History.GameStartCount(Game.CacheName));
     else result:='';
@@ -2688,7 +2714,7 @@ begin
   GetUserLists(GameDB,UserList,UserListUpper);
   try
     St.Add('<?xml version="1.0" encoding="'+LanguageSetup.CharsetHTMLCharset+'" standalone="no"?>');
-    St.Add('<!DOCTYPE GamesList SYSTEM "http://dfendreloaded.sourceforge.net/GamesListExport/GamesListExport.dtd">');
+    St.Add('<!DOCTYPE GamesList SYSTEM "http:/'+'/dfendreloaded.sourceforge.net/GamesListExport/GamesListExport.dtd">');
     St.Add('');
     DecodeDate(Date,Year,Month,Day);
     St.Add('<GamesList DFRVersion="'+GetNormalFileVersionAsString+'" ExportDate="'+Format('%d-%.2d-%.2d',[Year,Month,Day])+'">');
@@ -2940,7 +2966,7 @@ begin
         If T='SNAPSHOTIMAGE' then Game.CaptureFolder:=U;
         If T='EXIT' then Game.CloseDosBoxAfterGameExit:=StrToBool(U);
         If T='MANUALFILE' then Game.DataDir:=ExtractFilePath(U);
-        If T='WWWSITE' then Game.WWW:=U;
+        If T='WWWSITE' then Game.WWW[1]:=U;
       end;
 
       If Sec=1 then Autoexec.Add(St[I]);
@@ -3812,5 +3838,82 @@ begin
   If SetupFileDir<>'' then AddPrgDir(Mounting,SetupFileDir);
 end;
 
+Function GetProfFileList(const Dir : String) : TStringList;
+Var Rec : TSearchRec;
+    I : Integer;
+begin
+  result:=TStringList.Create;
+  I:=FindFirst(IncludeTrailingPathDelimiter(Dir)+'*.prof',faAnyFile,Rec);
+  try
+    While I=0 do begin result.Add(Rec.Name); I:=FindNext(Rec); end;
+  finally
+    FindClose(Rec);
+  end;
+end;
+
+Function TemplateNeeded(const AutoSetupDB : TGameDB; const ExeMD5 : String) : Boolean;
+Var S : String;
+    I : Integer;
+begin
+  S:=Trim(ExeMD5);
+  if S='' then begin result:=True; exit; end;
+  result:=False;
+  For I:=0 to AutoSetupDB.Count-1 do If AutoSetupDB[I].GameExeMD5=S then exit;
+  result:=True;
+end;
+
+Procedure CheckAutoSetupTemplates(const AutoSetupDB : TGameDB; const NewAutoSetupTemplatesFolder : String);
+Var St : TStringList;
+    I,J : Integer;
+    Dir,S : String;
+    Ini : TIniFile;
+begin
+  Dir:=IncludeTrailingPathDelimiter(NewAutoSetupTemplatesFolder);
+  St:=nil;
+  try
+    St:=GetProfFileList(Dir);
+
+    For I:=0 to St.Count-1 do begin
+      Ini:=TIniFile.Create(Dir+St[I]);
+      try
+        S:=Ini.ReadString('Extra','ExeMD5','');
+        If not TemplateNeeded(AutoSetupDB,S) then begin
+          {Delete not needed auto setup file}
+          FreeAndNil(Ini);
+          DeleteFile(Dir+St[I]);
+        end else begin
+          {Fix auto setup template}
+          Ini.WriteString('Extra','Exe',ExtractFileName(Ini.ReadString('Extra','Exe','')));
+          Ini.WriteString('Extra','Setup',ExtractFileName(Ini.ReadString('Extra','Setup','')));
+          Ini.WriteString('Extra','0','.\VirtualHD\;Drive;C;false;');
+          For J:=1 to 9 do Ini.DeleteKey('Extra',IntToStr(J));
+        end;
+      finally
+        Ini.Free;
+      end;
+    end;
+  finally
+    St.Free;
+  end;
+end;
+
+Function GetPixelShaders(const DOSBoxDir : String) : TStringList;
+Var Rec : TSearchRec;
+    I : Integer;
+
+begin
+  result:=TStringList.Create;
+  result.Add('none');  
+
+  I:=FindFirst(IncludeTrailingPathDelimiter(DOSBoxDir)+'Shaders\*.fx',faAnyFile,Rec);
+  try
+    While I=0 do begin
+      result.Add(ChangeFileExt(Rec.Name,''));
+      I:=FindNext(Rec);
+    end;
+  finally
+    FindClose(rec);
+  end;
+end;
 
 end.

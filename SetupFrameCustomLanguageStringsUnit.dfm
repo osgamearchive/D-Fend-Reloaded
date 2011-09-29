@@ -119,6 +119,19 @@ object SetupFrameCustomLanguageStrings: TSetupFrameCustomLanguageStrings
       'his list cannot been undone by pressing "Cancel".'
     WordWrap = True
   end
+  object EnglsihLabel: TLabel
+    Left = 16
+    Top = 19
+    Width = 689
+    Height = 54
+    Anchors = [akLeft, akTop, akRight]
+    AutoSize = False
+    Caption = 
+      'Setting up Non-English custom translations for the games list is' +
+      ' only available if a Non-English program language is selected.'
+    Visible = False
+    WordWrap = True
+  end
   object TypeComboBox: TComboBox
     Left = 16
     Top = 16

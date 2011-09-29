@@ -31,7 +31,7 @@ type
     Procedure BeforeChangeLanguage;
     Procedure LoadLanguage;
     Procedure DOSBoxDirChanged;
-    Procedure ShowFrame(const AdvencedMode : Boolean);
+    Procedure ShowFrame(const AdvancedMode : Boolean);
     procedure HideFrame;
     Procedure RestoreDefaults;
     Procedure SaveSetup;
@@ -134,6 +134,7 @@ begin
 end;
 
 procedure TSetupFrameGamesListColumns.LoadLanguage;
+Var I,J : Integer;
 begin
   ListViewLabel.Caption:=LanguageSetup.SetupFormListViewInfo;
   ListViewUpButton.Hint:=RemoveUnderline(LanguageSetup.MoveUp);
@@ -143,6 +144,20 @@ begin
   GridLinesCheckBox.Caption:=LanguageSetup.SetupFormShowGridLines;
   StoreColumnWidthsCheckBox.Caption:=LanguageSetup.SetupFormStoreColumnWidths;
 
+  For I:=0 to ListViewListBox.Items.Count-1 do begin
+    J:=Integer(ListViewListBox.Items.Objects[I]);
+    Case J of
+      0 : ListViewListBox.Items[I]:=LanguageSetup.GameSetup;
+      1 : ListViewListBox.Items[I]:=LanguageSetup.GameGenre;
+      2 : ListViewListBox.Items[I]:=LanguageSetup.GameDeveloper;
+      3 : ListViewListBox.Items[I]:=LanguageSetup.GamePublisher;
+      4 : ListViewListBox.Items[I]:=LanguageSetup.GameYear;
+      5 : ListViewListBox.Items[I]:=LanguageSetup.GameLanguage;
+      6 : ListViewListBox.Items[I]:=LanguageSetup.GameNotes;
+      7 : ListViewListBox.Items[I]:=LanguageSetup.GameStartCount;
+    end;
+  end;
+
   HelpContext:=ID_FileOptionsColumnsInTheGamesList;
 end;
 
@@ -150,7 +165,7 @@ procedure TSetupFrameGamesListColumns.DOSBoxDirChanged;
 begin
 end;
 
-procedure TSetupFrameGamesListColumns.ShowFrame(const AdvencedMode: Boolean);
+procedure TSetupFrameGamesListColumns.ShowFrame(const AdvancedMode: Boolean);
 begin
   ListViewListBoxClick(self);
   InitPopup;
@@ -201,7 +216,7 @@ begin
   S:=''; UserCount:=0;
   For I:=0 to ListViewListBox.Items.Count-1 do begin
     J:=Integer(ListViewListBox.Items.Objects[I])+1;
-    If J=100 then begin J:=9+UserCount; inc(UserCount); end;
+    If J>=100 then begin J:=9+UserCount; inc(UserCount); end;
     Case J of
       1..9 : S:=S+IntToStr(J);
       10..35 : S:=S+Chr(Ord('A')+J-10);

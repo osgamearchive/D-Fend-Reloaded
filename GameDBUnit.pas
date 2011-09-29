@@ -59,6 +59,9 @@ Type TConfOpt=class(TBasePrgSetup)
     property InnovaEmulationQuality : String index 47 read GetString write SetString;
     property NE2000EmulationBaseAddress : String index 48 read GetString write SetString;
     property NE2000EmulationInterrupt : String index 49 read GetString write SetString;
+    property MT32ReverbMode : String index 50 read GetString write SetString;
+    property MT32ReverbTime : String index 51 read GetString write SetString;
+    property MT32ReverbLevel : String index 52 read GetString write SetString;
 end;
 
 const NR_Name=1;
@@ -81,6 +84,7 @@ const NR_Name=1;
       NR_NoDOSBoxFailedDialog=26;
 
       NR_ExtraPrgFile=30; {30-39}
+      NR_ExtraPrgFileParameter=40; {40-49}
 
       NR_Genre=51;
       NR_Developer=52;
@@ -89,71 +93,88 @@ const NR_Name=1;
       NR_DataDir=55;
       NR_Favorite=56;
       NR_Notes=57;
-      NR_WWW=58;
-      NR_Language=59;
-      NR_UserInfo=60;
+      NR_Language=58;
+      NR_UserInfo=59;
+      NR_WWW1Name=60;
+      NR_WWW1=61;
+      NR_WWW2Name=62;
+      NR_WWW2=63;
+      NR_WWW3Name=64;
+      NR_WWW3=65;
+      NR_WWW4Name=66;
+      NR_WWW4=67;
+      NR_WWW5Name=68;
+      NR_WWW5=69;
+      NR_WWW6Name=70;
+      NR_WWW6=71;
+      NR_WWW7Name=72;
+      NR_WWW7=73;
+      NR_WWW8Name=74;
+      NR_WWW8=75;
+      NR_WWW9Name=76;
+      NR_WWW9=77;
 
-      NR_CloseDosBoxAfterGameExit=71;
-      NR_ShowConsoleWindow=72;
-      NR_StartFullscreen=73;
-      NR_AutoLockMouse=74;
-      NR_Force2ButtonMouseMode=75;
-      NR_SwapMouseButtons=76;
-      NR_UseDoublebuffering=77;
-      NR_AspectCorrection=78;
-      NR_UseScanCodesOld=79;
-      NR_UseScanCodes=80;
-      NR_MouseSensitivity=81;
-      NR_Render=82;
-      NR_WindowResolution=83;
-      NR_FullscreenResolution=84;
-      NR_Scale=85;
-      NR_TextModeLines=86;
-      NR_Priority=87;
-      NR_CustomDOSBoxDir=88;
-      NR_CustomKeyMappingFile=89;
-      NR_CustomDOSBoxLanguage=90;
+      NR_CloseDosBoxAfterGameExit=101;
+      NR_ShowConsoleWindow=102;
+      NR_StartFullscreen=103;
+      NR_AutoLockMouse=104;
+      NR_Force2ButtonMouseMode=105;
+      NR_SwapMouseButtons=106;
+      NR_UseDoublebuffering=107;
+      NR_AspectCorrection=108;
+      NR_UseScanCodesOld=109;
+      NR_UseScanCodes=110;
+      NR_MouseSensitivity=111;
+      NR_Render=112;
+      NR_WindowResolution=113;
+      NR_FullscreenResolution=114;
+      NR_Scale=115;
+      NR_TextModeLines=116;
+      NR_Priority=117;
+      NR_CustomDOSBoxDir=118;
+      NR_CustomKeyMappingFile=119;
+      NR_CustomDOSBoxLanguage=120;
 
-      NR_Memory=101;
-      NR_XMS=102;
-      NR_EMS=103;
-      NR_UMB=104;
-      NR_Core=105;
-      NR_Cycles=106;
-      NR_CyclesUp=107;
-      NR_CyclesDown=108;
-      NR_CPUType=109;
-      NR_FrameSkip=110;
-      NR_VideoCard=111;
-      NR_KeyboardLayout=112;
-      NR_Codepage=113;
-      NR_Serial1=114;
-      NR_Serial2=115;
-      NR_Serial3=116;
-      NR_Serial4=117;
-      NR_IPX=118;
-      NR_IPXType=119;
-      NR_IPXAddress=120;
-      NR_IPXPort=121;
-      NR_Use4DOS=122;
-      NR_UseDOS32A=123;
-      NR_ReportedDOSVersion=124;
-      NR_NumLockStatus=125;
-      NR_CapsLockStatus=126;
-      NR_ScrollLockStatus=127;
-      NR_VGAChipset=128;
-      NR_VideoRam=129;
-      NR_GlideEmulation=130;
-      NR_GlidePort=131;
-      NR_GlideLFB=132;
-      NR_PixelShader=133;
+      NR_Memory=131;
+      NR_XMS=132;
+      NR_EMS=133;
+      NR_UMB=134;
+      NR_Core=135;
+      NR_Cycles=136;
+      NR_CyclesUp=137;
+      NR_CyclesDown=138;
+      NR_CPUType=139;
+      NR_FrameSkip=140;
+      NR_VideoCard=141;
+      NR_KeyboardLayout=142;
+      NR_Codepage=143;
+      NR_Serial1=144;
+      NR_Serial2=145;
+      NR_Serial3=146;
+      NR_Serial4=147;
+      NR_IPX=148;
+      NR_IPXType=149;
+      NR_IPXAddress=150;
+      NR_IPXPort=151;
+      NR_Use4DOS=152;
+      NR_UseDOS32A=153;
+      NR_ReportedDOSVersion=154;
+      NR_NumLockStatus=155;
+      NR_CapsLockStatus=156;
+      NR_ScrollLockStatus=157;
+      NR_VGAChipset=158;
+      NR_VideoRam=159;
+      NR_GlideEmulation=160;
+      NR_GlidePort=161;
+      NR_GlideLFB=162;
+      NR_PixelShader=163;
 
-      NR_EnablePrinterEmulation=151;
-      NR_PrinterResolution=152;
-      NR_PaperWidth=153;
-      NR_PaperHeight=154;
-      NR_PrinterOutputFormat=155;
-      NR_PrinterMultiPage=156;
+      NR_EnablePrinterEmulation=171;
+      NR_PrinterResolution=172;
+      NR_PaperWidth=173;
+      NR_PaperHeight=174;
+      NR_PrinterOutputFormat=175;
+      NR_PrinterMultiPage=176;
 
       NR_NrOfMounts=181;
       NR_Mount0=182;
@@ -206,6 +227,9 @@ const NR_Name=1;
       NR_MIDIType=271;
       NR_MIDIDevice=272;
       NR_MIDIConfig=273;
+      NR_MIDIMT32Mode=274;
+      NR_MIDIMT32Time=275;
+      NR_MIDIMT32Level=276;
       NR_SpeakerPC=281;
       NR_SpeakerRate=282;
       NR_SpeakerTandy=283;
@@ -272,6 +296,7 @@ const NR_Name=1;
       NR_ScummVMWalkspeed=370;
       NR_ScummVMExtraPath=371;
       NR_ScummVMPlatform=372;
+      NR_ScummVMParameters=373;
 
       NR_CommandBeforeExecution=390;
       NR_CommandAfterExecution=391;
@@ -293,14 +318,14 @@ const NR_Name=1;
       NR_AddtionalChecksumFile5Checksum=409;
 
 
-const ScummVMSettings : Array[0..31] of Integer =(
+const ScummVMSettings : Array[0..32] of Integer =(
   NR_ScummVMGame, NR_ScummVMPath, NR_ScummVMZip, NR_ScummVMFilter, NR_ScummVMRenderMode, NR_ScummVMAutosave,
   NR_ScummVMLanguage, NR_ScummVMMusicVolume, NR_ScummVMSpeechVolume, NR_ScummVMSFXVolume, NR_ScummVMMIDIGain,
   NR_ScummVMSampleRate, NR_ScummVMMusicDriver, NR_ScummVMNativeMT32, NR_ScummVMEnableGS, NR_ScummVMMultiMIDI,
   NR_ScummVMTalkSpeed, NR_ScummVMSpeechMute, NR_ScummVMSubtitles, NR_ScummVMSavePath, NR_ScummVMConfirmExit,
   NR_ScummVMCDROM, NR_ScummVMJoystickNum, NR_ScummVMAltIntro, NR_ScummVMGFXDetails, NR_ScummVMMusicMute,
   NR_ScummVMObjectLabels, NR_ScummVMReverseStereo, NR_ScummVMSFXMute, NR_ScummVMWalkspeed, NR_ScummVMExtraPath,
-  NR_ScummVMPlatform
+  NR_ScummVMPlatform, NR_ScummVMParameters
 );
 
 Type TGameDB=class;
@@ -311,10 +336,17 @@ Type TGameDB=class;
     Procedure InitData;
     Function GetExtraPrgFile(I : Integer) : String;
     Procedure SetExtraPrgFile(I : Integer; S : String);
+    Function GetExtraPrgFileParameter(I : Integer) : String;
+    Procedure SetExtraPrgFileParameter(I : Integer; S : String);
     function GetMount(I: Integer): String;
     procedure SetMount(I: Integer; const Value: String);
     Procedure CreateConfFile;
     Function GetLicense : String;
+    function GetWWWNameString(I: Integer): String;
+    function GetPlainWWWNameString(I: Integer): String;
+    function GetWWWString(I: Integer): String;
+    procedure SetWWWNameString(I: Integer; const Value: String);
+    procedure SetWWWString(I: Integer; const Value: String);
   public
     CacheName, CacheNameUpper : String;
     CacheGenre, CacheGenreUpper : String;
@@ -357,6 +389,7 @@ Type TGameDB=class;
     property NoDOSBoxFailedDialog : Boolean index NR_NoDOSBoxFailedDialog read GetBoolean write SetBoolean;
 
     property ExtraPrgFile[I : Integer] : String read GetExtraPrgFile write SetExtraPrgFile;
+    property ExtraPrgFileParameter[I : Integer] : String read GetExtraPrgFileParameter write SetExtraPrgFileParameter;
 
     property Genre : String index NR_Genre read GetString write SetString;
     property Developer : String index NR_Developer read GetString write SetString;
@@ -365,7 +398,9 @@ Type TGameDB=class;
     property DataDir : String index NR_DataDir read GetString write SetString;
     property Favorite : Boolean index NR_Favorite read GetBoolean write SetBoolean;
     property Notes : String index NR_Notes read GetString write SetString;
-    property WWW : String index NR_WWW read GetString write SetString;
+    property WWWNamePlain[I : Integer] : String read GetPlainWWWNameString;
+    property WWWName[I : Integer] : String read GetWWWNameString write SetWWWNameString;
+    property WWW[I : Integer] : String read GetWWWString write SetWWWString;
     property Language : String index NR_Language read GetString write SetString;
     property UserInfo : String index NR_UserInfo read GetString write SetString;
     property License : String read GetLicense;
@@ -483,6 +518,9 @@ Type TGameDB=class;
     property MIDIType : String index NR_MIDIType read GetString write SetString;
     property MIDIDevice : String index NR_MIDIDevice read GetString write SetString;
     property MIDIConfig : String index NR_MIDIConfig read GetString write SetString;
+    property MIDIMT32Mode : String index NR_MIDIMT32Mode read GetString write SetString;
+    property MIDIMT32Time : String index NR_MIDIMT32Time read GetString write SetString;
+    property MIDIMT32Level : String index NR_MIDIMT32Level read GetString write SetString;
     property SpeakerPC : Boolean index NR_SpeakerPC read GetBoolean write SetBoolean;
     property SpeakerRate : Integer index NR_SpeakerRate read GetInteger write SetInteger;
     property SpeakerTandy : String index NR_SpeakerTandy read GetString write SetString;
@@ -551,6 +589,7 @@ Type TGameDB=class;
     property ScummVMWalkspeed : Integer index NR_ScummVMWalkspeed read GetInteger write SetInteger;
     property ScummVMExtraPath : String index NR_ScummVMExtraPath read GetString write SetString;
     property ScummVMPlatform : String index NR_ScummVMPlatform read GetString write SetString;
+    property ScummVMParameters : String index NR_ScummVMParameters read GetString write SetString;
 
     property CommandBeforeExecution : String index NR_CommandBeforeExecution read GetString write SetString;
     property CommandAfterExecution : String index NR_CommandAfterExecution read GetString write SetString;
@@ -617,6 +656,7 @@ end;
     Function GetLanguageList(WithDefaultProfile : Boolean =True; const HideWindowsProfiles : Boolean = False) : TStringList;
     Function GetLicenseList(WithDefaultProfile : Boolean =True; const HideWindowsProfiles : Boolean = False) : TStringList;
     Function GetWWWList(WithDefaultProfile : Boolean =True; const HideWindowsProfiles : Boolean = False) : TStringList;
+    Function GetWWWNameList(WithDefaultProfile : Boolean =True; const HideWindowsProfiles : Boolean = False) : TStringList;
     Function GetKeyValueList(const Key : String; WithDefaultProfile : Boolean =True) : TStringList;
     Function GetUserKeys : TStringList;
     Function GetSortedGamesList : TList;
@@ -712,6 +752,9 @@ Const DefaultValuesResolutionFullscreen='original,320x200,320x240,640x432,640x48
       DefaultValuesInnovaEmulationQuality='0,1,2,3';
       DefaultValuesNE2000EmulationBaseAddress='300,400,500';
       DefaultValuesNE2000EmulationInterrupt='3,5,7,10,11';
+      DefaultValuesMT32ReverbMode='0,1,2,3,auto';
+      DefaultValuesMT32ReverbTime='0,1,2,3,4,5,6,7';
+      DefaultValuesMT32ReverbLevel='0,1,2,3,4,5,6,7';
 
 implementation
 
@@ -775,6 +818,9 @@ begin
   AddStringRec(47,'InnovaEmulationQuality','value',DefaultValuesInnovaEmulationQuality);
   AddStringRec(48,'NE2000EmulationBaseAddress','value',DefaultValuesNE2000EmulationBaseAddress);
   AddStringRec(49,'NE2000EmulationInterrupt','value',DefaultValuesNE2000EmulationInterrupt);
+  AddStringRec(50,'MT32ReverbMode','value',DefaultValuesMT32ReverbMode);
+  AddStringRec(51,'MT32ReverbTime','value',DefaultValuesMT32ReverbTime);
+  AddStringRec(52,'MT32ReverbLevel','value',DefaultValuesMT32ReverbLevel);
 
   CacheAllStrings;
 end;
@@ -847,6 +893,9 @@ begin
   For I:=0 to 9 do begin
     AddStringRec(NR_ExtraPrgFile+I,'Extra','ExtraExe'+IntToStr(I),'');
   end;
+  For I:=0 to 9 do begin
+    AddStringRec(NR_ExtraPrgFileParameter+I,'Extra','ExtraParameter'+IntToStr(I),'');
+  end;
 
   AddStringRec(NR_Genre,'ExtraInfo','Genre','');
   AddStringRec(NR_Developer,'ExtraInfo','Developer','');
@@ -855,9 +904,26 @@ begin
   AddStringRec(NR_DataDir,'Extra','DataDir','');
   AddBooleanRec(NR_Favorite,'ExtraInfo','Favorite',False);
   AddStringRec(NR_Notes,'ExtraInfo','Notes','');
-  AddStringRec(NR_WWW,'ExtraInfo','WWW','');
   AddStringRec(NR_Language,'ExtraInfo','Language','');
   AddStringRec(NR_UserInfo,'ExtraInfo','UserInfo','');
+  AddStringRec(NR_WWW1Name,'ExtraInfo','WWWName','');
+  AddStringRec(NR_WWW1,'ExtraInfo','WWW','');
+  AddStringRec(NR_WWW2Name,'ExtraInfo','WWW2Name','');
+  AddStringRec(NR_WWW2,'ExtraInfo','WWW2','');
+  AddStringRec(NR_WWW3Name,'ExtraInfo','WWW3Name','');
+  AddStringRec(NR_WWW3,'ExtraInfo','WWW3','');
+  AddStringRec(NR_WWW4Name,'ExtraInfo','WWW4Name','');
+  AddStringRec(NR_WWW4,'ExtraInfo','WWW4','');
+  AddStringRec(NR_WWW5Name,'ExtraInfo','WWW5Name','');
+  AddStringRec(NR_WWW5,'ExtraInfo','WWW5','');
+  AddStringRec(NR_WWW6Name,'ExtraInfo','WWW6Name','');
+  AddStringRec(NR_WWW6,'ExtraInfo','WWW6','');
+  AddStringRec(NR_WWW7Name,'ExtraInfo','WWW7Name','');
+  AddStringRec(NR_WWW7,'ExtraInfo','WWW7','');
+  AddStringRec(NR_WWW8Name,'ExtraInfo','WWW8Name','');
+  AddStringRec(NR_WWW8,'ExtraInfo','WWW8','');
+  AddStringRec(NR_WWW9Name,'ExtraInfo','WWW9Name','');
+  AddStringRec(NR_WWW9,'ExtraInfo','WWW9','');
 
   AddBooleanRec(NR_CloseDosBoxAfterGameExit,'Extra','CloseOnExit',True);
   AddIntegerRec(NR_ShowConsoleWindow,'sdl','ConsoleWindow',1);
@@ -971,6 +1037,9 @@ begin
   AddStringRec(NR_MIDIType,'midi','mpu401','intelligent');
   AddStringRec(NR_MIDIDevice,'midi','device','default');
   AddStringRec(NR_MIDIConfig,'midi','config','');
+  AddStringRec(NR_MIDIMT32Mode,'midi','MT32Mode','auto');
+  AddStringRec(NR_MIDIMT32Time,'midi','MT32Time','5');
+  AddStringRec(NR_MIDIMT32Level,'midi','MT32Level','3');
   AddBooleanRec(NR_SpeakerPC,'speaker','pcspeaker',true);
   AddIntegerRec(NR_SpeakerRate,'speaker','pcrate',44100);
   AddStringRec(NR_SpeakerTandy,'speaker','tandy','auto');
@@ -1039,6 +1108,7 @@ begin
   AddIntegerRec(NR_ScummVMWalkspeed,'ScummVM','Walkspeed',2);
   AddStringRec(NR_ScummVMExtraPath,'ScummVM','ExtraPath','');
   AddStringRec(NR_ScummVMPlatform,'ScummVM','Platform','');
+  AddStringRec(NR_ScummVMParameters,'ScummVM','AdditionalParameters','');
 
   AddStringRec(NR_CommandBeforeExecution,'ExtraCommands','BeforeExecution','');
   AddStringRec(NR_CommandAfterExecution,'ExtraCommands','AfterExecution','');
@@ -1069,6 +1139,13 @@ begin
   result:=GetString(NR_ExtraPrgFile+I);
 end;
 
+Function TGame.GetExtraPrgFileParameter(I : Integer) : String;
+begin
+  result:='';
+  If (I<0) or (I>9) then exit;
+  result:=GetString(NR_ExtraPrgFileParameter+I);
+end;
+
 function TGame.GetLicense: String;
 Var I : Integer;
     St : TStringList;
@@ -1086,6 +1163,12 @@ Procedure TGame.SetExtraPrgFile(I : Integer; S : String);
 begin
   If (I<0) or (I>9) then exit;
   SetString(NR_ExtraPrgFile+I,S);
+end;
+
+Procedure TGame.SetExtraPrgFileParameter(I : Integer; S : String);
+begin
+  If (I<0) or (I>9) then exit;
+  SetString(NR_ExtraPrgFileParameter+I,S);
 end;
 
 function TGame.GetMount(I: Integer): String;
@@ -1122,6 +1205,43 @@ begin
     8 : Mount8:=Value;
     9 : Mount9:=Value;
   end;
+end;
+
+Function TGame.GetWWWNameString(I : Integer) : String;
+Var S : String;
+begin
+  If (I<1) or (I>9) then begin result:=''; exit; end;
+  result:=GetString(NR_WWW1Name+(I-1)*2);
+  If Trim(result)='' then begin
+    result:=GetString(NR_WWW1+(I-1)*2);
+    S:=Trim(ExtUpperCase(result));
+    if Copy(S,1,7)='HTTP:/'+'/' then result:=Copy(Trim(result),8,MaxInt);
+    if Copy(S,1,8)='HTTPS:/'+'/' then result:=Copy(Trim(result),9,MaxInt);
+  end;
+end;
+
+Function TGame.GetPlainWWWNameString(I : Integer) : String;
+begin
+  If (I<1) or (I>9) then begin result:=''; exit; end;
+  result:=GetString(NR_WWW1Name+(I-1)*2);
+end;
+
+Procedure TGame.SetWWWNameString(I : Integer; const Value : String);
+begin
+  If (I<1) or (I>9) then exit;
+  SetString(NR_WWW1Name+(I-1)*2,Value);
+end;
+
+Function TGame.GetWWWString(I : Integer) : String;
+begin
+  If (I<1) or (I>9) then begin result:=''; exit; end;
+  result:=GetString(NR_WWW1+(I-1)*2);
+end;
+
+Procedure TGame.SetWWWString(I : Integer; const Value : String);
+begin
+  If (I<1) or (I>9) then exit;
+  SetString(NR_WWW1+(I-1)*2,Value);
 end;
 
 procedure TGame.LoadCache;
@@ -1606,14 +1726,38 @@ begin
 end;
 
 Function TGameDB.GetWWWList(WithDefaultProfile : Boolean =True; const HideWindowsProfiles : Boolean = False) : TStringList;
-Var I : Integer;
+Var I,J : Integer;
     St : TStringList;
+    S : String;
 begin
   St:=TStringList.Create;
   try
     For I:=0 to FGameList.Count-1 do If WithDefaultProfile or (TGame(FGameList[I]).Name<>DosBoxDOSProfile) then begin
       If HideWindowsProfiles and WindowsExeMode(TGame(FGameList[I])) then continue;
-      St.Add(TGame(FGameList[I]).WWW);
+      For J:=1 to 9 do begin
+        S:=TGame(FGameList[I]).WWW[J];
+        If (J=1) or (Trim(S)<>'') then St.Add(S);
+      end;
+    end;
+    result:=GetList(St);
+  finally
+    St.Free;
+  end;
+end;
+
+Function TGameDB.GetWWWNameList(WithDefaultProfile : Boolean =True; const HideWindowsProfiles : Boolean = False) : TStringList;
+Var I,J : Integer;
+    St : TStringList;
+    S : String;
+begin
+  St:=TStringList.Create;
+  try
+    For I:=0 to FGameList.Count-1 do If WithDefaultProfile or (TGame(FGameList[I]).Name<>DosBoxDOSProfile) then begin
+      If HideWindowsProfiles and WindowsExeMode(TGame(FGameList[I])) then continue;
+      For J:=1 to 9 do begin
+        S:=TGame(FGameList[I]).WWWNamePlain[J];
+        If Trim(S)<>'' then St.Add(S);
+      end;
     end;
     result:=GetList(St);
   finally

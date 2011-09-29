@@ -34,7 +34,7 @@ type
   private
     { Private-Deklarationen }
     GameDB : TGameDB;
-    ValueChanged : Array[0..2] of Boolean;
+    ValueChanged : Array[0..3] of Boolean;
     Function DefaultValueOnList(const List, Value : String) : Boolean;
     Function DefaultValueChange(const OldList, Value : String; const SetIt : Boolean) : String;
   public
@@ -44,7 +44,7 @@ type
     Procedure BeforeChangeLanguage;
     Procedure LoadLanguage;
     Procedure DOSBoxDirChanged;
-    Procedure ShowFrame(const AdvencedMode : Boolean);
+    Procedure ShowFrame(const AdvancedMode : Boolean);
     procedure HideFrame;
     Procedure RestoreDefaults;
     Procedure SaveSetup;
@@ -103,6 +103,7 @@ begin
   ValueChanged[1]:=False;
 
   PixelShaderCheckBox.Checked:=PrgSetup.AllowPixelShader;
+  ValueChanged[3]:=False;
 
   MIDICheckBox.Checked:=DefaultValueOnList(GameDB.ConfOpt.MIDIDevice,'mt32');
   ValueChanged[2]:=False;
@@ -171,7 +172,7 @@ procedure TSetupFrameDOSBoxExt.DOSBoxDirChanged;
 begin
 end;
 
-procedure TSetupFrameDOSBoxExt.ShowFrame(const AdvencedMode: Boolean);
+procedure TSetupFrameDOSBoxExt.ShowFrame(const AdvancedMode: Boolean);
 begin
 end;
 
@@ -234,6 +235,10 @@ begin
   end;
 
   PrgSetup.AllowPixelShader:=PixelShaderCheckBox.Checked;
+  If ValueChanged[3] then begin
+    GameDB.ConfOpt.Scale:=DefaultValueChange(GameDB.ConfOpt.Scale,'Hardware 2x (hardware2x)',PixelShaderCheckBox.Checked);
+    GameDB.ConfOpt.Scale:=DefaultValueChange(GameDB.ConfOpt.Scale,'Hardware 3x (hardware3x)',PixelShaderCheckBox.Checked);
+  end;
 
   If ValueChanged[2] then begin
     GameDB.ConfOpt.MIDIDevice:=DefaultValueChange(GameDB.ConfOpt.MIDIDevice,'mt32',MIDICheckBox.Checked);

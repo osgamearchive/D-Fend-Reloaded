@@ -27,6 +27,7 @@ type
     procedure CustomKeyMapperEditChange(Sender: TObject);
   private
     { Private-Deklarationen }
+    Function CheckIsDOSBOXDefaultMapperFile(const Game: TGame; const MapperFile : String) : Boolean;
   public
     { Public-Deklarationen }
     Procedure InitGUI(var InitData : TModernProfileEditorInitData);
@@ -37,7 +38,7 @@ type
 implementation
 
 uses LanguageSetupUnit, VistaToolsUnit, CommonTools, PrgSetupUnit, HelpConsts,
-     IconLoaderUnit;
+     IconLoaderUnit, GameDBToolsUnit;
 
 {$R *.dfm}
 
@@ -98,6 +99,16 @@ begin
   HelpContext:=ID_ProfileEditKeyboard;
 end;
 
+Function TModernProfileEditorKeyboardFrame.CheckIsDOSBOXDefaultMapperFile(const Game: TGame; const MapperFile : String) : Boolean;
+Var I : Integer;
+    S : String;
+begin
+  I:=GetDOSBoxNr(Game);
+  S:=PrgSetup.DOSBoxSettings[I].DosBoxMapperFile;
+  If (Copy(S,1,2)='.\') and (Copy(MapperFile,1,2)<>'.\') then S:=Copy(S,3,MaxInt); 
+  result:=ExtUpperCase(MapperFile)=ExtUpperCase(S);
+end;
+
 procedure TModernProfileEditorKeyboardFrame.SetGame(const Game: TGame; const LoadFromTemplate: Boolean);
 Var S,T : String;
     I : Integer;
@@ -155,6 +166,9 @@ begin
   end;
 
   S:=Trim(ExtUpperCase(Game.CustomKeyMappingFile));
+  If (S<>'') and (S<>'DEFAULT') then begin
+    If CheckIsDOSBOXDefaultMapperFile(Game,S) then S:='';
+  end;
   If (S='') or (S='DEFAULT') then begin
     DefaultKeyMapperFileRadioButton.Checked:=True;
   end else begin

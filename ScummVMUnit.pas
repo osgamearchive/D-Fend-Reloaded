@@ -5,7 +5,7 @@ uses Classes, GameDBUnit;
 
 Procedure RunScummVMGame(const Game : TGame);
 
-Function BuildScummVMIniFile(const Game : TGame) : TStringList;
+Function BuildScummVMIniFile(const Game : TGame; const RunMode : Boolean = False) : TStringList;
 
 Function FindScummVMIni(UseSecondOne : Boolean = False) : String;
 
@@ -90,7 +90,7 @@ begin
   end;
 end;
 
-Function BuildScummVMIniFile(const Game : TGame) : TStringList;
+Function BuildScummVMIniFile(const Game : TGame; const RunMode : Boolean) : TStringList;
 Var S : String;
     Ini,Ini2 : TIniFile;
     St1,St2,St3 : TStringList;
@@ -105,7 +105,10 @@ begin
     If Game.StartFullscreen then St1.Add('fullscreen=true') else St1.Add('fullscreen=false');
     If Game.ScummVMConfirmExit then St1.Add('confirm_exit=true') else St1.Add('confirm_exit=false');
 
-    St2.Add('['+Game.ScummVMGame+']');
+    If RunMode then S:='DFR' else S:='';
+    St2.Add('['+S+Game.ScummVMGame+']');
+    St2.Add('gameid='+Game.ScummVMGame);
+
     If Trim(Game.ScummVMPath)='' then S:='' else S:=IncludeTrailingPathDelimiter(MakeAbsPath(Game.ScummVMPath,PrgSetup.BaseDir));
     St2.Add('path='+S);
 
@@ -185,7 +188,7 @@ begin
         Ini.Free;
       end;
     end else begin
-      St2.Add('themepath='+IncludeTrailingPathDelimiter(PrgSetup.ScummVMPath));
+      St2.Add('themepath="'+IncludeTrailingPathDelimiter(PrgSetup.ScummVMPath)+'"');
     end;
 
     result.AddStrings(St1);
@@ -207,7 +210,7 @@ begin
   end;
 end;
 
-Function RunScummVM(const INIFile, GameName : String; const FullScreen : Boolean; const ScreenshotDir, RenderMode, DataPlatform : String) : THandle;
+Function RunScummVM(const INIFile, GameName, AdditionalCommandLine : String; const FullScreen : Boolean; const GameDir, ScreenshotDir, RenderMode, DataPlatform : String) : THandle;
 Var PrgFile, Params, RenderModeParam, PlatformParam : String;
     StartupInfo : TStartupInfo;
     ProcessInformation : TProcessInformation;
@@ -229,6 +232,8 @@ begin
   PlatformParam:='';
   If (Trim(DataPlatform)<>'') and (Trim(ExtUpperCase(DataPlatform))<>'AUTO') then
     PlatformParam:='--platform='+DataPlatform+' ';
+
+  if Trim(AdditionalCommandLine)<>'' then Params:=Params+AdditionalCommandLine+' ';
 
   Params:='--config="'+INIFile+'" '+RenderModeParam+PlatformParam+GameName;
 
@@ -300,7 +305,7 @@ end;
 
 Procedure RunScummVMGame(const Game : TGame);
 Var St : TStringList;
-    S : String;
+    S,Params,Dir : String;
     ZipRecNr : Integer;
     Error : Boolean;
     ScummVMHandle : THandle;
@@ -312,7 +317,7 @@ begin
   If Error then exit;
 
   try
-    St:=BuildScummVMIniFile(Game);
+    St:=BuildScummVMIniFile(Game,True);
     try
       try
         St.SaveToFile(TempDir+ScummVMConfFileName);
@@ -336,7 +341,14 @@ begin
         Application.Minimize;
       end;
 
-      ScummVMHandle:=RunScummVM(TempDir+ScummVMConfFileName,Game.ScummVMGame,Game.StartFullscreen,S,Game.ScummVMRenderMode,Game.ScummVMPlatform);
+      Params:=Trim(PrgSetup.ScummVMAdditionalCommandLine);
+      If Trim(Game.ScummVMParameters)<>'' then begin
+        If Params<>'' then Params:=Params+' ';
+        Params:=Params+Trim(Game.ScummVMParameters);
+      end;
+
+      If Trim(Game.ScummVMPath)='' then Dir:='' else Dir:=IncludeTrailingPathDelimiter(MakeAbsPath(Game.ScummVMPath,PrgSetup.BaseDir));
+      ScummVMHandle:=RunScummVM(TempDir+ScummVMConfFileName,'DFR'+Game.ScummVMGame,Params,Game.StartFullscreen,Dir,S,Game.ScummVMRenderMode,Game.ScummVMPlatform);
       try
         If ZipRecNr>=0 then ZipManager.ActivateRepackCheck(ZipRecNr,ScummVMHandle);
         RunPrgManager.AddCommand(Game,ScummVMHandle);

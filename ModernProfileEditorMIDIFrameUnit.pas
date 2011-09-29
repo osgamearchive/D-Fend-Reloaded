@@ -18,8 +18,16 @@ type
     MIDISelectLabel1: TLabel;
     MIDISelectLabel2: TLabel;
     InfoLabel: TLabel;
+    MT32SettingsGroupBox: TGroupBox;
+    MT32ModeComboBox: TComboBox;
+    MT32TimeComboBox: TComboBox;
+    MT32LevelComboBox: TComboBox;
+    MT32ModeLabel: TLabel;
+    MT32TimeLabel: TLabel;
+    MT32LevelLabel: TLabel;
     procedure MIDISelectButtonClick(Sender: TObject);
     procedure MIDISelectListBoxClick(Sender: TObject);
+    procedure DeviceComboBoxChange(Sender: TObject);
   private
     { Private-Deklarationen }
   public
@@ -31,7 +39,8 @@ type
 
 implementation
 
-uses VistaToolsUnit, LanguageSetupUnit, CommonTools, HelpConsts, PrgSetupUnit, MIDITools;
+uses Math, VistaToolsUnit, LanguageSetupUnit, CommonTools, HelpConsts,
+     PrgSetupUnit, MIDITools;
 
 {$R *.dfm}
 
@@ -43,6 +52,12 @@ begin
   NoFlicker(TypeComboBox);
   NoFlicker(DeviceComboBox);
   NoFlicker(AdditionalSettingsEdit);
+  NoFlicker(MIDISelectButton);
+  NoFlicker(MIDISelectListBox);
+  NoFlicker(MT32SettingsGroupBox);
+  NoFlicker(MT32ModeComboBox);
+  NoFlicker(MT32TimeComboBox);
+  NoFlicker(MT32LevelComboBox);
 
   InfoLabel.Caption:=LanguageSetup.ProfileEditorSoundMIDIInfo;
   TypeLabel.Caption:=LanguageSetup.ProfileEditorSoundMIDIType;
@@ -55,6 +70,35 @@ begin
   MIDISelectLabel2.Caption:=LanguageSetup.ProfileEditorSoundMIDIConfigIDInfo;
   AddDefaultValueHint(TypeComboBox);
   AddDefaultValueHint(DeviceComboBox);
+
+  MT32SettingsGroupBox.Caption:=LanguageSetup.ProfileEditorSoundMIDIMT32;
+  MT32ModeLabel.Caption:=LanguageSetup.ProfileEditorSoundMIDIMT32Mode;
+  MT32TimeLabel.Caption:=LanguageSetup.ProfileEditorSoundMIDIMT32Time;
+  MT32LevelLabel.Caption:=LanguageSetup.ProfileEditorSoundMIDIMT32Level;
+
+  St:=ValueToList(InitData.GameDB.ConfOpt.MT32ReverbMode,';,');
+  try
+    MT32ModeComboBox.Items.Clear;
+    MT32ModeComboBox.Items.AddStrings(St);
+  finally
+    St.Free;
+  end;
+
+  St:=ValueToList(InitData.GameDB.ConfOpt.MT32ReverbTime,';,');
+  try
+    MT32TimeComboBox.Items.Clear;
+    MT32TimeComboBox.Items.AddStrings(St);
+  finally
+    St.Free;
+  end;
+
+  St:=ValueToList(InitData.GameDB.ConfOpt.MT32ReverbLevel,';,');
+  try
+    MT32LevelComboBox.Items.Clear;
+    MT32LevelComboBox.Items.AddStrings(St);
+  finally
+    St.Free;
+  end;
 
   HelpContext:=ID_ProfileEditSoundMIDI;
 end;
@@ -81,6 +125,17 @@ begin
   SetComboBox(TypeComboBox,Game.MIDIType,'intelligent');
   SetComboBox(DeviceComboBox,Game.MIDIDevice,'default');
   AdditionalSettingsEdit.Text:=Game.MIDIConfig;
+
+  MT32ModeComboBox.ItemIndex:=Max(0,MT32ModeComboBox.Items.IndexOf(Game.MIDIMT32Mode));
+  MT32TimeComboBox.ItemIndex:=Max(0,MT32TimeComboBox.Items.IndexOf(Game.MIDIMT32Time));
+  MT32LevelComboBox.ItemIndex:=Max(0,MT32LevelComboBox.Items.IndexOf(Game.MIDIMT32Level));
+
+  DeviceComboBoxChange(self);
+end;
+
+procedure TModernProfileEditorMIDIFrame.DeviceComboBoxChange(Sender: TObject);
+begin
+  MT32SettingsGroupBox.Visible:=(ExtUpperCase(DeviceComboBox.Text)='MT32');
 end;
 
 procedure TModernProfileEditorMIDIFrame.GetGame(const Game: TGame);
@@ -88,6 +143,10 @@ begin
   Game.MIDIType:=TypeComboBox.Text;
   Game.MIDIDevice:=DeviceComboBox.Text;
   Game.MIDIConfig:=AdditionalSettingsEdit.Text;
+
+  Game.MIDIMT32Mode:=MT32ModeComboBox.Text;
+  Game.MIDIMT32Time:=MT32TimeComboBox.Text;
+  Game.MIDIMT32Level:=MT32LevelComboBox.Text;
 end;
 
 procedure TModernProfileEditorMIDIFrame.MIDISelectButtonClick(Sender: TObject);

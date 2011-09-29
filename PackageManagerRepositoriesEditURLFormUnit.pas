@@ -26,6 +26,7 @@ type
     procedure SelectFileButtonClick(Sender: TObject);
     procedure OKButtonClick(Sender: TObject);
     procedure EditChange(Sender: TObject);
+    procedure RadioButtonOrEditChange(Sender: TObject);
   private
     { Private-Deklarationen }
   public
@@ -80,12 +81,23 @@ begin
     ClipboardTimerTimer(Sender);
     If PasteURLButton.Enabled then PasteURLButtonClick(Sender);
   end;
+
+  RadioButtonOrEditChange(Sender);
 end;
 
 procedure TPackageManagerRepositoriesEditURLForm.EditChange(Sender: TObject);
 begin
   If Sender=URLEdit then RadioButtonURL.Checked:=True;
   If Sender=LocalFileEdit then RadioButtonLocalFile.Checked:=True;
+
+  RadioButtonOrEditChange(Sender);
+end;
+
+procedure TPackageManagerRepositoriesEditURLForm.RadioButtonOrEditChange(Sender: TObject);
+Var S : String;
+begin
+  If RadioButtonURL.Checked then S:=URLEdit.Text else S:=LocalFileEdit.Text;
+  OKButton.Enabled:=(Trim(S)<>'');
 end;
 
 procedure TPackageManagerRepositoriesEditURLForm.ClipboardTimerTimer(Sender: TObject);

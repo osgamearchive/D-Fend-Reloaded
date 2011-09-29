@@ -8,31 +8,36 @@ uses
 
 type
   TSetupFrameGamesListAppearance = class(TFrame, ISetupFrame)
+    ImageOpenDialog: TOpenDialog;
+    ScrollBox: TScrollBox;
+    GamesListBackgroundButton: TSpeedButton;
+    GamesListFontSizeLabel: TLabel;
+    GamesListFontColorLabel: TLabel;
+    NoteInTooltipLabel: TLabel;
     GamesListBackgroundRadioButton1: TRadioButton;
     GamesListBackgroundRadioButton2: TRadioButton;
     GamesListBackgroundRadioButton3: TRadioButton;
     GamesListBackgroundColorBox: TColorBox;
     GamesListBackgroundEdit: TEdit;
-    GamesListBackgroundButton: TSpeedButton;
-    GamesListFontSizeLabel: TLabel;
     GamesListFontSizeEdit: TSpinEdit;
     GamesListFontColorBox: TColorBox;
-    GamesListFontColorLabel: TLabel;
     NotSetGroupBox: TGroupBox;
     NotSetRadioButton1: TRadioButton;
     NotSetRadioButton2: TRadioButton;
     NotSetRadioButton3: TRadioButton;
     NotSetEdit: TEdit;
-    ImageOpenDialog: TOpenDialog;
     FavoriteGroupBox: TGroupBox;
     CheckBoxBold: TCheckBox;
     CheckBoxItalic: TCheckBox;
     CheckBoxUnderline: TCheckBox;
     WindowsExeIconsCheckBox: TCheckBox;
     ShowTooltipsCheckBox: TCheckBox;
-    NoteInTooltipLabel: TLabel;
     NoteInTooltipEdit: TSpinEdit;
     RestoreSelectedCheckBox: TCheckBox;
+    NormalEntriesGroupBox: TGroupBox;
+    NormalCheckBoxBold: TCheckBox;
+    NormalCheckBoxItalic: TCheckBox;
+    NormalCheckBoxUnderline: TCheckBox;
     procedure GamesListBackgroundColorBoxChange(Sender: TObject);
     procedure GamesListBackgroundEditChange(Sender: TObject);
     procedure GamesListBackgroundButtonClick(Sender: TObject);
@@ -47,7 +52,7 @@ type
     Procedure BeforeChangeLanguage;
     Procedure LoadLanguage;
     Procedure DOSBoxDirChanged;
-    Procedure ShowFrame(const AdvencedMode : Boolean);
+    Procedure ShowFrame(const AdvancedMode : Boolean);
     procedure HideFrame;
     Procedure RestoreDefaults;
     Procedure SaveSetup;
@@ -87,6 +92,10 @@ begin
   NoFlicker(NotSetRadioButton2);
   NoFlicker(NotSetRadioButton3);
   NoFlicker(NotSetEdit);
+  NoFlicker(NormalEntriesGroupBox);
+  NoFlicker(NormalCheckBoxBold);
+  NoFlicker(NormalCheckBoxItalic);
+  NoFlicker(NormalCheckBoxUnderline);
   NoFlicker(FavoriteGroupBox);
   NoFlicker(CheckBoxBold);
   NoFlicker(CheckBoxItalic);
@@ -115,13 +124,25 @@ begin
   NotSetRadioButton3.Checked:=(S<>'') and (S<>'-');
   If NotSetRadioButton3.Checked then NotSetEdit.Text:=S;
 
+  NormalCheckBoxBold.Font.Style:=[fsBold];
+  NormalCheckBoxItalic.Font.Style:=[fsItalic];
+  NormalCheckBoxUnderline.Font.Style:=[fsUnderline];
+
   CheckBoxBold.Font.Style:=[fsBold];
   CheckBoxItalic.Font.Style:=[fsItalic];
   CheckBoxUnderline.Font.Style:=[fsUnderline];
 
+  NormalCheckBoxBold.Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName);
+  NormalCheckBoxItalic.Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName);
+  NormalCheckBoxUnderline.Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName);
+
   CheckBoxBold.Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName);
   CheckBoxItalic.Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName);
   CheckBoxUnderline.Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName);
+
+  NormalCheckBoxBold.Checked:=PrgSetup.NonFavoritesBold;
+  NormalCheckBoxItalic.Checked:=PrgSetup.NonFavoritesItalic;
+  NormalCheckBoxUnderline.Checked:=PrgSetup.NonFavoritesUnderline;
 
   CheckBoxBold.Checked:=PrgSetup.FavoritesBold;
   CheckBoxItalic.Checked:=PrgSetup.FavoritesItalic;
@@ -160,6 +181,10 @@ begin
   NotSetGroupBox.Caption:=LanguageSetup.ValueForNotSet+' "'+LanguageSetup.NotSet+'"';
   NotSetRadioButton1.Caption:='"'+LanguageSetup.NotSet+'"';
 
+  NormalEntriesGroupBox.Caption:=LanguageSetup.FontStyleForNonFavorites;
+  NormalCheckBoxBold.Caption:=LanguageSetup.FontStyleForFavoritesBold;
+  NormalCheckBoxItalic.Caption:=LanguageSetup.FontStyleForFavoritesItalic;
+  NormalCheckBoxUnderline.Caption:=LanguageSetup.FontStyleForFavoritesUnderline;
   FavoriteGroupBox.Caption:=LanguageSetup.FontStyleForFavorites;
   CheckBoxBold.Caption:=LanguageSetup.FontStyleForFavoritesBold;
   CheckBoxItalic.Caption:=LanguageSetup.FontStyleForFavoritesItalic;
@@ -177,7 +202,7 @@ procedure TSetupFrameGamesListAppearance.DOSBoxDirChanged;
 begin
 end;
 
-procedure TSetupFrameGamesListAppearance.ShowFrame(const AdvencedMode: Boolean);
+procedure TSetupFrameGamesListAppearance.ShowFrame(const AdvancedMode: Boolean);
 begin
 end;
 
@@ -204,6 +229,9 @@ begin
     end;
   end;
 
+  NormalCheckBoxBold.Checked:=False;
+  NormalCheckBoxItalic.Checked:=False;
+  NormalCheckBoxUnderline.Checked:=False;
   CheckBoxBold.Checked:=True;
   CheckBoxItalic.Checked:=False;
   CheckBoxUnderline.Checked:=False;
@@ -224,6 +252,9 @@ begin
   If NotSetRadioButton1.Checked then PrgSetup.ValueForNotSet:='';
   If NotSetRadioButton2.Checked then PrgSetup.ValueForNotSet:='-';
   If NotSetRadioButton3.Checked then PrgSetup.ValueForNotSet:=NotSetEdit.Text;
+  PrgSetup.NonFavoritesBold:=NormalCheckBoxBold.Checked;
+  PrgSetup.NonFavoritesItalic:=NormalCheckBoxItalic.Checked;
+  PrgSetup.NonFavoritesUnderline:=NormalCheckBoxUnderline.Checked;
   PrgSetup.FavoritesBold:=CheckBoxBold.Checked;
   PrgSetup.FavoritesItalic:=CheckBoxItalic.Checked;
   PrgSetup.FavoritesUnderline:=CheckBoxUnderline.Checked;

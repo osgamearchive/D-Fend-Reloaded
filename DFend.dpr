@@ -229,7 +229,9 @@ uses
   DOSBoxFailedFormUnit in 'DOSBoxFailedFormUnit.pas' {DOSBoxFailedForm},
   ModernProfileEditorInnovaFrameUnit in 'ModernProfileEditorInnovaFrameUnit.pas' {ModernProfileEditorInnovaFrame: TFrame},
   HistoryUnit in 'HistoryUnit.pas',
-  ExportGamesListFormUnit in 'ExportGamesListFormUnit.pas' {ExportGamesListForm};
+  ExportGamesListFormUnit in 'ExportGamesListFormUnit.pas' {ExportGamesListForm},
+  DOSBoxOutputTestFormUnit in 'DOSBoxOutputTestFormUnit.pas' {DOSBoxOutputTestForm},
+  SingleInstanceUnit in 'SingleInstanceUnit.pas';
 
 {$R *.res}
 

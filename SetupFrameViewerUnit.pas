@@ -8,25 +8,27 @@ uses
 
 type
   TSetupFrameViewer = class(TFrame, ISetupFrame)
-    ImagesGroupBox: TGroupBox;
-    ImagesRadioButton1: TRadioButton;
-    ImagesRadioButton2: TRadioButton;
-    ImagesRadioButton3: TRadioButton;
-    ImagesEdit: TEdit;
-    ImagesButton: TSpeedButton;
-    SoundsGroupBox: TGroupBox;
-    SoundsButton: TSpeedButton;
-    SoundsRadioButton1: TRadioButton;
-    SoundsRadioButton2: TRadioButton;
-    SoundsRadioButton3: TRadioButton;
-    SoundsEdit: TEdit;
+    PrgOpenDialog: TOpenDialog;
+    ScrollBox: TScrollBox;
     VideosGroupBox: TGroupBox;
     VideosButton: TSpeedButton;
     VideosRadioButton1: TRadioButton;
     VideosRadioButton2: TRadioButton;
     VideosRadioButton3: TRadioButton;
     VideosEdit: TEdit;
-    PrgOpenDialog: TOpenDialog;
+    SoundsGroupBox: TGroupBox;
+    SoundsButton: TSpeedButton;
+    SoundsRadioButton1: TRadioButton;
+    SoundsRadioButton2: TRadioButton;
+    SoundsRadioButton3: TRadioButton;
+    SoundsEdit: TEdit;
+    ImagesGroupBox: TGroupBox;
+    ImagesButton: TSpeedButton;
+    ImagesRadioButton1: TRadioButton;
+    ImagesRadioButton2: TRadioButton;
+    ImagesRadioButton3: TRadioButton;
+    ImagesEdit: TEdit;
+    ModalImageViewerCheckBox: TCheckBox;
     procedure ButtonWork(Sender: TObject);
     procedure ImagesEditChange(Sender: TObject);
     procedure SoundsEditChange(Sender: TObject);
@@ -40,7 +42,7 @@ type
     Procedure BeforeChangeLanguage;
     Procedure LoadLanguage;
     Procedure DOSBoxDirChanged;
-    Procedure ShowFrame(const AdvencedMode : Boolean);
+    Procedure ShowFrame(const AdvancedMode : Boolean);
     procedure HideFrame;
     Procedure RestoreDefaults;
     Procedure SaveSetup;
@@ -86,6 +88,7 @@ begin
       ImagesEdit.Text:=MakeRelPath(PrgSetup.ImageViewer,PrgSetup.BaseDir);
     end;
   end;
+  ModalImageViewerCheckBox.Checked:=not PrgSetup.NonModalViewer;
 
   S:=Trim(ExtUpperCase(PrgSetup.SoundPlayer));
   If (S='INTERNAL') or (S='') then SoundsRadioButton1.Checked:=True else begin
@@ -122,6 +125,7 @@ begin
   ImagesRadioButton2.Caption:=LanguageSetup.SetupFormTextMediaViewerDefault;
   ImagesRadioButton3.Caption:=LanguageSetup.SetupFormTextMediaViewerCustom;
   ImagesButton.Hint:=LanguageSetup.ChooseFile;
+  ModalImageViewerCheckBox.Caption:=LanguageSetup.SetupFormTextMediaViewerModal;
   SoundsRadioButton1.Caption:=LanguageSetup.SetupFormTextMediaViewerInterval;
   SoundsRadioButton2.Caption:=LanguageSetup.SetupFormTextMediaViewerDefault;
   SoundsRadioButton3.Caption:=LanguageSetup.SetupFormTextMediaViewerCustom;
@@ -141,7 +145,7 @@ procedure TSetupFrameViewer.DOSBoxDirChanged;
 begin
 end;
 
-procedure TSetupFrameViewer.ShowFrame(const AdvencedMode: Boolean);
+procedure TSetupFrameViewer.ShowFrame(const AdvancedMode: Boolean);
 begin
 end;
 
@@ -153,6 +157,7 @@ procedure TSetupFrameViewer.RestoreDefaults;
 begin
   ImagesEdit.Text:='';
   ImagesRadioButton1.Checked:=True;
+  ModalImageViewerCheckBox.Checked:=True;
   SoundsEdit.Text:='';
   SoundsRadioButton1.Checked:=True;
   VideosEdit.Text:='';
@@ -164,6 +169,7 @@ begin
   If ImagesRadioButton1.Checked then PrgSetup.ImageViewer:='Internal';
   If ImagesRadioButton2.Checked then PrgSetup.ImageViewer:='Default';
   If ImagesRadioButton3.Checked then PrgSetup.ImageViewer:=MakeRelPath(ImagesEdit.Text,PrgSetup.BaseDir);
+  PrgSetup.NonModalViewer:=not ModalImageViewerCheckBox.Checked;
 
   If SoundsRadioButton1.Checked then PrgSetup.SoundPlayer:='Internal';
   If SoundsRadioButton2.Checked then PrgSetup.SoundPlayer:='Default';

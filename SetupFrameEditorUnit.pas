@@ -28,7 +28,7 @@ type
     Procedure BeforeChangeLanguage;
     Procedure LoadLanguage;
     Procedure DOSBoxDirChanged;
-    Procedure ShowFrame(const AdvencedMode : Boolean);
+    Procedure ShowFrame(const AdvancedMode : Boolean);
     procedure HideFrame;
     Procedure RestoreDefaults;
     Procedure SaveSetup;
@@ -95,7 +95,7 @@ procedure TSetupFrameEditor.DOSBoxDirChanged;
 begin
 end;
 
-procedure TSetupFrameEditor.ShowFrame(const AdvencedMode: Boolean);
+procedure TSetupFrameEditor.ShowFrame(const AdvancedMode: Boolean);
 begin
 end;
 

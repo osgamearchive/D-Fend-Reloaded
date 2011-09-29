@@ -858,7 +858,12 @@ begin
            Case FileTypes[Integer(List.Selected.Data)].OpenType of
            otImageViewer : begin
                              T:=Trim(ExtUpperCase(PrgSetup.ImageViewer));
-                             If (T<>'') and (T<>'INTERNAL') then begin ShowImageDialog(self,S,nil,nil); exit; end;
+                             If (T<>'') and (T<>'INTERNAL') then begin
+                               If PrgSetup.NonModalViewer
+                                 then ShowNonModalImageDialog(self,S,nil,nil)
+                                 else ShowImageDialog(self,S,nil,nil);
+                               exit;
+                             end;
                            end;
            otSoundPlayer : begin
                              T:=Trim(ExtUpperCase(PrgSetup.SoundPlayer));
@@ -974,7 +979,9 @@ begin
     otImageViewer : begin
                       GetFilesInFolder(['.BMP','.JPG','.JPEG','.PNG','.GIF'],FileName,St1,St2);
                       try
-                       ShowImageDialog(self,FileName,St1,St2);
+                        If PrgSetup.NonModalViewer
+                          then ShowNonModalImageDialog(self,FileName,St1,St2)
+                          else ShowImageDialog(self,FileName,St1,St2);
                       finally
                         St1.Free; St2.Free;
                       end;

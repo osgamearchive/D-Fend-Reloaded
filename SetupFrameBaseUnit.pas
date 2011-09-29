@@ -10,6 +10,7 @@ type
   TSetupFrameBase = class(TFrame, ISetupFrame)
     MinimizeToTrayCheckBox: TCheckBox;
     StartWithWindowsCheckBox: TCheckBox;
+    OnlySingleInstanceCheckBox: TCheckBox;
   private
     { Private-Deklarationen }
   public
@@ -19,7 +20,7 @@ type
     Procedure BeforeChangeLanguage;
     Procedure LoadLanguage;
     Procedure DOSBoxDirChanged;
-    Procedure ShowFrame(const AdvencedMode : Boolean);
+    Procedure ShowFrame(const AdvancedMode : Boolean);
     Procedure HideFrame;
     Procedure RestoreDefaults;
     Procedure SaveSetup;
@@ -42,9 +43,11 @@ procedure TSetupFrameBase.InitGUIAndLoadSetup(var InitData : TInitData);
 begin
   NoFlicker(MinimizeToTrayCheckBox);
   NoFlicker(StartWithWindowsCheckBox);
+  NoFlicker(OnlySingleInstanceCheckBox);
 
   MinimizeToTrayCheckBox.Checked:=PrgSetup.MinimizeToTray;
   StartWithWindowsCheckBox.Checked:=PrgSetup.StartWithWindows;
+  OnlySingleInstanceCheckBox.Checked:=PrgSetup.SingleInstance;
 
   HelpContext:=ID_FileOptionsGeneral;
 end;
@@ -57,15 +60,17 @@ procedure TSetupFrameBase.LoadLanguage;
 begin
   MinimizeToTrayCheckBox.Caption:=LanguageSetup.SetupFormMinimizeToTray;
   StartWithWindowsCheckBox.Caption:=LanguageSetup.SetupFormStartWithWindows;
+  OnlySingleInstanceCheckBox.Caption:=LanguageSetup.SetupFormSingleInstance;
 end;
 
 procedure TSetupFrameBase.DOSBoxDirChanged;
 begin
 end;
 
-procedure TSetupFrameBase.ShowFrame(const AdvencedMode: Boolean);
+procedure TSetupFrameBase.ShowFrame(const AdvancedMode: Boolean);
 begin
-  StartWithWindowsCheckBox.Visible:=AdvencedMode;
+  StartWithWindowsCheckBox.Visible:=AdvancedMode;
+  OnlySingleInstanceCheckBox.Visible:=AdvancedMode;
 end;
 
 procedure TSetupFrameBase.HideFrame;
@@ -76,6 +81,7 @@ procedure TSetupFrameBase.RestoreDefaults;
 begin
   MinimizeToTrayCheckBox.Checked:=False;
   StartWithWindowsCheckBox.Checked:=False;
+  OnlySingleInstanceCheckBox.Checked:=True;
 end;
 
 procedure TSetupFrameBase.SaveSetup;
@@ -83,6 +89,7 @@ begin
   PrgSetup.MinimizeToTray:=MinimizeToTrayCheckBox.Checked;
   PrgSetup.StartWithWindows:=StartWithWindowsCheckBox.Checked;
   SetStartWithWindows(PrgSetup.StartWithWindows);
+  PrgSetup.SingleInstance:=OnlySingleInstanceCheckBox.Checked;
 end;
 
 end.

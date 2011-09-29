@@ -14,5 +14,5 @@ FunctionEnd
 Section "-Work"
   SectionIn RO
   
-  Exec ".\App\DFend.exe"
+  Exec ".\App\D-Fend Reloaded\DFend.exe"
 SectionEnd

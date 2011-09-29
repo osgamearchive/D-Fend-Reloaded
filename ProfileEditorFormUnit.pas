@@ -893,7 +893,7 @@ begin
         If Game.Publisher<>'' then ValueFromIndex[2]:=Game.Publisher;
         If Game.Year<>'' then ValueFromIndex[3]:=Game.Year;
         If Game.Language<>'' then ValueFromIndex[4]:=GetCustomLanguageName(Game.Language);
-        If Game.WWW<>'' then ValueFromIndex[5]:=Game.WWW;
+        If Game.WWW[1]<>'' then ValueFromIndex[5]:=Game.WWW[1];
         If Game.DataDir<>'' then ValueFromIndex[6]:=Game.DataDir;
         If Game.Favorite then ValueFromIndex[7]:=RemoveUnderline(LanguageSetup.Yes) else ValueFromIndex[7]:=RemoveUnderline(LanguageSetup.No);
       end;
@@ -1511,7 +1511,7 @@ begin
       Game.Publisher:=ValueFromIndex[2];
       Game.Year:=ValueFromIndex[3];
       Game.Language:=GetEnglishLanguageName(ValueFromIndex[4]);
-      Game.WWW:=ValueFromIndex[5];
+      Game.WWW[1]:=ValueFromIndex[5];
       Game.DataDir:=MakeRelPath(ValueFromIndex[6],PrgSetup.BaseDir);
       Game.Favorite:=(ValueFromIndex[7]=RemoveUnderline(LanguageSetup.Yes));
     end;

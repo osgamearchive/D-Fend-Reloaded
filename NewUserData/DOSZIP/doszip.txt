@@ -1,10 +1,10 @@
 DOSZIP.TXT--
-Copyright 2010 Hjort Nidudsson.
+Copyright 2011 Hjort Nidudsson.
 
 DOSZIP COMMANDER
-Version 2.08
+Version 2.17
 
-Welcome to Doszip Commander Version 2.08!
+Welcome to Doszip Commander Version 2.17!
 =========================================
 
 	Topics covered in this file include:
@@ -31,10 +31,10 @@ Welcome to Doszip Commander Version 2.08!
 Doszip Commander File List
 ==========================
 
-	DZ.EXE      		DZ Loader
-	DZ.ICO      		Icon File for DZ.EXE
-	DZMAIN.EXE  		DZ Main Shell
-	DOSZIP.TXT     		*this file
+	DZ.EXE		DZ Loader
+	DZ.ICO		Icon File for DZ.EXE
+	DZMAIN.EXE	DZ Main Shell
+	DOSZIP.TXT	*this file
 
 	The first time you run DZ.EXE, it creates a default
 	configuration file (DZ.INI).
@@ -42,10 +42,10 @@ Doszip Commander File List
 	Files added in the BETA release 1.0 (0.1.xx)
 	--------------------------------------------
 
-	COPYING			GNU General Public License
-	subdir-->\INC		Library header files
-		 \LIB		Library files are created here
-		 \SRC		The source files are contained here
+	COPYING		GNU General Public License
+	\INC		Library header files
+	\LIB		Library files are created here
+	\SRC		The source files are contained here
 
 	The version of the source code and binary files is the date
 	and time in the .ZIP file (1:00 == v1.00)
@@ -103,9 +103,10 @@ Compressed File Support
 	While the Doszip Commander Compression Engine is compatible with
 	PKZIP 1.x and PKZIP 2.x compress file formats, Commander only
 	allows a single password for each compressed file to be active.
+	The internal compression configuration is set by Ctrl-J
 
-	Compression configuration
-	-------------------------
+	External compression configuration
+	----------------------------------
 	The compression utility is defined under the section [Packer], and
 	must supports the concept of a response file. This file is created
 	in the TEMP directory, and past on as argument to the utility.
@@ -175,9 +176,9 @@ Editor Support
 
 	[Edit]
 	F4	= ; Editor for F4 (= Macro %EDIT%)
-	Alt   	= ; Editor for Alt+F4
-	Ctrl  	= ; Editor for Ctrl+F4
-	Shift 	= ; Editor for Shift+F4
+	Alt	= ; Editor for Alt+F4
+	Ctrl	= ; Editor for Ctrl+F4
+	Shift	= ; Editor for Shift+F4
 
 
 Extension and Filename Support
@@ -188,11 +189,30 @@ Extension and Filename Support
 	You can modify the [Filetype] section to associated files in
 	the format as follows:
 
-	<ext>  = <command> !.! - filetype
-	<name> = <command>     - filename (no ext)
+	<ext>	= <command> !.! - filetype
+	<name>	= <command>     - filename (no ext)
+
+	File macros:
+	------------
+	!!	!
+	!:	Drive + ':'
+	!\	Long path
+	!	Long file name
+	.!	Long extension
+	!~\	Short path
+	~!	Short file name
+
+	Default (no macro used):
+	'Long_Name.foo' --> '<command> Long_Name.foo'
+	'Long Name.foo' --> '<command> "Long Name.foo"'
+
+	Quotations are not added if macros are used:
+	- Short: txt=edit ~!.!~
+	- Long:  txt=notepad "!:!\\!.!"
 
 	Multiple commands are parsed to a batch file:
 	- use the ", " to separate the commands.
+
 
 	Example: README.TXT
 
@@ -205,16 +225,6 @@ Extension and Filename Support
 	echo README
 	echo .TXT
 	echo README.TXT
-
-	The macro !.! expand as follows:
-
-	.INI entry	Filename	Output
-	---------------------------------------------
-	mak=make -f!	foo.mak:  	make -ffoo
-	makefile=make   makefile: 	make makefile
-	ext=echo .! !!	foo.ext:  	echo .ext !
-	ext=echo 	foo.ext:  	echo foo.ext
-	foo=echo !.!	foo:  		echo foo
 
 
 Doszip Commander Environment Variables
@@ -298,7 +308,7 @@ Creating a tools menu
 
 	%EDIT%		[Edit] --> F4=<> | (null)
 	%VIEW%		[View] --> F3=<> | Internal viewer
-	%FIND%          Internal File Search(command)
+	%FIND%		Internal File Search(command)
 
 	These must be the first command on the line. The macro
 	%DOSZIP% may appear any place in the command line, and
@@ -313,16 +323,16 @@ Creating a tools menu
 	[Tools]
 	00 = &Add tool,			%EDIT% %DOSZIP%\DZ.INI
 	01 = <>
-	02 = &Doszip directory,  	[Doszip]
+	02 = &Doszip directory,		[Doszip]
 
 	[Doszip]
-	00 = Doszip &Command Line,      %DOSZIP%\DZ.EXE -?
-	01 = View &DZ.INI,              %VIEW% %DOSZIP%\DZ.INI
-	02 = View &README.TXT,          %VIEW% %DOSZIP%\README.TXT
-	03 = Search &Source Directory,  %FIND% %DOSZIP%\src\*.*
+	00 = Doszip &Command Line,	%DOSZIP%\DZ.EXE -?
+	01 = View &DZ.INI,		%VIEW% %DOSZIP%\DZ.INI
+	02 = View &README.TXT,		%VIEW% %DOSZIP%\README.TXT
+	03 = Search &Source Directory,	%FIND% %DOSZIP%\src\*.*
 	04 = Search &Include Directory, %FIND% %DOSZIP%\inc\*.*
 	05 = <>
-	06 = &Previous Menu.., 		[Tools]
+	06 = &Previous Menu..,		[Tools]
 
 
 The File Search utility
@@ -361,30 +371,30 @@ Operation Filter
 	You can modify the [Filter] section of DZ.INI file to add pre-defined
 	filters for use in commonly performed searches.
 
-	Use F3 to load pre-defined filters to [Include] and [Exlcude].	
+	Use F3 to load pre-defined filters to [Include] and [Exlcude].
 	Use F4 to load date from the calendar to [File date].
 
-	
+
 Shortkey Table
 ==============
 
 	F1		Help
-	F2              Rename
+	F2		Rename
 	F3		View file | Directory
 	F4		Edit
 	F5		Copy
 	F6		Move
 	F7		Make Directory
 	F8		Delete
-	F9		Change file attributes
-	F10             Exit
+	F9		Activate Menus
+	F10		Exit
 	F11		Toggle Panel size
-	F12             Toggle Horizontal
+	F12		Toggle Horizontal
 	Esc		Clear command line
 
 	Alt-[afesthb]	Activate Menus
 	Ctrl		Activate Ctrl-Status-line
-	Ctrl-Alt	Activate Quick Search (hold down Ctrl while typing)
+	Ctrl-Alt	Activate Quick Search
 	Alt-Up/Down	Resize Panels
 
 	Alt-F1		Select Disk Panel-A
@@ -399,8 +409,10 @@ Shortkey Table
 	Alt-[0..9]	Run Tool nr. [0..9]
 	Alt-C		Toggle Command Line
 	Alt-L		Create List File
-	Alt-X		Quit
+	Alt-M		Memory Information
 	Alt-P		Load Directory
+	Alt-W		Toggle wide view in current Panel
+	Alt-X		Quit
 
 	Ctrl-[0..9]	Load Directory defined in section [Directory]
 	Ctrl-Tab	File search (Ctrl-S)
@@ -409,35 +421,36 @@ Shortkey Table
 	Ctrl-F2		Toggle Panel-B
 	Ctrl-F3		View file --> DZ.INI
 	Ctrl-F4		Edit file --> DZ.INI
-	Ctrl-F5         Sort current panel by Name
+	Ctrl-F5		Sort current panel by Name
 	Ctrl-F6		Sort current panel by Type
 	Ctrl-F7		Sort current panel by Date
 	Ctrl-F8		Sort current panel by Size
 	Ctrl-F9		Configuration
 
-	Ctrl-F		Confirmation
-	Ctrl-P          Panel Options
-	Ctrl-A		Screen Options
+	Ctrl-A		File Attributes
 	Ctrl-B		User Screen
 	Ctrl-C		Compare Directories
+	Ctrl-D		Sort current panel by Date
+	Ctrl-E		Sort current panel by Type
+	Ctrl-F		Confirmation
+	Ctrl-H		Toggle Show Hidden in current Panel
 	Ctrl-I		Directory information
 	Ctrl-J		Compress Options
-	Ctrl-N		Sort current panel by Name
-	Ctrl-E		Sort current panel by Type
-	Ctrl-D		Sort current panel by Date
-	Ctrl-Z		Sort current panel by Size
-	Ctrl-U		Unsorted
-	Ctrl-O		Toggle Panels on/off
-	Ctrl-L		Toggle Long filenames in current Panel
-	Ctrl-H		Toggle Show Hidden in current Panel
-	Ctrl-T		Toggle Show Detail in current Panel
-	Ctrl-V		Toggle Show Volume Information in current Panel
-	Ctrl-M		Toggle Ministatus in current Panel
 	Ctrl-K		Toggle Status Line
-	Ctrl-X		Toggle Menus Line
+	Ctrl-L		Toggle Long filenames in current Panel
+	Ctrl-M		Toggle Ministatus in current Panel
+	Ctrl-N		Sort current panel by Name
+	Ctrl-O		Toggle Panels on/off
+	Ctrl-P		Panel Options
+	Ctrl-Q		Quick Search
 	Ctrl-R		Reread current Panel
 	Ctrl-S		File search
+	Ctrl-T		Toggle Show Detail in current Panel
+	Ctrl-U		Unsorted
+	Ctrl-V		Toggle Show Volume Information in current Panel
 	Ctrl-W		Swap Panels
+	Ctrl-X		Toggle Menus Line
+	Ctrl-Z		Sort current panel by Size
 
 	Ctrl-Left	History: Prev Directory
 	Ctrl-Right	History: Next Directory
@@ -459,6 +472,7 @@ Shortkey Table
 	Shift-F10       Activate the last menu you used with the last
 			item you selected highlighted
 
+	Insert		Select file
 	Keypad+		Select files
 	Keypad-		Deselect files
 	Keypad*		Invert
@@ -481,25 +495,13 @@ Compiling
 	dz		Source files for DZ.EXE
 	dzmain		Source files for DZMAIN.EXE
 	clib		Library source
-	make		Include files for MAKE and WMAKE
-	tools		Resource compiler and Text viewer
-	debug		Test programs for library code
-
-	Makefiles
-	---------
-	srcpath		Source directory
-	debug           EXE include file
-	release		EXE include file
-	rules		Library include file
-	borlandc	Borland C/C++ 3.1 - MAKE
-	opwatcom	Open Watcom 1.8   - WMAKE
 
 
 Additional Resources
 ====================
 
 	For more information about DOSZIP, visit the
-	Web site at: http://sourceforge.net/projects/doszip/
+	Web site at: http://doszip.sf.net/
 
 	Open Watcom is a project of the open source community to maintain
 	and enhance the Watcom C, C++, and Fortran cross compilers and tools.
