@@ -258,6 +258,7 @@ end;
 
 procedure TLinkList.AddLinksToMenu(const Menu: TPopupMenu; const Tag, EditTag: Integer; const OnClick: TNotifyEvent; const EditImage: Integer);
 begin
+  If Menu=nil then exit;
   If FParentMenuItems.IndexOf(Menu)<0 then begin
     FParentMenuItems.Add(Menu);
     FMenuItemsEditIcons.Add(Pointer(EditImage));

@@ -4,7 +4,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, 
-  Dialogs, StdCtrls, Buttons, SetupFormUnit, GameDBUnit, Menus, ImgList;
+  Dialogs, StdCtrls, Buttons, Menus, ImgList, SetupFormUnit, GameDBUnit,
+  LinkFileUnit;
 
 type
   TSetupFrameService = class(TFrame, ISetupFrame)
@@ -22,10 +23,12 @@ type
     RenameSounds: TMenuItem;
     RenameVideos: TMenuItem;
     ImageList: TImageList;
+    Service10Button: TBitBtn;
     procedure ButtonWork(Sender: TObject);
   private
     { Private-Deklarationen }
     GameDB : TGameDB;
+    SearchLinkFile : TLinkFile;
   public
     { Public-Deklarationen }
     Function GetName : String;
@@ -43,7 +46,7 @@ implementation
 
 uses LanguageSetupUnit, VistaToolsUnit, GameDBToolsUnit, PrgConsts, HelpConsts,
      IconLoaderUnit, PackageDBToolsUnit, PrgSetupUnit, CommonTools,
-     RenameAllScreenshotsFormUnit;
+     RenameAllScreenshotsFormUnit, ResetProfilesFormUnit;
 
 {$R *.dfm}
 
@@ -57,6 +60,7 @@ end;
 procedure TSetupFrameService.InitGUIAndLoadSetup(var InitData: TInitData);
 begin
   GameDB:=InitData.GameDB;
+  SearchLinkFile:=InitData.SearchLinkFile;
 
   NoFlicker(Service1Button);
   NoFlicker(Service2Button);
@@ -67,6 +71,7 @@ begin
   NoFlicker(Service7Button);
   NoFlicker(Service8Button);
   NoFlicker(Service9Button);
+  NoFlicker(Service10Button);
 
   UserIconLoader.DialogImage(DI_ResetProfile,Service3Button);
   UserIconLoader.DialogImage(DI_ResetProfile,Service4Button);
@@ -77,6 +82,7 @@ begin
   UserIconLoader.DialogImage(DI_Folders,Service7Button);
   UserIconLoader.DialogImage(DI_Folders,Service8Button);
   UserIconLoader.DialogImage(DI_Edit,Service9Button);
+  UserIconLoader.DialogImage(DI_Edit,Service10Button);
 
   UserIconLoader.DialogImage(DI_Image,ImageList,0);
   UserIconLoader.DialogImage(DI_Sound,ImageList,1);
@@ -98,6 +104,7 @@ begin
   Service7Button.Caption:=LanguageSetup.SetupFormService7;
   Service8Button.Caption:=LanguageSetup.SetupFormService8;
   Service9Button.Caption:=LanguageSetup.SetupFormService9;
+  Service10Button.Caption:=LanguageSetup.SetupFormService10;
   RenameScreenshots.Caption:=LanguageSetup.CaptureScreenshots;
   RenameSounds.Caption:=LanguageSetup.CaptureSounds;
   RenameVideos.Caption:=LanguageSetup.CaptureVideos;
@@ -118,6 +125,7 @@ begin
   Service7Button.Visible:=AdvancedMode;
   Service8Button.Visible:=AdvancedMode;
   Service9Button.Visible:=AdvancedMode;
+  Service10Button.Visible:=AdvancedMode and PrgSetup.ActivateIncompleteFeatures;
 end;
 
 procedure TSetupFrameService.HideFrame;
@@ -164,6 +172,7 @@ begin
           P:=ClientToScreen(Point(Service9Button.Left,Service9Button.Top));
           RenamePopupMenu.Popup(P.X+5,P.Y+5);
         end;
+    9 : ShowResetProfilesDialog(self,GameDB,SearchLinkFile);
     81 : RenameMediaFiles(self,nil,GameDB,rfScreenshots);
     82 : RenameMediaFiles(self,nil,GameDB,rfSounds);
     83 : RenameMediaFiles(self,nil,GameDB,rfVideos);

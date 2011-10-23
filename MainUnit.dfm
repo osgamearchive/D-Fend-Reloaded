@@ -3,7 +3,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
   Top = 0
   ActiveControl = TreeView
   Caption = 'D-Fend Reloaded'
-  ClientHeight = 658
+  ClientHeight = 678
   ClientWidth = 774
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -4360,7 +4360,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
   object Splitter: TSplitter
     Left = 169
     Top = 24
-    Height = 512
+    Height = 532
     ResizeStyle = rsUpdate
     OnMoved = FormResize
     ExplicitLeft = 224
@@ -4371,7 +4371,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
     Left = 0
     Top = 24
     Width = 169
-    Height = 512
+    Height = 532
     Align = alLeft
     Constraints.MinWidth = 50
     HideSelection = False
@@ -4518,13 +4518,13 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
     Left = 172
     Top = 24
     Width = 602
-    Height = 512
+    Height = 532
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 2
     object Splitter1: TSplitter
       Left = 0
-      Top = 309
+      Top = 329
       Width = 602
       Height = 3
       Cursor = crVSplit
@@ -4537,7 +4537,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
       Left = 0
       Top = 0
       Width = 602
-      Height = 309
+      Height = 329
       Align = alClient
       Columns = <>
       HideSelection = False
@@ -4559,7 +4559,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
     end
     object CapturePageControl: TPageControl
       Left = 0
-      Top = 312
+      Top = 332
       Width = 602
       Height = 200
       ActivePage = CaptureScreenshotsTab
@@ -4683,10 +4683,6 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
       object GameNotesPanel: TTabSheet
         Caption = 'Notes'
         ImageIndex = 44
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object GameNotesEdit: TRichEdit
           Left = 0
           Top = 22
@@ -4776,7 +4772,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
   end
   object ZipInfoPanel: TPanel
     Left = 0
-    Top = 536
+    Top = 556
     Width = 774
     Height = 40
     Align = alBottom
@@ -4803,7 +4799,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
   end
   object FirstRunInfoPanel: TPanel
     Left = 0
-    Top = 576
+    Top = 596
     Width = 774
     Height = 82
     Align = alBottom
@@ -4861,7 +4857,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
     Left = 304
     Top = 32
     Bitmap = {
-      494C01012E003400080010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01012E003400140010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000040000000C0000000010020000000000000C0
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -9767,7 +9763,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
     Left = 216
     Top = 296
     Bitmap = {
-      494C010104000C00080010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010104000C00140010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000002000000001002000000000000020
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

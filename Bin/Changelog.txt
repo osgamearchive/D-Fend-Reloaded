@@ -1,5 +1,15 @@
 D-Fend Reloaded Changelog
 
+Version 1.2.1 (10/23/2011)
+==========================
+- Added a setup option to select which filter keys to be displayed in the
+  filter tree view.
+- The Russian language file has been updated.
+- [Fix] Exception in the new game wizard when using the default template.
+- [Fix] Exception when using the "Reset all pages but this" function in the
+  profile editor to reset a profile to a template.
+- [Fix] Wrong name for "Export archive file" popup menu item.
+
 Version 1.2.0 (09/29/2011)
 ==========================
 - Updated DOSZip from 2.08 to 2.17.
@@ -140,7 +150,7 @@ Version 1.0.2 (10/25/2010)
 ==========================
 - Updated DOSZip from 2.01 to 2.05.
 - About 50 new auto setup templates.
-- The French and the French (Canada) languages file have been updated.
+- The French and the French (Canada) language files have been updated.
 - [Fix] When starting a new language based on "English" in the DOSBox language
   editor the chosen default DOSBox language was used, not always English.
 - [Fix] When importing a game from a plain archive file by using an auto setup

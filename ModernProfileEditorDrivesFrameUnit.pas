@@ -37,6 +37,7 @@ type
     function CanReachFile(const FileName: String): Boolean;
   public
     { Public-Deklarationen }
+    Constructor Create(AOwner : TComponent); override;
     Destructor Destroy; override;
     Procedure InitGUI(var InitData : TModernProfileEditorInitData);
     Procedure SetGame(const Game : TGame; const LoadFromTemplate : Boolean);
@@ -52,6 +53,12 @@ uses Math, VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgSetupUnit,
 {$R *.dfm}
 
 { TModernProfileEditorDrivesFrame }
+
+constructor TModernProfileEditorDrivesFrame.Create(AOwner: TComponent);
+begin
+  inherited Create(AOwner);
+  Mounting:=nil;
+end;
 
 procedure TModernProfileEditorDrivesFrame.InitGUI(var InitData : TModernProfileEditorInitData);
 begin
@@ -97,6 +104,7 @@ end;
 procedure TModernProfileEditorDrivesFrame.SetGame(const Game: TGame; const LoadFromTemplate: Boolean);
 Var I : Integer;
 begin
+  if Assigned(Mounting) then FreeAndNil(Mounting);
   Mounting:=TStringList.Create;
   For I:=0 to 9 do
     If Game.NrOfMounts>=I+1 then Mounting.Add(Game.Mount[I]) else break;
@@ -276,7 +284,7 @@ end;
 
 Destructor TModernProfileEditorDrivesFrame.Destroy;
 begin
-  Mounting.Free;
+  if Assigned(Mounting) then Mounting.Free;
   inherited Destroy;
 end;
 

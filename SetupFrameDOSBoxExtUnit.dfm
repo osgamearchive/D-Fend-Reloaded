@@ -3,6 +3,7 @@ object SetupFrameDOSBoxExt: TSetupFrameDOSBoxExt
   Top = 0
   Width = 585
   Height = 675
+  VertScrollBar.Tracking = True
   TabOrder = 0
   object ScrollBox: TScrollBox
     Left = 0

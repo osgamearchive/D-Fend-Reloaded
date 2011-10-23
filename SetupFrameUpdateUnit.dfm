@@ -46,7 +46,7 @@ object SetupFrameUpdate: TSetupFrameUpdate
     Width = 401
     Height = 21
     Style = csDropDownList
-    ItemHeight = 13
+    ItemHeight = 0
     TabOrder = 4
   end
   object PackagesComboBox: TComboBox
@@ -55,7 +55,7 @@ object SetupFrameUpdate: TSetupFrameUpdate
     Width = 401
     Height = 21
     Style = csDropDownList
-    ItemHeight = 13
+    ItemHeight = 0
     TabOrder = 2
   end
   object UpdateButton: TBitBtn
@@ -108,7 +108,7 @@ object SetupFrameUpdate: TSetupFrameUpdate
     Width = 401
     Height = 21
     Style = csDropDownList
-    ItemHeight = 13
+    ItemHeight = 0
     TabOrder = 3
   end
   object ProgramUpdateComboBox: TComboBox
@@ -117,7 +117,7 @@ object SetupFrameUpdate: TSetupFrameUpdate
     Width = 401
     Height = 21
     Style = csDropDownList
-    ItemHeight = 13
+    ItemHeight = 0
     TabOrder = 0
   end
 end

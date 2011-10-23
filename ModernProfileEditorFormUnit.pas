@@ -77,11 +77,9 @@ type
   private
     { Private-Deklarationen }
     ProfileName, ProfileExe, ProfileSetup, ProfileScummVMGameName, ProfileScummVMPath, ProfileDOSBoxInstallation, ProfileCaptureDir : String;
-    FrameList : Array of TFrameRecord;
     BaseFrame, StartFrame : TFrame;
     ScummVM, WindowsMode : Boolean;
     ResetThisPageMenuItems : Array of TMenuItem;
-    Procedure InitGUI;
     Procedure LoadData;
     Procedure SetProfileNameEvent(Sender : TObject; const AProfileName, AProfileExe, AProfileSetup, AProfileScummVMGameName, AProfileScummVMPath, AProfileDOSBoxInstallation, AProfileCaptureDir : String);
     Function AddTreeNode(const ParentTreeNode : TTreeNode; const F : TFrame; const I : IModernProfileEditorFrame; const Name : String; const PageCode : Integer; const ImageIndex : Integer) : TTreeNode;
@@ -104,6 +102,9 @@ type
     DeleteOnExit : TStringList;
     NewExeFileName, NewProfileName : String;
     HideGameInfoPage : Boolean;
+    FrameList : Array of TFrameRecord;
+    SilentMode : Boolean;
+    Procedure InitGUI;
   end;
 
 var
@@ -151,6 +152,7 @@ begin
   NewProfileName:='';
   NewExeFileName:='';
   HideGameInfoPage:=False;
+  SilentMode:=False;
 end;
 
 Function TModernProfileEditorForm.AddTreeNode(const ParentTreeNode : TTreeNode; const F : TFrame; const I : IModernProfileEditorFrame; const Name : String; const PageCode : Integer; const ImageIndex : Integer) : TTreeNode;
@@ -438,7 +440,7 @@ begin
                    end;
     30000..39999 : begin
                      DB:=TGameDB.Create(PrgDataDir+TemplateSubDir,False);
-                     try ResetTo(DB[(Sender as TComponent).Tag-20000],rmAllButThis); finally DB.Free; end;
+                     try ResetTo(DB[(Sender as TComponent).Tag-30000],rmAllButThis); finally DB.Free; end;
                    end;
   end;
 end;
@@ -726,7 +728,7 @@ begin
   end;
 
   If not ScummVM then begin
-    If (not EditingTemplate) and (LoadTemplate<>nil) and (Trim(TModernProfileEditorBaseFrame(BaseFrame).GameExeEdit.Text)='') and (WindowsMode or TModernProfileEditorStartFrame(StartFrame).AutoexecBootNormal.Checked) then begin
+    If (not SilentMode) and (not EditingTemplate) and (LoadTemplate<>nil) and (Trim(TModernProfileEditorBaseFrame(BaseFrame).GameExeEdit.Text)='') and (WindowsMode or TModernProfileEditorStartFrame(StartFrame).AutoexecBootNormal.Checked) then begin
       If MessageDlg(LanguageSetup.MessageNoGameFileNameWarning,mtConfirmation,[mbYes,mbNo],0)<>mrYes then begin
         Tree.Selected:=Tree.Items[0];
         ModalResult:=mrNone;
@@ -735,7 +737,7 @@ begin
     end;
 
     If WindowsMode then begin
-      If (not EditingTemplate) and (Trim(TModernProfileEditorBaseFrame(BaseFrame).GameExeEdit.Text)<>'') then begin
+      If (not SilentMode) and (not EditingTemplate) and (Trim(TModernProfileEditorBaseFrame(BaseFrame).GameExeEdit.Text)<>'') then begin
         S:=MakeAbsPath(TModernProfileEditorBaseFrame(BaseFrame).GameExeEdit.Text,PrgSetup.BaseDir);
         If IsDOSExe(S) then begin
           If MessageDlg(Format(LanguageSetup.MessageDOSExeEditWarning,[S]),mtConfirmation,[mbYes,mbNo],0)<>mrYes then begin
@@ -744,7 +746,7 @@ begin
             exit;
           end;
         end;
-        If (Trim(TModernProfileEditorBaseFrame(BaseFrame).SetupExeEdit.Text)<>'') then begin
+        If (not SilentMode) and (Trim(TModernProfileEditorBaseFrame(BaseFrame).SetupExeEdit.Text)<>'') then begin
           S:=MakeAbsPath(TModernProfileEditorBaseFrame(BaseFrame).SetupExeEdit.Text,PrgSetup.BaseDir);
           If IsDOSExe(S) then begin
             If MessageDlg(Format(LanguageSetup.MessageDOSExeEditWarning,[S]),mtConfirmation,[mbYes,mbNo],0)<>mrYes then begin
@@ -756,7 +758,7 @@ begin
         end;
       end;
     end else begin
-      If (not EditingTemplate) and TModernProfileEditorStartFrame(StartFrame).AutoexecBootNormal.Checked then begin
+      If (not SilentMode) and (not EditingTemplate) and TModernProfileEditorStartFrame(StartFrame).AutoexecBootNormal.Checked then begin
         If (not TModernProfileEditorBaseFrame(BaseFrame).GameRelPathCheckBox.Checked) and (Trim(TModernProfileEditorBaseFrame(BaseFrame).GameExeEdit.Text)<>'') then begin
           S:=MakeAbsPath(TModernProfileEditorBaseFrame(BaseFrame).GameExeEdit.Text,PrgSetup.BaseDir);
           If IsWindowsExe(S) and (not TModernProfileEditorBaseFrame(BaseFrame).IgnoreWindowsWarningsCheckBox.Checked) then begin
@@ -767,7 +769,7 @@ begin
             end;
           end;
         end;
-        If (not TModernProfileEditorBaseFrame(BaseFrame).SetupRelPathCheckBox.Checked) and (Trim(TModernProfileEditorBaseFrame(BaseFrame).SetupExeEdit.Text)<>'') then begin
+        If (not SilentMode) and (not TModernProfileEditorBaseFrame(BaseFrame).SetupRelPathCheckBox.Checked) and (Trim(TModernProfileEditorBaseFrame(BaseFrame).SetupExeEdit.Text)<>'') then begin
           S:=MakeAbsPath(TModernProfileEditorBaseFrame(BaseFrame).SetupExeEdit.Text,PrgSetup.BaseDir);
           If IsWindowsExe(S) and (not TModernProfileEditorBaseFrame(BaseFrame).IgnoreWindowsWarningsCheckBox.Checked) then begin
             If MessageDlg(Format(LanguageSetup.MessageWindowsExeEditWarning,[S]),mtConfirmation,[mbYes,mbNo],0)<>mrYes then begin
@@ -814,15 +816,17 @@ begin
     end;
   end;
 
-  If Tree.Selected<>nil then begin
-    LastPage:=FrameList[Integer(Tree.Selected.Data)].PageCode;
-    LastPageExt:=FrameList[Integer(Tree.Selected.Data)].ExtPageCode;
-  end else begin
-    LastPage:=0;
-    LastPageExt:=0;
+  If not SilentMode then begin
+    If Tree.Selected<>nil then begin
+      LastPage:=FrameList[Integer(Tree.Selected.Data)].PageCode;
+      LastPageExt:=FrameList[Integer(Tree.Selected.Data)].ExtPageCode;
+    end else begin
+      LastPage:=0;
+      LastPageExt:=0;
+    end;
+    Game.LastOpenTab:=LastPage;
+    Game.LastOpenTabModern:=LastPageExt;
   end;
-  Game.LastOpenTab:=LastPage;
-  Game.LastOpenTabModern:=LastPageExt;
 
   Game.StoreAllValues;
   Game.LoadCache;

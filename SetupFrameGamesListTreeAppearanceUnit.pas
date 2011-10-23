@@ -5,23 +5,25 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, 
   Dialogs, StdCtrls, Spin, ExtCtrls, Menus, Buttons, ComCtrls, SetupFormUnit,
-  GameDBUnit;
+  GameDBUnit, CheckLst;
 
 type
   TSetupFrameGamesListTreeAppearance = class(TFrame, ISetupFrame)
+    ScrollBox: TScrollBox;
+    TreeViewFontSizeLabel: TLabel;
+    TreeViewFontColorLabel: TLabel;
+    TreeViewGroupsLabel: TLabel;
+    TreeViewGroupsInfoLabel: TLabel;
     TreeViewBackgroundRadioButton1: TRadioButton;
     TreeViewBackgroundRadioButton2: TRadioButton;
     TreeViewBackgroundColorBox: TColorBox;
     TreeViewFontSizeEdit: TSpinEdit;
-    TreeViewFontSizeLabel: TLabel;
     TreeViewFontColorBox: TColorBox;
-    TreeViewFontColorLabel: TLabel;
-    TreeViewGroupsLabel: TLabel;
     TreeViewGroupsEdit: TRichEdit;
-    TreeViewGroupsInfoLabel: TLabel;
     UserKeysList: TBitBtn;
-    PopupMenu: TPopupMenu;
     ReselectFilterCheckBox: TCheckBox;
+    PopupMenu: TPopupMenu;
+    TreeViewDefaultGroups: TCheckListBox;
     procedure TreeViewBackgroundColorBoxChange(Sender: TObject);
     procedure UserKeysListClick(Sender: TObject);
     procedure PopupMenuPopup(Sender: TObject);
@@ -60,6 +62,7 @@ procedure TSetupFrameGamesListTreeAppearance.InitGUIAndLoadSetup(var InitData: T
 Var S : String;
     C : TColor;
     St : TStringList;
+    I : Integer;
 begin
   NoFlicker(ReselectFilterCheckBox);
   NoFlicker(TreeViewBackgroundRadioButton1);
@@ -86,6 +89,11 @@ begin
     try TreeViewFontColorBox.Selected:=StringToColor(S); except TreeViewFontColorBox.Selected:=clWindowText; end;
   end;
   TreeViewFontSizeEdit.Value:=PrgSetup.GamesTreeViewFontSize;
+
+  S:=PrgSetup.DefaultTreeFilter;
+  while (length(S)<7) do S:=S+'1';
+  for I:=0 to 6 do TreeViewDefaultGroups.Checked[I]:=(S[I+1]<>'0');
+
   St:=StringToStringList(PrgSetup.UserGroups);
   try TreeViewGroupsEdit.Lines.AddStrings(St); finally St.Free; end;
 
@@ -98,6 +106,8 @@ end;
 
 procedure TSetupFrameGamesListTreeAppearance.LoadLanguage;
 Var GermanColorNames : Boolean;
+    S : String;
+    I : Integer;
 begin
   ReselectFilterCheckBox.Caption:=LanguageSetup.SetupFormStartRestoreFilter;
 
@@ -115,6 +125,18 @@ begin
     else TreeViewFontColorBox.Style:=TreeViewFontColorBox.Style-[cbPrettyNames];
   TreeViewGroupsLabel.Caption:=LanguageSetup.SetupFormTreeViewGroupLabel;
   UserKeysList.Caption:=LanguageSetup.SetupFormTreeViewGroupAddButton;
+
+  S:='';
+  for I:=0 to TreeViewDefaultGroups.Items.Count-1 do if TreeViewDefaultGroups.Checked[I] then S:=S+'1' else S:=S+'0';
+  TreeViewDefaultGroups.Items[0]:=LanguageSetup.GameGenre;
+  TreeViewDefaultGroups.Items[1]:=LanguageSetup.GameDeveloper;
+  TreeViewDefaultGroups.Items[2]:=LanguageSetup.GamePublisher;
+  TreeViewDefaultGroups.Items[3]:=LanguageSetup.GameYear;
+  TreeViewDefaultGroups.Items[4]:=LanguageSetup.GameLanguage;
+  TreeViewDefaultGroups.Items[5]:=LanguageSetup.GameLicense;
+  TreeViewDefaultGroups.Items[6]:=LanguageSetup.GameEmulationType;
+  for I:=0 to 6 do TreeViewDefaultGroups.Checked[I]:=(S[I+1]<>'0');
+
   TreeViewGroupsInfoLabel.Caption:=LanguageSetup.SetupFormTreeViewGroupInfoLabel;
 
   HelpContext:=ID_FileOptionsAppearanceTree;
@@ -133,24 +155,31 @@ begin
 end;
 
 procedure TSetupFrameGamesListTreeAppearance.RestoreDefaults;
+Var I : Integer;
 begin
   ReselectFilterCheckBox.Checked:=True;
   TreeViewBackgroundColorBox.Selected:=clBlack;
   TreeViewBackgroundRadioButton1.Checked:=True;
   TreeViewFontSizeEdit.Value:=9;
   TreeViewFontColorBox.Selected:=clBlack;
+  for I:=0 to TreeViewDefaultGroups.Items.Count-1 do TreeViewDefaultGroups.Checked[I]:=True;
   TreeViewGroupsEdit.Lines.Clear;
 end;
 
 procedure TSetupFrameGamesListTreeAppearance.SaveSetup;
 Var St1,St2 : TStringList;
     I : Integer;
+    S : String;
 begin
   PrgSetup.RestoreFilter:=ReselectFilterCheckBox.Checked;
   If TreeViewBackgroundRadioButton1.Checked then PrgSetup.GamesTreeViewBackground:='';
   If TreeViewBackgroundRadioButton2.Checked then PrgSetup.GamesTreeViewBackground:=ColorToString(TreeViewBackgroundColorBox.Selected);
   PrgSetup.GamesTreeViewFontSize:=TreeViewFontSizeEdit.Value;
   PrgSetup.GamesTreeViewFontColor:=ColorToString(TreeViewFontColorBox.Selected);
+
+  S:='';
+  for I:=0 to TreeViewDefaultGroups.Items.Count-1 do if TreeViewDefaultGroups.Checked[I] then S:=S+'1' else S:=S+'0';
+  PrgSetup.DefaultTreeFilter:=S;
 
   St1:=TStringList.Create;
   St2:=TStringList.Create;

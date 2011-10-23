@@ -190,7 +190,7 @@ end;
 
 Procedure InitTreeViewForGamesList(const ATreeView : TTreeView; const GameDB : TGameDB);
 Var N,N2 : TTreeNode;
-    Group, SubGroup : String;
+    Group, SubGroup, TreeFilter : String;
     I : Integer;
     OnChange : TTVChangedEvent;
     UserGroups : TStringList;
@@ -221,20 +221,25 @@ begin
       N.ImageIndex:=9;
       N.SelectedIndex:=9;
 
-      AddTypeSelector(ATreeView,LanguageSetup.GameGenre,GetCustomGenreName(GameDB.GetGenreList));
-      AddTypeSelector(ATreeView,LanguageSetup.GameDeveloper,GameDB.GetDeveloperList);
-      AddTypeSelector(ATreeView,LanguageSetup.GamePublisher,GameDB.GetPublisherList);
-      AddTypeSelector(ATreeView,LanguageSetup.GameYear,GameDB.GetYearList);
-      AddTypeSelector(ATreeView,LanguageSetup.GameLanguage,GetCustomLanguageName(GameDB.GetLanguageList));
-      AddTypeSelector(ATreeView,LanguageSetup.GameLicense,GetCustomLicenseName(GameDB.GetLicenseList));
+      TreeFilter:=PrgSetup.DefaultTreeFilter;
+      while (length(TreeFilter)<7) do TreeFilter:=TreeFilter+'1';
 
-      N:=ATreeView.Items.AddChild(nil,LanguageSetup.GameEmulationType);
-      N.ImageIndex:=12; N.SelectedIndex:=12;
-      N2:=ATreeView.Items.AddChild(N,LanguageSetup.GameEmulationTypeDOSBox); N2.ImageIndex:=16; N2.SelectedIndex:=16;
-      N2:=ATreeView.Items.AddChild(N,LanguageSetup.GameEmulationTypeScummVM); N2.ImageIndex:=37; N2.SelectedIndex:=37;
-      N2:=ATreeView.Items.AddChild(N,LanguageSetup.GameEmulationTypeWindows); N2.ImageIndex:=40; N2.SelectedIndex:=40;
-      For I:=0 to PrgSetup.WindowsBasedEmulatorsNames.Count-1 do begin
-        N2:=ATreeView.Items.AddChild(N,PrgSetup.WindowsBasedEmulatorsNames[I]); N2.ImageIndex:=40; N2.SelectedIndex:=40;
+      if TreeFilter[1]<>'0' then AddTypeSelector(ATreeView,LanguageSetup.GameGenre,GetCustomGenreName(GameDB.GetGenreList));
+      if TreeFilter[2]<>'0' then AddTypeSelector(ATreeView,LanguageSetup.GameDeveloper,GameDB.GetDeveloperList);
+      if TreeFilter[3]<>'0' then AddTypeSelector(ATreeView,LanguageSetup.GamePublisher,GameDB.GetPublisherList);
+      if TreeFilter[4]<>'0' then AddTypeSelector(ATreeView,LanguageSetup.GameYear,GameDB.GetYearList);
+      if TreeFilter[5]<>'0' then AddTypeSelector(ATreeView,LanguageSetup.GameLanguage,GetCustomLanguageName(GameDB.GetLanguageList));
+      if TreeFilter[6]<>'0' then AddTypeSelector(ATreeView,LanguageSetup.GameLicense,GetCustomLicenseName(GameDB.GetLicenseList));
+
+      if TreeFilter[7]<>'0' then begin
+        N:=ATreeView.Items.AddChild(nil,LanguageSetup.GameEmulationType);
+        N.ImageIndex:=12; N.SelectedIndex:=12;
+        N2:=ATreeView.Items.AddChild(N,LanguageSetup.GameEmulationTypeDOSBox); N2.ImageIndex:=16; N2.SelectedIndex:=16;
+        N2:=ATreeView.Items.AddChild(N,LanguageSetup.GameEmulationTypeScummVM); N2.ImageIndex:=37; N2.SelectedIndex:=37;
+        N2:=ATreeView.Items.AddChild(N,LanguageSetup.GameEmulationTypeWindows); N2.ImageIndex:=40; N2.SelectedIndex:=40;
+        For I:=0 to PrgSetup.WindowsBasedEmulatorsNames.Count-1 do begin
+          N2:=ATreeView.Items.AddChild(N,PrgSetup.WindowsBasedEmulatorsNames[I]); N2.ImageIndex:=40; N2.SelectedIndex:=40;
+        end;
       end;
 
       UserGroups:=RemoveDoubleEntrys(StringToStringList(PrgSetup.UserGroups));

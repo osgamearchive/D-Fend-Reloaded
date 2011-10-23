@@ -8,6 +8,12 @@ uses
   Menus, AppEvnts, ActiveX, GameDBUnit, GameDBToolsUnit, ViewFilesFrameUnit,
   LinkFileUnit, HelpTools;
 
+{
+- Language strings for setup option to turn off the default filters in games tree and reset profiles to template dialog
+- Caption for SetupFrameGamesListTreeAppearanceUnit.TreeViewDefaultGroups
+- Help page for reset profiles to template dialog
+}
+
 type
   TDFendReloadedMainForm = class(TForm, IDropTarget)
     TreeView: TTreeView;
@@ -529,7 +535,7 @@ begin
   LogInfo('### Start of FormCreate ###');
 
   {Caption:=Caption+' THIS IS A TEST VERSION ! (Beta 1 of version 1.3)';}
-  {Caption:=Caption+' (Release candidate 1 of version 1.2)';}
+  {Caption:=Caption+' (Release candidate 1 of version 1.2.1)';}
 
   Height:=790;
   Width:=Min(Width,790);
@@ -848,7 +854,7 @@ begin
   MenuProfileOpenCaptureFolder.Caption:=LanguageSetup.MenuProfileOpenCaptureFolder;
   MenuProfileOpenDataFolder.Caption:=LanguageSetup.MenuProfileOpenDataFolder;
   MenuProfileOpenFileInProgramFolder.Visible:=PrgSetup.ActivateIncompleteFeatures;
-  //MenuProfileOpenFileInProgramFolder.Caption:=LanguageSetup.MenuProfileOpenFileInProgramFolder;
+  MenuProfileOpenFileInProgramFolder.Caption:=LanguageSetup.MenuProfileOpenFileInProgramFolder;
   MenuProfileOpenFileInDataFolder.Caption:=LanguageSetup.MenuProfileOpenFileInDataFolder;
   MenuProfileWWW.Caption:=LanguageSetup.GameWWW;
   MenuProfileMarkAsFavorite.Caption:=LanguageSetup.MenuProfileMarkAsFavorite;
@@ -953,6 +959,7 @@ begin
   PopupOpenCaptureFolder.Caption:=LanguageSetup.PopupOpenCaptureFolder;
   PopupOpenDataFolder.Caption:=LanguageSetup.PopupOpenDataFolder;
   PopupOpenFileInProgramFolder.Visible:=PrgSetup.ActivateIncompleteFeatures;
+  PopupOpenFileInProgramFolder.Caption:=LanguageSetup.PopupOpenFileInProgramFolder;
   PopupOpenFileInDataFolder.Caption:=LanguageSetup.PopupOpenFileInDataFolder;
   PopupWWW.Caption:=LanguageSetup.GameWWW;
   PopupMarkAsFavorite.Caption:=LanguageSetup.PopupMarkAsFavorite;
@@ -2646,7 +2653,7 @@ begin
       1006 : begin
                S:=GamesListSaveColWidthsToString(ListView);
                T:=GetUserCols;
-               if not ShowSetupDialog(self,GameDB) then exit;
+               if not ShowSetupDialog(self,GameDB,SearchLinkFile) then exit;
                AfterSetupDialog(S,T);
              end;
       1007 : Close;
@@ -3131,7 +3138,7 @@ begin
                B:=False;
                If ShowCheatApplyDialog(self,S,B) and B then begin
                  ShowCheatDBEditDialog(self,B);
-                 If B then ShowUpdateCheckDialog(self,GameDB);
+                 If B then ShowUpdateCheckDialog(self,GameDB,SearchLinkFile);
                end;
              end;
       4100..4199 : AddProfileForWindowsEmulator((Sender as TComponent).Tag-4100);
@@ -3256,12 +3263,12 @@ begin
       5022 : begin B:=False;
                If ShowCheatApplyDialog(self,MakeAbsPath(PrgSetup.GameDir,PrgSetup.BaseDir),B) and B then begin
                  ShowCheatDBEditDialog(self,B);
-                 If B then ShowUpdateCheckDialog(self,GameDB);
+                 If B then ShowUpdateCheckDialog(self,GameDB,SearchLinkFile);
                end;
              end;
       5023 : begin
                ShowCheatDBEditDialog(self,B);
-               If B then ShowUpdateCheckDialog(self,GameDB);
+               If B then ShowUpdateCheckDialog(self,GameDB,SearchLinkFile);
              end;
       5024 : ShowCheatSearchDialog(self);
       5025 : begin
@@ -3301,7 +3308,7 @@ begin
       6008 : ShellExecute(Handle,'open',PChar(LanguageSetup.MenuHelpHomepageURL),nil,nil,SW_SHOW);
       6009 : {ShellExecute(Handle,'open',PChar('http:/'+'/vogons.zetafleet.com/viewtopic.php?t=17415'),nil,nil,SW_SHOW);}
              Application.HelpCommand(HELP_CONTEXT,ID_HelpForum);
-      6010 : ShowUpdateCheckDialog(self,GameDB);
+      6010 : ShowUpdateCheckDialog(self,GameDB,SearchLinkFile);
       6014 : ShowStatisticsDialog(self,GameDB);
       6015 : ShowInfoDialog(self);
       6016 : ShellExecute(Handle,'open',PChar('http:/'+'/www.dosbox.com/'),nil,nil,SW_SHOW);
@@ -3997,7 +4004,7 @@ Var S,T : String;
 begin
   S:=GamesListSaveColWidthsToString(ListView);
   T:=GetUserCols;
-  if not ShowTreeListSetupDialog(self,GameDB) then exit;
+  if not ShowTreeListSetupDialog(self,GameDB,SearchLinkFile) then exit;
   AfterSetupDialog(S,T);
 end;
 
@@ -4007,8 +4014,8 @@ begin
   S:=GamesListSaveColWidthsToString(ListView);
   T:=GetUserCols;
   Case (Sender as TComponent).Tag of
-    0 : if not ShowToolbarSetupDialog(self,GameDB) then exit;
-    1 : if not ShowIconSetSetupDialog(self,GameDB) then exit;
+    0 : if not ShowToolbarSetupDialog(self,GameDB,SearchLinkFile) then exit;
+    1 : if not ShowIconSetSetupDialog(self,GameDB,SearchLinkFile) then exit;
     2 : begin MenuWork(MenuViewShowMenubar); exit; end;
   End;
   AfterSetupDialog(S,T);

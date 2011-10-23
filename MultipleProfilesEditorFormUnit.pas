@@ -277,7 +277,6 @@ begin
 
   PageControl.ActivePageIndex:=0;
   TemplateMode:=False;
-
 end;
 
 procedure TMultipleProfilesEditorForm.FormShow(Sender: TObject);

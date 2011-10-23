@@ -222,6 +222,8 @@ begin
     finally
       St.Free;
     end;
+  end else begin
+    For I:=1 to 9 do begin WWWNames.Add(''); WWWLinks.Add(''); end;
   end;
 end;
 

@@ -408,7 +408,7 @@ const NR_Author=1;
       NR_PopupDeinstall=37015;
       NR_PopupMakeInstaller=37016;
       NR_PopupMakeZipArchive=37017;
-      NR_PopupViewConfFile=37017;
+      NR_PopupViewConfFile=37018;
       NR_PopupView=37019;
 
       NR_ScreenshotPopupOpen=38101;
@@ -949,6 +949,7 @@ const NR_Author=1;
       NR_SetupFormService7=43709;
       NR_SetupFormService8=43710;
       NR_SetupFormService9=43711;
+      NR_SetupFormService10=43712;
       NR_SetupFormUpdate0=43801;
       NR_SetupFormUpdate1=43802;
       NR_SetupFormUpdate2=43803;
@@ -2162,6 +2163,14 @@ const NR_Author=1;
       NR_DOSBoxOutputTestStart=97208;
       NR_DOSBoxOutputTestRunning=97209;
 
+      NR_ResetProfiles=97301;
+      NR_ResetProfilesProfiles=97302;
+      NR_ResetProfilesProfilesInfo=97303;
+      NR_ResetProfilesSettings=97304;
+      NR_ResetProfilesSettingsInfo=97305;
+      NR_ResetProfilesTemplate=97306;
+      NR_ResetProfilesTemplateTemplate=97307;
+      NR_ResetProfilesTemplateAutoSetup=97308;
 
 Type TLanguageSetup=class(TBasePrgSetup)
   private
@@ -3113,6 +3122,7 @@ Type TLanguageSetup=class(TBasePrgSetup)
     property SetupFormService7 : String index NR_SetupFormService7 read GetString write SetString;
     property SetupFormService8 : String index NR_SetupFormService8 read GetString write SetString;
     property SetupFormService9 : String index NR_SetupFormService9 read GetString write SetString;
+    property SetupFormService10 : String index NR_SetupFormService10 read GetString2 write SetString2;
     property SetupFormUpdate0 : String index NR_SetupFormUpdate0 read GetString write SetString;
     property SetupFormUpdate1 : String index NR_SetupFormUpdate1 read GetString write SetString;
     property SetupFormUpdate2 : String index NR_SetupFormUpdate2 read GetString write SetString;
@@ -4323,6 +4333,15 @@ Type TLanguageSetup=class(TBasePrgSetup)
     property DOSBoxOutputTestSuccess : String index NR_DOSBoxOutputTestSuccess read GetString write SetString;
     property DOSBoxOutputTestStart : String index NR_DOSBoxOutputTestStart read GetString write SetString;
     property DOSBoxOutputTestRunning : String index NR_DOSBoxOutputTestRunning read GetString write SetString;
+
+    property ResetProfiles : String index NR_ResetProfiles read GetString2 write SetString2;
+    property ResetProfilesProfiles : String index NR_ResetProfilesProfiles read GetString2 write SetString2;
+    property ResetProfilesProfilesInfo : String index NR_ResetProfilesProfilesInfo read GetString2 write SetString2;
+    property ResetProfilesSettings : String index NR_ResetProfilesSettings read GetString2 write SetString2;
+    property ResetProfilesSettingsInfo : String index NR_ResetProfilesSettingsInfo read GetString2 write SetString2;
+    property ResetProfilesTemplate : String index NR_ResetProfilesTemplate read GetString2 write SetString2;
+    property ResetProfilesTemplateTemplate : String index NR_ResetProfilesTemplateTemplate read GetString2 write SetString2;
+    property ResetProfilesTemplateAutoSetup : String index NR_ResetProfilesTemplateAutoSetup read GetString2 write SetString2;
   end;
 
 Function MaskUnderlineAmpersand(const S : String) : String;
@@ -5357,6 +5376,7 @@ begin
   AddStringRec(NR_SetupFormService7,'SetupForm','Service7','Create capture folders for all profiles');
   AddStringRec(NR_SetupFormService8,'SetupForm','Service8','Create game data folders for all profiles');
   AddStringRec(NR_SetupFormService9,'SetupForm','Service9','Rename all media files for all profiles');
+  //AddStringRec(NR_SetupFormService10,'SetupForm','Service10','Reset profiles to templates');
   AddStringRec(NR_SetupFormUpdate0,'SetupForm','Update0','Only manual update checks (Menu: Help|Check for updates)');
   AddStringRec(NR_SetupFormUpdate1,'SetupForm','Update1','Check once a week');
   AddStringRec(NR_SetupFormUpdate2,'SetupForm','Update2','Check once every day');
@@ -6599,6 +6619,15 @@ begin
   AddStringRec(NR_DOSBoxOutputTestSuccess,'DOSBoxOutputTest','Test.Passed','working');
   AddStringRec(NR_DOSBoxOutputTestStart,'DOSBoxOutputTest','Test.Start','Start test');
   AddStringRec(NR_DOSBoxOutputTestRunning,'DOSBoxOutputTest','Test.InProgress','Testing output methods, please wait.');
+
+  //AddStringRec(NR_ResetProfiles,'ResetProfiles','Caption','Reset multiple profiles to values from templates');
+  //AddStringRec(NR_ResetProfilesProfiles,'ResetProfiles','Profiles','Step 1: Select games');
+  //AddStringRec(NR_ResetProfilesProfilesInfo,'ResetProfiles','Select the games to be changed:');
+  //AddStringRec(NR_ResetProfilesSettings,'ResetProfiles','Step 2: Select settings to be changed');
+  //AddStringRec(NR_ResetProfilesSettingsInfo,'ResetProfiles','Select pages to be reseted:');
+  //AddStringRec(NR_ResetProfilesTemplate,'ResetProfiles','Step 3: Select template');
+  //AddStringRec(NR_ResetProfilesTemplateTemplate,'ResetProfiles','Reset to template');
+  //AddStringRec(NR_ResetProfilesTemplateAutoSetup,'ResetProfiles','Reset to auto setup template');
 end;
 
 destructor TLanguageSetup.Destroy;
@@ -6614,11 +6643,30 @@ begin
     Case Index of
       NR_MenuProfileOpenFileInProgramFolder : result:='Datei in Programmordner öffnen';
       NR_PopupOpenFileInProgramFolder : result:='Datei in Programmordner öffnen';
+      NR_SetupFormService10 : result:='Mehrere Profile auf Werte aus Vorlagen zurücksetzen';
+      NR_ResetProfiles : result:='Mehrere Profile auf Werte aus Vorlagen zurücksetzen';
+      NR_ResetProfilesProfiles : result:=ChangeProfilesFormSelectGamesSheet;
+      NR_ResetProfilesProfilesInfo : result:=ChangeProfilesFormInfo;
+      NR_ResetProfilesSettings : result:='Schritt 2: Zu ändernde Einstellungen wählen';
+      NR_ResetProfilesSettingsInfo : result:='Wähen Sie die Profileditor-Seiten, die zurückgesetzt werden sollen:';
+      NR_ResetProfilesTemplate : result:='Schritt 3: Vorlage wählen';
+      NR_ResetProfilesTemplateTemplate : result:='Profile zu Vorlage zurücksetzen';
+      NR_ResetProfilesTemplateAutoSetup : result:='Profile zu AutoSetup-Vorlage zurücksetzen';
     End;
   end else begin
     Case Index of
       NR_MenuProfileOpenFileInProgramFolder : result:='Open file in program folder';
       NR_PopupOpenFileInProgramFolder : result:='Open file in program folder';
+      NR_SetupFormService10 : result:='Reset multiple profiles to values from templates';
+      NR_ResetProfiles : result:='Reset multiple profiles to values from templates';
+      NR_ResetProfilesProfiles : result:=ChangeProfilesFormSelectGamesSheet;
+      NR_ResetProfilesProfilesInfo : result:=ChangeProfilesFormInfo;
+      NR_ResetProfilesSettings : result:='Step 2: Select settings to be changed';
+      NR_ResetProfilesSettingsInfo : result:='Select pages to be reseted:';
+      NR_ResetProfilesTemplate : result:='Step 3: Select template';
+      NR_ResetProfilesTemplateTemplate : result:='Reset to template';
+      NR_ResetProfilesTemplateAutoSetup : result:='Reset to auto setup template';
+
     End;
   end;
 end;

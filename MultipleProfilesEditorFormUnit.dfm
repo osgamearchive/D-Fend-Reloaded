@@ -91,15 +91,11 @@ object MultipleProfilesEditorForm: TMultipleProfilesEditorForm
     object TabSheet2: TTabSheet
       Caption = 'TabSheet2'
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object ScrollBox: TScrollBox
         Left = 0
         Top = 0
-        Width = 637
-        Height = 362
+        Width = 636
+        Height = 447
         HorzScrollBar.Visible = False
         VertScrollBar.Smooth = True
         VertScrollBar.Tracking = True

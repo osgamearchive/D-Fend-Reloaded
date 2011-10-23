@@ -4,7 +4,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, ComCtrls, ExtCtrls, StdCtrls, Buttons, ImgList, Menus, GameDBUnit;
+  Dialogs, ComCtrls, ExtCtrls, StdCtrls, Buttons, ImgList, Menus, GameDBUnit,
+  LinkFileUnit;
 
 Type TFrameClass=class of TFrame; 
 
@@ -20,6 +21,7 @@ Type TInitData=record
   OpenLanguageEditorEvent : TOpenLanguageEditorEvent;
   CloseCheckEvent : TCloseCheckEvent;
   GetFrame : TGetFrameFunction;
+  SearchLinkFile : TLinkFile;
 end;
 
 Type ISetupFrame=interface
@@ -92,16 +94,17 @@ type
     OpenMode : TOpenMode;
     LanguageEditorMode : Integer;
     GameDB : TGameDB;
+    SearchLinkFile : TLinkFile;
   end;
 
 var
   SetupForm: TSetupForm;
 
-Function ShowSetupDialog(const AOwner : TComponent; const AGameDB : TGameDB; const OpenLanguageTab : Boolean = False) : Boolean;
-Function ShowTreeListSetupDialog(const AOwner : TComponent; const AGameDB : TGameDB) : Boolean;
-Function ShowToolbarSetupDialog(const AOwner : TComponent; const AGameDB : TGameDB) : Boolean;
-Function ShowIconSetSetupDialog(const AOwner : TComponent; const AGameDB : TGameDB) : Boolean;
-Function ShowUpdateSetupDialog(const AOwner : TComponent; const AGameDB : TGameDB) : Boolean;
+Function ShowSetupDialog(const AOwner : TComponent; const AGameDB : TGameDB; const ASearchLinkFile : TLinkFile; const OpenLanguageTab : Boolean = False) : Boolean;
+Function ShowTreeListSetupDialog(const AOwner : TComponent; const AGameDB : TGameDB; const ASearchLinkFile : TLinkFile) : Boolean;
+Function ShowToolbarSetupDialog(const AOwner : TComponent; const AGameDB : TGameDB; const ASearchLinkFile : TLinkFile) : Boolean;
+Function ShowIconSetSetupDialog(const AOwner : TComponent; const AGameDB : TGameDB; const ASearchLinkFile : TLinkFile) : Boolean;
+Function ShowUpdateSetupDialog(const AOwner : TComponent; const AGameDB : TGameDB; const ASearchLinkFile : TLinkFile) : Boolean;
 
 implementation
 
@@ -199,7 +202,7 @@ begin
   InitData.BeforeLanguageChangeNotify:=BeforeChangeLanguage;
   InitData.GameDB:=GameDB;
   InitData.GetFrame:=GetFrame;
-
+  InitData.SearchLinkFile:=SearchLinkFile;
   C:=length(Frames);
   with NewFrame do begin
     Visible:=False;
@@ -496,11 +499,12 @@ begin
   end;
 end;
 
-Function ShowSetupDialogSpecial(const AOwner : TComponent; const AGameDB : TGameDB; const OpenMode : TOpenMode) : Boolean;
+Function ShowSetupDialogSpecial(const AOwner : TComponent; const AGameDB : TGameDB; const ASearchLinkFile : TLinkFile; const OpenMode : TOpenMode) : Boolean;
 begin
   SetupForm:=TSetupForm.Create(AOwner);
   try
     SetupForm.GameDB:=AGameDB;
+    SetupForm.SearchLinkFile:=ASearchLinkFile;
     If OpenMode<>omNormal then SetupForm.OpenMode:=OpenMode;
     If (OpenMode<>omNormal) and (OpenMode<>omLanguage) and (OpenMode<>omIconSet) and (OpenMode<>omUpdate) then SetupForm.SetAdvanced:=True;
     result:=(SetupForm.ShowModal=mrOK);
@@ -511,31 +515,31 @@ begin
   end;
 end;
 
-Function ShowSetupDialog(const AOwner : TComponent; const AGameDB : TGameDB; const OpenLanguageTab : Boolean) : Boolean;
+Function ShowSetupDialog(const AOwner : TComponent; const AGameDB : TGameDB; const ASearchLinkFile : TLinkFile; const OpenLanguageTab : Boolean) : Boolean;
 begin
   If OpenLanguageTab
-    then result:=ShowSetupDialogSpecial(AOwner,AGameDB,omLanguage)
-    else result:=ShowSetupDialogSpecial(AOwner,AGameDB,omNormal);
+    then result:=ShowSetupDialogSpecial(AOwner,AGameDB,ASearchLinkFile,omLanguage)
+    else result:=ShowSetupDialogSpecial(AOwner,AGameDB,ASearchLinkFile,omNormal);
 end;
 
-Function ShowTreeListSetupDialog(const AOwner : TComponent; const AGameDB : TGameDB) : Boolean;
+Function ShowTreeListSetupDialog(const AOwner : TComponent; const AGameDB : TGameDB; const ASearchLinkFile : TLinkFile) : Boolean;
 begin
-  result:=ShowSetupDialogSpecial(AOwner,AGameDB,omTreeList);
+  result:=ShowSetupDialogSpecial(AOwner,AGameDB,ASearchLinkFile,omTreeList);
 end;
 
-Function ShowToolbarSetupDialog(const AOwner : TComponent; const AGameDB : TGameDB) : Boolean;
+Function ShowToolbarSetupDialog(const AOwner : TComponent; const AGameDB : TGameDB; const ASearchLinkFile : TLinkFile) : Boolean;
 begin
-  result:=ShowSetupDialogSpecial(AOwner,AGameDB,omToolbar);
+  result:=ShowSetupDialogSpecial(AOwner,AGameDB,ASearchLinkFile,omToolbar);
 end;
 
-Function ShowIconSetSetupDialog(const AOwner : TComponent; const AGameDB : TGameDB) : Boolean;
+Function ShowIconSetSetupDialog(const AOwner : TComponent; const AGameDB : TGameDB; const ASearchLinkFile : TLinkFile) : Boolean;
 begin
-  result:=ShowSetupDialogSpecial(AOwner,AGameDB,omIconSet);
+  result:=ShowSetupDialogSpecial(AOwner,AGameDB,ASearchLinkFile,omIconSet);
 end;
 
-Function ShowUpdateSetupDialog(const AOwner : TComponent; const AGameDB : TGameDB) : Boolean;
+Function ShowUpdateSetupDialog(const AOwner : TComponent; const AGameDB : TGameDB; const ASearchLinkFile : TLinkFile) : Boolean;
 begin
-  result:=ShowSetupDialogSpecial(AOwner,AGameDB,omUpdate);
+  result:=ShowSetupDialogSpecial(AOwner,AGameDB,ASearchLinkFile,omUpdate);
 end;
 
 end.

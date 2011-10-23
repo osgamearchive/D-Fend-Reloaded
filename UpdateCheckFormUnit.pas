@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, Buttons, GameDBUnit;
+  Dialogs, StdCtrls, Buttons, GameDBUnit, LinkFileUnit;
 
 type
   TUpdateCheckForm = class(TForm)
@@ -44,7 +44,7 @@ type
 var
   UpdateCheckForm: TUpdateCheckForm;
 
-Procedure ShowUpdateCheckDialog(const AOwner : TComponent; const AGameDB : TGameDB; const ANoConfigButton : Boolean = False);
+Procedure ShowUpdateCheckDialog(const AOwner : TComponent; const AGameDB : TGameDB; const ASearchLinkFile : TLinkFile; const ANoConfigButton : Boolean = False);
 Procedure RunProgramStartSilentUpdateCheck(const AForm : TForm; const ForceCheck : Boolean);
 
 implementation
@@ -196,7 +196,7 @@ begin
   BringWindowToTop(Handle);
 end;
 
-Procedure ShowUpdateCheckDialog(const AOwner : TComponent; const AGameDB : TGameDB; const ANoConfigButton : Boolean);
+Procedure ShowUpdateCheckDialog(const AOwner : TComponent; const AGameDB : TGameDB; const ASearchLinkFile : TLinkFile; const ANoConfigButton : Boolean);
 Var OpenSetup : Boolean;
 begin
   UpdateCheckForm:=TUpdateCheckForm.Create(AOwner);
@@ -208,7 +208,7 @@ begin
     UpdateCheckForm.Free;
   end;
 
-  If OpenSetup then ShowUpdateSetupDialog(AOwner,AGameDB);
+  If OpenSetup then ShowUpdateSetupDialog(AOwner,AGameDB,ASearchLinkFile);
 end;
 
 Procedure RunProgramStartSilentUpdateCheck(const AForm : TForm; const ForceCheck : Boolean);

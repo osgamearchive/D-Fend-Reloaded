@@ -231,7 +231,8 @@ uses
   HistoryUnit in 'HistoryUnit.pas',
   ExportGamesListFormUnit in 'ExportGamesListFormUnit.pas' {ExportGamesListForm},
   DOSBoxOutputTestFormUnit in 'DOSBoxOutputTestFormUnit.pas' {DOSBoxOutputTestForm},
-  SingleInstanceUnit in 'SingleInstanceUnit.pas';
+  SingleInstanceUnit in 'SingleInstanceUnit.pas',
+  ResetProfilesFormUnit in 'ResetProfilesFormUnit.pas' {ResetProfilesForm};
 
 {$R *.res}
 

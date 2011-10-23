@@ -4,7 +4,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, 
-  Dialogs, StdCtrls, Buttons, SetupFormUnit, PackageDBUnit, GameDBUnit;
+  Dialogs, StdCtrls, Buttons, SetupFormUnit, PackageDBUnit, GameDBUnit,
+  LinkFileUnit;
 
 type
   TSetupFrameUpdate = class(TFrame, ISetupFrame)
@@ -22,6 +23,7 @@ type
   private
     { Private-Deklarationen }
     GameDB : TGameDB;
+    SearchLinkFile : TLinkFile;
   public
     { Public-Deklarationen }
     Function GetName : String;
@@ -76,6 +78,7 @@ begin
   CheatsComboBox.ItemIndex:=Max(0,Min(2,PrgSetup.CheatsDBCheckForUpdates));
 
   GameDB:=InitData.GameDB;
+  SearchLinkFile:=InitData.SearchLinkFile;
 end;
 
 procedure TSetupFrameUpdate.BeforeChangeLanguage;
@@ -171,7 +174,7 @@ end;
 
 procedure TSetupFrameUpdate.ButtonWork(Sender: TObject);
 begin
-  ShowUpdateCheckDialog(self,GameDB,True);
+  ShowUpdateCheckDialog(self,GameDB,SearchLinkFile,True);
 end;
 
 end.
