@@ -74,7 +74,7 @@ type
     Procedure SetColWidths;
     Procedure AddResultsToList;
     Procedure ScanFolders;
-    Procedure ScanFolder(const Folder : String);
+    Procedure ScanFolder(const Folder : String; const AddAllPrgs : Boolean);
     Function FolderAlreadyknown(const Folder : String) : Boolean;
     Function GetSubFolderList: TStringList;
     Procedure AddGame(const NewGame : TNewGame);
@@ -472,13 +472,13 @@ begin
   end;
 end;
 
-procedure TScanGamesFolderForm.ScanFolder(const Folder: String);
+procedure TScanGamesFolderForm.ScanFolder(const Folder: String; const AddAllPrgs : Boolean);
 Var S,FileToStart : String;
     NewGame : TNewGame;
     Templates,PrgFiles : TStringList;
     I,J,NewLevel : Integer;
 begin
-  If FolderAlreadyknown(Folder) then exit;
+  If (not AddAllPrgs) and FolderAlreadyknown(Folder) then exit;
 
   PrgFiles:=TStringList.Create;
   try
@@ -501,23 +501,33 @@ begin
           NewGame:=TNewGame.Create(S,IncludeTrailingPathDelimiter(Folder)+FileToStart);
         end;
         NewGame.SelectedTemplate:=-1;
+        NewGame.AllExeFiles.AddStrings(PrgFiles);
+        NewGames.Add(NewGame);
       end else begin
-        FileToStart:=Templates[0];
-        NewGame:=TNewGame.Create(AutoSetupDB[Integer(Templates.Objects[0])].CacheName,IncludeTrailingPathDelimiter(Folder)+FileToStart);
-        NewGame.MatchingAutoSetup.AddStrings(Templates);
-        NewGame.SelectedTemplate:=Integer(Templates.Objects[0]);
+        If (Templates.Count=1) or (not AddAllPrgs) then begin
+          FileToStart:=Templates[0];
+          NewGame:=TNewGame.Create(AutoSetupDB[Integer(Templates.Objects[0])].CacheName,IncludeTrailingPathDelimiter(Folder)+FileToStart);
+          NewGame.MatchingAutoSetup.AddStrings(Templates);
+          NewGame.SelectedTemplate:=Integer(Templates.Objects[0]);
+          NewGame.AllExeFiles.AddStrings(PrgFiles);
+          NewGames.Add(NewGame);
+        end else begin
+          For I:=0 to Templates.Count-1 do begin
+            FileToStart:=Templates[I];
+            NewGame:=TNewGame.Create(AutoSetupDB[Integer(Templates.Objects[I])].CacheName,IncludeTrailingPathDelimiter(Folder)+FileToStart);
+            NewGame.MatchingAutoSetup.AddStrings(Templates);
+            NewGame.SelectedTemplate:=Integer(Templates.Objects[I]);
+            NewGame.AllExeFiles.Add(FileToStart);
+            NewGames.Add(NewGame);
+          end;
+        end;
       end;
-
-      NewGame.AllExeFiles.AddStrings(PrgFiles);
-
     finally
       Templates.Free;
     end;
   finally
     PrgFiles.Free;
   end;
-
-  NewGames.Add(NewGame);
 end;
 
 Function TScanGamesFolderForm.FolderAlreadyknown(const Folder : String) : Boolean;
@@ -557,16 +567,24 @@ end;
 
 procedure TScanGamesFolderForm.ScanFolders;
 Var Dirs : TStringList;
+    FreeDOS,Dir : String;
     I : Integer;
 begin
   InfoPanel.Visible:=False;
   Dirs:=GetSubFolderList;
+
+  FreeDOS:=Trim(PrgSetup.PathToFREEDOS);
+  If FreeDOS<>'' then FreeDOS:=IncludeTrailingPathDelimiter(MakeAbsPath(FreeDOS,PrgSetup.BaseDir));
+  If not DirectoryExists(FreeDOS) then FreeDOS:='';
+  FreeDOS:=ExtUpperCase(FreeDOS);
+
   try
     WaitForm:=CreateWaitForm(self,LanguageSetup.AutoDetectProfileScanning,Dirs.Count);
     try
       For I:=0 to Dirs.Count-1 do begin
         WaitForm.Step(I);
-        ScanFolder(IncludeTrailingPathDelimiter(Dirs[I]));
+        Dir:=IncludeTrailingPathDelimiter(Dirs[I]);
+        ScanFolder(Dir,ExtUpperCase(Dir)=FreeDOS);
       end;
     finally
       FreeAndNil(WaitForm);

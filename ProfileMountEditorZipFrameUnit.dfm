@@ -172,17 +172,22 @@ object ProfileMountEditorZipFrame: TProfileMountEditorZipFrame
   object RepackTypeComboBox: TComboBox
     Left = 16
     Top = 240
-    Width = 273
+    Width = 361
     Height = 21
     Style = csDropDownList
     ItemHeight = 13
-    ItemIndex = 1
+    ItemIndex = 0
     TabOrder = 4
-    Text = 'Delete files in folder'
+    Text = 'Repack but keep folder content'
+    OnChange = RepackTypeComboBoxChange
+    OnDropDown = RepackTypeComboBoxDropDown
     Items.Strings = (
-      'Kepp folder content'
-      'Delete files in folder'
-      'Delete files in folder and folder')
+      'Repack but keep folder content'
+      'Repack then delete files in folder'
+      'Repack then delete files in folder and folder'
+      'Do not repack, keep folder content'
+      'Do not repack, delete files in folder'
+      'Do not repack, delete files in folder and folder')
   end
   object MakeNormalDriveButton: TBitBtn
     Left = 16

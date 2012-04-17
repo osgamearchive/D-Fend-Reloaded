@@ -1059,7 +1059,6 @@
 			<param name="Name" value="Make installer package dialog">
 			<param name="Local" value="ProfileMakeInstallerPackage.html">
 			</OBJECT>
-
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="Manage icons dialog">
 			<param name="Local" value="ExtrasManageIcons.html">
@@ -1131,6 +1130,10 @@
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="Search for address in saved game">
 			<param name="Local" value="ExtrasSearchAddress.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Reset multiple profiles to values from templates">
+			<param name="Local" value="FileOptionsResetProfiles.html">
 			</OBJECT>
 	</UL>
 	<LI> <OBJECT type="text/sitemap">

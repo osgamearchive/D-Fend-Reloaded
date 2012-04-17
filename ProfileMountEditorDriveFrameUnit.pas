@@ -209,7 +209,7 @@ begin
     end;
     If MessageDlg(Format(LanguageSetup.ProfileMountingZipMakeFromNormalMountConfirmation,[MountDir,ZipFile]),mtConfirmation,[mbYes,mbNo],0)<>mrYes then exit;
     if not CreateZipFile(self,ZipFile,MountDir,dmFolder,GetCompressStrengthFromPrgSetup) then exit;
-    {RealFolder$ZipFile;ZIP;Letter;False;;FreeSpace;DeleteMode(no;files;folder)}
+    {RealFolder$ZipFile;ZIP;Letter;False;;FreeSpace;DeleteMode(no;files;folder;no-norepack;files-norepack;folder-norepack)}
     SpecialSettings:=MakeRelPath(MountDir,PrgSetup.BaseDir)+'$'+MakeRelPath(ZipFile,PrgSetup.BaseDir)+';ZIP;'+FolderDriveLetterComboBox.Text+';False;;'+IntToStr(FolderFreeSpaceTrackBar.Position)+';folder';
     InfoData.CloseRequest(self);
     exit;
@@ -253,7 +253,7 @@ begin
     F.ExtraExeFiles[I]:=S;
   end;
 
-  {RealFolder$ZipFile;ZIP;Letter;False;;FreeSpace;DeleteMode(no;files;folder)}
+  {RealFolder$ZipFile;ZIP;Letter;False;;FreeSpace;DeleteMode(no;files;folder;no-norepack;files-norepack;folder-norepack)}
   SpecialSettings:=MakeRelPath(ThisGameDir,PrgSetup.BaseDir)+'$'+MakeRelPath(ZipFile,PrgSetup.BaseDir)+';ZIP;'+FolderDriveLetterComboBox.Text+';False;;'+IntToStr(FolderFreeSpaceTrackBar.Position)+';folder';
   InfoData.CloseRequest(self);
   exit;

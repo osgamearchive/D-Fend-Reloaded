@@ -257,6 +257,7 @@ object ModernProfileEditorDirectoryFrame: TModernProfileEditorDirectoryFrame
     EditLabel.Height = 13
     EditLabel.Caption = 'ScreenshotFolderEdit'
     TabOrder = 0
+    OnChange = ScreenshotFolderEditChange
   end
   object GenerateScreenshotFolderNameButton: TBitBtn
     Tag = 9

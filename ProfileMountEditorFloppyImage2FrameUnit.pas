@@ -214,7 +214,7 @@ begin
             MessageDlg(LanguageSetup.MessageNoImageSelected,mtError,[mbOK],0);
             exit;
           end;
-          S:=ShowCreateImageFileDialog(self,True,False);
+          S:=ShowCreateImageFileDialog(self,True,False,InfoData.GameDB);
           If S='' then exit;
           FloppyImageTab.Cells[0,FloppyImageTab.Row]:=MakeRelPath(S,PrgSetup.BaseDir);
         end;

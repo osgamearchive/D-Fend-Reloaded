@@ -145,7 +145,7 @@ begin
     2 : Game.IPXType:='server';
   end;
   Game.IPXAddress:=ServerAddressEdit.Text;
-  Game.IPXPort:=IntToStr(PortEdit.Value);
+  Game.IPXPort:=IntToStr(Min(99999,Max(1,PortEdit.Value)));
 
   Game.NE2000:=NE2000CheckBox.Checked;
   Game.NE2000Base:=NE2000BaseAddressComboBox.Items[max(0,NE2000BaseAddressComboBox.ItemIndex)];

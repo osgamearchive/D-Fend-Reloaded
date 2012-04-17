@@ -71,7 +71,7 @@ type
 
 implementation
 
-uses VistaToolsUnit, LanguageSetupUnit, HelpConsts;
+uses Math, VistaToolsUnit, LanguageSetupUnit, HelpConsts;
 
 {$R *.dfm}
 
@@ -146,6 +146,21 @@ begin
   If JustChanging then exit;
   JustChanging:=True;
   try
+    SoundVolumeMasterLeftEdit.Value:=Min(200,Max(0,SoundVolumeMasterLeftEdit.Value));
+    SoundVolumeMasterRightEdit.Value:=Min(200,Max(0,SoundVolumeMasterRightEdit.Value));
+    SoundVolumeDisneyLeftEdit.Value:=Min(200,Max(0,SoundVolumeDisneyLeftEdit.Value));
+    SoundVolumeDisneyRightEdit.Value:=Min(200,Max(0,SoundVolumeDisneyRightEdit.Value));
+    SoundVolumeSpeakerLeftEdit.Value:=Min(200,Max(0,SoundVolumeSpeakerLeftEdit.Value));
+    SoundVolumeSpeakerRightEdit.Value:=Min(200,Max(0,SoundVolumeSpeakerRightEdit.Value));
+    SoundVolumeGUSLeftEdit.Value:=Min(200,Max(0,SoundVolumeGUSLeftEdit.Value));
+    SoundVolumeGUSRightEdit.Value:=Min(200,Max(0,SoundVolumeGUSRightEdit.Value));
+    SoundVolumeSBLeftEdit.Value:=Min(200,Max(0,SoundVolumeSBLeftEdit.Value));
+    SoundVolumeSBRightEdit.Value:=Min(200,Max(0,SoundVolumeSBRightEdit.Value));
+    SoundVolumeFMLeftEdit.Value:=Min(200,Max(0,SoundVolumeFMLeftEdit.Value));
+    SoundVolumeFMRightEdit.Value:=Min(200,Max(0,SoundVolumeFMRightEdit.Value));
+    SoundVolumeCDLeftEdit.Value:=Min(200,Max(0,SoundVolumeCDLeftEdit.Value));
+    SoundVolumeCDRightEdit.Value:=Min(200,Max(0,SoundVolumeCDRightEdit.Value));
+
     SoundVolumeMasterLeftTrackBar.Position:=SoundVolumeMasterLeftTrackBar.Max-SoundVolumeMasterLeftEdit.Value;
     SoundVolumeMasterRightTrackBar.Position:=SoundVolumeMasterRightTrackBar.Max-SoundVolumeMasterRightEdit.Value;
     SoundVolumeDisneyLeftTrackBar.Position:=SoundVolumeDisneyLeftTrackBar.Max-SoundVolumeDisneyLeftEdit.Value;
@@ -160,7 +175,6 @@ begin
     SoundVolumeFMRightTrackBar.Position:=SoundVolumeFMRightTrackBar.Max-SoundVolumeFMRightEdit.Value;
     SoundVolumeCDLeftTrackBar.Position:=SoundVolumeCDLeftTrackBar.Max-SoundVolumeCDLeftEdit.Value;
     SoundVolumeCDRightTrackBar.Position:=SoundVolumeCDRightTrackBar.Max-SoundVolumeCDRightEdit.Value;
-
   finally
     JustChanging:=False;
   end;

@@ -243,6 +243,7 @@ Type TByteArray=Array[0..MaxInt-1] of Byte;
 Function FindStringInFile(const FileName, SearchString : String) : Boolean;
 Var MSt : TMemoryStream;
     I,J : Integer;
+    B : Boolean;
 begin
   result:=False;
   If not FileExists(FileName) then exit;
@@ -250,7 +251,9 @@ begin
   try
     try MSt.LoadFromFile(FileName); except exit; end;
       For I:=0 to MSt.Size-length(SearchString) do If TByteArray(MSt.Memory^)[I]=Byte(SearchString[1]) then begin
-        for J:=2 to length(SearchString) do If TByteArray(MSt.Memory^)[I+J-1]=Byte(SearchString[J]) then begin result:=True; exit; end;
+        B:=True;
+        for J:=2 to length(SearchString) do If TByteArray(MSt.Memory^)[I+J-1]<>Byte(SearchString[J]) then begin B:=False; break; end;
+        if B then begin result:=True; exit; end;
       end;
   finally
     MSt.Free;

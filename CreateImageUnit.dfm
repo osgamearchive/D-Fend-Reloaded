@@ -3,7 +3,7 @@ object CreateImageForm: TCreateImageForm
   Top = 0
   BorderStyle = bsDialog
   Caption = 'CreateImage'
-  ClientHeight = 495
+  ClientHeight = 544
   ClientWidth = 554
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -19,7 +19,7 @@ object CreateImageForm: TCreateImageForm
   OnShow = FormShow
   DesignSize = (
     554
-    495)
+    544)
   PixelsPerInch = 96
   TextHeight = 13
   object ImageFileButton: TSpeedButton
@@ -175,35 +175,35 @@ object CreateImageForm: TCreateImageForm
   end
   object OKButton: TBitBtn
     Left = 8
-    Top = 462
-    Width = 97
-    Height = 25
-    Anchors = [akLeft, akBottom]
-    TabOrder = 11
-    OnClick = OKButtonClick
-    Kind = bkOK
-    ExplicitTop = 443
-  end
-  object CancelButton: TBitBtn
-    Left = 120
-    Top = 462
+    Top = 511
     Width = 97
     Height = 25
     Anchors = [akLeft, akBottom]
     TabOrder = 12
-    Kind = bkCancel
-    ExplicitTop = 443
+    OnClick = OKButtonClick
+    Kind = bkOK
+    ExplicitTop = 485
   end
-  object HelpButton: TBitBtn
-    Left = 232
-    Top = 462
+  object CancelButton: TBitBtn
+    Left = 120
+    Top = 511
     Width = 97
     Height = 25
     Anchors = [akLeft, akBottom]
     TabOrder = 13
+    Kind = bkCancel
+    ExplicitTop = 485
+  end
+  object HelpButton: TBitBtn
+    Left = 232
+    Top = 511
+    Width = 97
+    Height = 25
+    Anchors = [akLeft, akBottom]
+    TabOrder = 14
     OnClick = HelpButtonClick
     Kind = bkHelp
-    ExplicitTop = 443
+    ExplicitTop = 485
   end
   object ImageFileEdit: TLabeledEdit
     Left = 8
@@ -299,18 +299,37 @@ object CreateImageForm: TCreateImageForm
   end
   object WriteToFloppyCheckBox: TCheckBox
     Left = 8
-    Top = 432
+    Top = 455
     Width = 518
     Height = 17
     Anchors = [akLeft, akTop, akRight]
     Caption = 'Write image file to real floppy after creation'
+    TabOrder = 11
+  end
+  object AddDoszipCheckBox: TCheckBox
+    Left = 8
+    Top = 432
+    Width = 518
+    Height = 17
+    Caption = 'Add Doszip file manager'
+    Checked = True
+    State = cbChecked
     TabOrder = 10
+  end
+  object CreateProfileCheckBox: TCheckBox
+    Left = 8
+    Top = 478
+    Width = 518
+    Height = 17
+    Anchors = [akLeft, akTop, akRight]
+    Caption = 'Create DOSBox profile for booting the image'
+    TabOrder = 15
   end
   object ImageList: TImageList
     Left = 192
     Top = 1
     Bitmap = {
-      494C010102000400040010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010102000400100010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000001000000001002000000000000010
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

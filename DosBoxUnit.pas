@@ -816,6 +816,7 @@ Function BuildAutoexec(const Game : TGame; const RunSetup : Boolean; const St : 
   begin If (Left<>100) or (Right<>100) then St.Add('mixer '+Channel+' '+IntToStr(Left)+':'+IntToStr(Right)+' /NOSHOW'); end;
 Var S,T,U,NumCommands,MouseCommands,UsePath,Mount,UnMount : String;
     I : Integer;
+    B : Boolean;
     FreeDriveLetters : String;
     St2 : TStringList;
     DOSBoxNr : Integer;
@@ -979,7 +980,14 @@ begin
   SpeedTestInfo('Adding user defined autoexec lines to [autoexec] section of DOSBox conf file');
 
   St2:=StringToStringList(Game.Autoexec);
-  try St.AddStrings(St2); finally St2.Free; end;
+  try
+    B:=False;
+    If (St2.Count>0) then for I:=0 to Min(St2.Count-1,2) do If ExtUpperCase(St2[I])='ECHO.' then begin B:=True; break; end;
+    If not B then St.Add('echo.');
+    St.AddStrings(St2);
+  finally
+    St2.Free;
+  end;
 
   { Run command }
 

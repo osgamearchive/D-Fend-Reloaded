@@ -31,6 +31,7 @@ type
     Mounting : TStringList;
     ProfileExe, ProfileSetup, ProfileName : PString;
     FGetFrame : TGetFrameFunction;
+    GameDB : TGameDB;
     Procedure LoadMountingList;
     function NextFreeDriveLetter: Char;
     Function UsedDriveLetters(const AllowedNr : Integer = -1) : String;
@@ -97,6 +98,8 @@ begin
   ProfileName:=InitData.CurrentProfileName;
 
   FGetFrame:=InitData.GetFrame;
+
+  GameDB:=InitData.GameDB;
 
   HelpContext:=ID_ProfileEditDrives;
 end;
@@ -203,7 +206,7 @@ begin
   Case (Sender as TComponent).Tag of
     0 : If Mounting.Count<10 then begin
           S:='';
-          if not ShowProfileMountEditorDialog(self,S,UsedDriveLetters,InitialDir,ProfileName^,F,NextFreeDriveLetter) then exit;
+          if not ShowProfileMountEditorDialog(self,S,UsedDriveLetters,InitialDir,ProfileName^,GameDB,F,NextFreeDriveLetter) then exit;
           Mounting.Add(S);
           LoadMountingList;
           MountingListView.ItemIndex:=MountingListView.Items.Count-1;
@@ -212,7 +215,7 @@ begin
           I:=MountingListView.ItemIndex;
           If I<0 then exit;
           S:=Mounting[I];
-          if not ShowProfileMountEditorDialog(self,S,UsedDriveLetters(I),InitialDir,ProfileName^,F) then exit;
+          if not ShowProfileMountEditorDialog(self,S,UsedDriveLetters(I),InitialDir,ProfileName^,GameDB,F) then exit;
           Mounting[I]:=S;
           LoadMountingList;
           MountingListView.ItemIndex:=I;

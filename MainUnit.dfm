@@ -3,7 +3,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
   Top = 0
   ActiveControl = TreeView
   Caption = 'D-Fend Reloaded'
-  ClientHeight = 678
+  ClientHeight = 798
   ClientWidth = 774
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -4360,7 +4360,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
   object Splitter: TSplitter
     Left = 169
     Top = 24
-    Height = 532
+    Height = 652
     ResizeStyle = rsUpdate
     OnMoved = FormResize
     ExplicitLeft = 224
@@ -4371,7 +4371,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
     Left = 0
     Top = 24
     Width = 169
-    Height = 532
+    Height = 652
     Align = alLeft
     Constraints.MinWidth = 50
     HideSelection = False
@@ -4382,6 +4382,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
     TabOrder = 0
     OnChange = TreeViewChange
     OnDragDrop = MainDragDrop
+    ExplicitHeight = 632
   end
   object CoolBar: TCoolBar
     Left = 0
@@ -4518,13 +4519,14 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
     Left = 172
     Top = 24
     Width = 602
-    Height = 532
+    Height = 652
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 2
+    ExplicitHeight = 632
     object Splitter1: TSplitter
       Left = 0
-      Top = 329
+      Top = 449
       Width = 602
       Height = 3
       Cursor = crVSplit
@@ -4537,7 +4539,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
       Left = 0
       Top = 0
       Width = 602
-      Height = 329
+      Height = 449
       Align = alClient
       Columns = <>
       HideSelection = False
@@ -4556,10 +4558,11 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
       OnDragDrop = MainDragDrop
       OnInfoTip = ListViewInfoTip
       OnSelectItem = ListViewSelectItem
+      ExplicitHeight = 429
     end
     object CapturePageControl: TPageControl
       Left = 0
-      Top = 332
+      Top = 452
       Width = 602
       Height = 200
       ActivePage = CaptureScreenshotsTab
@@ -4573,6 +4576,10 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
       object CaptureScreenshotsTab: TTabSheet
         Caption = 'Screenshots'
         ImageIndex = 35
+        ExplicitLeft = 0
+        ExplicitTop = 0
+        ExplicitWidth = 0
+        ExplicitHeight = 0
         object ScreenshotListView: TListView
           Left = 0
           Top = 17
@@ -4683,6 +4690,10 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
       object GameNotesPanel: TTabSheet
         Caption = 'Notes'
         ImageIndex = 44
+        ExplicitLeft = 0
+        ExplicitTop = 0
+        ExplicitWidth = 0
+        ExplicitHeight = 0
         object GameNotesEdit: TRichEdit
           Left = 0
           Top = 22
@@ -4772,7 +4783,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
   end
   object ZipInfoPanel: TPanel
     Left = 0
-    Top = 556
+    Top = 676
     Width = 774
     Height = 40
     Align = alBottom
@@ -4782,6 +4793,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
     TabOrder = 3
     Visible = False
     OnDblClick = ZipInfoPanelDblClick
+    ExplicitTop = 656
     DesignSize = (
       774
       40)
@@ -4799,7 +4811,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
   end
   object FirstRunInfoPanel: TPanel
     Left = 0
-    Top = 596
+    Top = 716
     Width = 774
     Height = 82
     Align = alBottom
@@ -4809,6 +4821,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
     TabOrder = 4
     Visible = False
     OnDblClick = ZipInfoPanelDblClick
+    ExplicitTop = 696
     DesignSize = (
       774
       82)
@@ -4857,7 +4870,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
     Left = 304
     Top = 32
     Bitmap = {
-      494C01012E003400140010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01012E003400440010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000040000000C0000000010020000000000000C0
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -6894,33 +6907,42 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
       object N5: TMenuItem
         Caption = '-'
       end
-      object MenuProfileOpenFolder: TMenuItem
-        Tag = 4007
-        Caption = 'Open &program folder'
-        ImageIndex = 11
-        ShortCut = 16454
-        OnClick = MenuWork
-      end
-      object MenuProfileOpenCaptureFolder: TMenuItem
-        Tag = 4019
-        Caption = 'Open &capture folder'
-        ImageIndex = 35
-        OnClick = MenuWork
-      end
-      object MenuProfileOpenDataFolder: TMenuItem
-        Tag = 4008
-        Caption = 'Open &data folder'
-        ImageIndex = 13
-        ShortCut = 16455
-        OnClick = MenuWork
-      end
-      object MenuProfileOpenFileInProgramFolder: TMenuItem
-        Caption = 'Open file in program folder'
-        ImageIndex = 23
-      end
-      object MenuProfileOpenFileInDataFolder: TMenuItem
-        Caption = 'Open file in data folder'
-        ImageIndex = 23
+      object MenuProfileFilesFolders: TMenuItem
+        Caption = 'Files && Folders'
+        object MenuProfileOpenFolder: TMenuItem
+          Tag = 4007
+          Caption = 'Open &program folder'
+          ImageIndex = 11
+          ShortCut = 16454
+          OnClick = MenuWork
+        end
+        object MenuProfileOpenFolderDOSBox: TMenuItem
+          Tag = 4022
+          Caption = 'Open DOSBox prompt in program folder'
+          ImageIndex = 16
+          OnClick = MenuWork
+        end
+        object MenuProfileOpenCaptureFolder: TMenuItem
+          Tag = 4019
+          Caption = 'Open &capture folder'
+          ImageIndex = 35
+          OnClick = MenuWork
+        end
+        object MenuProfileOpenDataFolder: TMenuItem
+          Tag = 4008
+          Caption = 'Open &data folder'
+          ImageIndex = 13
+          ShortCut = 16455
+          OnClick = MenuWork
+        end
+        object MenuProfileOpenFileInProgramFolder: TMenuItem
+          Caption = 'Open file in program folder'
+          ImageIndex = 23
+        end
+        object MenuProfileOpenFileInDataFolder: TMenuItem
+          Caption = 'Open file in data folder'
+          ImageIndex = 23
+        end
       end
       object MenuProfileWWW: TMenuItem
         Caption = 'Internet-Adresse '#246'ffnen'
@@ -7358,33 +7380,42 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
     object N4: TMenuItem
       Caption = '-'
     end
-    object PopupOpenFolder: TMenuItem
-      Tag = 4007
-      Caption = 'Open &program folder'
-      ImageIndex = 11
-      ShortCut = 16454
-      OnClick = MenuWork
-    end
-    object PopupOpenCaptureFolder: TMenuItem
-      Tag = 4019
-      Caption = 'Open &capture folder'
-      ImageIndex = 35
-      OnClick = MenuWork
-    end
-    object PopupOpenDataFolder: TMenuItem
-      Tag = 4008
-      Caption = 'Open &data folder'
-      ImageIndex = 13
-      ShortCut = 16455
-      OnClick = MenuWork
-    end
-    object PopupOpenFileInProgramFolder: TMenuItem
-      Caption = 'Open file in program folder'
-      ImageIndex = 23
-    end
-    object PopupOpenFileInDataFolder: TMenuItem
-      Caption = 'Open file in data folder'
-      ImageIndex = 23
+    object PopupFilesFolders: TMenuItem
+      Caption = 'Files && Folders'
+      object PopupOpenFolder: TMenuItem
+        Tag = 4007
+        Caption = 'Open &program folder'
+        ImageIndex = 11
+        ShortCut = 16454
+        OnClick = MenuWork
+      end
+      object PopupOpenFolderDOSBox: TMenuItem
+        Tag = 4022
+        Caption = 'Open DOSBox prompt in program folder'
+        ImageIndex = 16
+        OnClick = MenuWork
+      end
+      object PopupOpenCaptureFolder: TMenuItem
+        Tag = 4019
+        Caption = 'Open &capture folder'
+        ImageIndex = 35
+        OnClick = MenuWork
+      end
+      object PopupOpenDataFolder: TMenuItem
+        Tag = 4008
+        Caption = 'Open &data folder'
+        ImageIndex = 13
+        ShortCut = 16455
+        OnClick = MenuWork
+      end
+      object PopupOpenFileInProgramFolder: TMenuItem
+        Caption = 'Open file in program folder'
+        ImageIndex = 23
+      end
+      object PopupOpenFileInDataFolder: TMenuItem
+        Caption = 'Open file in data folder'
+        ImageIndex = 23
+      end
     end
     object PopupWWW: TMenuItem
       Caption = 'Internet-Adresse '#246'ffnen'
@@ -9763,7 +9794,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
     Left = 216
     Top = 296
     Bitmap = {
-      494C010104000C00140010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010104000C00440010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000002000000001002000000000000020
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

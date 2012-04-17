@@ -242,7 +242,7 @@ object SetupFrameDOSBox: TSetupFrameDOSBox
     Height = 21
     Style = csDropDownList
     Anchors = [akLeft, akTop, akRight]
-    ItemHeight = 0
+    ItemHeight = 13
     TabOrder = 0
     OnChange = DOSBoxInstallationComboBoxChange
   end

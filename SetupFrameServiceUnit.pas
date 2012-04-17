@@ -125,7 +125,7 @@ begin
   Service7Button.Visible:=AdvancedMode;
   Service8Button.Visible:=AdvancedMode;
   Service9Button.Visible:=AdvancedMode;
-  Service10Button.Visible:=AdvancedMode and PrgSetup.ActivateIncompleteFeatures;
+  Service10Button.Visible:=AdvancedMode;
 end;
 
 procedure TSetupFrameService.HideFrame;

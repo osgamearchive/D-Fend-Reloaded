@@ -159,30 +159,25 @@ object ProfileMountEditorPhysFSFrame: TProfileMountEditorPhysFSFrame
     EditLabel.Caption = 'Select zip file to mount'
     TabOrder = 3
   end
-  object RepackCheckBox: TCheckBox
-    Left = 17
-    Top = 195
-    Width = 677
-    Height = 17
-    Anchors = [akLeft, akTop, akRight]
-    Caption = 'Repack folder content to zip file when DOSBox terminates'
-    TabOrder = 4
-    OnClick = RepackCheckBoxClick
-  end
   object RepackTypeComboBox: TComboBox
     Left = 16
     Top = 242
-    Width = 273
+    Width = 361
     Height = 21
     Style = csDropDownList
     ItemHeight = 13
     ItemIndex = 1
-    TabOrder = 5
-    Text = 'Delete files in folder'
+    TabOrder = 4
+    Text = 'Repack then delete files in folder'
+    OnChange = RepackTypeComboBoxChange
+    OnDropDown = RepackTypeComboBoxDropDown
     Items.Strings = (
-      'Kepp folder content'
-      'Delete files in folder'
-      'Delete files in folder and folder')
+      'Repack but keep folder content'
+      'Repack then delete files in folder'
+      'Repack then delete files in folder and folder'
+      'Do not repack, keep folder content'
+      'Do not repack, delete files in folder'
+      'Do not repack, delete files in folder and folder')
   end
   object MakeNormalDriveButton: TBitBtn
     Left = 16
@@ -195,7 +190,7 @@ object ProfileMountEditorPhysFSFrame: TProfileMountEditorPhysFSFrame
     Caption = 'Make normal drive from this mount'
     ParentShowHint = False
     ShowHint = True
-    TabOrder = 6
+    TabOrder = 5
     OnClick = MakeNormalDriveButtonClick
     Glyph.Data = {
       76010000424D7601000000000000760000002800000020000000100000000100

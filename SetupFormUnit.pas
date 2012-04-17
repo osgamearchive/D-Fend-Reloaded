@@ -125,7 +125,7 @@ uses Math, VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgSetupUnit,
      SetupFrameGameListIconModeAppearanceUnit, SetupFrameUserInterpreterFrameUnit,
      SetupFrameImageScalingUnit, SetupFrameMoreEmulatorsUnit,
      SetupFrameAutomaticConfigurationUnit, SetupFrameDOSBoxGlobalUnit,
-     SetupFrameDataPrivacyUnit;
+     SetupFrameDataPrivacyUnit, MainUnit;
 
 {$R *.dfm}
 
@@ -501,17 +501,22 @@ end;
 
 Function ShowSetupDialogSpecial(const AOwner : TComponent; const AGameDB : TGameDB; const ASearchLinkFile : TLinkFile; const OpenMode : TOpenMode) : Boolean;
 begin
-  SetupForm:=TSetupForm.Create(AOwner);
+  DFendReloadedMainForm.Enabled:=False;
   try
-    SetupForm.GameDB:=AGameDB;
-    SetupForm.SearchLinkFile:=ASearchLinkFile;
-    If OpenMode<>omNormal then SetupForm.OpenMode:=OpenMode;
-    If (OpenMode<>omNormal) and (OpenMode<>omLanguage) and (OpenMode<>omIconSet) and (OpenMode<>omUpdate) then SetupForm.SetAdvanced:=True;
-    result:=(SetupForm.ShowModal=mrOK);
-    if not result then LoadLanguage(PrgSetup.Language);
-    If result and (SetupForm.LanguageEditorMode>0) then OpenLanguageEditor(AOwner,SetupForm.LanguageEditorMode);
+    SetupForm:=TSetupForm.Create(AOwner);
+    try
+      SetupForm.GameDB:=AGameDB;
+      SetupForm.SearchLinkFile:=ASearchLinkFile;
+      If OpenMode<>omNormal then SetupForm.OpenMode:=OpenMode;
+      If (OpenMode<>omNormal) and (OpenMode<>omLanguage) and (OpenMode<>omIconSet) and (OpenMode<>omUpdate) then SetupForm.SetAdvanced:=True;
+      result:=(SetupForm.ShowModal=mrOK);
+      if not result then LoadLanguage(PrgSetup.Language);
+      If result and (SetupForm.LanguageEditorMode>0) then OpenLanguageEditor(AOwner,SetupForm.LanguageEditorMode);
+    finally
+      SetupForm.Free;
+    end;
   finally
-    SetupForm.Free;
+    DFendReloadedMainForm.Enabled:=True;
   end;
 end;
 

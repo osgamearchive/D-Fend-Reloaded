@@ -88,7 +88,7 @@ object ModernProfileEditorNetworkFrame: TModernProfileEditorNetworkFrame
     Top = 275
     Width = 113
     Height = 21
-    ItemHeight = 0
+    ItemHeight = 13
     TabOrder = 5
     Text = 'NE2000BaseAddressComboBox'
   end
@@ -97,7 +97,7 @@ object ModernProfileEditorNetworkFrame: TModernProfileEditorNetworkFrame
     Top = 275
     Width = 113
     Height = 21
-    ItemHeight = 0
+    ItemHeight = 13
     TabOrder = 6
     Text = 'NE2000InterruptComboBox'
   end

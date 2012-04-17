@@ -18,9 +18,11 @@ end;
 
 const TempDOSBoxName='TempDOSBox';
 
+Procedure RunDOSBoxCommandLineOnFolder(const Folder : String);
+
 implementation
 
-uses Classes, SysUtils, PrgSetupUnit, CommonTools;
+uses Classes, SysUtils, PrgSetupUnit, CommonTools, DosBoxUnit;
 
 { TTempGame }
 
@@ -120,6 +122,40 @@ begin
   FGame.StartFullscreen:=False;
   FGame.CustomDOSBoxDir:='';
   FGame.CloseDosBoxAfterGameExit:=True;
+end;
+
+Procedure RunDOSBoxCommandLineOnFolder(const Folder : String);
+Var Temp : TTempGame;
+    S,T : String;
+    St : TStringList;
+begin
+  Temp:=TTempGame.Create;
+  try
+    S:=MakeAbsPath(PrgSetup.GameDir,PrgSetup.BaseDir);
+    T:=MakeAbsPath(Folder,PrgSetup.BaseDir);
+    Temp.Game.NrOfMounts:=1;
+    St:=StringToStringList(Temp.Game.Autoexec);
+    St.Add('C:');
+    try
+      if Copy(ExtUpperCase(T),1,length(S))=ExtUpperCase(S) then begin
+        Temp.Game.Mount0:=MakeRelPath(PrgSetup.GameDir,PrgSetup.BaseDir,True)+';Drive;C;false;';
+        S:=ShortName(S);
+        T:=ShortName(T);
+        T:=Copy(T,length(S)+1,MaxInt);
+        If (T<>'') and (T[length(T)]='\') then T:=Copy(T,1,length(T)-1);
+        If (T<>'') and (T[1]='\') then T:=Copy(T,2,MaxInt);
+        if (T<>'') then St.Add('cd '+T);
+      end else begin
+        Temp.Game.Mount0:=MakeRelPath(Folder,PrgSetup.BaseDir,True)+';Drive;C;false;';
+      end;
+      Temp.Game.Autoexec:=StringListToString(St);
+    finally
+      St.Free;
+    end;
+    RunWithCommandline(Temp.Game,nil,'',true);
+  finally
+    Temp.Free;
+  end;
 end;
 
 end.

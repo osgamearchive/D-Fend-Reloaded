@@ -6,7 +6,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, ComCtrls, ZipMstr, SevenZipVCL;
 
-Type TZipMode=(zmExtract, zmCreate, zmAdd, zmCreateAndDelete, zmAddAndDelete);
+Type TZipMode=(zmExtract, zmCreate, zmAdd, zmCreateAndDelete, zmAddAndDelete, zmDeleteOnly);
 
 Type TDeleteMode=(dmNo, dmFiles, dmFolder, dmNoNoWarning, dmFilesNoWarning, dmFolderNoWarning); {Warning = Overwrite zip files warining}
 
@@ -60,6 +60,7 @@ var
 Function ExtractZipFile(const AOwner : TComponent; const AZipFile, ADestFolder : String) : Boolean;
 Function CreateZipFile(const AOwner : TComponent; const AZipFile, ADestFolder : String; const DeleteMode : TDeleteMode = dmNo; const CompressStrength : TCompressStrength = MAXIMUM) : Boolean;
 Function AddToZipFile(const AOwner : TComponent; const AZipFile, ADestFolder : String; const DeleteMode : TDeleteMode = dmNo; const CompressStrength : TCompressStrength = MAXIMUM) : Boolean;
+Function DeleteUnpackedFiles(const AOwner : TComponent; const ADestFolder : String; const DeleteMode : TDeleteMode = dmNo) : Boolean;
 
 Function ExtractZipDrive(const AOwner : TComponent; const AZipFile, AZipAddFolder, ADestFolder : String) : Boolean;
 
@@ -121,6 +122,7 @@ begin
     zmExtract                   : Caption:=LanguageSetup.ZipFormCaptionExtract;
     zmCreate, zmCreateAndDelete : Caption:=LanguageSetup.ZipFormCaptionCreate;
     zmAdd, zmAddAndDelete       : Caption:=LanguageSetup.ZipFormCaptionAdd;
+    zmDeleteOnly                : Caption:=LanguageSetup.ZipFormCaptionDelete;
   end;
 end;
 
@@ -139,31 +141,36 @@ begin
   SaveDir:=GetCurrentDir;
   try
     SetCurrentDir(ExtractFilePath(ExpandFileName(Application.ExeName)));
-    Ext:=Trim(UpperCase(ExtractFileExt(ZipFile)));
 
-    If (Mode in [zmCreate, zmAdd, zmCreateAndDelete, zmAddAndDelete]) and (not DirectoryExists(Folder)) then begin
-      MessageDlg(Format(LanguageSetup.MessageDirectoryNotFound,[Folder]),mtError,[mbOk],0);
-      ModalResult:=mrCancel;
-      PostMessage(Handle,WM_CLOSE,0,0);
-      exit;
+    if Mode=zmDeleteOnly then begin
+      Ok:=True;
+    end else begin
+      Ext:=Trim(UpperCase(ExtractFileExt(ZipFile)));
+
+      If (Mode in [zmCreate, zmAdd, zmCreateAndDelete, zmAddAndDelete]) and (not DirectoryExists(Folder)) then begin
+        MessageDlg(Format(LanguageSetup.MessageDirectoryNotFound,[Folder]),mtError,[mbOk],0);
+        ModalResult:=mrCancel;
+        PostMessage(Handle,WM_CLOSE,0,0);
+        exit;
+      end;
+
+      Handled:=False; Ok:=False;
+      For I:=0 to PrgSetup.PackerSettingsCount-1 do If ExtensionInList(Ext,PrgSetup.PackerSettings[I].FileExtensions) then begin
+        Handled:=True;
+        Ok:=ExternalWork(I);
+      end;
+
+      If not Handled then begin
+        If Ext='.ZIP' then begin Handled:=True; Ok:=ZipWork; end;
+        If Ext='.7Z' then begin Handled:=True; Ok:=SevenZipWork; end;
+      end;
+
+      If not Handled then begin
+        MessageDlg(Format(LanguageSetup.ZipFormUnknownExtension,[Ext]),mtError,[mbOK],0);
+      end;
     end;
 
-    Handled:=False; Ok:=False;
-    For I:=0 to PrgSetup.PackerSettingsCount-1 do If ExtensionInList(Ext,PrgSetup.PackerSettings[I].FileExtensions) then begin
-      Handled:=True;
-      Ok:=ExternalWork(I);
-    end;
-
-    If not Handled then begin
-      If Ext='.ZIP' then begin Handled:=True; Ok:=ZipWork; end;
-      If Ext='.7Z' then begin Handled:=True; Ok:=SevenZipWork; end;
-    end;
-
-    If not Handled then begin
-      MessageDlg(Format(LanguageSetup.ZipFormUnknownExtension,[Ext]),mtError,[mbOK],0);
-    end;
-
-    If Ok and ((Mode=zmCreateAndDelete) or (Mode=zmAddAndDelete)) then Ok:=DeleteFiles;
+    If Ok and ((Mode=zmCreateAndDelete) or (Mode=zmAddAndDelete) or (Mode=zmDeleteOnly)) then Ok:=DeleteFiles;
   finally
     SetCurrentDir(SaveDir);
   end;
@@ -541,6 +548,12 @@ begin
   If (DeleteMode<>dmNo) and (DeleteMode<>dmNoNoWarning)
     then result:=ZipDialogWork(AOwner,AZipFile,ADestFolder,zmAddAndDelete,CompressStrength,DeleteMode)
     else result:=ZipDialogWork(AOwner,AZipFile,ADestFolder,zmAdd,CompressStrength,DeleteMode);
+end;
+
+Function DeleteUnpackedFiles(const AOwner : TComponent; const ADestFolder : String; const DeleteMode : TDeleteMode = dmNo) : Boolean;
+begin
+  If (DeleteMode=dmNo) or (DeleteMode=dmNoNoWarning) then begin result:=True; exit; end;
+  result:=ZipDialogWork(AOwner,'',ADestFolder,zmDeleteOnly,SAVE,DeleteMode);
 end;
 
 Function ExtractZipDrive(const AOwner : TComponent; const AZipFile, AZipAddFolder, ADestFolder : String) : Boolean;

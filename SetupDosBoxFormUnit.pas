@@ -56,17 +56,6 @@ begin
   SetVistaFonts(self);
   Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName);
 
-  UserIconLoader.DialogImage(DI_Abort,AbortButton);
-
-  PostMessage(Handle,WM_USER+1,0,0);
-end;
-
-procedure TSetupDosBoxForm.StartSearch(var Msg: TMessage);
-Var C : Char;
-begin
-  Aborted:=False;
-  Count:=0;
-
   Case SearchType of
     stDOSBox  : Caption:=LanguageSetup.SetupDosBoxForm;
     stOggEnc  : Caption:=LanguageSetup.SetupDosBoxFormOggEnc;
@@ -75,6 +64,20 @@ begin
     stQBasic : Caption:=LanguageSetup.SetupDosBoxFormQBasic;
   end;
   AbortButton.Caption:=LanguageSetup.Abort;
+
+  UserIconLoader.DialogImage(DI_Abort,AbortButton);
+
+  PostMessage(Handle,WM_USER+1,0,0);
+end;
+
+procedure TSetupDosBoxForm.StartSearch(var Msg: TMessage);
+Var C : Char;
+begin
+  Repaint;
+  Application.ProcessMessages;
+
+  Aborted:=False;
+  Count:=0;
 
   try
     If SearchDir(PrgDir) then begin ModalResult:=mrOK; exit; end;

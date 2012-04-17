@@ -1779,7 +1779,7 @@ begin
             then T:=PrgSetup.GameDir
             else T:=ProfileSettingsValueListEditor.Strings.ValueFromIndex[2];
           U:=ProfileSettingsValueListEditor.Strings.ValueFromIndex[0];
-          if not ShowProfileMountEditorDialog(self,S,UsedDriveLetters,IncludeTrailingPathDelimiter(ExtractFilePath(T)),U,nil,NextFreeDriveLetter) then exit;
+          if not ShowProfileMountEditorDialog(self,S,UsedDriveLetters,IncludeTrailingPathDelimiter(ExtractFilePath(T)),U,GameDB,nil,NextFreeDriveLetter) then exit;
           Mounting.Add(S);
           LoadMountingList;
           MountingListView.ItemIndex:=MountingListView.Items.Count-1;
@@ -1792,7 +1792,7 @@ begin
             then T:=PrgSetup.GameDir
             else T:=ProfileSettingsValueListEditor.Strings.ValueFromIndex[2];
           U:=ProfileSettingsValueListEditor.Strings.ValueFromIndex[0];
-          if not ShowProfileMountEditorDialog(self,S,UsedDriveLetters(I),IncludeTrailingPathDelimiter(ExtractFilePath(T)),U) then exit;
+          if not ShowProfileMountEditorDialog(self,S,UsedDriveLetters(I),IncludeTrailingPathDelimiter(ExtractFilePath(T)),U,GameDB) then exit;
           Mounting[I]:=S;
           LoadMountingList;
           MountingListView.ItemIndex:=I;

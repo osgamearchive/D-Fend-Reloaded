@@ -84,7 +84,11 @@ begin
           If OpenDialog.Execute then begin
             FileNameEdit.Text:=OpenDialog.FileName;
             S:=Trim(ExtUpperCase(ExtractFileExt(FileNameEdit.Text)));
-            If (S='.ISO') or (S='.CUE') or (S='.BIN') then ImageTypeRadioGroup.ItemIndex:=2 else ImageTypeRadioGroup.ItemIndex:=0;
+            If (S='.ISO') or (S='.CUE') or (S='.BIN') then ImageTypeRadioGroup.ItemIndex:=2 else begin
+              if (GetFileSize(MakeAbsPath(FileNameEdit.Text,PrgSetup.BaseDir)))>=5*1024*1024
+              then ImageTypeRadioGroup.ItemIndex:=1
+              else ImageTypeRadioGroup.ItemIndex:=0;
+            end;
           end;
         end;
     1 : begin
@@ -108,7 +112,7 @@ begin
     MessageDlg(Format(LanguageSetup.MessageFileNotFound,[FileName]),mtError,[mbOk],0);
     ModalResult:=mrNone; exit;
   end;
-  If not CheckCDImage(FileName) then begin
+  If (ImageTypeRadioGroup.ItemIndex=2) and (not CheckCDImage(FileName)) then begin
     If MessageDlg(Format(LanguageSetup.ProfileMountingImageTypeWarning,[FileName]),mtWarning,[mbYes,mbNo],0)<>mrYes then begin
       ModalResult:=mrNone; exit;
     end;

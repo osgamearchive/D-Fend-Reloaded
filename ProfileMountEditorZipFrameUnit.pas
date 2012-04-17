@@ -33,6 +33,8 @@ type
     procedure ZipFileButtonClick(Sender: TObject);
     procedure ZipFolderCreateButtonClick(Sender: TObject);
     procedure MakeNormalDriveButtonClick(Sender: TObject);
+    procedure RepackTypeComboBoxChange(Sender: TObject);
+    procedure RepackTypeComboBoxDropDown(Sender: TObject);
   private
     { Private-Deklarationen }
     InfoData : TInfoData;
@@ -90,7 +92,10 @@ begin
   RepackTypeComboBox.Items[0]:=LanguageSetup.ProfileMountingZipRepackNoDelete;
   RepackTypeComboBox.Items[1]:=LanguageSetup.ProfileMountingZipRepackDeleteFiles;
   RepackTypeComboBox.Items[2]:=LanguageSetup.ProfileMountingZipRepackDeleteFolder;
-  RepackTypeComboBox.ItemIndex:=0;  
+  RepackTypeComboBox.Items[3]:=LanguageSetup.ProfileMountingZipRepackNoDeleteNoRepack;
+  RepackTypeComboBox.Items[4]:=LanguageSetup.ProfileMountingZipRepackDeleteFilesNoRepack;
+  RepackTypeComboBox.Items[5]:=LanguageSetup.ProfileMountingZipRepackDeleteFolderNoRepack;
+  RepackTypeComboBox.ItemIndex:=0;
 
   InfoLabel.Caption:=LanguageSetup.ProfileMountingZipInfo;
 
@@ -108,7 +113,7 @@ begin
   try
     S:=Trim(ExtUpperCase(St[1]));
     If S='ZIP' then begin
-      {RealFolder$ZipFile;ZIP;Letter;False;;FreeSpace;DeleteMode(no;files;folder)}
+      {RealFolder$ZipFile;ZIP;Letter;False;;FreeSpace;DeleteMode(no;files;folder;no-norepack;files-norepack;folder-norepack)}
       result:=True;
       S:=Trim(St[0]); I:=Pos('$',S); If I=0 then T:='' else begin T:=Trim(Copy(S,I+1,MaxInt)); S:=Trim(Copy(S,1,I-1)); end;
       ZipFolderEdit.Text:=S; ZipFileEdit.Text:=T;
@@ -125,6 +130,9 @@ begin
         If S='NO' then RepackTypeComboBox.ItemIndex:=0;
         If S='FILES' then RepackTypeComboBox.ItemIndex:=1;
         If S='FOLDER' then RepackTypeComboBox.ItemIndex:=2;
+        If S='NO-NOREPACK' then RepackTypeComboBox.ItemIndex:=3;
+        If S='FILES-NOREPACK' then RepackTypeComboBox.ItemIndex:=4;
+        If S='FOLDER-NOREPACK' then RepackTypeComboBox.ItemIndex:=5;
       end;
     end else begin
       result:=False;
@@ -138,6 +146,7 @@ begin
 
   ZipFolderDriveLetterComboBoxChange(self);
   ZipFolderFreeSpaceTrackBarChange(self);
+  RepackTypeComboBoxChange(self);
 end;
 
 procedure TProfileMountEditorZipFrame.ShowFrame;
@@ -178,13 +187,16 @@ begin
     If MessageDlg(Format(LanguageSetup.ProfileMountingFolderDeleteWarning,[PrgSetup.GameDir]),mtWarning,[mbYes,mbNo],0)<>mrYes then B:=False;
   end;
 
-  {RealFolder$ZipFile;ZIP;Letter;False;;FreeSpace;DeleteMode(no;files;folder)}
+  {RealFolder$ZipFile;ZIP;Letter;False;;FreeSpace;DeleteMode(no;files;folder;no-norepack;files-norepack;folder-norepack)}
   S:=StringReplace(MakeRelPath(ZipFolderEdit.Text,PrgSetup.BaseDir)+'$'+MakeRelPath(ZipFileEdit.Text,PrgSetup.BaseDir),';','<semicolon>',[rfReplaceAll])+';ZIP;'+ZipFolderDriveLetterComboBox.Text+';False;';
   S:=S+';'+IntToStr(ZipFolderFreeSpaceTrackBar.Position);
   Case RepackTypeComboBox.ItemIndex of
     0 : S:=S+';no';
     1 : S:=S+';files';
     2 : S:=S+';folder';
+    3 : S:=S+';no-norepack';
+    4 : S:=S+';files-norepack';
+    5 : S:=S+';folder-norepack';
   end;
 
   If B then result:=S else result:='';
@@ -309,6 +321,16 @@ begin
           InfoData.CloseRequest(self);
         end;
   end;
+end;
+
+procedure TProfileMountEditorZipFrame.RepackTypeComboBoxChange(Sender: TObject);
+begin
+  SetComboHint(RepackTypeComboBox);
+end;
+
+procedure TProfileMountEditorZipFrame.RepackTypeComboBoxDropDown(Sender: TObject);
+begin
+  SetComboDropDownDropDownWidth(RepackTypeComboBox);
 end;
 
 Function TProfileMountEditorZipFrame.ChangeExtraExeFile(const NewFolder : String; var ExeName : String) : Boolean;

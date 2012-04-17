@@ -32,12 +32,13 @@ type
     { Private-Deklarationen }
     Mounting, MountingSave : TStringList;
     CurrentGameFile, CurrentGameName : String;
+    GameDB : TGameDB;
     function NextFreeDriveLetter: Char;
     function UsedDriveLetters(const AllowedNr : Integer = -1): String;
     procedure LoadMountingList;
   public
     { Public-Deklarationen }
-    Procedure Init(const GameDB : TGameDB);
+    Procedure Init(const AGameDB : TGameDB);
     Procedure Done;
     Procedure SetInsecureStatus(const Insecure : Boolean);
     procedure LoadData(const Template: TGame; const GameFile, SetupFile, GameName : String);
@@ -53,7 +54,7 @@ uses Math, VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgSetupUnit,
 
 { TWizardFinishFrame }
 
-procedure TWizardFinishFrame.Init(const GameDB: TGameDB);
+procedure TWizardFinishFrame.Init(const AGameDB: TGameDB);
 begin
   SetVistaFonts(self);
 
@@ -84,6 +85,8 @@ begin
 
   Mounting:=TStringList.Create;
   MountingSave:=TStringList.Create;
+
+  GameDB:=AGameDB;
 end;
 
 procedure TWizardFinishFrame.Done;
@@ -176,7 +179,7 @@ begin
   Case (Sender as TComponent).Tag of
     0 : If Mounting.Count<10 then begin
           S:='';
-          if not ShowProfileMountEditorDialog(self,S,UsedDriveLetters,IncludeTrailingPathDelimiter(ExtractFilePath(CurrentGameFile)),CurrentGameName,nil,NextFreeDriveLetter) then exit;
+          if not ShowProfileMountEditorDialog(self,S,UsedDriveLetters,IncludeTrailingPathDelimiter(ExtractFilePath(CurrentGameFile)),CurrentGameName,GameDB,nil,NextFreeDriveLetter) then exit;
           Mounting.Add(S);
           LoadMountingList;
           MountingListView.ItemIndex:=MountingListView.Items.Count-1;
@@ -185,7 +188,7 @@ begin
           I:=MountingListView.ItemIndex;
           If I<0 then exit;
           S:=Mounting[I];
-          if not ShowProfileMountEditorDialog(self,S,UsedDriveLetters(I),IncludeTrailingPathDelimiter(ExtractFilePath(CurrentGameFile)),CurrentGameName) then exit;
+          if not ShowProfileMountEditorDialog(self,S,UsedDriveLetters(I),IncludeTrailingPathDelimiter(ExtractFilePath(CurrentGameFile)),CurrentGameName,GameDB) then exit;
           Mounting[I]:=S;
           LoadMountingList;
           MountingListView.ItemIndex:=I;

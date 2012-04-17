@@ -301,7 +301,9 @@ const NR_Author=1;
       NR_MenuProfileMakeZipArchive=33033;
       NR_MenuProfileViewConfFile=33034;
       NR_MenuProfileViewIniFile=33035;
-      NR_MenuProfileCheating=33036;
+      NR_MenuProfileFilesAndFolders=33036;
+      NR_MenuProfileOpenFolderDOSBox=33037;
+      NR_MenuProfileCheating=33038;
       NR_MenuExtras=34001;
       NR_MenuExtrasIconManager=34002;
       NR_MenuExtrasIconManagerCaption=34003;
@@ -409,7 +411,9 @@ const NR_Author=1;
       NR_PopupMakeInstaller=37016;
       NR_PopupMakeZipArchive=37017;
       NR_PopupViewConfFile=37018;
-      NR_PopupView=37019;
+      NR_PopupFilesFolder=37019;
+      NR_PopupOpenFolderDOSBox=37020;
+      NR_PopupView=37021;
 
       NR_ScreenshotPopupOpen=38101;
       NR_ScreenshotPopupOpenExternal=38102;
@@ -747,8 +751,10 @@ const NR_Author=1;
       NR_ProfileMountingZipRepackNoDelete=42136;
       NR_ProfileMountingZipRepackDeleteFiles=42137;
       NR_ProfileMountingZipRepackDeleteFolder=42138;
-      NR_ProfileMountingZipInfo=42139;
-      NR_ProfileMountingZipRepackPhysFS=42140;
+      NR_ProfileMountingZipRepackNoDeleteNoRepack=42139;
+      NR_ProfileMountingZipRepackDeleteFilesNoRepack=42140;
+      NR_ProfileMountingZipRepackDeleteFolderNoRepack=42141;
+      NR_ProfileMountingZipInfo=42142;
       NR_ProfileMountingZipMakeNormalMount=42150;
       NR_ProfileMountingZipMakeNormalMountHint=42151;
       NR_ProfileMountingZipMakeNormalMountHere=42152;
@@ -983,56 +989,57 @@ const NR_Author=1;
       NR_SetupFormFontSize=43909;
       NR_SetupFormFontColor=43910;
       NR_SetupFormToolbar=43911;
-      NR_SetupFormTreeViewGroupLabel=43912;
-      NR_SetupFormTreeViewGroupAddButton=43913;
-      NR_SetupFormTreeViewGroupInfoLabel=43914;
-      NR_SetupFormMode=43915;
-      NR_SetupFormModeEasy=43916;
-      NR_SetupFormModeAdvanced=43917;
-      NR_SetupFormExeFilter=43918;
-      NR_SetupFormWaveEnc=43919;
-      NR_SetupFormWaveEncMp3=43920;
-      NR_SetupFormWaveEncMp3Parameters=43921;
-      NR_SetupFormWaveEncOgg=43922;
-      NR_SetupFormWaveEncOggParameters=43923;
-      NR_SetupFormSearchLame=43924;
-      NR_SetupFormSearchOggEnc=43925;
-      NR_SetupFormCenterDOSBoxWindow=43926;
-      NR_SetupFormUseShortPathNames=43927;
-      NR_SetupFormShortNameWarnings=43928;
-      NR_SetupFormAlwaysCreateConfFiles=43929;
-      NR_SetupFormDOSBoxStartFailedTimeout=43930;
-      NR_ValueForNotSet=43931;
-      NR_FontStyleForNonFavorites=43932;
-      NR_FontStyleForFavorites=43933;
-      NR_FontStyleForFavoritesBold=43934;
-      NR_FontStyleForFavoritesItalic=43935;
-      NR_FontStyleForFavoritesUnderline=43936;
-      NR_ScreenshotListViewWidth=43937;
-      NR_ScreenshotListViewHeight=43938;
-      NR_ScreenshotListViewUseFirstScreenshot=43939;
-      NR_ScreenshotListViewUseFirstScreenshotInfo=43940;
-      NR_SetupFormShowGridLines=43941;
-      NR_SetupFormUseWindowsExeIcons=43942;
-      NR_SetupFormNoteLinesInTooltips=43943;
-      NR_SetupFormRestoreSelectedProfile=43944;
-      NR_SetupFormStoreColumnWidths=43945;
-      NR_SetupFormTextEditor=43946;
-      NR_SetupFormTextEditorDefault=43947;
-      NR_SetupFormTextEditorDefaultFallback=43948;
-      NR_SetupFormTextEditorNotepad=43949;
-      NR_SetupFormTextEditorCustom=43950;
-      NR_SetupFormTextEditorCustomOpenCaption=43951;
-      NR_SetupFormTextEditorFixLineWrap=43952;
-      NR_SetupFormTextMediaViewer=43953;
-      NR_SetupFormTextMediaViewerImages=43954;
-      NR_SetupFormTextMediaViewerSounds=43955;
-      NR_SetupFormTextMediaViewerVideos=43956;
-      NR_SetupFormTextMediaViewerInterval=43957;
-      NR_SetupFormTextMediaViewerDefault=43958;
-      NR_SetupFormTextMediaViewerCustom=43959;
-      NR_SetupFormTextMediaViewerCustomOpenCaption=43960;
-      NR_SetupFormTextMediaViewerModal=43961;
+      NR_SetupFormTreeViewDefaultGroupLabel=43912;
+      NR_SetupFormTreeViewGroupLabel=43913;
+      NR_SetupFormTreeViewGroupAddButton=43914;
+      NR_SetupFormTreeViewGroupInfoLabel=43915;
+      NR_SetupFormMode=43916;
+      NR_SetupFormModeEasy=43917;
+      NR_SetupFormModeAdvanced=43918;
+      NR_SetupFormExeFilter=43919;
+      NR_SetupFormWaveEnc=43920;
+      NR_SetupFormWaveEncMp3=43921;
+      NR_SetupFormWaveEncMp3Parameters=43922;
+      NR_SetupFormWaveEncOgg=43923;
+      NR_SetupFormWaveEncOggParameters=43924;
+      NR_SetupFormSearchLame=43925;
+      NR_SetupFormSearchOggEnc=43926;
+      NR_SetupFormCenterDOSBoxWindow=43927;
+      NR_SetupFormUseShortPathNames=43928;
+      NR_SetupFormShortNameWarnings=43929;
+      NR_SetupFormAlwaysCreateConfFiles=43930;
+      NR_SetupFormDOSBoxStartFailedTimeout=43931;
+      NR_ValueForNotSet=43932;
+      NR_FontStyleForNonFavorites=43933;
+      NR_FontStyleForFavorites=43934;
+      NR_FontStyleForFavoritesBold=43935;
+      NR_FontStyleForFavoritesItalic=43936;
+      NR_FontStyleForFavoritesUnderline=43937;
+      NR_ScreenshotListViewWidth=43938;
+      NR_ScreenshotListViewHeight=43939;
+      NR_ScreenshotListViewUseFirstScreenshot=43940;
+      NR_ScreenshotListViewUseFirstScreenshotInfo=43941;
+      NR_SetupFormShowGridLines=43942;
+      NR_SetupFormUseWindowsExeIcons=43943;
+      NR_SetupFormNoteLinesInTooltips=43944;
+      NR_SetupFormRestoreSelectedProfile=43945;
+      NR_SetupFormStoreColumnWidths=43946;
+      NR_SetupFormTextEditor=43947;
+      NR_SetupFormTextEditorDefault=43948;
+      NR_SetupFormTextEditorDefaultFallback=43949;
+      NR_SetupFormTextEditorNotepad=43950;
+      NR_SetupFormTextEditorCustom=43951;
+      NR_SetupFormTextEditorCustomOpenCaption=43952;
+      NR_SetupFormTextEditorFixLineWrap=43953;
+      NR_SetupFormTextMediaViewer=43954;
+      NR_SetupFormTextMediaViewerImages=43955;
+      NR_SetupFormTextMediaViewerSounds=43956;
+      NR_SetupFormTextMediaViewerVideos=43957;
+      NR_SetupFormTextMediaViewerInterval=43958;
+      NR_SetupFormTextMediaViewerDefault=43959;
+      NR_SetupFormTextMediaViewerCustom=43960;
+      NR_SetupFormTextMediaViewerCustomOpenCaption=43961;
+      NR_SetupFormTextMediaViewerModal=43962;
 
       NR_SetupFormWine=44001;
       NR_SetupFormWineEnable=44002;
@@ -1288,7 +1295,12 @@ const NR_Author=1;
       NR_CreateImageFormMakeFloppyBootableWithMemoryManager=52014;
       NR_CreateImageFormMakeFloppyBootableWithFormat=52015;
       NR_CreateImageFormMakeFloppyBootableWithEdit=52016;
-      NR_CreateImageFormFormat=52017;
+      NR_CreateImageFormMakeFloppyBootableWithDoszip=52017;
+      NR_CreateImageFormFormat=52018;
+      NR_CreateImageFormCreateProfile=52019;
+      NR_CreateImageFormCreateProfileName=52020;
+      NR_CreateImageFormCreateProfileNameCaption=52021;
+      NR_CreateImageFormCreateProfileNamePrompt=52022;
 
       NR_InfoForm=53001;
       NR_InfoFormMain=53002;
@@ -1687,21 +1699,22 @@ const NR_Author=1;
       NR_ZipFormCaptionExtract=84001;
       NR_ZipFormCaptionCreate=84002;
       NR_ZipFormCaptionAdd=84003;
-      NR_ZipFormPasswordPrompt=84004;
-      NR_ZipFormProgress=84005;
-      NR_ZipFormProgressExtract=84006;
-      NR_ZipFormProgressCreate=84007;
-      NR_ZipFormProgressAdd=84008;
-      NR_ZipFormOverwriteWarning=84009;
-      NR_ZipFormErrorExtract=84010;
-      NR_ZipFormErrorCompress=84011;
-      NR_ZipFormErrorNoRepack7ZipSupport=84012;
-      NR_ZipFormErrorNoPassword7ZipSupport=84013;
-      NR_ZipFormWaitInfo=84014;
-      NR_ZipFormCloseWarning=84015;
-      NR_ZipFormZipFileInUseWarning=84016;
-      NR_ZipFormInvalidParameters=84017;
-      NR_ZipFormUnknownExtension=84018;
+      NR_ZipFormCaptionDelete=84004;
+      NR_ZipFormPasswordPrompt=84005;
+      NR_ZipFormProgress=84006;
+      NR_ZipFormProgressExtract=84007;
+      NR_ZipFormProgressCreate=84008;
+      NR_ZipFormProgressAdd=84009;
+      NR_ZipFormOverwriteWarning=84010;
+      NR_ZipFormErrorExtract=84011;
+      NR_ZipFormErrorCompress=84012;
+      NR_ZipFormErrorNoRepack7ZipSupport=84013;
+      NR_ZipFormErrorNoPassword7ZipSupport=84014;
+      NR_ZipFormWaitInfo=84015;
+      NR_ZipFormCloseWarning=84016;
+      NR_ZipFormZipFileInUseWarning=84017;
+      NR_ZipFormInvalidParameters=84018;
+      NR_ZipFormUnknownExtension=84019;
 
       NR_ZipWaitInfoForm=85001;
       NR_ZipWaitInfoFormInfo=85002;
@@ -2177,8 +2190,8 @@ Type TLanguageSetup=class(TBasePrgSetup)
     Procedure SetupLanguageStrings1;
     Procedure SetupLanguageStrings2;
     Procedure SetupLanguageStrings3;
-    Function GetString2(Index : Integer) : String;
-    Procedure SetString2(Index : Integer; S : String);
+    {Function GetString2(Index : Integer) : String;
+    Procedure SetString2(Index : Integer; S : String);}
   public
     Constructor Create(FileName : String =''; const MinimalInit : Boolean = False);
     Destructor Destroy; override;
@@ -2470,7 +2483,7 @@ Type TLanguageSetup=class(TBasePrgSetup)
     property MenuProfileOpenCaptureFolder : String index NR_MenuProfileOpenCaptureFolder read GetString write SetString;
     property MenuProfileOpenDataFolder : String index NR_MenuProfileOpenDataFolder read GetString write SetString;
     property MenuProfileOpenFileInDataFolder : String index NR_MenuProfileOpenFileInDataFolder read GetString write SetString;
-    property MenuProfileOpenFileInProgramFolder : String index NR_MenuProfileOpenFileInProgramFolder read GetString2 write SetString2;
+    property MenuProfileOpenFileInProgramFolder : String index NR_MenuProfileOpenFileInProgramFolder read GetString write SetString;
     property MenuProfileMarkAsFavorite : String index NR_MenuProfileMarkAsFavorite read GetString write SetString;
     property MenuProfileUnMarkAsFavorite : String index NR_MenuProfileUnMarkAsFavorite read GetString write SetString;
     property MenuProfileCreateShortcut : String index NR_MenuProfileCreateShortcut read GetString write SetString;
@@ -2481,6 +2494,8 @@ Type TLanguageSetup=class(TBasePrgSetup)
     property MenuProfileMakeZipArchive : String index NR_MenuProfileMakeZipArchive read GetString write SetString;
     property MenuProfileViewConfFile : String index NR_MenuProfileViewConfFile read GetString write SetString;
     property MenuProfileViewIniFile : String index NR_MenuProfileViewIniFile read GetString write SetString;
+    property MenuProfileFilesAndFolders : String index NR_MenuProfileFilesAndFolders read GetString write SetString;
+    property MenuProfileOpenFolderDOSBox : String index NR_MenuProfileOpenFolderDOSBox read GetString write SetString;
     property MenuProfileCheating : String index NR_MenuProfileCheating read GetString write SetString;
     property MenuExtras : String index NR_MenuExtras read GetString write SetString;
     property MenuExtrasIconManager : String index NR_MenuExtrasIconManager read GetString write SetString;
@@ -2580,7 +2595,7 @@ Type TLanguageSetup=class(TBasePrgSetup)
     property PopupOpenCaptureFolder : String index NR_PopupOpenCaptureFolder read GetString write SetString;
     property PopupOpenDataFolder : String index NR_PopupOpenDataFolder read GetString write SetString;
     property PopupOpenFileInDataFolder : String index NR_PopupOpenFileInDataFolder read GetString write SetString;
-    property PopupOpenFileInProgramFolder : String index NR_PopupOpenFileInProgramFolder read GetString2 write SetString2;
+    property PopupOpenFileInProgramFolder : String index NR_PopupOpenFileInProgramFolder read GetString write SetString;
     property PopupMarkAsFavorite : String index NR_PopupMarkAsFavorite read GetString write SetString;
     property PopupCreateShortcut : String index NR_PopupCreateShortcut read GetString write SetString;
     property PopupSearchGame : String index NR_PopupSearchGame read GetString write SetString;
@@ -2588,6 +2603,8 @@ Type TLanguageSetup=class(TBasePrgSetup)
     property PopupMakeInstaller : String index NR_PopupMakeInstaller read GetString write SetString;
     property PopupMakeZipArchive : String index NR_PopupMakeZipArchive read GetString write SetString;
     property PopupViewConfFile : String index NR_PopupViewConfFile read GetString write SetString;
+    property PopupFilesFolder : String index NR_PopupFilesFolder read GetString write SetString;
+    property PopupOpenFolderDOSBox : String index NR_PopupOpenFolderDOSBox read GetString write SetString;
     property PopupView : String index NR_PopupView read GetString write SetString;
     property ScreenshotPopupOpen : String index NR_ScreenshotPopupOpen read GetString write SetString;
     property ScreenshotPopupOpenExternal : String index NR_ScreenshotPopupOpenExternal read GetString write SetString;
@@ -2926,8 +2943,10 @@ Type TLanguageSetup=class(TBasePrgSetup)
     property ProfileMountingZipRepackNoDelete : String index NR_ProfileMountingZipRepackNoDelete read GetString write SetString;
     property ProfileMountingZipRepackDeleteFiles : String index NR_ProfileMountingZipRepackDeleteFiles read GetString write SetString;
     property ProfileMountingZipRepackDeleteFolder : String index NR_ProfileMountingZipRepackDeleteFolder read GetString write SetString;
+    property ProfileMountingZipRepackNoDeleteNoRepack : String index NR_ProfileMountingZipRepackNoDeleteNoRepack read GetString write SetString;
+    property ProfileMountingZipRepackDeleteFilesNoRepack : String index NR_ProfileMountingZipRepackDeleteFilesNoRepack read GetString write SetString;
+    property ProfileMountingZipRepackDeleteFolderNoRepack : String index NR_ProfileMountingZipRepackDeleteFolderNoRepack read GetString write SetString;
     property ProfileMountingZipInfo : String index NR_ProfileMountingZipInfo read GetString write SetString;
-    property ProfileMountingZipRepackPhysFS : String index NR_ProfileMountingZipRepackPhysFS read GetString write SetString;
     property ProfileMountingZipMakeNormalMount : String index NR_ProfileMountingZipMakeNormalMount read GetString write SetString;
     property ProfileMountingZipMakeNormalMountHint : String index NR_ProfileMountingZipMakeNormalMountHint read GetString write SetString;
     property ProfileMountingZipMakeNormalMountHere : String index NR_ProfileMountingZipMakeNormalMountHere read GetString write SetString;
@@ -3122,7 +3141,7 @@ Type TLanguageSetup=class(TBasePrgSetup)
     property SetupFormService7 : String index NR_SetupFormService7 read GetString write SetString;
     property SetupFormService8 : String index NR_SetupFormService8 read GetString write SetString;
     property SetupFormService9 : String index NR_SetupFormService9 read GetString write SetString;
-    property SetupFormService10 : String index NR_SetupFormService10 read GetString2 write SetString2;
+    property SetupFormService10 : String index NR_SetupFormService10 read GetString write SetString;
     property SetupFormUpdate0 : String index NR_SetupFormUpdate0 read GetString write SetString;
     property SetupFormUpdate1 : String index NR_SetupFormUpdate1 read GetString write SetString;
     property SetupFormUpdate2 : String index NR_SetupFormUpdate2 read GetString write SetString;
@@ -3156,6 +3175,7 @@ Type TLanguageSetup=class(TBasePrgSetup)
     property SetupFormFontSize : String index NR_SetupFormFontSize read GetString write SetString;
     property SetupFormFontColor : String index NR_SetupFormFontColor read GetString write SetString;
     property SetupFormToolbar : String index NR_SetupFormToolbar read GetString write SetString;
+    property SetupFormTreeViewDefaultGroupLabel : String index NR_SetupFormTreeViewDefaultGroupLabel read GetString write SetString;
     property SetupFormTreeViewGroupLabel : String index NR_SetupFormTreeViewGroupLabel read GetString write SetString;
     property SetupFormTreeViewGroupAddButton : String index NR_SetupFormTreeViewGroupAddButton read GetString write SetString;
     property SetupFormTreeViewGroupInfoLabel : String index NR_SetupFormTreeViewGroupInfoLabel read GetString write SetString;
@@ -3461,7 +3481,12 @@ Type TLanguageSetup=class(TBasePrgSetup)
     property CreateImageFormMakeFloppyBootableWithMemoryManager : String index NR_CreateImageFormMakeFloppyBootableWithMemoryManager read GetString write SetString;
     property CreateImageFormMakeFloppyBootableWithFormat : String index NR_CreateImageFormMakeFloppyBootableWithFormat read GetString write SetString;
     property CreateImageFormMakeFloppyBootableWithEdit : String index NR_CreateImageFormMakeFloppyBootableWithEdit read GetString write SetString;
+    property CreateImageFormMakeFloppyBootableWithDoszip : String index NR_CreateImageFormMakeFloppyBootableWithDoszip read GetString write SetString;
     property CreateImageFormFormat : String index NR_CreateImageFormFormat read GetString write SetString;
+    property CreateImageFormCreateProfile : String index NR_CreateImageFormCreateProfile read GetString write SetString;
+    property CreateImageFormCreateProfileName : String index NR_CreateImageFormCreateProfileName read GetString write SetString;
+    property CreateImageFormCreateProfileNameCaption : String index NR_CreateImageFormCreateProfileNameCaption read GetString write SetString;
+    property CreateImageFormCreateProfileNamePrompt : String index NR_CreateImageFormCreateProfileNamePrompt read GetString write SetString;
 
     property InfoForm : String index NR_InfoForm read GetString write SetString;
     property InfoFormMain : String index NR_InfoFormMain read GetString write SetString;
@@ -3858,6 +3883,7 @@ Type TLanguageSetup=class(TBasePrgSetup)
     property ZipFormCaptionExtract : String index NR_ZipFormCaptionExtract read GetString write SetString;
     property ZipFormCaptionCreate : String index NR_ZipFormCaptionCreate read GetString write SetString;
     property ZipFormCaptionAdd : String index NR_ZipFormCaptionAdd read GetString write SetString;
+    property ZipFormCaptionDelete : String index NR_ZipFormCaptionDelete read GetString write SetString;
     property ZipFormPasswordPrompt : String index NR_ZipFormPasswordPrompt read GetString write SetString;
     property ZipFormProgress : String index NR_ZipFormProgress read GetString write SetString;
     property ZipFormProgressExtract : String index NR_ZipFormProgressExtract read GetString write SetString;
@@ -4334,14 +4360,14 @@ Type TLanguageSetup=class(TBasePrgSetup)
     property DOSBoxOutputTestStart : String index NR_DOSBoxOutputTestStart read GetString write SetString;
     property DOSBoxOutputTestRunning : String index NR_DOSBoxOutputTestRunning read GetString write SetString;
 
-    property ResetProfiles : String index NR_ResetProfiles read GetString2 write SetString2;
-    property ResetProfilesProfiles : String index NR_ResetProfilesProfiles read GetString2 write SetString2;
-    property ResetProfilesProfilesInfo : String index NR_ResetProfilesProfilesInfo read GetString2 write SetString2;
-    property ResetProfilesSettings : String index NR_ResetProfilesSettings read GetString2 write SetString2;
-    property ResetProfilesSettingsInfo : String index NR_ResetProfilesSettingsInfo read GetString2 write SetString2;
-    property ResetProfilesTemplate : String index NR_ResetProfilesTemplate read GetString2 write SetString2;
-    property ResetProfilesTemplateTemplate : String index NR_ResetProfilesTemplateTemplate read GetString2 write SetString2;
-    property ResetProfilesTemplateAutoSetup : String index NR_ResetProfilesTemplateAutoSetup read GetString2 write SetString2;
+    property ResetProfiles : String index NR_ResetProfiles read GetString write SetString;
+    property ResetProfilesProfiles : String index NR_ResetProfilesProfiles read GetString write SetString;
+    property ResetProfilesProfilesInfo : String index NR_ResetProfilesProfilesInfo read GetString write SetString;
+    property ResetProfilesSettings : String index NR_ResetProfilesSettings read GetString write SetString;
+    property ResetProfilesSettingsInfo : String index NR_ResetProfilesSettingsInfo read GetString write SetString;
+    property ResetProfilesTemplate : String index NR_ResetProfilesTemplate read GetString write SetString;
+    property ResetProfilesTemplateTemplate : String index NR_ResetProfilesTemplateTemplate read GetString write SetString;
+    property ResetProfilesTemplateAutoSetup : String index NR_ResetProfilesTemplateAutoSetup read GetString write SetString;
   end;
 
 Function MaskUnderlineAmpersand(const S : String) : String;
@@ -4718,7 +4744,7 @@ begin
   AddStringRec(NR_MenuProfileOpenCaptureFolder,'Menu','Profile.OpenCaptureFolder','Open &capture folder');
   AddStringRec(NR_MenuProfileOpenDataFolder,'Menu','Profile.OpenDataFolder','Open &data folder');
   AddStringRec(NR_MenuProfileOpenFileInDataFolder,'Menu','Profile.OpenFileInDataFolder','Open file in data folder');
-  //AddStringRec(NR_MenuProfileOpenFileInProgramFolder,'Menu','Profile.OpenFileInProgramFolder','Open file in program folder');
+  AddStringRec(NR_MenuProfileOpenFileInProgramFolder,'Menu','Profile.OpenFileInProgramFolder','Open file in program folder');
   AddStringRec(NR_MenuProfileMarkAsFavorite,'Menu','Profile.MarkAsFavorite','Mark as &favorite');
   AddStringRec(NR_MenuProfileUnMarkAsFavorite,'Menu','Profile.UnMarkAsFavorite','Remove mark as &favorite');
   AddStringRec(NR_MenuProfileCreateShortcut,'Menu','Profile.CreateShortcut','Create &shortcut...');
@@ -4729,6 +4755,8 @@ begin
   AddStringRec(NR_MenuProfileMakeZipArchive,'Menu','Profile.MakeZipArchive','Make &archive file package...');
   AddStringRec(NR_MenuProfileViewConfFile,'Menu','Profile.ViewConfFile','&View DOSBox conf file');
   AddStringRec(NR_MenuProfileViewIniFile,'Menu','Profile.ViewIniFile','&View ScummVM ini file');
+  AddStringRec(NR_MenuProfileFilesAndFolders,'Menu','Profile.FilesAndFolders','Files && Folders');
+  AddStringRec(NR_MenuProfileOpenFolderDOSBox,'Menu','Profile.OpenFolderDOSBox','Open DOSBox prompt in program folder');
   AddStringRec(NR_MenuProfileCheating,'Menu','Profile.Cheating','&Change saved game...');
   AddStringRec(NR_MenuExtras,'Menu','Extras','&Extras');
   AddStringRec(NR_MenuExtrasIconManager,'Menu','Extras.IconManager','Manage &icons...');
@@ -4831,7 +4859,7 @@ begin
   AddStringRec(NR_PopupOpenCaptureFolder,'Menu','Popup.OpenCaptureFolder','Open &capture folder');
   AddStringRec(NR_PopupOpenDataFolder,'Menu','Popup.OpenDataFolder','Open &data folder');
   AddStringRec(NR_PopupOpenFileInDataFolder,'Menu','Popup.OpenFileInDataFolder','Open file in data folder');
-  //AddStringRec(NR_PopupOpenFileInProgramFolder,'Menu','Popup.OpenFileInProgramFolder','Open file in program folder');
+  AddStringRec(NR_PopupOpenFileInProgramFolder,'Menu','Popup.OpenFileInProgramFolder','Open file in program folder');
   AddStringRec(NR_PopupMarkAsFavorite,'Menu','Popup.MarkAsFavorite','Mark as &favorite');
   AddStringRec(NR_PopupCreateShortcut,'Menu','Popup.CreateShortcut','Create &shortcut...');
   AddStringRec(NR_PopupSearchGame,'Menu','Popup.SearchGame','Search game');
@@ -4839,6 +4867,8 @@ begin
   AddStringRec(NR_PopupMakeInstaller,'Menu','Popup.MakeInstaller','&Make installer package...');
   AddStringRec(NR_PopupMakeZipArchive,'Menu','Popup.MakeZipArchive','Make &archive file package...');
   AddStringRec(NR_PopupViewConfFile,'Menu','Popup.ViewConfFile','&View DOSBox conf file');
+  AddStringRec(NR_PopupFilesFolder,'Menu','Popup.FilesAndFolders','Files && Folders');
+  AddStringRec(NR_PopupOpenFolderDOSBox,'Menu','Popup.OpenFolderDOSBox','Open DOSBox prompt in program folder');
   AddStringRec(NR_PopupView,'Menu','Popup.View','&View');
   AddStringRec(NR_ScreenshotPopupOpen,'Menu','ScreenshotPopup.Open','&Open...');
   AddStringRec(NR_ScreenshotPopupOpenExternal,'Menu','ScreenshotPopup.OpenExternal','Open in default viewer');
@@ -5173,12 +5203,14 @@ begin
   AddStringRec(NR_ProfileMountingDriveLetterAlreadyInUse,'ProfileMountingForm','DriveLetterAlreadyInUse','This drive letter is already in use by another mounted drive.');
   AddStringRec(NR_ProfileMountingDriveType,'ProfileMountingForm','DriveType','Type');
   AddStringRec(NR_ProfileMountingFolderDeleteWarning,'ProfileMountingForm','FolderDeleteWarning','In the chosen configuration the complete content of %s will be deleted when you quit the game. Do you really want to continue with this configuration ?');
-  AddStringRec(NR_ProfileMountingZipRepack,'ProfileMountingForm','ZipRepack','After repacking folder content to archive file');
-  AddStringRec(NR_ProfileMountingZipRepackNoDelete,'ProfileMountingForm','ZipRepack.NoDelete','Keep folder content');
-  AddStringRec(NR_ProfileMountingZipRepackDeleteFiles,'ProfileMountingForm','ZipRepack.DeleteFiles','Delete files in folder');
-  AddStringRec(NR_ProfileMountingZipRepackDeleteFolder,'ProfileMountingForm','ZipRepack.DeleteFolder','Delete files in folder and folder');
+  AddStringRec(NR_ProfileMountingZipRepack,'ProfileMountingForm','ZipRepack','When program quits:');
+  AddStringRec(NR_ProfileMountingZipRepackNoDelete,'ProfileMountingForm','ZipRepack.NoDelete','Repack but keep folder content');
+  AddStringRec(NR_ProfileMountingZipRepackDeleteFiles,'ProfileMountingForm','ZipRepack.DeleteFiles','Repack then delete files in folder');
+  AddStringRec(NR_ProfileMountingZipRepackDeleteFolder,'ProfileMountingForm','ZipRepack.DeleteFolder','Repack then delete files in folder and folder');
+  AddStringRec(NR_ProfileMountingZipRepackNoDeleteNoRepack,'ProfileMountingForm','ZipRepack.NoRepackNoDelete','Do not repack, keep folder content');
+  AddStringRec(NR_ProfileMountingZipRepackDeleteFilesNoRepack,'ProfileMountingForm','ZipRepack.NoRepackDeleteFiles','Do not repack, delete files in folder');
+  AddStringRec(NR_ProfileMountingZipRepackDeleteFolderNoRepack,'ProfileMountingForm','ZipRepack.NoRepackDeleteFolder','Do not repack, delete files in folder and folder');
   AddStringRec(NR_ProfileMountingZipInfo,'ProfileMountingForm','ZipInfo','The content of the archive will be extracted to the given folder before DOSBox is started. DOSBox will use the folder as a normal drive. After program termination of DOSBox the content of the folder is repacked to the archive.');
-  AddStringRec(NR_ProfileMountingZipRepackPhysFS,'ProfileMountingForm','ZipRepack.PhysFS','Repack folder content to zip file when DOSBox terminates');
   AddStringRec(NR_ProfileMountingZipMakeNormalMount,'ProfileMountingForm','ZipRepack.NormalMount','Make normal drive from this mount');
   AddStringRec(NR_ProfileMountingZipMakeNormalMountHint,'ProfileMountingForm','ZipRepack.NormalMount.Hint','This function will extract the archive file and convert the mount into a normal directory mount');
   AddStringRec(NR_ProfileMountingZipMakeNormalMountHere,'ProfileMountingForm','ZipRepack.NormalMount.Here','Extract files to selected folder');
@@ -5275,7 +5307,7 @@ begin
   AddStringRec(NR_SetupFormDOSBoxLang,'SetupForm','DOSBoxLanguage','DOSBox language file');
   AddStringRec(NR_SetupFormDOSBoxLangHint,'SetupForm','DOSBoxLanguage.Hint','This language applies to the default DOSBox installation only.');
   AddStringRec(NR_SetupFormInstallerLang,'SetupForm','InstallerLanguage','Installer language');
-  AddStringRec(NR_SetupFormInstallerLangInfo,'SetupForm','InstallerLanguageInfo','The chosen installer language is used when you install a games package or update D-Fend Reloaded. The language changer will ask you for admin rights when running under Vista because it needs to write to the all users section of the registry.');
+  AddStringRec(NR_SetupFormInstallerLangInfo,'SetupForm','InstallerLanguageInfo','The chosen installer language is used when you install a games package or update D-Fend Reloaded. The language changer will ask you for admin rights when running under Vista or higher because it needs to write to the all users section of the registry.');
   AddStringRec(NR_SetupFormDOSBoxSDLVideodriver,'SetupForm','DOSBoxVideoDriver','SDL videodriver:');
   AddStringRec(NR_SetupFormDOSBoxSDLVideodriverInfo,'SetupForm','DOSBoxVideoDriverInfo','Setting the SDL videodriver to "Win DIB" may solve keyboard problems.');
   AddStringRec(NR_SetupFormDOSBoxDisableScreensaver,'SetupForm','DOSBoxDisableScreensaver','Disable screensaver when DOSBox is running');
@@ -5376,7 +5408,7 @@ begin
   AddStringRec(NR_SetupFormService7,'SetupForm','Service7','Create capture folders for all profiles');
   AddStringRec(NR_SetupFormService8,'SetupForm','Service8','Create game data folders for all profiles');
   AddStringRec(NR_SetupFormService9,'SetupForm','Service9','Rename all media files for all profiles');
-  //AddStringRec(NR_SetupFormService10,'SetupForm','Service10','Reset profiles to templates');
+  AddStringRec(NR_SetupFormService10,'SetupForm','Service10','Reset profiles to templates');
   AddStringRec(NR_SetupFormUpdate0,'SetupForm','Update0','Only manual update checks (Menu: Help|Check for updates)');
   AddStringRec(NR_SetupFormUpdate1,'SetupForm','Update1','Check once a week');
   AddStringRec(NR_SetupFormUpdate2,'SetupForm','Update2','Check once every day');
@@ -5398,7 +5430,6 @@ begin
   AddStringRec(NR_SetupFormUpdateCheats0,'SetupForm','Update.Cheats0','Only manual ("Search for updates" in help menu)');
   AddStringRec(NR_SetupFormUpdateCheats1,'SetupForm','Update.Cheats1','Weekly');
   AddStringRec(NR_SetupFormUpdateCheats2,'SetupForm','Update.Cheats2','Daily');
-
   AddStringRec(NR_SetupFormListViewSheet1,'SetupForm','GamesListGUI.Columns','Columns in the games list');
   AddStringRec(NR_SetupFormListViewSheet2,'SetupForm','GamesListGUI.ListAppearance','Games list');
   AddStringRec(NR_SetupFormListViewSheet2b,'SetupForm','GamesListGUI.ListAppearanceScreenshotMode','List in screenshot mode');
@@ -5410,6 +5441,7 @@ begin
   AddStringRec(NR_SetupFormFontSize,'SetupForm','Font.Size','Font size');
   AddStringRec(NR_SetupFormFontColor,'SetupForm','Font.Color','Font color');
   AddStringRec(NR_SetupFormToolbar,'SetupForm','Toolbar','Toolbar');
+  AddStringRec(NR_SetupFormTreeViewDefaultGroupLabel,'SetupForm','TreeView.DefaultGroups.Label','Filter categories to be displayed:');
   AddStringRec(NR_SetupFormTreeViewGroupLabel,'SetupForm','TreeView.UserDefinedGroups.Label','User-defined filter categories:');
   AddStringRec(NR_SetupFormTreeViewGroupAddButton,'SetupForm','TreeView.UserDefinedGroups.AddButton','Add existing user key');
   AddStringRec(NR_SetupFormTreeViewGroupInfoLabel,'SetupForm','TreeView.UserDefinedGroups.InfoLabel','The user-defined categories will be displayed in the tree structure as additional filter categories. You can setup user-defined categories for each game in the profile editor section "User defined information".');
@@ -5629,7 +5661,7 @@ begin
   AddStringRec(NR_WizardFormButtonNext,'WizardForm','Button.Next','Next');
 
   AddStringRec(NR_WizardFormMainInfo,'WizardForm','MainInfo','Information about the D-Fend Reloaded file structure');
-  AddStringRec(NR_WizardFormMainInfo1,'WizardForm','MainInfoPart1','D-Fend Reloaded is 100% Vista compatible. This means it respects the conect of dividing the program data into program files and user data. If you have installed D-Fend Reloaded in "user profile mode", '+
+  AddStringRec(NR_WizardFormMainInfo1,'WizardForm','MainInfoPart1','D-Fend Reloaded is 100% Windows Vista and 7 compatible. This means it respects the conect of dividing the program data into program files and user data. If you have installed D-Fend Reloaded in "user profile mode", '+
                                                                    'the program files are located in the program files folder ("C:\Program files\D-Fend Reloaded" by default) and the user data files are located in a subfolder of the user profile directory ("C:\Users\<you>\D-Fend Reloaded" by default). '+
                                                                    'When D-Fend Reloaded is running it is not writing to the program folder any more. All setup data is stored in the user profile subfolder.');
   AddStringRec(NR_WizardFormMainInfo2,'WizardForm','MainInfoPart2','DOSBox and Windows do not use the same directory sturctures. The programs inside DOSBox only see a subset of the whole Windows directory sturcture. So games running in DOSBox cannot damage your system files '+
@@ -5731,7 +5763,12 @@ begin
   AddStringRec(NR_CreateImageFormMakeFloppyBootableWithMemoryManager,'CreateImageForm','MakeDiskImageBootable.WithMemoryManager','Use memory manager on disk image');
   AddStringRec(NR_CreateImageFormMakeFloppyBootableWithFormat,'CreateImageForm','MakeDiskImageBootable.WithDiskUtilities','Add disk management utilities');
   AddStringRec(NR_CreateImageFormMakeFloppyBootableWithEdit,'CreateImageForm','MakeDiskImageBootable.WithEdit','Add text editor');
+  AddStringRec(NR_CreateImageFormMakeFloppyBootableWithDoszip,'CreateImageForm','MakeDiskImageBootable.WithDosZip','Add DosZip file manager');
   AddStringRec(NR_CreateImageFormFormat,'CreateImageForm','Format','Create a preformated image');
+  AddStringRec(NR_CreateImageFormCreateProfile,'CreateImageForm','CreateProfile','Create DOSBox profile for booting the image');
+  AddStringRec(NR_CreateImageFormCreateProfileName,'CreateImageForm','CreateProfile.Name.Template','Profile for booting %s');
+  AddStringRec(NR_CreateImageFormCreateProfileNameCaption,'CreateImageForm','CreateProfile.Name.Caption','DOSBox profile for booting the image');
+  AddStringRec(NR_CreateImageFormCreateProfileNamePrompt,'CreateImageForm','CreateProfile.Name.Prompt','Name for the profile');
 
   AddStringRec(NR_InfoForm,'InfoForm','Caption','Program info');
   AddStringRec(NR_InfoFormMain,'InfoForm','MainSheet','Info');
@@ -6119,7 +6156,10 @@ begin
   AddStringRec(NR_MissingFilesDataDirectory,'MissingFilesCheck','DataDirectory','The data directory "%s" does not exist.');
   AddStringRec(NR_MissingFilesExtraFile,'MissingFilesCheck','ExtraFile','The extra file "%s" does not exist.');
   AddStringRec(NR_MissingFilesExtraDirectory,'MissingFilesCheck','ExtraDirectory','The extra directory "%s" does not exist.');
+end;
 
+Procedure TLanguageSetup.SetupLanguageStrings3;
+begin
   AddStringRec(NR_OperationModeCaption,'OperationMode','Caption','D-Fend Reloaded operation mode');
   AddStringRec(NR_OperationModeTopLabel,'OperationMode','TopLabel','Operation mode chosen during installation:');
   AddStringRec(NR_OperationModeOpModePrgDir,'OperationMode','OpMode.PrgDir','Program directroy mode');
@@ -6132,13 +6172,11 @@ begin
   AddStringRec(NR_OperationModeInfoDOSBoxRelative,'OperationMode','InfoDOSBoxRelative','DOSBox and games directories are stored relative to D-Fend Reloaded folder (for portable use)');
   AddStringRec(NR_OperationModePrgDir,'OperationMode','PrgDir','Directory for D-Fend Reloaded program files');
   AddStringRec(NR_OperationModeDataDir,'OperationMode','DataDir','Directory for data files (games, profiles, settings, etc.)');
-end;
 
-Procedure TLanguageSetup.SetupLanguageStrings3;
-begin
   AddStringRec(NR_ZipFormCaptionExtract,'ZipForm','Caption.Extract','Extracting');
   AddStringRec(NR_ZipFormCaptionCreate,'ZipForm','Caption.Create','Compressing');
   AddStringRec(NR_ZipFormCaptionAdd,'ZipForm','Caption.Add','Updating');
+  AddStringRec(NR_ZipFormCaptionDelete,'ZipForm','Caption.Delete','Deleting extracted files');
   AddStringRec(NR_ZipFormPasswordPrompt,'ZipForm','PasswordPrompt','Password for archive');
   AddStringRec(NR_ZipFormProgress,'ZipForm','Progress','%d%% done, %d MB processed (%d MB/Sec.)');
   AddStringRec(NR_ZipFormProgressExtract,'ZipForm','Progress.Extract','Extracting files from %s to');
@@ -6620,14 +6658,14 @@ begin
   AddStringRec(NR_DOSBoxOutputTestStart,'DOSBoxOutputTest','Test.Start','Start test');
   AddStringRec(NR_DOSBoxOutputTestRunning,'DOSBoxOutputTest','Test.InProgress','Testing output methods, please wait.');
 
-  //AddStringRec(NR_ResetProfiles,'ResetProfiles','Caption','Reset multiple profiles to values from templates');
-  //AddStringRec(NR_ResetProfilesProfiles,'ResetProfiles','Profiles','Step 1: Select games');
-  //AddStringRec(NR_ResetProfilesProfilesInfo,'ResetProfiles','Select the games to be changed:');
-  //AddStringRec(NR_ResetProfilesSettings,'ResetProfiles','Step 2: Select settings to be changed');
-  //AddStringRec(NR_ResetProfilesSettingsInfo,'ResetProfiles','Select pages to be reseted:');
-  //AddStringRec(NR_ResetProfilesTemplate,'ResetProfiles','Step 3: Select template');
-  //AddStringRec(NR_ResetProfilesTemplateTemplate,'ResetProfiles','Reset to template');
-  //AddStringRec(NR_ResetProfilesTemplateAutoSetup,'ResetProfiles','Reset to auto setup template');
+  AddStringRec(NR_ResetProfiles,'ResetProfiles','Caption','Reset multiple profiles to values from templates');
+  AddStringRec(NR_ResetProfilesProfiles,'ResetProfiles','Profiles','Step 1: Select games');
+  AddStringRec(NR_ResetProfilesProfilesInfo,'ResetProfiles','Profiles.Info','Select the games to be changed:');
+  AddStringRec(NR_ResetProfilesSettings,'ResetProfiles','Settings','Step 2: Select settings to be changed');
+  AddStringRec(NR_ResetProfilesSettingsInfo,'ResetProfiles','Settings.Info','Select pages to be reseted:');
+  AddStringRec(NR_ResetProfilesTemplate,'ResetProfiles','Template','Step 3: Select template');
+  AddStringRec(NR_ResetProfilesTemplateTemplate,'ResetProfiles','Template.Template','Reset to template');
+  AddStringRec(NR_ResetProfilesTemplateAutoSetup,'ResetProfiles','Template.AutoSetup','Reset to auto setup template');
 end;
 
 destructor TLanguageSetup.Destroy;
@@ -6636,44 +6674,23 @@ begin
   inherited Destroy;
 end;
 
-Function TLanguageSetup.GetString2(Index : Integer) : String;
+{Function TLanguageSetup.GetString2(Index : Integer) : String;
 begin
   result:='';
   If Trim(ExtUpperCase(ExtractFileName(SetupFile)))='GERMAN.INI' then begin
     Case Index of
-      NR_MenuProfileOpenFileInProgramFolder : result:='Datei in Programmordner öffnen';
-      NR_PopupOpenFileInProgramFolder : result:='Datei in Programmordner öffnen';
-      NR_SetupFormService10 : result:='Mehrere Profile auf Werte aus Vorlagen zurücksetzen';
-      NR_ResetProfiles : result:='Mehrere Profile auf Werte aus Vorlagen zurücksetzen';
-      NR_ResetProfilesProfiles : result:=ChangeProfilesFormSelectGamesSheet;
-      NR_ResetProfilesProfilesInfo : result:=ChangeProfilesFormInfo;
-      NR_ResetProfilesSettings : result:='Schritt 2: Zu ändernde Einstellungen wählen';
-      NR_ResetProfilesSettingsInfo : result:='Wähen Sie die Profileditor-Seiten, die zurückgesetzt werden sollen:';
-      NR_ResetProfilesTemplate : result:='Schritt 3: Vorlage wählen';
-      NR_ResetProfilesTemplateTemplate : result:='Profile zu Vorlage zurücksetzen';
-      NR_ResetProfilesTemplateAutoSetup : result:='Profile zu AutoSetup-Vorlage zurücksetzen';
+      NR_... : result:='';
     End;
   end else begin
     Case Index of
-      NR_MenuProfileOpenFileInProgramFolder : result:='Open file in program folder';
-      NR_PopupOpenFileInProgramFolder : result:='Open file in program folder';
-      NR_SetupFormService10 : result:='Reset multiple profiles to values from templates';
-      NR_ResetProfiles : result:='Reset multiple profiles to values from templates';
-      NR_ResetProfilesProfiles : result:=ChangeProfilesFormSelectGamesSheet;
-      NR_ResetProfilesProfilesInfo : result:=ChangeProfilesFormInfo;
-      NR_ResetProfilesSettings : result:='Step 2: Select settings to be changed';
-      NR_ResetProfilesSettingsInfo : result:='Select pages to be reseted:';
-      NR_ResetProfilesTemplate : result:='Step 3: Select template';
-      NR_ResetProfilesTemplateTemplate : result:='Reset to template';
-      NR_ResetProfilesTemplateAutoSetup : result:='Reset to auto setup template';
-
+      NR_... : result:='...';
     End;
   end;
 end;
 
 Procedure TLanguageSetup.SetString2(Index : Integer; S : String);
 begin
-end;
+end;}
 
 Function MaskUnderlineAmpersand(const S : String) : String;
 Var J : Integer;

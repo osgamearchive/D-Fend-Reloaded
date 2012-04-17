@@ -24,6 +24,7 @@ type
     ReselectFilterCheckBox: TCheckBox;
     PopupMenu: TPopupMenu;
     TreeViewDefaultGroups: TCheckListBox;
+    PredefinedGroupsLabel: TLabel;
     procedure TreeViewBackgroundColorBoxChange(Sender: TObject);
     procedure UserKeysListClick(Sender: TObject);
     procedure PopupMenuPopup(Sender: TObject);
@@ -123,6 +124,7 @@ begin
   If GermanColorNames
     then TreeViewFontColorBox.Style:=TreeViewFontColorBox.Style+[cbPrettyNames]
     else TreeViewFontColorBox.Style:=TreeViewFontColorBox.Style-[cbPrettyNames];
+  PredefinedGroupsLabel.Caption:=LanguageSetup.SetupFormTreeViewDefaultGroupLabel;
   TreeViewGroupsLabel.Caption:=LanguageSetup.SetupFormTreeViewGroupLabel;
   UserKeysList.Caption:=LanguageSetup.SetupFormTreeViewGroupAddButton;
 

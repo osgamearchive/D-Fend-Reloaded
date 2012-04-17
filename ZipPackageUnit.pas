@@ -600,9 +600,9 @@ end;
 Function GetTemplateFromFolderExt(const IsFolderScan : Boolean; Folder : String; const AutoSetupDB : TGameDB; const StartableFiles : TStringList) : TStringList;
 Var PrgFiles : TStringList;
     I,J,LastLevel,NewLevel : Integer;
-    GameCheckSum : String;
+    GameCheckSum,S: String;
     MatchByAdditionalData : TList;
-    B : Boolean;
+    B,Delete : Boolean;
 begin
   result:=TStringList.Create;
 
@@ -642,8 +642,18 @@ begin
         If B then begin
           I:=0;
           While I<result.Count do if Integer(MatchByAdditionalData[I])=0 then begin
-            result.Delete(I);
-            MatchByAdditionalData.Delete(I);
+            {Only delete sams PrgFiles records}
+            Delete:=False;
+            S:=result[I];
+            For J:=0 to result.Count-1 do If I<>J then if (result[J]=S) and (Integer(MatchByAdditionalData[I])<>0) then begin
+              Delete:=True; break;
+            end;
+            if Delete then begin
+              result.Delete(I);
+              MatchByAdditionalData.Delete(I);
+            end else begin
+              inc(I);
+            end;
           end else begin
             inc(I);
           end;

@@ -9,9 +9,6 @@ uses
   LinkFileUnit, HelpTools;
 
 {
-- Language strings for setup option to turn off the default filters in games tree and reset profiles to template dialog
-- Caption for SetupFrameGamesListTreeAppearanceUnit.TreeViewDefaultGroups
-- Help page for reset profiles to template dialog
 }
 
 type
@@ -353,6 +350,10 @@ type
     MenuRunDOSBoxOutputTest: TMenuItem;
     PopupOpenFileInProgramFolder: TMenuItem;
     MenuProfileOpenFileInProgramFolder: TMenuItem;
+    PopupOpenFolderDOSBox: TMenuItem;
+    MenuProfileOpenFolderDOSBox: TMenuItem;
+    MenuProfileFilesFolders: TMenuItem;
+    PopupFilesFolders: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure TreeViewChange(Sender: TObject; Node: TTreeNode);
@@ -516,7 +517,8 @@ uses ShellAPI, ShlObj, ClipBrd, Math, CommonTools, LanguageSetupUnit,
      UpdateCheckFormUnit, ProgramUpdateCheckUnit, GameDBFilterUnit,
      LoggingUnit, DOSBoxFailedFormUnit, DOSBoxLangEditFormUnit,
      DOSBoxLangStartFormUnit, HistoryUnit, ExportGamesListFormUnit,
-     DOSBoxOutputTestFormUnit, SingleInstanceUnit, SetupFrameZipPrgsUnit;
+     DOSBoxOutputTestFormUnit, SingleInstanceUnit, SetupFrameZipPrgsUnit,
+     DOSBoxTempUnit;
 
 {$R *.dfm}
 
@@ -534,8 +536,8 @@ begin
 
   LogInfo('### Start of FormCreate ###');
 
-  {Caption:=Caption+' THIS IS A TEST VERSION ! (Beta 1 of version 1.3)';}
-  {Caption:=Caption+' (Release candidate 1 of version 1.2.1)';}
+  {Caption:=Caption+' THIS IS A TEST VERSION ! (Beta 2 of version 1.3)';}
+  {Caption:=Caption+' (Release candidate 1 of version 1.3)';}
 
   Height:=790;
   Width:=Min(Width,790);
@@ -622,7 +624,7 @@ begin
   RegisterDragDrop(GameNotesEdit.Handle,Self);
 
   LogInfo('Setting up application icon');
-  Icon.Assign(Application.Icon); {Window icon is only 16x16, application icon is larger; Win7 is using the window icon in the taskbar} 
+  Icon.Assign(Application.Icon); {Window icon is only 16x16, application icon is larger; Win7 is using the window icon in the taskbar}
 
   {Turn on events again}
   ApplicationEvents.OnIdle:=ApplicationEventsIdle; IdleAddonTimer.Enabled:=True; TreeView.OnChange:=TreeViewChange;
@@ -850,10 +852,11 @@ begin
   MenuProfileMakeZipArchive.Caption:=LanguageSetup.MenuProfileMakeZipArchive;
   MenuProfileViewConfFile.Caption:=LanguageSetup.MenuProfileViewConfFile;
   MenuProfileViewIniFile.Caption:=LanguageSetup.MenuProfileViewIniFile;
+  MenuProfileFilesFolders.Caption:=LanguageSetup.MenuProfileFilesAndFolders;
   MenuProfileOpenFolder.Caption:=LanguageSetup.MenuProfileOpenFolder;
+  MenuProfileOpenFolderDOSBox.Caption:=LanguageSetup.MenuProfileOpenFolderDOSBox;
   MenuProfileOpenCaptureFolder.Caption:=LanguageSetup.MenuProfileOpenCaptureFolder;
   MenuProfileOpenDataFolder.Caption:=LanguageSetup.MenuProfileOpenDataFolder;
-  MenuProfileOpenFileInProgramFolder.Visible:=PrgSetup.ActivateIncompleteFeatures;
   MenuProfileOpenFileInProgramFolder.Caption:=LanguageSetup.MenuProfileOpenFileInProgramFolder;
   MenuProfileOpenFileInDataFolder.Caption:=LanguageSetup.MenuProfileOpenFileInDataFolder;
   MenuProfileWWW.Caption:=LanguageSetup.GameWWW;
@@ -955,10 +958,11 @@ begin
   PopupMakeZipArchive.Caption:=LanguageSetup.PopupMakeZipArchive;
   PopupViewConfFile.Caption:=LanguageSetup.MenuProfileViewConfFile;
   PopupViewINIFile.Caption:=LanguageSetup.MenuProfileViewIniFile;
+  PopupFilesFolders.Caption:=LanguageSetup.PopupFilesFolder;
   PopupOpenFolder.Caption:=LanguageSetup.PopupOpenFolder;
+  PopupOpenFolderDOSBox.Caption:=LanguageSetup.PopupOpenFolderDOSBox;
   PopupOpenCaptureFolder.Caption:=LanguageSetup.PopupOpenCaptureFolder;
   PopupOpenDataFolder.Caption:=LanguageSetup.PopupOpenDataFolder;
-  PopupOpenFileInProgramFolder.Visible:=PrgSetup.ActivateIncompleteFeatures;
   PopupOpenFileInProgramFolder.Caption:=LanguageSetup.PopupOpenFileInProgramFolder;
   PopupOpenFileInDataFolder.Caption:=LanguageSetup.PopupOpenFileInDataFolder;
   PopupWWW.Caption:=LanguageSetup.GameWWW;
@@ -1730,6 +1734,8 @@ begin
     MenuProfileViewIniFile.Enabled:=B2;
   end;
   MenuProfileOpenFolder.Enabled:=B and ((Trim(TGame(Item.Data).GameExe)<>'') or (B2 and (Trim(TGame(Item.Data).ScummVMPath)<>'')));
+  MenuProfileOpenFolderDOSBox.Visible:=B and (not B2) and (not B3);
+  MenuProfileOpenFolderDOSBox.Enabled:=B and (Trim(TGame(Item.Data).GameExe)<>'') and (not B2) and (not B3);
   MenuProfileOpenCaptureFolder.Enabled:=CaptureFolder;
   MenuProfileOpenDataFolder.Enabled:=B and (Trim(TGame(Item.Data).DataDir)<>'');
   MenuProfileMarkAsFavorite.Enabled:=B;
@@ -1771,6 +1777,8 @@ begin
     PopupViewINIFile.Enabled:=B2;
   end;
   PopupOpenFolder.Enabled:=B and ((Trim(TGame(Item.Data).GameExe)<>'') or (B2 and (Trim(TGame(Item.Data).ScummVMPath)<>'')));
+  PopupOpenFolderDOSBox.Visible:=B and (not B2) and (not B3);
+  PopupOpenFolderDOSBox.Enabled:=B and (Trim(TGame(Item.Data).GameExe)<>'') and (not B2) and (not B3);
   PopupOpenCaptureFolder.Enabled:=CaptureFolder;
   PopupOpenDataFolder.Enabled:=B and (Trim(TGame(Item.Data).DataDir)<>'');
   PopupWWW.Enabled:=B;
@@ -3141,6 +3149,10 @@ begin
                  If B then ShowUpdateCheckDialog(self,GameDB,SearchLinkFile);
                end;
              end;
+      4022 : begin
+               G:=TGame(ListView.Selected.Data);
+               RunDOSBoxCommandLineOnFolder(MakeAbsPath(ExtractFilePath(G.GameExe),PrgSetup.BaseDir));
+             end;
       4100..4199 : AddProfileForWindowsEmulator((Sender as TComponent).Tag-4100);
       {Extras}
       5001 : begin S:=''; ShowIconManager(self,S,PrgSetup.GameDir,True); end;
@@ -3183,7 +3195,14 @@ begin
                InitTreeViewForGamesList(TreeView,GameDB);
                TreeViewChange(Sender,TreeView.Selected);
              end;
-      5007 : ShowCreateImageFileDialog(self,True,True);
+      5007 : begin
+               ShowCreateImageFileDialog(self,True,True,GameDB);
+               If NewProfileFromImageCreator<>nil then begin
+                 InitTreeViewForGamesList(TreeView,GameDB);
+                 TreeViewChange(Sender,TreeView.Selected);
+                 SelectGame(NewProfileFromImageCreator);
+               end;
+             end;
       5008 : begin UpdateGameNotes; TransferGames(self,GameDB); end;
       5010 : begin
                If (ListView.Selected=nil) or (ListView.Selected.Data=nil) then G:=nil else G:=TGame(ListView.Selected.Data);

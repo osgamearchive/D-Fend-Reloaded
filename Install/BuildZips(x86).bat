@@ -1,7 +1,7 @@
 @echo off
 
 rem Create main zip archive
-"C:\Program Files\7-Zip\7z.exe" a -r D-Fend-Reloaded-.zip "C:\Users\Alexander Herzog\Desktop\D-Fend Reloaded\*.*"
+"C:\Program Files\7-Zip\7z.exe" a -r D-Fend-Reloaded-.zip "C:\Users\Alexander Herzog\Desktop\D-Fend Reloaded\"
 
 rem Create mini zip archive
 md "%USERPROFILE%\Desktop\D-Fend Reloaded (mini)"
@@ -16,7 +16,7 @@ rd "%USERPROFILE%\Desktop\D-Fend Reloaded (mini)\VirtualHD\DOSZip" /S /Q
 del "%USERPROFILE%\Desktop\D-Fend Reloaded (mini)\VirtualHD\FREEDOS\*.*" /S /Q
 rd "%USERPROFILE%\Desktop\D-Fend Reloaded (mini)\VirtualHD\FREEDOS" /S /Q
 
-"C:\Program Files\7-Zip\7z.exe" a -r D-Fend-Reloaded--Mini.zip "C:\Users\Alexander Herzog\Desktop\D-Fend Reloaded (mini)\*.*"
+"C:\Program Files\7-Zip\7z.exe" a -r D-Fend-Reloaded--Mini.zip "C:\Users\Alexander Herzog\Desktop\D-Fend Reloaded (mini)\"
 
 del "%USERPROFILE%\Desktop\D-Fend Reloaded (mini)\*.*" /S /Q
 rd "%USERPROFILE%\Desktop\D-Fend Reloaded (mini)" /S /Q 
@@ -39,7 +39,7 @@ rem Create source archive
 del "..\DFend.exe" 
 del "..\*.dcu" /Q
 del "..\*.~*" /Q
-"C:\Program Files\7-Zip\7z.exe" a -r -x!Install\*.exe -x!Install\*.zip D-Fend-Reloaded--Source.zip "..\*.*"
+"C:\Program Files\7-Zip\7z.exe" a -r -x!Install\*.exe -x!Install\*.zip D-Fend-Reloaded--Source.zip "..\"
 
 rem Clean up
 del "%USERPROFILE%\Desktop\D-Fend Reloaded\*.*" /S /Q

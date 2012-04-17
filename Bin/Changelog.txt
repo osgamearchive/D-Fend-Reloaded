@@ -1,5 +1,41 @@
 D-Fend Reloaded Changelog
 
+Version 1.3.0 (04/17/2012)
+==========================
+- Updated FreeDOS from 1.0 to 1.1 (full installer only).
+- Updated DOSZip from 2.17 to 2.27.
+- Menu item in profiles menu and profile context menu: Open file in program
+  files folder.
+- Service section of setup dialog: Reset all profiles to template.
+- New "Open DOSBox prompt in program folder" context menu and profile menu
+  item.
+- The floppy/harddisk image file creator can diretly create a profiles for
+  booting the created image file in DOSBox.
+- Now the floppy/harddisk image file creator can add Doszip to image files.
+- New option not to repack the archive file when the game quits when using an
+  archive file as a drive.
+- Improved detection whether a program is using DOS4GW or not.
+- Better disk image type auto detection when extracting files from an image file.
+- Improved checksum usage when searching for new game in the games folder.
+- [Fix] When entering numerical values in a spin input field in the profile
+  editor via keyboard the value range is not always checked properly.
+- [Fix] Creation of bootable hard disk images was broken.
+- [Fix] Trying to get the list of available MIDI devices fails if there are no
+  drive records in the default template.
+- [Fix] The edit button in the drives list context menu of the profile editor
+  opened the add drive dialog and not the edit drive dialog.
+- [Fix] Removed useless information popup when editing the capture folder for
+  a Windows game profile in the profile editor.
+- [Fix] Removed invalid ISO image warning when extracting a floppy or hard disk
+  image.
+- [Fix] When downloading a cover image from Mobygames right after changing the
+  capture folder (without closing the profile editor in between), the image
+  will be stored in the old capture folder.
+- [Fix] Wrong position for the portable version info button on the DOSBox
+  page of the configuration dialog when switching from basic to advanced
+  configuration mode.
+
+
 Version 1.2.1 (10/23/2011)
 ==========================
 - Added a setup option to select which filter keys to be displayed in the
@@ -9,6 +45,7 @@ Version 1.2.1 (10/23/2011)
 - [Fix] Exception when using the "Reset all pages but this" function in the
   profile editor to reset a profile to a template.
 - [Fix] Wrong name for "Export archive file" popup menu item.
+
 
 Version 1.2.0 (09/29/2011)
 ==========================

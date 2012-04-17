@@ -1130,6 +1130,10 @@
 			<param name="Name" value="In Spielstand nach Adresse suchen">
 			<param name="Local" value="ExtrasSearchAddress.html">
 			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Mehrere Profile auf Werte aus Vorlagen zurücksetzen">
+			<param name="Local" value="FileOptionsResetProfiles.html">
+			</OBJECT>
 	</UL>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="Zusätzliche Informationen">

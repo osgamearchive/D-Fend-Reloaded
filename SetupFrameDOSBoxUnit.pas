@@ -37,8 +37,10 @@ type
     DosBoxDirChange : TSimpleEvent;
     LastIndex : Integer;
     GameDB : TGameDB;
+    OrigPortableModeInfoButtonTop : Integer;
   public
     { Public-Deklarationen }
+    Constructor Create(AOwner : TComponent); override;
     Function GetName : String;
     Procedure InitGUIAndLoadSetup(var InitData : TInitData);
     Procedure BeforeChangeLanguage;
@@ -58,6 +60,12 @@ uses ShellAPI, ShlObj, Math, LanguageSetupUnit, VistaToolsUnit, CommonTools,
 {$R *.dfm}
 
 { TSetupFrameDOSBox }
+
+constructor TSetupFrameDOSBox.Create(AOwner: TComponent);
+begin
+  inherited Create(AOwner);
+  OrigPortableModeInfoButtonTop:=-1;
+end;
 
 function TSetupFrameDOSBox.GetName: String;
 begin
@@ -138,6 +146,9 @@ begin
   MoreSettingsButton.Visible:=AdvancedMode;
   PortableModeInfoButton.Visible:=(OperationMode=omPortable);
 
+  if OrigPortableModeInfoButtonTop<0
+    then OrigPortableModeInfoButtonTop:=PortableModeInfoButton.Top
+    else PortableModeInfoButton.Top:=OrigPortableModeInfoButtonTop;
 
   If AdvancedMode then begin
     If PortableModeInfoButton.Visible

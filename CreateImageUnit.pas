@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, Buttons, ComCtrls, ImgList, ExtCtrls;
+  Dialogs, StdCtrls, Buttons, ComCtrls, ImgList, ExtCtrls, GameDBUnit;
 
 type
   TCreateImageForm = class(TForm)
@@ -39,6 +39,8 @@ type
     FormatImageCheckBox: TCheckBox;
     MemoryManagerCheckBox: TCheckBox;
     WriteToFloppyCheckBox: TCheckBox;
+    AddDoszipCheckBox: TCheckBox;
+    CreateProfileCheckBox: TCheckBox;
     procedure FormCreate(Sender: TObject);
     procedure ImageFileButtonClick(Sender: TObject);
     procedure FloppyImageTypeComboBoxChange(Sender: TObject);
@@ -55,16 +57,20 @@ type
     JustChanging : Boolean;
     FloppyDriveAvailable : Boolean;
     Procedure CalcFloppySize;
+    Procedure CreateProfile(const Name, ImageFile : String; const FloppyDiskImage : Boolean);
   public
     { Public-Deklarationen }
     FloppyImageSize : Integer;
     ImageFileName : String;
+    GameDB : TGameDB;
   end;
 
 var
   CreateImageForm: TCreateImageForm;
 
-Function ShowCreateImageFileDialog(const AOwner : TComponent; const ShowFloppySheet, ShowHDSheet : Boolean) : String;
+Function ShowCreateImageFileDialog(const AOwner : TComponent; const ShowFloppySheet, ShowHDSheet : Boolean; const AGameDB : TGameDB) : String;
+
+var NewProfileFromImageCreator : TGame = nil;
 
 implementation
 
@@ -128,10 +134,12 @@ begin
   MemoryManagerCheckBox.Caption:=LanguageSetup.CreateImageFormMakeFloppyBootableWithMemoryManager;
   AddFormatCheckBox.Caption:=LanguageSetup.CreateImageFormMakeFloppyBootableWithFormat;
   AddEditCheckbox.Caption:=LanguageSetup.CreateImageFormMakeFloppyBootableWithEdit;
+  AddDoszipCheckBox.Caption:=LanguageSetup.CreateImageFormMakeFloppyBootableWithDoszip;
   HDSizeEdit.EditLabel.Caption:=LanguageSetup.CreateImageFormHDImageSize;
   HDGeometryEdit.EditLabel.Caption:=LanguageSetup.CreateImageFormHDImageGeometry;
   FormatImageCheckBox.Caption:=LanguageSetup.CreateImageFormFormat;
   WriteToFloppyCheckBox.Caption:=LanguageSetup.ImageFromFolderWriteToFloppy;
+  CreateProfileCheckBox.Caption:=LanguageSetup.CreateImageFormCreateProfile;
 
   OKButton.Caption:=LanguageSetup.OK;
   CancelButton.Caption:=LanguageSetup.Cancel;
@@ -259,11 +267,14 @@ begin
   MemoryManagerCheckBox.Enabled:=MakeBootableCheckBox.Enabled and MakeBootableCheckBox.Checked;
   AddFormatCheckBox.Enabled:=FormatImageCheckBox.Checked;
   AddEditCheckbox.Enabled:=FormatImageCheckBox.Checked;
+  AddDoszipCheckBox.Enabled:=FormatImageCheckBox.Checked and DosZipAvailable;
+  CreateProfileCheckBox.Enabled:=MakeBootableCheckBox.Enabled and MakeBootableCheckBox.Checked;
 end;
 
 procedure TCreateImageForm.OKButtonClick(Sender: TObject);
 Var I,NeededSize,AvailableSize : Integer;
     Upgrades : TDiskImageCreatorUpgrades;
+    S : String;
 begin
   {Checks}
   ImageFileName:=ImageFileEdit.Text;
@@ -288,6 +299,8 @@ begin
     If MemoryManagerCheckBox.Enabled and MemoryManagerCheckBox.Checked then Upgrades:=Upgrades+[dicuMemoryManager];
     If AddFormatCheckBox.Enabled and AddFormatCheckBox.Checked then Upgrades:=Upgrades+[dicuDiskTools];
     If AddEditCheckbox.Enabled and AddEditCheckbox.Checked then Upgrades:=Upgrades+[dicuEditor];
+    If AddDoszipCheckBox.Enabled and AddDoszipCheckBox.Checked then Upgrades:=Upgrades+[dicuDoszip];
+    If FD11ToolsAvailable then Upgrades:=Upgrades+[dicuUseFD11Tools];
     NeededSize:=DiskImageCreatorUpgradeSize(PageControl.ActivePageIndex=1,Upgrades);
     If PageControl.ActivePageIndex=0 then begin
       AvailableSize:=FloppyImageSize
@@ -340,6 +353,44 @@ begin
       StrToInt(FloppySPTComboBox.Text),
       );
   end;
+
+  {Create profile for image}
+  if CreateProfileCheckBox.Enabled and CreateProfileCheckBox.Checked then begin
+    S:=Format(LanguageSetup.CreateImageFormCreateProfileName,[ExtractFileName(ImageFileName)]);
+    If InputQuery(LanguageSetup.CreateImageFormCreateProfileNameCaption,LanguageSetup.CreateImageFormCreateProfileNamePrompt,S) then CreateProfile(S,ImageFileName,PageControl.ActivePageIndex=0);
+  end;
+end;
+
+procedure TCreateImageForm.CreateProfile(const Name, ImageFile: String; const FloppyDiskImage: Boolean);
+Var I : Integer;
+    NewProfile : TGame;
+    S : String;
+begin
+  {Setup new profile}
+  I:=GameDB.Add(Name);
+  NewProfile:=GameDB[I];
+  with NewProfile do begin
+    If FloppyDiskImage then begin
+      NrOfMounts:=0;
+      AutoexecBootImage:=MakeRelPath(ImageFile,PrgSetup.BaseDir);
+    end else begin
+      NrOfMounts:=1;
+      Mount0:=MakeRelPath(ImageFile,PrgSetup.BaseDir)+';IMAGE;2;;;'+GetGeometryFromFile(ImageFile);
+      AutoexecBootImage:='2';
+    end;
+  end;
+
+  S:=IncludeTrailingPathDelimiter(PrgSetup.CaptureDir)+MakeFileSysOKFolderName(NewProfile.Name)+'\';
+  I:=0;
+  While (not PrgSetup.IgnoreDirectoryCollisions) and DirectoryExists(MakeAbsPath(S,PrgSetup.BaseDir)) do begin
+    Inc(I);
+    S:=IncludeTrailingPathDelimiter(PrgSetup.CaptureDir)+MakeFileSysOKFolderName(NewProfile.Name)+IntToStr(I)+'\';
+  end;
+  NewProfile.CaptureFolder:=MakeRelPath(S,PrgSetup.BaseDir);
+
+  NewProfile.StoreAllValues;
+  NewProfile.LoadCache;
+  NewProfileFromImageCreator:=NewProfile;
 end;
 
 procedure TCreateImageForm.PageControlChange(Sender: TObject);
@@ -359,12 +410,14 @@ end;
 
 { global }
 
-Function ShowCreateImageFileDialog(const AOwner : TComponent; const ShowFloppySheet, ShowHDSheet : Boolean) : String;
+Function ShowCreateImageFileDialog(const AOwner : TComponent; const ShowFloppySheet, ShowHDSheet : Boolean; const AGameDB : TGameDB) : String;
 begin
+  NewProfileFromImageCreator:=nil;
   CreateImageForm:=TCreateImageForm.Create(AOwner);
   try
     CreateImageForm.FloppyImageSheet.TabVisible:=ShowFloppySheet;
     CreateImageForm.HDImageSheet.TabVisible:=ShowHDSheet;
+    CreateImageForm.GameDB:=AGameDB;
     If CreateImageForm.ShowModal=mrOk then result:=CreateImageForm.ImageFileName else result:='';
     if (result<>'') and CreateImageForm.WriteToFloppyCheckBox.Checked and CreateImageForm.WriteToFloppyCheckBox.Enabled then begin
       ShowWriteIMGImageDialog(AOwner,CreateImageForm.ImageFileEdit.Text);

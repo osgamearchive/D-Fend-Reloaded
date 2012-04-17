@@ -40,7 +40,7 @@ type
 
 implementation
 
-uses CommonTools, LanguageSetupUnit, VistaToolsUnit, HelpConsts, PrgSetupUnit;
+uses Math, CommonTools, LanguageSetupUnit, VistaToolsUnit, HelpConsts, PrgSetupUnit;
 
 {$R *.dfm}
 
@@ -208,8 +208,8 @@ begin
   If CyclesMaxRadioButton.Checked then Game.Cycles:='max';
   If CyclesValueRadioButton.Checked then Game.Cycles:=CyclesComboBox.Text;
 
-  Game.CyclesUp:=CyclesUpEdit.Value;
-  Game.CyclesDown:=CyclesDownEdit.Value;
+  Game.CyclesUp:=Min(30000,Max(1,CyclesUpEdit.Value));
+  Game.CyclesDown:=Min(30000,Max(1,CyclesDownEdit.Value));
 
   Game.CPUType:=CPUTypeComboBox.Text;
 end;

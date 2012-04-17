@@ -32,6 +32,7 @@ begin
   result:=TStringList.Create;
   TempGame:=TTempGame.Create;
   try
+    TempGame.Game.NrOfMounts:=1;
     TempGame.Game.Mount0:=TempDir+';DRIVE;C;False;;';
     St:=TStringList.Create;
     try
@@ -76,7 +77,7 @@ begin
     For I:=0 to St.Count-1 do begin
       T:=St[I];
       While (T<>'') and (T[length(T)]<>'(') do SetLength(T,length(T)-1);
-      SetLength(T,length(T)-1);
+      If (T<>'') then SetLength(T,length(T)-1);
       If ExtUpperCase(Trim(T))=S then begin
         T:=St[I];
         If (T<>'') then SetLength(T,length(T)-1);

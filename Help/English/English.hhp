@@ -74,6 +74,7 @@ FileOptionsService.html
 FileOptionsSearchForUpdates.html
 FileOptionsImageScaling.html
 FileOptionsOtherEmulators.html
+FileOptionsResetProfiles.html
 FileQuit.html
 ViewShowMenubar.html
 ViewShowToolbar.html
@@ -228,6 +229,7 @@ GPL3.html
 #define FileOptionsOtherEmulators 1133
 #define FileOptionsAutomaticConfiguration 1134
 #define FileOptionsDataPrivacy 1136
+#define FileOptionsResetProfiles 1137
 
 #define ViewQuickStarter 1501
 

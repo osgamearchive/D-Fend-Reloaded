@@ -40,9 +40,10 @@ type
     procedure ExtraFilesListBoxDblClick(Sender: TObject);
     procedure ExtraFilesListBoxKeyDown(Sender: TObject; var Key: Word;
       Shift: TShiftState);
+    procedure ScreenshotFolderEditChange(Sender: TObject);
   private
     { Private-Deklarationen }
-    FCurrentProfileName : PString;
+    FCurrentProfileName, FCurrentCaptureDir : PString;
     FLastCurrentProfileName : String;
     IsWindowsMode : Boolean;
     Procedure ShowFrame(Sender: TObject);
@@ -73,6 +74,7 @@ begin
   NoFlicker(ExtraDirsListBox);
 
   FCurrentProfileName:=InitData.CurrentProfileName;
+  FCurrentCaptureDir:=InitData.CurrentCaptureDir;
 
   ScreenshotFolderEdit.EditLabel.Caption:=LanguageSetup.ProfileEditorCaptureFolder;
   ScreenshotFolderEditButton.Hint:=LanguageSetup.ChooseFolder;
@@ -110,6 +112,11 @@ begin
   FLastCurrentProfileName:='';
 
   HelpContext:=ID_ProfileEditProgramDirectories;
+end;
+
+procedure TModernProfileEditorDirectoryFrame.ScreenshotFolderEditChange(Sender: TObject);
+begin
+  FCurrentCaptureDir^:=ScreenshotFolderEdit.Text;
 end;
 
 procedure TModernProfileEditorDirectoryFrame.SetGame(const Game: TGame; const LoadFromTemplate: Boolean);
@@ -181,7 +188,7 @@ begin
     ScreenshotFolderEdit.Text:=MakeRelPath(IncludeTrailingPathDelimiter(PrgSetup.CaptureDir)+MakeFileSysOKFolderName(FCurrentProfileName^)+'\',PrgSetup.BaseDir);
     FLastCurrentProfileName:=FCurrentProfileName^;
   end else begin
-    ShowMessage(S+#13+DefaultFolder+#13+OldFolder);
+    {Debug: ShowMessage(S+#13+DefaultFolder+#13+OldFolder);}
     Timer.Enabled:=False;
   end;
 end;

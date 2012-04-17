@@ -41,7 +41,7 @@ type
 
 implementation
 
-uses LanguageSetupUnit, VistaToolsUnit, CommonTools, PrgSetupUnit, HelpConsts;
+uses Math, LanguageSetupUnit, VistaToolsUnit, CommonTools, PrgSetupUnit, HelpConsts;
 
 {$R *.dfm}
 
@@ -86,18 +86,18 @@ end;
 procedure TModernProfileEditorMemoryFrame.SetFreeMemInfo;
 Var I : Integer;
 begin
-  If LoadFixCheckBox.Checked then I:=632-1-LoadFixEdit.Value else I:=632;
+  If LoadFixCheckBox.Checked then I:=632-1-Min(512,Max(0,LoadFixEdit.Value)) else I:=632;
   FreeMemLabel.Caption:=Format(LanguageSetup.GameMemoryFree,[I]);
 end;
 
 procedure TModernProfileEditorMemoryFrame.GetGame(const Game: TGame);
 begin
-  Game.Memory:=MemoryEdit.Value;
+  Game.Memory:=Min(63,Max(1,MemoryEdit.Value));
   Game.XMS:=XMSCheckBox.Checked;
   Game.EMS:=EMSCheckBox.Checked;
   Game.UMB:=UMBCheckBox.Checked;
   Game.LoadFix:=LoadFixCheckBox.Checked;
-  Game.LoadFixMemory:=LoadFixEdit.Value;
+  Game.LoadFixMemory:=Min(512,Max(0,LoadFixEdit.Value));
   Game.UseDOS32A:=DOS32ACheckBox.Checked;
   Timer.Enabled:=False;
 end;

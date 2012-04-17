@@ -69,7 +69,7 @@ object ScanGamesFolderForm: TScanGamesFolderForm
       Width = 206
       Height = 21
       Style = csDropDownList
-      ItemHeight = 0
+      ItemHeight = 13
       TabOrder = 1
       OnChange = Template1ComboBoxChange
       OnDropDown = ComboBoxDropDown
@@ -80,7 +80,7 @@ object ScanGamesFolderForm: TScanGamesFolderForm
       Width = 206
       Height = 21
       Style = csDropDownList
-      ItemHeight = 0
+      ItemHeight = 13
       TabOrder = 2
       OnChange = UpdateListRec
       OnDropDown = ComboBoxDropDown
@@ -91,7 +91,7 @@ object ScanGamesFolderForm: TScanGamesFolderForm
       Width = 206
       Height = 21
       Style = csDropDownList
-      ItemHeight = 0
+      ItemHeight = 13
       TabOrder = 3
       OnChange = UpdateListRec
       OnDropDown = ComboBoxDropDown
@@ -242,7 +242,7 @@ object ScanGamesFolderForm: TScanGamesFolderForm
     Left = 8
     Top = 48
     Bitmap = {
-      494C010106000C00040010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010106000C000C0010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000002000000001002000000000000020
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

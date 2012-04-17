@@ -135,7 +135,7 @@ end;
 procedure TProfileMountEditorHDImageFrame.ImageCreateButtonClick(Sender: TObject);
 Var S : String;
 begin
-  S:=ShowCreateImageFileDialog(self,False,True);
+  S:=ShowCreateImageFileDialog(self,False,True,InfoData.GameDB);
   If S='' then exit;
   ImageEdit.Text:=MakeRelPath(S,PrgSetup.BaseDir);
   ImageGeometryEdit.Text:=GetGeometryFromFile(S);

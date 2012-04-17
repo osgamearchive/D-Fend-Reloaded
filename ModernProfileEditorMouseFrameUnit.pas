@@ -27,7 +27,7 @@ type
 
 implementation
 
-uses VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgSetupUnit, HelpConsts;
+uses Math, VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgSetupUnit, HelpConsts;
 
 {$R *.dfm}
 
@@ -72,7 +72,7 @@ end;
 procedure TModernProfileEditorMouseFrame.GetGame(const Game: TGame);
 begin
   Game.AutoLockMouse:=LockMouseCheckBox.Checked;
-  Game.MouseSensitivity:=MouseSensitivityEdit.Value;
+  Game.MouseSensitivity:=Min(1000,Max(1,MouseSensitivityEdit.Value));
   Game.Force2ButtonMouseMode:=Force2ButtonsCheckBox.Checked;
   Game.SwapMouseButtons:=SwapButtonsCheckBox.Checked;
 end;

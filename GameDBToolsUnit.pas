@@ -46,6 +46,7 @@ Function GetUserDataList(const GameDB : TGameDB) : TStringList;
 
 Procedure DeleteOldFiles;
 Procedure ReplaceAbsoluteDirs(const GameDB : TGameDB);
+Procedure BuildDefaultDosProfileAutoexec(const GameDB : TGameDB);
 Function BuildDefaultDosProfile(const GameDB : TGameDB; const CopyFiles : Boolean = True) : TGame;
 Procedure BuildDefaultProfile;
 Procedure ReBuildTemplates(const InBackground : Boolean);
@@ -1848,7 +1849,7 @@ begin
 end;
 
 Procedure UpdateUserDataFolderAndSettingsAfterUpgrade(const GameDB : TGameDB; const LastVersion : Integer);
-Var Source,S : String;
+Var Source,Dest,S : String;
     I : Integer;
     DB : TGameDB;
     G : TGame;
@@ -1880,10 +1881,20 @@ begin
     {Add new auto setup templates (always)}
     CopyFiles(PrgDir+NewUserDataSubDir+'\'+AutoSetupSubDir,PrgDataDir+AutoSetupSubDir,False,True); {False = do not overwrite existing file}
 
-    {Update DozZip (only if upgrade from below 1.0)}
-    If LastVersion<10000 then begin
+    {Update DozZip (only if upgrade from below 1.3)}
+    If LastVersion<10300 then begin
       Source:=PrgDir+NewUserDataSubDir+'\DOSZIP\';
       If DirectoryExists(Source) then CopyFiles(Source,IncludeTrailingPathDelimiter(PrgSetup.GameDir)+'DOSZIP\',True,True);
+    end;
+
+    {Update FreeDOS (only if upgrade from below 1.3)}
+    If LastVersion<10300 then begin
+      Source:=PrgDir+NewUserDataSubDir+'\FREEDOS';
+      Dest:=IncludeTrailingPathDelimiter(PrgSetup.GameDir)+'FREEDOS';
+      if DirectoryExists(Source) and DirectoryExists(Dest) then begin
+        if (GetMD5Sum(Dest+'\kernel.sys',true)=FD10KernelSys) and (GetMD5Sum(Source+'\kernel.sys',true)=FD11KernelSys) then
+          CopyFiles(Source,Dest,True,True);
+      end;
     end;
 
     {Update DOSBox screenshot}
@@ -1961,6 +1972,11 @@ begin
     If (I>0) and (GameDB[I].CacheLanguage='multilingual') then begin
       GameDB[I].Language:='Multilingual'; GameDB[I].StoreAllValues; GameDB[I].LoadCache;
     end;
+  end;
+
+  {Update Autoexec.bat in "DOSBox DOS" profile (only if upgrade from below 1.3)}
+  If LastVersion<10300 then begin
+    BuildDefaultDosProfileAutoexec(GameDB);
   end;
 
   {Add new games list column}
@@ -2101,16 +2117,18 @@ begin
   end;
 end;
 
-Function BuildDefaultDosProfile(const GameDB : TGameDB; const CopyFiles : Boolean) : TGame;
+Procedure BuildDefaultDosProfileAutoexec(const GameDB : TGameDB);
 Var I : Integer;
+    Game : TGame;
     St : TStringList;
 begin
   I:=GameDB.IndexOf(DosBoxDOSProfile);
-  If I>=0 then result:=GameDB[I] else result:=GameDB[GameDB.Add(DosBoxDOSProfile)];
+  If I>=0 then Game:=GameDB[I] else exit;
 
   St:=TStringList.Create;
   try
     St.Add('C:');
+    St.Add('echo.');
     St.Add('');
     St.Add('If exist C:\FREEDOS\COMMAND.COM goto AddFreeDos');
     St.Add('Goto Next1');
@@ -2146,10 +2164,28 @@ begin
     St.Add('set path=%PATH%;C:\DOSZIP');
     St.Add('echo You can start Doszip Commander (file manager) by typing "DZ".');
     St.Add(':Next5');
-    result.Autoexec:=StringListToString(St);
+    St.Add('');
+    St.Add('If exist C:\FREEDOS\DOSSHELL.EXE goto AddDosshell');
+    St.Add('Goto Next6');
+    St.Add(':AddDosshell');
+    St.Add('echo You can start FreeDOS Shell (file manager) by typing "DOSSHELL".');
+    St.Add(':Next6');
+    Game.Autoexec:=StringListToString(St);
+    Game.StoreAllValues;
+    Game.LoadCache;
   finally
     St.Free;
   end;
+end;
+
+Function BuildDefaultDosProfile(const GameDB : TGameDB; const CopyFiles : Boolean) : TGame;
+Var I : Integer;
+begin
+  I:=GameDB.IndexOf(DosBoxDOSProfile);
+  If I>=0 then result:=GameDB[I] else result:=GameDB[GameDB.Add(DosBoxDOSProfile)];
+
+  BuildDefaultDosProfileAutoexec(GameDB);
+
   result.NrOfMounts:=1;
   result.Mount0:=MakeRelPath(PrgSetup.GameDir,PrgSetup.BaseDir,True)+';Drive;C;false;';
   result.CloseDosBoxAfterGameExit:=False;

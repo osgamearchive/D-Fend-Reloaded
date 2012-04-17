@@ -19,7 +19,6 @@ type
     ZipFileEdit: TLabeledEdit;
     ZipFileButton: TSpeedButton;
     OpenDialog: TOpenDialog;
-    RepackCheckBox: TCheckBox;
     RepackTypeLabel: TLabel;
     RepackTypeComboBox: TComboBox;
     ZipFolderCreateButton: TSpeedButton;
@@ -31,9 +30,10 @@ type
     procedure ZipFolderFreeSpaceTrackbarChange(Sender: TObject);
     procedure ZipFolderDriveLetterComboBoxChange(Sender: TObject);
     procedure ZipFileButtonClick(Sender: TObject);
-    procedure RepackCheckBoxClick(Sender: TObject);
     procedure ZipFolderCreateButtonClick(Sender: TObject);
     procedure MakeNormalDriveButtonClick(Sender: TObject);
+    procedure RepackTypeComboBoxChange(Sender: TObject);
+    procedure RepackTypeComboBoxDropDown(Sender: TObject);
   private
     { Private-Deklarationen }
     InfoData : TInfoData;
@@ -87,11 +87,14 @@ begin
     ZipFolderDriveLetterComboBox.Items.EndUpdate;
   end;
 
-  RepackCheckBox.Caption:=LanguageSetup.ProfileMountingZipRepackPhysFS;
   RepackTypeLabel.Caption:=LanguageSetup.ProfileMountingZipRepack;
   RepackTypeComboBox.Items[0]:=LanguageSetup.ProfileMountingZipRepackNoDelete;
   RepackTypeComboBox.Items[1]:=LanguageSetup.ProfileMountingZipRepackDeleteFiles;
   RepackTypeComboBox.Items[2]:=LanguageSetup.ProfileMountingZipRepackDeleteFolder;
+  RepackTypeComboBox.Items[3]:=LanguageSetup.ProfileMountingZipRepackNoDeleteNoRepack;
+  RepackTypeComboBox.Items[4]:=LanguageSetup.ProfileMountingZipRepackDeleteFilesNoRepack;
+  RepackTypeComboBox.Items[5]:=LanguageSetup.ProfileMountingZipRepackDeleteFolderNoRepack;
+  RepackTypeComboBox.ItemIndex:=1;
 
   MakeNormalDriveButton.Caption:=LanguageSetup.ProfileMountingZipMakeNormalMount;
   MakeNormalDriveButton.Hint:=LanguageSetup.ProfileMountingZipMakeNormalMountHint;
@@ -107,7 +110,7 @@ begin
   try
     S:=Trim(ExtUpperCase(St[1]));
     If S='PHYSFS' then begin
-      {RealFolder$ZipFile;PHYSFS;Letter;False;;FreeSpace;DeleteMode(no;files;folder)}
+      {RealFolder$ZipFile;PHYSFS;Letter;False;;FreeSpace;DeleteMode(no;files;folder;no-norepack;files-norepack;folder-norepack)}
       result:=True;
       S:=Trim(St[0]); I:=Pos('$',S); If I=0 then T:='' else begin T:=Trim(Copy(S,I+1,MaxInt)); S:=Trim(Copy(S,1,I-1)); end;
       ZipFolderEdit.Text:=S; ZipFileEdit.Text:=T;
@@ -121,9 +124,12 @@ begin
       end;
       If St.Count>=7 then begin
         S:=Trim(ExtUpperCase(St[6]));
-        If S='NO' then begin RepackCheckBox.Checked:=True; RepackCheckBox.Enabled:=True; RepackTypeComboBox.ItemIndex:=0; end;
-        If S='FILES' then begin RepackCheckBox.Checked:=True; RepackCheckBox.Enabled:=True; RepackTypeComboBox.ItemIndex:=1; end;
-        If S='FOLDER' then begin RepackCheckBox.Checked:=True; RepackCheckBox.Enabled:=True; RepackTypeComboBox.ItemIndex:=2; end;
+        If S='NO' then RepackTypeComboBox.ItemIndex:=0;
+        If S='FILES' then RepackTypeComboBox.ItemIndex:=1;
+        If S='FOLDER' then RepackTypeComboBox.ItemIndex:=2;
+        If S='NO-NOREPACK' then RepackTypeComboBox.ItemIndex:=3;
+        If S='FILES-NOREPACK' then RepackTypeComboBox.ItemIndex:=4;
+        If S='FOLDER-NOREPACK' then RepackTypeComboBox.ItemIndex:=5;
       end;
     end else begin
       result:=False;
@@ -137,7 +143,7 @@ begin
 
   ZipFolderDriveLetterComboBoxChange(self);
   ZipFolderFreeSpaceTrackBarChange(self);
-  RepackCheckBoxClick(self);
+  RepackTypeComboBoxChange(self);
 end;
 
 function TProfileMountEditorPhysFSFrame.CheckBeforeDone: Boolean;
@@ -170,17 +176,20 @@ begin
   If Copy(S,1,2)='.\' then S:=Trim(Copy(S,3,MaxInt));
   If Copy(T,1,2)='.\' then T:=Trim(Copy(T,3,MaxInt));
 
-  If RepackCheckBox.Checked and (RepackTypeComboBox.ItemIndex>0) and (S=T) then begin
+  If (RepackTypeComboBox.ItemIndex>0) and (S=T) then begin
     If MessageDlg(Format(LanguageSetup.ProfileMountingFolderDeleteWarning,[PrgSetup.GameDir]),mtWarning,[mbYes,mbNo],0)<>mrYes then B:=False;
   end;
 
-  {RealFolder$ZipFile;PHYSFS;Letter;False;;FreeSpace;DeleteMode(no;files;folder)}
+  {RealFolder$ZipFile;PHYSFS;Letter;False;;FreeSpace;DeleteMode(no;files;folder;no-norepack;files-norepack;folder-norepack)}
   S:=StringReplace(MakeRelPath(ZipFolderEdit.Text,PrgSetup.BaseDir)+'$'+MakeRelPath(ZipFileEdit.Text,PrgSetup.BaseDir),';','<semicolon>',[rfReplaceAll])+';PhysFS;'+ZipFolderDriveLetterComboBox.Text+';False;';
   S:=S+';'+IntToStr(ZipFolderFreeSpaceTrackBar.Position);
-  If RepackCheckBox.Checked then Case RepackTypeComboBox.ItemIndex of
+  Case RepackTypeComboBox.ItemIndex of
     0 : S:=S+';no';
     1 : S:=S+';files';
     2 : S:=S+';folder';
+    3 : S:=S+';no-norepack';
+    4 : S:=S+';files-norepack';
+    5 : S:=S+';folder-norepack';
   end;
 
   If B then result:=S else result:='';
@@ -221,16 +230,6 @@ begin
   OpenDialog.Filter:=LanguageSetup.ProfileMountingZipFileFilter;
   if not OpenDialog.Execute then exit;
   ZipFileEdit.Text:=MakeRelPath(OpenDialog.FileName,PrgSetup.BaseDir);
-end;
-
-procedure TProfileMountEditorPhysFSFrame.RepackCheckBoxClick(Sender: TObject);
-begin
-  If (not RepackTypeComboBox.Enabled) and RepackCheckBox.Checked then begin
-    RepackTypeComboBox.Enabled:=RepackCheckBox.Checked;
-    RepackTypeComboBox.ItemIndex:=1;
-  end else begin
-    RepackTypeComboBox.Enabled:=RepackCheckBox.Checked;
-  end;
 end;
 
 procedure TProfileMountEditorPhysFSFrame.ShowFrame;
@@ -319,6 +318,16 @@ begin
           InfoData.CloseRequest(self);
         end;
   end;
+end;
+
+procedure TProfileMountEditorPhysFSFrame.RepackTypeComboBoxChange(Sender: TObject);
+begin
+  SetComboHint(RepackTypeComboBox);
+end;
+
+procedure TProfileMountEditorPhysFSFrame.RepackTypeComboBoxDropDown(Sender: TObject);
+begin
+  SetComboDropDownDropDownWidth(RepackTypeComboBox);
 end;
 
 Function TProfileMountEditorPhysFSFrame.ChangeExtraExeFile(const NewFolder : String; var ExeName : String) : Boolean;

@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, Buttons, StdCtrls, ExtCtrls, ComCtrls, ImgList, Grids, Menus,
-  ModernProfileEditorBaseFrameUnit;
+  ModernProfileEditorBaseFrameUnit, GameDBUnit;
 
 Type TInfoData=record
   Data : String;
@@ -14,6 +14,7 @@ Type TInfoData=record
   ProfileFileName : String;
   CloseRequest : TNotifyEvent;
   BaseGameFrame : TModernProfileEditorBaseFrame;
+  GameDB : TGameDB;
 end;
 
 Type TProfileMountEditorFrame=interface
@@ -58,12 +59,13 @@ type
     UsedDriveLetters : String;
     DefaultInitialDir : String;
     ProfileFileName : String;
+    GameDB : TGameDB;
   end;
 
 var
   ProfileMountEditorForm: TProfileMountEditorForm;
 
-Function ShowProfileMountEditorDialog(const AOwner : TComponent; var AData : String; const AUsedDriveLetters : String; const ADefaultInitialDir : String; const AProfileFileName : String; const Frame : TModernProfileEditorBaseFrame =nil; const NextFreeDriveLetter : String ='' {for adding new drives}) : Boolean;
+Function ShowProfileMountEditorDialog(const AOwner : TComponent; var AData : String; const AUsedDriveLetters : String; const ADefaultInitialDir : String; const AProfileFileName : String; const AGameDB : TGameDB; const Frame : TModernProfileEditorBaseFrame =nil; const NextFreeDriveLetter : String ='' {for adding new drives}) : Boolean;
 
 implementation
 
@@ -121,6 +123,7 @@ begin
     else InfoData.DefaultInitialDir:=MakeAbsPath(DefaultInitialDir,PrgSetup.BaseDir);
   If not DirectoryExists(InfoData.DefaultInitialDir) then InfoData.DefaultInitialDir:=MakeAbsPath(PrgSetup.GameDir,PrgSetup.BaseDir);
   InfoData.ProfileFileName:=ProfileFileName;
+  InfoData.GameDB:=GameDB;
 
   If FrameI.Init(InfoData) then LastVisible:=I;
 
@@ -208,7 +211,7 @@ end;
 
 { global }
 
-Function ShowProfileMountEditorDialog(const AOwner : TComponent; var AData : String; const AUsedDriveLetters : String; const ADefaultInitialDir : String; const AProfileFileName : String; const Frame : TModernProfileEditorBaseFrame; const NextFreeDriveLetter : String) : Boolean;
+Function ShowProfileMountEditorDialog(const AOwner : TComponent; var AData : String; const AUsedDriveLetters : String; const ADefaultInitialDir : String; const AProfileFileName : String; const AGameDB : TGameDB; const Frame : TModernProfileEditorBaseFrame; const NextFreeDriveLetter : String) : Boolean;
 Var S : String;
 begin
   If AData='' then begin

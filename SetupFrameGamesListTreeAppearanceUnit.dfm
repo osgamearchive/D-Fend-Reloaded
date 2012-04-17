@@ -13,7 +13,6 @@ object SetupFrameGamesListTreeAppearance: TSetupFrameGamesListTreeAppearance
     Align = alClient
     BorderStyle = bsNone
     TabOrder = 0
-    ExplicitHeight = 478
     DesignSize = (
       589
       528)
@@ -51,6 +50,13 @@ object SetupFrameGamesListTreeAppearance: TSetupFrameGamesListTreeAppearance
         'f'#252'r die Kategorien '#252'ber die "Benutzerdefinierten Informationen" ' +
         'definiert werden.'
       WordWrap = True
+    end
+    object PredefinedGroupsLabel: TLabel
+      Left = 16
+      Top = 181
+      Width = 84
+      Height = 13
+      Caption = 'Vorgabegruppen:'
     end
     object TreeViewBackgroundRadioButton1: TRadioButton
       Left = 16

@@ -28,16 +28,12 @@ object ResetProfilesForm: TResetProfilesForm
     Top = 0
     Width = 654
     Height = 485
-    ActivePage = TabSheet3
+    ActivePage = TabSheet1
     Align = alTop
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 0
-    ExplicitWidth = 781
-    ExplicitHeight = 584
     object TabSheet1: TTabSheet
       Caption = 'TabSheet1'
-      ExplicitWidth = 636
-      ExplicitHeight = 447
       DesignSize = (
         646
         457)
@@ -56,8 +52,6 @@ object ResetProfilesForm: TResetProfilesForm
         Anchors = [akLeft, akTop, akRight, akBottom]
         ItemHeight = 13
         TabOrder = 0
-        ExplicitWidth = 618
-        ExplicitHeight = 389
       end
       object SelectAllButton: TBitBtn
         Left = 8
@@ -68,7 +62,6 @@ object ResetProfilesForm: TResetProfilesForm
         Caption = 'SelectAllButton'
         TabOrder = 1
         OnClick = SelectButtonClick
-        ExplicitTop = 419
       end
       object SelectNoneButton: TBitBtn
         Tag = 1
@@ -80,7 +73,6 @@ object ResetProfilesForm: TResetProfilesForm
         Caption = 'SelectNoneButton'
         TabOrder = 2
         OnClick = SelectButtonClick
-        ExplicitTop = 419
       end
       object SelectGenreButton: TBitBtn
         Tag = 2
@@ -92,14 +84,11 @@ object ResetProfilesForm: TResetProfilesForm
         Caption = 'By ...'
         TabOrder = 3
         OnClick = SelectButtonClick
-        ExplicitTop = 419
       end
     end
     object TabSheet2: TTabSheet
       Caption = 'TabSheet2'
       ImageIndex = 1
-      ExplicitWidth = 636
-      ExplicitHeight = 447
       object ScrollBox: TScrollBox
         Left = 0
         Top = 0
@@ -113,8 +102,6 @@ object ResetProfilesForm: TResetProfilesForm
         Color = clWindow
         ParentColor = False
         TabOrder = 0
-        ExplicitWidth = 636
-        ExplicitHeight = 447
         DesignSize = (
           646
           457)
@@ -133,8 +120,6 @@ object ResetProfilesForm: TResetProfilesForm
           Anchors = [akLeft, akTop, akRight, akBottom]
           ItemHeight = 13
           TabOrder = 0
-          ExplicitWidth = 618
-          ExplicitHeight = 389
         end
         object SelectAllButton2: TBitBtn
           Tag = 3
@@ -165,10 +150,6 @@ object ResetProfilesForm: TResetProfilesForm
     object TabSheet3: TTabSheet
       Caption = 'TabSheet3'
       ImageIndex = 2
-      ExplicitLeft = 52
-      ExplicitTop = 28
-      ExplicitWidth = 773
-      ExplicitHeight = 556
       DesignSize = (
         646
         457)
@@ -182,7 +163,6 @@ object ResetProfilesForm: TResetProfilesForm
         Checked = True
         TabOrder = 0
         TabStop = True
-        ExplicitWidth = 745
       end
       object ComboBoxTemplate: TComboBox
         Left = 32
@@ -194,7 +174,6 @@ object ResetProfilesForm: TResetProfilesForm
         ItemHeight = 13
         TabOrder = 1
         OnChange = ComboBoxChange
-        ExplicitWidth = 729
       end
       object RadioButtonAutoSetup: TRadioButton
         Left = 16
@@ -204,7 +183,6 @@ object ResetProfilesForm: TResetProfilesForm
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Reset to auto setup template'
         TabOrder = 2
-        ExplicitWidth = 745
       end
       object ComboBoxAutoSetup: TComboBox
         Left = 32
@@ -216,7 +194,6 @@ object ResetProfilesForm: TResetProfilesForm
         ItemHeight = 13
         TabOrder = 3
         OnChange = ComboBoxChange
-        ExplicitWidth = 729
       end
     end
   end
@@ -229,7 +206,6 @@ object ResetProfilesForm: TResetProfilesForm
     TabOrder = 1
     OnClick = OKButtonClick
     Kind = bkOK
-    ExplicitTop = 590
   end
   object CancelButton: TBitBtn
     Left = 120
@@ -239,7 +215,6 @@ object ResetProfilesForm: TResetProfilesForm
     Anchors = [akLeft, akBottom]
     TabOrder = 2
     Kind = bkCancel
-    ExplicitTop = 590
   end
   object HelpButton: TBitBtn
     Left = 232
@@ -250,7 +225,6 @@ object ResetProfilesForm: TResetProfilesForm
     TabOrder = 3
     OnClick = HelpButtonClick
     Kind = bkHelp
-    ExplicitTop = 590
   end
   object PopupMenu: TPopupMenu
     Left = 152

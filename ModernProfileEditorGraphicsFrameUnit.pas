@@ -346,7 +346,7 @@ begin
     S:=Copy(S,Pos('(',S)+1,MaxInt);
     If Pos(')',S)=0 then Game.Scale:=''  else Game.Scale:=Copy(S,1,Pos(')',S)-1);
   end;
-  Game.FrameSkip:=FrameSkipEdit.Value;
+  Game.FrameSkip:=Min(100,Max(0,FrameSkipEdit.Value));
 
   If PrgSetup.AllowTextModeLineChange then Case TextModeLinesRadioGroup.ItemIndex of
     0 : Game.TextModeLines:=25;

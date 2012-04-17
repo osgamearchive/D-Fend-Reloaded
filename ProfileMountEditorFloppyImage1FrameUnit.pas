@@ -150,7 +150,7 @@ Var S : String;
 begin
   Case (Sender as TComponent).Tag of
     0 : begin
-          S:=ShowCreateImageFileDialog(self,True,False);
+          S:=ShowCreateImageFileDialog(self,True,False,InfoData.GameDB);
           If S='' then exit;
           FloppyImageEdit.Text:=MakeRelPath(S,PrgSetup.BaseDir);;
         end;

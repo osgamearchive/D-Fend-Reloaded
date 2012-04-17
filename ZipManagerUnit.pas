@@ -106,7 +106,7 @@ begin
 
 
     If T='ZIP' then begin
-      {RealFolder$ZipFile;ZIP;Letter;False;;FreeSpace;DeleteMode(no;files;folder)}
+      {RealFolder$ZipFile;ZIP;Letter;False;;FreeSpace;DeleteMode(no;files;folder;no-norepack;files-norepack;folder-norepack)}
       result:=True;
       DriveLetter:=St[2];
       Folder:=ShortName(St2[0]);
@@ -116,17 +116,23 @@ begin
         S:=Trim(ExtUpperCase(St[6]));
         If S='FILES' then DeleteType:=1;
         If S='FOLDER' then DeleteType:=2;
+        If S='NO-NOREPACK' then DeleteType:=3;
+        If S='FILES-NOREPACK' then DeleteType:=4;
+        If S='FOLDER-NOREPACK' then DeleteType:=5;
       end;
     end;
 
     If T='PHYSFS' then begin
-      {RealFolder$ZipFile;PHYSFS;Letter;False;;FreeSpace;DeleteMode(no;files;folder)}
+      {RealFolder$ZipFile;PHYSFS;Letter;False;;FreeSpace;DeleteMode(no;files;folder;no-norepack;files-norepack;folder-norepack)}
 
       DeleteType:=0;
       If St.Count>=7 then begin
         S:=Trim(ExtUpperCase(St[6]));
         If S='FILES' then DeleteType:=1;
         If S='FOLDER' then DeleteType:=2;
+        If S='NO-NOREPACK' then DeleteType:=3;
+        If S='FILES-NOREPACK' then DeleteType:=4;
+        If S='FOLDER-NOREPACK' then DeleteType:=5;
       end;
       If DeleteType=0 then exit; {no extracting needed, only add a record if repack is needed}
 
@@ -266,15 +272,21 @@ begin
   AZipFile:=MakeAbsPath(ZipFile,PrgSetup.BaseDir);
   ADestFolder:=MakeAbsPath(Folder,PrgSetup.BaseDir);
   Case DeleteType of
-    0 : ADeleteMode:=dmNoNoWarning;
-    1 : ADeleteMode:=dmFilesNoWarning;
-    2 : ADeleteMode:=dmFolderNoWarning;
+    0,3 : ADeleteMode:=dmNoNoWarning;
+    1,4 : ADeleteMode:=dmFilesNoWarning;
+    2,5 : ADeleteMode:=dmFolderNoWarning;
     else ADeleteMode:=dmNoNoWarning;
   end;
 
-  If AddToZipFile
-    then ZipInfoFormUnit.AddToZipFile(Application.MainForm,AZipFile,ADestFolder,ADeleteMode,GetCompressStrengthFromPrgSetup)
-    else CreateZipFile(Application.MainForm,AZipFile,ADestFolder,ADeleteMode,GetCompressStrengthFromPrgSetup);
+  if (DeleteType>=3) then begin
+    {Delete only}
+    DeleteUnpackedFiles(Application.MainForm,ADestFolder,ADeleteMode);
+  end else begin
+    {Repack and delete}
+    If AddToZipFile
+      then ZipInfoFormUnit.AddToZipFile(Application.MainForm,AZipFile,ADestFolder,ADeleteMode,GetCompressStrengthFromPrgSetup)
+      else CreateZipFile(Application.MainForm,AZipFile,ADestFolder,ADeleteMode,GetCompressStrengthFromPrgSetup);
+  end;
 end;
 
 procedure TZipManager.TimerWork(Sender: TObject);

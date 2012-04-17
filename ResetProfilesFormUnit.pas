@@ -243,7 +243,7 @@ end;
 
 procedure TResetProfilesForm.HelpButtonClick(Sender: TObject);
 begin
-  Application.HelpCommand(HELP_CONTEXT,ID_Index); //...
+  Application.HelpCommand(HELP_CONTEXT,ID_FileOptionsResetProfiles);
 end;
 
 procedure TResetProfilesForm.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);

@@ -7,11 +7,14 @@ uses Classes, GameDBUnit;
 {Default floppy image} Function DiskImageCreator(const ImageFileName : String) : Boolean; overload;
 {HD image} Function DiskImageCreator(const HDSize : Integer; const ImageFileName : String; const CompressImage, FAT : Boolean) : Boolean; overload;
 
-Type TDiskImageCreatorUpgrade=(dicuMakeBootable,dicuKeyboardDriver,dicuMouseDriver,dicuMemoryManager,dicuDiskTools,dicuEditor,dicuAutoexecAddLines,dicuCopyFolder,dicuSwapMouseButtons,dicuForce2ButtonMouseMode);
+Type TDiskImageCreatorUpgrade=(dicuMakeBootable,dicuKeyboardDriver,dicuMouseDriver,dicuMemoryManager,dicuDiskTools,dicuEditor,dicuDoszip,dicuAutoexecAddLines,dicuCopyFolder,dicuSwapMouseButtons,dicuForce2ButtonMouseMode,dicuUseFD11Tools);
 Type TDiskImageCreatorUpgrades=set of TDiskImageCreatorUpgrade;
 
 Function DiskImageCreatorUpgrade(const ImageFileName : String; const IsHDImage : Boolean; const Upgrades : TDiskImageCreatorUpgrades; const CopyFolders : TStringList =nil; const CopyFoldersDest : TStringList =nil; const AutoexecAdd : TStringList =nil; const Game : TGame = nil; const FloppyCylinders : Integer = 80; const FloppyHeads : Integer = 2; const FloppySPT : Integer = 18) : Boolean;
 Function DiskImageCreatorUpgradeSize(const IsHDImage : Boolean; const Upgrades : TDiskImageCreatorUpgrades; const CopyFolders : TStringList =nil; const AddMB : Integer =0) : Integer;
+
+Function FD11ToolsAvailable : Boolean;
+Function DosZipAvailable : Boolean;
 
 implementation
 
@@ -305,29 +308,42 @@ begin
   end;
 end;
 
+Function GetDoszipDir : String;
+begin
+  result:=Trim('.\VirtualHD\Doszip\');
+  result:=IncludeTrailingPathDelimiter(MakeAbsPath(result,PrgSetup.BaseDir));
+  If (result='') or (not DirectoryExists(result) or (not FileExists(result+'dz.exe'))) then begin
+    result:='';
+    exit;
+  end;
+end;
+
 Function GetCodepage : String;
 begin
   result:=LanguageSetup.GameKeyboardCodepageDefault;
 end;
 
 Function DiskImageCreatorRunDOSBoxCommandsOnFloppyImage(const ImageFileName : String; const Autoexec, AdditionalFolders : TStringList) : Boolean;
-Var FreeDOSDir : String;
+Var FreeDOSDir,DoszipDir : String;
     TempGame : TTempGame;
-    I : Integer;
+    I,Add : Integer;
 begin
   result:=False;
   FreeDOSDir:=GetFreeDOSDir; If FreeDOSDir='' then exit;
+  DoszipDir:=GetDoszipDir;
 
   TempGame:=TTempGame.Create;
   try
     TempGame.Game.Mount0:=FreeDOSDir+';DRIVE;C;False;;'+IntToStr(DefaultFreeHDSize);
     TempGame.Game.Mount1:=ImageFileName+';FLOPPYIMAGE;A;;;';
+    If (DoszipDir<>'') then TempGame.Game.Mount2:=DoszipDir+';DRIVE;D;False;;'+IntToStr(DefaultFreeHDSize);
+    if (DoszipDir<>'') then Add:=1 else Add:=0;
     If AdditionalFolders<>nil then begin
-      TempGame.Game.NrOfMounts:=2+AdditionalFolders.Count;
+      TempGame.Game.NrOfMounts:=2+Add+AdditionalFolders.Count;
       For I:=0 to AdditionalFolders.Count-1 do
-        TempGame.Game.Mount[2+I]:=AdditionalFolders[I]+';DRIVE;'+Chr(Ord('D')+I)+';False;;1000';
+        TempGame.Game.Mount[2+Add+I]:=AdditionalFolders[I]+';DRIVE;'+Chr(Ord('D')+I+Add)+';False;;1000';
     end else begin
-      TempGame.Game.NrOfMounts:=2;
+      TempGame.Game.NrOfMounts:=2+Add;
     end;
     TempGame.Game.Autoexec:=StringListToString(Autoexec);
 
@@ -341,22 +357,26 @@ begin
 end;
 
 Function DiskImageCreatorRunDOSBoxCommandsOnHDImage(const ImageFileName : String; const Autoexec, AdditionalFolders : TStringList) : Boolean;
-Var FreeDOSDir : String;
+Var FreeDOSDir,DoszipDir : String;
     TempGame : TTempGame;
-    I : Integer;
+    I,Add : Integer;
 begin
   result:=False;
   FreeDOSDir:=GetFreeDOSDir; If FreeDOSDir='' then exit;
+  DoszipDir:=GetDoszipDir;
+
   TempGame:=TTempGame.Create;
   try
     TempGame.Game.Mount0:=FreeDOSDir+';DRIVE;C;False;;'+IntToStr(DefaultFreeHDSize);
     TempGame.Game.Mount1:=ImageFileName+';IMAGE;D;;;'+GetGeometryFromFile(ImageFileName);
+    If (DoszipDir<>'') then TempGame.Game.Mount2:=DoszipDir+';DRIVE;E;False;;'+IntToStr(DefaultFreeHDSize);
+    if (DoszipDir<>'') then Add:=1 else Add:=0;
     If AdditionalFolders<>nil then begin
-      TempGame.Game.NrOfMounts:=2+AdditionalFolders.Count;
+      TempGame.Game.NrOfMounts:=2+Add+AdditionalFolders.Count;
       For I:=0 to AdditionalFolders.Count-1 do
-        TempGame.Game.Mount[2+I]:=AdditionalFolders[I]+';DRIVE;'+Chr(Ord('E')+I)+';False;;1000';
+        TempGame.Game.Mount[2+I+Add]:=AdditionalFolders[I]+';DRIVE;'+Chr(Ord('E')+I+Add)+';False;;1000';
     end else begin
-      TempGame.Game.NrOfMounts:=2;
+      TempGame.Game.NrOfMounts:=2+Add;
     end;
     TempGame.Game.Autoexec:=StringListToString(Autoexec);
 
@@ -414,18 +434,26 @@ begin
       St.Add('echo BUFFERS=20 >> A:\config.sys');
       St.Add('echo FILES=40 >> A:\config.sys');
       St.Add('echo country='+LanguageSetup.GameKeyboardCountryDefault+' >> A:\config.sys');
-      St.Add('echo set COMSPEC=C:\COMMAND.COM > A:\autoexe.bat');
+      St.Add('echo set COMSPEC=C:\COMMAND.COM > A:\autoexec.bat');
       St.Add('echo set temp=A:\ >> A:\autoexec.bat');
       St.Add('echo set tmp=A:\ >> A:\autoexec.bat');
       St.Add('echo set dircmd=/ogn >> A:\autoexec.bat');
       If dicuMemoryManager in Upgrades then begin
-        St.Add('copy C:\himem.exe A:\');
-        St.Add('copy C:\emm386.exe A:\');
+        if (dicuUseFD11Tools in Upgrades) then begin
+          St.Add('copy C:\jemmex.exe A:\');
+        end else begin
+          St.Add('copy C:\himem.exe A:\');
+          St.Add('copy C:\emm386.exe A:\');
+        end;
         St.Add('copy C:\mem.exe A:\');
         St.Add('echo dos=high,umb >> A:\config.sys');
         St.Add('echo DOSDATA=UMB >> A:\config.sys');
-        St.Add('echo device=himem.exe >> A:\config.sys');
-        St.Add('echo devicehigh=emm386.exe >> A:\config.sys');
+        if (dicuUseFD11Tools in Upgrades) then begin
+          St.Add('echo devicehigh=jemmex.exe I=c800-dfff >> A:\config.sys');
+        end else begin
+          St.Add('echo device=himem.exe >> A:\config.sys');
+          St.Add('echo devicehigh=emm386.exe >> A:\config.sys');
+        end;
         St.Add('echo SHELLHIGH=A:\COMMAND.COM /E:256 /P >> A:\config.sys');
         lh:='lh ';
       end else begin
@@ -467,6 +495,11 @@ begin
     end;
     if dicuEditor in Upgrades then begin
       St.Add('copy C:\edit.* A:\');
+    end;
+    If dicuDoszip in Upgrades then begin
+      St.Add('copy D:\dz.exe A:\');
+      St.Add('copy D:\dz.dll A:\');
+      St.Add('copy D:\doszip.txt A:\');
     end;
     St.Add('exit');
     result:=DiskImageCreatorRunDOSBoxCommandsOnFloppyImage(ImageFileName,St,CopyFolders);
@@ -537,7 +570,7 @@ Function DiskImageCreatorUpgradeHD(const ImageFileName : String; const Upgrades 
 Var TempFloppyImage : String;
     St,St2 : TStringList;
     lh,CtMouseParameters : String;
-    I,J : Integer;
+    I,J,Add : Integer;
     C : Char;
 begin
   result:=False;
@@ -567,13 +600,21 @@ begin
       St.Add('echo set tmp=C:\ >> D:\autoexec.bat');
       St.Add('echo set dircmd=/ogn >> D:\autoexec.bat');
       If dicuMemoryManager in Upgrades then begin
-        St.Add('copy C:\himem.exe D:\');
-        St.Add('copy C:\emm386.exe D:\');
+        if (dicuUseFD11Tools in Upgrades) then begin
+          St.Add('copy C:\jemmex.exe D:\');
+        end else begin
+          St.Add('copy C:\himem.exe D:\');
+          St.Add('copy C:\emm386.exe D:\');
+        end;
         St.Add('copy C:\mem.exe D:\');
         St.Add('echo dos=high,umb >> D:\config.sys');
         St.Add('echo DOSDATA=UMB >> D:\config.sys');
-        St.Add('echo device=himem.exe >> D:\config.sys');
-        St.Add('echo devicehigh=emm386.exe >> D:\config.sys');
+        if (dicuUseFD11Tools in Upgrades) then begin
+          St.Add('echo devicehigh=jemmex.exe I=c800-dfff >> D:\config.sys');
+        end else begin
+          St.Add('echo device=himem.exe >> D:\config.sys');
+          St.Add('echo devicehigh=emm386.exe >> D:\config.sys');
+        end;
         St.Add('echo SHELLHIGH=C:\COMMAND.COM /E:256 /P >> D:\config.sys');
         lh:='lh ';
       end else begin
@@ -615,11 +656,17 @@ begin
     if dicuEditor in Upgrades then begin
       St.Add('copy C:\edit.* D:\');
     end;
+    if dicuDoszip in Upgrades then begin
+      St.Add('copy E:\dz.exe D:\');
+      St.Add('copy E:\dz.dll D:\');
+      St.Add('copy E:\doszip.txt D:\');
+    end;
     St2:=TStringList.Create;
     try
+      if (GetDoszipDir<>'') then Add:=1 else Add:=0;
       If (dicuCopyFolder in Upgrades) and (CopyFolders<>nil) and (CopyFoldersDest<>nil) then begin
         For I:=0 to Min(7,CopyFolders.Count-1) do begin
-          C:=Chr(Ord('E')+I);
+          C:=Chr(Ord('E')+I+Add);
           St2.Add(CopyFolders[I]);
           If (CopyFoldersDest<>nil) and (CopyFoldersDest.Count>I) then begin
             St.Add('mkdir D:\'+CopyFoldersDest[I]);
@@ -638,7 +685,7 @@ begin
         While CopyFolders.Count>J do begin
           St.Clear; St2.Clear;
           For I:=J to Min(7+J,CopyFolders.Count-1) do begin
-            C:=Chr(Ord('E')+I-J);
+            C:=Chr(Ord('E')+I-J+Add);
             St2.Add(CopyFolders[I]);
             If (CopyFoldersDest<>nil) and (CopyFoldersDest.Count>I) then begin
               St.Add('mkdir D:\'+CopyFoldersDest[I]);
@@ -723,7 +770,7 @@ begin
 end;
 
 Function DiskImageCreatorUpgradeSizeInt(const IsHDImage : Boolean; const Upgrades : TDiskImageCreatorUpgrades; const CopyFolders : TStringList; const ClusterSize : Integer) : Integer;
-Var FreeDOS : String;
+Var FreeDOS,Doszip : String;
     I : Integer;
 begin
   result:=0;
@@ -735,7 +782,11 @@ begin
       inc(result,CalcSektorByteSize(FreeDOS,['kernel.sys','command.com'],ClusterSize));
       If IsHDImage then inc(result,CalcSektorByteSize(FreeDOS,['grldr'],ClusterSize)+ClusterSize); {menu.lst}
       inc(result,ClusterSize); {config.sys}
-      If dicuMemoryManager in Upgrades then inc(result,CalcSektorByteSize(FreeDOS,['himem.exe','emm386.exe','mem.exe'],ClusterSize));
+      If dicuUseFD11Tools in Upgrades then begin
+        If dicuMemoryManager in Upgrades then inc(result,CalcSektorByteSize(FreeDOS,['jemmex.exe','mem.exe'],ClusterSize));
+      end else begin
+        If dicuMemoryManager in Upgrades then inc(result,CalcSektorByteSize(FreeDOS,['himem.exe','emm386.exe','mem.exe'],ClusterSize));
+      end;
       if dicuKeyboardDriver in Upgrades then inc(result,CalcSektorByteSize(FreeDOS,['keyb.exe','keyboard.sys','keybrd2.sys','keybrd3.sys','mode.com','display.exe','CPI/'+GetCPIFileName+'.CPX'],ClusterSize));
       If dicuMouseDriver in Upgrades then inc(result,CalcSektorByteSize(FreeDOS,['ctmouse.exe'],ClusterSize));
       if (dicuKeyboardDriver in Upgrades) or (dicuMouseDriver in Upgrades) then inc(result,ClusterSize); {autoexec.bat}
@@ -745,6 +796,12 @@ begin
       If (not IsHDImage) or (not (dicuMakeBootable in Upgrades)) then inc(result,CalcSektorByteSize(FreeDOS,['grldr'],ClusterSize));
     end;
     If dicuEditor in Upgrades then inc(result,CalcSektorByteSize(FreeDOS,['edit.exe','edit.hlp','edit.cfg'],ClusterSize));
+  end;
+
+  Doszip:=Trim('.\VirtualHD\Doszip\');
+  If Doszip<>'' then Doszip:=IncludeTrailingPathDelimiter(MakeAbsPath(Doszip,PrgSetup.BaseDir));
+  If (Doszip<>'') and DirectoryExists(Doszip) then begin
+    If dicuDoszip in Upgrades then inc(result,CalcSektorByteSize(Doszip,['doszip.txt','dz.dll','dz.exe'],ClusterSize));
   end;
 
   If (dicuCopyFolder in Upgrades) and (CopyFolders<>nil) then For I:=0 to CopyFolders.Count-1 do
@@ -762,6 +819,26 @@ begin
     ClusterSize:=GetClusterSize(result);
     result:=DiskImageCreatorUpgradeSizeInt(IsHDImage,Upgrades,CopyFolders,ClusterSize)+AddMB*1024*1024;
   end;
+end;
+
+Function FD11ToolsAvailable : Boolean;
+Var Dir : String;
+begin
+  result:=false;
+  Dir:=Trim(PrgSetup.PathToFREEDOS); If Dir='' then exit;
+  Dir:=IncludeTrailingPathDelimiter(MakeAbsPath(Dir,PrgSetup.BaseDir));
+  If not DirectoryExists(Dir) then exit;
+  result:=FileExists(Dir+'jemmex.exe');
+end;
+
+Function DosZipAvailable : Boolean;
+Var Dir : String;
+begin
+  result:=false;
+  Dir:=Trim('.\VirtualHD\Doszip\'); If Dir='' then exit;
+  Dir:=IncludeTrailingPathDelimiter(MakeAbsPath(Dir,PrgSetup.BaseDir));
+  If not DirectoryExists(Dir) then exit;
+  result:=FileExists(Dir+'dz.exe');
 end;
 
 end.

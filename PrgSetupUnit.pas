@@ -256,7 +256,7 @@ Type TPrgSetup=class(TBasePrgSetup)
     property SingleInstance : Boolean index 86 read GetBoolean write SetBoolean;
     property NonModalViewer : Boolean index 87 read GetBoolean write SetBoolean;
     property AllowPackingWindowsGames : Boolean index 88 read GetBoolean write SetBoolean;
-    property ActivateIncompleteFeatures : Boolean index 89 read GetBoolean write SetBoolean;
+    {property ActivateIncompleteFeatures : Boolean index 89 read GetBoolean write SetBoolean;}
 
     property MainLeft : Integer index 0 read GetInteger write SetInteger;
     property MainTop : Integer index 1 read GetInteger write SetInteger;
@@ -765,7 +765,7 @@ begin
   AddBooleanRec(86,'ProgramSets','SingleInstanceOnly',True);
   AddBooleanRec(87,'ProgramSets','NonModalViewer',False);
   AddBooleanRec(88,'ProgramSets','AllowPackingWindowsGames',False);
-  AddBooleanRec(89,'ProgramSets','ActivateIncompleteFeatures',False);
+  {AddBooleanRec(89,'ProgramSets','ActivateIncompleteFeatures',False);}
 
   AddIntegerRec(0,'ProgramSets','MainLeft',-1);
   AddIntegerRec(1,'ProgramSets','MainTop',-1);
