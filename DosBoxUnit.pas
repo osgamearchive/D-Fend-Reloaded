@@ -16,6 +16,7 @@ Procedure RunWithCommandlineAndWait(const Game : TGame; const DeleteOnExit : TSt
 
 Function BuildConfFile(const Game : TGame; const RunSetup : Boolean; const WarnIfNotReachable : Boolean; const RunExtraFile : Integer; const DeleteOnExit : TStringList) : TStringList;
 Function BuildAutoexec(const Game : TGame; const RunSetup : Boolean; const St : TStringList; const WarnIfNotReachable : Boolean; const RunExtraFile : Integer; const WarnIfWindowsExe, SelectCD : Boolean) : Boolean;
+Function GetDOSBoxCommandLine(const DOSBoxNr : Integer; const ConfFile : String; const ShowConsole : Integer; const DosBoxCommandLine : String ='') : String;
 
 Function IsWindowsExe(const FileName : String) : Boolean;
 Function IsDOSExe(const FileName : String) : Boolean;
@@ -1373,20 +1374,9 @@ begin
   end;
 end;
 
-Type TCharArray=Array[0..MaxInt-1] of Char;
-     PCharArray=^TCharArray;
-
-Function RunDosBox(const DOSBoxPath : String; const DOSBoxNr : Integer; const ConfFile : String; const FullScreen : Boolean; const ShowConsole : Integer; const DosBoxCommandLine : String ='') : THandle;
+Function GetDOSBoxCommandLine(const DOSBoxNr : Integer; const ConfFile : String; const ShowConsole : Integer; const DosBoxCommandLine : String ='') : String;
 Var Add : String;
-    PrgFile, Params, Env, S : String;
-    StartupInfo : TStartupInfo;
-    ProcessInformation : TProcessInformation;
-    I,Size : Integer;
-    P : PCharArray;
-    Q : Array of Char;
-    Waited : Boolean;
 begin
-  SpeedTestInfo('Building DOSBox command line');
   Add:='';
   Case ShowConsole of
     0 : Add:=' -NOCONSOLE';
@@ -1395,24 +1385,38 @@ begin
   End;
   If Trim(PrgSetup.DOSBoxSettings[DOSBoxNr].CommandLineParameters)<>'' then Add:=Add+' '+Trim(PrgSetup.DOSBoxSettings[DOSBoxNr].CommandLineParameters);
   If DosBoxCommandLine<>'' then Add:=Add+' '+DosBoxCommandLine;
+  result:='-CONF "'+ConfFile+'"'+Add;
+end;
 
+Type TCharArray=Array[0..MaxInt-1] of Char;
+     PCharArray=^TCharArray;
+
+Function RunDosBox(const DOSBoxPath : String; const DOSBoxNr : Integer; const ConfFile : String; const FullScreen : Boolean; const ShowConsole : Integer; const DosBoxCommandLine : String ='') : THandle;
+Var PrgFile, Params, Env, S : String;
+    StartupInfo : TStartupInfo;
+    ProcessInformation : TProcessInformation;
+    I,Size : Integer;
+    P : PCharArray;
+    Q : Array of Char;
+    Waited : Boolean;
+begin
+  SpeedTestInfo('Building DOSBox command line');
+  Params:=GetDOSBoxCommandLine(DOSBoxNr,ConfFile,ShowConsole,DosBoxCommandLine);
+
+  SpeedTestInfo('Searching DOSBox program file');
   PrgFile:=Trim(DOSBoxPath);
   If (PrgFile='') or (ExtUpperCase(PrgFile)='DEFAULT') then PrgFile:=IncludeTrailingPathDelimiter(PrgSetup.DOSBoxSettings[DOSBoxNr].DosBoxDir)+DosBoxFileName else begin
     If ExtUpperCase(Copy(PrgFile,length(PrgFile)-3,4))<>'.EXE' then PrgFile:=IncludeTrailingPathDelimiter(MakeAbsPath(PrgFile,PrgSetup.BaseDir))+DosBoxFileName;
   end;
-
-  SpeedTestInfo('Searching DOSBox program file');
   If not FileExists(PrgFile) then FindAlternativeDOSBoxFile(PrgFile);
-
   if not FileExists(PrgFile) then begin
     Application.Restore;
     MessageDlg(Format(LanguageSetup.MessageCouldNotFindDosBox,[PrgFile]),mtError,[mbOK],0);
     result:=INVALID_HANDLE_VALUE;
     exit;
   end;
-
   PrgFile:=UnmapDrive(PrgFile,ptDOSBox);
-  Params:='-CONF "'+ConfFile+'"'+Add;
+
   SpeedTestInfoOnly('DOSBox program file: '+PrgFile);
 
   S:=Trim(ExtUpperCase(PrgSetup.DOSBoxSettings[DOSBoxNr].SDLVideodriver));

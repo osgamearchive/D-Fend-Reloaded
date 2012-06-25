@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
 <!DOCTYPE DFRPackagesFile SYSTEM "http://dfendreloaded.sourceforge.net/Packages/DFRPackagesFile.dtd">
 
-<DFRPackagesFile Name="Official addons (languages, icon sets etc.) for D-Fend Reloaded" LastUpdateDate="03/25/2010">
+<DFRPackagesFile Name="Official addons (languages, icon sets etc.) for D-Fend Reloaded" LastUpdateDate="05/12/2012">
 
   <Language
     Name="Czech"
@@ -54,4 +54,13 @@
 	Author="Adam Sosnowski (oolie@wp.pl)"
 	PackageChecksum="5D84270E945C7E5306DC08DF7A316282"
 	Size="97162">Addons/Polish.ini</Language>
+	
+  <Language
+	Name="Korean"
+	Description="Korean language file for D-Fend Reloaded 1.3"
+	MinVersion="1.3.0"
+	MaxVersion="1.3.99"
+	Author="Decon(kmshts@naver.com)"
+	PackageChecksum="2D43A524E2FB896F542AC2BF3C005D85"
+	Size="116141">Addons/Korean.ini</Language>
 </DFRPackagesFile>

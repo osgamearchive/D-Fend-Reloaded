@@ -68,7 +68,7 @@ uses ShellAPI, VistaToolsUnit, LanguageSetupUnit, CommonTools, PrgConsts,
 {$R *.dfm}
 
 procedure TInfoForm.FormShow(Sender: TObject);
-Var I : Integer;
+Var I,J : Integer;
     Rec : TSearchRec;
     St,StShort : TStringList;
     Lang : TLanguageSetup;
@@ -161,7 +161,10 @@ begin
         If (T<>S) and (T<>'') then S:=T+' ('+S+')';
         LanguageAuthorsTab.Cells[0,I+1]:=S;
         LanguageAuthorsTab.Cells[1,I+1]:=Lang.Author;
-        LanguageAuthorsTab.Cells[2,I+1]:=Lang.MaxVersion;
+        S:=Lang.MaxVersion;
+        J:=VersionToInt(S);
+        if (J>=10000) or (Copy(S,1,2)='0.') then S:=IntToStr(J div 10000)+'.'+IntToStr((J mod 10000) div 100)+'.x';
+        LanguageAuthorsTab.Cells[2,I+1]:=S;
       finally
         Lang.Free;
       end;

@@ -6,6 +6,7 @@ uses Classes, GameDBUnit;
 Procedure RunScummVMGame(const Game : TGame);
 
 Function BuildScummVMIniFile(const Game : TGame; const RunMode : Boolean = False) : TStringList;
+Function GetScummVMCommandLine(const INIFile, GameName, AdditionalCommandLine, RenderMode, DataPlatform : String) : String;
 
 Function FindScummVMIni(UseSecondOne : Boolean = False) : String;
 
@@ -104,6 +105,7 @@ begin
     St1.Add('gfx_mode='+Game.ScummVMFilter);
     If Game.StartFullscreen then St1.Add('fullscreen=true') else St1.Add('fullscreen=false');
     If Game.ScummVMConfirmExit then St1.Add('confirm_exit=true') else St1.Add('confirm_exit=false');
+    If PrgSetup.HideScummVMConsole then St1.Add('console=false');
 
     If RunMode then S:='DFR' else S:='';
     St2.Add('['+S+Game.ScummVMGame+']');
@@ -210,8 +212,26 @@ begin
   end;
 end;
 
+Function GetScummVMCommandLine(const INIFile, GameName, AdditionalCommandLine, RenderMode, DataPlatform : String) : String;
+Var RenderModeParam, PlatformParam : String;
+begin
+  RenderModeParam:='';
+  If (Trim(RenderMode)<>'') and (Trim(ExtUpperCase(RenderMode))<>'DEFAULT') then
+    RenderModeParam:='--render-mode='+RenderMode+' ';
+
+  PlatformParam:='';
+  If (Trim(DataPlatform)<>'') and (Trim(ExtUpperCase(DataPlatform))<>'AUTO') then
+    PlatformParam:='--platform='+DataPlatform+' ';
+
+  result:='';
+  if Trim(AdditionalCommandLine)<>'' then result:=result+AdditionalCommandLine+' ';
+  If PrgSetup.HideScummVMConsole then result:=result+'--no-console ';
+
+  result:=result+'--config="'+INIFile+'" '+RenderModeParam+PlatformParam+GameName;
+end;
+
 Function RunScummVM(const INIFile, GameName, AdditionalCommandLine : String; const FullScreen : Boolean; const GameDir, ScreenshotDir, RenderMode, DataPlatform : String) : THandle;
-Var PrgFile, Params, RenderModeParam, PlatformParam : String;
+Var PrgFile, Params : String;
     StartupInfo : TStartupInfo;
     ProcessInformation : TProcessInformation;
     Waited : Boolean;
@@ -225,17 +245,7 @@ begin
     exit;
   end;
 
-  RenderModeParam:='';
-  If (Trim(RenderMode)<>'') and (Trim(ExtUpperCase(RenderMode))<>'DEFAULT') then
-    RenderModeParam:='--render-mode='+RenderMode+' ';
-
-  PlatformParam:='';
-  If (Trim(DataPlatform)<>'') and (Trim(ExtUpperCase(DataPlatform))<>'AUTO') then
-    PlatformParam:='--platform='+DataPlatform+' ';
-
-  if Trim(AdditionalCommandLine)<>'' then Params:=Params+AdditionalCommandLine+' ';
-
-  Params:='--config="'+INIFile+'" '+RenderModeParam+PlatformParam+GameName;
+  Params:=GetScummVMCommandLine(INIFile,GameName,AdditionalCommandLine,RenderMode,DataPlatform);
 
   with StartupInfo do begin
     cb:=SizeOf(TStartupInfo);

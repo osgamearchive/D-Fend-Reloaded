@@ -53,7 +53,7 @@ type
 
 implementation
 
-uses VistaToolsUnit, LanguageSetupUnit, CommonTools, ClassExtensions,
+uses Math, VistaToolsUnit, LanguageSetupUnit, CommonTools, ClassExtensions,
      IconLoaderUnit, TextEditPopupUnit, DataReaderFormUnit, GameDBToolsUnit,
      PrgSetupUnit, LinkFileEditFormUnit;
 
@@ -311,7 +311,7 @@ Var St : TStringList;
     I : Integer;
     S,T,License : String;
 begin
-  Game.Name:=BaseName.Text;
+  if BaseName.Text<>'' then Game.Name:=BaseName.Text;
 
   with GameInfoValueListEditor.Strings do begin
     Game.Genre:=GetEnglishGenreName(ValueFromIndex[0]);
@@ -323,8 +323,8 @@ begin
     License:=Trim(ValueFromIndex[6]);
   end;
   Game.Favorite:=FavouriteCheckBox.Checked;
-  Game.WWWName[1]:=WWWNames[0];
-  For I:=1 to 8 do begin Game.WWWName[I+1]:=WWWNames[I]; Game.WWW[I+1]:=WWWLinks[I]; end;
+  If WWWNames.Count>0 then Game.WWWName[1]:=WWWNames[0] else Game.WWWName[1]:='';
+  For I:=1 to Min(8,Min(WWWNames.Count,WWWLinks.Count)) do begin Game.WWWName[I+1]:=WWWNames[I]; Game.WWW[I+1]:=WWWLinks[I]; end;
 
   St:=TStringList.Create;
   try

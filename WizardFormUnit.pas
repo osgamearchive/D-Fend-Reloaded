@@ -247,7 +247,6 @@ begin
               If MessageDlg(LanguageSetup.MessageNoGameFileNameWarning,mtConfirmation,[mbYes,mbNo],0)<>mrYes then exit;
             end;
             WizardScummVMSettingsFrame.SetScummVMGameName(WizardScummVMFrame.GetScummVMGameName,WizardScummVMFrame.ProgramEdit.Text);
-            If WizardMode<2 then DoOKButtonClick:=True;
           end;
         end;
     2 : If NewPage=3 then begin
@@ -334,6 +333,7 @@ begin
 end;
 
 procedure TWizardForm.OKButtonClick(Sender: TObject);
+Var S : String;
 begin
   if NextButton.Enabled and (not ScummVM) and (not WindowsMode) then begin
     If ActivePage=2 then begin
@@ -350,11 +350,15 @@ begin
   end;
 
   If ScummVM then begin
-    Game:=WizardScummVMSettingsFrame.CreateGame(WizardGameInfoFrame.BaseName.Text);
+    S:=WizardGameInfoFrame.BaseName.Text;
+    If S='' then S:=CalcProfileName;
+    Game:=WizardScummVMSettingsFrame.CreateGame(S);
   end else begin
+    S:=WizardGameInfoFrame.BaseName.Text;
+    If S='' then S:=CalcProfileName;
     If WindowsMode
-      then Game:=WizardTemplateFrame.CreateWindowsGame(WizardGameInfoFrame.BaseName.Text)
-      else Game:=WizardTemplateFrame.CreateGame(WizardGameInfoFrame.BaseName.Text);
+      then Game:=WizardTemplateFrame.CreateWindowsGame(S)
+      else Game:=WizardTemplateFrame.CreateGame(S);
   end;
   WizardBaseFrame.WriteDataToGame(Game);
   If ScummVM then begin

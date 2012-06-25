@@ -1,11 +1,11 @@
 object ModernProfileEditorSoundFrame: TModernProfileEditorSoundFrame
   Left = 0
   Top = 0
-  Width = 473
+  Width = 556
   Height = 541
   TabOrder = 0
   DesignSize = (
-    473
+    556
     541)
   object PCSpeakerSampleRateLabel: TLabel
     Left = 40
@@ -24,16 +24,17 @@ object ModernProfileEditorSoundFrame: TModernProfileEditorSoundFrame
   object ActivateSoundCheckBox: TCheckBox
     Left = 24
     Top = 24
-    Width = 425
+    Width = 508
     Height = 17
     Anchors = [akLeft, akTop, akRight]
     Caption = 'ActivateSoundCheckBox'
     TabOrder = 0
+    ExplicitWidth = 425
   end
   object MixerGroupBox: TGroupBox
     Left = 40
     Top = 56
-    Width = 401
+    Width = 492
     Height = 97
     Caption = 'MixerGroupBox'
     TabOrder = 1
@@ -45,14 +46,14 @@ object ModernProfileEditorSoundFrame: TModernProfileEditorSoundFrame
       Caption = 'SampleRateLabel'
     end
     object BlockSizeLabel: TLabel
-      Left = 152
+      Left = 184
       Top = 32
       Width = 68
       Height = 13
       Caption = 'BlockSizeLabel'
     end
     object PreBufferLabel: TLabel
-      Left = 288
+      Left = 360
       Top = 34
       Width = 71
       Height = 13
@@ -68,7 +69,7 @@ object ModernProfileEditorSoundFrame: TModernProfileEditorSoundFrame
       TabOrder = 0
     end
     object BlockSizeComboBox: TComboBox
-      Left = 152
+      Left = 184
       Top = 51
       Width = 82
       Height = 21
@@ -76,8 +77,8 @@ object ModernProfileEditorSoundFrame: TModernProfileEditorSoundFrame
       TabOrder = 1
     end
     object PreBufferComboBox: TComboBox
-      Left = 288
-      Top = 51
+      Left = 360
+      Top = 53
       Width = 82
       Height = 21
       ItemHeight = 13
@@ -87,11 +88,12 @@ object ModernProfileEditorSoundFrame: TModernProfileEditorSoundFrame
   object ActivatePCSpeakerCheckBox: TCheckBox
     Left = 24
     Top = 184
-    Width = 425
+    Width = 508
     Height = 17
     Anchors = [akLeft, akTop, akRight]
     Caption = 'ActivatePCSpeakerCheckBox'
     TabOrder = 2
+    ExplicitWidth = 425
   end
   object PCSpeakerSampleRateComboBox: TComboBox
     Left = 40
@@ -126,10 +128,11 @@ object ModernProfileEditorSoundFrame: TModernProfileEditorSoundFrame
   object ActivateDisneyCheckBox: TCheckBox
     Left = 24
     Top = 464
-    Width = 425
+    Width = 508
     Height = 17
     Anchors = [akLeft, akTop, akRight]
     Caption = 'ActivateDisneyCheckBox'
     TabOrder = 6
+    ExplicitWidth = 425
   end
 end

@@ -2,9 +2,9 @@ DOSZIP.TXT--
 Copyright 2012 Hjort Nidudsson.
 
 DOSZIP COMMANDER
-Version 2.27
+Version 2.33
 
-Welcome to Doszip Commander Version 2.27!
+Welcome to Doszip Commander Version 2.33!
 =========================================
 
 <> Index
@@ -151,12 +151,11 @@ Welcome to Doszip Commander Version 2.27!
 
    Open and close files
 
-   Enter (Doszip) Open file (in /home/documents)
    F4 (Doszip)    Open file(s)
-   F5 (Doszip)    Copy file(s) to /home/documents (Open)
    Esc  	  Exit the editor and leave files open
    Ctrl-X         Close current file and continue (if more files)
    Alt-X	  Close all files and exit
+   Alt-F3         (Ctrl-X)
 
    Toggle flags On/Off
 
@@ -178,17 +177,21 @@ Welcome to Doszip Commander Version 2.27!
    External comands
    ----------------
 
-   You can modify the [TE.ShiftF1] --> [TE.ShiftF9] sections of the DZ.INI
-   file to associated 9 external comands:
+   You can modify the [ShiftF1..F9], and [AltF1..F6] sections of the DZ.INI
+   file to associate external comands: (excluding Alt-F3)
 
-   [TE.ShiftF3]
+   [ShiftF3]
    asm  = JWasm -I%doszip%\inc
    c    = wcc -ml
 
    The syntax is equal to the section [Filetype].
 
-   The section [TE.ShiftF3] parse a <filename>.err file from Open
-   Watcom tools. The result is paste to the FindFile funtion for edit.
+   The sections [Shift/Alt-FX] parse a "pipe.err" file if exist.
+   The file ERR.EXE creates the this file.
+   Usage:
+   [ShiftF3]
+   asm  = err JWasm -I%doszip%\inc
+   c    = err wcc -ml
 
    Syntax highlighting
    -------------------
@@ -242,12 +245,12 @@ Welcome to Doszip Commander Version 2.27!
    File type definition
    --------------------
 
-   [st.mask.*]     - all files
-   [st.mask.*.asm] - all *.asm files
+   [Styletype.*]     - all files
+   [Styletype.*.asm] - all *.asm files
 
-   The section [st.mask.*] have the following syntax:
+   The section [Styletype.*] have the following syntax:
 
-   [st.mask.*]
+   [Styletype.*]
    <Id>=<section>
    <Id>=[<section>]
 
@@ -257,11 +260,11 @@ Welcome to Doszip Commander Version 2.27!
    00=A 07
    [Blue]
    00=A 17
-   [st.mask.*]
+   [Styletype.*]
    00=Black
-   [st.mask.*.asm]
-   00=[st.mask.*]
-   [st.mask.*.c]
+   [Styletype.*.asm]
+   00=[Styletype.*]
+   [Styletype.*.c]
    00=Blue
 
    The *.c files are now Gray on Blue and the rest is Gray on Black.
@@ -663,4 +666,6 @@ Welcome to Doszip Commander Version 2.27!
 
    These people contributed to Doszip (additions, bugfixes, bug reports):
 
-   Hjort Nidudsson, Japheth, Michael Kennedy, Robert Riebisch, Rugxulo
+   Hjort Nidudsson, Japheth, Michael Kennedy, Robert Riebisch, Rugxulo,
+   Yury
+

@@ -7036,6 +7036,7 @@ end;
 Procedure GetLanguageInfo(const LangFile : String; var LangName : String; var NSIS : Integer; var MaxVersion : Integer);
 Var GlobalName, LocalName : String;
     TempLang : TLanguageSetup;
+    S : String;
 begin
   GlobalName:=ChangeFileExt(ExtractFileName(LangFile),'');
   TempLang:=TLanguageSetup.Create(LangFile,True);
@@ -7045,7 +7046,8 @@ begin
     If (Trim(ExtUpperCase(LocalName))=Trim(ExtUpperCase(GlobalName))) or (Trim(LocalName)='')
       then LangName:=GlobalName
       else LangName:=LocalName+' ('+GlobalName+')';
-    try NSIS:=StrToInt(TempLang.NSISLanguageID) except NSIS:=-1; end;
+    S:=Trim(TempLang.NSISLanguageID);
+    if S<>'' then try NSIS:=StrToInt(S) except NSIS:=-1; end else NSIS:=-1; 
     MaxVersion:=VersionToInt(TempLang.MaxVersion);
   finally
     TempLang.Free;

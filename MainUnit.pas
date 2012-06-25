@@ -536,9 +536,10 @@ begin
 
   LogInfo('### Start of FormCreate ###');
 
-  {Caption:=Caption+' THIS IS A TEST VERSION ! (Beta 2 of version 1.3)';}
-  {Caption:=Caption+' (Release candidate 1 of version 1.3)';}
+  {Caption:=Caption+' THIS IS A TEST VERSION ! (Beta 1 of version 1.4)';}
+  {Caption:=Caption+' (Release candidate 1 of version 1.3.1)';}
 
+  MI_Count:=ImageList.Count;
   Height:=790;
   Width:=Min(Width,790);
   JustStarted:=True;
@@ -614,6 +615,8 @@ end;
 procedure TDFendReloadedMainForm.FormShow(Sender: TObject);
 Var G : TGame;
     S : String;
+    St : TStringList;
+    I : Integer;
 begin
   If not JustStarted then exit;
   JustStarted:=False;
@@ -652,7 +655,13 @@ begin
   LoadSearchLinks;
 
   LogInfo('Loading GUI icons');
-  UserIconLoader.RegisterImageList(ImageList,'Main');
+  St:=TStringList.Create;
+  try
+    For I:=0 to PrgSetup.WindowsBasedEmulatorsPrograms.Count-1 do St.Add(MakeAbsPath(PrgSetup.WindowsBasedEmulatorsPrograms[I],PrgSetup.BaseDir));
+    UserIconLoader.RegisterImageList(ImageList,'Main',St,40);
+  finally
+    St.Free;
+  end;
   UserIconLoader.LoadIcons;
 
   If PrgSetup.FirstRun then begin
@@ -690,6 +699,8 @@ begin
       LogInfo('First run after update: Calling LoadGUISetup');
       LoadGUISetup(False);
     end else begin
+      LogInfo('Check helper program directories');
+      FastSearchAllTools;
       LogInfo('Calling LoadGUISetup');
       LoadGUISetup(True);
     end;
@@ -1103,7 +1114,6 @@ begin
   SearchEdit.Font.Color:=clGray;
   SearchEdit.OnChange:=SearchEditChange;
 
-  UserIconLoader.IconSet:=PrgSetup.IconSet;
   SetRichEditPopup(GameNotesEdit);
 
   If Assigned(ViewImageForm) then begin
@@ -2387,6 +2397,7 @@ Procedure TDFendReloadedMainForm.LoadGUISetup(const PrgStart : Boolean);
 Var S : String;
     I : Integer;
     M : TMenuItem;
+    St : TStringList;
 begin
   LogInfo('### Start of LoadGUISetup ###');
   LogInfo('Setting visible state of menu and toolbar icons');
@@ -2397,6 +2408,13 @@ begin
   and (not PrgSetup.ShowToolbarButtonHelp) and (not PrgSetup.ShowSearchBox) then PrgSetup.ShowToolbarButtonRun:=True;
 
   LogInfo('Loading icons for buttons');
+  St:=TStringList.Create;
+  try
+    For I:=0 to PrgSetup.WindowsBasedEmulatorsPrograms.Count-1 do St.Add(MakeAbsPath(PrgSetup.WindowsBasedEmulatorsPrograms[I],PrgSetup.BaseDir));
+    UserIconLoader.UpdateIconsFromPath(ImageList,St);
+  finally
+    St.Free;
+  end;
   UserIconLoader.IconSet:=PrgSetup.IconSet;
   UserIconLoader.DialogImage(DI_CloseX,FirstRunInfoButton);
   UserIconLoader.DialogImage(DI_CutToClipboard,GameNotesImageList,0);

@@ -3,6 +3,10 @@ interface
 
 uses Classes, Controls, Graphics, Buttons, IniFiles;
 
+{Number of main icons}
+var MI_Count : Integer;
+
+{Dialog icons}
 const DI_OK=0;
       DI_Cancel=1;
       DI_Close=2;
@@ -75,6 +79,8 @@ const DI_OK=0;
 
 Type TImageListRec=record
   ImageList, OriginalImageList : TImageList;
+  IconsFromPath : TStringList;
+  IconsFromPathDefault : Integer;
   ImageLoaded : TList;
   Name : String;
   AddImages, NeedReinit : Boolean;
@@ -97,11 +103,14 @@ Type TUserIconLoader=class
     Function GetDialogButtonBitmap(const Nr : Integer) : TBitmap;
     Function IsImageEmpty(const B : TBitmap) : Boolean;
     Function GetOriginalOfMainIconList : TImageList; {for use in GetExampleImage}
+    Procedure LoadIconsFromPath(const ImageList : TImageList; const IconsFromPath : TStringList; IconsFromPathDefault : Integer);
   public
     Constructor Create;
     Destructor Destroy; override;
-    Procedure RegisterImageList(const ImageList : TImageList; const Name : String; const AddImages : Boolean = False);
+    Procedure RegisterImageList(const ImageList : TImageList; const Name : String; const AddImages : Boolean = False); overload;
+    Procedure RegisterImageList(const ImageList : TImageList; const Name : String; const IconsFromPath : TStringList; const IconsFromPathDefault : Integer); overload;
     Procedure UnRegisterImageList(const ImageList : TImageList);
+    Procedure UpdateIconsFromPath(const ImageList : TImageList; const IconsFromPath : TStringList);
     Procedure DirectLoad(const ImageList : TImageList; const Name : String; const AddImages : Boolean = False; const ImageLoaded : TList = nil); overload;
     Procedure DirectLoad(const Name : String; Nr : Integer; const BitBtn : TBitBtn); overload;
     Procedure LoadIcons;
@@ -120,7 +129,7 @@ Function GetExampleImage(const ShortName : String) : TBitmap;
 
 implementation
 
-uses SysUtils, CommonTools, PrgSetupUnit, PrgConsts;
+uses SysUtils, CommonTools, PrgSetupUnit, PrgConsts, ImageStretch;
 
 { global }
 
@@ -238,12 +247,73 @@ begin
   PILRec^.AddImages:=AddImages;
   PILRec^.OriginalImageList:=TImageList.Create(nil);
   PILRec^.OriginalImageList.AddImages(ImageList);
+  PILRec^.IconsFromPath:=nil;
   PILRec^.NeedReinit:=False;
   PILRec^.ImageLoaded:=TList.Create;
 
   If FIconsLoaded then begin
     DirectLoad(PILRec^.ImageList,PILRec^.Name,PILRec^.AddImages);
     PILRec^.NeedReinit:=True;
+  end;
+end;
+
+Procedure TUserIconLoader.RegisterImageList(const ImageList : TImageList; const Name : String; const IconsFromPath : TStringList; const IconsFromPathDefault : Integer);
+Var I : Integer;
+    PILRec : ^TImageListRec;
+    B : TBitmap;
+begin
+  B:=TBitmap.Create;
+  try
+    B.Width:=ImageList.Width; B.Height:=ImageList.Height;
+    For I:=0 to IconsFromPath.Count-1 do ImageList.Add(B,B);
+  finally
+    B.Free;
+  end;
+
+  I:=length(ImageListList);
+  SetLength(ImageListList,I+1);
+  PILRec:=@ImageListList[I];
+  PILRec^.ImageList:=ImageList;
+  PILRec^.Name:=Name;
+  PILRec^.AddImages:=False;
+  PILRec^.OriginalImageList:=TImageList.Create(nil);
+  PILRec^.OriginalImageList.AddImages(ImageList);
+  PILRec^.IconsFromPath:=TStringList.Create;
+  PILRec^.IconsFromPath.AddStrings(IconsFromPath);
+  PILRec^.IconsFromPathDefault:=IconsFromPathDefault;
+  PILRec^.NeedReinit:=False;
+  PILRec^.ImageLoaded:=TList.Create;
+
+  If FIconsLoaded then begin
+    DirectLoad(PILRec^.ImageList,PILRec^.Name,PILRec^.AddImages);
+    LoadIconsFromPath(ImageList,IconsFromPath,IconsFromPathDefault);
+    PILRec^.NeedReinit:=True;
+  end;
+end;
+
+Procedure TUserIconLoader.UpdateIconsFromPath(const ImageList : TImageList; const IconsFromPath : TStringList);
+Var I,J,OldLength : Integer;
+    B : TBitmap;
+begin
+  For I:=0 to length(ImageListList)-1 do if ImageListList[I].ImageList=ImageList then begin
+    If ImageListList[I].IconsFromPath<>nil then OldLength:=ImageListList[I].IconsFromPath.Count else OldLength:=0;
+
+    If ImageListList[I].IconsFromPath=nil then ImageListList[I].IconsFromPath:=TStringList.Create;
+    ImageListList[I].IconsFromPath.Clear;
+    ImageListList[I].IconsFromPath.AddStrings(IconsFromPath);
+
+    B:=TBitmap.Create;
+    try
+      B.Width:=ImageList.Width; B.Height:=ImageList.Height;
+      For J:=OldLength+1 to IconsFromPath.Count do begin
+        ImageListList[I].ImageList.Add(B,B);
+        ImageListList[I].OriginalImageList.Add(B,B);
+      end;
+    finally
+      B.Free;
+    end;
+
+    LoadIconsFromPath(ImageListList[I].ImageList,ImageListList[I].IconsFromPath,ImageListList[I].IconsFromPathDefault);
   end;
 end;
 
@@ -260,6 +330,7 @@ begin
   For I:=0 to length(ImageListList)-1 do If ImageListList[I].ImageList=ImageList then begin
     If ImageListList[I].OriginalImageList<>nil then ImageListList[I].OriginalImageList.Free;
     If ImageListList[I].ImageLoaded<>nil then ImageListList[I].ImageLoaded.Free;
+    If ImageListList[I].IconsFromPath<>nil then ImageListList[I].IconsFromPath.Free; 
     For J:=I to length(ImageListList)-2 do ImageListList[J]:=ImageListList[J+1];
     SetLength(ImageListList,length(ImageListList)-1);
     exit;
@@ -340,7 +411,11 @@ begin
   result:=TBitmap.Create;
   result.SetSize(B.Width,B.Height);
   Can1:=B.Canvas;
-  C:=Can1.Pixels[0,B.Height-1];
+  If B.Transparent then begin
+    C:=clWhite;
+  end else begin
+    C:=Can1.Pixels[0,B.Height-1];
+  end;
   Can2:=result.Canvas;
   For X:=0 to B.Width-1 do For Y:=0 to B.Height-1 do If Can1.Pixels[X,Y]=C then Can2.Pixels[X,Y]:=$FFFFFF else Can2.Pixels[X,Y]:=clGray;
 end;
@@ -369,10 +444,22 @@ begin
       try
         B.SetSize(P.Width,P.Height);
         B.Canvas.Draw(0,0,P.Graphic);
+        If (B.Width<>ImageList.Width) or (B.Height<>ImageList.Height) then begin
+          B2:=TBitmap.Create;
+          try
+            B2.Width:=ImageList.Width; B2.Height:=ImageList.Height;
+            ScaleImage(B,B2);
+            B.Free; B:=B2; B2:=nil;
+          finally
+            B2.Free;
+          end;
+        end;
         try
+          B.TransparentColor:=clWhite;
+          B.Transparent:=True;
           B2:=CreateMask(B);
           try
-            If (B.Width=ImageList.Width) and (B.Height=ImageList.Height) then ImageList.Replace(Nr,B,B2);
+            ImageList.Replace(Nr,B,B2);
           finally
             B2.Free;
           end;
@@ -417,6 +504,36 @@ begin
   end;
 end;
 
+Procedure TUserIconLoader.LoadIconsFromPath(const ImageList : TImageList; const IconsFromPath : TStringList; IconsFromPathDefault : Integer);
+Var I,Nr : Integer;
+    B,Mask : TBitmap;
+begin
+  If IconsFromPath=nil then exit;
+
+  for I:=0 to IconsFromPath.Count-1 do begin
+    Nr:=ImageList.Count-IconsFromPath.Count+I;
+
+    {Load default icon}
+    B:=TBitmap.Create;
+    try
+      B.Width:=ImageList.Width; B.Height:=ImageList.Height;
+      If ImageList.GetBitmap(IconsFromPathDefault,B) then begin
+        Mask:=CreateMask(B);
+        try
+          ImageList.Replace(Nr,B,Mask);
+        finally
+          Mask.Free;
+        end;
+      end;
+    finally
+      B.Free;
+    end;
+
+    {load icon from path}
+    LoadIconToImageList(ImageList,Nr,IconsFromPath[I]);
+  end;
+end;
+
 procedure TUserIconLoader.LoadIcons;
 Procedure CheckDir(const Name : String);
 begin
@@ -453,6 +570,7 @@ begin
   try
     For I:=0 to Length(ImageListList)-1 do begin
       LoadUserIconsForList(ImageListList[I].ImageList,ImageListList[I].Name,ImageListList[I].AddImages,ImageListList[I].ImageLoaded,Ini,PrgDataDir+SettingsFolder+'\');
+      LoadIconsFromPath(ImageListList[I].ImageList,ImageListList[I].IconsFromPath,ImageListList[I].IconsFromPathDefault);
     end;
   finally
     Ini.Free;

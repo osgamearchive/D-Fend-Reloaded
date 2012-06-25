@@ -198,7 +198,7 @@ Var St : TStringList;
     S : String;
     I : Integer;
 begin
-  result:=Value;
+  result:=OldList;
   S:=Trim(ExtUpperCase(Value));
   St:=ValueToList(OldList,';,');
   try

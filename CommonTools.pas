@@ -1351,6 +1351,13 @@ begin
       end;
       exit;
     end;
+    If Ext='.EXE' then begin
+      I:=LoadIconFromExeFile(FileName);
+      If I=nil then FreeAndNil(result) else begin
+        try result.Assign(I); finally I.Free; end;
+      end;
+      exit;
+    end;
 
     result.LoadFromFile(FileName);
   except

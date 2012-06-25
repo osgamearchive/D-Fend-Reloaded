@@ -143,7 +143,7 @@ uses SysUtils, Forms, Dialogs, ShellAPI, ShlObj, IniFiles, Math,  PNGImage,
      ProfileEditorFormUnit, ModernProfileEditorFormUnit, HashCalc,
      SmallWaitFormUnit, ChecksumFormUnit, WaitFormUnit, ImageCacheUnit,
      DosBoxUnit, ScummVMUnit, ImageStretch, MainUnit, GameDBFilterUnit,
-     HistoryUnit;
+     HistoryUnit, IconLoaderUnit;
 
 Function GroupMatch(const GameGroupUpper, SelectedGroupUpper : String) : Boolean; forward;
 
@@ -214,14 +214,17 @@ begin
     try
       ATreeView.Items.Clear;
 
+      {All games}
       N:=ATreeView.Items.AddChild(nil,RemoveUnderline(LanguageSetup.All));
       N.ImageIndex:=8;
       N.SelectedIndex:=8;
 
+      {Favorites}
       N:=ATreeView.Items.AddChild(nil,LanguageSetup.GameFavorites);
       N.ImageIndex:=9;
       N.SelectedIndex:=9;
 
+      {Genre, Developer, Publisher, Year, Language, License}
       TreeFilter:=PrgSetup.DefaultTreeFilter;
       while (length(TreeFilter)<7) do TreeFilter:=TreeFilter+'1';
 
@@ -232,6 +235,7 @@ begin
       if TreeFilter[5]<>'0' then AddTypeSelector(ATreeView,LanguageSetup.GameLanguage,GetCustomLanguageName(GameDB.GetLanguageList));
       if TreeFilter[6]<>'0' then AddTypeSelector(ATreeView,LanguageSetup.GameLicense,GetCustomLicenseName(GameDB.GetLicenseList));
 
+      {Emulation type}
       if TreeFilter[7]<>'0' then begin
         N:=ATreeView.Items.AddChild(nil,LanguageSetup.GameEmulationType);
         N.ImageIndex:=12; N.SelectedIndex:=12;
@@ -239,10 +243,11 @@ begin
         N2:=ATreeView.Items.AddChild(N,LanguageSetup.GameEmulationTypeScummVM); N2.ImageIndex:=37; N2.SelectedIndex:=37;
         N2:=ATreeView.Items.AddChild(N,LanguageSetup.GameEmulationTypeWindows); N2.ImageIndex:=40; N2.SelectedIndex:=40;
         For I:=0 to PrgSetup.WindowsBasedEmulatorsNames.Count-1 do begin
-          N2:=ATreeView.Items.AddChild(N,PrgSetup.WindowsBasedEmulatorsNames[I]); N2.ImageIndex:=40; N2.SelectedIndex:=40;
+          N2:=ATreeView.Items.AddChild(N,PrgSetup.WindowsBasedEmulatorsNames[I]); N2.ImageIndex:=MI_Count+I; N2.SelectedIndex:=MI_Count+I;
         end;
       end;
 
+      {User categories}
       UserGroups:=RemoveDoubleEntrys(StringToStringList(PrgSetup.UserGroups));
       try
         For I:=0 to UserGroups.Count-1 do
@@ -251,6 +256,7 @@ begin
         UserGroups.Free;
       end;
 
+      {Select a group}
       If Group='' then exit;
 
       For I:=0 to ATreeview.Items.Count-1 do begin
@@ -3659,8 +3665,24 @@ begin
       St.Insert(1,'# Changes made to this file will NOT be transfered to D-Rend Reloaded profiles list.');
       St.Insert(2,'# D-Fend Reloaded will delete this file from temp directory on program close.');
       St.Insert(3,'');
-      St.Insert(4,'# Config file for profile "'+Game.Name+'"');
-      St.Insert(5,'');
+      St.Insert(4,'# Command line used when starting '+T+':');
+
+      If ScummVMMode(Game) then begin
+        T:=Trim(PrgSetup.ScummVMAdditionalCommandLine);
+        If Trim(Game.ScummVMParameters)<>'' then begin
+          If T<>'' then T:=T+' ';
+          T:=T+Trim(Game.ScummVMParameters);
+        end;
+        T:=GetScummVMCommandLine(S,Game.ScummVMGame,T,Game.ScummVMRenderMode,Game.ScummVMPlatform);
+      end else begin
+        T:=GetDOSBoxCommandLine(GetDOSBoxNr(Game),S,Game.ShowConsoleWindow,'');
+      end;
+
+      St.Insert(5,'# '+T);
+      St.Insert(6,'');
+      St.Insert(7,'# Config file for profile "'+Game.Name+'"');
+      St.Insert(8,'');
+
       St.SaveToFile(S);
     finally
       St.Free;
