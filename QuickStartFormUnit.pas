@@ -254,6 +254,12 @@ begin
     If (PrgSetup.QuickStarterTop>0) and (PrgSetup.QuickStarterTop<9*Screen.Height div 10) then Top:=PrgSetup.QuickStarterTop;
     If (PrgSetup.QuickStarterWidth>0) and (Left+PrgSetup.QuickStarterWidth<=Screen.Width) then Width:=PrgSetup.QuickStarterWidth;
     If (PrgSetup.QuickStarterHeight>0) and (Top+PrgSetup.QuickStarterHeight<=Screen.Height) then Height:=PrgSetup.QuickStarterHeight;
+
+    if (PrgSetup.QuickStarterLeft<0) and (PrgSetup.QuickStarterTop<0) and (PrgSetup.QuickStarterWidth<0) and (PrgSetup.QuickStarterHeight<0) then begin
+      Left:=DFendReloadedMainForm.Left+DFendReloadedMainForm.Width div 2-(Width div 2);
+      Top:=DFendReloadedMainForm.Top+DFendReloadedMainForm.Top div 2-(Top div 2);
+    end;
+
     Position:=poDesigned;
   end;
 

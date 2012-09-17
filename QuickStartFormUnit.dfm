@@ -128,7 +128,7 @@ object QuickStartForm: TQuickStartForm
       Width = 290
       Height = 21
       Style = csDropDownList
-      ItemHeight = 0
+      ItemHeight = 13
       TabOrder = 0
     end
     object SetupComboBox1: TComboBox
@@ -137,7 +137,7 @@ object QuickStartForm: TQuickStartForm
       Width = 125
       Height = 21
       Style = csDropDownList
-      ItemHeight = 0
+      ItemHeight = 13
       TabOrder = 1
     end
     object SetupComboBox2: TComboBox
@@ -147,7 +147,7 @@ object QuickStartForm: TQuickStartForm
       Height = 21
       Style = csDropDownList
       Anchors = [akLeft, akTop, akRight]
-      ItemHeight = 0
+      ItemHeight = 13
       TabOrder = 2
     end
   end
@@ -183,7 +183,7 @@ object QuickStartForm: TQuickStartForm
         Height = 21
         Align = alTop
         Style = csDropDownList
-        ItemHeight = 0
+        ItemHeight = 13
         TabOrder = 0
         OnChange = TreeTypeComboBoxChange
       end
@@ -227,7 +227,7 @@ object QuickStartForm: TQuickStartForm
     Left = 640
     Top = 8
     Bitmap = {
-      494C010114001C00040010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010114001C00080010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000006000000001002000000000000060
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

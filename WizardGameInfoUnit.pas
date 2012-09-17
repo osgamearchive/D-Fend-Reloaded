@@ -201,13 +201,18 @@ begin
 
     St:=StringToStringList(Template.UserInfo);
     try
+      I:=0; While I<St.Count do begin
+        S:=St[I];
+        J:=Pos('=',S);
+        If J<>0 then S:=Trim(Copy(S,1,J-1));
+        If Trim(ExtUpperCase(S))='LICENSE' then St.Delete(I) else inc(I);
+      end;
       If St.Count>0 then begin
         Tab.RowCount:=St.Count+1;
         For I:=0 to St.Count-1 do begin
           S:=St[I];
           J:=Pos('=',S);
           If J=0 then T:='' else begin T:=Trim(Copy(S,J+1,MaxInt)); S:=Trim(Copy(S,1,J-1)); end;
-          If Trim(ExtUpperCase(S))='LICENSE' then continue;
           Tab.Cells[0,I+1]:=S;
           Tab.Cells[1,I+1]:=T;
         end;

@@ -1150,6 +1150,11 @@ begin
   result.Add('machine='+S);
   result.Add('captures='+UnmapDrive(MakeAbsPath(Game.CaptureFolder,PrgSetup.BaseDir),ptScreenshot));
   result.Add('memsize='+IntToStr(Game.Memory));
+  If PrgSetup.AllowVGAChipsetSettings then begin
+    I:=Game.VideoRam;
+    if (I mod 1024)<>0 then I:=(I div 1024)+1 else I:=I div 1024; 
+    result.Add('vmemsize='+IntToStr(I));
+  end;
 
   result.Add('');
   result.Add('[render]');

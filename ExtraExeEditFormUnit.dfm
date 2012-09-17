@@ -71,7 +71,7 @@ object ExtraExeEditForm: TExtraExeEditForm
     Anchors = [akLeft, akTop, akRight, akBottom]
     ColCount = 3
     FixedCols = 0
-    RowCount = 11
+    RowCount = 51
     Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goEditing, goAlwaysShowEditor, goThumbTracking]
     TabOrder = 0
     OnClick = TabClick

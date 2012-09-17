@@ -18,6 +18,8 @@ type
   public
     { Public-Deklarationen }
     Thread : TThread;
+    ThreadList : TList;
+    Constructor Create(AOwner : TComponent); override;
   end;
 
 var
@@ -25,8 +27,9 @@ var
 
 Function ShowDataReaderInternetConfigWaitDialog(const AOwner : TComponent; const ADataReader : TDataReader; const AForceUpdate : Boolean; const ACaption, AInfo, AError : String) : Boolean;
 Function ShowDataReaderInternetListWaitDialog(const AOwner : TComponent; const ADataReader : TDataReader; const AName : String; const ACaption, AInfo, AError : String) : Boolean;
-Function ShowDataReaderInternetDataWaitDialog(const AOwner : TComponent; const ADataReader : TDataReader; const ANr : Integer; const ACaption, AInfo, AError : String) : TDataReaderGameDataThread;
-Procedure ShowDataReaderInternetCoverWaitDialog(const AOwner : TComponent; const ADataReader : TDataReader; const ADownloadURL, ADestFolder : String; const ACaption, AInfo, AError : String);
+Function ShowDataReaderInternetDataWaitDialog(const AOwner : TComponent; const ADataReader : TDataReader; const ANr : Integer; const AFullImages: Boolean; const ACaption, AInfo, AError : String) : TDataReaderGameDataThread;
+Procedure ShowDataReaderInternetCoverWaitDialog(const AOwner : TComponent; const ADataReader : TDataReader; const ADownloadURL, ADestFolder : String; const ACaption, AInfo, AError : String); overload;
+Procedure ShowDataReaderInternetCoverWaitDialog(const AOwner : TComponent; const ADataReader : TDataReader; const ADownloadURLs : TStringList; const ADestFolder : String; const ACaption, AInfo, AError : String); overload;
 
 Function DomainOnly(const S : String) : String;
 
@@ -37,6 +40,13 @@ uses ShellAnimations, VistaToolsUnit, CommonTools, LanguageSetupUnit, PrgConsts,
 
 {$R *.dfm}
 
+constructor TInternetDataWaitForm.Create(AOwner: TComponent);
+begin
+  inherited Create(AOwner);
+  Thread:=nil;
+  ThreadList:=nil;
+end;
+
 procedure TInternetDataWaitForm.FormShow(Sender: TObject);
 begin
   SetVistaFonts(self);
@@ -44,13 +54,20 @@ begin
 end;
 
 procedure TInternetDataWaitForm.TimerTimer(Sender: TObject);
+Var B : Boolean;
+    I : Integer;
 begin
   If Assigned(Thread) and (WaitForSingleObject(Thread.Handle,0)=WAIT_OBJECT_0) then ModalResult:=mrOK;
+  If ThreadList<>nil then begin
+    B:=True;
+    For I:=0 to ThreadList.Count-1 do If WaitForSingleObject(TThread(ThreadList[I]).Handle,0)<>WAIT_OBJECT_0 then begin B:=False; break; end;
+    If B then ModalResult:=mrOK;
+  end;
 end;
 
 { global }
 
-Procedure ShowInternetWaitDialog(const AOwner : TComponent; const AThread : TThread; const ACaption, AInfo : String);
+Procedure ShowInternetWaitDialog(const AOwner : TComponent; const AThread : TThread; const ACaption, AInfo : String); overload;
 begin
   InternetDataWaitForm:=TInternetDataWaitForm.Create(AOwner);
   try
@@ -63,10 +80,32 @@ begin
   end;
 end;
 
-Function ShowDataReaderInternetWaitDialog(const AOwner : TComponent; const AThread : TDataReaderThread; const ACaption, AInfo, AError : String) : Boolean;
+Procedure ShowInternetWaitDialog(const AOwner : TComponent; const AThread : TList; const ACaption, AInfo : String); overload;
+begin
+  InternetDataWaitForm:=TInternetDataWaitForm.Create(AOwner);
+  try
+    InternetDataWaitForm.Caption:=ACaption;
+    InternetDataWaitForm.InfoLabel.Caption:=AInfo;
+    InternetDataWaitForm.ThreadList:=AThread;
+    InternetDataWaitForm.ShowModal;
+  finally
+    InternetDataWaitForm.Free;
+  end;
+end;
+
+Function ShowDataReaderInternetWaitDialog(const AOwner : TComponent; const AThread : TDataReaderThread; const ACaption, AInfo, AError : String) : Boolean; overload;
 begin
   ShowInternetWaitDialog(AOwner,AThread,ACaption,AInfo);
   result:=AThread.Success;
+  If not result then MessageDlg(AError,mtError,[mbOK],0);
+end;
+
+Function ShowDataReaderInternetWaitDialog(const AOwner : TComponent; const AThread : TList; const ACaption, AInfo, AError : String) : Boolean; overload;
+Var I : Integer;
+begin
+  ShowInternetWaitDialog(AOwner,AThread,ACaption,AInfo);
+  result:=True;
+  For I:=0 to AThread.Count-1 do If not TDataReaderThread(AThread[I]).Success then result:=false;
   If not result then MessageDlg(AError,mtError,[mbOK],0);
 end;
 
@@ -94,9 +133,9 @@ begin
   end;
 end;
 
-Function ShowDataReaderInternetDataWaitDialog(const AOwner : TComponent; const ADataReader : TDataReader; const ANr : Integer; const ACaption, AInfo, AError : String) : TDataReaderGameDataThread;
+Function ShowDataReaderInternetDataWaitDialog(const AOwner : TComponent; const ADataReader : TDataReader; const ANr : Integer; const AFullImages: Boolean; const ACaption, AInfo, AError : String) : TDataReaderGameDataThread;
 begin
-  result:=TDataReaderGameDataThread.Create(ADataReader,ANr);
+  result:=TDataReaderGameDataThread.Create(ADataReader,ANr,AFullImages);
   If not ShowDataReaderInternetWaitDialog(AOwner,result,ACaption,Format(AInfo,[DomainOnly(ADataReader.Config.GameRecordBaseURL)]),Format(AError,[DomainOnly(ADataReader.Config.GameRecordBaseURL)])) then FreeAndNil(result);
 end;
 
@@ -108,6 +147,33 @@ begin
     ShowDataReaderInternetWaitDialog(AOwner,DataReaderGameCoverThread,ACaption,Format(AInfo,[DomainOnly(ADataReader.Config.GameRecordBaseURL)]),Format(AError,[DomainOnly(ADataReader.Config.GameRecordBaseURL)]));
   finally
     DataReaderGameCoverThread.Free;
+  end;
+end;
+
+Procedure ShowDataReaderInternetCoverWaitDialog(const AOwner : TComponent; const ADataReader : TDataReader; const ADownloadURLs : TStringList; const ADestFolder : String; const ACaption, AInfo, AError : String); overload;
+const ThreadCount=8;
+Var DataReaderGameCoverThread : Array[0..ThreadCount-1] of TDataReaderGameCoverThread;
+    URLList : Array[0..ThreadCount-1] of TStringList;
+    ThreadList : TList;
+    I : Integer;
+begin
+  For I:=0 to ThreadCount-1 do begin URLList[I]:=TStringList.Create; DataReaderGameCoverThread[I]:=nil; end;
+  try
+    For I:=0 to ADownloadURLs.Count-1 do URLList[I mod ThreadCount].Add(ADownloadURLs[I]);
+    For I:=0 to ThreadCount-1 do if URLList[I].Count>0 then DataReaderGameCoverThread[I]:=TDataReaderGameCoverThread.Create(ADataReader,URLList[I],ADestFolder);
+    try
+      ThreadList:=TList.Create;
+      try
+        For I:=0 to ThreadCount-1 do if DataReaderGameCoverThread[I]<>nil then ThreadList.Add(DataReaderGameCoverThread[I]);
+        ShowDataReaderInternetWaitDialog(AOwner,ThreadLIst,ACaption,Format(AInfo,[DomainOnly(ADataReader.Config.GameRecordBaseURL)]),Format(AError,[DomainOnly(ADataReader.Config.GameRecordBaseURL)]));
+      finally
+        ThreadList.Free;
+      end;
+    finally
+      For I:=0 to ThreadCount-1 do if DataReaderGameCoverThread[I]<>nil then DataReaderGameCoverThread[I].Free;
+    end;
+  finally
+    For I:=0 to ThreadCount-1 do URLList[I].Free;
   end;
 end;
 

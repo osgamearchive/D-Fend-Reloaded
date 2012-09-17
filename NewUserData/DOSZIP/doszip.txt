@@ -2,9 +2,9 @@ DOSZIP.TXT--
 Copyright 2012 Hjort Nidudsson.
 
 DOSZIP COMMANDER
-Version 2.33
+Version 2.34
 
-Welcome to Doszip Commander Version 2.33!
+Welcome to Doszip Commander Version 2.34!
 =========================================
 
 <> Index
@@ -346,9 +346,9 @@ Welcome to Doszip Commander Version 2.33!
 
 <> Windows 95/98/XP Compatibility
 
-   Doszip uses the 'Windows95 LONG FILENAME' functions if avalible.
+   Doszip uses the 'Windows95 LONG FILENAME' functions if available.
 
-   Doszip uses the 'WINOLDAP' functions if avalible. This enables
+   Doszip uses the 'WINOLDAP' functions if available. This enables
    clipboard functions to Copy and Paste text from Windows.
 
    To use graphical colors in XP demands a mode-change in order to

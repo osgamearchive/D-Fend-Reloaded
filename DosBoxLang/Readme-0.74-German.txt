@@ -1,6 +1,5 @@
-DOSBox v0.73 | Deutsche Lokalisierung von Andreas (weapon.zero@gmx.net)
-unter Zuhilfenahme der deutschen Übersetzung 0.72 von Christian König (krischn@gmx.net)
-
+DOSBox v0.74 | Deutsche Lokalisierung von Peter
+unter Zuhilfenahme der deutschen Übersetzung 0.73 Andreas (weapon.zero@gmx.net)
 
 
 =========

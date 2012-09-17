@@ -1,4 +1,4 @@
-DOSBox v0.73
+DOSBox v0.74 (utilizzare sempre l'ultima versione da www.dosbox.com)
 
 
 =====
@@ -8,7 +8,7 @@ NOTA:
 La nostra speranza è che un giorno DOSBox possa fare girare tutti i
 programmi mai fatti per PC, ma ancora non siamo a quel punto. Attualmente
 DOSBox in esecuzione su un computer potente è più o meno l'equivalente
-di un PC 486. DOSBox può essere configurato in modo da far girare
+di un PC Pentium 1. DOSBox può essere configurato in modo da far girare
 un certo numero di giochi DOS, dai classici in CGA/Tandy/PCjr fino
 ai giochi dell'era di Quake.
 
@@ -18,20 +18,22 @@ ai giochi dell'era di Quake.
 INDICE:
 =======
 1. Iniziare subito
-2. FAQ
-3. Uso
+2. Iniziare (FAQ)
+3. Parametri Riga di Comando
 4. Programmi Interni
 5. Tasti Speciali
-6. Mapper
-7. Layout della Tastiera
-8. Funzione Multiplayer Seriale
-9. Come giocare a giochi particolarmente esigenti
-10. Risoluzione dei problemi
-11. Il file di configurazione
-12. Il file linguaggio
-13. Costruire la tua versione di DOSBox
-14. Ringraziamenti speciali
-15. Contatti
+6. Joystick/Gamepad
+7. Mappa dei Tasti
+8. Layout della Tastiera
+9. Funzione Multiplayer Seriale
+10. Come velocizzare/rallentare DOSBox
+11. Risoluzione dei problemi
+12. Finestra di Stato DOSBOX
+13. Il file di configurazione (opzioni)
+14. Il file linguaggio
+15. Costruire la tua versione di DOSBox
+16. Ringraziamenti speciali
+17. Contatti
 
 
 
@@ -43,68 +45,72 @@ Digita INTRO in DOSBox per una rapida occhiata alle opzioni.
 È importantissimo che impari velocemente concetti come "montare drive",
 DOSBox non crea automaticamente nessun drive (o sue parti) accessibili
 dall'interno dell'emulazione.
-Per maggiori informazioni vedi la FAQ "Ho una Z invece che una C al prompt"
-e anche la descrizione del comando MOUNT (sezione 4).
+Per maggiori informazioni vedi la FAQ "Come Iniziare?"
+e anche la descrizione del comando MOUNT (sezione 4: "Programmi Interni").
+Se hai il tuo gioco su in cdrom puoi provare questa guida:
+http://vogons.zetafleet.com/viewtopic.php?t=8933
 
 
 
-=======
-2. FAQ:
-=======
+==================
+2. Iniziare (FAQ):
+==================
 
-Alcune domande poste frequentemente (FAQ):
-
-D: Ho una Z invece che una C al prompt.
-D: Devo sempre digitare questi comandi? Nessuna automazione?
-D: Come passo a schermo intero ?
-D: Il mio CD-ROM non funziona.
-D: Il gioco/applicazione non riesce a trovare il suo CD-ROM.
-D: Il mouse non funziona.
-D: Non c'è il suono.
-D: Il suono è a singhiozzo, rallentato o comunque strano.
-D: Non posso digitare \ o : in DOSBox.
-D: L'input da tastiera soffre di rallentamenti.
-D: Il cursore si muove sempre nella stessa direzione!
-D: Il gioco/applicazione gira troppo lentamente!
-D: Il gioco/applicazione non gira per niente, o va in crash!
-D: DOSBox può danneggiare il mio computer?
-D: Vorrei cambiare la dimensione della memoria/velocità cpu/ems/IRQ soundblaster.
-D: Attualmente, quali dispositivi sonori sono emulati da DOSBox?
-D: DOSBox crasha all'avvio e sto eseguendo arts.
-D: Il mio gioco Build (Duke3D/Blood/Shadow Warrior) ha problemi.
-D: Ottimo README, ma ancora non capisco.
-
+START: Come iniziare?
+AUTOMATION: Devo sempre digitare questi comandi "mount"?
+FULLSCREEN: Come passo a schermo intero ?
+CD-ROM: Il mio CD-ROM non funziona.
+CD-ROM: Il gioco/applicazione non riesce a trovare il suo CD-ROM.
+MOUSE: Il mouse non funziona.
+SOUND: Non c'è il suono.
+SOUND: Attualmente, quali dispositivi sonori DOSBOx emula?
+SOUND: Il suono è a singhiozzo, rallentato o comunque strano.
+KEYBOARD: Non posso digitare \ o : in DOSBox.
+KEYBOARD: Lo Shift Destro e "\" non funzionano in DOSBox. (Windows Soltanto)
+KEYBOARD: L'input da tastiera soffre di rallentamenti.
+CONTROL: I carattere/cursore/puntatore del mouse si muove sempre nella stessa direzione!
+SPEED: Il gioco/applicazione gira troppo lentamente/troppo velocemente!
+CRASH: Il gioco/applicazione non gira per niente, o va in crash!
+CRASH: DOSBox va in crash all'avvio!
+GAME: Il mio gioco Build (Duke3D/Blood/Shadow Warrior) ha problemi.
+SAFETY: DOSBox può danneggiare il mio computer?
+OPTIONS: Vorrei cambiare le opzioni di DOSBox.
+HELP: Ottimo Manuale, ma ancora non capisco.
 
 
 
-D: Ho una Z invece che una C al prompt.
-R: Devi fare in modo che le tue directory diventino disponibili sottoforma di
+
+START: Come Iniziare?
+   Devi fare in modo che le tue directory diventino disponibili sottoforma di
    drive in DOSBox usando il comando "mount". Per esempio, sotto Windows, il
    comando "mount C D:\GAMES" creerà un drive C in DOSBox, che punta alla tua
-   directory reale D:\GAMES. Sotto Linux, "mount c /home/nomeutente" creerà
+   directory reale D:\GAMES(che è stata creata in precedenza).
+   Sotto Linux, "mount c /home/nomeutente" creerà
    un drive C in DOSBox, che punta alla directory /home/nomeutente di Linux.
    Per spostarti nel drive appena montato digita "C:". Se tutto è andato bene,
    DOSBox mostrerà il prompt "C:\>".
 
 
-D: Devo sempre digitare questi comandi? Nessuna automazione?
-R: Nel file di configurazione di DOSBox c'è una sezione chiamata [autoexec].
+AUTOMATION: Devo sempre digitare questi comandi? Nessuna automazione?
+   Nel file di configurazione di DOSBox c'è una sezione chiamata [autoexec].
    I comandi presenti in questa sezione vengono eseguiti ad ogni avvio di
-   DOSBox, quindi puoi usarla per montare i drive.
+   DOSBox, quindi puoi usarla per montare i drive. Guarda la sezione 13:
+   Il file di configurazione (opzioni).
 
 
-D: Come passo a schermo intero ?
-R: Premi alt-invio. In alternativa: Modifica il file di configurazione di
+FULLSCREEN: Come passo a schermo intero?
+   Premi alt-invio. In alternativa: Modifica il file di configurazione di
    DOSBox e cambia l'opzione fullscreen=false in fullscreen=true. Se la
-   modalità a schermo intero non ti va bene, gioca con l'opzione fullresolution
-   nel file di configurazione di DOSBox. Per tornare indietro dalla modalità
-   schermo intero: Premi alt-invio di nuovo.
+   modalità a schermo intero non ti va bene, gioca con l'opzioni: fullresolution,
+   output and aspect nel file di configurazione di DOSBox.
+   Per tornare indietro dalla modalità schermo intero: Premi alt-invio di nuovo.
 
 
-D: Il mio CD-ROM non funziona.
-R: Per montare il tuo CD-ROM in DOSBox devi specificare qualche opzione addizionale
+CD-ROM: Il mio CD-ROM non funziona.
+   Per montare il tuo CD-ROM in DOSBox devi specificare qualche opzione addizionale
    all'atto del montaggio.
-   Per abilitare il supporto CD-ROM (include MSCDEX):
+   in Linux: - mount d /media/cdrom -t cdrom
+   Per abilitare il supporto CD-ROM (include MSCDEX) in Windows:
      - mount d f:\ -t cdrom
    Per abilitare il supporto CD-ROM di basso livello (usa ioctl se possibile):
      - mount d f:\ -t cdrom -usecd 0
@@ -121,14 +127,14 @@ R: Per montare il tuo CD-ROM in DOSBox devi specificare qualche opzione addizion
    Vedi anche la domanda: Il gioco/applicazione non riesce a trovare il suo CD-ROM.
 
 
-D: Il gioco/applicazione non riesce a trovare il suo CD-ROM.
-R: Assicurati di montare il CD-ROM col parametro -t cdrom, ciò abiliterà
+CD-ROM: Il gioco/applicazione non riesce a trovare il suo CD-ROM.
+   Assicurati di montare il CD-ROM col parametro -t cdrom, ciò abiliterà
    l'interfaccia MSCDEX richiesta dai giochi DOS per interfacciarsi con i
    CD-ROM. Prova anche ad aggiungere la giusta etichetta (-label ETICHETTA)
    al comando mount, dove ETICHETTA è l'etichetta CD (volume ID) del CD-ROM.
    Sotto Windows puoi specificare -ioctl, -aspi o -noioctl. Leggi la descrizione
-   del comando mount nella Sezione 4 per capirne il significato e per vedere
-   le altre opzioni legate ai CD audio -ioctl_dx, -ioctl_mci, -ioctl_dio.
+   del comando mount nella Sezione 4: "Programmi Interni" per capirne il significato
+   e per vedere le altre opzioni legate ai CD audio -ioctl_dx, -ioctl_mci, -ioctl_dio.
 
    Prova a creare una immagine CD-ROM (preferibilmente di tipo CUE/BIN) e usa
    lo strumento interno di DOSBox IMGMOUNT per montarla (il file CUE).
@@ -136,42 +142,82 @@ R: Assicurati di montare il CD-ROM col parametro -t cdrom, ciò abiliterà
    sistema operativo.
 
 
-D: Il mouse non funziona.
-R: Solitamente, DOSBox capisce quando un gioco usa il controllo via mouse.
+MOUSE: Il mouse non funziona.
+   Solitamente, DOSBox capisce quando un gioco usa il controllo via mouse.
    Quando clicchi sullo schermo dovrebe essere catturato (cioè confinato alla
    finestra di DOSBox) e funzionare. Con certi giochi, la rilevazione del mouse
    da parte di DOSBox non funziona. In questo caso dovrai catturare il mouse
    manualmente premendo CTRL-F10.
 
 
-D: Non c'è il suono.
-R: Assicurati che il suono sia correttamente configurato nel gioco. Ciò può
+SOUND: Non c'è il suono.
+   Assicurati che il suono sia correttamente configurato nel gioco. Ciò può
    di solito essere fatto durante l'installazione o con un setup/setsound
    allegato al gioco. Prima controlla che sia possibile fare l'autorilevazione.
-   Se non è disponibile prova a scegliere la soundblaster o soundblaster16
-   con le impostazioni di default "address=220 irq=7 dma=1". Potresti anche
-   dover impostare la musica midi all'indirizzo 330 come dispositivo.
+   Se non è disponibile prova a scegliere la Soundblaster o Soundblaster16
+   con le impostazioni di default "address=220 irq=7 dma=1"(o anche highdma=5).
+   Potresti anche dover impostare Sound Canvas/SCC/MPU-401/General MIDI/Wave Blaster
+   a "adressess=330 IRW=2" come dispositivo musicale.
    Questi parametri delle schede audio emulate possono essere cambiati nel
    file di configurazione di DOSBox.
-   Se ancora non senti niente imposta il core su normal e usa valori più bassi
-   per cycles (come cycles=2000). Assicurati inoltre che la tua scheda audio
-   reale funzioni correttamente.
+   Se ancora non senti niente imposta il core su normal in DOSBox
+   e usa valori più bassi per cycles (come cycles=2000).
+   Assicurati inoltre che la tua scheda audio reale funzioni correttamente.
    In certi casi potrebbe essere utile usare una scheda audio emulata differente
    come una soundblaster pro (sbtype=sbpro1 nel file di configurazione DOSBox) o
    la gravis ultrasound (gus=true).
 
 
-D: Il suono è a singhiozzo, rallentato o comunque strano.
-R: Stai sfruttando troppa potenza CPU per mantenere DOSBox a quella velocità.
+SOUND: Attualmente, quali dispositivi sonori DOSBox emula?
+   DOSBox emula diversi dispositivi sonori:
+   - Altoparlante interno PC/Buzzer
+     Questa emulazione include sia il generatore di note che diverse forme
+     di output audio digitale attraverso l'altoparlante interno.
+   - Creative CMS/Gameblaster
+     E' la prima scheda rilasciata da Creative Labs(R).  La configurazione
+     di default la piazza nell' address 220. Questa è disabilitata di serie.
+   - Tandy 3 voice
+     L'emulazione di questo hardware audio è completa ad eccezione del
+     noise channel. Il noise channel non è ben documentato e di conseguenza
+     vi si può andare solo per immaginazione, cercando l'accuratezza sonora.
+     Questa è disabilitata di serie.
+   - Tandy DAC
+     Alcuni giochi ridhiedono di spegnere l'emulazione della della soundblaster
+     (sbtype=none) per una migliore supporto del suono Tandy DAC. Non dimenticate di           riportare indietro sbtype come sb16 se non si utilizza il suono Tandy.
+   - Adlib
+     Questa emulazione è quasi perfetta e comprende la capacità di Adlib di
+     riprodurre quasi suono digitalizzato. Piazzare a address 220 (anche su 388).
+   - SoundBlaster 16/ SoundBlaster Pro I & II /SoundBlaster I & II
+     Per default DOSBox fornisce suono a 16-bit Soundblaster 16.
+     Puoi selezionare una versione diversa di SoundBlaster nel file di
+     configurazione di DOSBox.
+     AWE32 music non è emulata, invece si può usare MPU-401(vedi sotto).
+   - Disney Sound source e Covox Speech Thing
+     Usando la porta stampante, questo dispositivo sonoro produce soltanto
+     audio digitale. Piazzare su LPT1.
+   - Gravis Ultrasound
+     L'emulazione di questo hardware è quasi completa, anche se le funzioni
+     MIDI sono state lasciate fuori, dato che è già stato emulato MPU-401
+     in altro codice. Per Gravis music si devono installare anche i driver
+     Gravis all'interno DOSBox. Questa è disabilitata di serie.
+   - MPU-401
+     Una interfaccia MIDI è anch'essa emulata. Questo metodo di output
+     sonoro funzionerà soltanto se usato con un dispositivo/emulatore esterno.
+     I sistemi operativi Windows XP/Vista/7 e MAC hanno si serie un emulatore
+     compatibile con: Sound Canvas/SCC/General Standard/General MIDI/Wave Blaster.
+     Un altro dispositivo/emulatore è necessario per la compatibilità con
+     Roland LAPC/CM-32L/MT-32 .
+
+
+SOUND: Il suono è a singhiozzo, rallentato o comunque strano.
+   Stai sfruttando troppa potenza CPU per mantenere DOSBox a quella velocità.
    Puoi abbassare i cicli, saltare dei fotogrammi, ridurre la frequenza di campionamento
-   del dispositivo audio (vedi il file di configurazione di DOSBox) o del dispositivo
-   mixer. Puoi anche aumentare il prebuffer nel file di configurazione.
-   Se stai usando cycles=max o =auto, assicurati che non ci siano processi
-   in sottofondo che interferiscano! (specialmente se accedono al disco rigido)
+   del dispositivo audio, aumenta il prebuffer. Guarda la sezione 13: "Il file di            configurazione (opzioni)". Se stai usando cycles=max o =auto, assicurati che non ci       siano processi in background che interferiscano! (specialmente se accedono al
+   disco rigido). Si veda anche Sezione 10: "Come velocizzare/rallentare DOSBox"
 
 
-D: Non posso digitare \ o : in DOSBox.
-A: Può capitare in vari casi, come se la il layout della tua tastiera non ha una
+KEYBOARD: Non posso digitare \ o : in DOSBox.
+   Può capitare in vari casi, come se la il layout della tua tastiera non ha una
    corrispondente rappresentazione DOS (o non è stata correttamente rilevata),
    o le assegnazioni dei tasti sono errate.
    Alcune possibili soluzioni:
@@ -185,19 +231,27 @@ A: Può capitare in vari casi, come se la il layout della tua tastiera non ha una
    Nota che se è impossibile identificare il layout del tuo sistema, o keyboardlayout
    è impostato a none nel file di configurazione DOSBox, viene usato il layout standard
    americano (US). In questa configurazione, prova i tasti vicino a "invio" per il
-   tasto \ (backslash), e per il tasto : (due punti) usa maiusc e i tasti tra "invio"
-   e "l".
+   tasto \ (backslash),
+   e per il tasto : (due punti) usa maiuscolo e i tasti tra "invio" e "L".
 
 
-D: L'input da tastiera soffre di rallentamenti.
-R: Abbassa il livello di priorità nel file di configurazione di DOSBox
+KEYBOARD: Lo Shift Destro e "\" non funzionano in DOSBox. (Windows Soltanto)
+   Ciò può verificarsi se Windows crede che avete più di una tastiera
+   collegata al PC, quando si utilizzano alcuni dispositivi di controllo remoto.
+   Per verificare questo problema eseguire cmd.exe, andare nella cartella                    C:\Programmi\DOSBox e digitare: set SDL_VIDEODRIVER=windib dosbox.exe
+   controllare se la tastiera ha iniziato a funzionare correttamente.
+   Se windib è più lento è possibile utilizzare al meglio una delle due soluzioni            fornite qui: http://vogons.zetafleet.com/viewtopic.php?t=24072
+
+
+KEYBOARD: L'input da tastiera soffre di rallentamenti.
+   Abbassa il livello di priorità nel file di configurazione di DOSBox
    come ad esempio "priority=normal,normal". Puoi anche provare
    a diminuire i cicli.
    (usa un numero fisso di cicli da cui partire, come cycles=10000).
 
 
-D: Il cursore si muove sempre nella stessa direzione!
-R: Vedi se succede ancora quando disattivi l'emulazione joystick,
+CONTROL: I carattere/cursore/puntatore del mouse si muove sempre nella stessa direzione!
+   Vedi se succede ancora quando disattivi l'emulazione joystick,
    imposta joysticktype=none nella sezione [joystick] del tuo file
    di configurazione di DOSBox. Puoi anche provare a scollegare ogni
    joystick. Se vuoi usare il joystick nei giochi, prova a impostare
@@ -205,126 +259,83 @@ R: Vedi se succede ancora quando disattivi l'emulazione joystick,
    SO come anche nel gioco, o nel setup del gioco).
 
 
-D: Il gioco/applicazione gira troppo lentamente!
-R: Guarda nella sezione "Come avviare giochi pesanti" per maggiori
-   informazioni.
+SPEED: Il gioco/applicazione gira troppo lentamente/troppo velocemente!
+   Guarda nella sezione 10: "Come velocizzare/rallentare DOSBox" per ulteriori          informazioni.
 
 
-D: Il gioco/applicazione non gira per niente, o va in crash!
-A: Guarda la Sezione 10: Risoluzione dei problemi
+CRASH: Il gioco/applicazione non gira per niente, o va in crash!
+   Guarda la Sezione 11: Risoluzione dei problemi
 
 
-D: DOSBox può danneggiare il mio computer?
-R: Non più di qualsiasi altro programma che richieda molte risorse. L'incremento
+CRASH: DOSBox va in crash all'avvio!
+   Guarda la Sezione 11: Risoluzione dei problemi
+
+
+GAME: Il mio gioco Build (Duke3D/Blood/Shadow Warrior) ha problemi.
+   Prima di tutto, prova a trovare un port del gioco. Con quelli ti troverai
+   certamente meglio. Per sistemare i problemi grafici che avvengono in
+   DOSBox alle risoluzioni più alte: apri il file di configurazione DOSBox e cerca          machine=svga_s3. Cambia svga_s3 in vesa_nolfb ,cambia memsize=16 in memsize=63
+
+
+SAFETY: DOSBox può danneggiare il mio computer?
+   Non più di qualsiasi altro programma che richieda molte risorse. L'incremento
    dei cicli non è un overclock della tua CPU reale. Impostare un valore troppo
    alto ha un effetto negativo sulle prestazioni del software che gira all'interno
    di DOSBox.
 
 
-D: Vorrei cambiare la dimensione della memoria/velocità cpu/ems/IRQ soundblaster.
-R: Puoi farlo! Basta che crei un file di configurazione: config -writeconf nomefile.
-   Apri il tuo editor preferito e guarda le impostazioni. Per avviare DOSBox con
-   i tuoi nuovi settaggi: dosbox -conf nomefile
-   Guarda la descrizione del comando config nella Sezione 4 per ulteriori dettagli.
+OPTIONS: Vorrei cambiare le opzioni di DOSBox.
+   Guarda la sezione 13: "Il file di configurazione (opzioni)".
 
 
-D: Attualmente, quali dispositivi sonori DOSBox emula?
-R: DOSBox emula diversi dispositivi sonori:
-   - Altoparlante interno PC
-     Questa emulazione include sia il generatore di note che diverse forme
-     di output audio digitale attraverso l'altoparlante interno.
-   - Creative CMS/Gameblaster
-     E' la prima scheda rilasciata da Creative Labs(R).  La configurazione
-     di default la piazza nella porta 0x220.  Andrebbe notato che abilitarla
-     assieme all'emulazione Adlib potrebbe portare a conflitti.
-   - Tandy 3 voice
-     L'emulazione di questo hardware audio è completa ad eccezione del
-     noise channel. Il noise channel non è ben documentato e di conseguenza
-     vi si può andare solo per immaginazione, cercando l'accuratezza sonora.
-   - Tandy DAC
-     L'emulazione della Tandy DAC usa quella della soundblaster, quindi
-     assicurati che l'emulazione soundblaster non sia disattivata nel file
-     di configurazione di DOSBox. La Tandy DAC è emulata soltanto a livello
-     di BIOS.
-   - Adlib
-     This emulation is almost perfect and includes the Adlib's ability to 
-     almost play digitized sound.
-   - SoundBlaster 16/ SoundBlaster Pro I & II /SoundBlaster I & II
-     Per default DOSBox fornisce suono a 16-bit Soundblaster 16.
-     Puoi selezionare una versione diversa di SoundBlaster nel file di
-     configurazione di DOSBox (Vedi Comandi Interni: CONFIG).
-   - Disney Soundsource
-     Usando la porta stampante, questo dispositivo sonoro produce soltanto
-     audio digitale.
-   - Gravis Ultrasound
-     L'emulazione di questo hardware è quasi completa, anche se le funzioni
-     MIDI sono state lasciate fuori, dato che è già stato emulato MPU-401
-     in altro codice.
-   - MPU-401
-     Una interfaccia MIDI è anch'essa emulata.  Questo metodo di output
-     sonoro funzionerà soltanto se usato con un dispositivo General Midi o
-     MT-32.
-
-
-D: DOSBox crasha all'avvio e sto eseguendo arts.
-R: Non è un problema di DOSBox, comunque la soluzione è di impostare
-   la variabile d'ambiente SDL_AUDIODRIVER su alsa o oss.
-
-
-D: Il mio gioco Build (Duke3D/Blood/Shadow Warrior) ha problemi.
-A: Prima di tutto, prova a trovare un port del gioco. Con quelli ti troverai
-   certamente meglio. Per sistemare i problemi grafici che avvengono in
-   DOSBox alle risoluzioni più alte, apri il file di configurazione DOSBox
-   e cerca machine=svga_s3. Cambia svga_s3 in vesa_nolfb
-
-
-D: Ottimo README, ma ancora non capisco.
-R: Potrebbe aiutarti uno sguardo a "The Newbie's pictorial guide
-   to DOSBox" che si trova qui
-   http://vogons.zetafleet.com/viewforum.php?f=39
-   Prova anche il wiki di DOSBox:
-   http://www.dosbox.com/wiki/
-   (documenti in inglese)
-
-
-Per altre domande leggi il resto di questo README e/o controlla il
-sito/forum:
-http://www.dosbox.com
+HELP: Ottimo Manuale, ma ancora non capisco.
+   Per ulteriori domande leggere il resto di questo Manuale. Si può anche vedere:
+   la guida situata a http://vogons.zetafleet.com/viewforum.php?f=39
+   il wiki di DOSBOx http://www.dosbox.com/wiki/
+   il sito/forum: http://www.dosbox.com
+   (documentazione in inglese)
 
 
 
-=======
-3. Uso:
-=======
+=============================
+3. Parametri Riga di Comando:
+=============================
 
-Una panoramica sui parametri di linea di comando da passare a DOSBox.
-Gli utenti di Windows devono aprire cmd.exe o command.com o modificare
-il collegamento a DOSBox.exe per poterli usare.
+Una panoramica sui parametri di linea di comando da passare a DOSBox. Anche se nella maggior parte dei casi è invece più facile da usare il file di configurazione di DOSBox.
+Guarda la sezione 13: "Il file di configurazione (opzioni)".
+
+Per poter utilizzare parametri della riga di comando:
+(Windows) aprire cmd.exe o command.com o modificare il collegamento a DOSBox.exe
+(Linux)   usare la consolle
+(MAC OSX) avviare termila.app e andate a:
+          /applications/dosbox.app/contents/macos/dosbox
+
 Le opzioni sono valide per tutti i sistemi operativi tranne quando
 espressamente specificato nelle descrizioni:
 
-dosbox [nome] [-exit] [-c comando] [-fullscreen] [-conf fileconfig] 
-       [-lang filelinguaggio] [-machine tipomacchina] [-noconsole]
-       [-startmapper] [-noautoexec] [-securemode] 
-       [-scaler scaler | -forcescaler scaler]
-       [-version]
+dosbox [name] [-exit] [-c command] [-fullscreen] [-userconf] 
+       [-conf congfigfilelocation] [-lang languagefilelocation]
+       [-machine machine type] [-noconsole] [-startmapper] [-noautoexec]
+       [-securemode] [-scaler scaler | -forcescaler scaler] [-version]
+       [-socket socket]
        
 dosbox -version
 dosbox -editconf programma
 dosbox -opencaptures programma
 dosbox -printconf
 dosbox -eraseconf
+dosbox -erasemapper
 
-  nome
-        Se "nome" è una directory verrà montata come drive C:.
-        Se "nome" è un eseguibile, verrà montata la directory in cui "nome" si trova
-        come drive C: e verrà eseguito "nome".
+  name
+        Se "name" è una directory verrà montata come drive C:.
+        Se "name" è un eseguibile, verrà montata la directory in cui "name" si trova
+        come drive C: e verrà eseguito "name".
     
   -exit  
         DOSBox si chiuderà quando l'applicazione DOS "nome" sarà terminata.
 
-  -c comando
-        Esegue il comando specificato prima di avviare "nome". Possono essere
+  -c command
+        Esegue il comando specificato prima di avviare "name". Possono essere
         specificati comandi multipli. Ogni comando dovrebbe partire con "-c".
         Un comando può essere: un Programma Interno, un comando DOS o un
         eseguibile su un drive montato.
@@ -332,17 +343,23 @@ dosbox -eraseconf
   -fullscreen
         Avvia DOSBox in modalità a schermo intero.
 
-  -conf fileconfig
-        Avvia DOSBox con le impostazioni speficicate in "fileconfig".
+  -userconf
+        Avvia DOSBox con le impostazioni speficicate dall'utente.
+        Possono essere specificate diverse opzioni -conf
+        ma -userconf è sempre caricato prima di loro.
+
+  -conf configfilelocation
+        Avvia DOSBox con le impostazioni speficicate in "configfilelocation".
         Possono essere specificate diverse opzioni -conf.
-        Vedi la Sezione 11 per maggiori dettagli.
+        Vedi la Sezione 13 per maggiori dettagli.
 
-  -lang filelinguaggio
-        Avvia DOSBox usando la lingua specificata in "filelinguaggio".
+  -lang languagefilelocation
+        Avvia DOSBox usando la lingua specificata in "languagefilelocation".
+        Vedi la Sezione 14 per maggiori dettagli.
 
-  -machine tipomacchina
+  -machine machinetype
         Imposta DOSBox per emulare un tipo specifico di macchina. Scelte valide
-        sono: hercules, cga, pcjr, tandy, svga_s3 (default) oltre agli altri
+        sono: hercules, cga, ega, pcjr, tandy, svga_s3 (default) oltre agli altri
         chipset svga elencati nella guida del file di configurazione DOSBox.
         svga_s3 abilita anche l'emulazione vesa.
         Per alcuni effetti speciali vga, può essere usato solo il tipomacchina
@@ -353,8 +370,8 @@ dosbox -eraseconf
         audio disponibili.
 
   -noconsole (Solo Windows)
-        Avvia DOSBox senza mostrare la finestra console. L'output sarà
-        ridirezionato verso stdout.txt e stderr.txt
+        Avvia DOSBox senza mostrare DOSBOx Finestra di Stato(consolle).
+        L'output sarà ridirezionato verso stdout.txt e stderr.txt
 	
   -startmapper
         Avvia il keymapper immediatamente. Utile per gli utenti con
@@ -391,25 +408,33 @@ dosbox -eraseconf
   -printconf
         stampa la posizione del file di configurazione di default.
 
-  -eraseconf
+  -resetconf
         rimuove il file di configurazione.
 
-Nota: Se un nome/comando/fileconfigurazione/filelinguaggio contiene uno
-      spazio, metti l'intero nome/comando/fileconfigurazione/filelinguaggio
+
+  -resetmapper
+        rimuove il file mapper usando di serie il file diconfigurazione pulito.
+
+  -socket
+        passa il numero del socket all'emulazione nullmodem .
+        Guarda la sezione 9: "Funzione Multiplayer Seriale".
+
+
+Nota: Se un name/command/configfilelocation/languagefilelocation contiene uno
+      spazio, metti l'intero name/command/configfilelocation/languagefilelocation
       tra doppi apici ("comando o nome di file"). Se hai bisogno, ecco come
       usare doppi apici all'interno di altri doppi apici (succede spesso
       con -c e mount):
       Gli utenti Windows e OS/2 possono usare apici singoli all'interno di
       doppi apici. Gli altri dovrebbero essere in grado di usare doppi apici
       preceduti dal carattere di escape, all'interno di altri doppi apici.
-      Windows: -c "mount c 'c:\miei programmi\'"
+      Windows: -c "mount c 'c:\mia cartella con i giochi DOS\'"
       Linux: -c "mount c \"/tmp/nome con spazio\""
 
-Per esempio (Windows):
-
-dosbox c:\atlantis\atlantis.exe -c "MOUNT D C:\SAVES"
-  Questo monta c:\atlantis come c:\ ed esegue atlantis.exe.
-  Prima di fare questo, monta C:\SAVES come drive D.
+Un esempio piuttosto singolare, proprio per dimostrare cosa si può fare (Windows):
+dosbox D:\cartella\file.exe -c "MOUNT Y H:\MiaCartella"
+  Questo monta D:\cartella come C:\ ed esegue file.exe.
+  Prima di fare questo, monta H:\MiaCartella come drive Y.
 
 Sotto Windows, puoi anche trascinare directory/file sull'eseguibile di DOSBox.
 
@@ -425,16 +450,16 @@ Per avere una lista dei comandi interni digita "HELP" al prompt.
 Inoltre sono disponibili i seguenti comandi:
 
 MOUNT "Lettera Drive Emulato" "Drive o directory reale"
-      [-t tipo] [-aspi] [-ioctl] [-noioctl] [-usecd numero] [-size dimensionedrive] 
-      [-label etichettadrive] [-freesize dimensione_in_mb]
-      [-freesize dimensione_in_kb (per i floppy)]
+      [-t type] [-aspi] [-ioctl] [-noioctl] [-usecd number] [-size drivesize]
+      [-label drivelabel] [-freesize size_in_mb]
+      [-freesize size_in_kb (floppies)]
 MOUNT -cd
 MOUNT -u "Lettera Drive Emulato"
 
   Programma per montare le directory locali come drive dentro DOSBox.
 
   "Lettera Drive Emulato"
-        La lettera di drive dentro DOSBox (es. C).
+        La lettera di drive dentro DOSBox (per esempio C).
 
   "Lettera Drive Reale (solitamente per i CD-ROM in Windows) o Directory"
         La directory locale cui vuoi accedere da dentro DOSBox.
@@ -443,7 +468,8 @@ MOUNT -u "Lettera Drive Emulato"
         Tipo di directory montata. Valori supportati: dir (default),
         floppy, cdrom.
 
-  -size dimensionedrive
+  -size driversize
+        (solo esperti)
         Imposta la dimensione del drive, dove dimensionedrive è nella forma
         "bps,spc,tcl,fcl":
            bps: byte per settore, di default 512 per i drive regolari e
@@ -501,51 +527,68 @@ MOUNT -u "Lettera Drive Emulato"
   -u
         Rimuove il mount. Non funziona per Z:\.
 
-  Nota: E' possibile montare una directory locale come drive CD-ROM.
-        In questo caso però mancherà il supporto hardware.
+  Nota: E' possibile montare una directory locale come drive CD-ROM,
+        ma In questo caso però mancherà il supporto hardware.
 
   In pratica MOUNT ti permette di connettere l'hardware reale al PC emulato da
   DOSBox. Quindi MOUNT C C:\GIOCHI dice a DOSBox di usare la tua directory
-  C:\GIOCHI come drive C: in DOSBox. Ti permette anche di cambiare la lettera
-  identificativa del drive per venire incontro a quei programmi che richiedono
-  lettere di drive specifiche.
-  
-  Per esempio: Touche: Adventures of The Fifth Musketeer deve essere avviato
-  sul tuo drive C:. Usando DOSBox e il suo comando mount, puoi ingannare il
-  gioco e fargli credere di trovarsi nel drive C, mentre puoi continuare a
-  mettere il gioco dove preferisci. Per esempio, se il gioco si trova in
-  D:\GIOCHI\TOUCHE, il comando MOUNT C D:\GIOCHI\TOUCHE ti permetterà di
-  avviare Touche dal drive D.
+  C:\GIOCHI come drive C: in DOSBox. MOUNT C E:\QualsiasiCartella dice a DOSBox di       utilizzare E:\QualsiasiCartella come drive C: in DOSBox.
 
   Montare l'intero drive C con MOUNT C C:\ è ALTAMENTE sconsigliato! Stesso
   discorso vale per il montare la directory radice di qualsiasi altro drive,
   eccetto che per i CD-ROM (a causa della loro natura a sola lettura).
   In caso contrario, se fai errori all'interno del DOSBox potresti perdere
   tutti i tuoi file.
-  E' consigliato mettere tutte le tue applicazioni/giochi in una sottodirectory
-  e montare quella.
+  Inoltre non montare mai le cartelle "Windows" o "Programmi" o loro sottocartelle
+  in Windows Vista/7, DOSBox non può funzionare correttamente, o smetterà di funzionare
+  correttamente dopo. Si raccomanda di tenere tutte le vostre applicazioni dos/giochi
+  in una cartella semplice (ad esempio c:\dosgames) e montare quella.
+ 
+  È sempre necessario installare il tuo gioco all'interno di DOSBox.
+  Quindi sempre anche se avete il gioco su CD (anche dopo l'installazione!)
+  per il mount di entrambi: cartella come unità disco rigido e un CD-ROM.
+  HardDisk dovrebbe sempre essere montato come c
+    CD-ROM dovrebbe sempre essere montato come d
+    Floppy dovrebbe sempre essere montato come a (o b)
 
-  Esempi di MOUNT generali:
-    1. Per montare c:\DirX come floppy : 
-         mount a c:\DirX -t floppy
+  Esempi base di MOUNT per utenti normali (Windows):
+    1. Per montare una cartella come harddisk: 
+         mount c d:dosgame
     2. Per montare il cdrom di sistema E come cdrom sul drive D in DOSBox:
          mount d e:\ -t cdrom
-    3. Per montare il drive CD-ROM di sistema nel punto di mount /media/cdrom come
-       drive CD-ROM D in dosbox:
-         mount d /media/cdrom -t cdrom -usecd 0
-    4. Per montare un drive con ~870 mb di spazio disponibile (versione semplice):
-         mount c d:\ -freesize 870
-    5. Per montare un drive con ~870 mb di spazio disponibile (solo esperti, pieno controllo):
-         mount c d:\ -size 512,127,16513,13500
-    6. Per montare /home/user/dirY come drive C in DOSBox:
-         mount c /home/user/dirY
-    7. Per montare la directory da cui DOSBox è stato eseguito come D in DOSBox:
-         mount d .
-         (nota che . rappresenta la directory da cui DOSBox è avviato)
+    3. Per montare il drive a: come floppy:
+         mount a  :\ -t floppy
+
+  Esempi avanzati di MOUNT (Windows):
+    4. Per montare un hardisk con ~870 mb di spazio disponibile (versione semplice):
+         mount c d:\dosgame -freesize 870
+    5. Per montare un drive con ~870 mb di spazio disponibile
+       (solo esperti, pieno controllo):
+         mount c d:\dosgame -size 512,127,16513,13500
+
+  Altri esempi di MOUNT:
+    1. Per montare c:\dosgame\floppy come floppy:
+         mount a c:\dosgame\floppy\ - t floppy
+    2. Per montare mount il CD-ROM al mountpoint /media/cdrom comes CD-ROM D in DOSBox:
+          mount d /media/cdrom -t cdrom -usecd 0
+    3. Per montare /home/user/dosgames come drive C in DOSBox:
+          mount c /home/user/dosgames
+    4. Per montare la directory da cui DOSBox è stato eseguito come D in DOSBox:
+         mount c .
+         (nota che . rappresenta la directory da cui DOSBox è avviato,
+          in Windows Vista/7 non usare questo se avete installato DOSBox
+          nella cartella "Programmi)
+
+  Se si desidera montare l'immagine del CD o un'immagine floppy, usare IMGMOUNT.
+  MOUNT funziona anche con le immagini, ma solo se si utilizza un programma esterno,
+   per esempio, (entrambi sono gratuiti):
+   - Daemon Tools Lite (per le immagini CD),
+   - Virtual Floppy Drive (per le immagini floppy).
+   Anche se IMGMOUNT può dare una migliore compatibilità.
 
 
 MEM
-  Programma per visualizzare la quantità di memoria disponibile.
+  Programma per visualizzare la quantità e tipo di memoria disponibile.
 
 
 VER
@@ -557,11 +600,11 @@ VER set versione_maggiore [versione_minore]
   come versione DOS.
 
 
-CONFIG -writeconf filelocale
-CONFIG -writelang filelocale
+CONFIG -writeconf filelocation
+CONFIG -writelang filelocation
 CONFIG -securemode
-CONFIG -set "sezione proprietà=valore"
-CONFIG -get "sezione proprietà"
+CONFIG -set "section property=value"
+CONFIG -get "section property"
 
   CONFIG può essere usato per cambiare o visualizzare varie impostazioni di
   DOSBox durante la sua esecuzione. Può salvare le impostazioni correnti o
@@ -922,10 +965,49 @@ La directory deve esistere prima di avviare DOSBox, altrimenti non verrà
 salvato/registrato niente !
 
 
+====================
+6. Joystick/Gamepad:
+====================
 
-==========
-6. Mapper:
-==========
+La porta joystick in standard DOS supporta un massimo di 4 assi e 4 pulsanti.
+ Per di più, diverse modifiche di configurazione che sono stati utilizzati.
+
+ Per forzare DOSBox di utilizzare un diverso tipo di joystick emulato / gamepad, la voce
+ "joysticktype" nella sezione [joystick] del file di configurazione può DOSBox
+ essere utilizzato.
+
+ Nessuno - disabilita il supporto del controller.
+ auto - (default) rileva automaticamente se si dispone di uno o due controller collegati:
+           se ne avete uno - l'impostazione «4 assi 'è usata,
+           se si hanno due - impostando '2 'asse'è usato.
+ 2axis - Se si dispone di due controller collegati, ognuno avrà emulare un joystick
+         con 2 assi e 2 pulsanti. Se si dispone di un solo controller collegato,
+         Sarà emulare un joystick con solo 2 assi e 2 pulsanti.
+ 4axis - supporta solo primo controller, emula un joystick
+         con 4 assi e 4 pulsanti o un gamepad con 2axis e 6 pulsanti.
+ 4axis_2 - supporta solo secondo controller.
+ FCS - supporta solo primo controller, emula ThrustMaster
+         Flight Control System, con 3 assi, 4 pulsanti e 1 cappello.
+ ch - supporta solo primo controller, emula CH Flightstick,
+         con 4 assi, 6 pulsanti e 1 cappello, ma non si può premere più
+         di un pulsante, allo stesso tempo.
+
+ È inoltre necessario configurare il controller correttamente all'interno del gioco.
+
+ E 'importante ricordare che se si è salvato il mapperfile senza joystick
+
+ collegato, o con una diversa impostazione di joystick, la nuova impostazione sarà
+ non funziona
+ correttamente,
+ o non funzionano affatto, finché non si reimposta mapperfile DOSBox's.
+
+
+ Se il controller funziona correttamente fuori DOSBox, ma non calibrare correttamente
+ all'interno di DOSBox, provare diverse 'a tempo' impostazione nel file di configurazione di DOSBox.
+
+==================
+7. Mappa dei Tasti
+==================
 
 Quando avvii il mapper del DOSBox (con CTRL-F1 o col parametro -startmapper
 quando avvii l'eseguibile di DOSBox) ti viene presentata una tastiera virtuale
@@ -1015,9 +1097,8 @@ nel file di configurazione (la voce mapperfile= ). All'avvio, DOSBox caricherà
 il suddetto file, se è presente nel file di configurazione.
 
 
-
 =========================
-7. Layout della Tastiera:
+8. Layout della Tastiera:
 =========================
 
 Per passare ad un diverso layout di tastiera, puoi usare sia la voce
@@ -1034,6 +1115,8 @@ Cambiare layout
   default, in questo caso è necessario speficicare solo l'identificativo
   del layout (come keyboardlayout=it nel file di configurazione di DOSBox,
   o l'uso di "keyb it" al prompt dei comandi di DOSBox).
+  The list of all layouts built into DOSBox is
+  here: http://vogons.zetafleet.com/viewtopic.php?t=21824
   
   Certi layout di tastiera (ad esempio il layout GK codepage 869 e il layout
   RU codepage 808) hanno il supporto per i layout doppi che possono essere
@@ -1072,7 +1155,7 @@ poi accessibili da DOSBox.
 
 
 ================================
-8. Funzione Multiplayer Seriale:
+9. Funzione Multiplayer Seriale:
 ================================
  
 DOSBox può emulare un cavo nullmodem seriale attraverso una rete e
@@ -1122,9 +1205,9 @@ Esempio: Essere server in ascolto sulla porta TCP 5000.
 
 
 
-==================================================
-9. Come giocare a giochi particolarmente esigenti:
-==================================================
+=======================================
+10. Come velocizzare/rallentare DOSBox:
+=======================================
 
 DOSBox emula la CPU, il suono e le schede video, e altre periferiche di un
 PC, tutte allo stesso tempo. La velocità di una applicazione DOS emulata
@@ -1188,14 +1271,17 @@ Esempio:
 
 
 ============================
-10. Risoluzione dei problemi
+11. Risoluzione dei problemi
 ============================
+
+Trucco Generico:
+  Controlla i messaggi nella Finestra di Stato DOSBox. Guarda la sezione 12. "Finestra di Stato DOSBOx"
 
 DOSBox crasha proprio dopo averlo avviato:
   - usa diversi valori per l'opzione output= nel file di
     configurazione
   - prova ad aggiornare i driver video e le DirectX
-
+  - (Linux) set the environment variable SDL_AUDIODRIVER to alsa or oss
 
 L'avvio di un certo gioco chiude DOSBox, causa un crash con qualche messaggio o blocca tutto:
   - vedi se funziona con una installazione incontaminata di DOSBox
@@ -1230,14 +1316,30 @@ Il gioco esce al prompt di DOSBox con qualche strano messaggio di errore:
   - prova a reinstallare il gioco da dentro DOSBox
 
 
+============================
+12. Finestra di Stato DOSBOX
+============================
 
-==============================
-11. Il file di configurazione:
-==============================
+La finestra Stato DOSBox contiene molte informazioni utili sul tuo ribes
+ configurazione, le vostre azioni in DOSBox, errori che è successo e di più.
+ Ogni volta che avete qualche problema con DOSBox verificare i messaggi.
 
-Un file di configurazione può essere generato usando CONFIG.COM, che può
-essere trovato nel drive interno Z: quando avvii DOSBox. Leggi la sezione
-dei programmi interni del readme per sapere come usare CONFIG.COM.
+Per avviare la finestra di stato DOSBox:
+  (Windows)  Status Window is being started together with main DOSBox window.
+  (Linux)    You may have to start DOSBox from a console to see Status Window.
+  (MAC OS X) Right click on DOSBox.app, choose "Show Package Contents"->
+             ->enter "Contents"->enter "MacOS"->run "DOSBox"
+
+
+=======================================
+13. Il file di configurazione(opzioni):
+=======================================
+
+Un file di configurazione può essere generato quando avvii DOSBox.
+Il file si trova in:
+   (Windows)  "Start/WinLogo Menu"->"All Programs"->DOSBox-0.74->Options
+   (Linux)    ~/.dosbox/dosbox-0.74.conf
+   (MAC OS X) "~/Library/Preferences/DOSBox 0.74 Preferences"
 Puoi modificare il file di configurazione generato, per personalizzare
 DOSBox.
 
@@ -1257,14 +1359,13 @@ Gli utenti Windows dovrebbero usare la scorciatoia nel menu Start per
 trovarlo.
 
 
-
-
 =======================
-12. Il file linguaggio:
+14. Il file linguaggio:
 =======================
 
 CONFIG.COM può generare un file linguaggio (CONFIG -writelang filelinguaggio).
 Leggilo e, si spera, capirai come modificarlo.
+Guarda la seczione 4:"Programmi Intern" per usare CONFIG.COM.
 Avvia DOSBox col parametro -lang per usare il tuo nuovo file linguaggio.
 In alternativa, puoi impostarne il nome nel file di configurazione nella
 sezione [dosbox]. Troverai un'opzione language= che puoi cambiare come più
@@ -1273,7 +1374,7 @@ ti aggrada.
 
 
 ========================================
-13. Costruire la tua versione di DOSBox:
+15. Costruire la tua versione di DOSBox:
 ========================================
 
 Scarica i sorgenti.
@@ -1282,14 +1383,14 @@ Guarda l'INSTALL che sta al loro interno.
 
 
 ============================
-14. Ringraziamenti speciali:
+16. Ringraziamenti speciali:
 ============================
 
 Vedi il file THANKS.
 
 
 =============
-15. Contatti:
+17. Contatti:
 =============
 
 Vai nel sito:

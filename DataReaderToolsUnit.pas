@@ -12,6 +12,9 @@ Function DecodeName(const Name : String) : String;
 Function GetTagContents(const Lines : String; const StartPosition : Integer; Tag, TagAttributeName, TagAttributeValue : String; const RequestAttributeName : String =''; const RequestAttributeValue : TStringList = nil) : TStringList; overload;
 Function GetTagContents(const Lines : String; const StartPosition : Integer; Tag, TagAttributeName, TagAttributeValue : String; const TagNr : Integer) : String; overload; {Nr=1,2,...: number from start; Nr=-1,-2,...: number from last}
 
+Function GetTag(const Lines : String; const StartPosition : Integer; Tag, TagAttributeName, TagAttributeValue : String; const RequestAttributeName : String =''; const RequestAttributeValue : TStringList = nil) : TStringList; overload;
+Function GetTag(const Lines : String; const StartPosition : Integer; Tag, TagAttributeName, TagAttributeValue : String; const TagNr : Integer) : String; overload; {Nr=1,2,...: number from start; Nr=-1,-2,...: number from last}
+
 Function GetPlainText(const Lines : String) : TStringList;
 
 implementation
@@ -232,6 +235,103 @@ Var St : TStringList;
 begin
   result:='';
   St:=GetTagContents(Lines,StartPosition,Tag,TagAttributeName,TagAttributeValue);
+  try
+    If (TagNr>0) and (St.Count>=TagNr) then result:=St[TagNr-1];
+    If (TagNr<0) and (St.Count>=-TagNr) then result:=St[St.Count-TagNr];
+  finally
+    St.Free;
+  end;
+end;
+
+Function GetTag(const Lines : String; const StartPosition : Integer; Tag, TagAttributeName, TagAttributeValue : String; const RequestAttributeName : String =''; const RequestAttributeValue : TStringList = nil) : TStringList;
+Var Position,I,J,TagStart,Count,TagEnd : Integer;
+    C : Char;
+    Ok : Boolean;
+    RequestValue : String;
+begin
+  result:=TStringList.Create;
+  Position:=StartPosition;
+
+  {Find "<Tag"}
+  I:=FindNext(Lines,'<'+Tag,Position);
+  While I>0 do begin
+    TagStart:=I;
+    Position:=I+length('<'+Tag);
+    If Position>length(Lines) then exit;
+
+    {Check if "<Tag" has a DataKey="DataValue" or DataKey='DataValue' attribute}
+    If (Trim(TagAttributeName)='') and (Trim(RequestAttributeName)='') then begin
+      while Position<length(Lines) do begin
+        If Lines[Position]='>' then begin inc(Position); break; end;
+        inc(Position);
+      end;
+      Ok:=True;
+    end else begin
+      RequestValue:='';
+      Ok:=(Trim(TagAttributeName)='');
+      while Position<length(Lines) do begin
+        If Lines[Position]<>' ' then begin
+          If (Trim(TagAttributeName)<>'') and (ExtUpperCase(Copy(Lines,Position,length(TagAttributeName)))=ExtUpperCase(TagAttributeName)) then begin
+            inc(Position,length(TagAttributeName));
+            If (Position>length(Lines)) or (Lines[Position]<>'=') then continue;
+            inc(Position);
+            If (Position>length(Lines)) or ((Lines[Position]<>'"') and (Lines[Position]<>'''')) then continue;
+            C:=Lines[Position];
+            inc(Position);
+            If ExtUpperCase(Copy(Lines,Position,length(TagAttributeValue+C)))=ExtUpperCase(TagAttributeValue+C) then begin inc(Position,length(TagAttributeValue+C)); Ok:=True; end;
+            continue;
+          end;
+          If (Trim(RequestAttributeName)<>'') and (ExtUpperCase(Copy(Lines,Position,length(RequestAttributeName)))=ExtUpperCase(RequestAttributeName)) then begin
+            inc(Position,length(RequestAttributeName));
+            If (Position>length(Lines)) or (Lines[Position]<>'=') then continue;
+            inc(Position);
+            If (Position>length(Lines)) or ((Lines[Position]<>'"') and (Lines[Position]<>'''')) then continue;
+            C:=Lines[Position];
+            inc(Position);
+            I:=FindNext(Lines,C,Position);
+            If I=0 then RequestValue:=Copy(Lines,Position,MaxInt) else begin
+              RequestValue:=Copy(Lines,Position,(I-1)-Position+1);
+              Position:=I+1;
+            end;
+            continue;
+          end;
+        end;
+        If Lines[Position]='>' then begin inc(Position); break; end;
+        inc(Position);
+      end;
+    end;
+
+    {Find "</Tag", count open and closing tag to get the right one}
+    If Ok then begin
+      TagEnd:=length(Lines);
+      Count:=1;
+      While (Count>0) and (Position<length(Lines)) do begin
+        I:=FindNext(Lines,'<'+Tag,Position);
+        J:=FindNext(Lines,'</'+Tag,Position);
+        If (I=0) and (J=0) then break;
+        If (I=0) or (J=0) then begin
+          If I>0 then inc(Count) else dec(Count);
+          Position:=Max(I,J)+length(Tag);
+        end else begin
+          If I<J then inc(Count) else dec(Count);
+          Position:=Min(I,J)+length(Tag);
+        end;
+        While (Position<=length(Lines)) and (Lines[Position]<>'>') do inc(Position);
+        TagEnd:=Position;
+      end;
+      result.Add(Copy(Lines,TagStart,TagEnd-TagStart+1));
+      If Assigned(RequestAttributeValue) then RequestAttributeValue.Add(RequestValue);
+    end;
+
+    I:=FindNext(Lines,'<'+Tag,Position);
+  end;
+end;
+
+Function GetTag(const Lines : String; const StartPosition : Integer; Tag, TagAttributeName, TagAttributeValue : String; const TagNr : Integer) : String;
+Var St : TStringList;
+begin
+  result:='';
+  St:=GetTag(Lines,StartPosition,Tag,TagAttributeName,TagAttributeValue);
   try
     If (TagNr>0) and (St.Count>=TagNr) then result:=St[TagNr-1];
     If (TagNr<0) and (St.Count>=-TagNr) then result:=St[St.Count-TagNr];

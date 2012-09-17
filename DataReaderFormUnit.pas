@@ -244,7 +244,7 @@ begin
     Enabled:=False;
     try
       If ShowCompleted then O:=self else O:=Owner;
-      DataReaderGameDataThread:=ShowDataReaderInternetDataWaitDialog(O,DataReader,Nr,LanguageSetup.DataReaderDownloadCaption,LanguageSetup.DataReaderDownloadInfo,LanguageSetup.DataReaderDownloadError);
+      DataReaderGameDataThread:=ShowDataReaderInternetDataWaitDialog(O,DataReader,Nr,False,LanguageSetup.DataReaderDownloadCaption,LanguageSetup.DataReaderDownloadInfo,LanguageSetup.DataReaderDownloadError);
     finally
       Enabled:=True;
     end;
@@ -278,6 +278,8 @@ end;
 procedure TDataReaderForm.InsertButtonClick(Sender: TObject);
 Var S,T : String;
     I : Integer;
+    DataReaderGameDataThread : TDataReaderGameDataThread;
+    St : TStringList;
 begin
   Name:='';
   Genre:='';
@@ -292,18 +294,31 @@ begin
   If YearCheckBox.Enabled and YearCheckBox.Checked then Year:=YearLabel.Caption;
 
   If DownloadCoverCheckBox.Enabled and DownloadCoverCheckBox.Checked and (CaptureDir<>'') then begin
-    S:=CoverSt[ListBox.ItemIndex];
     If DownloadCoverAllCheckBox.Checked then begin
-      {Download all}
-      I:=Pos('$',S); While I>0 do begin
-        T:=Trim(Copy(S,1,I-1));
-        S:=Trim(Copy(S,I+1,MaxInt));
-        ShowDataReaderInternetCoverWaitDialog(self,DataReader,T,CaptureDir,LanguageSetup.DataReaderDownloadCaption,LanguageSetup.DataReaderDownloadInfo,LanguageSetup.DataReaderDownloadError);
-        If not DownloadCoverAllCheckBox.Checked then break;
-        I:=Pos('$',S);
+      {Get URLs of all images}
+      DataReaderGameDataThread:=ShowDataReaderInternetDataWaitDialog(self,DataReader,ListBox.ItemIndex,True,LanguageSetup.DataReaderDownloadCaption,LanguageSetup.DataReaderDownloadInfo,LanguageSetup.DataReaderDownloadError);
+      If DataReaderGameDataThread<>nil then try
+        S:=DataReaderGameDataThread.ImageURL;
+      finally
+        DataReaderGameDataThread.Free;
       end;
-      ShowDataReaderInternetCoverWaitDialog(self,DataReader,S,CaptureDir,LanguageSetup.DataReaderDownloadCaption,LanguageSetup.DataReaderDownloadInfo,LanguageSetup.DataReaderDownloadError);
+      {Download all}
+      St:=TStringList.Create;
+      try
+        I:=Pos('$',S); While I>0 do begin
+          T:=Trim(Copy(S,1,I-1));
+          S:=Trim(Copy(S,I+1,MaxInt));
+          St.Add(T);
+          If not DownloadCoverAllCheckBox.Checked then break;
+          I:=Pos('$',S);
+        end;
+        St.Add(S);
+        If St.Count>0 then ShowDataReaderInternetCoverWaitDialog(self,DataReader,St,CaptureDir,LanguageSetup.DataReaderDownloadCaption,LanguageSetup.DataReaderDownloadInfo,LanguageSetup.DataReaderDownloadError);
+      finally
+        St.Free;
+      end;
     end else begin
+      S:=CoverSt[ListBox.ItemIndex];
       {Download first}
       I:=Pos('$',S); If I>0 then S:=Trim(Copy(S,1,I-1));
       ShowDataReaderInternetCoverWaitDialog(self,DataReader,S,CaptureDir,LanguageSetup.DataReaderDownloadCaption,LanguageSetup.DataReaderDownloadInfo,LanguageSetup.DataReaderDownloadError);

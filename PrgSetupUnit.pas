@@ -256,7 +256,8 @@ Type TPrgSetup=class(TBasePrgSetup)
     property SingleInstance : Boolean index 86 read GetBoolean write SetBoolean;
     property NonModalViewer : Boolean index 87 read GetBoolean write SetBoolean;
     property AllowPackingWindowsGames : Boolean index 88 read GetBoolean write SetBoolean;
-    {property ActivateIncompleteFeatures : Boolean index 89 read GetBoolean write SetBoolean;}
+    property DataReaderDownloadCompleteMediaLibrary : Boolean index 89 read GetBoolean write SetBoolean;
+    {property ActivateIncompleteFeatures : Boolean index 90 read GetBoolean write SetBoolean;}
 
     property MainLeft : Integer index 0 read GetInteger write SetInteger;
     property MainTop : Integer index 1 read GetInteger write SetInteger;
@@ -295,6 +296,8 @@ Type TPrgSetup=class(TBasePrgSetup)
     property CheatsDBCheckForUpdates : Integer index 34 read GetInteger write SetInteger;
     property LastCheatsDBUpdateCheck : Integer index 35 read GetInteger write SetInteger;
     property DOSBoxStartFailedTimeout : Integer index 36 read GetInteger write SetInteger;
+    property DataReaderMaxImages : Integer index 37 read GetInteger write SetInteger;
+
 
     property DOSBoxSettingsCount : Integer index 0 read GetListCount;
     property DOSBoxSettings[I : Integer] : TDOSBoxSetting read GetDOSBoxSettings;
@@ -765,7 +768,8 @@ begin
   AddBooleanRec(86,'ProgramSets','SingleInstanceOnly',True);
   AddBooleanRec(87,'ProgramSets','NonModalViewer',False);
   AddBooleanRec(88,'ProgramSets','AllowPackingWindowsGames',False);
-  {AddBooleanRec(89,'ProgramSets','ActivateIncompleteFeatures',False);}
+  AddBooleanRec(89,'ProgramSets','DataReaderDownloadCompleteMediaLibrary',True);
+  {AddBooleanRec(90,'ProgramSets','ActivateIncompleteFeatures',False);}
 
   AddIntegerRec(0,'ProgramSets','MainLeft',-1);
   AddIntegerRec(1,'ProgramSets','MainTop',-1);
@@ -804,7 +808,7 @@ begin
   AddIntegerRec(34,'ProgramSets','CheatsDBCheckForUpdates',0);
   AddIntegerRec(35,'ProgramSets','LastCheatsDBUpdateCheck',0);
   AddIntegerRec(36,'ProgramSets','DOSBoxStartFailedTimeout',3);
-
+  AddIntegerRec(37,'ProgramSets','DataReaderMaxImages',25);
 end;
 
 Procedure TPrgSetup.InitDirs;

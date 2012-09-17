@@ -1,5 +1,30 @@
 D-Fend Reloaded Changelog
 
+Version 1.3.2 (09/17/2012)
+==========================
+- Updated Italian language file.
+- Updated French and French Canada language files.
+- Updated German language file.
+- Updated DOSZip from 2.33 to 2.35.
+- Updated German and Italian DOSBox language files.
+- When downloading images from mobygames, now also screenshots will be loaded.
+  Additionally the maximum number of covers and screenshots to be download
+  per profile have been increased from 10 to 25.
+- The mobygames data read is now downloading up to 8 files parallel, which
+  results in a significant speed up when downloading cover images.
+- Now up to 50 additional program file can be specified per profile.
+- The video RAM size now can be set up via the GUI for custom DOSBox builts not
+  using the videoram key in the [vga] section, too.
+- Improved initial screen position for the quick starter window.
+- Some smaller improvements to the automatic checksum collector for templates.
+- [Fix] The uninstall dialog offered to remove the whole game folder if there
+  was only one profile next to the "DOSBox DOS" profile and this profile used
+  a program or setup file located directly in the games folder.
+- [Fix] For some auto setup templates the user game information list on the
+  game information page of the new profile wizard showed an additional empty
+  line.
+
+
 Version 1.3.1 (06/25/2012)
 ==========================
 - Korean language file (thanks to Decon).
@@ -51,7 +76,7 @@ Version 1.3.0 (04/17/2012)
   a Windows game profile in the profile editor.
 - [Fix] Removed invalid ISO image warning when extracting a floppy or hard disk
   image.
-- [Fix] When downloading a cover image from Mobygames right after changing the
+- [Fix] When downloading a cover image from mobygames right after changing the
   capture folder (without closing the profile editor in between), the image
   will be stored in the old capture folder.
 - [Fix] Wrong position for the portable version info button on the DOSBox

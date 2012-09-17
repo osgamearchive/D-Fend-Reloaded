@@ -47,7 +47,7 @@ const DosBoxFileName='DOSBOX.EXE';
       PackageDBUserFile='User.xml';
       PackageDBCacheFile='Cache.xml';
 
-      CacheVersionString='DFRCacheFile-FileVersion=004';
+      CacheVersionString='DFRCacheFile-FileVersion=005';
       CacheInfoString=#13+#13+'This is just a cache file for the profiles in the current directory. You can'+#13+
                       'ignore or delete this file. D-Fend Reloaded will only load data from this file'+#13+
                       'if the .prof file on disk has not changed. If you delete or change one of the'+#13+

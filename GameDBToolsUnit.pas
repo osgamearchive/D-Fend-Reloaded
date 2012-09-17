@@ -550,7 +550,7 @@ begin
           If (S='') or (T='') then continue;
 
           SUpper:=ExtUpperCase(S);
-		  If SUpper='LICENSE' then continue;
+          If SUpper='LICENSE' then continue;
           Nr:=-1;
           For K:=0 to length(UserData)-1 do If UserData[K].NameUpper=SUpper then begin Nr:=K; break; end;
           If Nr<0 then begin
@@ -2486,7 +2486,7 @@ begin
         try
           For J:=0 to St2.Count-1 do If Pos('=',St2[J])>0 then begin
             T:=Trim(Copy(St2[J],1,Pos('=',St2[J])-1));
-            If ExtUpperCase(T)='LICENSE' then continue;            
+            If ExtUpperCase(T)='LICENSE' then continue;
             If UserListUpper.IndexOf(ExtUpperCase(T))<0 then begin UserList.Add(T); UserListUpper.Add(ExtUpperCase(T)); end;
           end;
         finally
@@ -3369,7 +3369,7 @@ begin
       If (Rec.Attr and faDirectory)=0 then begin
         S:=ExtUpperCase(Rec.Name);
         If (S<>Exe1) and (S<>Exe2) then begin
-          S:=ExtractFileExt(Rec.Name); If (S<>'') and (S[1]='.') then S:=Copy(S,2,MaxInt);
+          S:=ExtUpperCase(ExtractFileExt(Rec.Name)); If (S<>'') and (S[1]='.') then S:=Copy(S,2,MaxInt);
           OK:=False;
           For J:=Low(AdditionalChecksumDataGoodFileExt) to High(AdditionalChecksumDataGoodFileExt) do If AdditionalChecksumDataGoodFileExt[J]=S then begin OK:=True; break; end;
           If OK then For J:=Low(AdditionalChecksumDataExcludeFiles) to High(AdditionalChecksumDataExcludeFiles) do if Pos(AdditionalChecksumDataExcludeFiles[J],S)<>0 then begin Ok:=False; break; end;

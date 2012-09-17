@@ -537,7 +537,7 @@ begin
   LogInfo('### Start of FormCreate ###');
 
   {Caption:=Caption+' THIS IS A TEST VERSION ! (Beta 1 of version 1.4)';}
-  {Caption:=Caption+' (Release candidate 1 of version 1.3.1)';}
+  {Caption:=Caption+' (Release candidate 1 of version 1.3.2)';}
 
   MI_Count:=ImageList.Count;
   Height:=790;
@@ -1849,7 +1849,7 @@ begin
   PopupRunExtraFile.Clear;
   MenuRunExtraFile.Visible:=False;
   PopupRunExtraFile.Visible:=False;
-  If B and (not B2) then For I:=0 to 9 do begin
+  If B and (not B2) then For I:=0 to 49 do begin
     S:=Trim(TGame(Item.Data).ExtraPrgFile[I]);
     J:=Pos(';',S);
     If (S='') or (J=0) then continue;
@@ -2954,7 +2954,7 @@ begin
                  else MessageDlg(Format(LanguageSetup.MessageCouldNotFindFile,[S]),mtError,[mbOK],0);
              end;
       3008 : ShowDOSBoxOutputTestDialog(self,GameDB.ConfOpt);
-      3010..3019 : If (ListView.Selected<>nil) and (ListView.Selected.Data<>nil) then begin
+      3010..3059 : If (ListView.Selected<>nil) and (ListView.Selected.Data<>nil) then begin
                      G:=TGame(ListView.Selected.Data);
                      If ScummVMMode(G) then exit;
                      If WindowsExeMode(G)

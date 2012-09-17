@@ -14,7 +14,10 @@ Type TDataReader=class
     Procedure ReadListPerGamePart(const Lines : String; const NextElement : THTMLStructureElement; var GameName, GameURL : String);
     Procedure GetGameDataFromLines(const Lines : String; const NextElement : THTMLStructureElement; var Genre, Developer, Publisher, Year, ImagePageURL : String);
     Procedure GetGameCoverFromLines(const Lines : String; const NextElement : THTMLStructureElement; var ImageURL : String);
-    Function GetImageURLAndNextURLsFromURL(const CoverPageURL : String; var ImageURL : String; var PossibleNextURLs : TStringList) : Boolean;
+    Function GetImageURLAndNextURLsFromURL(const CoverPageURL : String; var ImageURL : String; const PossibleNextURLs : TStringList) : Boolean;
+    Procedure GetGameCoverFromSinglePages(const InitialURL : String; const ImageURLs : TStringList; const MaxImages : Integer);
+    Procedure ProcessLinks(const BaseURL : String; const Links : TStringList; const ImageBaseURL : String; const ImageURLs: TStringList; const MaxImages: Integer);
+    Procedure GetGameCoverFromMediaList(const ListPageURL : String; const ImageURLs : TStringList; const MaxImages : Integer);
   public
     Constructor Create;
     Destructor Destroy; override;
@@ -22,7 +25,7 @@ Type TDataReader=class
     Procedure OpenListPage(const ASearchString : String);
     Function ReadList(const ASearchString : String) : Boolean;
     Function GetGameData(const Nr : Integer; var Genre, Developer, Publisher, Year, ImagePageURL : String) : Boolean;
-    Function GetGameCover(const CoverPageURL : String; var ImageURL : String) : Boolean;
+    Function GetGameCover(const CoverPageURL : String; var ImageURL : String; const MaxImages : Integer) : Boolean;
     property Config : TDataReaderConfig read FConfig;
     property GameNames : TStringList read FGameNames;
     property LastUpdateCheckOK : Boolean read FLastUpdateCheckOK;
@@ -58,11 +61,12 @@ end;
 Type TDataReaderGameDataThread=class(TDataReaderThread)
   private
     FNr : Integer;
+    FFullImages : Boolean;
     FGenre, FDeveloper, FPublisher, FYear, FImageURL : String;
   protected
     Procedure Execute; override;
   public
-    Constructor Create(const ADataReader : TDataReader; const ANr : Integer);
+    Constructor Create(const ADataReader : TDataReader; const ANr : Integer; const AFullImages : Boolean);
     property Genre : String read FGenre;
     property Developer : String read FDeveloper;
     property Publisher : String read FPublisher;
@@ -72,11 +76,14 @@ end;
 
 Type TDataReaderGameCoverThread=class(TDataReaderThread)
   private
-    FDownloadURL, FDestFolder : String;
+    FDownloadURLs : TStringList;
+    FDestFolder : String;
   protected
     Procedure Execute; override;
   public
-    Constructor Create(const ADataReader : TDataReader; const ADownloadURL, ADestFolder : String);
+    Constructor Create(const ADataReader : TDataReader; const ADownloadURL, ADestFolder : String); overload;
+    Constructor Create(const ADataReader : TDataReader; const ADownloadURLs : TStringList; const ADestFolder : String); overload;
+    Destructor Destroy; override;
 end;
 
 implementation
@@ -390,7 +397,7 @@ begin
   end;
 end;
 
-Function TDataReader.GetImageURLAndNextURLsFromURL(const CoverPageURL : String; var ImageURL : String; var PossibleNextURLs : TStringList) : Boolean;
+Function TDataReader.GetImageURLAndNextURLsFromURL(const CoverPageURL : String; var ImageURL : String; const PossibleNextURLs : TStringList) : Boolean;
 Var Lines,S,T,LinesUpper,preURL : String;
     I,J,CharsBefore : Integer;
 begin
@@ -410,59 +417,57 @@ begin
   end;
 
   {Scan for other cover page URLs}
-  S:=CoverPageURL;
-  If S<>'' then SetLength(S,length(S)-1);
-  While (S<>'') and (S[length(S)]<>'/') do SetLength(S,length(S)-1);
-  preURL:='';
-  J:=0; For I:=1 to length(S) do If S[I]='/' then begin
-    inc(J); If J=3 then begin preURL:=Copy(S,1,I); S:=Copy(S,I+1,MaxInt); break; end;
-  end;
-  S:=ExtUpperCase(S);
-  If S='' then exit;
+  if PossibleNextURLs<>nil then begin
+    S:=CoverPageURL;
+    If S<>'' then SetLength(S,length(S)-1);
+    While (S<>'') and (S[length(S)]<>'/') do SetLength(S,length(S)-1);
+    preURL:='';
+    J:=0; For I:=1 to length(S) do If S[I]='/' then begin
+      inc(J); If J=3 then begin preURL:=Copy(S,1,I); S:=Copy(S,I+1,MaxInt); break; end;
+    end;
+    S:=ExtUpperCase(S);
+    If S='' then exit;
 
-  LinesUpper:=ExtUpperCase(Lines);
-  CharsBefore:=0;
+    LinesUpper:=ExtUpperCase(Lines);
+    CharsBefore:=0;
 
-  I:=Pos(S,LinesUpper); While I>0 do begin
-    T:=Copy(LinesUpper,I,MaxInt);
-    J:=Pos('"',T); If J=0 then break;
-    PossibleNextURLs.Add(preURL+Copy(Lines,CharsBefore+I,J-1));
+    I:=Pos(S,LinesUpper); While I>0 do begin
+      T:=Copy(LinesUpper,I,MaxInt);
+      J:=Pos('"',T); If J=0 then break;
+      PossibleNextURLs.Add(preURL+Copy(Lines,CharsBefore+I,J-1));
 
-    LinesUpper:=Copy(LinesUpper,(I-1)+J+1,MaxInt);
-    CharsBefore:=CharsBefore+(I-1)+J;
+      LinesUpper:=Copy(LinesUpper,(I-1)+J+1,MaxInt);
+      CharsBefore:=CharsBefore+(I-1)+J;
 
-    I:=Pos(S,LinesUpper);
+      I:=Pos(S,LinesUpper);
+    end;
   end;
 end;
 
-function TDataReader.GetGameCover(const CoverPageURL : String; var ImageURL: String): Boolean;
-Var NewImageURL,S,T : String;
-    WaitingURLs, ImageURLs, ScannedURLsUpper, PossibleNextURLs : TStringList;
-    I : Integer;
+Procedure TDataReader.GetGameCoverFromSinglePages(const InitialURL : String; const ImageURLs : TStringList; const MaxImages : Integer);
+Var NewImageURL,S : String;
+    WaitingURLs, ScannedURLsUpper, PossibleNextURLs,St : TStringList;
+    I,J : Integer;
+    B : Boolean;
 begin
-  ImageURL:='';
-  If Trim(CoverPageURL)='' then begin result:=True; exit; end;
-
   WaitingURLs:=TStringList.Create;
   try
     {Get initial cover page URL}
-    S:=FConfig.CoverRecordBaseURL;
-    If (S<>'') and (S[length(S)]<>'/') then S:=S+'/';
-    T:=CoverPageURL;
-    If (T<>'') and (T[1]='/') then T:=Copy(T,2,MaxInt);
-    WaitingURLs.Add(S+T);
+    WaitingURLs.Add(InitialURL);
 
-    ImageURLs:=TStringList.Create;
     ScannedURLsUpper:=TStringList.Create;
     PossibleNextURLs:=TStringList.Create;
     try
       {While there are URLs in the queue}
       While WaitingURLs.Count>0 do begin
         PossibleNextURLs.Clear;
+
         {Get next image URL and scan for more cover page URLs}
-        If GetImageURLAndNextURLsFromURL(WaitingURLs[0],NewImageURL,PossibleNextURLs) then begin
+        If MaxImages=1 then St:=nil else St:=PossibleNextURLs;
+        If GetImageURLAndNextURLsFromURL(WaitingURLs[0],NewImageURL,St) then begin
           {Save new image URL}
-          ImageURLs.Add(NewImageURL);
+          B:=True; For J:=0 to ImageURLs.Count-1 do if ExtUpperCase(ImageURLs[J])=ExtUpperCase(NewImageURL) then begin B:=False; break; end;
+          if B then ImageURLs.Add(NewImageURL);
 
           {Remove cover page URL from queue and mark it as scanned}
           ScannedURLsUpper.Add(ExtUpperCase(WaitingURLs[0]));
@@ -475,21 +480,193 @@ begin
           end;
         end;
 
-        {Stop after max. 10 images}
-        If ImageURLs.Count>=10 then break;
+        {Stop after max. MaxImages images}
+        If ImageURLs.Count>=MaxImages then break;
       end;
-
-      {Combine image URLs}
-      If ImageURLs.count>0 then ImageURL:=ImageURLs[0];
-      For I:=1 to ImageURLs.count-1 do ImageURL:=ImageURL+'$'+ImageURLs[I];
-      result:=(ImageURLs.count>0);
     finally
-      ImageURLs.Free;
       ScannedURLsUpper.Free;
       PossibleNextURLs.Free;
     end;
   finally
     WaitingURLs.Free;
+  end;
+end;
+
+Type TDownloadDataThread=class(TThread)
+  private
+    FImageBaseURL : String;
+    FDataReader : TDataReader;
+    FURList, FImageURLs : TStringList;
+  protected
+    Procedure Execute; override;
+  public
+    Constructor Create(const AImageBaseURL : String; const ADataReader : TDataReader; const AURLList : TStringList);
+    Destructor Destroy; override;
+    property ImageURLs : TStringList read FImageURLs;
+end;
+
+constructor TDownloadDataThread.Create(const AImageBaseURL : String; const ADataReader : TDataReader; const AURLList: TStringList);
+begin
+  inherited Create(true);
+  FImageBaseURL:=AImageBaseURL;
+  FDataReader:=ADataReader;
+  FURList:=AURLList;
+  FImageURLs:=TStringList.Create;
+  Resume;
+end;
+
+destructor TDownloadDataThread.Destroy;
+begin
+  FImageURLs.Free;
+  inherited Destroy;
+end;
+
+procedure TDownloadDataThread.Execute;
+Var NewImageURL : String;
+    I : Integer;
+begin
+  For I:=0 to FURList.Count-1 do begin
+    {Get next image URL}
+    If not FDataReader.GetImageURLAndNextURLsFromURL(FURList[I],NewImageURL,nil) then continue;
+
+    {Check if image URL is relative to ImageBaseURL and make is absolute if needed}
+    if ExtUpperCase(Trim(Copy(NewImageURL,1,4)))<>'HTTP' then begin
+      if FImageBaseURL[length(FImageBaseURL)]<>'\' then NewImageURL:=FImageBaseURL+'/'+NewImageURL else NewImageURL:=FImageBaseURL+NewImageURL;
+    end;
+
+    FImageURLs.Add(NewImageURL);
+  end;
+end;
+
+
+Procedure TDataReader.ProcessLinks(const BaseURL : String; const Links : TStringList; const ImageBaseURL : String; const ImageURLs: TStringList; const MaxImages: Integer);
+const ThreadCount=8;
+Var I,J,K : Integer;
+    ImagePages : TStringList;
+    S,NewImageURL : String;
+    B : Boolean;
+    ThreadURLList : Array[0..ThreadCount-1] of TStringList;
+    ThreadList : Array[0..ThreadCount-1] of TDownloadDataThread;
+begin
+  ImagePages:=TStringList.Create;
+  try
+    For I:=0 to Links.Count-1 do begin
+      if ImageURLs.Count+ImagePages.Count>=MaxImages then break;
+      S:=Links[I];
+
+      {Is this an URL to a real image?}
+      If (ExtUpperCase(Copy(S,1,length(BaseURL)))<>ExtUpperCase(BaseURL)) or (length(S)=length(BaseURL)) then continue;
+
+      ImagePages.Add(S);
+    end;
+
+    For I:=0 to ThreadCount-1 do ThreadURLList[I]:=TStringList.Create;
+    try
+      For I:=0 to ImagePages.Count-1 do ThreadURLList[I mod ThreadCount].Add(ImagePages[I]);
+
+      For I:=0 to ThreadCount-1 do if ThreadURLList[I].Count=0 then ThreadList[I]:=nil else ThreadList[I]:=TDownloadDataThread.Create(ImageBaseURL,self,ThreadURLList[I]);
+
+      try
+        repeat
+          Sleep(50);
+          B:=True;
+          For I:=0 to ThreadCount-1 do If (ThreadList[I]<>nil) and (WaitForSingleObject(ThreadList[I].Handle,0)<>WAIT_OBJECT_0) then begin B:=False; break; end;
+        until B;
+
+        {Save new image URLs}
+        For I:=0 to ThreadCount-1 do If ThreadList[I]<>nil then For J:=0 to ThreadList[I].ImageURLs.Count-1 do begin
+          NewImageURL:=ThreadList[I].ImageURLs[J];
+          B:=True; For K:=0 to ImageURLs.Count-1 do if ExtUpperCase(ImageURLs[K])=ExtUpperCase(NewImageURL) then begin B:=False; break; end;
+          if B then ImageURLs.Add(NewImageURL);
+        end;
+      finally
+        For I:=0 to ThreadCount-1 do If ThreadList[I]<>nil then ThreadList[I].Free;
+      end;
+    finally
+      For I:=0 to ThreadCount-1 do ThreadURLList[I].Free;
+    end;
+  finally
+    ImagePages.Free;
+  end;
+end;
+
+procedure TDataReader.GetGameCoverFromMediaList(const ListPageURL: String; const ImageURLs: TStringList; const MaxImages: Integer);
+Var Lines,ScreensahotsURL : String;
+    I : Integer;
+    Tags,href : TStringList;
+begin
+  if not DownloadTextFile(ListPageURL,Lines) then exit;
+
+  href:=TStringList.Create;
+  try
+    {Get all links, find link to screenshots page}
+    ScreensahotsURL:='';
+    Tags:=GetTagContents(Lines,1,'a','','','href',href);
+    try
+      For I:=0 to href.Count-1 do begin
+        href[I]:=Config.CoverRecordBaseURL+href[I];
+        if Trim(ExtUpperCase(Tags[I]))='SCREENSHOTS' then ScreensahotsURL:=href[I];
+      end;
+    finally
+      Tags.Free;
+    end;
+
+    {Process image file links}
+    ProcessLinks(ListPageURL,href,Config.CoverRecordBaseURL,ImageURLs,MaxImages);
+  finally
+    href.free;
+  end;
+
+  if ScreensahotsURL<>'' then begin
+    if ScreensahotsURL[length(ScreensahotsURL)]<>'/' then ScreensahotsURL:=ScreensahotsURL+'/';
+    if not DownloadTextFile(ScreensahotsURL,Lines) then exit;
+    href:=TStringList.Create;
+    try
+      Tags:=GetTagContents(Lines,1,'a','','','href',href);
+      Tags.Free;
+      For I:=0 to href.Count-1 do href[I]:=Config.CoverRecordBaseURL+href[I];
+      ProcessLinks(ScreensahotsURL,href,Config.CoverRecordBaseURL,ImageURLs,MaxImages);
+    finally
+      href.Free;
+    end;
+  end;
+end;
+
+function TDataReader.GetGameCover(const CoverPageURL : String; var ImageURL: String; const MaxImages : Integer): Boolean;
+Var URL,S : String;
+    ImageURLs : TStringList;
+    I : Integer;
+begin
+  ImageURL:='';
+  If Trim(CoverPageURL)='' then begin result:=True; exit; end;
+
+  ImageURLs:=TStringList.Create;
+  try
+    {Get initial cover page URL}
+    URL:=FConfig.CoverRecordBaseURL;
+    If (URL<>'') and (URL[length(URL)]<>'/') then URL:=URL+'/';
+    S:=CoverPageURL;
+    If (S<>'') and (S[1]='/') then S:=Copy(S,2,MaxInt);
+    URL:=URL+S;
+
+    {Get initial cover und folder links to more images}
+    GetGameCoverFromSinglePages(URL,ImageURLs,MaxImages);
+
+    if (MaxImages>1) and PrgSetup.DataReaderDownloadCompleteMediaLibrary then begin
+      {Get media list URL}
+      If (URL<>'') and (URL[length(URL)]='/') then URL:=Copy(URL,1,length(URL)-1);
+      While (URL<>'') and (URL[length(URL)]<>'/') do URL:=Copy(URL,1,length(URL)-1);
+
+      {Get complete media list}
+      GetGameCoverFromMediaList(URL,ImageURLs,MaxImages);
+    end;
+
+    {Combine image URLs}
+    If ImageURLs.count>0 then ImageURL:=ImageURLs[0];
+    For I:=1 to ImageURLs.count-1 do ImageURL:=ImageURL+'$'+ImageURLs[I];
+    result:=(ImageURLs.count>0);
+  finally
+    ImageURLs.Free;
   end;
 end;
 
@@ -591,19 +768,22 @@ end;
 
 { TDataReaderGameDataThread }
 
-constructor TDataReaderGameDataThread.Create(const ADataReader: TDataReader; const ANr: Integer);
+constructor TDataReaderGameDataThread.Create(const ADataReader: TDataReader; const ANr: Integer; const AFullImages : Boolean);
 begin
   inherited Create(ADataReader);
   FNr:=ANr;
+  FFullImages:=AFullImages;
   FGenre:=''; FDeveloper:=''; FPublisher:=''; FYear:=''; FImageURL:='';
   Resume;
 end;
 
 procedure TDataReaderGameDataThread.Execute;
 Var S : String;
+    MaxImageCount : Integer;
 begin
   FSuccess:=FDataReader.GetGameData(fNr,FGenre,FDeveloper,FPublisher,FYear,S);
-  If FSuccess then FSuccess:=FDataReader.GetGameCover(S,FImageURL);
+  if FFullImages then MaxImageCount:=PrgSetup.DataReaderMaxImages else MaxImageCount:=1;
+  If FSuccess then FSuccess:=FDataReader.GetGameCover(S,FImageURL,MaxImageCount);
 end;
 
 { TDataReaderGameCoverThread }
@@ -611,23 +791,40 @@ end;
 constructor TDataReaderGameCoverThread.Create(const ADataReader: TDataReader; const ADownloadURL, ADestFolder: String);
 begin
   inherited Create(ADataReader);
-  FDownloadURL:=ADownloadURL;
+  FDownloadURLs:=TStringList.Create;
+  FDownloadURLs.Add(ADownloadURL);
   FDestFolder:=ADestFolder;
   Resume;
 end;
 
+constructor TDataReaderGameCoverThread.Create(const ADataReader: TDataReader; const ADownloadURLs: TStringList; const ADestFolder: String);
+begin
+  inherited Create(ADataReader);
+  FDownloadURLs:=TStringList.Create;
+  FDownloadURLs.AddStrings(ADownloadURLs);
+  FDestFolder:=ADestFolder;
+  Resume;
+end;
+
+destructor TDataReaderGameCoverThread.Destroy;
+begin
+  FDownloadURLs.Free;
+  inherited Destroy;
+end;
+
 procedure TDataReaderGameCoverThread.Execute;
 Var FileName,Path : String;
-    I : Integer;
+    I,J : Integer;
 begin
-  FSuccess:=False;
+  FSuccess:=True;
 
-  FileName:=FDownloadURL;
-  I:=Pos('/',FileName); While I>0 do begin FileName:=Copy(FileName,I+1,MaxInt); I:=Pos('/',FileName); end;
-  Path:=IncludeTrailingPathDelimiter(FDestFolder);
-  If FileExists(Path+FileName) then begin FSuccess:=True; exit; end;
-
-  FSuccess:=DownloadFileToDisk(FDownloadURL,Path+FileName);
+  For J:=0 to FDownloadURLs.Count-1 do begin
+    FileName:=FDownloadURLs[J];
+    I:=Pos('/',FileName); While I>0 do begin FileName:=Copy(FileName,I+1,MaxInt); I:=Pos('/',FileName); end;
+    Path:=IncludeTrailingPathDelimiter(FDestFolder);
+    If FileExists(Path+FileName) then continue;
+    If not DownloadFileToDisk(FDownloadURLs[J],Path+FileName) then FSuccess:=False;
+  end;
 end;
 
 end.

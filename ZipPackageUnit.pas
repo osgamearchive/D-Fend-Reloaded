@@ -945,7 +945,7 @@ begin
   Game.GameExe:=FixSingleFileRecord(Game.GameExe,True);
   Game.SetupExe:=FixSingleFileRecord(Game.SetupExe,True);
 
-  For I:=0 to 9 do begin
+  For I:=0 to 49 do begin
     S:=Game.ExtraPrgFile[I];
     If Pos(';',S)=0 then continue;
     Game.ExtraPrgFile[I]:=Copy(S,1,Pos(';',S)-1)+';'+FixSingleFileRecord(Copy(S,Pos(';',S)+1,MaxInt),True);

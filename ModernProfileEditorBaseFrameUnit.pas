@@ -270,7 +270,7 @@ begin
       TurnOffDOSBoxFailedWarningCheckBox.Checked:=Game.NoDOSBoxFailedDialog;
     end;
     { Windows and DOSBox mode }
-    For I:=0 to 9 do If Trim(Game.ExtraPrgFile[I])<>'' then begin
+    For I:=0 to 49 do If Trim(Game.ExtraPrgFile[I])<>'' then begin
       ExtraExeFiles.Add(Game.ExtraPrgFile[I]);
       ExtraExeFilesParameters.Add(Game.ExtraPrgFileParameter[I]);
     end;
@@ -378,11 +378,15 @@ begin
       Game.NoDOSBoxFailedDialog:=TurnOffDOSBoxFailedWarningCheckBox.Checked;
     end;
 
-    For I:=0 to 9 do begin Game.ExtraPrgFile[I]:=''; Game.ExtraPrgFileParameter[I]:=''; end;
-    For I:=0 to Min(9,ExtraExeFiles.Count-1) do begin
+    For I:=0 to 49 do begin Game.ExtraPrgFile[I]:=''; Game.ExtraPrgFileParameter[I]:=''; end;
+    For I:=0 to Min(49,ExtraExeFiles.Count-1) do begin
       Game.ExtraPrgFile[I]:=Trim(ExtraExeFiles[I]);
       Game.ExtraPrgFileParameter[I]:=Trim(ExtraExeFilesParameters[I]);
     end;
+    For I:=Min(49,ExtraExeFiles.Count-1)+1 to ExtraExeFiles.Count-1 do begin
+      Game.ExtraPrgFile[I]:='';
+      Game.ExtraPrgFileParameter[I]:='';
+    end; 
   end;
 
   If not ProfileNameEdit.ReadOnly then begin

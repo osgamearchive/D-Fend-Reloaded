@@ -79,7 +79,7 @@ begin
 end;
 
 procedure TUninstallForm.FormShow(Sender: TObject);
-Var S : String;
+Var S,Dir : String;
     St, Files, Folders : TStringList;
     I : Integer;
 begin
@@ -113,9 +113,33 @@ begin
     If S='' then S:=Trim(Game.SetupExe);
     If ExtUpperCase(Copy(S,1,7))='DOSBOX:' then S:='';
     S:=ExtractFilePath(MakeAbsPath(S,PrgSetup.BaseDir));
-    If (S<>'') and (not UsedByOtherGame(GameDB,Game,S)) then begin
-      ListBox.Items.Add(LanguageSetup.UninstallFormProgramDir+': '+S);
-      DirList.Add(S);
+    If S<>'' then begin
+      if not UsedByOtherGame(GameDB,Game,S) then begin
+        ListBox.Items.Add(LanguageSetup.UninstallFormProgramDir+': '+S);
+        DirList.Add(S);
+      end else begin
+        {if folder is not removeable offer to remove files at least}
+        S:=Trim(Game.GameExe);
+        If (S<>'') and (ExtUpperCase(Copy(S,1,7))<>'DOSBOX:') then begin
+          Dir:=ExtractFilePath(MakeAbsPath(S,PrgSetup.BaseDir));
+          Dir:=Trim(ExtUpperCase(ExtractFilePath(MakeAbsPath(IncludeTrailingPathDelimiter(Dir),PrgSetup.BaseDir))));
+          If Dir=Trim(ExtUpperCase(MakeAbsPath(IncludeTrailingPathDelimiter(PrgSetup.GameDir),PrgSetup.BaseDir))) then begin
+            S:=MakeAbsPath(S,PrgSetup.BaseDir);
+            ListBox.Items.Add(LanguageSetup.UninstallFormExtraFile+': '+S);
+            DirList.AddObject(S,TObject(1)); {TObject(1) = is file not folder}
+          end;
+        end;
+        S:=Trim(Game.SetupExe);
+        If (S<>'') and (ExtUpperCase(Copy(S,1,7))<>'DOSBOX:') then begin
+          Dir:=ExtractFilePath(MakeAbsPath(S,PrgSetup.BaseDir));
+          Dir:=Trim(ExtUpperCase(ExtractFilePath(MakeAbsPath(IncludeTrailingPathDelimiter(Dir),PrgSetup.BaseDir))));
+          If Dir=Trim(ExtUpperCase(MakeAbsPath(IncludeTrailingPathDelimiter(PrgSetup.GameDir),PrgSetup.BaseDir))) then begin
+            S:=MakeAbsPath(S,PrgSetup.BaseDir);
+            ListBox.Items.Add(LanguageSetup.UninstallFormExtraFile+': '+S);
+            DirList.AddObject(S,TObject(1)); {TObject(1) = is file not folder}
+          end;
+        end;
+      end;
     end;
   end;
 
@@ -288,6 +312,8 @@ begin
   Dir:=Trim(ExtUpperCase(ExtractFilePath(MakeAbsPath(IncludeTrailingPathDelimiter(Dir),PrgSetup.BaseDir))));
 
   result:=True;
+
+  If Dir=Trim(ExtUpperCase(MakeAbsPath(IncludeTrailingPathDelimiter(PrgSetup.GameDir),PrgSetup.BaseDir))) then exit;
 
   If Trim(PrgSetup.PathToFREEDOS)<>'' then begin
     If Dir=Trim(ExtUpperCase(MakeAbsPath(IncludeTrailingPathDelimiter(PrgSetup.PathToFREEDOS),PrgSetup.BaseDir))) then exit;
