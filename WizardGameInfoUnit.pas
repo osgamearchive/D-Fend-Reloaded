@@ -156,7 +156,7 @@ begin
 end;
 
 procedure TWizardGameInfoFrame.SearchClick(Sender: TObject);
-Var Name,Genre,Developer,Publisher,Year,Internet : String;
+Var Name,Genre,Developer,Publisher,Year,Internet,Notes : String;
 begin
   Case (Sender as TComponent).Tag of
     0 : begin
@@ -167,13 +167,14 @@ begin
     2 : OpenLink(LinkFile.Link[0],'<GAMENAME>',BaseName.Text);
     3 : begin
           TempCaptureDir:=TempDir+'DFR-TempCapture\'; ForceDirectories(TempCaptureDir);
-          If ShowDataReaderDialog(self,BaseName.Text,Name,Genre,Developer,Publisher,Year,Internet,TempCaptureDir) then with GameInfoValueListEditor.Strings do begin
+          If ShowDataReaderDialog(self,BaseName.Text,Name,Genre,Developer,Publisher,Year,Internet,Notes,TempCaptureDir) then with GameInfoValueListEditor.Strings do begin
             If Name<>'' then BaseName.Text:=Name;
             If Genre<>'' then ValueFromIndex[0]:=Genre;
             If Developer<>'' then ValueFromIndex[1]:=Developer;
             If Publisher<>'' then ValueFromIndex[2]:=Publisher;
             If Year<>'' then ValueFromIndex[3]:=Year;
             If (Internet<>'') and (Trim(ValueFromIndex[5])='') then ValueFromIndex[5]:=Internet;
+            if Notes<>'' then NotesMemo.Lines.Add(Notes);
           end;
         end;
   end;

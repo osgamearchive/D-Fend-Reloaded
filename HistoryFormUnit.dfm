@@ -49,7 +49,6 @@ object HistoryForm: THistoryForm
       333333333333888888F3333F00003333330000003333333333338FFFF8F3333F
       0000}
     NumGlyphs = 2
-    ExplicitTop = 383
   end
   object ClearButton: TBitBtn
     Left = 111
@@ -75,7 +74,6 @@ object HistoryForm: THistoryForm
       BBB35555F55555575F555550555555550BBB55575555555575F5555555555555
       50BB555555555555575F555555555555550B5555555555555575}
     NumGlyphs = 2
-    ExplicitTop = 383
   end
   object HelpButton: TBitBtn
     Left = 214
@@ -86,7 +84,6 @@ object HistoryForm: THistoryForm
     TabOrder = 2
     OnClick = HelpButtonClick
     Kind = bkHelp
-    ExplicitTop = 383
   end
   object PageControl: TPageControl
     Left = 0
@@ -96,12 +93,8 @@ object HistoryForm: THistoryForm
     ActivePage = TabSheet1
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 3
-    ExplicitWidth = 554
-    ExplicitHeight = 377
     object TabSheet1: TTabSheet
       Caption = 'Verlauf'
-      ExplicitWidth = 546
-      ExplicitHeight = 349
       object ListView: TListView
         Left = 0
         Top = 0
@@ -115,15 +108,11 @@ object HistoryForm: THistoryForm
         ViewStyle = vsReport
         OnColumnClick = ListViewColumnClick
         OnCompare = ListViewCompare
-        ExplicitWidth = 546
-        ExplicitHeight = 349
       end
     end
     object TabSheet2: TTabSheet
       Caption = 'Statistik'
       ImageIndex = 1
-      ExplicitWidth = 546
-      ExplicitHeight = 349
       object ListView2: TListView
         Left = 0
         Top = 0
@@ -137,8 +126,6 @@ object HistoryForm: THistoryForm
         ViewStyle = vsReport
         OnColumnClick = ListViewColumnClick
         OnCompare = ListViewCompare
-        ExplicitWidth = 546
-        ExplicitHeight = 349
       end
     end
   end

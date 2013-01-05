@@ -664,7 +664,7 @@ begin
   AddStringRec(44,'ProgramSets','ExportColumns','XXXXXXXXX');
   AddStringRec(45,'ProgramSets','ArchiveIDFiles',DefaultArchiveIDFiles);
   AddStringRec(46,'ProgramSets','LastSelectedProfile','');
-  AddStringRec(47,'ProgramSets','DefaultTreeFilter','1111111');
+  AddStringRec(47,'ProgramSets','DefaultTreeFilter','11111111');
 
   For I:=0 to 25 do AddStringRec(450+I,'WineSupport',chr(ord('A')+I),'');
 

@@ -1510,8 +1510,10 @@ begin
 end;
 
 Function GetScreensaverAllowStatus : Boolean;
+Var I : Integer;
 begin
-  SystemParametersInfo(SPI_GETSCREENSAVEACTIVE,0,@result,0);
+  SystemParametersInfo(SPI_GETSCREENSAVEACTIVE,0,@I,0);
+  result:=(I<>0);
 end;
 
 Procedure SetScreensaverAllowStatus(const Enable : Boolean);

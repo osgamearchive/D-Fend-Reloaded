@@ -36,6 +36,7 @@ Type THistory=class
     Function Clear : Boolean;
     Procedure LoadHistory(const AListView : TListView);
     Procedure LoadStatistics(const AListView : TListView);
+    function GetRecentlyStarted(const MaxGames : Integer; const UpperCase : Boolean) : TStringList;
     Function GameStartCount(const GameName : String) : Integer;
     property StartCount[I : Integer] : Integer read GetStartCount;
     property StartDateTime[I : Integer] : TDateTime read GetStartDateTime;
@@ -311,6 +312,21 @@ begin
     AListView.Items.EndUpdate;
     For I:=0 to AListView.Columns.Count-1 do AListView.Columns[I].Width:=-2;
     AListView.Columns.EndUpdate;
+  end;
+end;
+
+function THistory.GetRecentlyStarted(const MaxGames : Integer; const UpperCase : Boolean) : TStringList;
+Var S : String;
+    I : Integer;
+begin
+  LoadOrUpdateList;
+
+  result:=TStringList.Create;
+  For I:=StartNames.Count-1 downto 0 do begin
+    S:=StartNames[I];
+    if UpperCase then S:=ExtUpperCase(S);    
+    if (result.indexOf(S)<0) then result.add(S);
+    if (result.count>=MaxGames) then exit;
   end;
 end;
 

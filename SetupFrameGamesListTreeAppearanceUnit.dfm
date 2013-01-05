@@ -2,20 +2,20 @@ object SetupFrameGamesListTreeAppearance: TSetupFrameGamesListTreeAppearance
   Left = 0
   Top = 0
   Width = 589
-  Height = 528
+  Height = 548
   TabOrder = 0
   object ScrollBox: TScrollBox
     Left = 0
     Top = 0
     Width = 589
-    Height = 528
+    Height = 548
     VertScrollBar.Tracking = True
     Align = alClient
     BorderStyle = bsNone
     TabOrder = 0
     DesignSize = (
       589
-      528)
+      548)
     object TreeViewFontSizeLabel: TLabel
       Left = 16
       Top = 129
@@ -32,14 +32,14 @@ object SetupFrameGamesListTreeAppearance: TSetupFrameGamesListTreeAppearance
     end
     object TreeViewGroupsLabel: TLabel
       Left = 16
-      Top = 337
+      Top = 361
       Width = 137
       Height = 13
       Caption = 'Benutzerdefinierte Gruppen:'
     end
     object TreeViewGroupsInfoLabel: TLabel
       Left = 16
-      Top = 440
+      Top = 464
       Width = 561
       Height = 57
       Anchors = [akLeft, akTop, akRight]
@@ -106,7 +106,7 @@ object SetupFrameGamesListTreeAppearance: TSetupFrameGamesListTreeAppearance
     end
     object TreeViewGroupsEdit: TRichEdit
       Left = 16
-      Top = 356
+      Top = 380
       Width = 161
       Height = 78
       PlainText = True
@@ -115,7 +115,7 @@ object SetupFrameGamesListTreeAppearance: TSetupFrameGamesListTreeAppearance
     end
     object UserKeysList: TBitBtn
       Left = 183
-      Top = 354
+      Top = 378
       Width = 202
       Height = 25
       Caption = 'Existierende Benutzerschl'#252'ssel'
@@ -135,7 +135,7 @@ object SetupFrameGamesListTreeAppearance: TSetupFrameGamesListTreeAppearance
       Left = 16
       Top = 200
       Width = 161
-      Height = 115
+      Height = 129
       ItemHeight = 13
       Items.Strings = (
         '1'
@@ -144,7 +144,8 @@ object SetupFrameGamesListTreeAppearance: TSetupFrameGamesListTreeAppearance
         '4'
         '5'
         '6'
-        '7')
+        '7'
+        '8')
       TabOrder = 6
     end
   end

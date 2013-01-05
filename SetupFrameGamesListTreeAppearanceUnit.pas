@@ -91,9 +91,9 @@ begin
   end;
   TreeViewFontSizeEdit.Value:=PrgSetup.GamesTreeViewFontSize;
 
-  S:=PrgSetup.DefaultTreeFilter;
-  while (length(S)<7) do S:=S+'1';
-  for I:=0 to 6 do TreeViewDefaultGroups.Checked[I]:=(S[I+1]<>'0');
+  S:=PrgSetup.DefaultTreeFilter; //...
+  while (length(S)<8) do S:=S+'1';
+  for I:=0 to 7 do TreeViewDefaultGroups.Checked[I]:=(S[I+1]<>'0');
 
   St:=StringToStringList(PrgSetup.UserGroups);
   try TreeViewGroupsEdit.Lines.AddStrings(St); finally St.Free; end;
@@ -137,6 +137,7 @@ begin
   TreeViewDefaultGroups.Items[4]:=LanguageSetup.GameLanguage;
   TreeViewDefaultGroups.Items[5]:=LanguageSetup.GameLicense;
   TreeViewDefaultGroups.Items[6]:=LanguageSetup.GameEmulationType;
+  TreeViewDefaultGroups.Items[7]:=LanguageSetup.GameRecentlyPlayed;
   for I:=0 to 6 do TreeViewDefaultGroups.Checked[I]:=(S[I+1]<>'0');
 
   TreeViewGroupsInfoLabel.Caption:=LanguageSetup.SetupFormTreeViewGroupInfoLabel;

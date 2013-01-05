@@ -28,6 +28,7 @@ type
     NameCheckBox: TCheckBox;
     NameLabel: TLabel;
     DownloadCoverAllCheckBox: TCheckBox;
+    DescriptionCheckBox: TCheckBox;
     procedure FormShow(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -39,25 +40,25 @@ type
     procedure DownloadCoverCheckBoxClick(Sender: TObject);
   private
     { Private-Deklarationen }
-    GenreSt, DeveloperSt, PublisherSt, YearSt, CoverSt : TStringList;
+    GenreSt, DeveloperSt, PublisherSt, YearSt, CoverSt, NotesSt : TStringList;
     DataReader : TDataReader;
     ShowCompleted : Boolean;
   public
     { Public-Deklarationen }
     ConfigOK : Boolean;
     CaptureDir : String;
-    Name, Genre, Developer, Publisher, Year, Internet : String;
+    Name, Genre, Developer, Publisher, Year, Internet, Notes : String;
   end;
 
 var
   DataReaderForm: TDataReaderForm;
 
-Function ShowDataReaderDialog(const AOwner : TComponent; const AGameName : String; var Name, Genre, Developer, Publisher, Year, Internet : String; const CaptureDir : String) : Boolean;
+Function ShowDataReaderDialog(const AOwner : TComponent; const AGameName : String; var Name, Genre, Developer, Publisher, Year, Internet, Notes : String; const CaptureDir : String) : Boolean;
 
 implementation
 
 uses LanguageSetupUnit, CommonTools, VistaToolsUnit, InternetDataWaitFormUnit,
-     PrgSetupUnit, PrgConsts, IconLoaderUnit;
+     PrgSetupUnit, PrgConsts, IconLoaderUnit, GameDBToolsUnit;
 
 {$R *.dfm}
 
@@ -69,6 +70,7 @@ begin
   PublisherSt:=TStringList.Create;
   YearSt:=TStringList.Create;
   CoverSt:=TStringList.Create;
+  NotesSt:=TStringList.Create;
   DataReader:=TDataReader.Create;
 
   ConfigOK:=ShowDataReaderInternetConfigWaitDialog(Owner,DataReader,False,LanguageSetup.DataReaderDownloadCaption,LanguageSetup.DataReaderDownloadInfo,LanguageSetup.DataReaderDownloadError);
@@ -104,6 +106,7 @@ begin
   YearCheckBox.Caption:=LanguageSetup.GameYear;
   DownloadCoverCheckBox.Caption:=LanguageSetup.DataReaderCoverCheckbox;
   DownloadCoverAllCheckBox.Caption:=LanguageSetup.DataReaderCoverAllCheckbox;
+  DescriptionCheckBox.Caption:=LanguageSetup.CaptureNotes;
 
   InsertButton.Caption:=LanguageSetup.DataReaderInsert;
   CancelButton.Caption:=LanguageSetup.Cancel;
@@ -128,6 +131,7 @@ begin
   DownloadCoverCheckBox.Checked:=(S[6]<>'-');
   DownloadCoverAllCheckBox.Enabled:=DownloadCoverCheckBox.Checked;
   DownloadCoverAllCheckBox.Checked:=(S[7]<>'-');
+  DescriptionCheckBox.Checked:=(S[8]<>'-');
 end;
 
 procedure TDataReaderForm.FormDestroy(Sender: TObject);
@@ -141,6 +145,8 @@ begin
   If YearCheckBox.Checked then S:=S+'X' else S:=S+'-';
   If DownloadCoverCheckBox.Checked then S:=S+'X' else S:=S+'-';
   If DownloadCoverAllCheckBox.Checked then S:=S+'X' else S:=S+'-';
+  if DescriptionCheckBox.Checked then S:=S+'X' else S:=S+'-';
+  
   PrgSetup.DataReaderActiveSettings:=S;
 
   GenreSt.Free;
@@ -148,6 +154,7 @@ begin
   PublisherSt.Free;
   YearSt.Free;
   CoverSt.Free;
+  NotesSt.Free;
   DataReader.Free;
 end;
 
@@ -197,6 +204,7 @@ begin
       PublisherSt.Add('');
       YearSt.Add('');
       CoverSt.Add('');
+      NotesSt.Add('');
     end;
   finally
     If ListBox.Items.Count>0 then ListBox.ItemIndex:=0;
@@ -237,10 +245,11 @@ begin
     YearLabel.Caption:='';
     DownloadCoverCheckBox.Enabled:=False;
     DownloadCoverAllCheckBox.Enabled:=False;
+    DeveloperCheckBox.Enabled:=False;
     exit;
   end;
 
-  If (Trim(GenreSt[Nr])='') and (Trim(DeveloperSt[Nr])='') and (Trim(PublisherSt[Nr])='') and (Trim(YearSt[Nr])='') and (Trim(CoverSt[Nr])='') then begin
+  If (Trim(GenreSt[Nr])='') and (Trim(DeveloperSt[Nr])='') and (Trim(PublisherSt[Nr])='') and (Trim(YearSt[Nr])='') and (Trim(CoverSt[Nr])='') and (Trim(NotesSt[Nr])='') then begin
     Enabled:=False;
     try
       If ShowCompleted then O:=self else O:=Owner;
@@ -254,6 +263,7 @@ begin
       PublisherSt[Nr]:=DataReaderGameDataThread.Publisher;
       YearSt[Nr]:=DataReaderGameDataThread.Year;
       CoverSt[Nr]:=DataReaderGameDataThread.ImageURL;
+      NotesSt[Nr]:=DecodeHTMLSymbols(DataReaderGameDataThread.Notes);
     finally
       DataReaderGameDataThread.Free;
     end;
@@ -272,7 +282,9 @@ begin
   YearLabel.Caption:=YearSt[Nr];
   DownloadCoverCheckBox.Enabled:=(Trim(CoverSt[Nr])<>'');
   DownloadCoverAllCheckBox.Enabled:=DownloadCoverCheckBox.Enabled and (Pos('$',CoverSt[Nr])>0);
-  InsertButton.Enabled:=(Trim(GenreSt[Nr])<>'') or (Trim(DeveloperSt[Nr])<>'') or (Trim(PublisherSt[Nr])<>'') or (Trim(YearSt[Nr])<>'') or (Trim(CoverSt[Nr])<>'');
+  DescriptionCheckBox.Enabled:=(Trim(NotesSt[Nr])<>'');
+
+  InsertButton.Enabled:=(Trim(GenreSt[Nr])<>'') or (Trim(DeveloperSt[Nr])<>'') or (Trim(PublisherSt[Nr])<>'') or (Trim(YearSt[Nr])<>'') or (Trim(CoverSt[Nr])<>'') or (Trim(NotesSt[Nr])<>'');
 end;
 
 procedure TDataReaderForm.InsertButtonClick(Sender: TObject);
@@ -286,6 +298,7 @@ begin
   Developer:='';
   Publisher:='';
   Year:='';
+  Notes:='';
 
   If NameCheckBox.Enabled and NameCheckBox.Checked then Name:=ListBox.Items[ListBox.ItemIndex];
   If GenreCheckBox.Enabled and GenreCheckBox.Checked then Genre:=GenreLabel.Caption;
@@ -294,6 +307,7 @@ begin
   If YearCheckBox.Enabled and YearCheckBox.Checked then Year:=YearLabel.Caption;
 
   If DownloadCoverCheckBox.Enabled and DownloadCoverCheckBox.Checked and (CaptureDir<>'') then begin
+    ForceDirectories(CaptureDir);
     If DownloadCoverAllCheckBox.Checked then begin
       {Get URLs of all images}
       DataReaderGameDataThread:=ShowDataReaderInternetDataWaitDialog(self,DataReader,ListBox.ItemIndex,True,LanguageSetup.DataReaderDownloadCaption,LanguageSetup.DataReaderDownloadInfo,LanguageSetup.DataReaderDownloadError);
@@ -324,11 +338,13 @@ begin
       ShowDataReaderInternetCoverWaitDialog(self,DataReader,S,CaptureDir,LanguageSetup.DataReaderDownloadCaption,LanguageSetup.DataReaderDownloadInfo,LanguageSetup.DataReaderDownloadError);
     end;
   end;
+
+  If DescriptionCheckBox.Enabled and DescriptionCheckBox.Checked then Notes:=NotesSt[ListBox.ItemIndex];
 end;
 
 { global }
 
-Function ShowDataReaderDialog(const AOwner : TComponent; const AGameName : String; var Name, Genre, Developer, Publisher, Year, Internet : String; const CaptureDir : String) : Boolean;
+Function ShowDataReaderDialog(const AOwner : TComponent; const AGameName : String; var Name, Genre, Developer, Publisher, Year, Internet, Notes : String; const CaptureDir : String) : Boolean;
 begin
   DataReaderForm:=TDataReaderForm.Create(AOwner);
   try
@@ -343,6 +359,7 @@ begin
       Publisher:=DataReaderForm.Publisher;
       Year:=DataReaderForm.Year;
       Internet:=DataReaderForm.Internet;
+      Notes:=DataReaderForm.Notes;
     end;
   finally
     DataReaderForm.Free;

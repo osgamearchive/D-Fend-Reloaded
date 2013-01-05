@@ -73,13 +73,14 @@ end;
 
 Type TSearchGameData=class(THTMLStructureElement)
   private
-    FGenre, FDeveloper, FPublisher, FYear : String;
+    FGenre, FDeveloper, FPublisher, FYear, FNotes : String;
   public
     Constructor Create(const Node : IXMLNode);
     property Genre : String read FGenre;
     property Developer : String read FDeveloper;
     property Publisher : String read FPublisher;
     property Year : String read FYear;
+    property Notes : String read FNotes;
 end;
 
 Type TDataReaderConfig=class
@@ -240,6 +241,7 @@ begin
   If Node.HasAttribute('Developer') then FDeveloper:=Node.Attributes['Developer'] else FDeveloper:='';
   If Node.HasAttribute('Publisher') then FPublisher:=Node.Attributes['Publisher'] else FPublisher:='';
   If Node.HasAttribute('Year') then FYear:=Node.Attributes['Year'] else FYear:='';
+  If Node.HasAttribute('Notes') then FNotes:=Node.Attributes['Notes'] else FNotes:='';
 end;
 
 { TDataReaderConfig }

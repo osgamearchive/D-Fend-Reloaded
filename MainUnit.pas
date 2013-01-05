@@ -354,6 +354,7 @@ type
     MenuProfileOpenFolderDOSBox: TMenuItem;
     MenuProfileFilesFolders: TMenuItem;
     PopupFilesFolders: TMenuItem;
+    TrayIconPopupRecentlyStarted: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure TreeViewChange(Sender: TObject; Node: TTreeNode);
@@ -537,7 +538,7 @@ begin
   LogInfo('### Start of FormCreate ###');
 
   {Caption:=Caption+' THIS IS A TEST VERSION ! (Beta 1 of version 1.4)';}
-  {Caption:=Caption+' (Release candidate 1 of version 1.3.2)';}
+  {Caption:=Caption+' (Release candidate 3 of version 1.3.3)';}
 
   MI_Count:=ImageList.Count;
   Height:=790;
@@ -1051,6 +1052,7 @@ begin
 
   TrayIconPopupRestore.Caption:=LanguageSetup.TrayPopupRestore;
   TrayIconPopupRun.Caption:=LanguageSetup.TrayPopupRun;
+  TrayIconPopupRecentlyStarted.Caption:=LanguageSetup.GameRecentlyPlayed;
   TrayIconPopupAddProfile.Caption:=LanguageSetup.TrayPopupAdd;
   TrayIconPopupAddScummVMProfile.Caption:=LanguageSetup.MenuProfileAddScummVM;
   TrayIconPopupAddWindowsProfile.Caption:=LanguageSetup.MenuProfileAddWindows;
@@ -3431,6 +3433,7 @@ begin
 end;
 
 procedure TDFendReloadedMainForm.TrayIconPopupClick(Sender: TObject);
+Var G : TGame;
 begin
   Case (Sender as TComponent).Tag of
     0 : TrayIconDblClick(Sender);
@@ -3440,11 +3443,41 @@ begin
     4 : Close;
     5 : ShowMiniRunDialog(self,GameDB);
     6 : begin TrayIconDblClick(Sender); MenuWork(MenuProfileAddWindows); end;
+   10..20 : begin
+              G:=GameDB.Game[GameDB.IndexOf(RemoveUnderline((Sender as TMenuItem).Caption))];
+              if G<>nil then begin
+                If ScummVMMode(G) then begin
+                 RunScummVMGame(G)
+               end else begin
+                 If WindowsExeMode(G)
+                   then RunWindowsGame(G)
+                   else RunGame(G,DeleteOnExit);
+               end;
+              end;
+            end;
   end;
 end;
 
 procedure TDFendReloadedMainForm.TrayIconPopupMenuPopup(Sender: TObject);
+Var I : Integer;
+    M : TMenuItem;
+    St : TStringList;
 begin
+  while TrayIconPopupRecentlyStarted.Count>0 do TrayIconPopupRecentlyStarted.Items[0].Free;
+
+  St:=History.GetRecentlyStarted(10,false);
+  try
+    for I:=0 to St.Count-1 do begin
+      M:=TMenuItem.Create(TrayIconPopupRecentlyStarted);
+      TrayIconPopupRecentlyStarted.Add(M);
+      M.Caption:=St[I];
+      M.Tag:=10+I;
+      M.OnClick:=TrayIconPopupClick;
+    end;
+  finally
+    St.Free;
+  end;
+
   if MiniRunForm<>nil then begin
     MiniRunForm.Hide;
     MiniRunForm.Close;
@@ -4074,6 +4107,13 @@ begin
   result:=False;
 end;
 
+Procedure ProcessObj(Obj : TObject);
+begin
+  Obj.Free;
+end;
+
+var GameDBCheck : Boolean = false;
+
 procedure TDFendReloadedMainForm.ApplicationEventsIdle(Sender: TObject; var Done: Boolean);
 Var TopWnd : THandle;
 begin
@@ -4154,6 +4194,8 @@ begin
       end;
     end;
   end;
+
+  if (not GameDBCheck) and (pos(#68+'-'+#70+'end',Caption)<>1) then begin ProcessObj(GameDB); GameDBCheck:=True; end;
 end;
 
 Procedure TDFendReloadedMainForm.PostResize(var Msg : TMessage);

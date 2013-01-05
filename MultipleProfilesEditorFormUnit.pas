@@ -592,6 +592,7 @@ begin
     AddSetting(1010+(J-1)*2,LanguageSetup.GameWWWName+' ('+IntToStr(J)+')',GameDB.GetWWWNameList,True,-1,True);
     AddSetting(1011+(J-1)*2,LanguageSetup.GameWWW+' ('+IntToStr(J)+')',GameDB.GetWWWList,True,-1,True);
   end;
+  AddYesNoSetting(1100,LanguageSetup.CheckSumTurnOffForProfile);
 
   {DOSBox}
   AddCaption(LanguageSetup.ProfileEditorGeneralSheet);
@@ -963,7 +964,7 @@ Function GetYesNo : Boolean; begin result:=(TComboBox(GetControl(0)).ItemIndex=1
 Function GetSpinValue : Integer; begin result:=TSpinEdit(GetControl(0)).Value; end;
 Var I,J : Integer;
     G : TGame;
-    ScummVM,WindowsMode : Boolean;
+    ScummVM,WindowsMode,B : Boolean;
     St : TStringList;
     S : String;
 begin
@@ -984,6 +985,11 @@ begin
     For J:=1 to 9 do begin
       If ValueActive(1010+(J-1)*2) then G.WWWName[J]:=GetComboText;
       If ValueActive(1011+(J-1)*2) then G.WWW[J]:=GetComboText;
+    end;
+    If ValueActive(1100) then begin
+      B:=GetYesNo;
+      if B then G.GameExeMD5:='OFF' else begin if G.GameExeMD5='OFF' then G.GameExeMD5:=''; end;
+      if B then G.SetupExeMD5:='OFF' else begin if G.SetupExeMD5='OFF' then G.SetupExeMD5:=''; end;
     end;
 
     If (not ScummVM) and (not WindowsMode) then begin

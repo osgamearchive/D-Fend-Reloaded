@@ -78,7 +78,7 @@ Var I,J,K : Integer;
     S : String;
 begin
   J:=1;
-  For I:=0 to Min(9,ExeFiles.Count-1) do begin
+  For I:=0 to Min(Tab.RowCount-2,ExeFiles.Count-1) do begin
     S:=Trim(ExeFiles[I]);
     If S<>'' then begin
       K:=Pos(';',S);
@@ -111,7 +111,7 @@ Var I : Integer;
 begin
   ExeFiles.Clear;
   Parameters.Clear;
-  For I:=1 to 19 do begin
+  For I:=1 to Tab.RowCount-1 do begin
     S:=Trim(Tab.Cells[0,I]);
     T:=Trim(Tab.Cells[1,I]);
     If (S<>'') and (T<>'') then begin

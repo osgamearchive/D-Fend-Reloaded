@@ -1460,6 +1460,7 @@ const NR_Author=1;
       NR_GameDOSBoxConsole=61045;
       NR_GameDOSBoxConsoleHide=61046;
       NR_GameDOSBoxConsoleShow=61047;
+      NR_GameRecentlyPlayed=61048;
       NR_GameXMS=62001;
       NR_GameEMS=62002;
       NR_GameUMB=62003;
@@ -3646,6 +3647,7 @@ Type TLanguageSetup=class(TBasePrgSetup)
     property GameDOSBoxConsole : String index NR_GameDOSBoxConsole read GetString write SetString;
     property GameDOSBoxConsoleHide : String index NR_GameDOSBoxConsoleHide read GetString write SetString;
     property GameDOSBoxConsoleShow : String index NR_GameDOSBoxConsoleShow read GetString write SetString;
+    property GameRecentlyPlayed : String index NR_GameRecentlyPlayed read GetString write SetString;
     property GameXMS : String index NR_GameXMS read GetString write SetString;
     property GameEMS : String index NR_GameEMS read GetString write SetString;
     property GameUMB : String index NR_GameUMB read GetString write SetString;
@@ -5929,6 +5931,7 @@ begin
   AddStringRec(NR_GameDOSBoxConsole,'GameSetup','DOSBoxConsole','Use this custom settings for the console window');
   AddStringRec(NR_GameDOSBoxConsoleHide,'GameSetup','DOSBoxConsole.Hide','Hide');
   AddStringRec(NR_GameDOSBoxConsoleShow,'GameSetup','DOSBoxConsole.Show','Show');
+  AddStringRec(NR_GameRecentlyPlayed,'GameSetup','RecentlyPlayed','Recently started');
   AddStringRec(NR_GameXMS,'GameSetup','EnableXMS','Use XMS memory');
   AddStringRec(NR_GameEMS,'GameSetup','EnableEMS','Use EMS memory');
   AddStringRec(NR_GameUMB,'GameSetup','EnableUMB','Use UMB memory');

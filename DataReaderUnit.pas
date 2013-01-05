@@ -12,7 +12,7 @@ Type TDataReader=class
     Function DownloadConfigFile(const DestFile : String) : Boolean;
     Function ReadListGlobalPart(const Lines : String; const NextElement : THTMLStructureElement) : Boolean;
     Procedure ReadListPerGamePart(const Lines : String; const NextElement : THTMLStructureElement; var GameName, GameURL : String);
-    Procedure GetGameDataFromLines(const Lines : String; const NextElement : THTMLStructureElement; var Genre, Developer, Publisher, Year, ImagePageURL : String);
+    Procedure GetGameDataFromLines(const Lines : String; const NextElement : THTMLStructureElement; var Genre, Developer, Publisher, Year, Notes, ImagePageURL : String);
     Procedure GetGameCoverFromLines(const Lines : String; const NextElement : THTMLStructureElement; var ImageURL : String);
     Function GetImageURLAndNextURLsFromURL(const CoverPageURL : String; var ImageURL : String; const PossibleNextURLs : TStringList) : Boolean;
     Procedure GetGameCoverFromSinglePages(const InitialURL : String; const ImageURLs : TStringList; const MaxImages : Integer);
@@ -24,7 +24,7 @@ Type TDataReader=class
     Function LoadConfig(const AConfigFile : String; const UpdateCheck : Boolean) : Boolean;
     Procedure OpenListPage(const ASearchString : String);
     Function ReadList(const ASearchString : String) : Boolean;
-    Function GetGameData(const Nr : Integer; var Genre, Developer, Publisher, Year, ImagePageURL : String) : Boolean;
+    Function GetGameData(const Nr : Integer; var Genre, Developer, Publisher, Year, Notes, ImagePageURL : String) : Boolean;
     Function GetGameCover(const CoverPageURL : String; var ImageURL : String; const MaxImages : Integer) : Boolean;
     property Config : TDataReaderConfig read FConfig;
     property GameNames : TStringList read FGameNames;
@@ -62,7 +62,7 @@ Type TDataReaderGameDataThread=class(TDataReaderThread)
   private
     FNr : Integer;
     FFullImages : Boolean;
-    FGenre, FDeveloper, FPublisher, FYear, FImageURL : String;
+    FGenre, FDeveloper, FPublisher, FYear, FImageURL, FNotes : String;
   protected
     Procedure Execute; override;
   public
@@ -72,6 +72,7 @@ Type TDataReaderGameDataThread=class(TDataReaderThread)
     property Publisher : String read FPublisher;
     property Year : String read FYear;
     property ImageURL : String read FImageURL; {Multiple images can be separated by "$"}
+    property Notes : String read FNotes;
 end;
 
 Type TDataReaderGameCoverThread=class(TDataReaderThread)
@@ -267,11 +268,11 @@ begin
   end;
 end;
 
-function TDataReader.GetGameData(const Nr: Integer; var Genre, Developer, Publisher, Year, ImagePageURL: String): Boolean;
+function TDataReader.GetGameData(const Nr: Integer; var Genre, Developer, Publisher, Year, Notes, ImagePageURL: String): Boolean;
 Var S,T,Lines : String;
 begin
   result:=False;
-  Genre:=''; Developer:=''; Publisher:=''; Year:=''; ImagePageURL:='';
+  Genre:=''; Developer:=''; Publisher:=''; Year:=''; Notes:=''; ImagePageURL:='';
   If (Nr<0) or (Nr>=FGameNames.Count) then exit;
 
   S:=FConfig.GameRecordBaseURL;
@@ -281,7 +282,7 @@ begin
 
   if not DownloadTextFile(S+T,Lines,FLastListRequest) then exit;
   result:=True;
-  GetGameDataFromLines(Lines,FConfig.GameRecord,Genre,Developer,Publisher,Year,ImagePageURL);
+  GetGameDataFromLines(Lines,FConfig.GameRecord,Genre,Developer,Publisher,Year,Notes,ImagePageURL);
 end;
 
 Function ExtDecodeName(const S : String) : String;
@@ -297,11 +298,11 @@ begin
   end;
 end;
 
-procedure TDataReader.GetGameDataFromLines(const Lines: String; const NextElement: THTMLStructureElement; var Genre, Developer, Publisher, Year, ImagePageURL: String);
+procedure TDataReader.GetGameDataFromLines(const Lines: String; const NextElement: THTMLStructureElement; var Genre, Developer, Publisher, Year, Notes, ImagePageURL: String);
 Var St,St2 : TStringList;
     S,T : String;
     I,J : Integer;
-    S1,S2,S3,S4 : String;
+    S1,S2,S3,S4,S5 : String;
 begin
   If NextElement is TLink then begin
     St2:=TStringList.Create;
@@ -343,7 +344,7 @@ begin
         If (I<0) and (St.Count>=-I) then S:=St[St.Count-I];
       end;
       For I:=0 to TElement(NextElement).ChildCount-1 do
-        GetGameDataFromLines(S,TElement(NextElement).Children[I],Genre,Developer,Publisher,Year,ImagePageURL);
+        GetGameDataFromLines(S,TElement(NextElement).Children[I],Genre,Developer,Publisher,Year,Notes,ImagePageURL);
     finally
       St.Free;
     end;
@@ -355,6 +356,23 @@ begin
     S2:=Trim(ExtUpperCase(TSearchGameData(NextElement).Developer));
     S3:=Trim(ExtUpperCase(TSearchGameData(NextElement).Publisher));
     S4:=Trim(ExtUpperCase(TSearchGameData(NextElement).Year));
+    S5:=Trim(ExtUpperCase(TSearchGameData(NextElement).Notes));
+
+    if (S5<>'') then begin
+      St:=GetPlainText(Lines);
+      try
+        Notes:=''; T:='';
+        For I:=0 to St.Count-2 do begin
+          S:=St[I];
+          if (S='edit description') or (S='view history') or (S='Alternate Titles') then break;
+          if Notes<>'' then Notes:=Notes+#13;
+          Notes:=Notes+T;
+          if S<>'Description' then T:=S else T:='';
+        end;
+      finally
+        St.Free;
+      end;
+    end;
 
     {Simple mode (fallback)}
     St:=GetPlainText(Lines);
@@ -390,6 +408,7 @@ begin
         If (S2<>'') and (Pos(S2,S)<>0) then begin T:=ExtDecodeName(St[I+1]); If T<>'' then Developer:=T; end;
         If (S3<>'') and (Pos(S3,S)<>0) then begin T:=ExtDecodeName(St[I+1]); If T<>'' then Publisher:=T; end;
         If (S4<>'') and (Pos(S4,S)<>0) then begin T:=ExtDecodeName(St[I+1]); If T<>'' then Year:=T; end;
+        If (S5<>'') and (Pos(S5,S)<>0) then begin T:=ExtDecodeName(St[I+1]); If T<>'' then Notes:=T; end;
       end;
     finally
       St.Free;
@@ -773,7 +792,7 @@ begin
   inherited Create(ADataReader);
   FNr:=ANr;
   FFullImages:=AFullImages;
-  FGenre:=''; FDeveloper:=''; FPublisher:=''; FYear:=''; FImageURL:='';
+  FGenre:=''; FDeveloper:=''; FPublisher:=''; FYear:=''; FImageURL:=''; FNotes:='';
   Resume;
 end;
 
@@ -781,7 +800,7 @@ procedure TDataReaderGameDataThread.Execute;
 Var S : String;
     MaxImageCount : Integer;
 begin
-  FSuccess:=FDataReader.GetGameData(fNr,FGenre,FDeveloper,FPublisher,FYear,S);
+  FSuccess:=FDataReader.GetGameData(fNr,FGenre,FDeveloper,FPublisher,FYear,FNotes,S);
   if FFullImages then MaxImageCount:=PrgSetup.DataReaderMaxImages else MaxImageCount:=1;
   If FSuccess then FSuccess:=FDataReader.GetGameCover(S,FImageURL,MaxImageCount);
 end;

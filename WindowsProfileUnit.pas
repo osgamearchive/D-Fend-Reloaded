@@ -43,8 +43,12 @@ begin
     StartupInfo,
     ProcessInformation
   ) then begin
-    Application.Restore;
-    MessageDlg(Format(LanguageSetup.MessageCouldNotStartProgram,[FileName]),mtError,[mbOK],0);
+    if (GetLastError=740) then begin
+      if (ShellExecute(Application.MainForm.Handle,'open',PChar(FileName),PChar(Parameters),PChar(IncludeTrailingPathDelimiter((ExtractFilePath(FileName)))),SW_SHOW)<=32) then begin
+        Application.Restore;
+        MessageDlg(Format(LanguageSetup.MessageCouldNotStartProgram,[FileName])+#13+#13+SysErrorMessage(GetLastError),mtError,[mbOK],0);
+      end;
+    end;
     result:=INVALID_HANDLE_VALUE;
     exit;
   end;
@@ -59,6 +63,40 @@ begin
 
   WindowsGameCounter.Add(result);
 end;
+
+
+Function RunFile2(const FileName, Parameters: String): THandle;
+var ShellExecInfo: SHELLEXECUTEINFO;
+begin
+    FillChar(ShellExecInfo, SizeOf(ShellExecInfo), 0);
+    with ShellExecInfo do begin
+        cbSize := SizeOf(ShellExecInfo);
+        fMask := SEE_MASK_NOCLOSEPROCESS;
+        Wnd := Application.MainForm.Handle;
+        lpVerb := 'open';
+        lpFile := PChar(FileName);
+        lpParameters := PChar(Parameters);
+        lpDirectory := PChar(IncludeTrailingPathDelimiter((ExtractFilePath(FileName))));
+        nShow := SW_SHOW;
+    end;
+
+    if ShellExecuteEx(@ShellExecInfo) then begin
+        Result := ShellExecInfo.hProcess;
+    end else begin
+        Application.Restore;
+        MessageDlg(Format(LanguageSetup.MessageCouldNotStartProgram,[FileName]),mtError,[mbOK],0);
+        Result := INVALID_HANDLE_VALUE;
+        exit;
+    end;
+
+  If PrgSetup.MinimizeOnWindowsGameStart then begin
+    Sleep(1000);
+    {MinimizedAtWindowsGameStart:=True; -> RunWindowsGame/RunWindowssExtraFile}
+  end;
+
+  WindowsGameCounter.Add(result);
+end;
+
 
 Function WindowsRunCheck(var FileName : String) : Boolean;
 begin
@@ -112,7 +150,7 @@ begin
       Application.Minimize;
     end;
 
-    Handle:=RunFile(S,T);
+    Handle:=RunFile2(S,T);
     try
       RunPrgManager.AddCommand(Game,Handle);
     finally
@@ -154,7 +192,7 @@ begin
       Application.Minimize;
     end;
 
-    Handle:=RunFile(S,T);
+    Handle:=RunFile2(S,T);
     try
       RunPrgManager.AddCommand(Game,Handle);
     finally

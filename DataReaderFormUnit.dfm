@@ -3,10 +3,10 @@ object DataReaderForm: TDataReaderForm
   Top = 0
   BorderIcons = [biSystemMenu, biMaximize]
   Caption = 'DataReaderForm'
-  ClientHeight = 424
+  ClientHeight = 462
   ClientWidth = 592
   Color = clBtnFace
-  Constraints.MinHeight = 460
+  Constraints.MinHeight = 500
   Constraints.MinWidth = 600
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -22,7 +22,7 @@ object DataReaderForm: TDataReaderForm
   OnShow = FormShow
   DesignSize = (
     592
-    424)
+    462)
   PixelsPerInch = 96
   TextHeight = 13
   object SearchResultsLabel: TLabel
@@ -71,7 +71,7 @@ object DataReaderForm: TDataReaderForm
     Left = 16
     Top = 88
     Width = 201
-    Height = 298
+    Height = 336
     Anchors = [akLeft, akTop, akBottom]
     ItemHeight = 13
     TabOrder = 2
@@ -81,13 +81,13 @@ object DataReaderForm: TDataReaderForm
     Left = 232
     Top = 88
     Width = 352
-    Height = 299
+    Height = 337
     Anchors = [akLeft, akTop, akRight, akBottom]
     Caption = 'GameDataBox'
     TabOrder = 3
     DesignSize = (
       352
-      299)
+      337)
     object GenreLabel: TLabel
       Left = 32
       Top = 90
@@ -199,10 +199,19 @@ object DataReaderForm: TDataReaderForm
       Caption = 'Download all available images'
       TabOrder = 6
     end
+    object DescriptionCheckBox: TCheckBox
+      Left = 16
+      Top = 304
+      Width = 321
+      Height = 17
+      Anchors = [akLeft, akTop, akRight]
+      Caption = 'Description'
+      TabOrder = 7
+    end
   end
   object InsertButton: TBitBtn
     Left = 16
-    Top = 393
+    Top = 431
     Width = 97
     Height = 25
     Anchors = [akLeft, akBottom]
@@ -232,7 +241,7 @@ object DataReaderForm: TDataReaderForm
   end
   object CancelButton: TBitBtn
     Left = 128
-    Top = 393
+    Top = 431
     Width = 97
     Height = 25
     Anchors = [akLeft, akBottom]

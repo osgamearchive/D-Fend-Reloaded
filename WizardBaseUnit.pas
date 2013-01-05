@@ -108,16 +108,14 @@ procedure TWizardBaseFrame.WriteDataToGame(const Game: TGame);
 Var S : String;
     I : Integer;
 begin
-  If (EmulationType=-1) or (EmulationType=-2) then begin
-    S:=IncludeTrailingPathDelimiter(PrgSetup.CaptureDir)+MakeFileSysOKFolderName(Game.Name)+'\';
-    I:=0;
-    While (not PrgSetup.IgnoreDirectoryCollisions) and DirectoryExists(MakeAbsPath(S,PrgSetup.BaseDir)) do begin
-      Inc(I);
-      S:=IncludeTrailingPathDelimiter(PrgSetup.CaptureDir)+MakeFileSysOKFolderName(Game.Name)+IntToStr(I)+'\';
-    end;
-    Game.CaptureFolder:=MakeRelPath(S,PrgSetup.BaseDir);
-    CreateDir(MakeAbsPath(Game.CaptureFolder,PrgSetup.BaseDir));
+  S:=IncludeTrailingPathDelimiter(PrgSetup.CaptureDir)+MakeFileSysOKFolderName(Game.Name)+'\';
+  I:=0;
+  While (not PrgSetup.IgnoreDirectoryCollisions) and DirectoryExists(MakeAbsPath(S,PrgSetup.BaseDir)) do begin
+    Inc(I);
+    S:=IncludeTrailingPathDelimiter(PrgSetup.CaptureDir)+MakeFileSysOKFolderName(Game.Name)+IntToStr(I)+'\';
   end;
+  Game.CaptureFolder:=MakeRelPath(S,PrgSetup.BaseDir);
+  CreateDir(MakeAbsPath(Game.CaptureFolder,PrgSetup.BaseDir));
 end;
 
 procedure TWizardBaseFrame.ButtonWork(Sender: TObject);

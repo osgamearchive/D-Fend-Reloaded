@@ -156,7 +156,7 @@ begin
     N:=ATreeView.Items.AddChild(nil,Name);
     N.ImageIndex:=12;
     N.SelectedIndex:=12;
-    For I:=0 to St.Count-1 do begin
+    if (St<>nil) then For I:=0 to St.Count-1 do begin
       S:=St[I];
       If S='' then S:=LanguageSetup.NotSet;
       N2:=ATreeView.Items.AddChild(N,S);
@@ -226,7 +226,7 @@ begin
 
       {Genre, Developer, Publisher, Year, Language, License}
       TreeFilter:=PrgSetup.DefaultTreeFilter;
-      while (length(TreeFilter)<7) do TreeFilter:=TreeFilter+'1';
+      while (length(TreeFilter)<8) do TreeFilter:=TreeFilter+'1';
 
       if TreeFilter[1]<>'0' then AddTypeSelector(ATreeView,LanguageSetup.GameGenre,GetCustomGenreName(GameDB.GetGenreList));
       if TreeFilter[2]<>'0' then AddTypeSelector(ATreeView,LanguageSetup.GameDeveloper,GameDB.GetDeveloperList);
@@ -246,6 +246,9 @@ begin
           N2:=ATreeView.Items.AddChild(N,PrgSetup.WindowsBasedEmulatorsNames[I]); N2.ImageIndex:=MI_Count+I; N2.SelectedIndex:=MI_Count+I;
         end;
       end;
+
+      {Recently played}
+      if TreeFilter[8]<>'0' then AddTypeSelector(ATreeView,LanguageSetup.GameRecentlyPlayed,nil);
 
       {User categories}
       UserGroups:=RemoveDoubleEntrys(StringToStringList(PrgSetup.UserGroups));
@@ -1090,6 +1093,7 @@ Var I,J,K,Nr,ItemsUsed : Integer;
     Filter : TGamesListFilter;
     UseBackgroundColor : Boolean;
     BackgroundColor : TColor;
+    RecentlyStarted : TStringList;
     {$IFDEF SpeedTest}Ca : Cardinal;{$ENDIF}
 begin
   {$IFDEF SpeedTest}Ca:=GetTickCount;{$ENDIF}
@@ -1135,13 +1139,14 @@ begin
     AListView.Columns.EndUpdate;
   end;
 
+  RecentlyStarted:=nil;
   List:=TList.Create;
   try
     {Select games to add}
     Filter:=TGamesListFilter.Create;
     try
       Filter.SetFilterString(SearchString);
-      If SubGroup='' then begin
+      If (SubGroup='') and (Group<>LanguageSetup.GameRecentlyPlayed) then begin
         B:=(Group=LanguageSetup.GameFavorites);
         for I:=0 to GameDB.Count-1 do begin
           If B and (not GameDB[I].Favorite) then continue;
@@ -1162,6 +1167,11 @@ begin
         If Group=LanguageSetup.GameLanguage then Nr:=4;
         If Group=LanguageSetup.GameEmulationType then Nr:=5;
         If Group=LanguageSetup.GameLicense then Nr:=6;
+        If Group=LanguageSetup.GameRecentlyPlayed then Nr:=8;
+
+        if Nr=8 then begin
+          RecentlyStarted:=History.GetRecentlyStarted(50,true);
+        end;
 
         EmType1:=ExtUpperCase(LanguageSetup.GameEmulationTypeDOSBox);
         EmType2:=ExtUpperCase(LanguageSetup.GameEmulationTypeScummVM);
@@ -1212,6 +1222,9 @@ begin
                   finally
                     St2.Free;
                   end;
+                end;
+            8 : begin
+                  B:=(RecentlyStarted.IndexOf(GameDB[I].CacheNameUpper)>=0);
                 end;
           end;
           If not B then continue;
@@ -1308,6 +1321,7 @@ begin
       St.Free;
     end;
   finally
+   if RecentlyStarted<>nil then RecentlyStarted.Free;
     List.Free;
     AListView.Columns.BeginUpdate;
     try
@@ -2942,10 +2956,45 @@ begin
   Game.NrOfMounts:=Game.NrOfMounts+1;
 end;
 
-Procedure MakeMountsFromAutoexec(const Game : TGame; const Autoexec : TStringList);
-Var I,J,K : Integer;
-    S,SUpper,T,U : String;
+Procedure AddCDImageDrive(const Game : TGame; const RealFolder, Letter : String);
+Var S : String;
+begin
+  {ImageFile;CDROMIMAGE;Letter;;;}
+  S:=MakeRelPath(RealFolder,PrgSetup.BaseDir,True)+';CDRomImage;'+Letter+';;';
 
+  Game.Mount[Game.NrOfMounts]:=S;
+  Game.NrOfMounts:=Game.NrOfMounts+1;
+end;
+
+
+Function GetFolderAndDriveLetter(var Params, Letter, Folder : String) : Boolean;
+Var J,K : Integer;
+begin
+  result:=False;
+
+  J:=Pos(' ',Params); If J=0 then exit;
+  Letter:=Trim(Copy(Params,1,J-1)); Params:=Trim(Copy(Params,J+1,MaxInt));
+
+  If length(Letter)=3 then begin If (Letter[2]<>':') or (Letter[3]<>'\') then exit; Letter:=Letter[1]; end;
+  If length(Letter)=2 then begin If Letter[2]<>':' then exit; Letter:=Letter[1]; end;
+  Letter:=ExtUpperCase(Letter);
+  If (Letter<'A') or (Letter>'Z') then exit;
+
+  If Params[1]='"' then begin
+    Params:=Trim(Copy(Params,2,MaxInt));
+    K:=-1;
+    For J:=1 to length(Params) do If Params[J]='"' then begin K:=J; break; end;
+    If K=-1 then begin Folder:=''; Params:='"'+Params; end else begin Folder:=Trim(Copy(Params,1,K-1)); Params:=Trim(Copy(Params,K+1,MaxInt)); end;
+  end else begin
+    J:=Pos(' ',Params); If J>0 then begin Folder:=Trim(Copy(Params,1,J-1)); Params:=Trim(Copy(Params,J+1,MaxInt)); end else begin Folder:=Params; Params:=''; end;
+  end;
+  
+  result:=True;
+end;
+
+Procedure MakeMountsFromAutoexec(const Game : TGame; const Autoexec : TStringList);
+Var I : Integer;
+    S,SUpper,Letter,Folder : String;
 begin
   I:=0;
   while I<Autoexec.Count do begin
@@ -2955,30 +3004,27 @@ begin
     If (S<>'') and (S[1]='@') then S:=Trim(Copy(S,2,MaxInt));
     SUpper:=ExtUpperCase(S);
     If (S='') or (Copy(SUpper,1,4)='ECHO') or (Copy(SUpper,1,3)='REM') or (Copy(SUpper,1,4)='SET ') or (Copy(SUpper,1,5)='KEYB ') then begin inc(I); continue; end;
-    If Copy(SUpper,1,6)<>'MOUNT ' then exit;
-    S:=Trim(Copy(S,7,MaxInt));
 
-    J:=Pos(' ',S); If J=0 then begin inc(I); continue; end;
-    T:=Trim(Copy(S,1,J-1)); S:=Trim(Copy(S,J+1,MaxInt));
-
-    If length(T)=3 then begin If (T[2]<>':') or (T[3]<>'\') then exit; T:=T[1]; end;
-    If length(T)=2 then begin If T[2]<>':' then exit; T:=T[1]; end;
-    T:=ExtUpperCase(T);
-    If (T<'A') or (T>'Z') then begin inc(I); continue; end;
-
-    If S[1]='"' then begin
-      S:=Trim(Copy(S,2,MaxInt));
-      K:=-1;
-      For J:=1 to length(S) do If S[J]='"' then begin K:=J; break; end;
-      If K=-1 then begin U:=S; S:=''; end else begin U:=Trim(Copy(S,1,K-1)); S:=Trim(Copy(S,K+1,MaxInt)); end;
-    end else begin
-      J:=Pos(' ',S); If J>0 then begin U:=Trim(Copy(S,1,J-1)); S:=Trim(Copy(S,J+1,MaxInt)); end else begin U:=S; S:=''; end;
+    If Copy(SUpper,1,6)='MOUNT ' then begin
+      S:=Trim(Copy(S,7,MaxInt));
+      if not GetFolderAndDriveLetter(S,Letter,Folder) then begin inc(I); continue; end;
+      If Trim(ExtUpperCase(Copy(S,1,9)))='-FREESIZE' then S:=Trim(Copy(S,10,MaxInt)) else S:='';
+      AddDrive(Game,Folder,Letter,S);
+      Autoexec.Delete(I);
+      continue;
     end;
 
-    If Trim(ExtUpperCase(Copy(U,1,9)))='-FREESIZE' then U:=Trim(Copy(U,10,MaxInt));
+    If Copy(SUpper,1,9)='IMGMOUNT ' then begin
+      S:=Trim(Copy(S,10,MaxInt));
+      if not GetFolderAndDriveLetter(S,Letter,Folder) then begin inc(I); continue; end;
+      S:=Trim(ExtUpperCase(S));
+      if (S<>'-T ISO -FS ISO') and (S<>'-FS ISO -T ISO') then begin inc(I); continue; end;
+      AddCDImageDrive(Game,Folder,Letter);
+      Autoexec.Delete(I);
+      continue;
+    end;
 
-    AddDrive(Game,U,T,S);
-    Autoexec.Delete(I);
+    inc(I);
   end;
 end;
 
@@ -3016,10 +3062,18 @@ begin
         If T='WWWSITE' then Game.WWW[1]:=U;
       end;
 
-      If Sec=1 then Autoexec.Add(St[I]);
+      If Sec=1 then begin
+        T:=ExtUpperCase(St[I]);
+        if T='EXIT' then begin Game.CloseDosBoxAfterGameExit:=true; continue; end;
+        if Copy(Trim(T),1,1)='#' then continue;
+        Autoexec.Add(St[I]);
+      end;
     end;
 
     MakeMountsFromAutoexec(Game,Autoexec);
+
+    while (Autoexec.Count>0) and (Trim(Autoexec[0])='') do Autoexec.Delete(0);
+
     Game.Autoexec:=StringListToString(Autoexec);
   finally
     St.Free;

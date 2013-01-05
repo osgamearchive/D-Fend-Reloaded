@@ -2,9 +2,9 @@ DOSZIP.TXT--
 Copyright 2012 Hjort Nidudsson.
 
 DOSZIP COMMANDER
-Version 2.34
+Version 2.44
 
-Welcome to Doszip Commander Version 2.34!
+Welcome to Doszip Commander Version 2.44!
 =========================================
 
 <> Index
@@ -138,14 +138,18 @@ Welcome to Doszip Commander Version 2.34!
    --------
 
    F1   	  Help
-   F2  (Ctrl-F2)  Save file (as...)
-   F3  (Ctrl-L)   Search (again)
+   F2 (Ctrl-F2)   Save file (as...)
+   F3 (Ctrl-L)    Search (again)
    F4   	  Replace
    F5   	  Open file
    F6   	  Toggle files
-   F9  (Esc)      Toggle edit
+   F7 (Esc)       Toggle edit
+   F8   	  Save session
+   F9   	  Load session
+   Alt-0	  Window list
    Alt-L	  Goto line number
    Alt-S	  Word search
+   Ctrl-F9        Options
    Ctrl-R         Reload current file
    Ctrl-O         User screen
 
@@ -155,7 +159,6 @@ Welcome to Doszip Commander Version 2.34!
    Esc  	  Exit the editor and leave files open
    Ctrl-X         Close current file and continue (if more files)
    Alt-X	  Close all files and exit
-   Alt-F3         (Ctrl-X)
 
    Toggle flags On/Off
 
@@ -544,12 +547,13 @@ Welcome to Doszip Commander Version 2.34!
    Alt-F2         Select Disk Panel-B
    Alt-F3         View file --> DZ.INI
    Alt-F4         Edit file --> DZ.INI
-   Alt-F5         Screen options
-   Alt-F6         System options
+   Alt-F5         Compress
+   Alt-F6         Decompress
    Alt-F7         File search
    Alt-F8         History: list of the last 16 DOS commands
    Alt-F9         Toggle 50/25 lines
-   Alt-[0..9]     Run Tool nr. [0..9]
+   Alt-0	  Window list
+   Alt-[1..9]     Run Tool nr. [1..9]
    Alt-C	  Toggle Command Line
    Alt-L	  Create List File
    Alt-M	  Memory Information
@@ -570,9 +574,9 @@ Welcome to Doszip Commander Version 2.34!
    Ctrl-F3        View file --> DZ.INI
    Ctrl-F4        Edit file --> DZ.INI
    Ctrl-F5        Sort current panel by Name
-   Ctrl-F6        Sort current panel by Type
-   Ctrl-F7        Sort current panel by Date
-   Ctrl-F8        Sort current panel by Size
+   Ctrl-F6        Editor options
+   Ctrl-F7        Screen options
+   Ctrl-F8        System options
    Ctrl-F9        Configuration
 
    Ctrl-A         File Attributes
@@ -618,8 +622,9 @@ Welcome to Doszip Commander Version 2.34!
    Edit text
    ---------
 
-   Shift-Del      Cut
-   Shift-Ins      Paste
+   Ctrl-X         Cut (Shift-Del)
+   Ctrl-C         Copy
+   Ctrl-V         Paste (Shift-Ins)
    Ctrl-Ins       Copy (use Cut+Paste in the command line)
    Ctrl-Left      Goto previous word
    Ctrl-Right     Goto next word
