@@ -19,7 +19,7 @@ type
 var
   SmallWaitForm: TSmallWaitForm = nil;
 
-Procedure LoadAndShowSmallWaitForm(const Info : String ='');
+Procedure LoadAndShowSmallWaitForm(Info : String ='');
 Procedure FreeSmallWaitForm;
 
 implementation
@@ -35,11 +35,12 @@ begin
   Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName);
 end;
 
-Procedure LoadAndShowSmallWaitForm(const Info : String);
+Procedure LoadAndShowSmallWaitForm(Info : String);
 begin
   If Application.MainForm.WindowState=wsMinimized then exit;
   SmallWaitForm:=TSmallWaitForm.Create(Application.MainForm);
-  If Trim(Info)<>'' then SmallWaitForm.Label1.Caption:=Info;
+  If Trim(Info)='' then Info:=LanguageSetup.ProgressFormCaption;
+  SmallWaitForm.Label1.Caption:=Info;
   SmallWaitForm.Show;
   SmallWaitForm.BringToFront;
   Application.ProcessMessages;

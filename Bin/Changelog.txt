@@ -1,5 +1,22 @@
 D-Fend Reloaded Changelog
 
+Version 1.3.4 (26/08/2013)
+==========================
+- Updated Korean language file.
+- Updated French and French Canada language files.
+- Updated DOSZip from 2.44 to 2.48.
+- Added options to set sound volulme for multiple profiles at once to the
+  multiple profiles editor.
+- Setting the font properties for the preview area now will also apply to
+  the notes text input field.
+- Extracting and creating archive files can be canceled now.
+- Now also data files for which there is an user-defined interpreter can be
+  added by drag&drop.
+- The screenshot thumbnails in the preview area of the D-Fend Reloaded program
+  window will be cached now so the screenshot images will not need to be
+  scaled down each time the screenshot previews will be displayed.
+
+
 Version 1.3.3 (01/05/2013)
 ==========================
 - Updated DOSZip from 2.35 to 2.44.

@@ -1005,9 +1005,11 @@ begin
     B:=Application.MainForm.Enabled;
    Application.MainForm.Enabled:=False;
   end;
+  LoadAndShowSmallWaitForm;
   try
     CopyFolderWithMsg(Dir,PrgSetup.BaseDir,True,True,result,True);
   finally
+    FreeSmallWaitForm;
     If Application.MainForm<>nil then begin
       While PeekMessage(Msg,Application.MainForm.Handle,WM_INPUT,WM_INPUT,1) do ;
       Application.MainForm.Enabled:=B;

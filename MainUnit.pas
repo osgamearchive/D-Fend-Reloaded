@@ -456,6 +456,8 @@ type
     Procedure LoadGUISetup(const PrgStart : Boolean);
     Procedure SetupToolbarHints;
     Procedure LoadListViewGUISetup(const ListView : TListView; const Background, FontColor : String; const FontSize : Integer);
+    Procedure LoadLabelGUISetup(const L : TPanel; const Background, FontColor : String; const FontSize : Integer);
+    Procedure LoadRichEditGUISetup(const R : TRichEdit; const Background, FontColor : String; const FontSize : Integer);
     Procedure LoadTreeViewGUISetup(const TreeView : TTreeView; const Background, FontColor : String; const FontSize : Integer);
     Procedure LoadCoolBarGUISetup(const CoolBar : TCoolBar; const Background : String; const FontSize : Integer);
     Procedure ConfFileCheck;
@@ -538,7 +540,7 @@ begin
   LogInfo('### Start of FormCreate ###');
 
   {Caption:=Caption+' THIS IS A TEST VERSION ! (Beta 1 of version 1.4)';}
-  {Caption:=Caption+' (Release candidate 3 of version 1.3.3)';}
+  {Caption:=Caption+' (Release candidate 1 of version 1.3.4)';}
 
   MI_Count:=ImageList.Count;
   Height:=790;
@@ -2296,6 +2298,44 @@ begin
   ListView.Font.Size:=FontSize;
 end;
 
+Procedure TDFendReloadedMainForm.LoadLabelGUISetup(const L : TPanel; const Background, FontColor : String; const FontSize : Integer);
+Var S : String;
+begin
+  S:=Trim(Background);
+  If S='' then L.Color:=clWindow else begin
+    try
+      L.Color:=StringToColor(S);
+    except
+      L.Color:=clWindow;
+    end;
+  end;
+
+  S:=Trim(FontColor);
+  If S='' then L.Font.Color:=clWindowText else begin
+    try L.Font.Color:=StringToColor(FontColor); except L.Font.Color:=clWindowText; end;
+  end;
+  L.Font.Size:=FontSize;
+end;
+
+Procedure TDFendReloadedMainForm.LoadRichEditGUISetup(const R : TRichEdit; const Background, FontColor : String; const FontSize : Integer);
+Var S : String;
+begin
+  S:=Trim(Background);
+  If S='' then R.Color:=clWindow else begin
+    try
+      R.Color:=StringToColor(S);
+    except
+      R.Color:=clWindow;
+    end;
+  end;
+
+  S:=Trim(FontColor);
+  If S='' then R.Font.Color:=clWindowText else begin
+    try R.Font.Color:=StringToColor(FontColor); except R.Font.Color:=clWindowText; end;
+  end;
+  R.Font.Size:=FontSize;
+end;
+
 Procedure TDFendReloadedMainForm.LoadTreeViewGUISetup(const TreeView : TTreeView; const Background, FontColor : String; const FontSize : Integer);
 Var S : String;
 begin
@@ -2449,11 +2489,17 @@ begin
 
   LogInfo('Load list view background');
   LoadListViewGUISetup(ListView,PrgSetup.GamesListViewBackground,PrgSetup.GamesListViewFontColor,PrgSetup.GamesListViewFontSize);
+  LoadLabelGUISetup(ScreenshotsInfoPanel,PrgSetup.ScreenshotsListViewBackground,PrgSetup.ScreenshotsListViewFontColor,PrgSetup.ScreenshotsListViewFontSize);
   LoadListViewGUISetup(ScreenshotListView,PrgSetup.ScreenshotsListViewBackground,PrgSetup.ScreenshotsListViewFontColor,PrgSetup.ScreenshotsListViewFontSize);
+  LoadLabelGUISetup(SoundInfoPanel,PrgSetup.ScreenshotsListViewBackground,PrgSetup.ScreenshotsListViewFontColor,PrgSetup.ScreenshotsListViewFontSize);
   LoadListViewGUISetup(SoundListView,PrgSetup.ScreenshotsListViewBackground,PrgSetup.ScreenshotsListViewFontColor,PrgSetup.ScreenshotsListViewFontSize);
+  LoadLabelGUISetup(VideoInfoPanel,PrgSetup.ScreenshotsListViewBackground,PrgSetup.ScreenshotsListViewFontColor,PrgSetup.ScreenshotsListViewFontSize);
   LoadListViewGUISetup(VideoListView,PrgSetup.ScreenshotsListViewBackground,PrgSetup.ScreenshotsListViewFontColor,PrgSetup.ScreenshotsListViewFontSize);
+  LoadRichEditGUISetup(GameNotesEdit,PrgSetup.ScreenshotsListViewBackground,PrgSetup.ScreenshotsListViewFontColor,PrgSetup.ScreenshotsListViewFontSize);
   LoadTreeViewGUISetup(TreeView,PrgSetup.GamesTreeViewBackground,PrgSetup.GamesTreeViewFontColor,PrgSetup.GamesTreeViewFontSize);
   LoadCoolBarGUISetup(CoolBar,PrgSetup.ToolbarBackground,PrgSetup.ToolbarFontSize);
+  LoadTreeViewGUISetup(ViewFilesFrame.Tree,PrgSetup.ScreenshotsListViewBackground,PrgSetup.ScreenshotsListViewFontColor,PrgSetup.ScreenshotsListViewFontSize);
+  LoadListViewGUISetup(ViewFilesFrame.List,PrgSetup.ScreenshotsListViewBackground,PrgSetup.ScreenshotsListViewFontColor,PrgSetup.ScreenshotsListViewFontSize);
 
   LogInfo('Setting up checked menu items');
   CoolBar.Visible:=PrgSetup.ShowToolbar;
@@ -4382,7 +4428,8 @@ Var FileExt : String;
     G : TGame;
     S : String;
     B : Boolean;
-    I : Integer;
+    I,J : Integer;
+    St : TStringList;
 begin
   StopCaptureChangeNotify;
   try
@@ -4556,6 +4603,22 @@ begin
       TreeViewChange(self,TreeView.Selected);
       SelectGame(G);
       exit;
+    end;
+
+    {User-Interpreters}
+    For I:=0 to PrgSetup.DOSBoxBasedUserInterpretersExtensions.Count-1 do begin
+      St:=ValueToList(PrgSetup.DOSBoxBasedUserInterpretersExtensions[I]);
+      try
+        For J:=0 to St.Count-1 do begin
+          S:=Trim(ExtUpperCase(St[J])); if (S<>'') and (S[1]<>'.') then S:='.'+S;
+          if S=FileExt then begin
+            StartWizard(FileName,False);
+            exit;
+          end;
+        end;
+      finally
+        St.Free;
+      end;
     end;
 
     {Otherwise try to copy the file to the game DataDir}

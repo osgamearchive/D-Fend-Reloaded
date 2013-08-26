@@ -1,10 +1,10 @@
 DOSZIP.TXT--
-Copyright 2012 Hjort Nidudsson.
+Copyright 2013 Hjort Nidudsson.
 
 DOSZIP COMMANDER
-Version 2.44
+Version 2.48
 
-Welcome to Doszip Commander Version 2.44!
+Welcome to Doszip Commander Version 2.48!
 =========================================
 
 <> Index
@@ -21,6 +21,7 @@ Welcome to Doszip Commander Version 2.44!
    <> Installing Commander under Windows
    <> Creating a user defined tools menu
    <> The File Search utility
+   <> Create List File
    <> Operation Filter
    <> Plugins
    <> Shortcut keys
@@ -149,28 +150,28 @@ Welcome to Doszip Commander Version 2.44!
    Alt-0	  Window list
    Alt-L	  Goto line number
    Alt-S	  Word search
-   Ctrl-F9        Options
-   Ctrl-R         Reload current file
-   Ctrl-O         User screen
+   Ctrl-F9	Options
+   Ctrl-R	 Reload current file
+   Ctrl-O	 User screen
 
    Open and close files
 
    F4 (Doszip)    Open file(s)
    Esc  	  Exit the editor and leave files open
-   Ctrl-X         Close current file and continue (if more files)
+   Ctrl-X	 Close current file and continue (if more files)
    Alt-X	  Close all files and exit
 
    Toggle flags On/Off
 
-   Ctrl-S         Style
-   Ctrl-T         Show Tabs
-   Ctrl-F         Optimal fill (Use Tabs)
-   Ctrl-I         Autoindent mode
+   Ctrl-S	 Style
+   Ctrl-T	 Show Tabs
+   Ctrl-F	 Optimal fill (Use Tabs)
+   Ctrl-I	 Autoindent mode
    Ctrl-M (F11)   Menus
 
    Cursor
 
-   Ctrl-Up        Scroll up one line
+   Ctrl-Up	Scroll up one line
    Ctrl-Down      Scroll down one line
    Ctrl-PgUp      Top of file
    Ctrl-PgDn      Bottom of file
@@ -461,6 +462,30 @@ Welcome to Doszip Commander Version 2.44!
    Esc  - Exit program.
 
 
+<> Create List File
+
+   The Create List File utility use the short key Alt-L, or drag and drop
+   selected files to the command line. Use F2 in File Search to save list.
+
+   Output format string:
+
+   \\	\
+   \%	%
+   \t	09
+   \n	0D 0A
+   %id       Index
+
+   %ext      .asm
+   %n	cmmklist
+   %p	/doszip/src/dzmain
+   %f	/doszip/src/dzmain/cmmklist.asm
+
+   %s	Search string
+   %o	Offset from File Search
+   %cd       Current directory
+   %dz       Doszip directory
+
+
 <> Operation Filter
 
    Choosing the Filters button (available on many of the file operation
@@ -543,15 +568,15 @@ Welcome to Doszip Commander Version 2.44!
    Alt-Left       History: Prev Directory
    Alt-Right      History: Next Directory
 
-   Alt-F1         Select Disk Panel-A
-   Alt-F2         Select Disk Panel-B
-   Alt-F3         View file --> DZ.INI
-   Alt-F4         Edit file --> DZ.INI
-   Alt-F5         Compress
-   Alt-F6         Decompress
-   Alt-F7         File search
-   Alt-F8         History: list of the last 16 DOS commands
-   Alt-F9         Toggle 50/25 lines
+   Alt-F1	 Select Disk Panel-A
+   Alt-F2	 Select Disk Panel-B
+   Alt-F3	 View file --> DZ.INI
+   Alt-F4	 Edit file --> DZ.INI
+   Alt-F5	 Compress
+   Alt-F6	 Decompress
+   Alt-F7	 File search
+   Alt-F8	 History: list of the last 16 DOS commands
+   Alt-F9	 Toggle 50/25 lines
    Alt-0	  Window list
    Alt-[1..9]     Run Tool nr. [1..9]
    Alt-C	  Toggle Command Line
@@ -561,7 +586,7 @@ Welcome to Doszip Commander Version 2.44!
    Alt-W	  Toggle wide view in current Panel
    Alt-X	  Quit
 
-   Ctrl-Up        History: Prev Command (Doskey-Up)
+   Ctrl-Up	History: Prev Command (Doskey-Up)
    Ctrl-Down      History: Next Command (Doskey-Down)
    Ctrl-Home      Goto root directory
    Ctrl-PgUp      Enter Updir
@@ -569,42 +594,42 @@ Welcome to Doszip Commander Version 2.44!
    Ctrl-[0..9]    Load Directory defined in section [Directory]
    Ctrl-Tab       File search (Ctrl-S)
 
-   Ctrl-F1        Toggle Panel-A
-   Ctrl-F2        Toggle Panel-B
-   Ctrl-F3        View file --> DZ.INI
-   Ctrl-F4        Edit file --> DZ.INI
-   Ctrl-F5        Sort current panel by Name
-   Ctrl-F6        Editor options
-   Ctrl-F7        Screen options
-   Ctrl-F8        System options
-   Ctrl-F9        Configuration
+   Ctrl-F1	Toggle Panel-A
+   Ctrl-F2	Toggle Panel-B
+   Ctrl-F3	View file --> DZ.INI
+   Ctrl-F4	Edit file --> DZ.INI
+   Ctrl-F5	Sort current panel by Name
+   Ctrl-F6	Editor options
+   Ctrl-F7	Screen options
+   Ctrl-F8	System options
+   Ctrl-F9	Configuration
 
-   Ctrl-A         File Attributes
-   Ctrl-B         User Screen
-   Ctrl-C         Compare Directories
-   Ctrl-D         Sort current panel by Date
-   Ctrl-E         Sort current panel by Type
-   Ctrl-F         Confirmation
-   Ctrl-G         Activates the Calendar (Mouse-click upper right)
+   Ctrl-A	 File Attributes
+   Ctrl-B	 User Screen
+   Ctrl-C	 Compare Directories
+   Ctrl-D	 Sort current panel by Date
+   Ctrl-E	 Sort current panel by Type
+   Ctrl-F	 Confirmation
+   Ctrl-G	 Activates the Calendar (Mouse-click upper right)
    - Navigate:    Home, (Pg)Up, (Pg)Down, Left, Right, Ctrl-PgUp, Ctrl-PgDn
-   Ctrl-H         Toggle Show Hidden in current Panel
-   Ctrl-I         Directory information
-   Ctrl-J         Compress Options
-   Ctrl-K         Toggle Status Line
-   Ctrl-L         Toggle Long filenames in current Panel
-   Ctrl-M         Toggle Ministatus in current Panel
-   Ctrl-N         Sort current panel by Name
-   Ctrl-O         Toggle Panels on/off
-   Ctrl-P         Panel Options
-   Ctrl-Q         Quick Search
-   Ctrl-R         Reread current Panel
-   Ctrl-S         File search
-   Ctrl-T         Toggle Show Detail in current Panel
-   Ctrl-U         Unsorted
-   Ctrl-V         Toggle Show Volume Information in current Panel
-   Ctrl-W         Swap Panels
-   Ctrl-X         Toggle Menus Line
-   Ctrl-Z         Sort current panel by Size
+   Ctrl-H	 Toggle Show Hidden in current Panel
+   Ctrl-I	 Directory information
+   Ctrl-J	 Compress Options
+   Ctrl-K	 Toggle Status Line
+   Ctrl-L	 Toggle Long filenames in current Panel
+   Ctrl-M	 Toggle Ministatus in current Panel
+   Ctrl-N	 Sort current panel by Name
+   Ctrl-O	 Toggle Panels on/off
+   Ctrl-P	 Panel Options
+   Ctrl-Q	 Quick Search
+   Ctrl-R	 Reread current Panel
+   Ctrl-S	 File search
+   Ctrl-T	 Toggle Show Detail in current Panel
+   Ctrl-U	 Unsorted
+   Ctrl-V	 Toggle Show Volume Information in current Panel
+   Ctrl-W	 Swap Panels
+   Ctrl-X	 Toggle Menus Line
+   Ctrl-Z	 Sort current panel by Size
 
    Shift-F2       Copy file (- to a new name in current directory)
    Shift-F3       View file --> DZ.INI
@@ -614,17 +639,17 @@ Welcome to Doszip Commander Version 2.44!
    Shift-F10      Activate the last menu you used with the last
 		  item you selected highlighted
 
-   Insert         Select file
-   Keypad+        Select files
-   Keypad-        Deselect files
-   Keypad*        Invert
+   Insert	 Select file
+   Keypad+	Select files
+   Keypad-	Deselect files
+   Keypad*	Invert
 
    Edit text
    ---------
 
-   Ctrl-X         Cut (Shift-Del)
-   Ctrl-C         Copy
-   Ctrl-V         Paste (Shift-Ins)
+   Ctrl-X	 Cut (Shift-Del)
+   Ctrl-C	 Copy
+   Ctrl-V	 Paste (Shift-Ins)
    Ctrl-Ins       Copy (use Cut+Paste in the command line)
    Ctrl-Left      Goto previous word
    Ctrl-Right     Goto next word
@@ -634,7 +659,7 @@ Welcome to Doszip Commander Version 2.44!
 
    Source directory:
    -----------------
-   dz        - Source files for DZ.EXE
+   dz	- Source files for DZ.EXE
    dzmain    - Source files for DZ.DLL
    clib      - Library source
    makefile  - Makefile for DZ.EXE and DZ.DLL

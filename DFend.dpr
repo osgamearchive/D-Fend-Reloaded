@@ -232,7 +232,8 @@ uses
   ExportGamesListFormUnit in 'ExportGamesListFormUnit.pas' {ExportGamesListForm},
   DOSBoxOutputTestFormUnit in 'DOSBoxOutputTestFormUnit.pas' {DOSBoxOutputTestForm},
   SingleInstanceUnit in 'SingleInstanceUnit.pas',
-  ResetProfilesFormUnit in 'ResetProfilesFormUnit.pas' {ResetProfilesForm};
+  ResetProfilesFormUnit in 'ResetProfilesFormUnit.pas' {ResetProfilesForm},
+  ScreenshotsCacheUnit in 'ScreenshotsCacheUnit.pas';
 
 {$R *.res}
 

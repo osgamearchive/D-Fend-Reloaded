@@ -91,7 +91,7 @@ begin
   end;
   TreeViewFontSizeEdit.Value:=PrgSetup.GamesTreeViewFontSize;
 
-  S:=PrgSetup.DefaultTreeFilter; //...
+  S:=PrgSetup.DefaultTreeFilter;
   while (length(S)<8) do S:=S+'1';
   for I:=0 to 7 do TreeViewDefaultGroups.Checked[I]:=(S[I+1]<>'0');
 

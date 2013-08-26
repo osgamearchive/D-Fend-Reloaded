@@ -65,6 +65,7 @@ object SetupFrameQBasic: TSetupFrameQBasic
     Width = 147
     Height = 13
     Caption = 'You can download QBasic from'
+    Visible = False
   end
   object QBasicDownloadURL: TLabel
     Left = 16
@@ -72,6 +73,7 @@ object SetupFrameQBasic: TSetupFrameQBasic
     Width = 98
     Height = 13
     Caption = 'QBasicDownloadURL'
+    Visible = False
     OnClick = QBasicDownloadURLClick
   end
   object QBasicEdit: TLabeledEdit

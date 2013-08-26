@@ -39,7 +39,7 @@ rem Create source archive
 del "..\DFend.exe" 
 del "..\*.dcu" /Q
 del "..\*.~*" /Q
-"C:\Program Files\7-Zip\7z.exe" a -r -x!Install\*.exe -x!Install\*.zip D-Fend-Reloaded--Source.zip "..\"
+"C:\Program Files\7-Zip\7z.exe" a -r -i!Install\Tools\*.exe -xr-!Install\*.exe -x!Install\*.zip D-Fend-Reloaded--Source.zip "..\"
 
 rem Clean up
 del "%USERPROFILE%\Desktop\D-Fend Reloaded\*.*" /S /Q

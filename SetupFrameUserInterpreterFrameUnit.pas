@@ -25,6 +25,7 @@ type
     procedure ProgramEditChange(Sender: TObject);
   private
     { Private-Deklarationen }
+    PBaseDir : PString;
     Programs, Extensions, Parameters : TStringList;
     LastItem : Integer;
     JustChanging : Boolean;
@@ -74,6 +75,8 @@ begin
   Programs.Assign(PrgSetup.DOSBoxBasedUserInterpretersPrograms);
   Extensions.Assign(PrgSetup.DOSBoxBasedUserInterpretersExtensions);
   Parameters.Assign(PrgSetup.DOSBoxBasedUserInterpretersParameters);
+
+  PBaseDir:=InitData.PBaseDir;
 
   NoFlicker(ComboBox);
   NoFlicker(ProgramEdit);
@@ -242,7 +245,9 @@ begin
         end;
     4 : begin
           S:=MakeAbsPath(ProgramEdit.Text,PrgSetup.BaseDir); If S<>'' then S:=ExtractFilePath(S);
-          If S='' then S:=GetSpecialFolder(Application.MainForm.Handle,CSIDL_PROGRAM_FILES);
+          {If S='' then S:=GetSpecialFolder(Application.MainForm.Handle,CSIDL_PROGRAM_FILES);}
+          If Trim(S)='' then S:=IncludeTrailingPathDelimiter(PBaseDir^);
+          S:=MakeAbsPath(S,IncludeTrailingPathDelimiter(PBaseDir^));
           OpenDialog.Title:=LanguageSetup.SetupFormUserDefinedInterpretersProgramTitle;
           OpenDialog.Filter:=LanguageSetup.SetupFormUserDefinedInterpretersProgramFilter;
           If S<>'' then OpenDialog.InitialDir:=S;

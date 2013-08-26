@@ -11,6 +11,7 @@ const DosBoxFileName='DOSBOX.EXE';
       IconsConfFile='Icons.ini';
       DosBoxDOSProfile='DOSBox DOS';
       RenderTestTempFile='Output.txt';
+      ScreenshotsCacheFileName='ScreenshotsThumbnailCache.dat';
 
       GameListSubDir='Confs';
       IconsSubDir='IconLibrary';

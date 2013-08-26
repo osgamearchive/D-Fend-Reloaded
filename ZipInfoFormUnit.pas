@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, ComCtrls, ZipMstr, SevenZipVCL;
+  Dialogs, StdCtrls, ComCtrls, ZipMstr, SevenZipVCL, Buttons;
 
 Type TZipMode=(zmExtract, zmCreate, zmAdd, zmCreateAndDelete, zmAddAndDelete, zmDeleteOnly);
 
@@ -14,8 +14,10 @@ type
   TZipInfoForm = class(TForm)
     ProgressBar: TProgressBar;
     InfoLabel: TLabel;
+    CancelButton: TBitBtn;
     procedure FormShow(Sender: TObject);
     procedure FormCreate(Sender: TObject);
+    procedure CancelButtonClick(Sender: TObject);
   private
     { Private-Deklarationen }
     Zip : TZipMaster;
@@ -26,6 +28,7 @@ type
     Mode : TZipMode;
     FCompressStrength : TCompressStrength;
     FDeleteMode : TDeleteMode;
+    FProcessingCanceled : Boolean;
 
     SevenZipLastError : Integer;
     SevenZipMaxProgress : Int64;
@@ -74,12 +77,13 @@ Function GetCompressStrengthFromPrgSetup : TCompressStrength;
 implementation
 
 uses Math, LanguageSetupUnit, PrgSetupUnit, CommonTools, DOSBoxUnit, PrgConsts,
-     GameDBToolsUnit;
+     GameDBToolsUnit, VistaToolsUnit;
 
 {$R *.dfm}
 
 procedure TZipInfoForm.FormCreate(Sender: TObject);
 begin
+  FProcessingCanceled:=false;
   DoubleBuffered:=True;
   FCompressStrength:=MAXIMUM;
 end;
@@ -128,6 +132,10 @@ end;
 
 procedure TZipInfoForm.FormShow(Sender: TObject);
 begin
+  SetVistaFonts(self);
+  Font.Charset:=CharsetNameToFontCharSet(LanguageSetup.CharsetName);
+  CancelButton.Caption:=LanguageSetup.Cancel;
+
   PostMessage(Handle,WM_USER+1,0,0);
 end;
 
@@ -191,6 +199,7 @@ begin
     SetCurrentDir(PrgDir+BinFolder);
     Zip:=TZipMaster.Create(self);
     Zip.Dll_Load:=True;
+    Zip.Unattended:=True;
     SetCurrentDir(S);
   end;
 
@@ -200,15 +209,18 @@ begin
     Zip.ZipFileName:=ZipFile;
     Zip.RootDir:=Folder;
 
-    Case Mode of
+    CancelButton.Enabled:=True;
+
+    try case Mode of
       zmExtract                   : ZipExtract;
       zmCreate, zmCreateAndDelete : ZipCreate;
       zmAdd, zmAddAndDelete       : ZipAdd;
-    end;
+    end except end;
 
     while Zip.Busy do begin
       Sleep(500);
       Application.ProcessMessages;
+      if FProcessingCanceled then begin Zip.Cancel:=True; result:=false; break; end;
     end;
 
     If Zip.ErrCode<>0 then begin
@@ -295,6 +307,8 @@ begin
   InfoLabel.Caption:=
     Format(S,[ExtractFileName(ZipFile)])+#13+#13+Folder+#13+#13+
     Format(LanguageSetup.ZipFormProgress,[Details.TotalPerCent,Details.TotalPosition div 1024 div 1024,1000*Details.TotalPosition div 1024 div 1024 div Max(1,(GetTickCount-Start))]);
+
+  if FProcessingCanceled then Zip.Cancel:=True;
 end;
 
 function TZipInfoForm.SevenZipWork: Boolean;
@@ -311,7 +325,8 @@ begin
     SevenZip:=TSevenZip.Create(self);
     SetCurrentDir(S);
   end;
-  
+
+  CancelButton.Enabled:=True;
   try
     SevenZip.SZFileName:=ZipFile;
     SevenZip.OnPreProgress:=SevenZipPreProgress;
@@ -337,6 +352,7 @@ begin
         then MessageDlg(LanguageSetup.ZipFormErrorExtract,mtError,[mbOK],0)
         else MessageDlg(LanguageSetup.ZipFormErrorCompress,mtError,[mbOK],0);
     end;
+    if FProcessingCanceled then result:=False;
   finally
     SevenZip.Free;
   end;
@@ -381,6 +397,7 @@ begin
     Format(LanguageSetup.ZipFormProgress,[100*FilePosArc div SevenZipMaxProgress,FilePosArc div 1024 div 1024,1000*FilePosArc div 1024 div 1024 div Max(1,(GetTickCount-Start))]);
 
   Application.ProcessMessages;
+  if FProcessingCanceled then SevenZip.Cancel;
 end;
 
 procedure TZipInfoForm.SevenZipExtractOverwrite(Sender: TObject; FileName: WideString; var DoOverwrite: Boolean);
@@ -507,6 +524,12 @@ begin
   end;
 
   result:=True;
+end;
+
+procedure TZipInfoForm.CancelButtonClick(Sender: TObject);
+begin
+  CancelButton.Enabled:=False;
+  FProcessingCanceled:=true;
 end;
 
 function TZipInfoForm.DeleteFiles: Boolean;

@@ -143,7 +143,7 @@ uses SysUtils, Forms, Dialogs, ShellAPI, ShlObj, IniFiles, Math,  PNGImage,
      ProfileEditorFormUnit, ModernProfileEditorFormUnit, HashCalc,
      SmallWaitFormUnit, ChecksumFormUnit, WaitFormUnit, ImageCacheUnit,
      DosBoxUnit, ScummVMUnit, ImageStretch, MainUnit, GameDBFilterUnit,
-     HistoryUnit, IconLoaderUnit;
+     HistoryUnit, IconLoaderUnit, ScreenshotsCacheUnit;
 
 Function GroupMatch(const GameGroupUpper, SelectedGroupUpper : String) : Boolean; forward;
 
@@ -1452,43 +1452,12 @@ begin
 end;
 
 Procedure AddScreenshotsToList(const AListView : TListView; const AImageList : TImageList; Dir : String);
-Procedure CalcWH(const OldW, OldH, MaxW, MaxH : Integer; var NewW, NewH : Integer);
-Var F : Double;
-begin
-  F:=OldW/OldH;
-
-  If (OldW<=MaxW) and (OldH<=MaxH) then begin
-    {too small scale up}
-    If MaxH*F>MaxW then begin NewW:=MaxW; NewH:=Round(NewW/F); end else begin NewH:=MaxH; NewW:=Round(NewH*F); end;
-    exit;
-  end;
-
-  {scale down}
-  If OldW>MaxW then begin
-    {too wide}
-    NewW:=MaxW; NewH:=Round(NewW/F);
-    {also to high ?}
-    If NewH>MaxH then begin NewH:=MaxH; NewW:=Round(NewH*F); end;
-    exit;
-  end;
-
-  {too high}
-  NewH:=MaxH; NewW:=Round(NewH*F);
-  {also too wide ?}
-  If NewW>MaxW then begin NewW:=MaxW; NewH:=Round(NewW/F); end;
-end;
 const Exts : Array[0..4] of String = ('png','jpg','jpeg','gif','bmp');
-Var I,K : Integer;
+Var St : TStringList;
+    I,K : Integer;
     Rec : TSearchRec;
-    P : TPNGObject;
-    J : TJPEGImage;
-    G : TGIFImage;
-    B,B2 : TBitmap;
+    B : TBitmap;
     L : TListItem;
-    OK : Boolean;
-    NewW, NewH : Integer;
-    St : TStringList;
-    S : String;
 begin
   AListView.SortType:=stNone;
   Dir:=IncludeTrailingPathDelimiter(Dir);
@@ -1506,102 +1475,13 @@ begin
 
     {Add games to list view}
     For K:=0 to St.Count-1 do begin
-      S:=ExtUpperCase(ExtractFileExt(St[K]));
-      OK:=False;
-
-      If S='.PNG' then begin
-        P:=TPNGObject.Create;
-        try
-          OK:=True; try P.LoadFromFile(Dir+St[K]); except OK:=False; end;
-          if P=nil then OK:=False;
-          If OK then begin
-            B:=TBitmap.Create;
-            try try
-              {not working well: B.Assign(P);}
-              B.Width:=P.Width;
-              B.Height:=P.Height;
-              P.Draw(B.Canvas,Rect(0,0,B.Width-1,B.Height-1));
-
-              B2:=TBitmap.Create;
-              try
-                B2.SetSize(AImageList.Width,AImageList.Height);
-                CalcWH(B.Width,B.Height,AImageList.Width,AImageList.Height,NewW,NewH);
-                ScaleImage(B,B2,NewW,NewH);
-                AImageList.AddMasked(B2,clNone);
-              finally
-                B2.Free;
-              end;
-            except OK:=True; end; finally B.Free; end;
-          end;
-        finally P.Free; end;
-      end;
-
-      If (S='.JPG') or (S='.JPEG') then begin
-        J:=TJPEGImage.Create;
-        try
-          OK:=True; try J.LoadFromFile(Dir+St[K]); except OK:=False; end;
-          If OK then begin
-            B:=TBitmap.Create;
-            try try
-              B.Assign(J);
-              B2:=TBitmap.Create;
-              try
-                B2.SetSize(AImageList.Width,AImageList.Height);
-                CalcWH(B.Width,B.Height,AImageList.Width,AImageList.Height,NewW,NewH);
-                ScaleImage(B,B2,NewW,NewH);
-                AImageList.AddMasked(B2,clNone);
-              finally
-                B2.Free;
-              end;
-            except OK:=False; end; finally B.Free; end;
-          end;
-        finally J.Free; end;
-      end;
-
-      If S='.GIF' then begin
-        G:=TGifImage.Create;
-        try
-          OK:=True; try G.LoadFromFile(Dir+St[K]); except OK:=False; end;
-          If OK then begin
-            B:=TBitmap.Create;
-            try try
-              B.Assign(G);
-              B2:=TBitmap.Create;
-              try
-                B2.SetSize(AImageList.Width,AImageList.Height);
-                CalcWH(B.Width,B.Height,AImageList.Width,AImageList.Height,NewW,NewH);
-                ScaleImage(B,B2,NewW,NewH);
-                AImageList.AddMasked(B2,clNone);
-              finally
-                B2.Free;
-              end;
-            except OK:=False; end; finally B.Free; end;
-          end;
-        finally G.Free; end;
-      end;
-
-      If S='.BMP' then begin
-        B:=TBitmap.Create;
-        try
-          OK:=True; try B.LoadFromFile(Dir+St[K]); except OK:=False; end;
-          If OK then begin
-            B2:=TBitmap.Create;
-            try try
-              B2.SetSize(AImageList.Width,AImageList.Height);
-                CalcWH(B.Width,B.Height,AImageList.Width,AImageList.Height,NewW,NewH);
-                ScaleImage(B,B2,NewW,NewH);
-              AImageList.AddMasked(B2,clNone);
-            except OK:=False; end; finally B2.Free; end;
-          end;
-        finally B.Free; end;
-      end;
-
-      If OK then begin
+      B:=ScreenshotsCache.GetThumbnail(Dir+St[K],AImageList.Width,AImageList.Height);
+      If B<>nil then begin
+        AImageList.AddMasked(B,clNone); B.Free;
         L:=AListView.Items.Add;
         L.Caption:=St[K];
         L.ImageIndex:=AImageList.Count-1;
       end;
-
     end;
   finally
     St.Free;

@@ -3,7 +3,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
   Top = 0
   ActiveControl = TreeView
   Caption = 'D-Fend Reloaded'
-  ClientHeight = 878
+  ClientHeight = 898
   ClientWidth = 774
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -4360,7 +4360,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
   object Splitter: TSplitter
     Left = 169
     Top = 24
-    Height = 732
+    Height = 752
     ResizeStyle = rsUpdate
     OnMoved = FormResize
     ExplicitLeft = 224
@@ -4371,7 +4371,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
     Left = 0
     Top = 24
     Width = 169
-    Height = 732
+    Height = 752
     Align = alLeft
     Constraints.MinWidth = 50
     HideSelection = False
@@ -4518,13 +4518,13 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
     Left = 172
     Top = 24
     Width = 602
-    Height = 732
+    Height = 752
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 2
     object Splitter1: TSplitter
       Left = 0
-      Top = 529
+      Top = 549
       Width = 602
       Height = 3
       Cursor = crVSplit
@@ -4537,7 +4537,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
       Left = 0
       Top = 0
       Width = 602
-      Height = 529
+      Height = 549
       Align = alClient
       Columns = <>
       HideSelection = False
@@ -4559,7 +4559,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
     end
     object CapturePageControl: TPageControl
       Left = 0
-      Top = 532
+      Top = 552
       Width = 602
       Height = 200
       ActivePage = CaptureScreenshotsTab
@@ -4579,9 +4579,9 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
         ExplicitHeight = 0
         object ScreenshotListView: TListView
           Left = 0
-          Top = 17
+          Top = 35
           Width = 594
-          Height = 154
+          Height = 136
           Align = alClient
           BorderStyle = bsNone
           Columns = <>
@@ -4599,7 +4599,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
           Left = 0
           Top = 0
           Width = 594
-          Height = 17
+          Height = 35
           Align = alTop
           BevelOuter = bvNone
           Caption = 'You can save screenshots by pressing Ctrl+F5 in DOSBox.'
@@ -4616,9 +4616,9 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
         ExplicitHeight = 0
         object SoundListView: TListView
           Left = 0
-          Top = 17
+          Top = 35
           Width = 594
-          Height = 154
+          Height = 136
           Align = alClient
           BorderStyle = bsNone
           Columns = <>
@@ -4636,7 +4636,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
           Left = 0
           Top = 0
           Width = 594
-          Height = 17
+          Height = 35
           Align = alTop
           BevelOuter = bvNone
           Caption = 
@@ -4655,9 +4655,9 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
         ExplicitHeight = 0
         object VideoListView: TListView
           Left = 0
-          Top = 17
+          Top = 35
           Width = 594
-          Height = 154
+          Height = 136
           Align = alClient
           BorderStyle = bsNone
           Columns = <>
@@ -4675,7 +4675,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
           Left = 0
           Top = 0
           Width = 594
-          Height = 17
+          Height = 35
           Align = alTop
           BevelOuter = bvNone
           Caption = 
@@ -4780,7 +4780,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
   end
   object ZipInfoPanel: TPanel
     Left = 0
-    Top = 756
+    Top = 776
     Width = 774
     Height = 40
     Align = alBottom
@@ -4807,7 +4807,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
   end
   object FirstRunInfoPanel: TPanel
     Left = 0
-    Top = 796
+    Top = 816
     Width = 774
     Height = 82
     Align = alBottom
@@ -4865,7 +4865,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
     Left = 304
     Top = 32
     Bitmap = {
-      494C01012E003400980010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01012E003400B40010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000040000000C0000000010020000000000000C0
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -9792,7 +9792,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
     Left = 216
     Top = 296
     Bitmap = {
-      494C010104000C00980010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010104000C00B40010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000002000000001002000000000000020
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

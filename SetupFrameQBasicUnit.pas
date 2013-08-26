@@ -19,6 +19,7 @@ type
     procedure QBasicDownloadURLClick(Sender: TObject);
   private
     { Private-Deklarationen }
+    PBaseDir : PString;
   public
     { Public-Deklarationen }
     Function GetName : String;
@@ -48,6 +49,8 @@ end;
 
 procedure TSetupFrameQBasic.InitGUIAndLoadSetup(var InitData: TInitData);
 begin
+  PBaseDir:=InitData.PBaseDir;
+
   NoFlicker(QBasicEdit);
   NoFlicker(QBasicParamEdit);
 
@@ -105,7 +108,9 @@ begin
   Case (Sender as TComponent).Tag of
    19 : begin
           S:=Trim(QBasicEdit.Text); If S<>'' then S:=ExtractFilePath(S);
-          If S='' then S:=GetSpecialFolder(Application.MainForm.Handle,CSIDL_PROGRAM_FILES);
+          If Trim(S)='' then S:=IncludeTrailingPathDelimiter(PBaseDir^);
+          S:=MakeAbsPath(S,IncludeTrailingPathDelimiter(PBaseDir^));
+          {If S='' then S:=GetSpecialFolder(Application.MainForm.Handle,CSIDL_PROGRAM_FILES);}
           PrgOpenDialog.Title:=LanguageSetup.SetupFormQBasicFile;
           PrgOpenDialog.Filter:=LanguageSetup.SetupFormExeFilter;
           If S<>'' then PrgOpenDialog.InitialDir:=S;

@@ -722,6 +722,23 @@ begin
   AddSetting(8008,LanguageSetup.ProfileEditorSoundMiscTandyRate,ValueToList(GameDB.ConfOpt.TandyRate,';,'),False,ValueWidth,True);
   AddYesNoSetting(8009,LanguageSetup.ProfileEditorSoundMiscEnableDisneySoundsSource);
 
+  {Volume}
+  AddCaption(LanguageSetup.ProfileEditorGeneralSheet+' - '+LanguageSetup.ProfileEditorSoundVolumeSheet);
+  AddSpinSetting(8051,LanguageSetup.ProfileEditorSoundMasterVolume+' - '+LanguageSetup.Left,0,200,ValueWidth,100);
+  AddSpinSetting(8052,LanguageSetup.ProfileEditorSoundMasterVolume+' - '+LanguageSetup.Right,0,200,ValueWidth,100);
+  AddSpinSetting(8053,LanguageSetup.ProfileEditorSoundMiscDisneySoundsSource+' - '+LanguageSetup.Left,0,200,ValueWidth,100);
+  AddSpinSetting(8054,LanguageSetup.ProfileEditorSoundMiscDisneySoundsSource+' - '+LanguageSetup.Right,0,200,ValueWidth,100);
+  AddSpinSetting(8055,LanguageSetup.ProfileEditorSoundMiscPCSpeaker+' - '+LanguageSetup.Left,0,200,ValueWidth,100);
+  AddSpinSetting(8056,LanguageSetup.ProfileEditorSoundMiscPCSpeaker+' - '+LanguageSetup.Right,0,200,ValueWidth,100);
+  AddSpinSetting(8057,LanguageSetup.ProfileEditorSoundGUS+' - '+LanguageSetup.Left,0,200,ValueWidth,100);
+  AddSpinSetting(8058,LanguageSetup.ProfileEditorSoundGUS+' - '+LanguageSetup.Right,0,200,ValueWidth,100);
+  AddSpinSetting(8059,LanguageSetup.ProfileEditorSoundSoundBlaster+' - '+LanguageSetup.Left,0,200,ValueWidth,100);
+  AddSpinSetting(8060,LanguageSetup.ProfileEditorSoundSoundBlaster+' - '+LanguageSetup.Right,0,200,ValueWidth,100);
+  AddSpinSetting(8061,LanguageSetup.ProfileEditorSoundFM+' - '+LanguageSetup.Left,0,200,ValueWidth,100);
+  AddSpinSetting(8062,LanguageSetup.ProfileEditorSoundFM+' - '+LanguageSetup.Right,0,200,ValueWidth,100);
+  AddSpinSetting(8063,LanguageSetup.ProfileEditorSoundCD+' - '+LanguageSetup.Left,0,200,ValueWidth,100);
+  AddSpinSetting(8064,LanguageSetup.ProfileEditorSoundCD+' - '+LanguageSetup.Right,0,200,ValueWidth,100);
+
   {SoundBlaster}
   AddCaption(LanguageSetup.ProfileEditorGeneralSheet+' - '+LanguageSetup.ProfileEditorSoundSoundBlaster);
   AddSetting(8101,LanguageSetup.ProfileEditorSoundSBType,ValueToList(GameDB.ConfOpt.Sblaster,';,'),False,ValueWidth,True);
@@ -1106,6 +1123,22 @@ begin
       end;
       If ValueActive(8006) then begin try J:=Min(65536,Max(1,StrToInt(GetComboText))); except J:=10; end; G.SpeakerTandyRate:=J; end;
       If ValueActive(8009) then G.SpeakerDisney:=GetYesNo;
+
+      {Volume}
+      If ValueActive(8051) then G.MixerVolumeMasterLeft:=Max(0,Min(200,GetSpinValue));
+      If ValueActive(8052) then G.MixerVolumeMasterRight:=Max(0,Min(200,GetSpinValue));
+      If ValueActive(8053) then G.MixerVolumeDisneyLeft:=Max(0,Min(200,GetSpinValue));
+      If ValueActive(8054) then G.MixerVolumeDisneyRight:=Max(0,Min(200,GetSpinValue));
+      If ValueActive(8055) then G.MixerVolumeSpeakerLeft:=Max(0,Min(200,GetSpinValue));
+      If ValueActive(8056) then G.MixerVolumeSpeakerRight:=Max(0,Min(200,GetSpinValue));
+      If ValueActive(8057) then G.MixerVolumeGUSLeft:=Max(0,Min(200,GetSpinValue));
+      If ValueActive(8058) then G.MixerVolumeGUSRight:=Max(0,Min(200,GetSpinValue));
+      If ValueActive(8059) then G.MixerVolumeSBLeft:=Max(0,Min(200,GetSpinValue));
+      If ValueActive(8060) then G.MixerVolumeSBRight:=Max(0,Min(200,GetSpinValue));
+      If ValueActive(8061) then G.MixerVolumeFMLeft:=Max(0,Min(200,GetSpinValue));
+      If ValueActive(8062) then G.MixerVolumeFMRight:=Max(0,Min(200,GetSpinValue));
+      If ValueActive(8063) then G.MixerVolumeCDLeft:=Max(0,Min(200,GetSpinValue));
+      If ValueActive(8064) then G.MixerVolumeCDRight:=Max(0,Min(200,GetSpinValue));
 
       {SoundBlaster}
       If ValueActive(8101) then G.SBType:=GetComboText;

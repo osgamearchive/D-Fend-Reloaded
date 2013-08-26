@@ -297,6 +297,7 @@ Type TPrgSetup=class(TBasePrgSetup)
     property LastCheatsDBUpdateCheck : Integer index 35 read GetInteger write SetInteger;
     property DOSBoxStartFailedTimeout : Integer index 36 read GetInteger write SetInteger;
     property DataReaderMaxImages : Integer index 37 read GetInteger write SetInteger;
+    property ThumbnailCacheSize : Integer index 38 read GetInteger write SetInteger;
 
 
     property DOSBoxSettingsCount : Integer index 0 read GetListCount;
@@ -809,6 +810,7 @@ begin
   AddIntegerRec(35,'ProgramSets','LastCheatsDBUpdateCheck',0);
   AddIntegerRec(36,'ProgramSets','DOSBoxStartFailedTimeout',3);
   AddIntegerRec(37,'ProgramSets','DataReaderMaxImages',25);
+  AddIntegerRec(38,'ProgramSets','ThumbnailCacheSize',500);
 end;
 
 Procedure TPrgSetup.InitDirs;
