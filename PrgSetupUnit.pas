@@ -155,6 +155,7 @@ Type TPrgSetup=class(TBasePrgSetup)
     property ArchiveIDFiles : String index 45 read GetString write SetString;
     property LastSelectedProfile : String index 46 read GetString write SetString;
     property DefaultTreeFilter : String index 47 read GetString write SetString;
+    property DefaultFloppyDrive : String index 48 read GetString write SetString;
 
     property LinuxRemap[DriveLetter : Char] : String read GetDriveLetter write SetDriveLetter;
 
@@ -666,6 +667,7 @@ begin
   AddStringRec(45,'ProgramSets','ArchiveIDFiles',DefaultArchiveIDFiles);
   AddStringRec(46,'ProgramSets','LastSelectedProfile','');
   AddStringRec(47,'ProgramSets','DefaultTreeFilter','11111111');
+  AddStringRec(48,'ProgramSets','DefaultFloppyDrive','');
 
   For I:=0 to 25 do AddStringRec(450+I,'WineSupport',chr(ord('A')+I),'');
 

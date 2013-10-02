@@ -9,13 +9,17 @@ Function DownloadFileToDisk(const URL, FileName : String; const Referer : String
 Function EncodeName(const Name : String) : String;
 Function DecodeName(const Name : String) : String;
 
-Function GetTagContents(const Lines : String; const StartPosition : Integer; Tag, TagAttributeName, TagAttributeValue : String; const RequestAttributeName : String =''; const RequestAttributeValue : TStringList = nil) : TStringList; overload;
+Function GetTagContents(const Lines : String; const StartPosition : Integer; Tag, TagAttributeName, TagAttributeValue : String; const RequestAttributeName : String =''; const RequestAttributeValue : TStringList = nil; const RequestTextContent : String ='') : TStringList; overload;
 Function GetTagContents(const Lines : String; const StartPosition : Integer; Tag, TagAttributeName, TagAttributeValue : String; const TagNr : Integer) : String; overload; {Nr=1,2,...: number from start; Nr=-1,-2,...: number from last}
+
+Function GetJavascriptURLs(const Lines : String; const RequestTextContent : String) : TStringList;
 
 Function GetTag(const Lines : String; const StartPosition : Integer; Tag, TagAttributeName, TagAttributeValue : String; const RequestAttributeName : String =''; const RequestAttributeValue : TStringList = nil) : TStringList; overload;
 Function GetTag(const Lines : String; const StartPosition : Integer; Tag, TagAttributeName, TagAttributeValue : String; const TagNr : Integer) : String; overload; {Nr=1,2,...: number from start; Nr=-1,-2,...: number from last}
 
 Function GetPlainText(const Lines : String) : TStringList;
+
+Function GetPlainDecodedText(Lines : String) : String;
 
 implementation
 
@@ -66,12 +70,12 @@ Var MSt : TMemoryStream;
 begin
   result:=False;
   MSt:=DownloadFile(URL,Referer); If MSt=nil then exit;
+  result:=True;
   try
     try MSt.SaveToFile(FileName); except exit; end;
   finally
     MSt.Free;
   end;
-  result:=True;
 end;
 
 Function FindNext(const Lines : String; const Search : String; const From : Integer =1) : Integer;
@@ -145,11 +149,11 @@ begin
   end;
 end;
 
-Function GetTagContents(const Lines : String; const StartPosition : Integer; Tag, TagAttributeName, TagAttributeValue : String; const RequestAttributeName : String =''; const RequestAttributeValue : TStringList = nil) : TStringList;
+Function GetTagContents(const Lines : String; const StartPosition : Integer; Tag, TagAttributeName, TagAttributeValue : String; const RequestAttributeName : String =''; const RequestAttributeValue : TStringList = nil; const RequestTextContent : String ='') : TStringList;
 Var Position,I,J,TagContentStart,Count,TagContentEnd : Integer;
     C : Char;
     Ok : Boolean;
-    RequestValue : String;
+    RequestValue,S : String;
 begin
   result:=TStringList.Create;
   Position:=StartPosition;
@@ -222,8 +226,15 @@ begin
         end;
         While (Position<=length(Lines)) and (Lines[Position]<>'>') do inc(Position);
       end;
-      result.Add(Copy(Lines,TagContentStart,TagContentEnd-TagContentStart+1));
-      If Assigned(RequestAttributeValue) then RequestAttributeValue.Add(RequestValue);
+
+      S:=Copy(Lines,TagContentStart,TagContentEnd-TagContentStart+1);
+      if RequestTextContent<>'' then begin
+        if Pos(ExtUpperCase(RequestTextContent),ExtUpperCase(S))=0 then Ok:=False;
+      end;
+      if Ok then begin
+        result.Add(S);
+        If Assigned(RequestAttributeValue) then RequestAttributeValue.Add(RequestValue);
+      end;
     end;
 
     I:=FindNext(Lines,'<'+Tag,Position);
@@ -238,6 +249,31 @@ begin
   try
     If (TagNr>0) and (St.Count>=TagNr) then result:=St[TagNr-1];
     If (TagNr<0) and (St.Count>=-TagNr) then result:=St[St.Count-TagNr];
+  finally
+    St.Free;
+  end;
+end;
+
+Function GetJavascriptURLs(const Lines : String; const RequestTextContent : String) : TStringList;
+Var S : String;
+    St : TStringList;
+    I,J : Integer;
+begin
+  result:=TStringList.Create;
+  St:=GetTagContents(Lines,1,'script','type','text/javascript','',nil,RequestTextContent);
+  try
+    if St.Count=0 then exit;
+    S:=St[0];
+    While S<>'' do begin
+      I:=FindNext(S,'http:/'+'/'); if I=0 then exit;
+      S:=Copy(S,I,MaxInt);
+      I:=FindNext(S,'"'); J:=FindNext(S,''''); if (I=0) and (J=0) then exit;
+      if I=0 then I:=J else begin
+        if J<>0 then I:=Min(I,J);
+      end;
+      result.add(Copy(S,1,I-1));
+      S:=Copy(S,I+1,MaxInt);
+    end;
   finally
     St.Free;
   end;
@@ -358,5 +394,50 @@ begin
     I:=J+1; InTag:=not InTag;
   end;
 end;
+
+Function GetPlainDecodedText(Lines : String) : String;
+Var S : String;
+    I,J,Count : Integer;
+    St : TStringList;
+begin
+  S:='';
+  Count:=0;
+
+  While Lines<>'' do begin
+    I:=FindNext(Lines,'<div',1);
+    J:=FindNext(Lines,'</div',1);
+
+    If (I=0) and (J=0) then break;
+
+    If (J=0) or ((I>0) and (I<J)) then begin
+      If Count=0 then S:=Trim(S+' '+Copy(Lines,1,I-1));
+      inc(Count);
+      Lines:=Copy(Lines,I+4,MaxInt);
+      continue;
+    end;
+
+    if (I=0) or ((J>0) and (J<I)) then begin
+      J:=FindNext(Lines,'>',J+4);
+      if J=0 then Lines:='' else begin
+        If Count>0 then dec(Count);
+        Lines:=Copy(Lines,J+1,MaxInt);
+      end;
+      continue;
+    end;
+  end;
+
+  If Count=0 then S:=Trim(S+' '+Lines);
+
+  St:=GetPlainText(S);
+  try
+    result:=Trim(St.Text);
+  finally
+    St.Free;
+  end;
+
+  if (length(result)>length('View History')) and (Copy(result,length(result)-length('View History')+1,MaxInt)='View History') then result:=Trim(Copy(result,1,length(result)-length('View History')));
+  if (length(result)>length('Edit')) and (Copy(result,length(result)-length('Edit')+1,MaxInt)='Edit') then result:=Trim(Copy(result,1,length(result)-length('Edit')));
+end;
+
 
 end.

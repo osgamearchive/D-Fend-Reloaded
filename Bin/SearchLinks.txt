@@ -1,5 +1,5 @@
 Mobygames.com;http://www.mobygames.com/search/quick?game=<GAMENAME>&p=-1&search=Go
-Squakenet.com;http://www.squakenet.com/pc_games/step2.asp?game_title=<GAMENAME>
+Squakenet.com;http://www.squakenet.com/pc_games/?q=<GAMENAME>
 TheLegacy.de;http://www.thelegacy.de/Museum/SQLFrameset.php3?SearchValue=<GAMENAME>&searchEntity=TITLE&misc=yes&quick=yes&list=SQLlist_games.php3
 KultPower.de;http://www.kultpower.de/kultpower_search.php?search=<GAMENAME>
 Google.com;http://www.google.com/search?q=<GAMENAME>

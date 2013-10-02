@@ -2,9 +2,9 @@ DOSZIP.TXT--
 Copyright 2013 Hjort Nidudsson.
 
 DOSZIP COMMANDER
-Version 2.48
+Version 2.50
 
-Welcome to Doszip Commander Version 2.48!
+Welcome to Doszip Commander Version 2.50!
 =========================================
 
 <> Index
@@ -23,7 +23,6 @@ Welcome to Doszip Commander Version 2.48!
    <> The File Search utility
    <> Create List File
    <> Operation Filter
-   <> Plugins
    <> Shortcut keys
    <> Compiling
    <> Additional Resources
@@ -34,21 +33,21 @@ Welcome to Doszip Commander Version 2.48!
 
    DZBIN???.ZIP: Program files
 
-   DZ.EXE       - DZ Loader
-   DZ.DLL       - DZ Main Shell
-   DZ.ICO       - DZ Icon File
-   DOSZIP.TXT   - DZ Help file (this file)
-   COPYING      - GNU General Public License
+   DZ.EXE	- DZ Loader
+   DZ.BIN	- DZ Main Shell
+   DZ.ICO	- DZ Icon File
+   DOSZIP.TXT	- DZ Help file (this file)
+   LICENSE.TXT  - GNU General Public License
 
    DZSRC???.ZIP: Source code
 
-   INC  	- Library header files
-   LIB  	- Library files are created here
-   SRC  	- The source files are contained here
+   INC		- Library header files
+   LIB		- Library files are created here
+   SRC		- The source files are contained here
    HISTORY.TXT  - Changelog file for Doszip
 
    The first time you run DZ.EXE, it creates a default configuration
-   file (DZ.INI).
+   directory (.\DOC) with subdirs and .INI-files.
 
    The version of the source code and binary files is the date and
    time in the .ZIP file (1:00 == v1.00)
@@ -72,14 +71,14 @@ Welcome to Doszip Commander Version 2.48!
 
 <> Command Line
 
-   Command      Description
-   -------      ------------------------------------------------
-   /T   	Launch Commander with TINY memory configuration.
+   Command	Description
+   -------	------------------------------------------------
+   /T		Launch Commander with TINY memory configuration.
 		Number of files per panel is 500.
-   /L   	Launch Commander with  LARGE memory configuration.
+   /L		Launch Commander with  LARGE memory configuration.
 		Number of files per panel is 5000.
-   /XP (WinXP)  Trigger a mode change on startup.
-   /C<path>     Set Configuration PATH to <path> (.CFG and .INI path)
+   /XP		Trigger a mode change on startup (WinXP).
+   /C<path>	Set Configuration PATH to <path> (default is .\doc)
 
      DZ <filename> command starts DZ and forces it to show <filename>
    contents if it is an archive or show folder contents if <filename>
@@ -108,8 +107,8 @@ Welcome to Doszip Commander Version 2.48!
    section of DZ.INI file to associated 4 viewers:
 
    [View]
-   F3    = ; You can override the internal viewer by redefine F3
-   Alt   = ; Viewer for Alt+F3
+   F3	 = ; You can override the internal viewer by redefine F3
+   Alt	 = ; Viewer for Alt+F3
    Ctrl  = ; Viewer for Ctrl+F3
    Shift = ; Viewer for Shift+F3
 
@@ -125,8 +124,8 @@ Welcome to Doszip Commander Version 2.48!
    section of DZ.INI file to associated 4 editors:
 
    [Edit]
-   F4    = ; You can override the internal editor by redefine F4
-   Alt   = ; Editor for Alt+F4
+   F4	 = ; You can override the internal editor by redefine F4
+   Alt	 = ; Editor for Alt+F4
    Ctrl  = ; Editor for Ctrl+F4
    Shift = ; Editor for Shift+F4
 
@@ -138,64 +137,45 @@ Welcome to Doszip Commander Version 2.48!
    Keyboard
    --------
 
-   F1   	  Help
-   F2 (Ctrl-F2)   Save file (as...)
-   F3 (Ctrl-L)    Search (again)
-   F4   	  Replace
-   F5   	  Open file
-   F6   	  Toggle files
-   F7 (Esc)       Toggle edit
-   F8   	  Save session
-   F9   	  Load session
+   F1		  Help
+   F2 (Ctrl-F2)	  Save file (as...)
+   F3 (Ctrl-L)	  Search (again)
+   F4		  Replace
+   F5		  Open file
+   F6		  Toggle files
+   F7 (Esc)	  Toggle edit
+   F8		  Save session
+   F9		  Load session
    Alt-0	  Window list
    Alt-L	  Goto line number
    Alt-S	  Word search
-   Ctrl-F9	Options
-   Ctrl-R	 Reload current file
-   Ctrl-O	 User screen
+   Ctrl-F9	  Options
+   Ctrl-R	  Reload current file
+   Ctrl-O	  User screen
 
    Open and close files
 
-   F4 (Doszip)    Open file(s)
-   Esc  	  Exit the editor and leave files open
-   Ctrl-X	 Close current file and continue (if more files)
+   F4 (Doszip)	  Open file(s)
+   Esc		  Exit the editor and leave files open
+   Ctrl-X	  Close current file and continue (if more files)
    Alt-X	  Close all files and exit
 
    Toggle flags On/Off
 
-   Ctrl-S	 Style
-   Ctrl-T	 Show Tabs
-   Ctrl-F	 Optimal fill (Use Tabs)
-   Ctrl-I	 Autoindent mode
-   Ctrl-M (F11)   Menus
+   Ctrl-S	  Style
+   Ctrl-T	  Show Tabs
+   Ctrl-F	  Optimal fill (Use Tabs)
+   Ctrl-I	  Autoindent mode
+   Ctrl-M (F11)	  Menus
 
    Cursor
 
-   Ctrl-Up	Scroll up one line
-   Ctrl-Down      Scroll down one line
-   Ctrl-PgUp      Top of file
-   Ctrl-PgDn      Bottom of file
-   Ctrl-Home      Top of window
-   Ctrl-End       Bottom of window
-
-   External comands
-   ----------------
-
-   You can modify the [ShiftF1..F9], and [AltF1..F6] sections of the DZ.INI
-   file to associate external comands: (excluding Alt-F3)
-
-   [ShiftF3]
-   asm  = JWasm -I%doszip%\inc
-   c    = wcc -ml
-
-   The syntax is equal to the section [Filetype].
-
-   The sections [Shift/Alt-FX] parse a "pipe.err" file if exist.
-   The file ERR.EXE creates the this file.
-   Usage:
-   [ShiftF3]
-   asm  = err JWasm -I%doszip%\inc
-   c    = err wcc -ml
+   Ctrl-Up	  Scroll up one line
+   Ctrl-Down	  Scroll down one line
+   Ctrl-PgUp	  Top of file
+   Ctrl-PgDn	  Bottom of file
+   Ctrl-Home	  Top of window
+   Ctrl-End	  Bottom of window
 
    Syntax highlighting
    -------------------
@@ -249,29 +229,22 @@ Welcome to Doszip Commander Version 2.48!
    File type definition
    --------------------
 
-   [Styletype.*]     - all files
-   [Styletype.*.asm] - all *.asm files
+   Code for syntax is located in [%dz%\style] directory, and file types
+   must be defined under the section [Style] in the DZ.INI file:
 
-   The section [Styletype.*] have the following syntax:
+   [Style]
+   asm = asm.ini
+   inc = asm.ini
 
-   [Styletype.*]
-   <Id>=<section>
-   <Id>=[<section>]
+   .ASM and .INC files will now use the file %dz%\style\asm.ini
 
-   Example:
+   The editor reads the section [.] in the code file which have the
+   following syntax:
 
-   [Black]
-   00=A 07
-   [Blue]
-   00=A 17
-   [Styletype.*]
-   00=Black
-   [Styletype.*.asm]
-   00=[Styletype.*]
-   [Styletype.*.c]
-   00=Blue
-
-   The *.c files are now Gray on Blue and the rest is Gray on Black.
+   [.]
+   <Id>=<section> | [<file>]
+   [<section>]
+   <code>
 
 
 <> Extension and Filename Support
@@ -282,17 +255,17 @@ Welcome to Doszip Commander Version 2.48!
    as follows:
 
    <ext>  = <command> !.! - filetype
-   <name> = <command>     - filename (no ext)
+   <name> = <command>	  - filename (no ext)
 
    File macros:
 
-   !!   !
-   !:   Drive + ':'
-   !\   Long path
-   !    Long file name
-   .!   Long extension
+   !!	!
+   !:	Drive + ':'
+   !\	Long path
+   !	Long file name
+   .!	Long extension
    !~\  Short path
-   ~!   Short file name
+   ~!	Short file name
 
    Default (no macro used):
 
@@ -332,7 +305,7 @@ Welcome to Doszip Commander Version 2.48!
 
    The value of %DZ% may be set in the environment (SET DZ=<path>), or on
    the command line (/C<path>). Command line overwrites environment.
-   The default value is equal to %DOSZIP%.
+   The default value is equal to %DOSZIP%\doc.
 
    The variable COMSPEC will be overwritten by the [Comspec] value if
    defined:
@@ -450,14 +423,14 @@ Welcome to Doszip Commander Version 2.48!
 
    Shortkeys
    ---------
-   F2   - Save result to list file.
-   F3   - View current file - same as Enter.
-   F4   - Edit current file - exit and execute external editor.
-   F5   - Launch the Operation Filter dialog.
-   F6   - Toggle ascii/hex search string.
-   F7   - Start a new search.
-   F8   - Delete  Delete file from list.
-   F9   - Load predefined file mask from .INI file.
+   F2	- Save result to list file.
+   F3	- View current file - same as Enter.
+   F4	- Edit current file - exit and execute external editor.
+   F5	- Launch the Operation Filter dialog.
+   F6	- Toggle ascii/hex search string.
+   F7	- Start a new search.
+   F8	- Delete  Delete file from list.
+   F9	- Load predefined file mask from .INI file.
    F10  - Toggle output format
    Esc  - Exit program.
 
@@ -469,21 +442,21 @@ Welcome to Doszip Commander Version 2.48!
 
    Output format string:
 
-   \\	\
-   \%	%
-   \t	09
-   \n	0D 0A
-   %id       Index
+   \\	     \
+   \%	     %
+   \t	     09
+   \n	     0D 0A
+   %id	     Index
 
-   %ext      .asm
-   %n	cmmklist
-   %p	/doszip/src/dzmain
-   %f	/doszip/src/dzmain/cmmklist.asm
+   %ext	     .asm
+   %n	     cmmklist
+   %p	     /doszip/src/dzmain
+   %f	     /doszip/src/dzmain/cmmklist.asm
 
-   %s	Search string
-   %o	Offset from File Search
-   %cd       Current directory
-   %dz       Doszip directory
+   %s	     Search string
+   %o	     Offset from File Search
+   %cd	     Current directory
+   %dz	     Doszip directory
 
 
 <> Operation Filter
@@ -502,83 +475,42 @@ Welcome to Doszip Commander Version 2.48!
    Use F4 to load date from the calendar to [File date].
 
 
-<> Plugins
-
-   The Doszip Loadable Library files are intended to provide external read
-   and write functions as a plugin for the file panels.
-
-   All plugins are defined in the file DZ.INI, and it is assumed that the
-   .DLL files are located in the %doszip% directory. A full path to another
-   directory may be added.
-
-   To install, simply copy the .DLL file to the DLL directory, and edit the
-   DZ.INI file as needed.
-
-   Plugins read commands from the DZ.INI file if available or needed.
-   The install instructions should include the settings.
-
-   The loading of plugins is from entering a file. The signature is 4 byte
-   and a table of MAX (100) signatures are used:
-
-   signatures label dword
-   db 'PK',0,0  ; signature for .ZIP files (inline)
-   dd 99 dup(?) ; signatures defined in DZ.INI (external)
-
-   Some archives do not have a signature, like .TAR files, so these files must
-   be defined by extension, but at the same time have a signature. In this
-   case the first two bytes are zero, and the next two a unique value.
-
-   External plugins are defined by this signature in this format:
-
-   <id> = <signature>, <file> ; Id is 00..99 - sequential read
-
-   Example:
-
-   [Plugins]
-   00=0x0000EA60,DZARJ.DLL ; real  - signatures[0]
-   01=0x10000000,DZTAR.DLL ; dummy - signatures[1]
-
-   ; hook extension .TAR with DZTAR.DLL
-   [Filetype]
-   tar=[0x10000000]
-
-
 <> Shortcut keys
 
-   F1   	  Help
-   F2   	  Rename
-   F3   	  View
-   F4   	  Edit
-   F5   	  Copy
-   F6   	  Move
-   F7   	  Make Directory
-   F8   	  Delete
-   F9   	  Activate Edit
-   F10  	  Exit
-   F11  	  Toggle Panel size
-   F12  	  Toggle Vertical/Horizontal/Fullscreen Panels
-   Esc  	  Clear command line (or User screen)
+   F1		  Help
+   F2		  Rename
+   F3		  View
+   F4		  Edit
+   F5		  Copy
+   F6		  Move
+   F7		  Make Directory
+   F8		  Delete
+   F9		  Activate Edit
+   F10		  Exit
+   F11		  Toggle Panel size
+   F12		  Toggle Vertical/Horizontal/Fullscreen Panels
+   Esc		  Clear command line (or User screen)
 
    Alt-[afesthb]  Activate Menus
-   Ctrl 	  Activate Ctrl-Statusline
-   Ctrl-Alt       Activate Quick Search
-   Up   	  If panels off: Prev Command (Doskey-Up)
-   Down 	  If panels off: Next Command (Doskey-Down)
-   Alt-Up/Down    Resize Panels
-   Alt-Left       History: Prev Directory
-   Alt-Right      History: Next Directory
+   Ctrl		  Activate Ctrl-Statusline
+   Ctrl-Alt	  Activate Quick Search
+   Up		  If panels off: Prev Command (Doskey-Up)
+   Down		  If panels off: Next Command (Doskey-Down)
+   Alt-Up/Down	  Resize Panels
+   Alt-Left	  History: Prev Directory
+   Alt-Right	  History: Next Directory
 
-   Alt-F1	 Select Disk Panel-A
-   Alt-F2	 Select Disk Panel-B
-   Alt-F3	 View file --> DZ.INI
-   Alt-F4	 Edit file --> DZ.INI
-   Alt-F5	 Compress
-   Alt-F6	 Decompress
-   Alt-F7	 File search
-   Alt-F8	 History: list of the last 16 DOS commands
-   Alt-F9	 Toggle 50/25 lines
+   Alt-F1	  Select Disk Panel-A
+   Alt-F2	  Select Disk Panel-B
+   Alt-F3	  View file --> DZ.INI
+   Alt-F4	  Edit file --> DZ.INI
+   Alt-F5	  Compress
+   Alt-F6	  Decompress
+   Alt-F7	  File search
+   Alt-F8	  History: list of the last 16 DOS commands
+   Alt-F9	  Toggle 50/25 lines
    Alt-0	  Window list
-   Alt-[1..9]     Run Tool nr. [1..9]
+   Alt-[1..9]	  Run Tool nr. [1..9]
    Alt-C	  Toggle Command Line
    Alt-L	  Create List File
    Alt-M	  Memory Information
@@ -586,83 +518,88 @@ Welcome to Doszip Commander Version 2.48!
    Alt-W	  Toggle wide view in current Panel
    Alt-X	  Quit
 
-   Ctrl-Up	History: Prev Command (Doskey-Up)
-   Ctrl-Down      History: Next Command (Doskey-Down)
-   Ctrl-Home      Goto root directory
-   Ctrl-PgUp      Enter Updir
-   Ctrl-Enter     Past current file to command line
-   Ctrl-[0..9]    Load Directory defined in section [Directory]
-   Ctrl-Tab       File search (Ctrl-S)
+   Ctrl-Up	  History: Prev Command (Doskey-Up)
+   Ctrl-Down	  History: Next Command (Doskey-Down)
+   Ctrl-Home	  Goto root directory
+   Ctrl-PgUp	  Enter Updir
+   Ctrl-Enter	  Past current file to command line
+   Ctrl-[0..9]	  Load Directory defined in section [Directory]
+   Ctrl-Tab	  File search (Ctrl-S)
 
-   Ctrl-F1	Toggle Panel-A
-   Ctrl-F2	Toggle Panel-B
-   Ctrl-F3	View file --> DZ.INI
-   Ctrl-F4	Edit file --> DZ.INI
-   Ctrl-F5	Sort current panel by Name
-   Ctrl-F6	Editor options
-   Ctrl-F7	Screen options
-   Ctrl-F8	System options
-   Ctrl-F9	Configuration
+   Ctrl-F1	  Toggle Panel-A
+   Ctrl-F2	  Toggle Panel-B
+   Ctrl-F3	  View file --> DZ.INI
+   Ctrl-F4	  Edit file --> DZ.INI
+   Ctrl-F5	  Sort current panel by Name
+   Ctrl-F6	  Editor options
+   Ctrl-F7	  Screen options
+   Ctrl-F8	  System options
+   Ctrl-F9	  Configuration
 
-   Ctrl-A	 File Attributes
-   Ctrl-B	 User Screen
-   Ctrl-C	 Compare Directories
-   Ctrl-D	 Sort current panel by Date
-   Ctrl-E	 Sort current panel by Type
-   Ctrl-F	 Confirmation
-   Ctrl-G	 Activates the Calendar (Mouse-click upper right)
-   - Navigate:    Home, (Pg)Up, (Pg)Down, Left, Right, Ctrl-PgUp, Ctrl-PgDn
-   Ctrl-H	 Toggle Show Hidden in current Panel
-   Ctrl-I	 Directory information
-   Ctrl-J	 Compress Options
-   Ctrl-K	 Toggle Status Line
-   Ctrl-L	 Toggle Long filenames in current Panel
-   Ctrl-M	 Toggle Ministatus in current Panel
-   Ctrl-N	 Sort current panel by Name
-   Ctrl-O	 Toggle Panels on/off
-   Ctrl-P	 Panel Options
-   Ctrl-Q	 Quick Search
-   Ctrl-R	 Reread current Panel
-   Ctrl-S	 File search
-   Ctrl-T	 Toggle Show Detail in current Panel
-   Ctrl-U	 Unsorted
-   Ctrl-V	 Toggle Show Volume Information in current Panel
-   Ctrl-W	 Swap Panels
-   Ctrl-X	 Toggle Menus Line
-   Ctrl-Z	 Sort current panel by Size
+   Ctrl-A	  File Attributes
+   Ctrl-B	  User Screen
+   Ctrl-C	  Compare Directories
+   Ctrl-D	  Sort current panel by Date
+   Ctrl-E	  Sort current panel by Type
+   Ctrl-F	  Confirmation
+   Ctrl-G	  Activates the Calendar (Mouse-click upper right)
+   - Navigate:	  Home, (Pg)Up, (Pg)Down, Left, Right, Ctrl-PgUp, Ctrl-PgDn
+   Ctrl-H	  Toggle Show Hidden in current Panel
+   Ctrl-I	  Directory information
+   Ctrl-J	  Compress Options
+   Ctrl-K	  Toggle Status Line
+   Ctrl-L	  Toggle Long filenames in current Panel
+   Ctrl-M	  Toggle Ministatus in current Panel
+   Ctrl-N	  Sort current panel by Name
+   Ctrl-O	  Toggle Panels on/off
+   Ctrl-P	  Panel Options
+   Ctrl-Q	  Quick Search
+   Ctrl-R	  Reread current Panel
+   Ctrl-S	  File search
+   Ctrl-T	  Toggle Show Detail in current Panel
+   Ctrl-U	  Unsorted
+   Ctrl-V	  Toggle Show Volume Information in current Panel
+   Ctrl-W	  Swap Panels
+   Ctrl-X	  Toggle Menus Line
+   Ctrl-Z	  Sort current panel by Size
 
-   Shift-F2       Copy file (- to a new name in current directory)
-   Shift-F3       View file --> DZ.INI
-   Shift-F4       Edit file --> DZ.INI
-   Shift-F7       Create .ZIP archive
-   Shift-F9       Save configuration
-   Shift-F10      Activate the last menu you used with the last
+   Shift-F2	  Copy file (- to a new name in current directory)
+   Shift-F3	  View file --> DZ.INI
+   Shift-F4	  Edit file --> DZ.INI
+   Shift-F7	  Create .ZIP archive
+   Shift-F9	  Save configuration
+   Shift-F10	  Activate the last menu you used with the last
 		  item you selected highlighted
 
-   Insert	 Select file
-   Keypad+	Select files
-   Keypad-	Deselect files
-   Keypad*	Invert
+   Insert	  Select file
+   Keypad+	  Select files
+   Keypad-	  Deselect files
+   Keypad*	  Invert
 
    Edit text
    ---------
 
-   Ctrl-X	 Cut (Shift-Del)
-   Ctrl-C	 Copy
-   Ctrl-V	 Paste (Shift-Ins)
-   Ctrl-Ins       Copy (use Cut+Paste in the command line)
-   Ctrl-Left      Goto previous word
-   Ctrl-Right     Goto next word
+   Ctrl-X	  Cut (Shift-Del)
+   Ctrl-C	  Copy
+   Ctrl-V	  Paste (Shift-Ins)
+   Ctrl-Ins	  Copy (use Cut+Paste in the command line)
+   Ctrl-Left	  Goto previous word
+   Ctrl-Right	  Goto next word
 
 
 <> Compiling
 
    Source directory:
    -----------------
-   dz	- Source files for DZ.EXE
-   dzmain    - Source files for DZ.DLL
-   clib      - Library source
-   makefile  - Makefile for DZ.EXE and DZ.DLL
+   lib		- Library and startup source
+   src		- Source files for Doszip
+   makefile	- Makefile for Doszip
+
+   Tools needed:
+   -------------
+   ASM.EXE	- Modified version of JWasm v2.09
+   WLIB.EXE	- Open Watcom Library Manager
+   WLINK.EXE	- Open Watcom Linker
 
 
 <> Additional Resources

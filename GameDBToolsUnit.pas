@@ -1195,15 +1195,15 @@ begin
                       If SubGroupUpper=EmType3 then begin
                         B:=WindowsExeMode(GameDB[I]);
                         If B then For J:=0 to Length(EmTypeUser)-1 do begin
-                          if ExtUpperCase(GameDB[I].GameExe)=ExtUpperCase(PrgSetup.WindowsBasedEmulatorsPrograms[J]) then begin
+                          if ExtUpperCase(MakeAbsPath(GameDB[I].GameExe,PrgSetup.BaseDir))=ExtUpperCase(PrgSetup.WindowsBasedEmulatorsPrograms[J]) then begin
                             B:=False;
                             break;
                           end;
                         end;
-                       end else begin
+                      end else begin
                         B:=False;
                         If WindowsExeMode(GameDB[I]) then For J:=0 to Length(EmTypeUser)-1 do If SubGroupUpper=EmTypeUser[J] then begin
-                          B:=(ExtUpperCase(GameDB[I].GameExe)=ExtUpperCase(PrgSetup.WindowsBasedEmulatorsPrograms[J]));
+                          B:=(ExtUpperCase(MakeAbsPath(GameDB[I].GameExe,PrgSetup.BaseDir))=ExtUpperCase(PrgSetup.WindowsBasedEmulatorsPrograms[J]));
                           break;
                         end;
                       end;
@@ -1757,8 +1757,12 @@ Var Source,Dest,S : String;
 begin
   {Copy new and changed NewUserData files to DataDir}
   If PrgDataDir<>PrgDir then begin
+    {Update DataReader.xml to version 6 (only if upgrade from below 1.3.5)}
+    if LastVersion<10305 then begin
+      If FileExists(PrgDir+NewUserDataSubDir+'\'+DataReaderConfigFile) then CopyFile(PChar(PrgDir+NewUserDataSubDir+'\'+DataReaderConfigFile),PChar(PrgDataDir+SettingsFolder+'\'+DataReaderConfigFile),False); {False = overwrite existing file}
+    end;
 
-    {Update installer package base script (only if upgrade from below 9.0)}
+    {Update installer package base script (only if upgrade from below 0.9)}
     If LastVersion<900 then begin
       If FileExists(PrgDir+NSIInstallerHelpFile) then begin
         CopyFile(PChar(PrgDir+NSIInstallerHelpFile),PChar(PrgDataDir+SettingsFolder+'\'+NSIInstallerHelpFile),False); {False = overwrite existing file}

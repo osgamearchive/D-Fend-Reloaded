@@ -540,7 +540,7 @@ begin
   LogInfo('### Start of FormCreate ###');
 
   {Caption:=Caption+' THIS IS A TEST VERSION ! (Beta 1 of version 1.4)';}
-  {Caption:=Caption+' (Release candidate 1 of version 1.3.4)';}
+  {Caption:=Caption+' (Release candidate 1 of version 1.3.5)';}
 
   MI_Count:=ImageList.Count;
   Height:=790;
@@ -2639,7 +2639,7 @@ begin
   Enabled:=False;
   try
     DefaultGame.ProfileMode:='Windows';
-    ExeFile:=PrgSetup.WindowsBasedEmulatorsPrograms[Nr];
+    ExeFile:=MakeRelPath(PrgSetup.WindowsBasedEmulatorsPrograms[Nr],PrgSetup.BaseDir);
     Parameters:=Format(PrgSetup.WindowsBasedEmulatorsParameters[Nr],[S]);
     DefaultGame.GameParameters:=Parameters;
     if not ModernEditGameProfil(self,GameDB,G,DefaultGame,SearchLinkFile,DeleteOnExit,ChangeFileExt(ExtractFileName(S),''),ExeFile) then exit;
@@ -3743,7 +3743,7 @@ begin
             Messagedlg(Format(LanguageSetup.MessageCouldNotDeleteDir,[IncludeTrailingPathDelimiter(S)+ScreenshotListView.Selected.Caption]),mtError,[mbOK],0);
           ListViewSelectItem(Sender,ListView.Selected,True);
         end;
-    5 : If ScreenshotListView.Selected<>nil then begin
+    5 : begin
           S:=Trim(TGame(ListView.Selected.Data).CaptureFolder);
           If S<>'' then S:=MakeAbsPath(S,PrgSetup.BaseDir);
           If S='' then exit;
@@ -3927,7 +3927,7 @@ begin
             Messagedlg(Format(LanguageSetup.MessageCouldNotDeleteDir,[IncludeTrailingPathDelimiter(S)+SoundListView.Selected.Caption]),mtError,[mbOK],0);
           ListViewSelectItem(Sender,ListView.Selected,True);
         end;
-    7 : If SoundListView.Selected<>nil then begin
+    7 : begin
           S:=Trim(TGame(ListView.Selected.Data).CaptureFolder);
           If S<>'' then S:=MakeAbsPath(S,PrgSetup.BaseDir);
           If S='' then exit;
@@ -4064,7 +4064,7 @@ begin
             Messagedlg(Format(LanguageSetup.MessageCouldNotDeleteDir,[IncludeTrailingPathDelimiter(S)+VideoListView.Selected.Caption]),mtError,[mbOK],0);
           ListViewSelectItem(Sender,ListView.Selected,True);
         end;
-    7 : If VideoListView.Selected<>nil then begin
+    7 : begin
           S:=Trim(TGame(ListView.Selected.Data).CaptureFolder);
           If S<>'' then S:=MakeAbsPath(S,PrgSetup.BaseDir);
           If S='' then exit;

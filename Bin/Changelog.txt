@@ -1,5 +1,26 @@
 D-Fend Reloaded Changelog
 
+Version 1.3.5 (02/10/2013)
+==========================
+- Updated Polish language file.
+- Updated DOSZip from 2.48 to 2.50.
+- Improved game information reader to receive data from the updated Mobygames
+  homepage.
+- Updated search link for Squakenet.com.
+- Now the base folder used for making folder names relative can be mounted as a
+  drive, too.
+- [Fix] The "Delete all" context menu item for screenshots, sounds and videos
+  did not work if no item was selected.
+- [Fix] When using Windows-based emulators stored in a path relative to the
+  D-Fend Reloaded program directory in portable mode, games using this emulator
+  where not displayed correctly in the "Emulation type" filter of the games
+  filter tree.
+- [Fix] Starting a game could fail if there were multiple drive mountings
+  directing to the game files folder.
+- [Fix] When trying to install a game from a real floppy drive the installation
+  support function could fail.
+
+
 Version 1.3.4 (26/08/2013)
 ==========================
 - Updated Korean language file.

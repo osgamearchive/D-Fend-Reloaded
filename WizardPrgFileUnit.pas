@@ -119,11 +119,11 @@ Var I : Integer;
 begin
   If (not GamesFolderEdit.Visible) and (OtherEmulator>=0) then begin
     If Trim(ProgramEdit.Text)='' then begin Game.GameExe:=''; Game.GameParameters:=''; end else begin
-      Game.GameExe:=PrgSetup.WindowsBasedEmulatorsPrograms[OtherEmulator];
+      Game.GameExe:=MakeRelPath(PrgSetup.WindowsBasedEmulatorsPrograms[OtherEmulator],PrgSetup.BaseDir);
       Game.GameParameters:=Format(PrgSetup.WindowsBasedEmulatorsParameters[OtherEmulator],[ProgramEdit.Text]);
     end;
     If Trim(SetupEdit.Text)='' then begin Game.SetupExe:=''; Game.SetupParameters:=''; end else begin
-      Game.SetupExe:=PrgSetup.WindowsBasedEmulatorsPrograms[OtherEmulator];
+      Game.SetupExe:=MakeRelPath(PrgSetup.WindowsBasedEmulatorsPrograms[OtherEmulator],PrgSetup.BaseDir);
       Game.SetupParameters:=Format(PrgSetup.WindowsBasedEmulatorsParameters[OtherEmulator],[SetupEdit.Text]);
     end;
   end else begin

@@ -13,8 +13,8 @@ Type TDataReader=class
     Function ReadListGlobalPart(const Lines : String; const NextElement : THTMLStructureElement) : Boolean;
     Procedure ReadListPerGamePart(const Lines : String; const NextElement : THTMLStructureElement; var GameName, GameURL : String);
     Procedure GetGameDataFromLines(const Lines : String; const NextElement : THTMLStructureElement; var Genre, Developer, Publisher, Year, Notes, ImagePageURL : String);
-    Procedure GetGameCoverFromLines(const Lines : String; const NextElement : THTMLStructureElement; var ImageURL : String);
-    Function GetImageURLAndNextURLsFromURL(const CoverPageURL : String; var ImageURL : String; const PossibleNextURLs : TStringList) : Boolean;
+    function GetGameCoverFromLines(const Lines: String; const NextElement: THTMLStructureElement; var JSMode : Boolean) : TStringList;
+    Function GetImageURLAndNextURLsFromURL(const CoverPageURL : String; var ImageURLs : TStringList; const PossibleNextURLs : TStringList) : Boolean;
     Procedure GetGameCoverFromSinglePages(const InitialURL : String; const ImageURLs : TStringList; const MaxImages : Integer);
     Procedure ProcessLinks(const BaseURL : String; const Links : TStringList; const ImageBaseURL : String; const ImageURLs: TStringList; const MaxImages: Integer);
     Procedure GetGameCoverFromMediaList(const ListPageURL : String; const ImageURLs : TStringList; const MaxImages : Integer);
@@ -167,7 +167,8 @@ begin
 end;
 
 function TDataReader.ReadList(const ASearchString: String): Boolean;
-Var Lines,URL : String;
+Var Lines,URL,S : String;
+    I,Count : Integer;
 begin
   FGameNames.Clear;
   FGameURLs.Clear;
@@ -175,8 +176,21 @@ begin
   result:=False;
   If not Assigned(FConfig) then exit;
   If PrgSetup.DataReaderAllPlatforms then URL:=FConfig.GamesListAllPlatformsURL else URL:=FConfig.GamesListURL;
-  if not DownloadTextFile(Format(URL,[EncodeName(ASearchString)]),Lines) then exit;
-  result:=ReadListGlobalPart(Lines,FConfig.GamesList);
+
+  result:=False;
+  URL:=Format(URL,[EncodeName(ASearchString)]);
+  For I:=0 to 10 do begin
+    S:=URL;
+    if I>0 then begin
+      If S[length(S)]<>'/' then S:=S+'/';
+      S:=S+'offset,'+IntToStr(I*25)+'/';
+    end;
+    if not DownloadTextFile(S,Lines) then exit;
+    Count:=FGameURLs.Count;
+    if ReadListGlobalPart(Lines,FConfig.GamesList) then result:=true;
+    if FGameURLs.Count=Count then break;
+  end;
+
   if result then FLastListRequest:=Format(URL,[EncodeName(ASearchString)]);
 end;
 
@@ -197,7 +211,10 @@ begin
         If (I>0) and (St.Count>=I) then S:=St[I-1];
         If (I<0) and (St.Count>=-I) then S:=St[St.Count-I];
       end;
-      result:=ReadListGlobalPart(S,TElement(NextElement).Child);
+      result:=False;
+      For I:=0 to TElement(NextElement).ChildCount-1 do begin
+        if ReadListGlobalPart(S,TElement(NextElement).Children[I]) then result:=True;
+      end;
     finally
       St.Free;
     end;
@@ -211,7 +228,7 @@ begin
       result:=True;
       For I:=0 to St.Count-1 do begin
         ReadListPerGamePart(St[I],TPerGameBlock(NextElement).Child,S,T);
-        If (S<>'') and (T<>'') then begin FGameNames.Add(DecodeName(S)); FGameURLs.Add(T); end;
+        If (S<>'') and (T<>'') and (FGameURLs.IndexOf(T)<0) then begin FGameNames.Add(DecodeName(S)); FGameURLs.Add(T); end;
       end;
     finally
       St.Free;
@@ -334,7 +351,7 @@ begin
   end;
 
   If NextElement is TElement then begin
-    St:=GetTagContents(Lines,1,TElement(NextElement).ElementType,TElement(NextElement).AttributeKey,TElement(NextElement).AttributeValue);
+    St:=GetTagContents(Lines,1,TElement(NextElement).ElementType,TElement(NextElement).AttributeKey,TElement(NextElement).AttributeValue,TElement(NextElement).ContainsText);
     try
       If St.Count=0 then exit;
       S:=St[0];
@@ -358,7 +375,7 @@ begin
     S4:=Trim(ExtUpperCase(TSearchGameData(NextElement).Year));
     S5:=Trim(ExtUpperCase(TSearchGameData(NextElement).Notes));
 
-    if (S5<>'') then begin
+    if (S5<>'') and (S5<>'SELF') then begin
       St:=GetPlainText(Lines);
       try
         Notes:=''; T:='';
@@ -375,6 +392,7 @@ begin
     end;
 
     {Simple mode (fallback)}
+
     St:=GetPlainText(Lines);
     try
       For I:=0 to St.Count-2 do begin
@@ -387,6 +405,14 @@ begin
     finally
       St.Free;
     end;
+
+    {Semi simple mode}
+    
+    if S1='SELF' then Genre:=GetPlainDecodedText(Lines);
+    if S2='SELF' then Developer:=GetPlainDecodedText(Lines);
+    if S3='SELF' then Publisher:=GetPlainDecodedText(Lines);
+    if S4='SELF' then Year:=GetPlainDecodedText(Lines);
+    if S5='SELF' then Notes:=GetPlainDecodedText(Lines);
 
     {Complex mode for detecting multiple values}
 
@@ -416,27 +442,36 @@ begin
   end;
 end;
 
-Function TDataReader.GetImageURLAndNextURLsFromURL(const CoverPageURL : String; var ImageURL : String; const PossibleNextURLs : TStringList) : Boolean;
+Function TDataReader.GetImageURLAndNextURLsFromURL(const CoverPageURL : String; var ImageURLs : TStringList; const PossibleNextURLs : TStringList) : Boolean;
 Var Lines,S,T,LinesUpper,preURL : String;
     I,J,CharsBefore : Integer;
+    St : TStringList;
+    JSMode : Boolean;
 begin
   result:=False;
   if not DownloadTextFile(CoverPageURL,Lines) then exit;
 
   {Scan for image URL in lines}
-  GetGameCoverFromLines(Lines,FConfig.CoverRecord,ImageURL);
-  result:=(ImageURL<>'');
-  If ImageURL<>'' then begin
-    T:=Trim(ExtUpperCase(ImageURL));
-    If (Copy(T,1,7)<>'HTTP:/'+'/') and (Copy(T,1,8)<>'HTTPS:/'+'/') then begin
-      T:=ImageURL;
-      If (T<>'') and (T[1]='/') then T:=Copy(T,2,MaxInt);
-      ImageURL:=S+T;
+  JSMode:=False;
+  St:=GetGameCoverFromLines(Lines,FConfig.CoverRecord,JSMode);
+  try
+    result:=(St.Count<>0);
+    For I:=0 to St.Count-1 do begin
+      T:=Trim(ExtUpperCase(St[I]));
+      If (Copy(T,1,7)<>'HTTP:/'+'/') and (Copy(T,1,8)<>'HTTPS:/'+'/') then begin
+        T:=St[I];
+        If (T<>'') and (T[1]='/') then T:=Copy(T,2,MaxInt);
+        ImageURLs.Add(S+T);
+      end else begin
+        ImageURLs.Add(St[I]);
+      end;
     end;
+  finally
+    St.Free;
   end;
 
   {Scan for other cover page URLs}
-  if PossibleNextURLs<>nil then begin
+  if (PossibleNextURLs<>nil) and not JSMode then begin
     S:=CoverPageURL;
     If S<>'' then SetLength(S,length(S)-1);
     While (S<>'') and (S[length(S)]<>'/') do SetLength(S,length(S)-1);
@@ -464,8 +499,8 @@ begin
 end;
 
 Procedure TDataReader.GetGameCoverFromSinglePages(const InitialURL : String; const ImageURLs : TStringList; const MaxImages : Integer);
-Var NewImageURL,S : String;
-    WaitingURLs, ScannedURLsUpper, PossibleNextURLs,St : TStringList;
+Var S : String;
+    WaitingURLs, ScannedURLsUpper, PossibleNextURLs, St, NewImageURLs : TStringList;
     I,J : Integer;
     B : Boolean;
 begin
@@ -483,20 +518,27 @@ begin
 
         {Get next image URL and scan for more cover page URLs}
         If MaxImages=1 then St:=nil else St:=PossibleNextURLs;
-        If GetImageURLAndNextURLsFromURL(WaitingURLs[0],NewImageURL,St) then begin
-          {Save new image URL}
-          B:=True; For J:=0 to ImageURLs.Count-1 do if ExtUpperCase(ImageURLs[J])=ExtUpperCase(NewImageURL) then begin B:=False; break; end;
-          if B then ImageURLs.Add(NewImageURL);
+        NewImageURLs:=TStringList.Create;
+        try
+          If GetImageURLAndNextURLsFromURL(WaitingURLs[0],NewImageURLs,St) then begin
+            {Save new image URL}
+            For I:=0 to NewImageURLs.Count-1 do begin
+              B:=True; For J:=0 to ImageURLs.Count-1 do if ExtUpperCase(ImageURLs[J])=ExtUpperCase(NewImageURLs[I]) then begin B:=False; break; end;
+              if B then ImageURLs.Add(NewImageURLs[I]);
+            end;
 
-          {Remove cover page URL from queue and mark it as scanned}
-          ScannedURLsUpper.Add(ExtUpperCase(WaitingURLs[0]));
-          WaitingURLs.Delete(0);
+            {Remove cover page URL from queue and mark it as scanned}
+            ScannedURLsUpper.Add(ExtUpperCase(WaitingURLs[0]));
+            WaitingURLs.Delete(0);
 
-          {Check possible new cover page URLs for real new URLs}
-          For I:=0 to PossibleNextURLs.Count-1 do begin
-            S:=ExtUpperCase(PossibleNextURLs[I]);
-            If ScannedURLsUpper.IndexOf(S)<0 then WaitingURLs.Add(PossibleNextURLs[I]);
+            {Check possible new cover page URLs for real new URLs}
+            For I:=0 to PossibleNextURLs.Count-1 do begin
+              S:=ExtUpperCase(PossibleNextURLs[I]);
+              If ScannedURLsUpper.IndexOf(S)<0 then WaitingURLs.Add(PossibleNextURLs[I]);
+            end;
           end;
+        finally
+          NewImageURLs.Free;
         end;
 
         {Stop after max. MaxImages images}
@@ -541,19 +583,26 @@ begin
 end;
 
 procedure TDownloadDataThread.Execute;
-Var NewImageURL : String;
-    I : Integer;
+Var NewImageURLs : TStringList;
+    I,J : Integer;
 begin
   For I:=0 to FURList.Count-1 do begin
-    {Get next image URL}
-    If not FDataReader.GetImageURLAndNextURLsFromURL(FURList[I],NewImageURL,nil) then continue;
+    NewImageURLs:=TStringList.Create;
+    try
+      {Get next image URL}
+      If not FDataReader.GetImageURLAndNextURLsFromURL(FURList[I],NewImageURLs,nil) then continue;
 
-    {Check if image URL is relative to ImageBaseURL and make is absolute if needed}
-    if ExtUpperCase(Trim(Copy(NewImageURL,1,4)))<>'HTTP' then begin
-      if FImageBaseURL[length(FImageBaseURL)]<>'\' then NewImageURL:=FImageBaseURL+'/'+NewImageURL else NewImageURL:=FImageBaseURL+NewImageURL;
+      {Check if image URL is relative to ImageBaseURL and make is absolute if needed}
+      For J:=0 to NewImageURLs.Count-1 do begin
+        if ExtUpperCase(Trim(Copy(NewImageURLs[J],1,4)))<>'HTTP' then begin
+          if FImageBaseURL[length(FImageBaseURL)]<>'\' then NewImageURLs[J]:=FImageBaseURL+'/'+NewImageURLs[J] else NewImageURLs[J]:=FImageBaseURL+NewImageURLs[J];
+        end;
+      end;
+
+      FImageURLs.AddStrings(NewImageURLs);
+    finally
+      NewImageURLs.Free;
     end;
-
-    FImageURLs.Add(NewImageURL);
   end;
 end;
 
@@ -689,11 +738,13 @@ begin
   end;
 end;
 
-procedure TDataReader.GetGameCoverFromLines(const Lines: String; const NextElement: THTMLStructureElement; var ImageURL: String);
+function TDataReader.GetGameCoverFromLines(const Lines: String; const NextElement: THTMLStructureElement; var JSMode : Boolean) : TStringList;
 Var St,St2 : TStringList;
     I : Integer;
     S : String;
 begin
+  result:=TStringList.create;
+
   If NextElement is TElement then begin
     St:=GetTagContents(Lines,1,TElement(NextElement).ElementType,TElement(NextElement).AttributeKey,TElement(NextElement).AttributeValue);
     try
@@ -704,7 +755,23 @@ begin
         If (I>0) and (St.Count>=I) then S:=St[I-1];
         If (I<0) and (St.Count>=-I) then S:=St[St.Count-I];
       end;
-      GetGameCoverFromLines(S,TElement(NextElement).Child,ImageURL);
+      St2:=GetGameCoverFromLines(S,TElement(NextElement).Child,JSMode);
+      try
+        result.AddStrings(St2);
+      finally
+        St2.Free;
+      end;
+    finally
+      St.Free;
+    end;
+    exit;
+  end;
+
+  If NextElement is TJavascript then begin
+    JSMode:=True;
+    St:=GetJavascriptURLs(Lines,TJavascript(NextElement).ContainsText);
+    try
+      result.AddStrings(St);
     finally
       St.Free;
     end;
@@ -723,7 +790,7 @@ begin
           If (I>0) and (St.Count>=I) then S:=St2[I-1];
           If (I<0) and (St.Count>=-I) then S:=St2[St.Count-I];
         end;
-        If S<>'' then ImageURL:=S;
+        If S<>'' then result.add(S);
       finally
         St.Free;
       end;
@@ -832,16 +899,24 @@ begin
 end;
 
 procedure TDataReaderGameCoverThread.Execute;
-Var FileName,Path : String;
+Var FileName,Path,S : String;
     I,J : Integer;
 begin
   FSuccess:=True;
 
   For J:=0 to FDownloadURLs.Count-1 do begin
     FileName:=FDownloadURLs[J];
+
     I:=Pos('/',FileName); While I>0 do begin FileName:=Copy(FileName,I+1,MaxInt); I:=Pos('/',FileName); end;
     Path:=IncludeTrailingPathDelimiter(FDestFolder);
     If FileExists(Path+FileName) then continue;
+
+    I:=Pos('/covers/small/',FDownloadURLs[J]);
+    if (I<>0) then begin
+      S:=Copy(FDownloadURLs[J],1,I-1)+'/covers/large/'+copy(FDownloadURLs[J],I+length('/covers/small/'),MaxInt);
+      If DownloadFileToDisk(S,Path+FileName) then continue;
+    end;
+
     If not DownloadFileToDisk(FDownloadURLs[J],Path+FileName) then FSuccess:=False;
   end;
 end;

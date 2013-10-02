@@ -117,7 +117,7 @@ begin
 end;
 
 Function TProfileMountEditorDriveFrame.Done : String;
-Var S : String;
+Var S,T : String;
 begin
   If SpecialSettings<>'' then begin result:=SpecialSettings; exit; end;
 
@@ -128,7 +128,8 @@ begin
   If (length(S)=3) and (Copy(S,2,2)=':\') then begin
     If MessageDlg(LanguageSetup.MessageRootDirMountWaring,mtWarning,[mbYes,mbNo],0)<>mrYes then exit;
   end;
-  result:=StringReplace(MakeRelPath(FolderEdit.Text,PrgSetup.BaseDir),';','<semicolon>',[rfReplaceAll])+';Drive;'+FolderDriveLetterComboBox.Text+';False;;';
+  T:=MakeRelPath(FolderEdit.Text,PrgSetup.BaseDir); if T='' then T:='.\';                                                    
+  result:=StringReplace(T,';','<semicolon>',[rfReplaceAll])+';Drive;'+FolderDriveLetterComboBox.Text+';False;;';
   If FolderFreeSpaceTrackBar.Position<>DefaultFreeHDSize then result:=result+IntToStr(FolderFreeSpaceTrackBar.Position);
 end;
 

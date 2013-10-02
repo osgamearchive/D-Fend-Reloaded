@@ -210,6 +210,7 @@ Function FloppyDriveLetter : Char;
 Var C : Char;
 begin
   result:='A';
+  if PrgSetup.DefaultFloppyDrive<>'' then result:=PrgSetup.DefaultFloppyDrive[1];
   For C:='A' to 'Z' do if GetDriveType(PChar(C+':\'))=DRIVE_REMOVABLE then begin result:=C; exit; end;
 end;
 
@@ -237,7 +238,7 @@ begin
 
   Case InstallType of
          itFloppy : begin
-                      Game.Mount1:=FloppyDriveLetter+';FLOPPY;A;False;;';
+                      Game.Mount1:=FloppyDriveLetter+':\;FLOPPY;A;False;;';
                       If SecondTry then FileToStart:='' else FileToStart:=FindFileToStart(FloppyDriveLetter+':\');
                       If FileToStart='' then StartUpCmds.Add('A:');
                       HideSourceSection;

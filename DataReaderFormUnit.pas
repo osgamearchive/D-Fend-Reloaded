@@ -132,6 +132,8 @@ begin
   DownloadCoverAllCheckBox.Enabled:=DownloadCoverCheckBox.Checked;
   DownloadCoverAllCheckBox.Checked:=(S[7]<>'-');
   DescriptionCheckBox.Checked:=(S[8]<>'-');
+
+  SearchTypeCheckBox.Visible:=(ExtUpperCase(Trim(DataReader.Config.GamesListURL))<>ExtUpperCase(Trim(DataReader.Config.GamesListAllPlatformsURL)));
 end;
 
 procedure TDataReaderForm.FormDestroy(Sender: TObject);
@@ -160,7 +162,7 @@ end;
 
 procedure TDataReaderForm.DownloadCoverCheckBoxClick(Sender: TObject);
 begin
-  DownloadCoverAllCheckBox.Enabled:=DownloadCoverCheckBox.Checked;
+  DownloadCoverAllCheckBox.Enabled:=DownloadCoverCheckBox.Checked and DownloadCoverCheckBox.Enabled;
 end;
 
 procedure TDataReaderForm.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);

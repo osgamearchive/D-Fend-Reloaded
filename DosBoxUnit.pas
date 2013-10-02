@@ -565,7 +565,7 @@ Var Prefix,S,T,UsePath,Mount,Unmount : String;
     I : Integer;
     St2 : TStringList;
     NoFreeDOS : Boolean;
-    Path, Drive, RootPath : String;
+    Path, Drive, RootPath, RootPathTemp : String;
     B : Boolean;
 begin
   result:=True;
@@ -619,9 +619,9 @@ begin
           S:=MakePathShort(MakeAbsPath(IncludeTrailingPathDelimiter(St2[0]),PrgSetup.BaseDir));
 
           If Copy(T,1,length(S))=S then begin
-            RootPath:=LongPath(S);
+            RootPathTemp:=LongPath(S);
             S:=Copy(T,length(S)+1,MaxInt);
-            If (Drive='') or (length(S)<length(Path)) then begin Path:=S; Drive:=St2[2]+':'; end;
+            If (Drive='') or (length(S)<length(Path)) then begin Path:=S; Drive:=St2[2]+':'; RootPath:=RootPathTemp; end;
           end;
         finally
           St2.Free;

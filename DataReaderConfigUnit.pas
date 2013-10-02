@@ -51,7 +51,7 @@ end;
 
 Type TElement=class(TElementWithSub)
   private
-    FElementType, FAttributeKey, FAttributeValue : String;
+    FElementType, FAttributeKey, FAttributeValue, FContainsText : String;
     FNr : Integer;
   public
     Constructor Create(const Node : IXMLNode; const AllowMultipleChildren : Boolean);
@@ -59,6 +59,15 @@ Type TElement=class(TElementWithSub)
     property AttributeKey : String read FAttributeKey;
     property AttributeValue : String read FAttributeValue;
     property Nr : Integer read FNr;
+    property ContainsText : String read FContainsText;
+end;
+
+Type TJavascript=class(THTMLStructureElement)
+  private
+    FContainsText : String;
+  public
+    Constructor Create(const Node : IXMLNode);
+    property ContainsText : String read FContainsText;
 end;
 
 Type TPerGameBlock=class(TElementWithSub)
@@ -121,6 +130,7 @@ begin
   If N.NodeName='PerGameBlock' then result:=TPerGameBlock.Create(N);
   If N.NodeName='Link' then result:=TLink.Create(N);
   If N.NodeName='Img' then result:=TImg.Create(N);
+  If N.NodeName='Javascript' then result:=TJavascript.Create(N);
   If Assigned(result) then begin
     If not result.LoadOK then FreeAndNil(result);
   end;
@@ -136,6 +146,7 @@ begin
     N:=Node.ChildNodes[I];
     E:=nil;
     If N.NodeName='Element' then E:=TElement.Create(N,True);
+    If N.NodeName='PerGameBlock' then E:=TPerGameBlock.Create(N);
     If N.NodeName='Link' then E:=TLink.Create(N);
     If N.NodeName='SearchGameData' then E:=TSearchGameData.Create(N);
     if E=nil then exit else List.Add(E);
@@ -217,6 +228,16 @@ begin
   If Node.HasAttribute('Key') then FAttributeKey:=Node.Attributes['Key'] else FAttributeKey:='';
   If Node.HasAttribute('Value') then FAttributeValue:=Node.Attributes['Value'] else FAttributeValue:='';
   If Node.HasAttribute('Nr') then begin FLoadOK:=TryStrToInt(Node.Attributes['Nr'],FNr); If not FLoadOK then exit; end else FNr:=0;
+  If Node.HasAttribute('ContainsText') then FContainsText:=Node.Attributes['ContainsText'] else FContainsText:='';
+end;
+
+{ TJavascript }
+
+constructor TJavascript.Create(const Node: IXMLNode);
+begin
+  inherited Create;
+
+  If Node.HasAttribute('ContainsText') then FContainsText:=Node.Attributes['ContainsText'] else FContainsText:='';
 end;
 
 { TPerGameBlock }
@@ -274,7 +295,7 @@ begin
       If N.NodeName='GamesList' then begin
         If Assigned(FGamesList) then exit;
         If N.HasAttribute('URL') then FGamesListURL:=N.Attributes['URL'] else exit;
-        FGamesList:=HTMLStructElementFromXMLNode(N,False); If FGamesList=nil then exit;
+        FGamesList:=HTMLStructElementFromXMLNode(N,True); If FGamesList=nil then exit;
         If N.HasAttribute('AllPlatformsURL')
           then FGamesListAllPlatformsURL:=N.Attributes['AllPlatformsURL']
           else FGamesListAllPlatformsURL:=FGamesListURL;
