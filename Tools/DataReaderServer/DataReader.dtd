@@ -54,6 +54,9 @@
 	Developer CDATA #IMPLIED
 	Year CDATA #IMPLIED
 	Genre CDATA #IMPLIED
+	IgnoreTags CDATA #IMPLIED
+	StartTokens CDATA #IMPLIED
+	StoppTokens CDATA #IMPLIED
 >
 
 <!ELEMENT Img EMPTY>

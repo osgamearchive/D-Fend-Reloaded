@@ -80,6 +80,8 @@ Var M : TMenuItem;
 begin
   If ProfFileMode then begin
     Caption:=LanguageSetup.CreateConfFormProfMode;
+    InfoLabel.Caption:=LanguageSetup.CreateConfFormInfoProfMode;
+    FolderEdit.EditLabel.Caption:=LanguageSetup.CreateConfFormSelectFolderProfMode;
     ExportAutoSetupTemplatesCheckBox.Visible:=True;
   end;
 

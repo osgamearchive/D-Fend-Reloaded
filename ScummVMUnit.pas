@@ -3,6 +3,8 @@ interface
 
 uses Classes, GameDBUnit;
 
+{DEFINE AddDFRPrefixInRunMode}
+
 Procedure RunScummVMGame(const Game : TGame);
 
 Function BuildScummVMIniFile(const Game : TGame; const RunMode : Boolean = False) : TStringList;
@@ -107,7 +109,7 @@ begin
     If Game.ScummVMConfirmExit then St1.Add('confirm_exit=true') else St1.Add('confirm_exit=false');
     If PrgSetup.HideScummVMConsole then St1.Add('console=false');
 
-    If RunMode then S:='DFR' else S:='';
+    {$IFDEF AddDFRPrefixInRunMode} If RunMode then S:='DFR' else {$ENDIF} S:='';
     St2.Add('['+S+Game.ScummVMGame+']');
     St2.Add('gameid='+Game.ScummVMGame);
 
@@ -358,7 +360,7 @@ begin
       end;
 
       If Trim(Game.ScummVMPath)='' then Dir:='' else Dir:=IncludeTrailingPathDelimiter(MakeAbsPath(Game.ScummVMPath,PrgSetup.BaseDir));
-      ScummVMHandle:=RunScummVM(TempDir+ScummVMConfFileName,'DFR'+Game.ScummVMGame,Params,Game.StartFullscreen,Dir,S,Game.ScummVMRenderMode,Game.ScummVMPlatform);
+      ScummVMHandle:=RunScummVM(TempDir+ScummVMConfFileName,{$IFDEF AddDFRPrefixInRunMode}'DFR'+{$ENDIF}Game.ScummVMGame,Params,Game.StartFullscreen,Dir,S,Game.ScummVMRenderMode,Game.ScummVMPlatform);
       try
         If ZipRecNr>=0 then ZipManager.ActivateRepackCheck(ZipRecNr,ScummVMHandle);
         RunPrgManager.AddCommand(Game,ScummVMHandle);

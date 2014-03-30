@@ -446,6 +446,7 @@ begin
 
   If T<>'' then begin
     If T[1]<>'\' then T:='\'+T;
+    if T[length(T)]='\' then SetLength(T,length(T)-1);    
     St.Add('cd '+T);
   end;
 end;
@@ -1706,6 +1707,14 @@ begin
   end;
 end;
 
+Function IsDosZipHybridExe(const FileName : String) : Boolean;
+begin
+  result:=False;
+  if ExtUpperCase(ExtractFileName(FileName))<>'DZ.EXE' then exit;
+  if not FileExists(ChangeFileExt(FileName,'.DOS')) then exit;
+  result:=True;
+end;
+
 Function IsWindowsExe(const FileName : String) : Boolean;
 Var FSt : TFileStream;
     I : Integer;
@@ -1722,6 +1731,8 @@ begin
       FSt.Read(C,4);
       If (C[0]<>'M') or (C[1]<>'Z') then exit;
       If $3C>FSt.Size-4 then exit;
+      {$O-}
+      FSt.Read(W,2);
 
       {Detect win32 PE header}
       FSt.Seek($3C,soBeginning);
@@ -1729,7 +1740,11 @@ begin
       If (I<0) or (I>FSt.Size-4) then exit;
       FSt.Seek(I,soBeginning);
       FSt.Read(C,4);
-      If (C[0]='P') and (C[1]='E') and (C[2]=#0) and (C[3]=#0) then begin result:=True; exit; end;
+      If (C[0]='P') and (C[1]='E') and (C[2]=#0) and (C[3]=#0) then begin
+        if IsDosZipHybridExe(FileName) then begin result:=False; exit; end;
+        result:=True;
+        exit;
+      end;
 
       {Detect win16 NE header}
       FSt.Seek($3C,soBeginning);

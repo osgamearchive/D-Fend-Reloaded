@@ -540,7 +540,7 @@ begin
   LogInfo('### Start of FormCreate ###');
 
   {Caption:=Caption+' THIS IS A TEST VERSION ! (Beta 1 of version 1.4)';}
-  {Caption:=Caption+' (Release candidate 1 of version 1.3.5)';}
+{  Caption:=Caption+' (Release candidate 2 of version 1.3.6)';}
 
   MI_Count:=ImageList.Count;
   Height:=790;
@@ -1452,8 +1452,9 @@ begin
   Resize;
   Realign;
 
-  LogInfo('Init view style');
+  LogInfo('Init view style for games list');
   InitViewStyle;
+  LogInfo('Init view style for data area');
   with ScreenshotListView do begin ViewStyle:=vsReport; ViewStyle:=vsIcon; end;
   with SoundListView do begin ViewStyle:=vsReport; ViewStyle:=vsList; end;
   with VideoListView do begin ViewStyle:=vsReport; ViewStyle:=vsList; end;
@@ -1592,18 +1593,24 @@ Var G : TGame;
     S : String;
     IL1, IL2 : TImageList;
 begin
-  If TreeUpdateInProgress then begin TreeUpdateNeededAgain:=True; exit; end;
+  If TreeUpdateInProgress then begin
+    LogInfo('TreeViewChange: Tree update in progress not rebuilding games list yet');
+    TreeUpdateNeededAgain:=True;
+    exit;
+  end;
+  LogInfo('### Start of TreeViewChange ###');
 
   TreeUpdateInProgress:=True;
   try
     repeat
       TreeUpdateNeededAgain:=False;
-      
+
       If GameDB.Count>1 then FirstRunInfoPanel.Visible:=False;
 
       If ListView.LargeImages=nil then IL1:=ListviewIconImageList else IL1:=ListView.LargeImages as TImageList;
       If ListView.SmallImages=nil then IL2:=ListviewImageList else IL2:=ListView.SmallImages as TImageList;
 
+      LogInfo('Update game notes');
       UpdateGameNotes; LastSelectedGame:=nil;
 
       ListView.Items.BeginUpdate;
@@ -1613,16 +1620,25 @@ begin
         If SearchEdit.Font.Color<>clGray then S:=SearchEdit.Text else S:='';
 
         If TreeView.Selected=nil then begin
+          LogInfo('Adding all games to games list');
           AddGamesToList(ListView,IL2,IL1,ImageList,GameDB,RemoveUnderline(LanguageSetup.All),'',S,PrgSetup.ShowExtraInfo,ListSort,ListSortReverse,False,False,False,MenuViewsScreenshots.Checked);
         end else begin
-          If TreeView.Selected.Parent=nil
-            then AddGamesToList(ListView,IL2,IL1,ImageList,GameDB,TreeView.Selected.Text,'',S,PrgSetup.ShowExtraInfo,ListSort,ListSortReverse,False,False,False,MenuViewsScreenshots.Checked)
-            else AddGamesToList(ListView,IL2,IL1,ImageList,GameDB,TreeView.Selected.Parent.Text,TreeView.Selected.Text,S,PrgSetup.ShowExtraInfo,ListSort,ListSortReverse,False,False,False,MenuViewsScreenshots.Checked);
+          If TreeView.Selected.Parent=nil then begin
+            LogInfo('Adding filter matching games to games list (main category)');
+            AddGamesToList(ListView,IL2,IL1,ImageList,GameDB,TreeView.Selected.Text,'',S,PrgSetup.ShowExtraInfo,ListSort,ListSortReverse,False,False,False,MenuViewsScreenshots.Checked);
+          end else begin
+            LogInfo('Adding filter matching games to games list (sub category)');
+            AddGamesToList(ListView,IL2,IL1,ImageList,GameDB,TreeView.Selected.Parent.Text,TreeView.Selected.Text,S,PrgSetup.ShowExtraInfo,ListSort,ListSortReverse,False,False,False,MenuViewsScreenshots.Checked);
+          end;
         end;
         If G<>nil then begin
+          LogInfo('Select last selected game');
           SelectGame(G);
         end else begin
-          If ListView.Items.Count>0 then SelectGame(TGame(ListView.Items[0].Data));
+          If ListView.Items.Count>0 then begin
+            LogInfo('Select first game in list');
+            SelectGame(TGame(ListView.Items[0].Data));
+          end;
         end;
       finally
         ListView.Items.EndUpdate;
@@ -1631,6 +1647,7 @@ begin
   finally
     TreeUpdateInProgress:=False;
   end;
+    LogInfo('### End of TreeViewChange ###');
 end;
 
 procedure TDFendReloadedMainForm.ListViewAdvancedCustomDrawItem(Sender: TCustomListView; Item: TListItem; State: TCustomDrawState; Stage: TCustomDrawStage; var DefaultDraw: Boolean);
@@ -1994,7 +2011,7 @@ begin
   GameNotesToolBar.Enabled:=GameNotesEdit.Visible;
 
   If (LastSelectedGame<>nil) and (ListView.Items.Count>0) then begin
-    S:=StringListToString(GameNotesEdit.Lines);
+    S:=StringListToString(GameNotesEdit.Text);
     If LastSelectedGame.Notes<>S then begin
       LastSelectedGame.Notes:=S;
       LastSelectedGame.StoreAllValues;
@@ -4241,7 +4258,7 @@ begin
     end;
   end;
 
-  if (not GameDBCheck) and (pos(#68+'-'+#70+'end',Caption)<>1) then begin ProcessObj(GameDB); GameDBCheck:=True; end;
+  if (not GameDBCheck) and (pos(#68+'-'+#70+'end',Caption)<1) then begin ProcessObj(GameDB); GameDBCheck:=True; end;
 end;
 
 Procedure TDFendReloadedMainForm.PostResize(var Msg : TMessage);

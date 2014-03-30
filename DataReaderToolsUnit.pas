@@ -17,7 +17,7 @@ Function GetJavascriptURLs(const Lines : String; const RequestTextContent : Stri
 Function GetTag(const Lines : String; const StartPosition : Integer; Tag, TagAttributeName, TagAttributeValue : String; const RequestAttributeName : String =''; const RequestAttributeValue : TStringList = nil) : TStringList; overload;
 Function GetTag(const Lines : String; const StartPosition : Integer; Tag, TagAttributeName, TagAttributeValue : String; const TagNr : Integer) : String; overload; {Nr=1,2,...: number from start; Nr=-1,-2,...: number from last}
 
-Function GetPlainText(const Lines : String) : TStringList;
+Function GetPlainText(const Lines : String; const IgnoreTags : TStrings = nil; StartTokens : TStrings = nil; const StoppTokens : TStrings = nil) : TStringList;
 
 Function GetPlainDecodedText(Lines : String) : String;
 
@@ -83,7 +83,7 @@ Var S,T : String;
     I : Integer;
 begin
   result:=0;
-  S:=ExtUpperCase(Search);
+  If  Search=' ' then S:=' ' else S:=ExtUpperCase(Search);
   For I:=From to length(Lines)-length(S)+1 do begin
     T:=ExtUpperCase(Lines[I]); If T='' then T:=' ';
     If T[1]=S[1] then begin
@@ -376,8 +376,95 @@ begin
   end;
 end;
 
-Function GetPlainText(const Lines : String) : TStringList;
-Var I,J : Integer;
+Procedure GetTokens(const Lines : String; const Data : TStringList; const IsTag : TList);
+Var P : Integer;
+    InTag : Boolean;
+    I,J : Integer;
+begin
+  P:=1;
+  InTag:=False;
+
+  While P<length(Lines) do begin
+
+    if InTag then begin
+      I:=FindNext(Lines,'>',P);
+      If I=0 then exit;
+      J:=FindNext(Lines,' ',P);
+      If (J=0) or (J>I) then J:=I;
+      Data.Add(ExtUpperCase(Copy(Lines,P,J-P)));
+      IsTag.Add(TObject(1));
+    end else begin
+      I:=FindNext(Lines,'<',P);
+      If I=0 then begin Data.Add(Copy(Lines,I,MaxInt)); IsTag.Add(TObject(0)); exit; end;
+      If I>P then begin Data.Add(Copy(Lines,P,I-P)); IsTag.Add(TObject(0)); end;
+    end;
+
+    P:=I+1;
+    InTag:=not InTag;
+  end;
+end;
+
+Function GetPlainText(const Lines : String; const IgnoreTags : TStrings = nil; StartTokens : TStrings = nil; const StoppTokens : TStrings = nil) : TStringList;
+Var Data : TStringList;
+    IsTag : TList;
+    InIgnoreMode : String;
+    Started : Boolean;
+    I : Integer;
+    Token, S : String;
+begin
+  result:=TStringList.Create;
+  result.Add('');
+
+  If IgnoreTags<>nil then For I:=0 To IgnoreTags.Count-1 do IgnoreTags[I]:=ExtUpperCase(IgnoreTags[I]);
+  If StartTokens<>nil then For I:=0 To StartTokens.Count-1 do StartTokens[I]:=ExtUpperCase(StartTokens[I]);
+  If StoppTokens<>nil then For I:=0 To StoppTokens.Count-1 do StoppTokens[I]:=ExtUpperCase(StoppTokens[I]);
+
+  Started:=(StartTokens=nil);
+
+  Data:=TStringList.Create;
+  IsTag:=TLIst.Create;
+  try
+    GetTokens(Lines,Data,IsTag);
+
+    InIgnoreMode:='';
+    For I:=0 To Data.Count-1 do begin
+      Token:=Trim(Data[I]);
+      If Token='' then  continue;
+      if Integer(IsTag[I])=1 then begin
+        {Tag}
+        if (InIgnoreMode='') then begin
+          if (IgnoreTags<>nil) and (IgnoreTags.IndexOf(Token)>=0) then InIgnoreMode:=Token;
+          If (InIgnoreMode='') and Started then begin
+            if (Token='BR') or (Token='BR/') or (Token='P') or (Token='DIV') or (Token='LI') then result.Add('');
+          end;
+        end else begin
+          If Token='/'+InIgnoreMode then InIgnoreMode:='';
+        end;
+      end else begin
+        {Text}
+        If (StartTokens<>nil) and (StartTokens.IndexOf(ExtUpperCase(Token))>=0) then begin
+           Started:=true;
+           continue;
+        end;
+        If (StoppTokens<>nil) and (StoppTokens.IndexOf(ExtUpperCase(Token))>=0) then begin
+           break;
+        end;
+        If (InIgnoreMode='') and Started then begin
+          S:=result[result.Count-1];
+          If (S<>'') and (S[length(S)]<>' ') and (Pos(Token[1],'.,;:')=0) then S:=S+' ';
+          S:=S+Token;
+          result[result.Count-1]:=S;
+        end;
+      end;
+    end;
+    
+  finally
+    Data.Free;
+    IsTag.Free;
+  end;
+
+end;
+{Var I,J : Integer;
     InTag : Boolean;
 begin
   result:=TStringList.Create;
@@ -393,7 +480,7 @@ begin
     end;
     I:=J+1; InTag:=not InTag;
   end;
-end;
+end;}
 
 Function GetPlainDecodedText(Lines : String) : String;
 Var S : String;

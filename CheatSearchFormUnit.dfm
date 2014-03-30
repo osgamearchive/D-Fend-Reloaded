@@ -29,6 +29,7 @@ object CheatSearchForm: TCheatSearchForm
     Width = 550
     Height = 286
     Anchors = [akLeft, akTop, akRight, akBottom]
+    PageIndex = 2
     TabOrder = 0
     object TPage
       Left = 0
@@ -247,7 +248,7 @@ object CheatSearchForm: TCheatSearchForm
         WordWrap = True
       end
       object BytesLabel: TLabel
-        Left = 432
+        Left = 416
         Top = 52
         Width = 67
         Height = 13
@@ -270,7 +271,7 @@ object CheatSearchForm: TCheatSearchForm
       object AddressEdit: TLabeledEdit
         Left = 16
         Top = 71
-        Width = 265
+        Width = 249
         Height = 21
         EditLabel.Width = 100
         EditLabel.Height = 13
@@ -279,9 +280,9 @@ object CheatSearchForm: TCheatSearchForm
         TabOrder = 0
       end
       object BytesComboBox: TComboBox
-        Left = 432
+        Left = 416
         Top = 71
-        Width = 97
+        Width = 113
         Height = 21
         Style = csDropDownList
         ItemHeight = 13
@@ -317,7 +318,7 @@ object CheatSearchForm: TCheatSearchForm
         TabOrder = 5
       end
       object NewValueEdit: TLabeledEdit
-        Left = 296
+        Left = 280
         Top = 71
         Width = 121
         Height = 21

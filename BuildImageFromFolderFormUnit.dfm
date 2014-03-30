@@ -3,7 +3,7 @@ object BuildImageFromFolderForm: TBuildImageFromFolderForm
   Top = 0
   BorderStyle = bsDialog
   Caption = 'Imagedatei von Ordnerinhalt erstellen'
-  ClientHeight = 427
+  ClientHeight = 428
   ClientWidth = 533
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -19,7 +19,7 @@ object BuildImageFromFolderForm: TBuildImageFromFolderForm
   OnShow = FormShow
   DesignSize = (
     533
-    427)
+    428)
   PixelsPerInch = 96
   TextHeight = 13
   object FileNameButton: TSpeedButton
@@ -84,31 +84,32 @@ object BuildImageFromFolderForm: TBuildImageFromFolderForm
     Left = 25
     Top = 199
     Width = 500
-    Height = 40
+    Height = 50
     Anchors = [akLeft, akTop, akRight]
     AutoSize = False
     Caption = 'NeedFreeDOSLabel'
     WordWrap = True
-    ExplicitWidth = 460
   end
   object OKButton: TBitBtn
     Left = 8
-    Top = 396
+    Top = 395
     Width = 97
     Height = 25
     Anchors = [akLeft, akBottom]
     TabOrder = 11
     OnClick = OKButtonClick
     Kind = bkOK
+    ExplicitTop = 405
   end
   object CancelButton: TBitBtn
     Left = 120
-    Top = 396
+    Top = 395
     Width = 97
     Height = 25
     Anchors = [akLeft, akBottom]
     TabOrder = 12
     Kind = bkCancel
+    ExplicitTop = 405
   end
   object FolderEdit: TLabeledEdit
     Left = 8
@@ -144,7 +145,7 @@ object BuildImageFromFolderForm: TBuildImageFromFolderForm
   end
   object AddKeyboardDriverCheckBox: TCheckBox
     Left = 8
-    Top = 247
+    Top = 255
     Width = 518
     Height = 17
     Anchors = [akLeft, akTop, akRight]
@@ -156,7 +157,7 @@ object BuildImageFromFolderForm: TBuildImageFromFolderForm
   end
   object WriteToFloppyCheckBox: TCheckBox
     Left = 8
-    Top = 362
+    Top = 370
     Width = 518
     Height = 17
     Anchors = [akLeft, akTop, akRight]
@@ -165,7 +166,7 @@ object BuildImageFromFolderForm: TBuildImageFromFolderForm
   end
   object AddMouseDriverCheckBox: TCheckBox
     Left = 8
-    Top = 270
+    Top = 278
     Width = 517
     Height = 17
     Anchors = [akLeft, akTop, akRight]
@@ -177,17 +178,18 @@ object BuildImageFromFolderForm: TBuildImageFromFolderForm
   end
   object HelpButton: TBitBtn
     Left = 232
-    Top = 396
+    Top = 395
     Width = 97
     Height = 25
     Anchors = [akLeft, akBottom]
     TabOrder = 13
     OnClick = HelpButtonClick
     Kind = bkHelp
+    ExplicitTop = 405
   end
   object AddFormatCheckBox: TCheckBox
     Left = 8
-    Top = 316
+    Top = 324
     Width = 556
     Height = 17
     Anchors = [akLeft, akTop, akRight]
@@ -198,7 +200,7 @@ object BuildImageFromFolderForm: TBuildImageFromFolderForm
   end
   object AddEditCheckbox: TCheckBox
     Left = 8
-    Top = 339
+    Top = 347
     Width = 517
     Height = 17
     Anchors = [akLeft, akTop, akRight]
@@ -222,7 +224,7 @@ object BuildImageFromFolderForm: TBuildImageFromFolderForm
   end
   object MemoryManagerCheckBox: TCheckBox
     Left = 8
-    Top = 293
+    Top = 301
     Width = 517
     Height = 17
     Anchors = [akLeft, akTop, akRight]

@@ -187,6 +187,7 @@ begin
   PublisherSt.Clear;
   YearSt.Clear;
   CoverSt.Clear;
+  NotesSt.Clear;
 
   try
     Enabled:=False;
@@ -225,6 +226,26 @@ Var I : Integer;
 begin
   result:=S;
   For I:=1 to length(result) do if result[I]=',' then result[I]:=';';
+end;
+
+Function BuildHint(Text : String) : String;
+const MaxHint=1000;
+const MaxLine=70;
+Var I,Count : Integer;
+begin
+  Text:=Trim(Text);
+
+  Count:=0;
+  For I:=1 to length(Text) do begin
+    if Text[I]=#10 then continue;
+    if (Text[I]=#13) or ((Count>MaxLine) and (Text[I]=' ')) then begin
+      if length(result)>MaxHint then begin result:=result+'...'; exit; end;
+      result:=result+#13; Count:=0;
+      continue;
+    end;
+    result:=result+Text[I];
+    inc(Count);
+  end;
 end;
 
 procedure TDataReaderForm.ListBoxClick(Sender: TObject);
@@ -285,6 +306,7 @@ begin
   DownloadCoverCheckBox.Enabled:=(Trim(CoverSt[Nr])<>'');
   DownloadCoverAllCheckBox.Enabled:=DownloadCoverCheckBox.Enabled and (Pos('$',CoverSt[Nr])>0);
   DescriptionCheckBox.Enabled:=(Trim(NotesSt[Nr])<>'');
+  DescriptionCheckBox.Hint:=BuildHint(NotesSt[Nr]);
 
   InsertButton.Enabled:=(Trim(GenreSt[Nr])<>'') or (Trim(DeveloperSt[Nr])<>'') or (Trim(PublisherSt[Nr])<>'') or (Trim(YearSt[Nr])<>'') or (Trim(CoverSt[Nr])<>'') or (Trim(NotesSt[Nr])<>'');
 end;

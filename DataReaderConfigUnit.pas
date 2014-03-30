@@ -83,13 +83,18 @@ end;
 Type TSearchGameData=class(THTMLStructureElement)
   private
     FGenre, FDeveloper, FPublisher, FYear, FNotes : String;
+    FIgnoreTags, FStartTokens, FStoppTokens : TStringList;
   public
     Constructor Create(const Node : IXMLNode);
+    Destructor Destroy; override;
     property Genre : String read FGenre;
     property Developer : String read FDeveloper;
     property Publisher : String read FPublisher;
     property Year : String read FYear;
     property Notes : String read FNotes;
+    property IgnoreTags : TStringList read FIgnoreTags;
+    property StartTokens : TStringList read FStartTokens;
+    property StoppTokens : TStringList read FStoppTokens;
 end;
 
 Type TDataReaderConfig=class
@@ -116,7 +121,7 @@ end;
 
 implementation
 
-uses SysUtils, XMLDom, XMLDoc, MSXMLDOM, PackageDBToolsUnit;
+uses SysUtils, XMLDom, XMLDoc, MSXMLDOM, CommonTools, PackageDBToolsUnit;
 
 { global }
 
@@ -263,6 +268,32 @@ begin
   If Node.HasAttribute('Publisher') then FPublisher:=Node.Attributes['Publisher'] else FPublisher:='';
   If Node.HasAttribute('Year') then FYear:=Node.Attributes['Year'] else FYear:='';
   If Node.HasAttribute('Notes') then FNotes:=Node.Attributes['Notes'] else FNotes:='';
+
+  If Node.HasAttribute('IgnoreTags') then begin
+    FIgnoreTags:=ValueToList(Node.Attributes['IgnoreTags']);
+  end else begin
+    FIgnoreTags:=TStringList.Create;
+  end;
+
+    If Node.HasAttribute('StartTokens') then begin
+    FStartTokens:=ValueToList(Node.Attributes['StartTokens']);
+  end else begin
+    FStartTokens:=TStringList.Create;
+  end;
+
+  If Node.HasAttribute('StoppTokens') then begin
+    FStoppTokens:=ValueToList(Node.Attributes['StoppTokens']);
+  end else begin
+    FStoppTokens:=TStringList.Create;
+  end;
+end;
+
+Destructor TSearchGameData.Destroy;
+begin
+  FIgnoreTags.Free;
+  FStartTokens.Free;
+  FStoppTokens.Free;
+  inherited Destroy;
 end;
 
 { TDataReaderConfig }

@@ -3,7 +3,7 @@ object InstallationSupportForm: TInstallationSupportForm
   Top = 0
   BorderIcons = [biSystemMenu, biMaximize]
   Caption = 'Install game from source media'
-  ClientHeight = 327
+  ClientHeight = 355
   ClientWidth = 528
   Color = clBtnFace
   Constraints.MinHeight = 325
@@ -21,7 +21,7 @@ object InstallationSupportForm: TInstallationSupportForm
   OnShow = FormShow
   DesignSize = (
     528
-    327)
+    355)
   PixelsPerInch = 96
   TextHeight = 13
   object AddButton: TSpeedButton
@@ -77,14 +77,14 @@ object InstallationSupportForm: TInstallationSupportForm
   end
   object DropInfoLabel: TLabel
     Left = 8
-    Top = 226
+    Top = 232
     Width = 511
-    Height = 19
+    Height = 41
     Anchors = [akLeft, akRight, akBottom]
     AutoSize = False
     Caption = 'You can also drag&&drop ... here.'
     WordWrap = True
-    ExplicitWidth = 477
+    ExplicitTop = 223
   end
   object UpButton: TSpeedButton
     Tag = 2
@@ -151,44 +151,46 @@ object InstallationSupportForm: TInstallationSupportForm
   end
   object CDImageTypeLabel: TLabel
     Left = 8
-    Top = 143
+    Top = 155
     Width = 483
-    Height = 77
+    Height = 62
     Anchors = [akLeft, akRight, akBottom]
     AutoSize = False
     Caption = 'Only ISO and CUE/BIN images supported.'
     Visible = False
     WordWrap = True
-    ExplicitWidth = 449
   end
   object OKButton: TBitBtn
     Left = 8
-    Top = 298
+    Top = 326
     Width = 97
     Height = 25
     Anchors = [akLeft, akBottom]
     TabOrder = 3
     OnClick = OKButtonClick
     Kind = bkOK
+    ExplicitTop = 298
   end
   object CancelButton: TBitBtn
     Left = 111
-    Top = 298
+    Top = 326
     Width = 97
     Height = 25
     Anchors = [akLeft, akBottom]
     TabOrder = 4
     Kind = bkCancel
+    ExplicitTop = 298
   end
   object HelpButton: TBitBtn
     Left = 214
-    Top = 298
+    Top = 326
     Width = 97
     Height = 25
     Anchors = [akLeft, akBottom]
     TabOrder = 5
     OnClick = HelpButtonClick
     Kind = bkHelp
+    ExplicitTop = 298
   end
   object InstallTypeComboBox: TComboBox
     Left = 8
@@ -205,7 +207,7 @@ object InstallationSupportForm: TInstallationSupportForm
     Left = 8
     Top = 35
     Width = 482
-    Height = 142
+    Height = 114
     Anchors = [akLeft, akTop, akRight, akBottom]
     ItemHeight = 13
     TabOrder = 1
@@ -215,7 +217,7 @@ object InstallationSupportForm: TInstallationSupportForm
   end
   object AlwaysMountSourceCheckBox: TCheckBox
     Left = 8
-    Top = 247
+    Top = 275
     Width = 512
     Height = 17
     Anchors = [akLeft, akRight, akBottom]
@@ -223,16 +225,18 @@ object InstallationSupportForm: TInstallationSupportForm
     Checked = True
     State = cbChecked
     TabOrder = 2
+    ExplicitTop = 247
   end
   object AlwaysMountSourceComboBox: TComboBox
     Left = 23
-    Top = 264
+    Top = 292
     Width = 497
     Height = 21
     Style = csDropDownList
     Anchors = [akLeft, akRight, akBottom]
     ItemHeight = 13
     TabOrder = 6
+    ExplicitTop = 264
   end
   object OpenDialog: TOpenDialog
     Left = 16

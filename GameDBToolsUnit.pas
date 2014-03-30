@@ -4,6 +4,8 @@ interface
 uses Windows, Classes, ComCtrls, Controls, Graphics, Menus, CheckLst,
      GameDBUnit, LinkFileUnit;
 
+var GameDBToolsUnitShowDialogs : Boolean = False;
+
 {DEFINE SpeedTest}
 
 { Load Data to GUI }
@@ -143,7 +145,7 @@ uses SysUtils, Forms, Dialogs, ShellAPI, ShlObj, IniFiles, Math,  PNGImage,
      ProfileEditorFormUnit, ModernProfileEditorFormUnit, HashCalc,
      SmallWaitFormUnit, ChecksumFormUnit, WaitFormUnit, ImageCacheUnit,
      DosBoxUnit, ScummVMUnit, ImageStretch, MainUnit, GameDBFilterUnit,
-     HistoryUnit, IconLoaderUnit, ScreenshotsCacheUnit;
+     HistoryUnit, IconLoaderUnit, ScreenshotsCacheUnit, LoggingUnit;
 
 Function GroupMatch(const GameGroupUpper, SelectedGroupUpper : String) : Boolean; forward;
 
@@ -956,7 +958,7 @@ begin
   end;
 
   {Set L to TListItem to use}
-  If ItemsUsed=AListView.Items.Count
+  If ItemsUsed>=AListView.Items.Count
     then L:=AListView.Items.Add
     else L:=AListView.Items[ItemsUsed];
   inc(ItemsUsed);
@@ -1097,11 +1099,13 @@ Var I,J,K,Nr,ItemsUsed : Integer;
     {$IFDEF SpeedTest}Ca : Cardinal;{$ENDIF}
 begin
   {$IFDEF SpeedTest}Ca:=GetTickCount;{$ENDIF}
+  LogInfo('### Start of AddGamesToList ###');
 
   S:=Trim(PrgSetup.GamesListViewBackground);
   UseBackgroundColor:=(S<>''); BackgroundColor:=clWhite;
   If UseBackgroundColor then try BackgroundColor:=StringToColor(S); except UseBackgroundColor:=False; end;
 
+  LogInfo('Preparing ListView');
   {Prepare ListView}
   AListViewImageList.Clear;
 
@@ -1139,6 +1143,7 @@ begin
     AListView.Columns.EndUpdate;
   end;
 
+  LogInfo('Selecting game to add to ListView');
   RecentlyStarted:=nil;
   List:=TList.Create;
   try
@@ -1241,6 +1246,7 @@ begin
       List.Add(Game); {ScummVM default template}
     end;
 
+    LogInfo('Sorting games');
     St:=TStringList.Create;
     try
       {Sort games}
@@ -1276,6 +1282,7 @@ begin
           For I:=0 to List.Count-1 do St.AddObject('',TGame(List[I]));
         end;
 
+        LogInfo('Adding game to ListView (start)');
         {Add games to list}
         ItemsUsed:=0;
         If Trim(PrgSetup.ValueForNotSet)='' then T:=LanguageSetup.NotSet else T:=Trim(PrgSetup.ValueForNotSet);
@@ -1295,12 +1302,16 @@ begin
             If ReverseOrder then begin
               For I:=St.Count-1 downto 0 do begin
                 If (I mod 25=0) and Assigned(F) then Application.ProcessMessages;
+                if (St.Count<100) then LogInfo('Adding '+IntToStr(I+1)+'/'+IntToStr(St.Count)+': '+TGame(St.Objects[I]).CacheName);
+                if (St.Objects[I]=nil) or (not (St.Objects[I] is TGame)) then continue;
                 AddGameToList(AListView,ItemsUsed,AListViewImageList,AListViewIconImageList,AImageList,TGame(St.Objects[I]),ShowExtraInfo,O,V,VUserSt,T,ScreenshotViewMode,FirstDefaultTemplate,UseBackgroundColor,BackgroundColor);
                 If (TGame(St.Objects[I]).CacheName='') and (not TGame(St.Objects[I]).OwnINI) then FirstDefaultTemplate:=False;
               end;
             end else begin
               For I:=0 to St.Count-1 do begin
                 If (I mod 25=0) and Assigned(F) then Application.ProcessMessages;
+                if (St.Count<100) then LogInfo('Adding '+IntToStr(I+1)+'/'+IntToStr(St.Count)+': '+TGame(St.Objects[I]).CacheName);
+                if (St.Objects[I]=nil) or (not (St.Objects[I] is TGame)) then continue;
                 AddGameToList(AListView,ItemsUsed,AListViewImageList,AListViewIconImageList,AImageList,TGame(St.Objects[I]),ShowExtraInfo,O,V,VUserSt,T,ScreenshotViewMode, not FirstDefaultTemplate,UseBackgroundColor,BackgroundColor);
                 If (TGame(St.Objects[I]).CacheName='') and (not TGame(St.Objects[I]).OwnINI) then FirstDefaultTemplate:=False;
               end;
@@ -1315,6 +1326,8 @@ begin
         VUserSt.Free;
       end;
 
+      LogInfo('Adding game to ListView (done)');
+
       while ItemsUsed<AListView.Items.Count do AListView.Items.Delete(AListView.Items.Count-1);
 
     finally
@@ -1323,15 +1336,18 @@ begin
   finally
    if RecentlyStarted<>nil then RecentlyStarted.Free;
     List.Free;
+    LogInfo('Updating column widths');
     AListView.Columns.BeginUpdate;
     try
-      For I:=0 to length(C)-1 do AListView.Columns[I].Width:=C[I];
+      For I:=0 to min(length(C),AListView.Columns.Count)-1 do AListView.Columns[I].Width:=C[I];
     finally
       AListView.Columns.EndUpdate;
     end;
   end;
 
   {$IFDEF SpeedTest}Application.MainForm.Caption:=IntToStr(GetTickCount-Ca);{$ENDIF}
+
+  LogInfo('### End of AddGamesToList ###');
 end;
 
 Function GamesListSaveColWidthsToString(const AListView : TListView) : String;

@@ -68,8 +68,8 @@ object DataReaderForm: TDataReaderForm
     NumGlyphs = 2
   end
   object ListBox: TListBox
-    Left = 16
-    Top = 88
+    Left = 8
+    Top = 89
     Width = 201
     Height = 336
     Anchors = [akLeft, akTop, akBottom]
@@ -206,6 +206,8 @@ object DataReaderForm: TDataReaderForm
       Height = 17
       Anchors = [akLeft, akTop, akRight]
       Caption = 'Description'
+      ParentShowHint = False
+      ShowHint = True
       TabOrder = 7
     end
   end

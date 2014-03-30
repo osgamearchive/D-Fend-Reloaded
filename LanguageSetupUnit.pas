@@ -1200,9 +1200,11 @@ const NR_Author=1;
       NR_CreateConfForm=49001;
       NR_CreateConfFormProfMode=49002;
       NR_CreateConfFormInfo=49003;
-      NR_CreateConfFormSelectFolder=49004;
-      NR_CreateConfFormAutoSetup=49005;
-      NR_CreateConfFormSelectGamesWithoutAutoSetup=49006;
+      NR_CreateConfFormInfoProfMode=49004;
+      NR_CreateConfFormSelectFolder=49005;
+      NR_CreateConfFormSelectFolderProfMode=49006;
+      NR_CreateConfFormAutoSetup=49007;
+      NR_CreateConfFormSelectGamesWithoutAutoSetup=49008;
 
       NR_WizardForm=50001;
       NR_WizardFormButtonPrevious=50002;
@@ -2191,6 +2193,8 @@ Type TLanguageSetup=class(TBasePrgSetup)
     Procedure SetupLanguageStrings1;
     Procedure SetupLanguageStrings2;
     Procedure SetupLanguageStrings3;
+    Procedure SetupLanguageStrings4;
+    Procedure SetupLanguageStrings5;
     {Function GetString2(Index : Integer) : String;
     Procedure SetString2(Index : Integer; S : String);}
   public
@@ -3387,7 +3391,9 @@ Type TLanguageSetup=class(TBasePrgSetup)
     property CreateConfForm : String index NR_CreateConfForm read GetString write SetString;
     property CreateConfFormProfMode : String index NR_CreateConfFormProfMode read GetString write SetString;
     property CreateConfFormInfo : String index NR_CreateConfFormInfo read GetString write SetString;
+    property CreateConfFormInfoProfMode : String index NR_CreateConfFormInfoProfMode read GetString write SetString;
     property CreateConfFormSelectFolder : String index NR_CreateConfFormSelectFolder read GetString write SetString;
+    property CreateConfFormSelectFolderProfMode : String index NR_CreateConfFormSelectFolderProfMode read GetString write SetString;
     property CreateConfFormAutoSetup : String index NR_CreateConfFormAutoSetup read GetString write SetString;
     property CreateConfFormSelectGamesWithoutAutoSetup : String index NR_CreateConfFormSelectGamesWithoutAutoSetup read GetString write SetString;
 
@@ -4457,6 +4463,8 @@ begin
     SetupLanguageStrings1;
     SetupLanguageStrings2;
     SetupLanguageStrings3;
+    SetupLanguageStrings4;
+    SetupLanguageStrings5;
     {Needed to split this; compiler said "Too many local constants. Use shorter procedures."}
   finally
     FastAddRecDone;
@@ -4947,6 +4955,10 @@ begin
   AddStringRec(NR_ProfileEditorRelPathInfo,'ProfileEditorForm','RelativePath.Info','Info');
   AddStringRec(NR_ProfileEditorRelPathHint,'ProfileEditorForm','RelativePath.Hint','This function has nothing to do with the portable operation mode of D-Fend Realoded! This function is meant to access files inside ISO images mounted in DOSBox which cannot be accessed by the Windows file structure. '+
                                                                                    'If you want to run D-Fend Reloaded from different place use a portable installation. This function will not help you running D-Fend Reloaded portabely.');
+end;
+
+Procedure TLanguageSetup.SetupLanguageStrings2;
+begin
   AddStringRec(NR_ProfileEditorIgnoreWindowsWarnings,'ProfileEditorForm','IgnoreWindowsWarnings','No Windows file warnings for this profile');
   AddStringRec(NR_ProfileEditorIgnoreWindowsWarningsHints,'ProfileEditorForm','IgnoreWindowsWarnings.Hints','If you select Windows executable files to be started with DOSBox D-Fend Reloaded will warn you. In some very rare cases an exe file contains DOS and Windows program code. In this case the warning can be disabled.');
   AddStringRec(NR_TurnOffDOSBoxFailedWarning,'ProfileEditorForm','TurnOffDOSBoxFailedWarning','Turn off DOSBox failed warning for this profile');
@@ -5242,10 +5254,7 @@ begin
   AddStringRec(NR_ProfileMountingCDDriveTypeFolder,'ProfileMountingForm','CDDrive.MountType.Folder','Mount physical drive by folder on CD');
   AddStringRec(NR_ProfileMountingCDDriveTypeFolderLabel,'ProfileMountingForm','CDDrive.MountType.FolderLabel','Folder in root directory of the CD');
   AddStringRec(NR_ProfileMountingCDDriveTypeFolderShort,'ProfileMountingForm','CDDrive.MountType.FolderShort','CD with folder "%s" on it');
-end;
 
-Procedure TLanguageSetup.SetupLanguageStrings2;
-begin
   AddStringRec(NR_SetupForm,'SetupForm','Caption','Program settings');
   AddStringRec(NR_SetupFormGeneralSheet,'SetupForm','GeneralSheet','General');
   AddStringRec(NR_SetupFormDirectoriesSheet,'SetupForm','DirectoriesSheet','Directories');
@@ -5494,7 +5503,10 @@ begin
   AddStringRec(NR_SetupFormTextMediaViewerCustom,'SetupForm','MediaViewer.Custom','Use custom program');
   AddStringRec(NR_SetupFormTextMediaViewerCustomOpenCaption,'SetupForm','MediaViewer.Custom.OpenCaption','Select viewer to be used');
   AddStringRec(NR_SetupFormTextMediaViewerModal,'SetupForm','MediaViewer.Images.Modal','Show internal image viewer as modal window');
+end;
 
+Procedure TLanguageSetup.SetupLanguageStrings3;
+begin
   AddStringRec(NR_SetupFormWine,'SetupForm','Wine','Wine support');
   AddStringRec(NR_SetupFormWineEnable,'SetupForm','Wine.Enable','Enable Wine mode');
   AddStringRec(NR_SetupFormWineEnableInfo,'SetupForm','Wine.EnableInfo','You can overwrite this setting by using one of the following command line parameters: "WindowsMode" or "NoWineSupport".');
@@ -5654,7 +5666,9 @@ begin
   AddStringRec(NR_CreateConfForm,'CreateConfForm','Caption','Create conf files');
   AddStringRec(NR_CreateConfFormProfMode,'CreateConfForm','CaptionProf','Create prof files');
   AddStringRec(NR_CreateConfFormInfo,'CreateConfForm','Info','Please select the games for which conf files shall be created:');
+  AddStringRec(NR_CreateConfFormInfoProfMode,'CreateConfForm','InfoProf','Please select the games for which prof files shall be created:');
   AddStringRec(NR_CreateConfFormSelectFolder,'CreateConfForm','SelectFolder','Destination folder for conf files:');
+  AddStringRec(NR_CreateConfFormSelectFolderProfMode,'CreateConfForm','SelectFolderProf','Destination folder for prof files:');
   AddStringRec(NR_CreateConfFormAutoSetup,'CreateConfForm','ExportAsAutoSetup','Export profiles as auto setup templates');
   AddStringRec(NR_CreateConfFormSelectGamesWithoutAutoSetup,'CreateConfForm','SelectGamesWithoutAutoSetup','Games for which there is no auto setup template');
 
@@ -6161,7 +6175,7 @@ begin
   AddStringRec(NR_MissingFilesExtraDirectory,'MissingFilesCheck','ExtraDirectory','The extra directory "%s" does not exist.');
 end;
 
-Procedure TLanguageSetup.SetupLanguageStrings3;
+Procedure TLanguageSetup.SetupLanguageStrings4;
 begin
   AddStringRec(NR_OperationModeCaption,'OperationMode','Caption','D-Fend Reloaded operation mode');
   AddStringRec(NR_OperationModeTopLabel,'OperationMode','TopLabel','Operation mode chosen during installation:');
@@ -6520,7 +6534,10 @@ begin
   AddStringRec(NR_ApplyCheatDataBaseError,'ApplyCheat','DataBaseError','Loading the cheats data base failed.');
   AddStringRec(NR_ApplyCheatNoMatchingCheatRecord,'ApplyCheat','NoMatchingCheatRecord','No matching cheat records.');
   AddStringRec(NR_ApplyCheatInvalidValue,'ApplyCheat','InvalidValue','The given value is invalid.');
+end;
 
+Procedure TLanguageSetup.SetupLanguageStrings5;
+begin
   AddStringRec(NR_EditCheats,'EditCheats','Caption','Edit cheats data base');
   AddStringRec(NR_EditCheatsGameName,'EditCheats','Game.Name','Game name');
   AddStringRec(NR_EditCheatsGameAdd,'EditCheats','Game.Add','Add game record');

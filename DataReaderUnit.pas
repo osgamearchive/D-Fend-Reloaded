@@ -376,16 +376,10 @@ begin
     S5:=Trim(ExtUpperCase(TSearchGameData(NextElement).Notes));
 
     if (S5<>'') and (S5<>'SELF') then begin
-      St:=GetPlainText(Lines);
+      St:=GetPlainText(Lines,TSearchGameData(NextElement).IgnoreTags,TSearchGameData(NextElement).StartTokens,TSearchGameData(NextElement).StoppTokens);
       try
-        Notes:=''; T:='';
-        For I:=0 to St.Count-2 do begin
-          S:=St[I];
-          if (S='edit description') or (S='view history') or (S='Alternate Titles') then break;
-          if Notes<>'' then Notes:=Notes+#13;
-          Notes:=Notes+T;
-          if S<>'Description' then T:=S else T:='';
-        end;
+        Notes:=Trim(St.Text);
+        If (Notes<>'') and (Notes[length(Notes)]='[') then Notes:=Trim(Copy(Notes,1,length(Notes)-1));
       finally
         St.Free;
       end;

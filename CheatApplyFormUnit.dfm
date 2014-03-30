@@ -139,7 +139,7 @@ object CheatApplyForm: TCheatApplyForm
   object EditButton: TBitBtn
     Left = 315
     Top = 406
-    Width = 190
+    Width = 214
     Height = 25
     Anchors = [akLeft, akBottom]
     Caption = 'Edit cheats data base'

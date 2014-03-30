@@ -12,7 +12,8 @@ Function ValueToList(Value : String; const Divider : String = ';') : TStringList
 Function ListToValue(const St : TStrings; Divider : Char =';') : String;
 
 Function StringToStringList(S : String) : TStringList; {"[13][10]" as Divider}
-Function StringListToString(const St : TStrings) : String; {"[13][10]" as Divider}
+Function StringListToString(const St : TStrings) : String; overload; {"[13][10]" as Divider}
+Function StringListToString(const S : String) : String; overload; {"[13][10]" as Divider}
 Function Replace(const S, FromSub, ToSub : String) : String;
 
 Function FindStringInFile(const FileName, SearchString : String) : Boolean;
@@ -212,6 +213,16 @@ Var I : Integer;
     S : String;
 begin
   S:=St.Text;
+  result:='';
+
+  result:='';
+  For I:=1 to length(S) do
+    If S[I]<#32 then result:=result+'['+IntToStr(Ord(S[I]))+']' else result:=result+S[I];
+end;
+
+Function StringListToString(const S : String) : String;
+Var I : Integer;
+begin
   result:='';
 
   result:='';
