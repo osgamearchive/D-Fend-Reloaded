@@ -119,6 +119,19 @@ begin
   NextButton.Enabled:=(NextVideos.Count>0);
   Caption:=LanguageSetup.CaptureVideos+' ['+MakeRelPath(FileName,PrgSetup.BaseDir)+']';
 
+  if not FileExists(FileName) then begin
+    InfoLabel.Caption:=Format(LanguageSetup.MessageCouldNotFindFile,[FileName]);
+    InfoLabel.Visible:=True;
+    InstallButton.Visible:=False;
+    PlayPauseButton.Enabled:=False;
+    Panel1.Visible:=False;
+    ZoomButton.Enabled:=False;
+    SaveButton.Enabled:=False;
+    exit;
+  end else begin
+    SaveButton.Enabled:=True;
+  end;
+
   If VideoFileDamaged then begin
     InfoLabel.Caption:=LanguageSetup.CaptureVideosVideoDamaged;
     InfoLabel.Visible:=True;

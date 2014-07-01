@@ -28,7 +28,7 @@
     <Borland.Personality>Delphi.Personality</Borland.Personality>
     <Borland.ProjectType />
     <BorlandProject>
-<BorlandProject><Delphi.Personality><Parameters><Parameters Name="UseLauncher">False</Parameters><Parameters Name="LoadAllSymbols">True</Parameters><Parameters Name="LoadUnspecifiedSymbols">False</Parameters></Parameters><VersionInfo><VersionInfo Name="IncludeVerInfo">True</VersionInfo><VersionInfo Name="AutoIncBuild">False</VersionInfo><VersionInfo Name="MajorVer">1</VersionInfo><VersionInfo Name="MinorVer">3</VersionInfo><VersionInfo Name="Release">6</VersionInfo><VersionInfo Name="Build">91</VersionInfo><VersionInfo Name="Debug">False</VersionInfo><VersionInfo Name="PreRelease">False</VersionInfo><VersionInfo Name="Special">False</VersionInfo><VersionInfo Name="Private">False</VersionInfo><VersionInfo Name="DLL">False</VersionInfo><VersionInfo Name="Locale">1031</VersionInfo><VersionInfo Name="CodePage">1252</VersionInfo></VersionInfo><VersionInfoKeys><VersionInfoKeys Name="CompanyName"></VersionInfoKeys><VersionInfoKeys Name="FileDescription">D-Fend Reloaded</VersionInfoKeys><VersionInfoKeys Name="FileVersion">1.3.6.91</VersionInfoKeys><VersionInfoKeys Name="InternalName">D-Fend Reloaded</VersionInfoKeys><VersionInfoKeys Name="LegalCopyright">Alexander Herzog</VersionInfoKeys><VersionInfoKeys Name="LegalTrademarks"></VersionInfoKeys><VersionInfoKeys Name="OriginalFilename">DFend.exe</VersionInfoKeys><VersionInfoKeys Name="ProductName">D-Fend Reloaded</VersionInfoKeys><VersionInfoKeys Name="ProductVersion">1.0.0.0</VersionInfoKeys><VersionInfoKeys Name="Comments">GPL v3</VersionInfoKeys></VersionInfoKeys><Source><Source Name="MainSource">DFend.dpr</Source></Source></Delphi.Personality><ModelSupport>False</ModelSupport></BorlandProject></BorlandProject>
+<BorlandProject><Delphi.Personality><Parameters><Parameters Name="UseLauncher">False</Parameters><Parameters Name="LoadAllSymbols">True</Parameters><Parameters Name="LoadUnspecifiedSymbols">False</Parameters></Parameters><VersionInfo><VersionInfo Name="IncludeVerInfo">True</VersionInfo><VersionInfo Name="AutoIncBuild">False</VersionInfo><VersionInfo Name="MajorVer">1</VersionInfo><VersionInfo Name="MinorVer">4</VersionInfo><VersionInfo Name="Release">0</VersionInfo><VersionInfo Name="Build">95</VersionInfo><VersionInfo Name="Debug">False</VersionInfo><VersionInfo Name="PreRelease">False</VersionInfo><VersionInfo Name="Special">False</VersionInfo><VersionInfo Name="Private">False</VersionInfo><VersionInfo Name="DLL">False</VersionInfo><VersionInfo Name="Locale">1031</VersionInfo><VersionInfo Name="CodePage">1252</VersionInfo></VersionInfo><VersionInfoKeys><VersionInfoKeys Name="CompanyName"></VersionInfoKeys><VersionInfoKeys Name="FileDescription">D-Fend Reloaded</VersionInfoKeys><VersionInfoKeys Name="FileVersion">1.4.0.95</VersionInfoKeys><VersionInfoKeys Name="InternalName">D-Fend Reloaded</VersionInfoKeys><VersionInfoKeys Name="LegalCopyright">Alexander Herzog</VersionInfoKeys><VersionInfoKeys Name="LegalTrademarks"></VersionInfoKeys><VersionInfoKeys Name="OriginalFilename">DFend.exe</VersionInfoKeys><VersionInfoKeys Name="ProductName">D-Fend Reloaded</VersionInfoKeys><VersionInfoKeys Name="ProductVersion">1.0.0.0</VersionInfoKeys><VersionInfoKeys Name="Comments">GPL v3</VersionInfoKeys></VersionInfoKeys><Source><Source Name="MainSource">DFend.dpr</Source></Source></Delphi.Personality><ModelSupport>False</ModelSupport></BorlandProject></BorlandProject>
   </ProjectExtensions>
   <Import Project="$(MSBuildBinPath)\Borland.Delphi.Targets" />
   <ItemGroup>
@@ -95,12 +95,14 @@
     <DCCReference Include="CreateXMLFormUnit.pas">
       <Form>CreateXMLForm</Form>
     </DCCReference>
+    <DCCReference Include="DataReaderBaseUnit.pas" />
     <DCCReference Include="DataReaderConfigUnit.pas" />
     <DCCReference Include="DataReaderFormUnit.pas">
       <Form>DataReaderForm</Form>
     </DCCReference>
+    <DCCReference Include="DataReaderMobyUnit.pas" />
+    <DCCReference Include="DataReaderTheGamesDBUnit.pas" />
     <DCCReference Include="DataReaderToolsUnit.pas" />
-    <DCCReference Include="DataReaderUnit.pas" />
     <DCCReference Include="DOSBoxCountUnit.pas" />
     <DCCReference Include="DOSBoxFailedFormUnit.pas">
       <Form>DOSBoxFailedForm</Form>

@@ -39,6 +39,7 @@ type
     InfoButton2: TSpeedButton;
     IgnoreWindowsWarningsCheckBox: TCheckBox;
     TurnOffDOSBoxFailedWarningCheckBox: TCheckBox;
+    RunAsAdminCheckBox: TCheckBox;
     procedure IconButtonClick(Sender: TObject);
     procedure ExeSelectButtonClick(Sender: TObject);
     procedure ProfileNameEditChange(Sender: TObject);
@@ -136,6 +137,7 @@ begin
   GameExeButton.Hint:=LanguageSetup.ChooseFile;
   GameRelPathCheckBox.Caption:=LanguageSetup.ProfileEditorRelPath;
   GameRelPathCheckBox.Hint:=LanguageSetup.ProfileEditorRelPathHint;
+  RunAsAdminCheckBox.Caption:=LanguageSetup.ProfileEditorRunAsAdmin;
   GameParameterEdit.EditLabel.Caption:=LanguageSetup.ProfileEditorGameParameters;
   UserIconLoader.DialogImage(DI_SelectFile,GameExeButton);
 
@@ -157,6 +159,7 @@ begin
   GameZipButton.Hint:=LanguageSetup.ChooseFile;
   GameZipLabel.Caption:=LanguageSetup.ProfileEditorScummVMGameZipFileInfo;
   UserIconLoader.DialogImage(DI_SelectFolder,GameButton);
+  UserIconLoader.DialogImage(DI_SelectFile,GameZipButton);
 
   ProfileName:=InitData.CurrentProfileName;
   ProfileExe:=InitData.CurrentProfileExe;
@@ -246,6 +249,7 @@ begin
       GameParameterEdit.Text:=Game.GameParameters;
       SetupExeEdit.Text:=Game.SetupExe;
       SetupParameterEdit.Text:=Game.SetupParameters;
+      RunAsAdminCheckBox.Checked:=Game.RunAsAdmin;
     end else begin
       { DOSBox mode }
       S:=Trim(ExtUpperCase(Game.GameExe));
@@ -288,6 +292,7 @@ begin
     GameComboBoxChange(self);
     IgnoreWindowsWarningsCheckBox.Visible:=False;
     TurnOffDOSBoxFailedWarningCheckBox.Visible:=False;
+    RunAsAdminCheckBox.Visible:=False;
   end else begin
     GameGroup.Visible:=False;
     GameExeGroup.Top:=GameGroup.Top;
@@ -296,16 +301,19 @@ begin
     IgnoreWindowsWarningsCheckBox.Top:=ExtraExeFilesButton.Top+5;
     TurnOffDOSBoxFailedWarningCheckBox.Top:=IgnoreWindowsWarningsCheckBox.Top+IgnoreWindowsWarningsCheckBox.Height;
     If WindowsMode then begin
+      { Windows mode }
       GameRelPathCheckBox.Visible:=False;
       SetupRelPathCheckBox.Visible:=False;
       InfoButton1.Visible:=False;
       InfoButton2.Visible:=False;
       IgnoreWindowsWarningsCheckBox.Visible:=False;
       TurnOffDOSBoxFailedWarningCheckBox.Visible:=False;
+      RunAsAdminCheckBox.Visible:=PrgSetup.OfferRunAsAdmin;
     end else begin
       { DOSBox mode }
       GameExeEditChange(Sender); {Make IgnoreWindowsWarningsCheckBox visible if needed}
       TurnOffDOSBoxFailedWarningCheckBox.Visible:=TurnOffDOSBoxFailedWarningCheckBox.Checked;
+      RunAsAdminCheckBox.Visible:=False;
       CalcCheckBoxTop;
     end;
   end;
@@ -363,6 +371,7 @@ begin
       Game.GameParameters:=GameParameterEdit.Text;
       Game.SetupExe:=SetupExeEdit.Text;
       Game.SetupParameters:=SetupParameterEdit.Text;
+      Game.RunAsAdmin:=RunAsAdminCheckBox.Checked;
     end else begin
       { DOSBox mode }
       Game.ProfileMode:='DOSBox';

@@ -30,6 +30,7 @@ type
     DOSBoxBackgroundPriorityLabel: TLabel;
     UserConsoleCheckBox: TCheckBox;
     UserConsoleComboBox: TComboBox;
+    RunAsAdminCheckBox: TCheckBox;
     procedure CustomDOSBoxInstallationButtonClick(Sender: TObject);
     procedure CustomDOSBoxInstallationEditChange(Sender: TObject);
     procedure ButtonWork(Sender: TObject);
@@ -119,6 +120,8 @@ begin
     Add(LanguageSetup.GamePriorityHighest);
   end;
   CloseDOSBoxOnExitCheckBox.Caption:=LanguageSetup.GameCloseDosBoxAfterGameExit;
+  RunAsAdminCheckBox.Caption:=LanguageSetup.ProfileEditorRunAsAdmin;
+  RunAsAdminCheckBox.Visible:=PrgSetup.OfferRunAsAdmin;
   DefaultDOSBoxInstallationRadioButton.Caption:=LanguageSetup.GameDOSBoxVersionDefault;
   CustomDOSBoxInstallationRadioButton.Caption:=LanguageSetup.GameDOSBoxVersionCustom;
   CustomDOSBoxInstallationButton.Hint:=LanguageSetup.ChooseFolder;
@@ -182,6 +185,7 @@ begin
   end;
 
   CloseDOSBoxOnExitCheckBox.Checked:=Game.CloseDosBoxAfterGameExit;
+  RunAsAdminCheckBox.Checked:=Game.RunAsAdmin;
 
   S:=Trim(ExtUpperCase(Game.CustomDOSBoxDir)); B:=False;
   If S='' then S:='DEFAULT';
@@ -321,6 +325,7 @@ procedure TModernProfileEditorDOSBoxFrame.GetGame(const Game: TGame);
 begin
   Game.Priority:=FPriority[DOSBoxForegroundPriorityComboBox.ItemIndex]+','+BPriority[DOSBoxBackgroundPriorityComboBox.ItemIndex];
   Game.CloseDosBoxAfterGameExit:=CloseDOSBoxOnExitCheckBox.Checked;
+  Game.RunAsAdmin:=RunAsAdminCheckBox.Checked;
   If DefaultDOSBoxInstallationRadioButton.Checked then begin
     Game.CustomDOSBoxDir:=PrgSetup.DOSBoxSettings[DOSBoxInstallationComboBox.ItemIndex].Name;
   end else begin

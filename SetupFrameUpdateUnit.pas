@@ -40,7 +40,7 @@ type
 implementation
 
 uses ShellAPI, Math, LanguageSetupUnit, VistaToolsUnit, PrgSetupUnit, PrgConsts,
-     HelpConsts, IconLoaderUnit, InternetDataWaitFormUnit, DataReaderUnit,
+     HelpConsts, IconLoaderUnit, InternetDataWaitFormUnit, DataReaderMobyUnit,
      CommonTools, MainUnit, DownloadWaitFormUnit, ProgramUpdateCheckUnit,
      CheatDBToolsUnit, UpdateCheckFormUnit;
 

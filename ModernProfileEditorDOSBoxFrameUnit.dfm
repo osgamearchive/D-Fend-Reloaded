@@ -2,14 +2,14 @@ object ModernProfileEditorDOSBoxFrame: TModernProfileEditorDOSBoxFrame
   Left = 0
   Top = 0
   Width = 641
-  Height = 504
+  Height = 530
   TabOrder = 0
   DesignSize = (
     641
-    504)
+    530)
   object CustomDOSBoxInstallationButton: TSpeedButton
     Left = 605
-    Top = 181
+    Top = 205
     Width = 23
     Height = 22
     Anchors = [akTop, akRight]
@@ -33,7 +33,7 @@ object ModernProfileEditorDOSBoxFrame: TModernProfileEditorDOSBoxFrame
   end
   object CustomSetsLabel: TLabel
     Left = 16
-    Top = 296
+    Top = 320
     Width = 82
     Height = 13
     Caption = 'CustomSetsLabel'
@@ -63,43 +63,43 @@ object ModernProfileEditorDOSBoxFrame: TModernProfileEditorDOSBoxFrame
   end
   object DefaultDOSBoxInstallationRadioButton: TRadioButton
     Left = 16
-    Top = 113
+    Top = 137
     Width = 612
     Height = 17
     Anchors = [akLeft, akTop, akRight]
     Caption = 'DefaultDOSBoxInstallationRadioButton'
     Checked = True
-    TabOrder = 3
+    TabOrder = 4
     TabStop = True
     OnClick = DOSBoxInstallationTypeClick
   end
   object CustomDOSBoxInstallationRadioButton: TRadioButton
     Left = 16
-    Top = 163
+    Top = 187
     Width = 612
     Height = 17
     Anchors = [akLeft, akTop, akRight]
     Caption = 'CustomDOSBoxInstallationRadioButton'
-    TabOrder = 5
+    TabOrder = 6
     OnClick = DOSBoxInstallationTypeClick
   end
   object CustomDOSBoxInstallationEdit: TEdit
     Left = 32
-    Top = 182
+    Top = 206
     Width = 567
     Height = 21
     Anchors = [akLeft, akTop, akRight]
-    TabOrder = 6
+    TabOrder = 7
     OnChange = CustomDOSBoxInstallationEditChange
   end
   object CustomSetsClearButton: TBitBtn
     Left = 16
-    Top = 468
+    Top = 494
     Width = 105
     Height = 25
     Anchors = [akLeft, akBottom]
     Caption = 'L'#246'schen'
-    TabOrder = 12
+    TabOrder = 13
     OnClick = ButtonWork
     Glyph.Data = {
       76010000424D7601000000000000760000002800000020000000100000000100
@@ -119,12 +119,12 @@ object ModernProfileEditorDOSBoxFrame: TModernProfileEditorDOSBoxFrame
   object CustomSetsLoadButton: TBitBtn
     Tag = 1
     Left = 129
-    Top = 468
+    Top = 494
     Width = 105
     Height = 25
     Anchors = [akLeft, akBottom]
     Caption = 'Laden...'
-    TabOrder = 13
+    TabOrder = 14
     OnClick = ButtonWork
     Glyph.Data = {
       76010000424D7601000000000000760000002800000020000000100000000100
@@ -144,12 +144,12 @@ object ModernProfileEditorDOSBoxFrame: TModernProfileEditorDOSBoxFrame
   object CustomSetsSaveButton: TBitBtn
     Tag = 2
     Left = 240
-    Top = 468
+    Top = 494
     Width = 105
     Height = 25
     Anchors = [akLeft, akBottom]
     Caption = 'Speichern...'
-    TabOrder = 14
+    TabOrder = 15
     OnClick = ButtonWork
     Glyph.Data = {
       76010000424D7601000000000000760000002800000020000000100000000100
@@ -168,45 +168,45 @@ object ModernProfileEditorDOSBoxFrame: TModernProfileEditorDOSBoxFrame
   end
   object CustomSetsMemo: TRichEdit
     Left = 16
-    Top = 312
+    Top = 336
     Width = 612
-    Height = 150
+    Height = 152
     Anchors = [akLeft, akTop, akRight, akBottom]
     PlainText = True
     ScrollBars = ssBoth
-    TabOrder = 11
+    TabOrder = 12
     WordWrap = False
   end
   object DOSBoxInstallationComboBox: TComboBox
     Left = 32
-    Top = 132
+    Top = 156
     Width = 596
     Height = 21
     Style = csDropDownList
     Anchors = [akLeft, akTop, akRight]
-    ItemHeight = 13
-    TabOrder = 4
+    ItemHeight = 0
+    TabOrder = 5
     OnChange = DOSBoxInstallationComboBoxChange
   end
   object UserLanguageCheckBox: TCheckBox
     Left = 16
-    Top = 232
+    Top = 256
     Width = 411
     Height = 17
     Anchors = [akLeft, akTop, akRight]
     Caption = 'Use this custom language in DOSBox'
-    TabOrder = 7
+    TabOrder = 8
     OnClick = UserLanguageCheckBoxClick
   end
   object UserLanguageComboBox: TComboBox
     Left = 483
-    Top = 230
+    Top = 254
     Width = 145
     Height = 21
     Style = csDropDownList
     Anchors = [akTop, akRight]
-    ItemHeight = 13
-    TabOrder = 8
+    ItemHeight = 0
+    TabOrder = 9
   end
   object DOSBoxForegroundPriorityComboBox: TComboBox
     Left = 16
@@ -214,7 +214,7 @@ object ModernProfileEditorDOSBoxFrame: TModernProfileEditorDOSBoxFrame
     Width = 185
     Height = 21
     Style = csDropDownList
-    ItemHeight = 13
+    ItemHeight = 0
     TabOrder = 0
   end
   object DOSBoxBackgroundPriorityComboBox: TComboBox
@@ -223,34 +223,43 @@ object ModernProfileEditorDOSBoxFrame: TModernProfileEditorDOSBoxFrame
     Width = 185
     Height = 21
     Style = csDropDownList
-    ItemHeight = 13
+    ItemHeight = 0
     TabOrder = 1
   end
   object UserConsoleCheckBox: TCheckBox
     Left = 16
-    Top = 264
+    Top = 288
     Width = 417
     Height = 17
     Caption = 'Use this custom settings for the console window'
-    TabOrder = 9
+    TabOrder = 10
     OnClick = UserConsoleCheckBoxClick
   end
   object UserConsoleComboBox: TComboBox
     Left = 483
-    Top = 262
+    Top = 286
     Width = 145
     Height = 21
     Style = csDropDownList
     Anchors = [akTop, akRight]
-    ItemHeight = 13
-    TabOrder = 10
+    ItemHeight = 0
+    TabOrder = 11
+  end
+  object RunAsAdminCheckBox: TCheckBox
+    Left = 16
+    Top = 105
+    Width = 612
+    Height = 17
+    Anchors = [akLeft, akTop, akRight]
+    Caption = 'RunAsAdminCheckBox'
+    TabOrder = 3
   end
   object OpenDialog: TOpenDialog
     Left = 291
-    Top = 298
+    Top = 322
   end
   object SaveDialog: TSaveDialog
     Left = 323
-    Top = 298
+    Top = 322
   end
 end

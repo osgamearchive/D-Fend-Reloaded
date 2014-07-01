@@ -1387,9 +1387,9 @@ begin
   Case ShowConsole of
     0 : Add:=' -NOCONSOLE';
     2 : ; {always show console}
-    else {1 :} if PrgSetup.DOSBoxSettings[DOSBoxNr].HideDosBoxConsole then Add:=' -NOCONSOLE';
+    else {1 :} if PrgSetup.DOSBoxSettings[Max(0,DOSBoxNr)].HideDosBoxConsole then Add:=' -NOCONSOLE';
   End;
-  If Trim(PrgSetup.DOSBoxSettings[DOSBoxNr].CommandLineParameters)<>'' then Add:=Add+' '+Trim(PrgSetup.DOSBoxSettings[DOSBoxNr].CommandLineParameters);
+  If Trim(PrgSetup.DOSBoxSettings[Max(0,DOSBoxNr)].CommandLineParameters)<>'' then Add:=Add+' '+Trim(PrgSetup.DOSBoxSettings[DOSBoxNr].CommandLineParameters);
   If DosBoxCommandLine<>'' then Add:=Add+' '+DosBoxCommandLine;
   result:='-CONF "'+ConfFile+'"'+Add;
 end;
@@ -1397,7 +1397,7 @@ end;
 Type TCharArray=Array[0..MaxInt-1] of Char;
      PCharArray=^TCharArray;
 
-Function RunDosBox(const DOSBoxPath : String; const DOSBoxNr : Integer; const ConfFile : String; const FullScreen : Boolean; const ShowConsole : Integer; const DosBoxCommandLine : String ='') : THandle;
+Function RunDosBox(const DOSBoxPath : String; const DOSBoxNr : Integer; const ConfFile : String; const FullScreen : Boolean; const ShowConsole : Integer; const asAdmin : Boolean; const DosBoxCommandLine : String ='') : THandle;
 Var PrgFile, Params, Env, S : String;
     StartupInfo : TStartupInfo;
     ProcessInformation : TProcessInformation;
@@ -1425,6 +1425,26 @@ begin
 
   SpeedTestInfoOnly('DOSBox program file: '+PrgFile);
 
+  If FullScreen then ShowFullscreenInfoDialog(Application.MainForm);
+
+  if asAdmin then begin
+    S:=Trim(ExtUpperCase(PrgSetup.DOSBoxSettings[DOSBoxNr].SDLVideodriver));
+    Env:='';
+    If S='WINDIB' then Env:='windib';
+    If S='DIRECTX' then Env:='directx';
+    result:=INVALID_HANDLE_VALUE;
+    S:=IncludeTrailingPathDelimiter((ExtractFilePath(PrgFile)));
+    ShellExecute(
+      Application.MainForm.Handle,
+      'open',
+      PChar(PrgDir+BinFolder+'\AdminLauncher.exe'),
+      PChar('/driver='+Env+' /dir='+S+' /run="'+PrgFile+'" '+Params),
+      PChar(S),
+      SW_SHOW
+    );
+    exit;
+  end;
+
   S:=Trim(ExtUpperCase(PrgSetup.DOSBoxSettings[DOSBoxNr].SDLVideodriver));
   Env:='';
   If S='WINDIB' then Env:='windib';
@@ -1449,8 +1469,6 @@ begin
   end else begin
     P:=nil;
   end;
-
-  If FullScreen then ShowFullscreenInfoDialog(Application.MainForm);
 
   SpeedTestInfo('Starting DOSBox');
   SpeedTestInfoOnly('Command: "'+PrgFile+'" '+Params);
@@ -1512,6 +1530,7 @@ Var St : TStringList;
     Error : Boolean;
     DOSBoxNr : Integer;
     AlreadyMinimized : Boolean;
+    RunAsAdmin : Boolean;
 begin
   result:=INVALID_HANDLE_VALUE;
   AlreadyMinimized:=False;
@@ -1567,7 +1586,12 @@ begin
         Application.Minimize;
       end;
 
-      result:=RunDosBox(T,Max(0,DOSBoxNr),TempDir+DosBoxConfFileName,Game.StartFullscreen,Game.ShowConsoleWindow,DosBoxCommandLine);
+      RunAsAdmin:=False;
+      if Game.RunAsAdmin and PrgSetup.OfferRunAsAdmin then begin
+        if ZipRecNr<0 then RunAsAdmin:=True else MessageDlg(LanguageSetup.ProfileMountingZipAdminError,mtError,[mbOK],0);
+      end;
+
+      result:=RunDosBox(T,Max(0,DOSBoxNr),TempDir+DosBoxConfFileName,Game.StartFullscreen,Game.ShowConsoleWindow,RunAsAdmin,DosBoxCommandLine);
 
       SpeedTestDone;
 

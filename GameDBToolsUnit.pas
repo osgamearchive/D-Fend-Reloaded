@@ -1773,8 +1773,8 @@ Var Source,Dest,S : String;
 begin
   {Copy new and changed NewUserData files to DataDir}
   If PrgDataDir<>PrgDir then begin
-    {Update DataReader.xml to version 6 (only if upgrade from below 1.3.5)}
-    if LastVersion<10305 then begin
+    {Update DataReader.xml to version 6 (only if upgrade from below 1.4.0)}
+    if LastVersion<10400 then begin
       If FileExists(PrgDir+NewUserDataSubDir+'\'+DataReaderConfigFile) then CopyFile(PChar(PrgDir+NewUserDataSubDir+'\'+DataReaderConfigFile),PChar(PrgDataDir+SettingsFolder+'\'+DataReaderConfigFile),False); {False = overwrite existing file}
     end;
 

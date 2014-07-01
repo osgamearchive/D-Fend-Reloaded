@@ -13,7 +13,7 @@ implementation
 
 uses Windows, SysUtils, Dialogs, Forms, ShellAPI, LanguageSetupUnit,
      CommonTools, PrgSetupUnit, GameDBToolsUnit, DOSBoxUnit, RunPrgManagerUnit,
-     DOSBoxCountUnit, HistoryUnit;
+     DOSBoxCountUnit, HistoryUnit, PrgConsts;
 
 Function RunFile(const FileName, Parameters : String) : THandle;
 Var StartupInfo : TStartupInfo;
@@ -65,9 +65,24 @@ begin
 end;
 
 
-Function RunFile2(const FileName, Parameters: String): THandle;
+Function RunFile2(const FileName, Parameters: String; const asAdmin : Boolean): THandle;
 var ShellExecInfo: SHELLEXECUTEINFO;
+    S : String;
 begin
+  if asAdmin then begin
+    result:=INVALID_HANDLE_VALUE;
+    S:=IncludeTrailingPathDelimiter((ExtractFilePath(FileName)));
+    ShellExecute(
+      Application.MainForm.Handle,
+      'open',
+      PChar(PrgDir+BinFolder+'\AdminLauncher.exe'),
+      PChar('/dir='+S+' /run="'+FileName+'" '+Parameters),
+      PChar(S),
+      SW_SHOW
+    );
+    exit;
+  end;
+
     FillChar(ShellExecInfo, SizeOf(ShellExecInfo), 0);
     with ShellExecInfo do begin
         cbSize := SizeOf(ShellExecInfo);
@@ -150,7 +165,7 @@ begin
       Application.Minimize;
     end;
 
-    Handle:=RunFile2(S,T);
+    Handle:=RunFile2(S,T,Game.RunAsAdmin and PrgSetup.OfferRunAsAdmin);
     try
       RunPrgManager.AddCommand(Game,Handle);
     finally
@@ -192,7 +207,7 @@ begin
       Application.Minimize;
     end;
 
-    Handle:=RunFile2(S,T);
+    Handle:=RunFile2(S,T,Game.RunAsAdmin and PrgSetup.OfferRunAsAdmin);
     try
       RunPrgManager.AddCommand(Game,Handle);
     finally

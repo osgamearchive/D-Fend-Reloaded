@@ -33,6 +33,8 @@ Var FilterSelectLicense : TStringList = nil;
 
 procedure OpenFilterPopup(const OpenPos : TPoint; const AutoSetups : Boolean; const PopupMenu : TPopupMenu; const PackageDB : TPackageDB; const OnClick : TNotifyEvent; const HideIfAlreadyInstalled : Boolean; const AutoSetupChecksumScanner : TChecksumScanner; const GameDB : TGameDB);
 
+Procedure SortListView(const AListView : TListView; const ColNr : Integer; const Reverse : Boolean);
+
 {ExePackages info memo}
 
 Function ExePackageInfo(const AObject : TObject; const PackageDBCache : TPackageDBCache) : TStringList;
@@ -670,6 +672,71 @@ begin
     result.Add(LanguageSetup.PackageManagerDownloadSize+': '+GetNiceFileSize(CachedPackage.Size));
     result.Add('');
     result.Add(LanguageSetup.PackageManagerPackageOnlyInCache);
+  end;
+end;
+
+Type TListRec=record
+  Checked : Boolean;
+  Selected : Boolean;
+  Cols : Array of String;
+  Data : Pointer;
+end;
+
+Procedure SortListView(const AListView : TListView; const ColNr : Integer; const Reverse : Boolean);
+Var St : TStringList;
+    Data : Array of TListRec;
+    I,J,Nr,NewSelIndex : Integer;
+    Item : TListItem;
+    B : Boolean;
+begin
+  {Save list}
+  SetLength(Data,AListView.Items.Count);
+  for I:=0 to AListView.Items.Count-1 do begin
+    Data[I].Checked:=AListView.Items[I].Checked;
+    Data[I].Selected:=False;
+    SetLength(Data[I].Cols,AListView.Items[I].SubItems.Count+1);
+    Data[I].Cols[0]:=AListView.Items[I].Caption;
+    for J:=1 to length(Data[I].Cols)-1 do Data[I].Cols[J]:=AListView.Items[I].SubItems[J-1];
+    Data[I].Data:=AListView.Items[I].Data;
+  end;
+  If AListView.ItemIndex>=0 then Data[AListView.ItemIndex].Selected:=True;
+
+  St:=TStringList.Create;
+  try
+    {Build list to sort}
+    for I:=0 to length(Data)-1 do St.AddObject(Data[I].Cols[ColNr],TObject(I));
+
+    {Sort}
+    St.Sort;
+
+    {Rebuild needed?}
+    B:=False;
+    if Reverse then begin
+      for I:=0 to St.Count-1 do if Integer(St.Objects[I])<>(St.Count-1)-I then begin B:=True; break; end;
+    end else begin
+      for I:=0 to St.Count-1 do if Integer(St.Objects[I])<>I then begin B:=True; break; end;
+    end;
+    if not B then exit;
+
+    {Create new list}
+    NewSelIndex:=-1;
+    AListView.Items.BeginUpdate;
+    try
+      AListView.Items.Clear;
+      for I:=0 to St.Count-1 do begin
+        if Reverse then  Nr:=Integer(St.Objects[(St.Count-1)-I]) else Nr:=Integer(St.Objects[I]);
+        Item:=AListView.Items.Add;
+        Item.Checked:=Data[Nr].Checked;
+        Item.Caption:=Data[Nr].Cols[0];
+        for J:=1 to length(Data[Nr].Cols)-1 do Item.SubItems.Add(Data[Nr].Cols[J]);
+        if Data[Nr].Selected then NewSelIndex:=I;
+      end;
+    finally
+      AListView.Items.EndUpdate;
+    end;
+    if NewSelIndex>=0 then AListView.ItemIndex:=NewSelIndex;
+  finally
+    St.Free;
   end;
 end;
 

@@ -87,4 +87,15 @@ object SetupFrameSecurity: TSetupFrameSecurity
       '6')
     TabOrder = 3
   end
+  object OfferRunAsAdminCheckBox: TCheckBox
+    Left = 16
+    Top = 345
+    Width = 625
+    Height = 17
+    Anchors = [akLeft, akTop, akRight]
+    Caption = 
+      'Im Profileditor anbieten, DOSBox usw. mit Admin-Rechten auszuf'#252'h' +
+      'ren'
+    TabOrder = 4
+  end
 end

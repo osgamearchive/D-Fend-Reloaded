@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, ExtCtrls, Buttons, DataReaderUnit;
+  Dialogs, StdCtrls, ExtCtrls, Buttons, DataReaderBaseUnit;
 
 type
   TDataReaderForm = class(TForm)
@@ -29,6 +29,8 @@ type
     NameLabel: TLabel;
     DownloadCoverAllCheckBox: TCheckBox;
     DescriptionCheckBox: TCheckBox;
+    SourceLabel: TLabel;
+    SourceComboBox: TComboBox;
     procedure FormShow(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -38,11 +40,13 @@ type
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure SearchTypeCheckBoxClick(Sender: TObject);
     procedure DownloadCoverCheckBoxClick(Sender: TObject);
+    procedure SourceComboBoxChange(Sender: TObject);
   private
     { Private-Deklarationen }
     GenreSt, DeveloperSt, PublisherSt, YearSt, CoverSt, NotesSt : TStringList;
     DataReader : TDataReader;
     ShowCompleted : Boolean;
+    LastSource : Integer;
   public
     { Public-Deklarationen }
     ConfigOK : Boolean;
@@ -57,8 +61,9 @@ Function ShowDataReaderDialog(const AOwner : TComponent; const AGameName : Strin
 
 implementation
 
-uses LanguageSetupUnit, CommonTools, VistaToolsUnit, InternetDataWaitFormUnit,
-     PrgSetupUnit, PrgConsts, IconLoaderUnit, GameDBToolsUnit;
+uses Math, LanguageSetupUnit, CommonTools, VistaToolsUnit,
+     InternetDataWaitFormUnit, PrgSetupUnit, PrgConsts, IconLoaderUnit,
+     GameDBToolsUnit, DataReaderMobyUnit, DataReaderTheGamesDBUnit;
 
 {$R *.dfm}
 
@@ -71,8 +76,8 @@ begin
   YearSt:=TStringList.Create;
   CoverSt:=TStringList.Create;
   NotesSt:=TStringList.Create;
-  DataReader:=TDataReader.Create;
 
+  DataReader:=TTheGamesDBDataReader.Create;
   ConfigOK:=ShowDataReaderInternetConfigWaitDialog(Owner,DataReader,False,LanguageSetup.DataReaderDownloadCaption,LanguageSetup.DataReaderDownloadInfo,LanguageSetup.DataReaderDownloadError);
 end;
 
@@ -94,6 +99,7 @@ begin
   YearLabel.Caption:='';
 
   Caption:=LanguageSetup.DataReader;
+  SourceLabel.Caption:=LanguageSetup.DataReaderSource;
   GameNameEdit.EditLabel.Caption:=LanguageSetup.GameName;
   SearchButton.Caption:=LanguageSetup.Search;
   SearchTypeCheckBox.Caption:=LanguageSetup.DataReaderSearchForDOSGames;
@@ -115,6 +121,9 @@ begin
   UserIconLoader.DialogImage(DI_OK,InsertButton);
   UserIconLoader.DialogImage(DI_Cancel,CancelButton);
 
+  SourceComboBox.ItemIndex:=Min(SourceComboBox.Items.Count-1,Max(0,PrgSetup.DataReaderSource));
+  SourceComboBoxChange(nil);
+
   SearchTypeCheckBox.Checked:=not PrgSetup.DataReaderAllPlatforms;
 
   If Trim(GameNameEdit.Text)<>'' then SearchButtonClick(Sender) else ListBoxClick(Sender);
@@ -133,12 +142,14 @@ begin
   DownloadCoverAllCheckBox.Checked:=(S[7]<>'-');
   DescriptionCheckBox.Checked:=(S[8]<>'-');
 
-  SearchTypeCheckBox.Visible:=(ExtUpperCase(Trim(DataReader.Config.GamesListURL))<>ExtUpperCase(Trim(DataReader.Config.GamesListAllPlatformsURL)));
+  SearchTypeCheckBox.Visible:=(ExtUpperCase(Trim(DataReader.GetListURL(false)))<>ExtUpperCase(Trim(DataReader.GetListURL(true))));
 end;
 
 procedure TDataReaderForm.FormDestroy(Sender: TObject);
 Var S : String;
 begin
+  PrgSetup.DataReaderSource:=SourceComboBox.ItemIndex;
+
   S:='';
   If NameCheckBox.Checked then S:=S+'X' else S:=S+'-';
   If GenreCheckBox.Checked then S:=S+'X' else S:=S+'-';
@@ -219,6 +230,22 @@ end;
 procedure TDataReaderForm.SearchTypeCheckBoxClick(Sender: TObject);
 begin
   PrgSetup.DataReaderAllPlatforms:=not SearchTypeCheckBox.Checked;
+end;
+
+procedure TDataReaderForm.SourceComboBoxChange(Sender: TObject);
+begin
+  if DataReader<>nil then FreeAndNil(DataReader);
+  
+  Case SourceComboBox.ItemIndex of
+    0 : DataReader:=TTheGamesDBDataReader.Create;
+    1 : begin
+          DataReader:=TMobyDataReader.Create;
+          ShowDataReaderInternetConfigWaitDialog(Owner,DataReader,False,LanguageSetup.DataReaderDownloadCaption,LanguageSetup.DataReaderDownloadInfo,LanguageSetup.DataReaderDownloadError);
+        end;
+  end;
+
+  if (Sender<>nil) and (LastSource<>SourceComboBox.ItemIndex) then SearchButtonClick(Sender);
+  LastSource:=SourceComboBox.ItemIndex;
 end;
 
 Function ProcessGenre(const S : String) : String;

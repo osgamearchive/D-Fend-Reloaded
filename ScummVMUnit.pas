@@ -16,7 +16,7 @@ Var MinimizedAtScummVMStart : Boolean = False;
 
 implementation
 
-uses Windows, Forms, Dialogs, SysUtils, IniFiles, ShlObj, PrgSetupUnit,
+uses Windows, Forms, Dialogs, SysUtils, IniFiles, ShellAPI, ShlObj, PrgSetupUnit,
      CommonTools, PrgConsts, GameDBToolsUnit, LanguageSetupUnit,
      ScummVMToolsUnit, ZipManagerUnit, DOSBoxCountUnit, RunPrgManagerUnit,
      HistoryUnit;
@@ -232,7 +232,7 @@ begin
   result:=result+'--config="'+INIFile+'" '+RenderModeParam+PlatformParam+GameName;
 end;
 
-Function RunScummVM(const INIFile, GameName, AdditionalCommandLine : String; const FullScreen : Boolean; const GameDir, ScreenshotDir, RenderMode, DataPlatform : String) : THandle;
+Function RunScummVM(const INIFile, GameName, AdditionalCommandLine : String; const FullScreen : Boolean; const GameDir, ScreenshotDir, RenderMode, DataPlatform : String; const asAdmin : Boolean) : THandle;
 Var PrgFile, Params : String;
     StartupInfo : TStartupInfo;
     ProcessInformation : TProcessInformation;
@@ -248,6 +248,18 @@ begin
   end;
 
   Params:=GetScummVMCommandLine(INIFile,GameName,AdditionalCommandLine,RenderMode,DataPlatform);
+
+  if asAdmin then begin
+    ShellExecute(
+      Application.MainForm.Handle,
+      'open',
+      PChar(PrgDir+BinFolder+'\AdminLauncher.exe'),
+      PChar('/dir='+ScreenshotDir+' /run="'+PrgFile+'" '+Params),
+      PChar(ScreenshotDir),
+      SW_SHOW
+    );
+    exit;
+  end;
 
   with StartupInfo do begin
     cb:=SizeOf(TStartupInfo);
@@ -322,6 +334,7 @@ Var St : TStringList;
     Error : Boolean;
     ScummVMHandle : THandle;
     AlreadyMinimized : Boolean;
+    RunAsAdmin : Boolean;
 begin
   AlreadyMinimized:=False;
 
@@ -359,8 +372,13 @@ begin
         Params:=Params+Trim(Game.ScummVMParameters);
       end;
 
+      RunAsAdmin:=False;
+      if Game.RunAsAdmin and PrgSetup.OfferRunAsAdmin then begin
+        if ZipRecNr<0 then RunAsAdmin:=True else MessageDlg(LanguageSetup.ProfileMountingZipAdminError,mtError,[mbOK],0);
+      end;
+
       If Trim(Game.ScummVMPath)='' then Dir:='' else Dir:=IncludeTrailingPathDelimiter(MakeAbsPath(Game.ScummVMPath,PrgSetup.BaseDir));
-      ScummVMHandle:=RunScummVM(TempDir+ScummVMConfFileName,{$IFDEF AddDFRPrefixInRunMode}'DFR'+{$ENDIF}Game.ScummVMGame,Params,Game.StartFullscreen,Dir,S,Game.ScummVMRenderMode,Game.ScummVMPlatform);
+      ScummVMHandle:=RunScummVM(TempDir+ScummVMConfFileName,{$IFDEF AddDFRPrefixInRunMode}'DFR'+{$ENDIF}Game.ScummVMGame,Params,Game.StartFullscreen,Dir,S,Game.ScummVMRenderMode,Game.ScummVMPlatform,RunAsAdmin);
       try
         If ZipRecNr>=0 then ZipManager.ActivateRepackCheck(ZipRecNr,ScummVMHandle);
         RunPrgManager.AddCommand(Game,ScummVMHandle);

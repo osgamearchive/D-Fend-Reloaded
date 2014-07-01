@@ -1,3 +1,4 @@
+The Games DB;http://thegamesdb.net/search/?string=<GAMENAME>&function=Search
 Mobygames.com;http://www.mobygames.com/search/quick?game=<GAMENAME>&p=-1&search=Go
 Squakenet.com;http://www.squakenet.com/pc_games/?q=<GAMENAME>
 TheLegacy.de;http://www.thelegacy.de/Museum/SQLFrameset.php3?SearchValue=<GAMENAME>&searchEntity=TITLE&misc=yes&quick=yes&list=SQLlist_games.php3

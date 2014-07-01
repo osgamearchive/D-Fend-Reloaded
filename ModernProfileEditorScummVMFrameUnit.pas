@@ -34,6 +34,7 @@ type
     ExtraDirButton: TSpeedButton;
     CustomLanguageEdit: TEdit;
     CommandLineEdit: TLabeledEdit;
+    RunAsAdminCheckBox: TCheckBox;
     procedure SavePathEditButtonClick(Sender: TObject);
     procedure SavePathEditChange(Sender: TObject);
     procedure ButtonWork(Sender: TObject);
@@ -91,6 +92,8 @@ begin
   TalkSpeedLabel.Caption:=LanguageSetup.ProfileEditorScummVMTextSpeed;
   SubtitlesCheckBox.Caption:=LanguageSetup.ProfileEditorScummVMSubtitles;
   ConfirmExitCheckBox.Caption:=LanguageSetup.ProfileEditorScummVMConfirmExit;
+  RunAsAdminCheckBox.Caption:=LanguageSetup.ProfileEditorRunAsAdmin;
+  RunAsAdminCheckBox.Visible:=PrgSetup.OfferRunAsAdmin;
   SavePathGroupBox.Caption:=LanguageSetup.ProfileEditorScummVMSavePath;
   SavePathDefaultRadioButton.Caption:=LanguageSetup.ProfileEditorScummVMSavePathGameDir+' ('+LanguageSetup.Default+')';
   SavePathCustomRadioButton.Caption:=LanguageSetup.ProfileEditorScummVMSavePathCustom;
@@ -123,6 +126,7 @@ begin
   TalkSpeedEdit.Value:=Min(1000,Max(1,Game.ScummVMTalkSpeed));
   SubtitlesCheckBox.Checked:=Game.ScummVMSubtitles;
   ConfirmExitCheckBox.Checked:=Game.ScummVMConfirmExit;
+  RunAsAdminCheckBox.Checked:=Game.RunAsAdmin;
 
   SavePathEdit.Text:=Game.ScummVMSavePath;
   SavePathEditChange(self);
@@ -219,6 +223,7 @@ begin
   Game.ScummVMTalkSpeed:=TalkSpeedEdit.Value;
   Game.ScummVMSubtitles:=SubtitlesCheckBox.Checked;
   Game.ScummVMConfirmExit:=ConfirmExitCheckBox.Checked;
+  Game.RunAsAdmin:=RunAsAdminCheckBox.Checked;
   If SavePathDefaultRadioButton.Checked then Game.ScummVMSavePath:='' else Game.ScummVMSavePath:=Trim(SavePathEdit.Text);
   If ExtraDirCheckBox.Checked then Game.ScummVMExtraPath:=Trim(ExtraDirEdit.Text) else Game.ScummVMExtraPath:='';
   Game.ScummVMParameters:=CommandLineEdit.Text; 

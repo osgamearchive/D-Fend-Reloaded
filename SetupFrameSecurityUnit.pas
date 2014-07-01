@@ -15,6 +15,7 @@ type
     UseChecksumsLabel: TLabel;
     RecycleBinLabel: TLabel;
     RecycleBinListBox: TCheckListBox;
+    OfferRunAsAdminCheckBox: TCheckBox;
   private
     { Private-Deklarationen }
   public
@@ -61,6 +62,8 @@ begin
   RecycleBinListBox.Checked[4]:=(S[Integer(ftQuickStart)+1]='1');
   RecycleBinListBox.Checked[5]:=(S[Integer(ftZipOperation)+1]='1');
   RecycleBinListBox.Checked[6]:=(S[Integer(ftTemp)+1]='1');
+
+  OfferRunAsAdminCheckBox.Checked:=PrgSetup.OfferRunAsAdmin;
 end;
 
 procedure TSetupFrameSecurity.BeforeChangeLanguage;
@@ -89,6 +92,8 @@ begin
   RecycleBinListBox.Items[5]:=LanguageSetup.SetupFormRecycleBinZipOperation;
   RecycleBinListBox.Items[6]:=LanguageSetup.SetupFormRecycleBinTemp;
 
+  OfferRunAsAdminCheckBox.Caption:=LanguageSetup.SetupFormOfferRunAsAdmin;
+
   HelpContext:=ID_FileOptionsSecurity;
 end;
 
@@ -113,6 +118,7 @@ begin
   while RecycleBinListBox.Items.Count<7 do RecycleBinListBox.Items.Add('');
   For I:=0 to 4 do RecycleBinListBox.Checked[I]:=True;
   For I:=5 to 6 do RecycleBinListBox.Checked[I]:=False;
+  OfferRunAsAdminCheckBox.Checked:=False;
 end;
 
 procedure TSetupFrameSecurity.SaveSetup;
@@ -132,6 +138,8 @@ begin
   If not RecycleBinListBox.Checked[5] then S[Integer(ftZipOperation)+1]:='0';
   If not RecycleBinListBox.Checked[6] then S[Integer(ftTemp)+1]:='0';
   PrgSetup.DeleteToRecycleBin:=S;
+
+  PrgSetup.OfferRunAsAdmin:=OfferRunAsAdminCheckBox.Checked;
 end;
 
 end.

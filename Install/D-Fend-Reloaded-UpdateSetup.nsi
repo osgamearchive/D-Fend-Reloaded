@@ -104,6 +104,7 @@ Section "$(LANGNAME_DFendReloaded)" ID_DFend
   File "..\Bin\DelZip179.dll"
   File "..\Bin\mediaplr.dll"
   File "..\Bin\InstallVideoCodec.exe"
+  File "..\Bin\AdminLauncher.exe"
   IntCmp $InstallDataType 2 +2
   File "..\Bin\DFendGameExplorerData.dll"
   

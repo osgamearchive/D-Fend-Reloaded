@@ -132,7 +132,7 @@ object ModernProfileEditorBaseFrame: TModernProfileEditorBaseFrame
       EditLabel.Width = 95
       EditLabel.Height = 13
       EditLabel.Caption = 'GameParameterEdit'
-      TabOrder = 2
+      TabOrder = 3
     end
     object GameRelPathCheckBox: TCheckBox
       Left = 16
@@ -144,7 +144,17 @@ object ModernProfileEditorBaseFrame: TModernProfileEditorBaseFrame
       ParentShowHint = False
       ShowHint = True
       TabOrder = 1
+      Visible = False
       OnClick = RelPathCheckBoxClick
+    end
+    object RunAsAdminCheckBox: TCheckBox
+      Left = 16
+      Top = 68
+      Width = 510
+      Height = 17
+      Anchors = [akLeft, akTop, akRight]
+      Caption = 'RunAsAdminCheckBox'
+      TabOrder = 2
     end
   end
   object SetupExeGroup: TGroupBox
@@ -319,7 +329,7 @@ object ModernProfileEditorBaseFrame: TModernProfileEditorBaseFrame
       Height = 21
       Style = csDropDownList
       Anchors = [akLeft, akTop, akRight]
-      ItemHeight = 0
+      ItemHeight = 13
       TabOrder = 0
       OnChange = GameComboBoxChange
     end

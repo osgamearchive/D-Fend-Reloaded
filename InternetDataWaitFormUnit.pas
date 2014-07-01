@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, ComCtrls, ExtCtrls, StdCtrls, DataReaderUnit;
+  Dialogs, ComCtrls, ExtCtrls, StdCtrls, DataReaderBaseUnit, DataReaderMobyUnit;
 
 type
   TInternetDataWaitForm = class(TForm)
@@ -126,7 +126,7 @@ Var DataReaderGameListThread : TDataReaderGameListThread;
 begin
   DataReaderGameListThread:=TDataReaderGameListThread.Create(ADataReader,AName);
   try
-    If PrgSetup.DataReaderAllPlatforms then URL:=ADataReader.Config.GamesListAllPlatformsURL else URL:=ADataReader.Config.GamesListURL;
+    URL:=ADataReader.GetListURL(PrgSetup.DataReaderAllPlatforms);
     result:=ShowDataReaderInternetWaitDialog(AOwner,DataReaderGameListThread,ACaption,Format(AInfo,[DomainOnly(URL)]),Format(AError,[DomainOnly(URL)]));
   finally
     DataReaderGameListThread.Free;
@@ -136,7 +136,7 @@ end;
 Function ShowDataReaderInternetDataWaitDialog(const AOwner : TComponent; const ADataReader : TDataReader; const ANr : Integer; const AFullImages: Boolean; const ACaption, AInfo, AError : String) : TDataReaderGameDataThread;
 begin
   result:=TDataReaderGameDataThread.Create(ADataReader,ANr,AFullImages);
-  If not ShowDataReaderInternetWaitDialog(AOwner,result,ACaption,Format(AInfo,[DomainOnly(ADataReader.Config.GameRecordBaseURL)]),Format(AError,[DomainOnly(ADataReader.Config.GameRecordBaseURL)])) then FreeAndNil(result);
+  If not ShowDataReaderInternetWaitDialog(AOwner,result,ACaption,Format(AInfo,[ADataReader.DataDomain]),Format(AError,[ADataReader.DataDomain])) then FreeAndNil(result);
 end;
 
 Procedure ShowDataReaderInternetCoverWaitDialog(const AOwner : TComponent; const ADataReader : TDataReader; const ADownloadURL, ADestFolder : String; const ACaption, AInfo, AError : String);
@@ -144,7 +144,7 @@ Var DataReaderGameCoverThread : TDataReaderGameCoverThread;
 begin
   DataReaderGameCoverThread:=TDataReaderGameCoverThread.Create(ADataReader,ADownloadURL,ADestFolder);
   try
-    ShowDataReaderInternetWaitDialog(AOwner,DataReaderGameCoverThread,ACaption,Format(AInfo,[DomainOnly(ADataReader.Config.GameRecordBaseURL)]),Format(AError,[DomainOnly(ADataReader.Config.GameRecordBaseURL)]));
+    ShowDataReaderInternetWaitDialog(AOwner,DataReaderGameCoverThread,ACaption,Format(AInfo,[ADataReader.DataDomain]),Format(AError,[ADataReader.DataDomain]));
   finally
     DataReaderGameCoverThread.Free;
   end;
@@ -165,7 +165,7 @@ begin
       ThreadList:=TList.Create;
       try
         For I:=0 to ThreadCount-1 do if DataReaderGameCoverThread[I]<>nil then ThreadList.Add(DataReaderGameCoverThread[I]);
-        ShowDataReaderInternetWaitDialog(AOwner,ThreadLIst,ACaption,Format(AInfo,[DomainOnly(ADataReader.Config.GameRecordBaseURL)]),Format(AError,[DomainOnly(ADataReader.Config.GameRecordBaseURL)]));
+        ShowDataReaderInternetWaitDialog(AOwner,ThreadLIst,ACaption,Format(AInfo,[ADataReader.DataDomain]),Format(AError,[ADataReader.DataDomain]));
       finally
         ThreadList.Free;
       end;

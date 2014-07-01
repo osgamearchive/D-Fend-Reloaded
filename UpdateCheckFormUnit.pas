@@ -51,7 +51,7 @@ implementation
 
 uses ShellAPI, Math, CommonTools, LanguageSetupUnit, VistaToolsUnit, PrgSetupUnit,
      IconLoaderUnit, ProgramUpdateCheckUnit, CheatDBToolsUnit, SetupFormUnit,
-     DataReaderUnit, InternetDataWaitFormUnit, PackageDBToolsUnit, PrgConsts;
+     DataReaderMobyUnit, InternetDataWaitFormUnit, PackageDBToolsUnit, PrgConsts;
 
 {$R *.dfm}
 
@@ -170,11 +170,11 @@ begin
 end;
 
 procedure TUpdateCheckForm.UpdateDataReader;
-Var DataReader : TDataReader;
+Var DataReader : TMobyDataReader;
     I : Integer;
 begin
   SetStatus(StatusLabelDatareader,LanguageSetup.UpdateCheckDialogStatusSearching,clDarkYellow);
-  DataReader:=TDataReader.Create;
+  DataReader:=TMobyDataReader.Create;
   try
     If not DataReader.LoadConfig(PrgDataDir+SettingsFolder+'\'+DataReaderConfigFile,False) then begin
       SetStatus(StatusLabelDatareader,Format(LanguageSetup.DataReaderDownloadError,[DataReaderUpdateURL]),clRed);

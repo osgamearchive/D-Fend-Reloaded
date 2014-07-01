@@ -200,7 +200,7 @@ uses
   PackageManagerRepositoriesEditURLFormUnit in 'PackageManagerRepositoriesEditURLFormUnit.pas' {PackageManagerRepositoriesEditURLForm},
   DataReaderConfigUnit in 'DataReaderConfigUnit.pas',
   DataReaderToolsUnit in 'DataReaderToolsUnit.pas',
-  DataReaderUnit in 'DataReaderUnit.pas',
+  DataReaderMobyUnit in 'DataReaderMobyUnit.pas',
   InstallationRunFormUnit in 'InstallationRunFormUnit.pas' {InstallationRunForm},
   MakeBootImageFromProfileFormUnit in 'MakeBootImageFromProfileFormUnit.pas' {MakeBootImageFromProfileForm},
   SetupFrameAutomaticConfigurationUnit in 'SetupFrameAutomaticConfigurationUnit.pas' {SetupFrameAutomaticConfiguration: TFrame},
@@ -233,7 +233,9 @@ uses
   DOSBoxOutputTestFormUnit in 'DOSBoxOutputTestFormUnit.pas' {DOSBoxOutputTestForm},
   SingleInstanceUnit in 'SingleInstanceUnit.pas',
   ResetProfilesFormUnit in 'ResetProfilesFormUnit.pas' {ResetProfilesForm},
-  ScreenshotsCacheUnit in 'ScreenshotsCacheUnit.pas';
+  ScreenshotsCacheUnit in 'ScreenshotsCacheUnit.pas',
+  DataReaderBaseUnit in 'DataReaderBaseUnit.pas',
+  DataReaderTheGamesDBUnit in 'DataReaderTheGamesDBUnit.pas';
 
 {$R *.res}
 

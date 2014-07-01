@@ -305,6 +305,7 @@ const NR_Name=1;
       NR_CommandAfterExecutionMinimized=494;
       NR_CommandBeforeExecutionParallel=495;
       NR_CommandAfterExecutionParallel=496;
+      NR_RunAsAdmin=497;
 
       NR_AddtionalChecksumFile1=500;
       NR_AddtionalChecksumFile1Checksum=501;
@@ -598,6 +599,7 @@ Type TGameDB=class;
     property CommandAfterExecutionMinimized : Boolean index NR_CommandAfterExecutionMinimized read GetBoolean write SetBoolean;
     property CommandBeforeExecutionParallel : Boolean index NR_CommandBeforeExecutionParallel read GetBoolean write SetBoolean;
     property CommandAfterExecutionParallel : Boolean index NR_CommandAfterExecutionParallel read GetBoolean write SetBoolean;
+    property RunAsAdmin : Boolean index NR_RunAsAdmin read GetBoolean write SetBoolean;
 
     property AddtionalChecksumFile1 : String index NR_AddtionalChecksumFile1 read GetString write SetString;
     property AddtionalChecksumFile1Checksum : String index NR_AddtionalChecksumFile1Checksum read GetString write SetString;
@@ -1117,6 +1119,7 @@ begin
   AddBooleanRec(NR_CommandAfterExecutionMinimized,'ExtraCommands','AfterExecution.Minimized',False);
   AddBooleanRec(NR_CommandBeforeExecutionParallel,'ExtraCommands','BeforeExecution.Parallel',False);
   AddBooleanRec(NR_CommandAfterExecutionParallel,'ExtraCommands','AfterExecution.Parallel',False);
+  AddBooleanRec(NR_RunAsAdmin,'Extra','RunAsAdmin',False);
 
   AddStringRec(NR_AddtionalChecksumFile1,'ExtraGameIdentify','File1.Filename','');
   AddStringRec(NR_AddtionalChecksumFile1Checksum,'ExtraGameIdentify','File1.Checksum','');

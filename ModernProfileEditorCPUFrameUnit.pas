@@ -24,6 +24,7 @@ type
     InfoLabel: TLabel;
     CyclesUpComboBox: TComboBox;
     CyclesDownComboBox: TComboBox;
+    CyclesMaxLimitCheckBox: TCheckBox;
     procedure CPUCyclesChange(Sender: TObject);
     procedure CyclesUpComboBoxChange(Sender: TObject);
     procedure CyclesDownComboBoxChange(Sender: TObject);
@@ -63,12 +64,14 @@ begin
   NoFlicker(CyclesDownEdit);
   NoFlicker(CyclesDownComboBox);
   NoFlicker(CPUTypeComboBox);
+  NoFlicker(CyclesMaxLimitCheckBox);
 
   CPUCoreRadioGroup.Caption:=LanguageSetup.GameCore;
   CPUCyclesGroupBox.Caption:=LanguageSetup.GameCycles;
   CyclesAutoRadioButton.Caption:=LanguageSetup.GameCyclesAuto;
   CyclesMaxRadioButton.Caption:=LanguageSetup.GameCyclesMax;
   CyclesValueRadioButton.Caption:=LanguageSetup.Value;
+  CyclesMaxLimitCheckBox.Caption:=LanguageSetup.GameCyclesMaxLimitValue;
 
   St:=ValueToList(InitData.GameDB.ConfOpt.Core,';,'); try CPUCoreRadioGroup.Items.AddStrings(St); finally St.Free; end;
   CPUCoreRadioGroup.ItemIndex:=0;
@@ -122,7 +125,7 @@ end;
 
 procedure TModernProfileEditorCPUFrame.SetGame(const Game: TGame; const LoadFromTemplate: Boolean);
 Var I : Integer;
-    S : String;
+    S,T : String;
 begin
   S:=Trim(ExtUpperCase(Game.Core));
   For I:=0 to CPUCoreRadioGroup.Items.Count-1 do begin
@@ -132,8 +135,20 @@ begin
   SaveCycles:=Game.Cycles;
   S:=Trim(ExtUpperCase(Game.Cycles));
   CyclesAutoRadioButton.Checked:=(S='AUTO');
-  CyclesMaxRadioButton.Checked:=(S='MAX');
-  If (S<>'AUTO') and (S<>'MAX') then begin
+  If Copy(S,1,3)='MAX' then begin
+    CyclesMaxRadioButton.Checked:=True;
+    CyclesMaxLimitCheckBox.Visible:=True;
+    T:=Trim(Copy(S,4,MaxInt));
+    if (T<>'') and (Copy(T,1,5)='LIMIT') then T:=Trim(Copy(T,6,MaxInt));
+    if T<>'' then begin
+      CyclesMaxLimitCheckBox.Checked:=True;
+      CyclesComboBox.Text:=T;
+    end else begin
+      CyclesMaxLimitCheckBox.Checked:=False;
+    end;
+  end;
+  If (S<>'AUTO') and (Copy(S,1,3)<>'MAX') then begin
+    CyclesMaxLimitCheckBox.Visible:=False;
     CyclesValueRadioButton.Checked:=True;
     CyclesComboBox.Text:=Game.Cycles;
   end;
@@ -179,7 +194,8 @@ end;
 
 procedure TModernProfileEditorCPUFrame.CPUCyclesChange(Sender: TObject);
 begin
-  CyclesComboBox.Enabled:=CyclesValueRadioButton.Checked;
+  CyclesMaxLimitCheckBox.Visible:=CyclesMaxRadioButton.Checked;
+  CyclesComboBox.Enabled:=CyclesValueRadioButton.Checked or (CyclesMaxLimitCheckBox.Visible and CyclesMaxLimitCheckBox.Checked);
 end;
 
 procedure TModernProfileEditorCPUFrame.CyclesUpComboBoxChange(Sender: TObject);
@@ -205,9 +221,11 @@ begin
   Game.Core:=CPUCoreRadioGroup.Items[CPUCoreRadioGroup.ItemIndex];
 
   If CyclesAutoRadioButton.Checked then Game.Cycles:='auto';
-  If CyclesMaxRadioButton.Checked then Game.Cycles:='max';
+  If CyclesMaxRadioButton.Checked then begin
+    Game.Cycles:='max';
+    if CyclesMaxLimitCheckBox.Checked then Game.Cycles:=Game.Cycles+' limit '+CyclesComboBox.Text;
+  end;
   If CyclesValueRadioButton.Checked then Game.Cycles:=CyclesComboBox.Text;
-
   Game.CyclesUp:=Min(30000,Max(1,CyclesUpEdit.Value));
   Game.CyclesDown:=Min(30000,Max(1,CyclesDownEdit.Value));
 

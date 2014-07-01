@@ -2,11 +2,11 @@ object ModernProfileEditorScummVMFrame: TModernProfileEditorScummVMFrame
   Left = 0
   Top = 0
   Width = 602
-  Height = 482
+  Height = 512
   TabOrder = 0
   DesignSize = (
     602
-    482)
+    512)
   object LanguageLabel: TLabel
     Left = 24
     Top = 13
@@ -29,15 +29,15 @@ object ModernProfileEditorScummVMFrame: TModernProfileEditorScummVMFrame
     Caption = 'TalkSpeedLabel'
   end
   object CustomSetsLabel: TLabel
-    Left = 22
-    Top = 386
+    Left = 24
+    Top = 410
     Width = 82
     Height = 13
     Caption = 'CustomSetsLabel'
   end
   object ExtraDirButton: TSpeedButton
-    Left = 557
-    Top = 305
+    Left = 559
+    Top = 329
     Width = 23
     Height = 22
     Anchors = [akTop, akRight]
@@ -65,7 +65,7 @@ object ModernProfileEditorScummVMFrame: TModernProfileEditorScummVMFrame
     Width = 105
     Height = 21
     Style = csDropDownList
-    ItemHeight = 13
+    ItemHeight = 0
     TabOrder = 0
     OnChange = LanguageComboBoxChange
   end
@@ -99,13 +99,13 @@ object ModernProfileEditorScummVMFrame: TModernProfileEditorScummVMFrame
     Value = 60
   end
   object SavePathGroupBox: TGroupBox
-    Left = 22
-    Top = 192
+    Left = 24
+    Top = 216
     Width = 561
     Height = 81
     Anchors = [akLeft, akTop, akRight]
     Caption = 'Folder for saved games'
-    TabOrder = 6
+    TabOrder = 7
     DesignSize = (
       561
       81)
@@ -174,23 +174,23 @@ object ModernProfileEditorScummVMFrame: TModernProfileEditorScummVMFrame
   end
   object CustomSetsMemo: TRichEdit
     Left = 24
-    Top = 400
+    Top = 424
     Width = 558
-    Height = 45
+    Height = 51
     Anchors = [akLeft, akTop, akRight, akBottom]
     PlainText = True
     ScrollBars = ssBoth
-    TabOrder = 10
+    TabOrder = 11
     WordWrap = False
   end
   object CustomSetsClearButton: TBitBtn
     Left = 26
-    Top = 451
+    Top = 481
     Width = 105
     Height = 25
     Anchors = [akLeft, akBottom]
     Caption = 'L'#246'schen'
-    TabOrder = 11
+    TabOrder = 12
     OnClick = ButtonWork
     Glyph.Data = {
       76010000424D7601000000000000760000002800000020000000100000000100
@@ -210,12 +210,12 @@ object ModernProfileEditorScummVMFrame: TModernProfileEditorScummVMFrame
   object CustomSetsLoadButton: TBitBtn
     Tag = 1
     Left = 137
-    Top = 451
+    Top = 481
     Width = 105
     Height = 25
     Anchors = [akLeft, akBottom]
     Caption = 'Laden...'
-    TabOrder = 12
+    TabOrder = 13
     OnClick = ButtonWork
     Glyph.Data = {
       76010000424D7601000000000000760000002800000020000000100000000100
@@ -235,12 +235,12 @@ object ModernProfileEditorScummVMFrame: TModernProfileEditorScummVMFrame
   object CustomSetsSaveButton: TBitBtn
     Tag = 2
     Left = 248
-    Top = 451
+    Top = 481
     Width = 105
     Height = 25
     Anchors = [akLeft, akBottom]
     Caption = 'Speichern...'
-    TabOrder = 13
+    TabOrder = 14
     OnClick = ButtonWork
     Glyph.Data = {
       76010000424D7601000000000000760000002800000020000000100000000100
@@ -258,21 +258,21 @@ object ModernProfileEditorScummVMFrame: TModernProfileEditorScummVMFrame
     NumGlyphs = 2
   end
   object ExtraDirCheckBox: TCheckBox
-    Left = 22
-    Top = 288
+    Left = 24
+    Top = 312
     Width = 561
     Height = 17
     Anchors = [akLeft, akTop, akRight]
     Caption = 'Use extra directory'
-    TabOrder = 7
+    TabOrder = 8
   end
   object ExtraDirEdit: TEdit
-    Left = 22
-    Top = 306
+    Left = 24
+    Top = 330
     Width = 529
     Height = 21
     Anchors = [akLeft, akTop, akRight]
-    TabOrder = 8
+    TabOrder = 9
     OnChange = ExtraDirEditChange
   end
   object CustomLanguageEdit: TEdit
@@ -284,15 +284,24 @@ object ModernProfileEditorScummVMFrame: TModernProfileEditorScummVMFrame
     Visible = False
   end
   object CommandLineEdit: TLabeledEdit
-    Left = 22
-    Top = 352
+    Left = 24
+    Top = 376
     Width = 527
     Height = 21
     Anchors = [akLeft, akTop, akRight]
     EditLabel.Width = 84
     EditLabel.Height = 13
     EditLabel.Caption = 'CommandLineEdit'
-    TabOrder = 9
+    TabOrder = 10
+  end
+  object RunAsAdminCheckBox: TCheckBox
+    Left = 24
+    Top = 182
+    Width = 559
+    Height = 17
+    Anchors = [akLeft, akTop, akRight]
+    Caption = 'RunAsAdminCheckBox'
+    TabOrder = 6
   end
   object OpenDialog: TOpenDialog
     Left = 355

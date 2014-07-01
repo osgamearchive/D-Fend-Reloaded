@@ -1,14 +1,11 @@
-unit DataReaderUnit;
+unit DataReaderMobyUnit;
 interface
 
-uses Classes, DataReaderConfigUnit;
+uses Classes, DataReaderConfigUnit, DataReaderBaseUnit;
 
-Type TDataReader=class
+Type TMobyDataReader=class(TDataReader)
   private
     FConfig : TDataReaderConfig;
-    FGameNames, FGameURLs : TStringList;
-    FLastListRequest : String;
-    FLastUpdateCheckOK : Boolean;
     Function DownloadConfigFile(const DestFile : String) : Boolean;
     Function ReadListGlobalPart(const Lines : String; const NextElement : THTMLStructureElement) : Boolean;
     Procedure ReadListPerGamePart(const Lines : String; const NextElement : THTMLStructureElement; var GameName, GameURL : String);
@@ -21,15 +18,13 @@ Type TDataReader=class
   public
     Constructor Create;
     Destructor Destroy; override;
-    Function LoadConfig(const AConfigFile : String; const UpdateCheck : Boolean) : Boolean;
-    Procedure OpenListPage(const ASearchString : String);
-    Function ReadList(const ASearchString : String) : Boolean;
-    Function GetGameData(const Nr : Integer; var Genre, Developer, Publisher, Year, Notes, ImagePageURL : String) : Boolean;
-    Function GetGameCover(const CoverPageURL : String; var ImageURL : String; const MaxImages : Integer) : Boolean;
+    Function LoadConfig(const AConfigFile : String; const UpdateCheck : Boolean) : Boolean; override;
+    Function ReadList(const ASearchString : String) : Boolean; override;
+    Function GetListURL(const all : Boolean) : String; override;
+    Function GetGameData(const Nr : Integer; var Genre, Developer, Publisher, Year, Notes, ImagePageURL : String) : Boolean; override;
+    Function GetGameCover(const CoverPageURL : String; var ImageURL : String; const MaxImages : Integer) : Boolean; override;
     property Config : TDataReaderConfig read FConfig;
-    property GameNames : TStringList read FGameNames;
-    property LastUpdateCheckOK : Boolean read FLastUpdateCheckOK;
-end; 
+end;
 
 Type TDataReaderThread=class(TThread)
   protected
@@ -90,29 +85,23 @@ end;
 implementation
 
 uses Windows, SysUtils, Forms, ShellAPI, ActiveX, CommonTools,
-     DataReaderToolsUnit, PrgConsts, PrgSetupUnit;
+     DataReaderToolsUnit, PrgConsts, PrgSetupUnit, InternetDataWaitFormUnit;
 
-{ TDataReader }
+{ TMobyDataReader }
 
-constructor TDataReader.Create;
+constructor TMobyDataReader.Create;
 begin
   inherited Create;
   FConfig:=nil;
-  FGameNames:=TStringList.Create;
-  FGameURLs:=TStringList.Create;
-  FLastListRequest:='';
-  FLastUpdateCheckOK:=True;
 end;
 
-destructor TDataReader.Destroy;
+destructor TMobyDataReader.Destroy;
 begin
   If Assigned(FConfig) then FConfig.Free;
-  FGameNames.Free;
-  FGameURLs.Free;
   inherited Destroy;
 end;
 
-function TDataReader.LoadConfig(const AConfigFile : String; const UpdateCheck : Boolean): Boolean;
+function TMobyDataReader.LoadConfig(const AConfigFile : String; const UpdateCheck : Boolean): Boolean;
 Var TempConfig : TDataReaderConfig;
     I : Integer;
 begin
@@ -152,21 +141,18 @@ begin
       end;
     end;
   end;
+
+  FBrowserURLDOS:=FConfig.GamesListURL;
+  FBrowserURLAll:=FConfig.GamesListAllPlatformsURL;
+  FDataDomain:=DomainOnly(FConfig.GameRecordBaseURL);
 end;
 
-function TDataReader.DownloadConfigFile(const DestFile: String): Boolean;
+function TMobyDataReader.DownloadConfigFile(const DestFile: String): Boolean;
 begin
   result:=DownloadFileToDisk(DataReaderUpdateURL,DestFile);
 end;
 
-Procedure TDataReader.OpenListPage(const ASearchString : String);
-Var URL : String;
-begin
-  If PrgSetup.DataReaderAllPlatforms then URL:=FConfig.GamesListURL else URL:=FConfig.GamesListAllPlatformsURL;
-  ShellExecute(Application.Handle,'open',PChar(Format(URL,[EncodeName(ASearchString)])),nil,nil,SW_SHOW);
-end;
-
-function TDataReader.ReadList(const ASearchString: String): Boolean;
+function TMobyDataReader.ReadList(const ASearchString: String): Boolean;
 Var Lines,URL,S : String;
     I,Count : Integer;
 begin
@@ -175,7 +161,7 @@ begin
   FLastListRequest:='';
   result:=False;
   If not Assigned(FConfig) then exit;
-  If PrgSetup.DataReaderAllPlatforms then URL:=FConfig.GamesListAllPlatformsURL else URL:=FConfig.GamesListURL;
+  URL:=GetListURL(PrgSetup.DataReaderAllPlatforms);
 
   result:=False;
   URL:=Format(URL,[EncodeName(ASearchString)]);
@@ -194,7 +180,12 @@ begin
   if result then FLastListRequest:=Format(URL,[EncodeName(ASearchString)]);
 end;
 
-function TDataReader.ReadListGlobalPart(const Lines: String; const NextElement: THTMLStructureElement): Boolean;
+Function TMobyDataReader.GetListURL(const all : Boolean) : String;
+begin
+  If all then result:=FConfig.GamesListAllPlatformsURL else result:=FConfig.GamesListURL;
+end;
+
+function TMobyDataReader.ReadListGlobalPart(const Lines: String; const NextElement: THTMLStructureElement): Boolean;
 Var St : TStringList;
     I : Integer;
     S,T : String;
@@ -237,7 +228,7 @@ begin
   end;
 end;
 
-Procedure TDataReader.ReadListPerGamePart(const Lines : String; const NextElement : THTMLStructureElement; var GameName, GameURL : String);
+Procedure TMobyDataReader.ReadListPerGamePart(const Lines : String; const NextElement : THTMLStructureElement; var GameName, GameURL : String);
 Var St,St2 : TStringList;
     I : Integer;
     S : String;
@@ -285,7 +276,7 @@ begin
   end;
 end;
 
-function TDataReader.GetGameData(const Nr: Integer; var Genre, Developer, Publisher, Year, Notes, ImagePageURL: String): Boolean;
+function TMobyDataReader.GetGameData(const Nr: Integer; var Genre, Developer, Publisher, Year, Notes, ImagePageURL: String): Boolean;
 Var S,T,Lines : String;
 begin
   result:=False;
@@ -315,7 +306,7 @@ begin
   end;
 end;
 
-procedure TDataReader.GetGameDataFromLines(const Lines: String; const NextElement: THTMLStructureElement; var Genre, Developer, Publisher, Year, Notes, ImagePageURL: String);
+procedure TMobyDataReader.GetGameDataFromLines(const Lines: String; const NextElement: THTMLStructureElement; var Genre, Developer, Publisher, Year, Notes, ImagePageURL: String);
 Var St,St2 : TStringList;
     S,T : String;
     I,J : Integer;
@@ -436,7 +427,7 @@ begin
   end;
 end;
 
-Function TDataReader.GetImageURLAndNextURLsFromURL(const CoverPageURL : String; var ImageURLs : TStringList; const PossibleNextURLs : TStringList) : Boolean;
+Function TMobyDataReader.GetImageURLAndNextURLsFromURL(const CoverPageURL : String; var ImageURLs : TStringList; const PossibleNextURLs : TStringList) : Boolean;
 Var Lines,S,T,LinesUpper,preURL : String;
     I,J,CharsBefore : Integer;
     St : TStringList;
@@ -492,7 +483,7 @@ begin
   end;
 end;
 
-Procedure TDataReader.GetGameCoverFromSinglePages(const InitialURL : String; const ImageURLs : TStringList; const MaxImages : Integer);
+Procedure TMobyDataReader.GetGameCoverFromSinglePages(const InitialURL : String; const ImageURLs : TStringList; const MaxImages : Integer);
 Var S : String;
     WaitingURLs, ScannedURLsUpper, PossibleNextURLs, St, NewImageURLs : TStringList;
     I,J : Integer;
@@ -530,6 +521,8 @@ begin
               S:=ExtUpperCase(PossibleNextURLs[I]);
               If ScannedURLsUpper.IndexOf(S)<0 then WaitingURLs.Add(PossibleNextURLs[I]);
             end;
+          end else begin
+            WaitingURLs.Delete(0);
           end;
         finally
           NewImageURLs.Free;
@@ -550,17 +543,17 @@ end;
 Type TDownloadDataThread=class(TThread)
   private
     FImageBaseURL : String;
-    FDataReader : TDataReader;
+    FDataReader : TMobyDataReader;
     FURList, FImageURLs : TStringList;
   protected
     Procedure Execute; override;
   public
-    Constructor Create(const AImageBaseURL : String; const ADataReader : TDataReader; const AURLList : TStringList);
+    Constructor Create(const AImageBaseURL : String; const ADataReader : TMobyDataReader; const AURLList : TStringList);
     Destructor Destroy; override;
     property ImageURLs : TStringList read FImageURLs;
 end;
 
-constructor TDownloadDataThread.Create(const AImageBaseURL : String; const ADataReader : TDataReader; const AURLList: TStringList);
+constructor TDownloadDataThread.Create(const AImageBaseURL : String; const ADataReader : TMobyDataReader; const AURLList: TStringList);
 begin
   inherited Create(true);
   FImageBaseURL:=AImageBaseURL;
@@ -601,7 +594,7 @@ begin
 end;
 
 
-Procedure TDataReader.ProcessLinks(const BaseURL : String; const Links : TStringList; const ImageBaseURL : String; const ImageURLs: TStringList; const MaxImages: Integer);
+Procedure TMobyDataReader.ProcessLinks(const BaseURL : String; const Links : TStringList; const ImageBaseURL : String; const ImageURLs: TStringList; const MaxImages: Integer);
 const ThreadCount=8;
 Var I,J,K : Integer;
     ImagePages : TStringList;
@@ -652,7 +645,7 @@ begin
   end;
 end;
 
-procedure TDataReader.GetGameCoverFromMediaList(const ListPageURL: String; const ImageURLs: TStringList; const MaxImages: Integer);
+procedure TMobyDataReader.GetGameCoverFromMediaList(const ListPageURL: String; const ImageURLs: TStringList; const MaxImages: Integer);
 Var Lines,ScreensahotsURL : String;
     I : Integer;
     Tags,href : TStringList;
@@ -694,7 +687,7 @@ begin
   end;
 end;
 
-function TDataReader.GetGameCover(const CoverPageURL : String; var ImageURL: String; const MaxImages : Integer): Boolean;
+function TMobyDataReader.GetGameCover(const CoverPageURL : String; var ImageURL: String; const MaxImages : Integer): Boolean;
 Var URL,S : String;
     ImageURLs : TStringList;
     I : Integer;
@@ -732,7 +725,7 @@ begin
   end;
 end;
 
-function TDataReader.GetGameCoverFromLines(const Lines: String; const NextElement: THTMLStructureElement; var JSMode : Boolean) : TStringList;
+function TMobyDataReader.GetGameCoverFromLines(const Lines: String; const NextElement: THTMLStructureElement; var JSMode : Boolean) : TStringList;
 Var St,St2 : TStringList;
     I : Integer;
     S : String;

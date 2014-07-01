@@ -87,7 +87,7 @@ object ModernProfileEditorCPUFrame: TModernProfileEditorCPUFrame
       Width = 113
       Height = 17
       Caption = 'Value'
-      TabOrder = 2
+      TabOrder = 3
       OnClick = CPUCyclesChange
     end
     object CyclesComboBox: TComboBox
@@ -95,8 +95,17 @@ object ModernProfileEditorCPUFrame: TModernProfileEditorCPUFrame
       Top = 76
       Width = 104
       Height = 21
-      ItemHeight = 0
-      TabOrder = 3
+      ItemHeight = 13
+      TabOrder = 4
+    end
+    object CyclesMaxLimitCheckBox: TCheckBox
+      Left = 112
+      Top = 57
+      Width = 97
+      Height = 17
+      Caption = 'Limit value'
+      TabOrder = 2
+      OnClick = CPUCyclesChange
     end
   end
   object CyclesUpEdit: TSpinEdit
@@ -125,7 +134,7 @@ object ModernProfileEditorCPUFrame: TModernProfileEditorCPUFrame
     Width = 145
     Height = 21
     Style = csDropDownList
-    ItemHeight = 0
+    ItemHeight = 13
     TabOrder = 1
   end
   object CyclesUpComboBox: TComboBox
@@ -134,7 +143,7 @@ object ModernProfileEditorCPUFrame: TModernProfileEditorCPUFrame
     Width = 145
     Height = 21
     Style = csDropDownList
-    ItemHeight = 0
+    ItemHeight = 13
     TabOrder = 4
     OnChange = CyclesUpComboBoxChange
   end
@@ -144,7 +153,7 @@ object ModernProfileEditorCPUFrame: TModernProfileEditorCPUFrame
     Width = 145
     Height = 21
     Style = csDropDownList
-    ItemHeight = 0
+    ItemHeight = 13
     TabOrder = 6
     OnChange = CyclesDownComboBoxChange
   end

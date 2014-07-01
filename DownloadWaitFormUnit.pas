@@ -236,6 +236,7 @@ begin
     HTTP.OnRedirect:=RedirectEvent;
     HTTP.HandleRedirects:=True;
     HTTP.ConnectTimeout:=10*1000;
+    HTTP.ReadTimeout:=10*1000;
 
     If FSize<1024*1024 then begin
       {Small file - download to memory stream}

@@ -3,10 +3,10 @@ object DataReaderForm: TDataReaderForm
   Top = 0
   BorderIcons = [biSystemMenu, biMaximize]
   Caption = 'DataReaderForm'
-  ClientHeight = 462
+  ClientHeight = 494
   ClientWidth = 592
   Color = clBtnFace
-  Constraints.MinHeight = 500
+  Constraints.MinHeight = 532
   Constraints.MinWidth = 600
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -22,35 +22,43 @@ object DataReaderForm: TDataReaderForm
   OnShow = FormShow
   DesignSize = (
     592
-    462)
+    494)
   PixelsPerInch = 96
   TextHeight = 13
   object SearchResultsLabel: TLabel
-    Left = 16
-    Top = 69
+    Left = 8
+    Top = 128
     Width = 68
     Height = 13
     Caption = 'Search results'
   end
+  object SourceLabel: TLabel
+    Left = 8
+    Top = 6
+    Width = 58
+    Height = 13
+    Caption = 'Data source'
+    FocusControl = SourceComboBox
+  end
   object GameNameEdit: TLabeledEdit
-    Left = 16
-    Top = 24
+    Left = 8
+    Top = 72
     Width = 473
     Height = 21
     Anchors = [akLeft, akTop, akRight]
     EditLabel.Width = 72
     EditLabel.Height = 13
     EditLabel.Caption = 'GameNameEdit'
-    TabOrder = 0
+    TabOrder = 1
   end
   object SearchButton: TBitBtn
     Left = 495
-    Top = 22
+    Top = 70
     Width = 89
     Height = 25
     Anchors = [akTop, akRight]
     Caption = 'Search'
-    TabOrder = 1
+    TabOrder = 2
     OnClick = SearchButtonClick
     Glyph.Data = {
       76010000424D7601000000000000760000002800000020000000100000000100
@@ -69,25 +77,25 @@ object DataReaderForm: TDataReaderForm
   end
   object ListBox: TListBox
     Left = 8
-    Top = 89
+    Top = 147
     Width = 201
-    Height = 336
+    Height = 310
     Anchors = [akLeft, akTop, akBottom]
     ItemHeight = 13
-    TabOrder = 2
+    TabOrder = 3
     OnClick = ListBoxClick
   end
   object GameDataBox: TGroupBox
     Left = 232
-    Top = 88
+    Top = 128
     Width = 352
-    Height = 337
+    Height = 329
     Anchors = [akLeft, akTop, akRight, akBottom]
     Caption = 'GameDataBox'
-    TabOrder = 3
+    TabOrder = 4
     DesignSize = (
       352
-      337)
+      329)
     object GenreLabel: TLabel
       Left = 32
       Top = 90
@@ -213,14 +221,14 @@ object DataReaderForm: TDataReaderForm
   end
   object InsertButton: TBitBtn
     Left = 16
-    Top = 431
+    Top = 463
     Width = 97
     Height = 25
     Anchors = [akLeft, akBottom]
     Caption = 'Insert data'
     Enabled = False
     ModalResult = 1
-    TabOrder = 4
+    TabOrder = 5
     OnClick = InsertButtonClick
     Glyph.Data = {
       DE010000424DDE01000000000000760000002800000024000000120000000100
@@ -243,23 +251,39 @@ object DataReaderForm: TDataReaderForm
   end
   object CancelButton: TBitBtn
     Left = 128
-    Top = 431
+    Top = 463
     Width = 97
     Height = 25
     Anchors = [akLeft, akBottom]
-    TabOrder = 5
+    TabOrder = 6
     Kind = bkCancel
   end
   object SearchTypeCheckBox: TCheckBox
-    Left = 16
-    Top = 46
+    Left = 8
+    Top = 94
     Width = 473
     Height = 17
     Anchors = [akLeft, akTop, akRight]
     Caption = 'Search for DOS games only'
     Checked = True
     State = cbChecked
-    TabOrder = 6
+    TabOrder = 7
     OnClick = SearchTypeCheckBoxClick
+  end
+  object SourceComboBox: TComboBox
+    Left = 8
+    Top = 23
+    Width = 473
+    Height = 21
+    Style = csDropDownList
+    Anchors = [akLeft, akTop, akRight]
+    ItemHeight = 13
+    ItemIndex = 0
+    TabOrder = 0
+    Text = 'The Games DB (thegamesdb.net)'
+    OnChange = SourceComboBoxChange
+    Items.Strings = (
+      'The Games DB (thegamesdb.net)'
+      'Moby Games (www.mobygames.com)')
   end
 end
