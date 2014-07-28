@@ -58,6 +58,8 @@ type
     IconsSizeLabel: TLabel;
     IconSetsSizeLabel: TLabel;
     LanguageFilesSizeLabel: TLabel;
+    ListViewPopupMenu: TPopupMenu;
+    ListViewPopupMenuDelete: TMenuItem;
     procedure ButtonWork(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -78,6 +80,7 @@ type
     procedure ListViewChanging(Sender: TObject; Item: TListItem;
       Change: TItemChange; var AllowChange: Boolean);
     procedure GamesListViewColumnClick(Sender: TObject; Column: TListColumn);
+    procedure ListViewPopupMenuDeleteClick(Sender: TObject);
   private
     { Private-Deklarationen }
     PackageDB : TPackageDB;
@@ -160,6 +163,8 @@ begin
   ExePackagesButton.Caption:=LanguageSetup.PackageManagerInstallPackage;
   ExePackagesDelButton.Caption:=LanguageSetup.PackageManagerDeletePackage;
 
+  ListViewPopupMenuDelete.Caption:=LanguageSetup.Del;
+
   UserIconLoader.DialogImage(DI_Import,GamesButton);
   UserIconLoader.DialogImage(DI_Import,AutoSetupButton);
   UserIconLoader.DialogImage(DI_Import,LanguageButton);
@@ -235,24 +240,24 @@ begin
   {Games list}
   LoadListView(GamesListView,PackageDB,GamesFilter,AutoSetupChecksumScanner,False,GameDB,AutoSetupDB,HideIfAlreadyInstalled);
   GamesFilterButton.Enabled:=(GamesListView.Items.Count>0);
-  SortListView(GamesListView,abs(SortCol[0])-1,SortCol[0]<0);
+  SortListView(GamesListView,abs(SortCol[0])-1,SortCol[0]<0,Abs(SortCol[0])=4);
 
   {Auto setup templates list}
   LoadListView(AutoSetupListView,PackageDB,AutoSetupFilter,AutoSetupChecksumScanner,True,GameDB,AutoSetupDB,HideIfAlreadyInstalled);
   AutoSetupFilterButton.Enabled:=(AutoSetupListView.Items.Count>0);
-  SortListView(AutoSetupListView,abs(SortCol[1])-1,SortCol[1]<0);
+  SortListView(AutoSetupListView,abs(SortCol[1])-1,SortCol[1]<0,Abs(SortCol[0])=3);
 
   {Icon list}
   LoadIconsListView(IconsListView,PackageDB,IconChecksumScanner,HideIfAlreadyInstalled);
-  SortListView(IconsListView,abs(SortCol[2])-1,SortCol[2]<0);
+  SortListView(IconsListView,abs(SortCol[2])-1,SortCol[2]<0,Abs(SortCol[0])=2);
 
   {Icon sets}
   LoadIconSetsListView(IconSetsListView,PackageDB,HideIfAlreadyInstalled);
-  SortListView(IconSetsListView,abs(SortCol[3])-1,SortCol[3]<0);
+  SortListView(IconSetsListView,abs(SortCol[3])-1,SortCol[3]<0,Abs(SortCol[0])=2);
 
   {Language files list}
   LoadLanguagesListView(LanguagesListView,PackageDB,HideIfAlreadyInstalled,LanguageChecksumScanner1,LanguageChecksumScanner2);
-  SortListView(LanguagesListView,abs(SortCol[4])-1,SortCol[4]<0);
+  SortListView(LanguagesListView,abs(SortCol[4])-1,SortCol[4]<0,false);
 
   {Multiple games pacakges list}
   ExePackagesListBox.Items.Clear;
@@ -283,6 +288,52 @@ begin
   InfoTip:='';
   If (Item=nil) or (Item.Data=nil) then exit;
   InfoTip:=GetPackageManagerToolTip(TDownloadData(Item.Data));
+end;
+
+procedure TPackageManagerForm.ListViewPopupMenuDeleteClick(Sender: TObject);
+Function DeleteRecord(Data : Pointer) : Boolean;
+begin
+  result:=False;
+  Case PageControl.ActivePageIndex of
+    0 : result:=PackageDB.FindAndRemoveGame(TDownloadZipData(Data),self);
+    1 : result:=PackageDB.FindAndRemoveAutoSetup(TDownloadAutoSetupData(Data),self);
+    2 : result:=PackageDB.FindAndRemoveIcon(TDownloadIconData(Data),self);
+    3 : result:=PackageDB.FindAndRemoveIconSet(TDownloadIconSetData(Data),self);
+    4 : result:=PackageDB.FindAndRemoveLanguage(TDownloadLanguageData(Data),self);
+  End;
+end;
+Var ListView : TListView;
+    I : Integer;
+    Checked, NeedRebuild : Boolean;
+begin
+  ListView:=nil;
+  Case PageControl.ActivePageIndex of
+    0 : ListView:=GamesListView;
+    1 : ListView:=AutoSetupListView;
+    2 : ListView:=IconsListView;
+    3 : ListView:=IconSetsListView;
+    4 : ListView:=LanguagesListView;
+  end;
+  if ListView=nil then exit;
+  Checked:=False;
+  For I:=0 to ListView.Items.Count-1 do if ListView.Items[I].Checked then begin Checked:=True; break; end;
+  if not Checked and (ListView.ItemIndex=-1) then exit;
+
+  ListView.Visible:=False;
+  try
+    If Checked then begin
+      NeedRebuild:=False;
+      For I:=0 to ListView.Items.Count-1 do if ListView.Items[I].Checked then begin
+        if DeleteRecord(ListView.Items[I].Data) then NeedRebuild:=True;
+      end;
+      if not NeedRebuild then exit;
+    end else begin
+      if not DeleteRecord(ListView.Items[ListView.ItemIndex].Data) then exit;
+    end;
+    LoadLists;
+  finally
+    ListView.Visible:=True;
+  end;
 end;
 
 Procedure TPackageManagerForm.PackageDBDownload(Sender : TObject; const Progress, Size : Int64; const Status : TDownloadStatus; var ContinueDownload : Boolean);
@@ -508,21 +559,21 @@ begin
 end;
 
 procedure TPackageManagerForm.GamesListViewColumnClick(Sender: TObject; Column: TListColumn);
-Var I,ColNr : Integer;
+Var I,J,ColNr : Integer;
 begin
-  I:=-1;
-  if Sender=GamesListView then I:=0;
-  if Sender=AutoSetupListView then I:=1;
-  if Sender=IconsListView then I:=2;
-  if Sender=IconSetsListView then I:=3;
-  if Sender=LanguagesListView then I:=4;
+  I:=-1; J:=-1;
+  if Sender=GamesListView then begin I:=0; J:=3; end;
+  if Sender=AutoSetupListView then begin I:=1; J:=2; end;
+  if Sender=IconsListView then begin  I:=2; J:=1; end;
+  if Sender=IconSetsListView then begin  I:=3; J:=1; end;
+  if Sender=LanguagesListView then begin  I:=4; J:=1; end;
   if I<0 then exit;
 
   ColNr:=Column.Index+1;
 
   if Abs(SortCol[I])=ColNr then SortCol[I]:=-SortCol[I] else SortCol[I]:=ColNr;
 
-  SortListView(TListView(Sender),abs(SortCol[I])-1,SortCol[I]<0);
+  SortListView(TListView(Sender),abs(SortCol[I])-1,SortCol[I]<0,Abs(SortCol[I])=J+1);
 end;
 
 procedure TPackageManagerForm.AutoSetupButtonClick(Sender: TObject);

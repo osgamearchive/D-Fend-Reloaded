@@ -4382,7 +4382,6 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
     TabOrder = 0
     OnChange = TreeViewChange
     OnDragDrop = MainDragDrop
-    ExplicitHeight = 832
   end
   object CoolBar: TCoolBar
     Left = 0
@@ -4523,7 +4522,6 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 2
-    ExplicitHeight = 832
     object Splitter1: TSplitter
       Left = 0
       Top = 649
@@ -4558,7 +4556,6 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
       OnDragDrop = MainDragDrop
       OnInfoTip = ListViewInfoTip
       OnSelectItem = ListViewSelectItem
-      ExplicitHeight = 629
     end
     object CapturePageControl: TPageControl
       Left = 0
@@ -4793,7 +4790,6 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
     TabOrder = 3
     Visible = False
     OnDblClick = ZipInfoPanelDblClick
-    ExplicitTop = 856
     DesignSize = (
       774
       40)
@@ -4821,7 +4817,6 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
     TabOrder = 4
     Visible = False
     OnDblClick = ZipInfoPanelDblClick
-    ExplicitTop = 896
     DesignSize = (
       774
       82)
@@ -4870,7 +4865,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
     Left = 304
     Top = 32
     Bitmap = {
-      494C01012E003400240110001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01012E003400340110001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000040000000C0000000010020000000000000C0
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -9797,7 +9792,7 @@ object DFendReloadedMainForm: TDFendReloadedMainForm
     Left = 216
     Top = 296
     Bitmap = {
-      494C010104000C00240110001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010104000C00340110001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000002000000001002000000000000020
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

@@ -16,6 +16,7 @@ Type TPackageList=class;
   public
     Constructor Create(const APackageList : TPackageList);
     Function LoadFromXMLNode(const N : IXMLNode) : Boolean; virtual;
+    Procedure SaveToXMLNode(const N : IXMLNode); virtual;
     property Name : String read FName;
     property URL : String read FURL;
     property Size : Int64 read FSize;
@@ -35,6 +36,7 @@ end;
   public
     Constructor Create(const APackageList : TPackageList);
     Function LoadFromXMLNode(const N : IXMLNode) : Boolean; override;
+    Procedure SaveToXMLNode(const N : IXMLNode); override;
     property MaxVersion : String read FMaxVersion;
     property Genre : String read FGenre;
     property Developer : String read FDeveloper;
@@ -52,6 +54,7 @@ end;
   public
     Constructor Create(const APackageList : TPackageList);
     Function LoadFromXMLNode(const N : IXMLNode) : Boolean; override;
+    Procedure SaveToXMLNode(const N : IXMLNode); override;
     property License : String read FLicense;
     property MetaLink : Boolean read FMetaLink;
     property AutoSetupForZipURL : String read FAutoSetupForZipURL;
@@ -65,6 +68,7 @@ end;
   public
     Constructor Create(const APackageList : TPackageList);
     Function LoadFromXMLNode(const N : IXMLNode) : Boolean; override;
+    Procedure SaveToXMLNode(const N : IXMLNode); override;
     property Author : String read FAuthor;
     property MinVersion : String read FMinVersion;
     property MaxVersion : String read FMaxVersion;
@@ -77,6 +81,7 @@ end;
   public
     Constructor Create(const APackageList : TPackageList);
     Function LoadFromXMLNode(const N : IXMLNode) : Boolean; override;
+    Procedure SaveToXMLNode(const N : IXMLNode); override;
     property Description : String read FDescription;
 end;
 
@@ -86,6 +91,7 @@ end;
   public
     Constructor Create(const APackageList : TPackageList);
     Function LoadFromXMLNode(const N : IXMLNode) : Boolean; override;
+    Procedure SaveToXMLNode(const N : IXMLNode); override;
     property MinVersion : String read FMinVersion;
     property MaxVersion : String read FMaxVersion;
     property Author : String read FAuthor;
@@ -102,6 +108,7 @@ end;
     FGame, FAutoSetup, FLanguage, FExePackage, FIcon, FIconSet : TList;
     FProviderName, FProviderText, FProviderURL, FReferer : String;
     FProviderActions : TProviderActions;
+    HasProviderInfo : Boolean;
     function GetCount(const Index: Integer): Integer;
     Function AddGame(const N : IXMLNode) : Boolean;
     Function AddAutoSetup(const N : IXMLNode) : Boolean;
@@ -121,6 +128,12 @@ end;
     Destructor Destroy; override;
     Procedure Clear;
     Function LoadFromFile(const AFileName : String; const AOrigFileName : String ='') : Boolean;
+    Function SaveToFile(const ParentForm : TForm) : Boolean;
+    Function FindAndRemoveGame(const AGame : TDownloadZipData; const ParentForm : TForm) : Boolean;
+    Function FindAndRemoveAutoSetup(const AAutoSetup : TDownloadAutoSetupData; const ParentForm : TForm) : Boolean;
+    Function FindAndRemoveIcon(const AIcon : TDownloadIconData; const ParentForm : TForm) : Boolean;
+    Function FindAndRemoveIconSet(const AIconSet : TDownloadIconSetData; const ParentForm : TForm) : Boolean;
+    Function FindAndRemoveLanguage(const ALanguage : TDownloadLanguageData; const ParentForm : TForm) : Boolean;
     property FileName : String read FFileName;
     property URL : String read FURL;
     property Name : String read FName;
@@ -194,6 +207,11 @@ Type TPackageDB=class
     Procedure Clear;
     Function LoadDB(const Update, UpdateAll, UpdateErrorQuite : Boolean) : Boolean;
     Procedure UpdateRemoteFiles(const UpdateErrorQuite : Boolean);
+    Function FindAndRemoveGame(const AGame : TDownloadZipData; const ParentForm : TForm) : Boolean;
+    Function FindAndRemoveAutoSetup(const AAutoSetup : TDownloadAutoSetupData; const ParentForm : TForm) : Boolean;
+    Function FindAndRemoveIcon(const AIcon : TDownloadIconData; const ParentForm : TForm) : Boolean;
+    Function FindAndRemoveIconSet(const AIconSet : TDownloadIconSetData; const ParentForm : TForm) : Boolean;
+    Function FindAndRemoveLanguage(const ALanguage : TDownloadLanguageData; const ParentForm : TForm) : Boolean;
     property Count : Integer read GetCount;
     property List[I : Integer] : TPackageList read GetPackageList; default;
     property DBDir : String read FDBDir;
@@ -239,6 +257,14 @@ begin
   result:=True;
 end;
 
+Procedure TDownloadData.SaveToXMLNode(const N : IXMLNode);
+begin
+  N.Attributes['Name']:=EncodeHTMLSymbols(FName);
+  N.Attributes[FChecksumXMLName]:=FPackageChecksum;
+  N.Attributes['Size']:=IntToStr(FSize);
+  N.NodeValue:=FURL;
+end;
+
 { TDownloadIconData }
 
 constructor TDownloadIconData.Create(const APackageList : TPackageList);
@@ -275,6 +301,18 @@ begin
   result:=True;
 end;
 
+Procedure TDownloadAutoSetupData.SaveToXMLNode(const N : IXMLNode);
+begin
+  inherited SaveToXMLNode(N);
+  N.Attributes['Genre']:=EncodeHTMLSymbols(FGenre);
+  N.Attributes['Developer']:=EncodeHTMLSymbols(FDeveloper);
+  N.Attributes['Publisher']:=EncodeHTMLSymbols(FPublisher);
+  N.Attributes['Year']:=EncodeHTMLSymbols(FYear);
+  N.Attributes['Language']:=EncodeHTMLSymbols(FLanguage);
+  If FGameExeChecksum<>'' then N.Attributes['GameExeChecksum']:=FGameExeChecksum;
+  if FMaxVersion<>'' then N.Attributes['MaxVersion']:=FMaxVersion;
+end;
+
 { TDownloadZipData }
 
 constructor TDownloadZipData.Create(const APackageList : TPackageList);
@@ -306,6 +344,18 @@ begin
   result:=True;
 end;
 
+Procedure TDownloadZipData.SaveToXMLNode(const N : IXMLNode);
+begin
+  inherited SaveToXMLNode(N);
+
+  N.Attributes['License']:=EncodeHTMLSymbols(FLicense);
+  if FMetaLink then N.Attributes['MetaLink']:='Yes';
+  If FAutoSetupForZipURL<>'' then begin
+    N.Attributes['AutoSetupURL']:=FAutoSetupForZipURL;
+    If FAutoSetupForZipURLMaxVersion<>'' then N.Attributes['AutoSetupURLMaxVersion']:=FAutoSetupForZipURLMaxVersion;
+  end;
+end;
+
 { TDownloadLanguage }
 
 constructor TDownloadLanguageData.Create(const APackageList : TPackageList);
@@ -326,6 +376,15 @@ begin
   result:=True;
 end;
 
+Procedure TDownloadLanguageData.SaveToXMLNode(const N : IXMLNode);
+begin
+  inherited SaveToXMLNode(N);
+  If FDescription<>'' then N.Attributes['Description']:=FDescription;
+  N.Attributes['MinVersion']:=FMinVersion;
+  N.Attributes['MaxVersion']:=FMaxVersion;
+  N.Attributes['Author']:=EncodeHTMLSymbols(FAuthor);
+end;
+
 { TDownloadExeData }
 
 constructor TDownloadExeData.Create(const APackageList : TPackageList);
@@ -341,6 +400,12 @@ begin
   if not CheckAttributes(N,['Description']) then exit;
   FDescription:=DecodeHTMLSymbols(N.Attributes['Description']);
   result:=True;
+end;
+
+Procedure TDownloadExeData.SaveToXMLNode(const N : IXMLNode);
+begin
+  inherited SaveToXMLNode(N);
+  N.Attributes['Description']:=EncodeHTMLSymbols(FDescription);
 end;
 
 { TDownloadIconSetData }
@@ -361,6 +426,14 @@ begin
   FMaxVersion:=N.Attributes['MaxVersion'];
   FAuthor:=DecodeHTMLSymbols(N.Attributes['Author']);
   result:=True;
+end;
+
+Procedure TDownloadIconSetData.SaveToXMLNode(const N : IXMLNode);
+begin
+  inherited SaveToXMLNode(N);
+  N.Attributes['MinVersion']:=FMinVersion;
+  N.Attributes['MaxVersion']:=FMaxVersion;
+  N.Attributes['Author']:=EncodeHTMLSymbols(FAuthor);
 end;
 
 { TPackageList }
@@ -415,6 +488,7 @@ begin
   FProviderText:='';
   FProviderURL:='';
   FProviderActions:=[];
+  HasProviderInfo:=False;
 end;
 
 function TPackageList.GetCount(const Index: Integer): Integer;
@@ -510,6 +584,7 @@ end;
 
 Procedure TPackageList.SetProviderInfo(const N : IXMLNode);
 begin
+  HasProviderInfo:=True;
   If (N.HasAttribute('WriteToProfile')) and (Trim(ExtUpperCase(N.Attributes['WriteToProfile']))='YES') then FProviderActions:=FProviderActions+[paWriteInfoToProfile];
   If (N.HasAttribute('Dialog')) and (Trim(ExtUpperCase(N.Attributes['Dialog']))='YES') then FProviderActions:=FProviderActions+[paInfoDialog];
   If (N.HasAttribute('OpenURL')) and (Trim(ExtUpperCase(N.Attributes['OpenURL']))='YES') then FProviderActions:=FProviderActions+[paOpenURL];
@@ -551,6 +626,128 @@ begin
   end;
 
   result:=True;
+end;
+
+Function TPackageList.SaveToFile(const ParentForm : TForm) : Boolean;
+Var Doc : TXMLDocument;
+    I : Integer;
+    Node : IXMLNode;
+begin
+  result:=False;
+  If FFileName='' then exit;
+
+   Doc:=TXMLDocument.Create(ParentForm);
+  try
+    try
+      Doc.DOMVendor:=MSXML_DOM;
+      Doc.Active:=True;
+    except
+      on E : Exception do begin MessageDlg(E.Message,mtError,[mbOK],0); exit; end;
+    end;
+
+    Doc.DocumentElement:=Doc.CreateNode('DFRPackagesFile');
+    Doc.DocumentElement.Attributes['Name']:=FName;
+    Doc.DocumentElement.Attributes['LastUpdateDate']:=EncodeUpdateDate(FUpdateDate);
+
+    For I:=0 to FExePackage.Count-1 do TDownloadExeData(FExePackage[I]).SaveToXMLNode(Doc.DocumentElement.AddChild('ExePackage'));
+    For I:=0 to FGame.Count-1 do TDownloadZipData(FGame[I]).SaveToXMLNode(Doc.DocumentElement.AddChild('Game'));
+    For I:=0 to FAutoSetup.Count-1 do TDownloadAutoSetupData(FAutoSetup[I]).SaveToXMLNode(Doc.DocumentElement.AddChild('AutoSetup'));
+    For I:=0 to FIcon.Count-1 do TDownloadIconData(FIcon[I]).SaveToXMLNode(Doc.DocumentElement.AddChild('Icon'));
+    For I:=0 to FIconSet.Count-1 do TDownloadIconSetData(FIconSet[I]).SaveToXMLNode(Doc.DocumentElement.AddChild('IconSet'));
+    For I:=0 to FLanguage.Count-1 do TDownloadLanguageData(FLanguage[I]).SaveToXMLNode(Doc.DocumentElement.AddChild('Language'));
+
+    if HasProviderInfo then begin
+      Node:=Doc.DocumentElement.AddChild('Provider');
+      If paWriteInfoToProfile in FProviderActions then Node.Attributes['WriteToProfile']:='Yes';
+      If paInfoDialog in FProviderActions then Node.Attributes['Dialog']:='Yes';
+      If paOpenURL in FProviderActions then Node.Attributes['OpenURL']:='Yes';
+      If FProviderName<>'' then Node.Attributes['Name']:=EncodeHTMLSymbols(FProviderName);
+      If FProviderText<>'' then Node.Attributes['Text']:=EncodeHTMLSymbols(FProviderText);
+      If FProviderURL<>'' then Node.Attributes['URL']:=FProviderURL;
+      If FReferer<>'' then Node.Attributes['Referer']:=FReferer;
+    end;
+
+    SaveXMLDoc(Doc,['<!DOCTYPE DFRPackagesFile SYSTEM "'+DFRHomepage+'Packages/DFRPackagesFile.dtd">'],FFileName,False);
+  finally
+    Doc.Free;
+  end;
+  result:=True;
+end;
+
+Function TPackageList.FindAndRemoveGame(const AGame : TDownloadZipData; const ParentForm : TForm) : Boolean;
+Var I, Index : Integer;
+begin
+  Result:=False;
+  Index:=-1;
+  For I:=0 to FGame.Count-1 do if AGame=FGame[I] then begin Index:=I; break; end;
+  if Index<0 then exit;
+
+  TDownloadZipData(FGame[Index]).Free;
+  FGame.Delete(Index);
+
+  result:=True;
+  SaveToFile(ParentForm);
+end;
+
+Function TPackageList.FindAndRemoveAutoSetup(const AAutoSetup : TDownloadAutoSetupData; const ParentForm : TForm) : Boolean;
+Var I, Index : Integer;
+begin
+  Result:=False;
+  Index:=-1;
+  For I:=0 to FAutoSetup.Count-1 do if AAutoSetup=FAutoSetup[I] then begin Index:=I; break; end;
+  if Index<0 then exit;
+
+  TDownloadAutoSetupData(FAutoSetup[Index]).Free;
+  FAutoSetup.Delete(Index);
+  
+  result:=True;
+  SaveToFile(ParentForm);
+end;
+
+Function TPackageList.FindAndRemoveIcon(const AIcon : TDownloadIconData; const ParentForm : TForm) : Boolean;
+Var I, Index : Integer;
+begin
+  Result:=False;
+  Index:=-1;
+  For I:=0 to FIcon.Count-1 do if AIcon=FIcon[I] then begin Index:=I; break; end;
+  if Index<0 then exit;
+
+  TDownloadIconData(FIcon[Index]).Free;
+  FIcon.Delete(Index);
+  
+  result:=True;
+  SaveToFile(ParentForm);
+end;
+
+
+Function TPackageList.FindAndRemoveIconSet(const AIconSet : TDownloadIconSetData; const ParentForm : TForm) : Boolean;
+Var I, Index : Integer;
+begin
+  Result:=False;
+  Index:=-1;
+  For I:=0 to FIconSet.Count-1 do if AIconSet=FIconSet[I] then begin Index:=I; break; end;
+  if Index<0 then exit;
+
+  TDownloadIconSetData(FIconSet[Index]).Free;
+  FIconSet.Delete(Index);
+  
+  result:=True;
+  SaveToFile(ParentForm);
+end;
+
+Function TPackageList.FindAndRemoveLanguage(const ALanguage : TDownloadLanguageData; const ParentForm : TForm) : Boolean;
+Var I, Index : Integer;
+begin
+  Result:=False;
+  Index:=-1;
+  For I:=0 to FLanguage.Count-1 do if ALanguage=FLanguage[I] then begin Index:=I; break; end;
+  if Index<0 then exit;
+
+  TDownloadLanguageData(FIconSet[Index]).Free;
+  FLanguage.Delete(Index);
+  
+  result:=True;
+  SaveToFile(ParentForm);
 end;
 
 { TMainPackageFile }
@@ -926,6 +1123,46 @@ begin
   finally
     MainFile.Free;
   end;
+end;
+
+Function TPackageDB.FindAndRemoveGame(const AGame : TDownloadZipData; const ParentForm : TForm) : Boolean;
+Var I : Integer;
+begin
+  result:=True;
+  For I:=0 to FPackageList.Count-1 do If TPackageList(FPackageList[I]).FindAndRemoveGame(AGame,ParentForm) then exit;
+  result:=False;
+end;
+
+Function TPackageDB.FindAndRemoveAutoSetup(const AAutoSetup : TDownloadAutoSetupData; const ParentForm : TForm) : Boolean;
+Var I : Integer;
+begin
+  result:=True;
+  For I:=0 to FPackageList.Count-1 do If TPackageList(FPackageList[I]).FindAndRemoveAutoSetup(AAutoSetup,ParentForm) then exit;
+  result:=False;
+end;
+
+Function TPackageDB.FindAndRemoveIcon(const AIcon : TDownloadIconData; const ParentForm : TForm) : Boolean;
+Var I : Integer;
+begin
+  result:=True;
+  For I:=0 to FPackageList.Count-1 do If TPackageList(FPackageList[I]).FindAndRemoveIcon(AIcon,ParentForm) then exit;
+  result:=False;
+end;
+
+Function TPackageDB.FindAndRemoveIconSet(const AIconSet : TDownloadIconSetData; const ParentForm : TForm) : Boolean;
+Var I : Integer;
+begin
+  result:=True;
+  For I:=0 to FPackageList.Count-1 do If TPackageList(FPackageList[I]).FindAndRemoveIconSet(AIconSet,ParentForm) then exit;
+  result:=False;
+end;
+
+Function TPackageDB.FindAndRemoveLanguage(const ALanguage : TDownloadLanguageData; const ParentForm : TForm) : Boolean;
+Var I : Integer;
+begin
+  result:=True;
+  For I:=0 to FPackageList.Count-1 do If TPackageList(FPackageList[I]).FindAndRemoveLanguage(ALanguage,ParentForm) then exit;
+  result:=False;
 end;
 
 end.

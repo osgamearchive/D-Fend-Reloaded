@@ -539,8 +539,8 @@ begin
 
   LogInfo('### Start of FormCreate ###');
 
-  {Caption:=Caption+' THIS IS A TEST VERSION ! (Beta 2 of version 1.4)';}
-  {Caption:=Caption+' (Release candidate 1 of version 1.4)';}
+  {Caption:=Caption+' THIS IS A TEST VERSION ! (Beta 1 of version 1.5)';}
+  {Caption:=Caption+' (Release candidate 1 of version 1.4.1)';}
 
   MI_Count:=ImageList.Count;
   Height:=790;
@@ -1497,16 +1497,24 @@ begin
 
   For I:=2 to ParamCount do S:=S+' '+ParamStr(I);
   T:=ExtUpperCase(S);
+  LogInfo('Trying to find "'+S+'" in game db.');
 
-  For I:=0 to GameDB.Count-1 do If Trim(ExtUpperCase(GameDB[I].Name))=T then begin
+  For I:=0 to GameDB.Count-1 do If Trim(GameDB[I].CacheNameUpper)=T then begin
     CloseOK:=True;
     If ScummVMMode(GameDB[I]) then begin
+      LogInfo('Found ScummVM game "'+S+'" in game db.');
+      LogInfo('Running profile '+GameDB[I].SetupFile);
       RunScummVMGame(GameDB[I]);
       CloseOK:=(ZipManager.Count=0);
     end else begin
       If WindowsExeMode(GameDB[I]) then begin
+        LogInfo('Found Windows game "'+S+'" in game db.');
+        LogInfo('Running profile '+GameDB[I].SetupFile);
         RunWindowsGame(GameDB[I]);
       end else begin
+        LogInfo('Found DOSBox game "'+S+'" in game db.');
+        LogInfo('Running profile '+GameDB[I].SetupFile);
+        if GameDB[I].StartFullscreen then LogInfo('Fullscreen mode: yes') else LogInfo('Fullscreen mode: no');
         RunGame(GameDB[I],DeleteOnExit);
         CloseOK:=(ZipManager.Count=0);
       end;

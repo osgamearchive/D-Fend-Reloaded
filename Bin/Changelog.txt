@@ -1,5 +1,14 @@
 D-Fend Reloaded Changelog
 
+Version 1.4.1 (07/29/2014)
+==========================
+- Updated Italian language file.
+- Improved sorting speed in the package manager.
+- Records can be manually deleted from the package manager via the context
+  menu.
+- [Fix] Sorting the package manager games list by download size did not work.
+
+
 Version 1.4.0 (07/01/2014)
 ==========================
 - When downloading game information now The Games DB (thegamesdb.net) can be

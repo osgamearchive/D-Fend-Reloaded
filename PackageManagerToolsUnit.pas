@@ -33,7 +33,7 @@ Var FilterSelectLicense : TStringList = nil;
 
 procedure OpenFilterPopup(const OpenPos : TPoint; const AutoSetups : Boolean; const PopupMenu : TPopupMenu; const PackageDB : TPackageDB; const OnClick : TNotifyEvent; const HideIfAlreadyInstalled : Boolean; const AutoSetupChecksumScanner : TChecksumScanner; const GameDB : TGameDB);
 
-Procedure SortListView(const AListView : TListView; const ColNr : Integer; const Reverse : Boolean);
+Procedure SortListView(const AListView : TListView; const ColNr : Integer; const Reverse, IsSize : Boolean);
 
 {ExePackages info memo}
 
@@ -47,7 +47,8 @@ uses SysUtils, IniFiles, PackageDBToolsUnit, CommonTools, LanguageSetupUnit,
 Function GetPackageManagerToolTip2(const DownloadAutoSetupData : TDownloadAutoSetupData) : String;
 begin
   {Had to split this otherwise the compiler says "the return value is may not defined"}
-  result:=#13+LanguageSetup.GameGenre+': '+GetCustomGenreName(DownloadAutoSetupData.Genre)
+  result:='';
+  result:=result+#13+LanguageSetup.GameGenre+': '+GetCustomGenreName(DownloadAutoSetupData.Genre)
     +#13+LanguageSetup.GameDeveloper+': '+DownloadAutoSetupData.Developer
     +#13+LanguageSetup.GamePublisher+': '+DownloadAutoSetupData.Publisher
     +#13+LanguageSetup.GameYear+': '+DownloadAutoSetupData.Year
@@ -682,12 +683,13 @@ Type TListRec=record
   Data : Pointer;
 end;
 
-Procedure SortListView(const AListView : TListView; const ColNr : Integer; const Reverse : Boolean);
+Procedure SortListView(const AListView : TListView; const ColNr : Integer; const Reverse, IsSize : Boolean);
 Var St : TStringList;
     Data : Array of TListRec;
     I,J,Nr,NewSelIndex : Integer;
     Item : TListItem;
-    B : Boolean;
+    B,Rebuild : Boolean;
+    S,T : String;
 begin
   {Save list}
   SetLength(Data,AListView.Items.Count);
@@ -704,7 +706,20 @@ begin
   St:=TStringList.Create;
   try
     {Build list to sort}
-    for I:=0 to length(Data)-1 do St.AddObject(Data[I].Cols[ColNr],TObject(I));
+    for I:=0 to length(Data)-1 do begin
+      S:=Data[I].Cols[ColNr];
+      if IsSize then begin
+        T:=Copy(S,length(S)-1,MaxInt);
+        If TryStrToInt(Trim(Copy(S,1,length(S)-2)),J) then begin
+          if T='KB' then J:=J*1024;
+          if T='MB' then J:=J*1024*1024;
+          if T='GB' then J:=J*1024*1024*1024;
+        end;
+        S:=IntToStr(J);
+        while length(S)<10 do S:='0'+S;
+      end;
+      St.AddObject(S,TObject(I));
+    end;
 
     {Sort}
     St.Sort;
@@ -722,17 +737,45 @@ begin
     NewSelIndex:=-1;
     AListView.Items.BeginUpdate;
     try
-      AListView.Items.Clear;
+      AListView.Columns.BeginUpdate;
+      try
+        For I:=0 to AListView.Columns.Count-1 do AListView.Column[I].Width:=1;
+      finally
+        AListView.Columns.EndUpdate;
+      end;
+
+      Rebuild:=AListView.Items.Count=St.Count;
+      if not Rebuild then AListView.Items.Clear;
       for I:=0 to St.Count-1 do begin
         if Reverse then  Nr:=Integer(St.Objects[(St.Count-1)-I]) else Nr:=Integer(St.Objects[I]);
-        Item:=AListView.Items.Add;
-        Item.Checked:=Data[Nr].Checked;
-        Item.Caption:=Data[Nr].Cols[0];
-        for J:=1 to length(Data[Nr].Cols)-1 do Item.SubItems.Add(Data[Nr].Cols[J]);
+        if Rebuild then begin
+          Item:=AListView.Items[I];
+          Item.Checked:=Data[Nr].Checked;
+          Item.Caption:=Data[Nr].Cols[0];
+          for J:=1 to length(Data[Nr].Cols)-1 do Item.SubItems[J-1]:=Data[Nr].Cols[J];
+        end else begin
+          Item:=AListView.Items.Add;
+          Item.Checked:=Data[Nr].Checked;
+          Item.Caption:=Data[Nr].Cols[0];
+          for J:=1 to length(Data[Nr].Cols)-1 do Item.SubItems.Add(Data[Nr].Cols[J]);
+        end;
         if Data[Nr].Selected then NewSelIndex:=I;
       end;
     finally
       AListView.Items.EndUpdate;
+
+      AListView.Columns.BeginUpdate;
+      try
+        For I:=0 to AListView.Columns.Count-1 do If AListView.Items.Count>0 then begin
+          AListView.Column[I].Width:=-2;
+          AListView.Column[I].Width:=-1;
+        end else begin
+          AListView.Column[I].Width:=-2;
+        end;
+      finally
+        AListView.Columns.EndUpdate;
+      end;
+      AListView.Invalidate;
     end;
     if NewSelIndex>=0 then AListView.ItemIndex:=NewSelIndex;
   finally

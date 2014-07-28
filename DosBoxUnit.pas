@@ -40,10 +40,26 @@ var SpeedTestSt : TStringList = nil;
     LastSpeedTestStep : String = '';
     LastSpeedTestStep2 : String = '';
     LastSpeedTestTickCount : Cardinal;
+    SpeedTest : Integer =-1;
+
+Function SpeedTestLogFile : String;
+begin
+  result:=GetSpecialFolder(Application.MainForm.Handle,CSIDL_DESKTOPDIRECTORY)+'D-Fend-Reloaded-DOSBoxStartLog.txt';
+end;
+
+Function IsSpeedTest : Boolean;
+begin
+  if SpeedTest=-1 then begin
+    result:=PrgSetup.DOSBoxStartLogging or FileExists(SpeedTestLogFile);
+    if result then SpeedTest:=1 else SpeedTest:=0;
+  end else begin
+    result:=(SpeedTest=1);
+  end;
+end;
 
 Procedure SpeedTestInfo(const Info : String; const Init : Boolean=False);
 begin
-  if not PrgSetup.DOSBoxStartLogging then exit;
+  if not IsSpeedTest then exit;
 
   If Assigned(SpeedTestSt) then begin
     SpeedTestSt.Add(LastSpeedTestStep+': '+IntToStr(GetTickCount-LastSpeedTestTickCount)+'ms');
@@ -60,13 +76,14 @@ begin
   If not Init then exit;
 
   SpeedTestSt:=TStringList.Create;
+  SpeedTestSt.Add(TimeToStr(Now)+' ### Benchmarking DOSBox start ###'+#13);
   LastSpeedTestStep:=Info;
   LastSpeedTestTickCount:=GetTickCount;
 end;
 
 Procedure SpeedTestInfoOnly(const Info : String);
 begin
-  if not PrgSetup.DOSBoxStartLogging then exit;
+  if not IsSpeedTest then exit;
 
   If Assigned(SpeedTestSt) then begin
     LastSpeedTestStep2:=Info;
@@ -74,13 +91,23 @@ begin
 end;
 
 Procedure SpeedTestDone;
+Var St : TStringList;
 begin
-  if not PrgSetup.DOSBoxStartLogging then exit;
+  if not IsSpeedTest then exit;
 
   If not Assigned(SpeedTestSt) then exit;
   SpeedTestInfo('');
   try
-    SpeedTestSt.SaveToFile(GetSpecialFolder(Application.MainForm.Handle,CSIDL_DESKTOPDIRECTORY)+'DFR-DOSBox-Start-Test.txt');
+    St:=TStringList.Create;
+      If FileExists(SpeedTestLogFile) then begin
+        try
+          St.LoadFromFile(SpeedTestLogFile);
+        finally
+        end;
+      end;
+      St.Add('');
+      St.AddStrings(SpeedTestSt);
+      St.SaveToFile(SpeedTestLogFile);
   finally
     FreeAndNil(SpeedTestSt);
   end;
@@ -1524,7 +1551,7 @@ begin
 end;
 
 Function RunGameInt(const Game : TGame; const RunSetup : Boolean; const DosBoxCommandLine : String; const DeleteOnExit : TStringList; const RunExtraFile : Integer = -1) : THandle;
-Var St : TStringList;
+Var St,St2 : TStringList;
     T : String;
     ZipRecNr : Integer;
     Error : Boolean;
@@ -1535,7 +1562,8 @@ begin
   result:=INVALID_HANDLE_VALUE;
   AlreadyMinimized:=False;
 
-  SpeedTestInfo('File checksum test',True);
+  SpeedTestInfo('Starting profile '+Game.SetupFile,True);
+  SpeedTestInfo('File checksum test');
   If not RunCheck(Game,RunSetup,RunExtraFile) then exit;
 
   SpeedTestInfo('DOSBox installation selection');
@@ -1593,11 +1621,19 @@ begin
 
       result:=RunDosBox(T,Max(0,DOSBoxNr),TempDir+DosBoxConfFileName,Game.StartFullscreen,Game.ShowConsoleWindow,RunAsAdmin,DosBoxCommandLine);
 
+      St2:=TStringList.Create;
+      try
+        St2.LoadFromFile(Game.SetupFile);
+        SpeedTestInfoOnly(#13+#13+'### Content of prof file:'+#13+#13+St2.Text+#13+#13+'### Content of conf file:'+#13+#13+St.Text);
+      finally
+        St2.Free;
+      end;
       SpeedTestDone;
 
       If ZipRecNr>=0 then ZipManager.ActivateRepackCheck(ZipRecNr,result);
       RunPrgManager.AddCommand(Game,result);
       ScreensaverControl.DOSBoxStarted(result,PrgSetup.DOSBoxSettings[Max(0,DOSBoxNr)].DisableScreensaver);
+
     finally
       St.Free;
     end;

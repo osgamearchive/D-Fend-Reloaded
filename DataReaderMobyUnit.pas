@@ -178,6 +178,7 @@ begin
   end;
 
   if result then FLastListRequest:=Format(URL,[EncodeName(ASearchString)]);
+  result:=true; {if no games found but no error occured, report true}
 end;
 
 Function TMobyDataReader.GetListURL(const all : Boolean) : String;
@@ -822,6 +823,7 @@ begin
     end;
   end;
   If FDataReader.LoadConfig(PrgDataDir+SettingsFolder+'\'+DataReaderConfigFile,DoUpdateCheck) then FSuccess:=FDataReader.LastUpdateCheckOK else FSuccess:=False;
+  if not FSuccess then FSuccess:=FDataReader.LoadConfig(PrgDataDir+SettingsFolder+'\'+DataReaderConfigFile,false);  
   If DoUpdateCheck and FSuccess then PrgSetup.LastDataReaderUpdateCheck:=Round(Int(Date));
 end;
 
