@@ -1,8 +1,18 @@
 D-Fend Reloaded Changelog
 
+Version 1.4.2 (09/19/2014)
+==========================
+- Updated Korean language file.
+- Better error handling when internet connection fails while trying to download
+  game information from Mobygames.
+- [Fix] The "File path is relative to the DOSBox directory structure" checkbox
+  below the program file input line in the profile editor was not visible
+  anymore.
+  
+
 Version 1.4.1 (07/29/2014)
 ==========================
-- Updated Italian language file.
+- Updated French, Italian and Russian language files.
 - Improved sorting speed in the package manager.
 - Records can be manually deleted from the package manager via the context
   menu.

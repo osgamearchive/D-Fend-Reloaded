@@ -540,7 +540,7 @@ begin
   LogInfo('### Start of FormCreate ###');
 
   {Caption:=Caption+' THIS IS A TEST VERSION ! (Beta 1 of version 1.5)';}
-  {Caption:=Caption+' (Release candidate 1 of version 1.4.1)';}
+  {Caption:=Caption+' (Release candidate 1 of version 1.4.3)';}
 
   MI_Count:=ImageList.Count;
   Height:=790;

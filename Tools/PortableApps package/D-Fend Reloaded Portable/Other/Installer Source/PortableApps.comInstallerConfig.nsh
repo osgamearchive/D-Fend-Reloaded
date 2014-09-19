@@ -34,7 +34,7 @@
 !define NAME "D-Fend Reloaded Portable"
 !define SHORTNAME "D-FendReloadedPortable"
 !define VERSION "1.4.1.0"
-!define FILENAME "D-Fend-Reloaded-1.4.1-Portable"
+!define FILENAME "D-Fend-Reloaded-1.4.2-Portable"
 !define CHECKRUNNING "DFend.exe"
 !define CLOSENAME "D-Fend Reloaded Portable "
 !define ADDONSDIRECTORYPRESERVE "NONE" ;use "NONE" for no plugins directory or relative to install directory: App\AppName\plugins

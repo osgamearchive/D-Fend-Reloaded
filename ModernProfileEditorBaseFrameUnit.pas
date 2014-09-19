@@ -244,7 +244,6 @@ begin
     If WindowsExeMode(Game) then begin
       { Windows mode }
       WindowsMode:=True;
-
       GameExeEdit.Text:=Game.GameExe;
       GameParameterEdit.Text:=Game.GameParameters;
       SetupExeEdit.Text:=Game.SetupExe;
@@ -252,6 +251,7 @@ begin
       RunAsAdminCheckBox.Checked:=Game.RunAsAdmin;
     end else begin
       { DOSBox mode }
+      GameRelPathCheckBox.Visible:=True;
       S:=Trim(ExtUpperCase(Game.GameExe));
       If Copy(S,1,7)='DOSBOX:' then begin
         GameRelPathCheckBox.Checked:=True;

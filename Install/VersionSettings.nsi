@@ -1,12 +1,12 @@
 !macro VersionData
 !define VER_MAYOR 1
 !define VER_MINOR1 4
-!define VER_MINOR2 1
+!define VER_MINOR2 2
 !macroend
 
 !macro BetaWarning
 
-!define BETA_NUMBER 2
+!define BETA_NUMBER 1
 !define RC_NUMBER 1
 
 ;MessageBox MB_OK "This is beta version ${BETA_NUMBER} of D-Fend Reloaded ${VER_MAYOR}.${VER_MINOR1}.${VER_MINOR2}! The final version of D-Fend Reloaded ${VER_MAYOR}.${VER_MINOR1}.${VER_MINOR2} has not yet been released. This version is for testing only."

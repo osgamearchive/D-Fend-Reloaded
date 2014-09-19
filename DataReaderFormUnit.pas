@@ -233,6 +233,7 @@ begin
 end;
 
 procedure TDataReaderForm.SourceComboBoxChange(Sender: TObject);
+Var B : Boolean;
 begin
   if DataReader<>nil then FreeAndNil(DataReader);
   
@@ -240,7 +241,12 @@ begin
     0 : DataReader:=TTheGamesDBDataReader.Create;
     1 : begin
           DataReader:=TMobyDataReader.Create;
-          ShowDataReaderInternetConfigWaitDialog(Owner,DataReader,False,LanguageSetup.DataReaderDownloadCaption,LanguageSetup.DataReaderDownloadInfo,LanguageSetup.DataReaderDownloadError);
+          B:=ShowDataReaderInternetConfigWaitDialog(Owner,DataReader,False,LanguageSetup.DataReaderDownloadCaption,LanguageSetup.DataReaderDownloadInfo,LanguageSetup.DataReaderDownloadError);
+          if not B then begin
+            SourceComboBox.ItemIndex:=0;
+            SourceComboBoxChange(nil);
+            exit;
+          end;
         end;
   end;
 
