@@ -28,6 +28,8 @@ uses SysUtils, Forms, IdHTTP, Math, CommonTools;
 function DownloadFile(const URL, Referer: String): TMemoryStream;
 Var HTTP: TIdHTTP;
 begin
+  if (LowerCase(Copy(URL,1,7))<>'http://') and (LowerCase(Copy(URL,1,8))<>'https://') and (LowerCase(Copy(URL,1,6))<>'ftp://') then begin result:=nil; exit; end;
+                                                                                                                                                                 
   HTTP:=TIdHTTP.Create(Application.MainForm);
   try
     result:=TMemoryStream.Create;

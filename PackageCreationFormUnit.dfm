@@ -100,7 +100,7 @@ object PackageCreationForm: TPackageCreationForm
     Top = -2
     Width = 707
     Height = 370
-    ActivePage = TabSheet1
+    ActivePage = TabSheet7
     Anchors = [akLeft, akTop, akRight, akBottom]
     Images = ImageList
     TabOrder = 0
@@ -162,10 +162,6 @@ object PackageCreationForm: TPackageCreationForm
     object TabSheet2: TTabSheet
       Caption = 'Auto setup templates'
       ImageIndex = 5
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object AutoSetupPanel: TPanel
         Left = 0
         Top = 305
@@ -222,10 +218,6 @@ object PackageCreationForm: TPackageCreationForm
     object TabSheet3: TTabSheet
       Caption = 'Icons'
       ImageIndex = 6
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object IconsPanel: TPanel
         Left = 0
         Top = 305
@@ -277,10 +269,6 @@ object PackageCreationForm: TPackageCreationForm
     object TabSheet6: TTabSheet
       Caption = 'Icon sets'
       ImageIndex = 7
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object IconSetsPanel: TPanel
         Left = 0
         Top = 305
@@ -323,10 +311,6 @@ object PackageCreationForm: TPackageCreationForm
     object TabSheet4: TTabSheet
       Caption = 'Language files'
       ImageIndex = 8
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object LanguageFilesPanel: TPanel
         Left = 0
         Top = 305
@@ -369,10 +353,6 @@ object PackageCreationForm: TPackageCreationForm
     object TabSheet5: TTabSheet
       Caption = 'Multiple games packages'
       ImageIndex = 9
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object PackagesPanel: TPanel
         Left = 0
         Top = 305
@@ -579,7 +559,7 @@ object PackageCreationForm: TPackageCreationForm
     Left = 456
     Top = 504
     Bitmap = {
-      494C01010B000C00040010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01010B000C00080010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000003000000001002000000000000030
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

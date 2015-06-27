@@ -2,29 +2,29 @@ DOSZIP.TXT--
 Copyright 2014 Hjort Nidudsson.
 
 DOSZIP COMMANDER
-Version 3.21
+Version 3.38
 
-Welcome to Doszip Commander Version 3.21!
+Welcome to Doszip Commander Version 3.38!
 =========================================
 
 
 <> Index
 
     <> Doszip Commander File List
-    <> Memory Requirements
     <> Command Line
     <> Compressed File Support
     <> Viewer Support
     <> Editor Support
     <> Extension and Filename Support
     <> Environment Variables
-    <> Windows 95/98/XP Compatibility
     <> Installing Commander under Windows
     <> Creating a user defined tools menu
     <> The File Search utility
+    <> Compare Directories
     <> Create List File
     <> Operation Filter
     <> Shortcut keys
+    <> Configuration
     <> Additional Resources
     <> Contributors
 
@@ -33,9 +33,8 @@ Welcome to Doszip Commander Version 3.21!
 
     DZBIN???.ZIP: Program files
 
-    DZ.EXE	- DZ Loader (DOS) / DZ Main Shell (Win32)
-    DZ.DOS	- DZ Main Shell (DOS)
-    DOSZIP.TXT  - DZ Help file (this file)
+    DZ.EXE	- DZ Main Shell
+    DZ.TXT	- DZ Help file (this file)
     LICENSE.TXT - GNU General Public License
 
     DZSRC???.ZIP: Source code
@@ -46,31 +45,12 @@ Welcome to Doszip Commander Version 3.21!
     HISTORY.TXT - Changelog file for Doszip
 
     The first time you run DZ.EXE, it creates a default configuration
-    directory (.\doc). Configuration files will be located there.
+    file (dz.ini). On exit a history file (dz.cfg) will be created.
 
     The version of the source code and binary files is the date and
     time in the .ZIP file (1:00 == v1.00)
 
     The date format is (Norwegian) dd.mm.yyyy
-
-
-<> Memory Requirements (DOS)
-
-    Doszip Commander needs at least 200K conventional memory in order
-    to run all its internal viewers.
-
-    The [Panel Filter] of each panel controles the global memory usage
-    in the [Read count] section.
-
-    The Doszip Commander comes with two additional memory configurations
-    that can be selected from the command line. Each memory configuration
-    limits the number of files that can be stored in each Commander File
-    Panel. The command line syntax of these memory configurations are:
-
-      /T	Launch Commander with TINY memory configuration.
-		Number of files per panel is 500.
-      /L	Launch Commander with  LARGE memory configuration.
-		Number of files per panel is 5000.
 
 
 <> Command Line
@@ -79,7 +59,7 @@ Welcome to Doszip Commander Version 3.21!
     ---------	-----------------------------------------------------
     /C<path>	Set Configuration PATH to <path>
     /N<count>	Maximum number of files in each panel
-		Default is 5000 in Win32 and 3000 in DOS.
+		Default is 5000.
 
       DZ <filename> command starts DZ and forces it to show <filename>
     contents if it is an archive or show folder contents if <filename>
@@ -207,53 +187,52 @@ Welcome to Doszip Commander Version 3.21!
     The code have the following syntax:
 
     [<name>]
-    00 = <attrib>[ <string>][ <string2>]...
-    01 = ...
+    0 = <attrib>[ <string>][ <string2>]...
+    1 = ...
 
     Attrib: Color and character, or color (default is space (20h))
-    00=A 07 FA
+    0=A 07 FA
 
     Control: Color
-    00=O 4X
+    0=O 4X
 
     Quote: Color
-    00=Q XB
+    0=Q XB
 
     Digit: Color
-    00=D XB
+    0=D XB
 
     Char: Color and char(s)
-    00=C XF $%()
+    0=C XF $%()
 
     String: Color and string
-    00=S 4X Error
+    0=S 4X Error
 
     Begin: Color and string(s)
-    00=B X6 # include
+    0=B X6 # include
 
     Word: Color and word(s)
-    00=W X4 ax bx cx dx al bl cl dl
-    01=ds es cs ss
+    0=W X4 ax bx cx dx al bl cl dl
+    1=ds es cs ss
 
     Nested: Color, string1 and string2
-    00=N X8 /* */
+    0=N X8 /* */
 
     File type definition
     --------------------
 
-    Code for syntax is located in [.\doc\style] directory, and file types
-    must be defined under the section [Style] in the DZ.INI file:
+    Code for syntax is located in the DZ.INI file, and file types
+    must be defined under the section [Style]
 
     [Style]
-    asm = asm.ini
-    inc = asm.ini
+    asm = style_asm
+    inc = style_asm
 
-    .ASM and .INC files will now use the file .\doc\style\asm.ini
+    .ASM and .INC files will now use the section [style_asm]
 
-    The editor reads the section [.] in the code file which have the
-    following syntax:
+    The editor reads this section which have the following syntax:
 
-    [.]
+    [<section_name>]
     <Id>=<section>
     [<section>]
     <code>
@@ -323,27 +302,24 @@ Welcome to Doszip Commander Version 3.21!
     defined:
 
     [Comspec]
-    00=C:\WINDOWS\SYSTEM32\CMD.EXE
-    01=/C
+    0=C:\WINDOWS\SYSTEM32\CMD.EXE
+    1=/C
 
     This will force Doszip to use CMD.EXE insted of COMMAND.COM
-    To define a single-line program, just exclude the 01= value:
+    To define a single-line program, just exclude the 1= value:
 
     [Comspec]
-    00=D:\CYGWIN\BIN\BASH.EXE
+    0=D:\CYGWIN\BIN\BASH.EXE
 
+    The use of the .INI setting is controlled by the [x] Use NT Prompt
+    in the System Options dialog. If set this will be used to execute
+    commands except from the following:
 
-<> Windows 95/98/XP Compatibility
+      - execution of .BAT files
+      - commands including '<' or '>'
+      - some special 16-bit executables
 
-    Doszip uses the 'Windows95 LONG FILENAME' functions if available.
-
-    Doszip uses the 'WINOLDAP' functions if available. This enables
-    clipboard functions to Copy and Paste text from Windows.
-
-    NTCMDPROMPT
-    -----------
-    To use the NT command prompt (Cmd.exe) as discribed in the CONFIG.NT
-    file, the [Comspec] value should be set in the DZ.INI file.
+    In that case the %COMSPEC% variable will be used.
 
 
 <> Installing Commander under Windows
@@ -367,9 +343,9 @@ Welcome to Doszip Commander Version 3.21!
 
     To define a Menu item use the following format:
 
-    XX = <> ; Insert a line
-    XX = Menu_Item_Name, Command_to_be_invoked_when_selected
-    XX = Menu_Item_Name, [Menu_to_be_invoked_when_selected]
+    X = <> ; Insert a line
+    X = Menu_Item_Name, Command_to_be_invoked_when_selected
+    X = Menu_Item_Name, [Menu_to_be_invoked_when_selected]
 
     Macros that can be used in 'Command' expand as follows:
 
@@ -385,18 +361,18 @@ Welcome to Doszip Commander Version 3.21!
     For example a simple Tools Menu may look like:
 
     [Tools]
-    00 = &Add tool,%EDIT% %DZ%\DZ.INI
-    01 = <>
-    02 = &Doszip directory,[Doszip]
+    0 = &Add tool,%EDIT% %DZ%\DZ.INI
+    1 = <>
+    2 = &Doszip directory,[Doszip]
 
     [Doszip]
-    00 = Doszip &Command Line, %DOSZIP%\DZ.EXE -?
-    01 = View &DZ.INI, %VIEW% %DZ%\DZ.INI
-    02 = View &DOSZIP.TXT, %VIEW% %DZ%\DOSZIP.TXT
-    03 = Search &Source Directory, %FIND% %DOSZIP%\src\*.*
-    04 = Search &Include Directory, %FIND% %DOSZIP%\inc\*.*
-    05 = <>
-    06 = &Previous Menu..,[Tools]
+    0 = Doszip &Command Line, %DOSZIP%\DZ.EXE -?
+    1 = View &DZ.INI, %VIEW% %DZ%\DZ.INI
+    2 = View &DOSZIP.TXT, %VIEW% %DZ%\DOSZIP.TXT
+    3 = Search &Source Directory, %FIND% %DOSZIP%\src\*.*
+    4 = Search &Include Directory, %FIND% %DOSZIP%\inc\*.*
+    5 = <>
+    6 = &Previous Menu..,[Tools]
 
 
 <> The File Search utility
@@ -416,9 +392,31 @@ Welcome to Doszip Commander Version 3.21!
     F5	 - Launch the Operation Filter dialog.
     F6	 - Toggle ascii/hex search string.
     F7	 - Start a new search.
-    F8	 - Delete  Delete file from list.
+    F8	 - Delete file from list.
     F9	 - Load predefined file mask from .INI file.
     F10  - Toggle output format
+    Esc  - Exit program.
+
+
+<> Compare Directories
+
+    The Compare Directories utility use the short key Shift-F5
+
+    It compares Modification Time, Size, and File Name. The result
+    is a list from the Target directory found in Source. The default
+    Target is Panel-A and the default Source directory is Panel-B.
+
+    Multiple directories may be used as Target: ["C:\my dir" E: F:\doc]
+
+    Shortkeys
+    ---------
+    F2	 - Save result to list file.
+    F3	 - View current file - same as Enter.
+    F4	 - Edit current file - exit and execute external editor.
+    F5	 - Launch the Operation Filter dialog.
+    F7	 - Start a new search.
+    F8	 - Delete file from list.
+    F9	 - Load predefined file mask from .INI file.
     Esc  - Exit program.
 
 
@@ -527,7 +525,7 @@ Welcome to Doszip Commander Version 3.21!
     Ctrl-9		Past Panel-B directory to command line
     Ctrl-A		File Attributes
     Ctrl-B		User Screen
-    Ctrl-C		Compare Directories
+    Ctrl-C		Compare Panels
     Ctrl-D		Sort current panel by Date
     Ctrl-E		Sort current panel by Type
     Ctrl-F		Confirmation
@@ -555,6 +553,8 @@ Welcome to Doszip Commander Version 3.21!
     Shift-F2		Copy file (- to a new name in current directory)
     Shift-F3		View file --> DZ.INI
     Shift-F4		Edit file --> DZ.INI
+    Shift-F5		Compare Directories
+    Shift-F6		Edit Environment
     Shift-F7		Create .ZIP archive
     Shift-F9		Save configuration
     Shift-F10		Activate the last menu you used with the last
@@ -574,6 +574,90 @@ Welcome to Doszip Commander Version 3.21!
     Ctrl-Ins		Copy (use Cut+Paste in the command line)
     Ctrl-Left		Goto previous word
     Ctrl-Right		Goto next word
+
+
+<> Configuration
+
+   <> System Options
+
+      System
+
+	  [ ] Use Beep
+	      - on edit text and IO-error
+	  [x] Use Mouse
+	  [x] Use Long File Names
+	  [x] Use System Clipboard
+	  [x] Use NT Prompt
+	      - uses [Comspec] if set
+	      - runs assosiated programs on Enter if set
+	  [x] Use SSE Functions
+	  [x] Use Ascii Symbols
+	      - system font or TTF
+
+      Startup
+
+	  [x] Restore Screen Mode
+	      - restore screen size (80x25 / full screen)
+
+      Exit
+
+	  [ ] Auto Delete History
+	      - delete configuration file(s) on exit
+
+      Keyboard
+
+	  [x] Esc for user screen
+
+   <> Screen Options
+
+      Desktop
+
+	  [x] Menu Bar	   long version
+	      [ ] Date	   [ ] YYYY.MM.DD
+	      [x] Time	   [ ] HH:MM:SS
+	      - this control update sec/minute
+	  [x] Command Line
+	  [x] Key Bar
+
+
+   <> Panel Options
+
+       [x] Insert moves down
+       [ ] Select Directories
+       [ ] Sort Directories
+       [ ] Clear read only from CD
+       [ ] Visual update on copy
+
+
+   <> Editor Options
+
+       [x] Use menus
+       [x] Optimal fill
+       [x] Overwrite block
+       [x] Autoindent mode
+       [x] Syntax highlighting
+       [x] Use tab character
+       [x] Create backup files
+       [x] New line: 0D 0A or 0A
+
+
+   <> Confirmations
+
+       [x] Copy
+       [x] Move
+       [x] Delete
+       [x] Delete Directory
+       [x] Delete System
+       [x] Delete Hidden
+       [x] Exit Program
+
+   <> Compression
+
+   [x] Auto save setup
+
+       Auto save the configuration on exit.
+       Default is set.
+
 
 <> Additional Resources
 

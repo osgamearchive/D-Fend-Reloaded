@@ -1,5 +1,12 @@
 D-Fend Reloaded Changelog
 
+Version 1.4.3 (06/27/2015)
+==========================
+- Updated Turkish language file.
+- Updated DOSZip from 3.21 to 3.38.
+- [Fix] The mobygames data read failed to download images specified as relative URLs.
+
+
 Version 1.4.2 (09/19/2014)
 ==========================
 - Updated Korean language file.

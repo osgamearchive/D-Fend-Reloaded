@@ -689,7 +689,7 @@ begin
 end;
 
 function TMobyDataReader.GetGameCover(const CoverPageURL : String; var ImageURL: String; const MaxImages : Integer): Boolean;
-Var URL,S : String;
+Var URL,S,T : String;
     ImageURLs : TStringList;
     I : Integer;
 begin
@@ -715,6 +715,18 @@ begin
 
       {Get complete media list}
       GetGameCoverFromMediaList(URL,ImageURLs,MaxImages);
+    end;
+
+    {Fix URLs with missing absolute part}
+    for I:=0 to ImageURLs.Count-1 do begin
+      S:=ImageURLs[I];
+      if LowerCase(Copy(S,1,4))<>'http' then begin
+        if Copy(S,1,1)='/' then S:=Copy(S,2,MaxInt);
+        T:=FConfig.CoverRecordBaseURL;
+        if T[length(T)]<>'/' then T:=T+'/';        
+        S:=T+S;
+        ImageURLs[I]:=S;
+      end;
     end;
 
     {Combine image URLs}
