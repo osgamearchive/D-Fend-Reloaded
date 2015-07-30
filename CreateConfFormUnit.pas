@@ -264,7 +264,7 @@ begin
         St:=BuildScummVMIniFile(G);
       end else begin
         S:=Dir+ChangeFileExt(ExtractFileName(G.SetupFile),'.conf');
-        St:=BuildConfFile(G,False,False,-1,nil);
+        St:=BuildConfFile(G,False,False,-1,nil,false);
         If St=nil then continue;
       end;
       try

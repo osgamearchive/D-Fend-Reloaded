@@ -834,7 +834,7 @@ begin
   If (not WindowsMode) and (not ScummVM) and (not EditingTemplate) then begin
     St:=TStringList.Create;
     try
-      BuildAutoexec(Game,False,St,True,-1,False,False,false);
+      BuildAutoexec(Game,False,St,True,-1,False,False);
     finally
       St.Free;
     end;

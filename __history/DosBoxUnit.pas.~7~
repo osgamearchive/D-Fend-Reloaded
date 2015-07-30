@@ -775,7 +775,7 @@ Procedure BuildFloppyBoot(const Autoexec : TStringList; Images : String; const F
 Var Imgs : TStringList;
     I : Integer;
     TempDrive : Char;
-    Path,S,T : String;
+    Path,S : String;
 begin
   Imgs:=TStringList.Create;
   try
@@ -793,9 +793,7 @@ begin
       S:='"'+TempDrive+':\'+ExtractFileName(ShortName(Imgs[0]))+'"';
       For I:=1 to Imgs.Count-1 do S:=S+' "'+TempDrive+':\'+ExtractFileName(ShortName(Imgs[I]))+'"';
 
-      T:=UnmapDrive(Path,ptMount);
-      if BuildForArchivePackage then T:=MakeRelPath(T,PrgDataDir);
-      Autoexec.Add('mount '+TempDrive+' "'+T+'"');
+      Autoexec.Add('mount '+TempDrive+' "'+UnmapDrive(Path,ptMount)+'"'); //...
       Autoexec.Add('boot '+S);
     end else begin
 
@@ -1040,7 +1038,7 @@ begin
     If (S='2') or (S='3') then begin
       If S='2' then St.Add('boot -l C') else St.Add('boot -l D');
     end else begin
-      BuildFloppyBoot(St,S,FreeDriveLetters,BuildForArchivePackage);
+      BuildFloppyBoot(St,S,FreeDriveLetters);
     end;
     SpeedTestInfoOnly('Command: '+St[St.Count-1]);
   end else begin
@@ -1183,14 +1181,14 @@ begin
       T:=UnmapDrive(S,ptDOSBox);
       if BuildForArchivePackage then begin
         T:=MakeRelPath(T,PrgDataDir);
-        if BuildForArchivePackage and (Copy(T,2,1)=':') then T:=ExtractFileName(T); {Completly remove path if its not possible to make the path realtive.}
+         //...
       end;
       result.Add('language='+T);
     end else begin
       T:=UnmapDrive(S,ptDOSBox);
       if BuildForArchivePackage then begin
         T:=MakeRelPath(T,PrgDataDir);
-        if BuildForArchivePackage and (Copy(T,2,1)=':') then T:=ExtractFileName(T); {Completly remove path if its not possible to make the path realtive.}
+        //...
       end;  
       If FileExists(S) then result.Add('language='+T);
     end;
@@ -1390,9 +1388,7 @@ begin
     result.Add('');
     result.Add('[printer]');
     result.Add('printer='+BoolToStr(Game.EnablePrinterEmulation));
-    T:=UnmapDrive(MakeAbsPath(Game.CaptureFolder,PrgSetup.BaseDir),ptScreenshot);
-    if BuildForArchivePackage then T:=MakeRelPath(T,PrgDataDir);
-    result.Add('docpath='+T);
+    result.Add('docpath='+UnmapDrive(MakeAbsPath(Game.CaptureFolder,PrgSetup.BaseDir),ptScreenshot));
     result.Add('dpi='+IntToStr(Game.PrinterResolution));
     result.Add('width='+IntToStr(Game.PaperWidth));
     result.Add('height='+IntToStr(Game.PaperHeight));

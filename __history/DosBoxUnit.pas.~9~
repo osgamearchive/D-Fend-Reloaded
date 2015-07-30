@@ -795,7 +795,7 @@ begin
 
       T:=UnmapDrive(Path,ptMount);
       if BuildForArchivePackage then T:=MakeRelPath(T,PrgDataDir);
-      Autoexec.Add('mount '+TempDrive+' "'+T+'"');
+      Autoexec.Add('mount '+TempDrive+' "'+T+'"'); //...
       Autoexec.Add('boot '+S);
     end else begin
 
@@ -1183,14 +1183,14 @@ begin
       T:=UnmapDrive(S,ptDOSBox);
       if BuildForArchivePackage then begin
         T:=MakeRelPath(T,PrgDataDir);
-        if BuildForArchivePackage and (Copy(T,2,1)=':') then T:=ExtractFileName(T); {Completly remove path if its not possible to make the path realtive.}
+        if BuildForArchivePackage and (Copy(T,2,1)=':') then T:=ExtractFileName(T);
       end;
       result.Add('language='+T);
     end else begin
       T:=UnmapDrive(S,ptDOSBox);
       if BuildForArchivePackage then begin
         T:=MakeRelPath(T,PrgDataDir);
-        if BuildForArchivePackage and (Copy(T,2,1)=':') then T:=ExtractFileName(T); {Completly remove path if its not possible to make the path realtive.}
+        if BuildForArchivePackage and (Copy(T,2,1)=':') then T:=ExtractFileName(T);
       end;  
       If FileExists(S) then result.Add('language='+T);
     end;
@@ -1390,9 +1390,7 @@ begin
     result.Add('');
     result.Add('[printer]');
     result.Add('printer='+BoolToStr(Game.EnablePrinterEmulation));
-    T:=UnmapDrive(MakeAbsPath(Game.CaptureFolder,PrgSetup.BaseDir),ptScreenshot);
-    if BuildForArchivePackage then T:=MakeRelPath(T,PrgDataDir);
-    result.Add('docpath='+T);
+    result.Add('docpath='+UnmapDrive(MakeAbsPath(Game.CaptureFolder,PrgSetup.BaseDir),ptScreenshot));
     result.Add('dpi='+IntToStr(Game.PrinterResolution));
     result.Add('width='+IntToStr(Game.PaperWidth));
     result.Add('height='+IntToStr(Game.PaperHeight));

@@ -1,5 +1,11 @@
 D-Fend Reloaded Changelog
 
+
+Version 1.4.4 (07/30/2015)
+==========================
+- All path names in conf files stored in archive files are made relaltive.
+
+
 Version 1.4.3 (06/27/2015)
 ==========================
 - Updated Turkish language file.

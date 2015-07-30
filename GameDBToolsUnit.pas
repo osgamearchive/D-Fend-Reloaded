@@ -2827,7 +2827,7 @@ begin
       If not DOSBoxMode(GameDB[I]) then continue;
       S:=GameDB[I].SetupFile; T:=ChangeFileExt(S,'.conf');
       If NeedUpdate(S,T) then begin
-        St2:=BuildConfFile(GameDB[I],False,False,-1,nil);
+        St2:=BuildConfFile(GameDB[I],False,False,-1,nil,false);
         try St2.SaveToFile(T); finally St2.Free; end;
       end;
       J:=St.IndexOf(ExtUpperCase(ExtractFileName(T))); If J>=0 then St.Delete(J);
@@ -3611,7 +3611,7 @@ begin
   end else begin
     S:=TempDir+ChangeFileExt(ExtractFileName(Game.SetupFile),'.conf');
     T:='DOSBox';
-    St:=BuildConfFile(Game,False,False,-1,nil);
+    St:=BuildConfFile(Game,False,False,-1,nil,false);
     If St=nil then exit;
   end;
     try

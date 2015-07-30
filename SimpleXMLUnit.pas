@@ -170,7 +170,7 @@ begin
     St.Add('    </Information>');
     St.Add('    <Settings>');
     St.Add('      <Full-Configuration>');
-    St2:=BuildConfFile(G,False,False,-1,nil); if St2=nil then exit;
+    St2:=BuildConfFile(G,False,False,-1,nil,false); if St2=nil then exit;
     try If St2.Count>0 then begin St2[0]:='      <![CDATA['+St2[0]; St2.Add(']]>'); end; St.AddStrings(St2); finally St2.Free; end;
     St.Add('      </Full-Configuration>');
     St.Add('      <Manual-Configuration>');
@@ -266,11 +266,11 @@ begin
     end;
     St.Add('  </meta-info>');
     St.Add('  <full-configuration>');
-    St2:=BuildConfFile(G,False,False,-1,nil); if St2=nil then exit;
+    St2:=BuildConfFile(G,False,False,-1,nil,false); if St2=nil then exit;
     try If St2.Count>0 then begin St2[0]:='    <![CDATA['+St2[0]; St2.Add(']]>'); end; St.AddStrings(St2); finally St2.Free; end;
     St.Add('  </full-configuration>');
     St.Add('  <incremental-configuration>');
-    St2:=BuildConfFile(G,False,False,-1,nil); if St2=nil then exit;
+    St2:=BuildConfFile(G,False,False,-1,nil,false); if St2=nil then exit;
     try If St2.Count>0 then begin St2[0]:='    <![CDATA['+St2[0]; St2.Add(']]>'); end; St.AddStrings(St2); finally St2.Free; end;
     St.Add('  </incremental-configuration>');
     St.Add('  <dosbox>');

@@ -1275,7 +1275,7 @@ Var St : TStringList;
 begin
   If not DOSBoxMode(self) then exit;
 
-  St:=BuildConfFile(self,False,False,-1,nil);
+  St:=BuildConfFile(self,False,False,-1,nil,false);
   try
     St.SaveToFile(ChangeFileExt(SetupFile,'.conf'));
   finally

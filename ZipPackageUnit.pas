@@ -191,7 +191,7 @@ begin
     {conf or ini file}
     S:=Dir+ChangeFileExt(ExtractFileName(Game.SetupFile),'.conf');
     If DOSBoxMode(Game) then begin
-      St:=BuildConfFile(Game,False,False,-1,nil);
+      St:=BuildConfFile(Game,False,False,-1,nil,true);
       If St<>nil then begin
         try
           try St.SaveToFile(S); except MessageDlg(Format(LanguageSetup.MessageCouldNotSaveFile,[S]),mtError,[mbOK],0); exit; end;
